@@ -7,22 +7,22 @@
     <div class="leftCol">
         <h2 class="container_page_title">Manager configuration</h2>
         <ul id="managerConfiguration">
-            <li><a ng-class="{ active: isSet(1) }" href ng-click="setTab(1)" ng-if="managerConfiguration.global.jsonout_output 
+            <li><a ng-class="{ active: isSetTab(1) }" href ng-click="setTab(1)" ng-if="managerConfiguration.global.jsonout_output 
             || managerConfiguration.global.logall || managerConfiguration.global.white_list || managerConfiguration.global.stats 
             || managerConfiguration.global.host_infomation || managerConfiguration.alerts.log_alert_level">Global</a></li>
-            <li><a ng-class="{ active: isSet(2) }" href ng-click="setTab(2)" ng-if="managerConfiguration.global.email_notification 
+            <li><a ng-class="{ active: isSetTab(2) }" href ng-click="setTab(2)" ng-if="managerConfiguration.global.email_notification 
             || managerConfiguration.global.email_alert_level || managerConfiguration.global.email_to || managerConfiguration.global.email_from
             || managerConfiguration.global.smtp_server || managerConfiguration.global.email_maxperhour || managerConfiguration.global.email_idsname
             || managerConfiguration.email_alerts">Mail</a></li>
-            <li><a ng-class="{ active: isSet(3) }" href ng-click="setTab(3)" ng-if="managerConfiguration['active-response']">Active response</a></li>
-            <li><a ng-class="{ active: isSet(4) }" href ng-click="setTab(4)" ng-if="managerConfiguration.command">Commands</a></li>
-            <li><a ng-class="{ active: isSet(5) }" href ng-click="setTab(5)" ng-if="managerConfiguration.rules">Rules</a></li>
-            <li><a ng-class="{ active: isSet(6) }" href ng-click="setTab(6)" ng-if="managerConfiguration.rootcheck">Rootcheck</a></li>
-            <li><a ng-class="{ active: isSet(7) }" href ng-click="setTab(7)" ng-if="managerConfiguration.syscheck">Syscheck</a></li>
-            <li><a ng-class="{ active: isSet(8) }" href ng-click="setTab(8)" ng-if="managerConfiguration['localfile']">Log collector</a></li>
+            <li><a ng-class="{ active: isSetTab(3) }" href ng-click="setTab(3)" ng-if="managerConfiguration['active-response'] && (managerConfiguration['active-response'].disabled !== 'yes')">Active response</a></li>
+            <li><a ng-class="{ active: isSetTab(4) }" href ng-click="setTab(4)" ng-if="managerConfiguration.command">Commands</a></li>
+            <li><a ng-class="{ active: isSetTab(5) }" href ng-click="setTab(5)" ng-if="managerConfiguration.rules">Rules</a></li>
+            <li><a ng-class="{ active: isSetTab(6) }" href ng-click="setTab(6)" ng-if="managerConfiguration.rootcheck">Rootcheck</a></li>
+            <li><a ng-class="{ active: isSetTab(7) }" href ng-click="setTab(7)" ng-if="managerConfiguration.syscheck">Syscheck</a></li>
+            <li><a ng-class="{ active: isSetTab(8) }" href ng-click="setTab(8)" ng-if="managerConfiguration['localfile']">Log collector</a></li>
         </ul>  
           <div class="managerConfigurationTab">
-            <div id="managerConfigurationTab-Global" ng-show="isSet(1)">
+            <div id="managerConfigurationTab-Global" ng-show="isSetTab(1)">
                 <table class="table-manager ng-scope table-manager-configuration">
                     <tbody>
                      <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.jsonout_output">
@@ -52,7 +52,7 @@
                   </tbody>
               </table>  
             </div>
-            <div id="managerConfigurationTab-Mail"  ng-show="isSet(2)">
+            <div id="managerConfigurationTab-Mail"  ng-show="isSetTab(2)">
                 <table class="table-manager ng-scope table-manager-configuration">
                     <tbody>
                      <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.email_notification">
@@ -119,7 +119,7 @@
                   </tbody>
               </table>  
             </div>
-            <div id="managerConfigurationTab-ActiveResponse"  ng-show="isSet(3)"  ng-if='managerConfiguration["active-response"]'>
+            <div id="managerConfigurationTab-ActiveResponse"  ng-show="isSetTab(3)"  ng-if='managerConfiguration["active-response"] || (managerConfiguration["active-response"].disabled == yes)'>
                <div ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
                    <table class="table-manager ng-scope table-manager-configuration">
                         <tbody>
@@ -161,7 +161,7 @@
                   </table>  
               </div>
             </div>
-            <div id="managerConfigurationTab-Commands"  ng-show="isSet(4)" ng-if="managerConfiguration.command">
+            <div id="managerConfigurationTab-Commands"  ng-show="isSetTab(4)" ng-if="managerConfiguration.command">
                 <div ng-repeat="item in managerConfiguration.command|orderBy:'name'">
                        <table class="table-manager ng-scope table-manager-configuration">
                             <tbody>
@@ -187,7 +187,7 @@
                       </table>  
                 </div>
             </div>
-            <div id="managerConfigurationTab-Rules" ng-show="isSet(5)" ng-if="managerConfiguration.rules">
+            <div id="managerConfigurationTab-Rules" ng-show="isSetTab(5)" ng-if="managerConfiguration.rules">
               <div ng-if="managerConfiguration.rules.decoder_dir">
                 <table class="table-manager ng-scope table-manager-configuration">
                   <tbody>
@@ -278,7 +278,7 @@
                 </table>
               </div>
             </div>  
-            <div id="managerConfigurationTab-Rootcheck"  ng-show="isSet(6)" ng-if="managerConfiguration.rootcheck">
+            <div id="managerConfigurationTab-Rootcheck"  ng-show="isSetTab(6)" ng-if="managerConfiguration.rootcheck">
                 <table class="table-manager ng-scope table-manager-configuration">
                     <tbody>
                         <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck.disabled">
@@ -327,7 +327,7 @@
                   </table>  
                 </div>
             </div>
-            <div id="managerConfigurationTab-Syscheck"  ng-show="isSet(7)" ng-if="managerConfiguration.syscheck">
+            <div id="managerConfigurationTab-Syscheck"  ng-show="isSetTab(7)" ng-if="managerConfiguration.syscheck">
                 <table class="table-manager ng-scope table-manager-configuration">
                     <tbody>
                         <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.syscheck.disabled">
@@ -395,7 +395,7 @@
                   </table>  
                 </div>
             </div>
-            <div id="managerConfigurationTab-LogCollector"  ng-show="isSet(8)"  ng-if='managerConfiguration["localfile"]'>
+            <div id="managerConfigurationTab-LogCollector"  ng-show="isSetTab(8)"  ng-if='managerConfiguration["localfile"]'>
                <div ng-repeat='item in managerConfiguration["localfile"]|orderBy:["location", "command"]'>
                    <table class="table-manager ng-scope table-manager-configuration">
                         <tbody>

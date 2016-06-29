@@ -100,12 +100,12 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
       var limit;
       if ((method === 'get') && (limitPath)) {
-        apiReq.request('get', limitPath, {})
+        apiReq.request('get', limitPath, body)
         .then(function (data) {
           limit = data.data;
           _instances[instance] = {
             'method': method, 'path': path, 'body': body, 'pageSize': pageSize,
-            'offset': offset, 'limit': limit, 'pagination': true
+            'offset': offset, 'limit': limit, 'limitPath': limitPath, 'pagination': true
           };
           defered.resolve(instance);
         }, function (data) {
@@ -206,6 +206,15 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
       if (newBody) {
         _instances[instanceId]['body'] = newBody;
+
+        if (_instances[instanceId]['pagination']) {
+          _instances[instanceId]['offset'] = 0;
+          apiReq.request('get', _instances[instanceId]['limitPath'], newBody)
+            .then(function (data) {
+              _instances[instance][limit] = data.data;
+            });
+        }
+
       }
 
       var preparedBody = _instances[instanceId]['body'];

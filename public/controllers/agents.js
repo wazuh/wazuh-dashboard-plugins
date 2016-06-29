@@ -98,10 +98,11 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     };
 
     $scope.delete = function (agent) {
-        alertify.confirm("Are you sure you want to delete the agent with ID " + $agent.id + "?", function () {
+        alertify.confirm("Are you sure you want to delete the agent with ID " + agent.id + "?", function () {
             DataFactory.getAndClean('delete', '/agents/'+agent.id, {})
             .then(function (data) {
                 alertify.delay(10000).closeLogOnClick(true).success('Agent deleted successfully');
+                $scope.agentsGet();
             }, printError);
         });
     };
@@ -126,7 +127,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     };
     
     $scope.deleteSyscheck = function (agent) {
-        alertify.confirm("Are you sure you want to clear FIM database in agent with ID " + $agent.id + "?", function () {
+        alertify.confirm("Are you sure you want to clear FIM database in agent with ID " + agent.id + "?", function () {
             DataFactory.getAndClean('delete', '/syscheck/'+agent.id, {})
             .then(function (data) {
                 alertify.delay(10000).closeLogOnClick(true).success('Syscheck database deleted successfully');
@@ -135,7 +136,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     };
 
     $scope.deleteRootcheck = function (agent) {
-        alertify.confirm("Are you sure you want to clear Rootcheck database in agent with ID " + $agent.id + "?", function () {
+        alertify.confirm("Are you sure you want to clear Rootcheck database in agent with ID " + agent.id + "?", function () {
             DataFactory.getAndClean('delete', '/rootcheck/'+agent.id, {})
             .then(function (data) {
                 alertify.delay(10000).closeLogOnClick(true).success('Rootcheck database deleted successfully');
@@ -156,6 +157,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
                 ip: $scope.newIp
             }).then(function (data) {
                 alertify.delay(10000).closeLogOnClick(true).success('Agent added successfully');
+                $scope.agentsGet();
             }, printError);
         }
     };
