@@ -1,0 +1,166 @@
+<div class="container" ng-controller="overviewController">
+        <div ng-if="load" style="text-align: center;">
+                <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+        </div>
+        <div class="row" ng-if="!load">
+                <div ng-if="error">
+                        <span class="settings-message-error">
+                                Elasticsearch index "wazuh-agents" not found. In order to see agents status over time additional Python script is needed. Please visit <a target="_blank" href="http://www.wazuh.com/">Wazuh Kibana application docs</a> for more information.
+                        </span>
+                </div>
+                <div style="text-align: center;">
+                        <span class="settings-message-error">{{message}}</span>
+                        <div class="row">
+                                <!-- Agents total agents -->
+                                <div class="panel panel-default" style="display: inline-block; width: auto;">
+                                        <div class="panel-heading">
+                                                <span class="panel-title" style="text-align: center">Total agents</span>
+                                        </div>
+                                        <div class="panel-content" style="font-size:20px; text-align: center;">
+                                                {{agentsCountTotal}}
+                                        </div>
+                                </div>
+                                <!-- Agents active -->
+                                <div class="panel panel-default" style="display: inline-block; width: auto;">
+                                        <div class="panel-heading">
+                                                <span class="panel-title" style="text-align: center">Active</span>
+                                        </div>
+                                        <div class="panel-content" style="font-size:20px; text-align: center;">
+                                                {{agentsCountActive}}
+                                        </div>
+                                </div>
+                                <!-- Agents disconnected -->
+                                <div class="panel panel-default" style="display: inline-block; width: auto;">
+                                        <div class="panel-heading">
+                                                <span class="panel-title" style="text-align: center">Disconnected</span>
+                                        </div>
+                                        <div class="panel-content" style="font-size:20px; text-align: center;">
+                                                {{agentsCountDisconnected}}
+                                        </div>
+                                </div>
+                                <!-- Agents never connected -->
+                                <div class="panel panel-default" style="display: inline-block; width: auto;">
+                                        <div class="panel-heading">
+                                                <span class="panel-title" style="text-align: center">Never connected</span>
+                                        </div>
+                                        <div class="panel-content" style="font-size:20px; text-align: center;">
+                                                {{agentsCountNeverConnected}}
+                                        </div>
+                                </div>
+                        </div>
+
+                        <div class="row">
+                                <!-- Agents current status table -->
+                                <div style="display: inline-block; margin-right: 10%; width: 40%; height: 332px;">
+                                        <table class="table table-condensed">
+                                                <caption style="text-align: center;">Agents status</caption>
+                                                <thead>
+                                                        <tr>
+                                                                <th colspan="4">
+                                                                        <input type="text" ng-model="searchAgentsStatus" class="form-control" placeholder="Search...">
+                                                                </th>
+                                                        </tr>
+                                                        <tr>
+                                                                <th ng-click="sortStatus('id')">ID <span class="glyphicon sort-icon" ng-show="sortKeyStatus=='id'"
+                                                                                ng-class="{'glyphicon-chevron-up':reverseStatus,'glyphicon-chevron-down':!reverseStatus}"></span></th>
+                                                                <th ng-click="sortStatus('name')">Name <span class="glyphicon sort-icon" ng-show="sortKeyStatus=='name'"
+                                                                                ng-class="{'glyphicon-chevron-up':reverseStatus,'glyphicon-chevron-down':!reverseStatus}"></span></th>
+                                                                <th ng-click="sortStatus('ip')">IP <span class="glyphicon sort-icon" ng-show="sortKeyStatus=='ip'"
+                                                                                ng-class="{'glyphicon-chevron-up':reverseStatus,'glyphicon-chevron-down':!reverseStatus}"></span></th>
+                                                                <th ng-click="sortStatus('status')">Status <span class="glyphicon sort-icon" ng-show="sortKeyStatus=='status'"
+                                                                                ng-class="{'glyphicon-chevron-up':reverseStatus,'glyphicon-chevron-down':!reverseStatus}"></span></th>
+                                                        </tr>
+                                                </thead>
+                                                <tbody dir-paginate="agent in agents|orderBy:sortKeyStatus:reverseStatus|filter:searchAgentsStatus|itemsPerPage:5" pagination-id="tableAgents">
+                                                        <tr>
+                                                                <td>{{agent.id}}</td>
+                                                                <td>{{agent.name}}</td>
+                                                                <td>{{agent.ip}}</td>
+                                                                <td>{{agent.status}}</td>
+                                                        </tr>
+                                                </tbody>
+                                        </table>
+                                        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true" pagination-id="tableAgents" autoHide="true">
+                                        </dir-pagination-controls>
+                                </div>
+                                <!-- Agents disconnected table -->
+                                <div style="display: inline-block; width: 40%; height: 332px;">
+                                        <table class="table table-condensed">
+                                                <caption style="text-align: center;">Agents disconnected</caption>
+                                                <thead>
+                                                        <tr>
+                                                                <th colspan="4">
+                                                                        <input type="text" ng-model="searchAgentsDisconnected" class="form-control" placeholder="Search...">
+                                                                </th>
+                                                        </tr>
+                                                        <tr>
+                                                                <th ng-click="sortDisconnected('id')">ID <span class="glyphicon sort-icon" ng-show="sortKeyDisconnected=='id'"
+                                                                                ng-class="{'glyphicon-chevron-up':reverseDisconnected,'glyphicon-chevron-down':!reverseDisconnected}"></span></th>
+                                                                <th ng-click="sortDisconnected('name')">Name <span class="glyphicon sort-icon" ng-show="sortKeyDisconnected=='name'"
+                                                                                ng-class="{'glyphicon-chevron-up':reverseDisconnected,'glyphicon-chevron-down':!reverseDisconnected}"></span></th>
+                                                                <th ng-click="sortDisconnected('ip')">IP <span class="glyphicon sort-icon" ng-show="sortKeyDisconnected=='ip'"
+                                                                                ng-class="{'glyphicon-chevron-up':reverseDisconnected,'glyphicon-chevron-down':!reverseDisconnected}"></span></th>
+                                                                <th ng-click="sortDisconnected('status')">Status <span class="glyphicon sort-icon" ng-show="sortKeyDisconnected=='status'"
+                                                                                ng-class="{'glyphicon-chevron-up':reverseDisconnected,'glyphicon-chevron-down':!reverseDisconnected}"></span></th>
+                                                        </tr>
+                                                </thead>
+                                                <tbody dir-paginate="disconnectedAgent in disconnectedAgents|orderBy:sortKeyDisconnected:reverseDisconnected|filter:searchAgentsDisconnected|itemsPerPage:5"
+                                                        pagination-id="tableDisconnectedAgents">
+                                                        <tr>
+                                                                <td>{{disconnectedAgent.id}}</td>
+                                                                <td>{{disconnectedAgent.name}}</td>
+                                                                <td>{{disconnectedAgent.ip}}</td>
+                                                                <td>{{disconnectedAgent.status}}</td>
+                                                        </tr>
+                                                </tbody>
+                                        </table>
+                                        <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true" pagination-id="tableDisconnectedAgents"
+                                                autoHide="true">
+                                        </dir-pagination-controls>
+                                </div>
+                        </div>
+
+                        <div class="row">
+                                <!-- Agents with more alerts in the last 24h -->
+                                <div style="display: inline-block; width: 40%; height: 332px;">
+                                        <table class="table table-condensed">
+                                                <caption style="text-align: center;">Agents with more alerts in the last 24h</caption>
+                                                <thead>
+                                                        <tr>
+                                                                <th>Agent</th>
+                                                                <th>Alerts count</th>
+                                                        </tr>
+                                                </thead>
+                                                <tbody ng-repeat="topAgent in topAgents">
+                                                        <tr>
+                                                                <td>{{topAgent.key}}</td>
+                                                                <td>{{topAgent.doc_count}}</td>
+                                                        </tr>
+                                                </tbody>
+                                        </table>
+                                </div>
+                        </div>
+                        
+                        <!-- Agents current status chart -->
+                        <div class="row" style="text-align: center;">
+                                <span>Agent status:</span></br>
+                                <div height="261" width="523" style="width: 523px; height: 261px; display: inline-block;">
+                                        <canvas id="bar" class="chart chart-bar" chart-data="statusChartData" chart-labels="statusChartLabels" chart-series="statusChartSeries"
+                                                chart-options="statusChartOptions" height="261" width="523" style="width: 523px; height: 261px;">
+                                        </canvas>
+                                </div>
+                        </div>
+
+                        <div ng-if="!error" class="row" style="text-align: center;">
+                                <span>Agent status by time:</span></br>
+                                <!-- Status over time -->
+                                <div height="261" style="height: 261px; display: inline-block;">
+                                        <canvas id="timelineBar" class="chart chart-bar" chart-data="statusTlData" chart-labels="statusTlLabels" chart-series="statusTlSeries"
+                                                chart-options="statusTlOptions" height="261" width="523" style="width: 523px; height: 261px;">
+                                        </canvas>
+                                </div>
+                        </div>
+                        </br>
+                </div>
+        </div>
+</div>

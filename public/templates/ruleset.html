@@ -1,0 +1,329 @@
+<div class="container" ng-controller="rulesetController">
+    <div ng-if="load" style="text-align: center;">
+        <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+    </div>
+    <div class="row containerRuleset" ng-if="!load">
+        <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
+        <div class="leftCol">
+            <h2 class="container_page_title">Ruleset</h2>
+            <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;"
+                ng-show="isSet(1)">
+                <div style="float: left;">
+                    <form class="form-inline ng-pristine ng-valid">
+                        <div class="form-group" style="position: relative;">
+                            <i class="fa fa-search input_search_icon"></i>
+                            <input type="text" ng-model="search" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
+                        </div>
+                    </form>
+                </div>
+            </div>
+                        <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;"
+                ng-show="isSet(2)">
+                <div style="float: left;">
+                    <form class="form-inline ng-pristine ng-valid">
+                        <div class="form-group" style="position: relative;">
+                            <i class="fa fa-search input_search_icon"></i>
+                            <input type="text" ng-model="decoder_search" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div style="margin-left: 10px; width: 202px; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;"
+                ng-show="isSet(1)">
+                <div ng-class="{ ruleset_button_active: rulesetStatusFilter == 'enabled' }" ng-click="filterStatus('enabled')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                    class="rulesetFilter">Enabled </div>
+                <div ng-class="{ ruleset_button_active: rulesetStatusFilter == 'disabled' }" ng-click="filterStatus('disabled')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                    class="rulesetFilter">Disabled </div>
+            </div>
+            <div style="margin-left: 10px; width: 202px; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;"
+                ng-show="isSet(2)">
+                <div ng-class="{ ruleset_button_active: decoderType == 'all' }" ng-click="filterDecoderType('all')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                    class="rulesetFilter">All decoders </div>
+                <div ng-class="{ ruleset_button_active: decoderType == 'parents' }" ng-click="filterDecoderType('parents')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                    class="rulesetFilter">Parents </div>
+            </div>
+            <div class="form-group ruleLevel_div" ng-show="isSet(1)">
+                <label class="ruleLevel_label">Alert level:</label>
+                <input type="number" min="0" max="{{$parent.maxLevel}}" step="1" ng-model="$parent.minLevel" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch ruleLevel_input">
+                <label class="ruleLevel_label">-</label>
+                <input type="number" min="{{$parent.minLevel}}" max="15" step="1" ng-model="$parent.maxLevel" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch ruleLevel_input">
+                <button type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button" ng-click="filterLevel();"><span>Change</span></button>
+            </div>
+            </br>
+            </br>
+            <div class="filterActive_div" ng-if="hasFileFilter();" ng-show="isSet(1)">
+                <span ng-click="setFileFilter(fileFilter)" ng-class="{ textFilterActive_header: isSetFileFilter(fileFilter) }" class="bold">Selected file: {{fileFilter}}   <span class="glyphicon glyphicon-remove"></span>   </span>
+                <a class="glyphicon glyphicon-download-alt textFilterActive_glyphicon" ng-init="downloadRuleFile(fileFilter)" ng-href="{{encodedFile}}"
+                    download="file.xml"></a>
+            </div>
+            <div class="filterActive_div" ng-if="hasGroupFilter();" ng-show="isSet(1)">
+                <span ng-click="setGroupFilter(groupFilter)" ng-class="{ textFilterActive_header: isSetGroupFilter(group) }" class="bold">Selected group: {{groupFilter}}   <span class="glyphicon glyphicon-remove"></span></span>
+            </div>
+            <div class="filterActive_div" ng-if="hasPciFilter();" ng-show="isSet(1)">
+                <span ng-click="setPciFilter(pciFilter)" ng-class="{ textFilterActive_header: isSetPciFilter(pci) }" class="bold">Selected PCI group: {{pciFilter}}   <span class="glyphicon glyphicon-remove"></span></span>
+            </div>
+            <div class="filterActive_div" ng-if="hasDecoderFilter();" ng-show="isSet(2)">
+                <span ng-click="setDecoderPathFilter(pathDecoderFilter)" ng-class="{ textFilterActive_header: isSetDecoderPathFilter(pathDecoderFilter) }" class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{pathDecoderFilter}}">Selected file: {{formatFile(pathDecoderFilter)}}   <span class="glyphicon glyphicon-remove"></span></span>
+            </div>
+            <div class="filterActive_div" ng-if="hasParentFilter();" ng-show="isSet(2)">
+                <span ng-click="filterDecoderParent(parent_filter)" ng-class="{ textFilterActive_header: isSetParentFilter(parent_filter) }" class="bold">Selected parent: {{parent_filter}}   <span class="glyphicon glyphicon-remove"></span></span>
+            </div>
+            <ul id="rulesetTabs">
+                <li><a ng-class="{ active: isSet(1) }" href ng-click="setTab(1)">Rules</a></li>
+                <li><a ng-class="{ active: isSet(2) }" href ng-click="setTab(2)" ng-disabled="!decoderLoad">Decoders</a></li>
+                <li><a ng-class="{ active: isSet(3) }" href ng-click="setTab(3)">Update</a></li>
+            </ul>
+            <div class="rulesetContentTabs">
+                <div id="rulesTab" ng-show="isSet(1)">
+                    <div class="rules_card_list" dir-paginate="rule in rules|filter:{status: rulesetStatusFilter}|filter:{file: fileFilter}|filter:{groups: groupFilter}|filter:{pci: pciFilter}|filter:search|itemsPerPage:10"
+                        pagination-id="rules">
+                        <div class="rule_card" ng-class="{ rule_card_active: showDetails }" ng-click=" showDetails = ! showDetails; ">
+                            <div class="id"> {{rule.id}} </div>
+                            <div class="float_left">
+                                <div class="text" style="width: 535px; height: 45px; overflow: hidden;">{{rule.description}}</div>
+                            </div>
+                            <div class="float_right">
+                                <div ng-class='getRuleStatusClass(rule);' class="status" ng-style="{ 'border-bottom-right-radius' : (showDetails) ? '0px' : '4px' }"
+                                    tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{getStatusTooltip(rule)}}"></div>
+                            </div>
+                            <div class="float_right">
+                                <div class="level" tooltips tooltip-template="Alert level">{{rule.level}}</div>
+                            </div>
+
+                        </div>
+                        <div style="" class="rule_card_detail" ng-show="showDetails">
+                            <div class="ruleTabs-container">
+                                <div class="ruleTabs-info">
+                                    <div class="ruleTabs-box">
+                                        <table class="table-rule-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">ID</td>
+                                                    <td class="table-rule-information-td-value ng-binding">{{rule.id}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Description</td>
+                                                    <td class="table-rule-information-td-value ng-binding" colspan="2">{{rule.description}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Level</td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" ng-click="setFilterLevel(rule.level);">{{rule.level}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">File</td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" ng-click="setFileFilterOutside(rule.file);">{{rule.file}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Groups</td>
+                                                </tr>
+                                                <tr ng-repeat="group in rule.groups">
+                                                    <td class="table-rule-information-td-title"> </td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" ng-click="setGroupFilterOutside(group);">{{group}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title" ng-if="rule.pci.length > 0">PCI groups</td>
+                                                </tr>
+                                                <tr ng-repeat="pci in rule.pci">
+                                                    <td class="table-rule-information-td-title"> </td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" ng-click="setPciFilterOutside(pci);">{{pci}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Advanced details</td>
+                                                </tr>
+                                                <tr ng-repeat="(detailk, detailv) in rule.details">
+                                                    <td class="table-rule-information-td-title"><span class="glyphicon glyphicon-question-sign" tooltips tooltip-size="large" tooltip-side="auto" tooltip-template="{{rulesTooltips(detailk)}}"></span></td>
+                                                    <td class="table-rule-information-td-title">{{detailk}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding">{{detailv}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <dir-pagination-controls pagination-id="rules" max-size="5" style="display: inline-block;"></dir-pagination-controls>
+                </div>
+                <div id="decodersTab" ng-show="isSet(2)">
+                    <div class="rules_card_list" dir-paginate="decoder in decoders|filter:{full_path: pathDecoderFilter}|filter:{name: parent_filter}|filter:decoder_search|itemsPerPage:10"
+                        pagination-id="decoders">
+                        <div class="rule_card" ng-class="{ rule_card_active: showDetails }" ng-click=" showDetails = ! showDetails; ">
+                            <div class="float_left">
+                                <div class="text" style="width: 535px; height: 45px; overflow: hidden;">{{decoder.name}}</div>
+                            </div>
+                            <div class="float_right">
+                                <div class="level" tooltips tooltip-template="Position">{{decoder.position}}</div>
+                            </div>
+                        </div>
+                        <div style="" class="rule_card_detail" ng-show="showDetails">
+                            <div class="ruleTabs-container">
+                                <div class="ruleTabs-info">
+                                    <div class="ruleTabs-box">
+                                        <table class="table-rule-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Name</td>
+                                                    <td class="table-rule-information-td-value ng-binding" colspan="2">{{decoder.name}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">File</td>
+                                                    <td class="table-rule-information-td-value ng-binding" colspan="2">{{decoder.file}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Full path</td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-click="setDecoderPathFilter(decoder.full_path);">{{decoder.full_path}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Position</td>
+                                                    <td class="table-rule-information-td-value ng-binding">{{decoder.position}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" tooltips tooltip-size="large" tooltip-side="auto" tooltip-template="<div style='width: 300px;'>Place occupied by the decoder in the file.</div>"><span class="glyphicon glyphicon-question-sign"></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title" ng-if="decoder.details.parent">Parent</td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-if="decoder.details.parent" ng-click="filterDecoderParent(decoder.details.parent);">{{decoder.details.parent}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Advanced details</td>
+                                                </tr>
+                                                <tr ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
+                                                    <td class="table-rule-information-td-title"><span class="glyphicon glyphicon-question-sign" tooltips tooltip-size="large" tooltip-side="auto" tooltip-template="{{decoderTooltips(detailk)}}"></span></td>
+                                                    <td class="table-rule-information-td-title">{{detailk}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" ng-if="(detailk !== 'regex') && (detailk !== 'order')">{{detailv}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)">{{colorRegex(detailv)}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)">{{colorOrder(detailv)}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <dir-pagination-controls pagination-id="decoders" max-size="5" style="display: inline-block;"></dir-pagination-controls>
+                </div>
+                <div id="updaterTab" ng-show="isSet(3)">
+                    <table class="updateGuideTable">
+                        <tbody>
+                            <tr>
+                                <td colspan="2">1. Select what you want to update:</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div ng-class="{ ruleset_button_active: $parent.updateType == 'r' }" ng-click="selectUpdateType('r')" style="font-weight: bold; border-radius: 0px; width: 100px; margin-right: 5px;"
+                                        class="rulesetFilter">Rules </div>
+                                    <div ng-class="{ ruleset_button_active: $parent.updateType == 'c' }" ng-click="selectUpdateType('c')" style="font-weight: bold; border-radius: 0px; width: 100px; margin-right: 5px;"
+                                        class="rulesetFilter">Rootcheck </div>
+                                    <div ng-class="{ ruleset_button_active: $parent.updateType == 'b' }" ng-click="selectUpdateType('b')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                                        class="rulesetFilter">Both </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">2. Do you want to force it?</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-right: 5px;">
+                                    <div ng-class="{ ruleset_button_active: !$parent.updateForce }" ng-click="$parent.updateForce = false" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                                        class="rulesetFilter">No </div>
+                                </td>
+                                <td>Update the outdated rules (Manager will be restarted only if enabled rules are updated)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-right: 5px;">
+                                    <div ng-class="{ ruleset_button_active: $parent.updateForce }" ng-click="$parent.updateForce = true" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                                        class="rulesetFilter">Yes </div>
+                                </td>
+                                <td>Overwrite all the rules (OSSEC manager is going to be restarted)</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="padding-top: 10px;"><button type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button"
+                                        style="margin-left: 100px; width: 150px !important;" ng-click="updateRuleset();"><span>Update ruleset</span></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display: inline-block; border-top: 1px solid #cccccc; margin-top: 15px;">
+                        <label style="margin-top: 15px; margin-right: 15px;">Backups:</label>
+                        <div ng-model="$parent.selectedBackup" custom-select="backup for backup in $parent.backups | filter:$searchTerm"></div>
+                        <button type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button" style="margin-left: 15px; width: 150px !important;"
+                            ng-click="restoreBackup();"><span>Restore backup</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="rightCol" ng-show="isSet(1)">
+            <div class="tabBlock">
+                <ul id="rulesetTabsFilters">
+                    <li><a ng-class="{ active: isSetFilters(1) }" href ng-click="setTabFilters(1)">Files</a></li>
+                    <li><a ng-class="{ active: isSetFilters(2) }" href ng-click="setTabFilters(2)">Groups</a></li>
+                    <li><a ng-class="{ active: isSetFilters(3) }" href ng-click="setTabFilters(3)">PCI</a></li>
+                </ul>
+            </div>
+            <div class="filesBlock">
+                <table class="table-files" ng-show="isSet(1) && isSetFilters(1)">
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td"><input type="text" ng-model="searchFilesRules" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                                placeholder="Search..."></td>
+                    </tr>
+                    <tr ng-class="" class="table-files-list-tr" dir-paginate="file in filesRules|filter:{status: rulesetStatusFilter}|filter:searchFilesRules|itemsPerPage:6"
+                        pagination-id="filesRules">
+                        <td class="table-files-list-td"><span ng-click="setFileFilter(file.name)" ng-class="{ textFilterActive: isSetFileFilter(file.name) }"
+                                class="bold">{{file.name}}</span></td>
+                    </tr>
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td">
+                            <dir-pagination-controls pagination-id="filesRules" max-size="5" style="display: inline-block;"></dir-pagination-controls>
+                        </td>
+                    </tr>
+                </table>
+                <table class="table-files" ng-show="isSet(1) && isSetFilters(2)">
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td"><input type="text" ng-model="searchGroupsRules" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                                placeholder="Search..."></td>
+                    </tr>
+                    <tr ng-class="" class="table-files-list-tr" dir-paginate="group in groupsRules|filter:searchGroupsRules|itemsPerPage:6" pagination-id="groupsRules">
+                        <td class="table-files-list-td"><span ng-click="setGroupFilter(group)" ng-class="{ textFilterActive: isSetGroupFilter(group) }" class="bold">{{group}}</span></td>
+                    </tr>
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td">
+                            <dir-pagination-controls pagination-id="groupsRules" max-size="5" style="display: inline-block;"></dir-pagination-controls>
+                        </td>
+                    </tr>
+                </table>
+                <table class="table-files" ng-show="isSet(1) && isSetFilters(3)">
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td"><input type="text" ng-model="searchFilesPci" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                                placeholder="Search..."></td>
+                    </tr>
+                    <tr ng-class="" class="table-files-list-tr" dir-paginate="pci in pciGroupsRules|filter:searchFilesPci|itemsPerPage:6"
+                        pagination-id="pciRules">
+                        <td class="table-files-list-td"><span ng-click="setPciFilter(pci)" ng-class="{ textFilterActive: isSetPciFilter(pci) }" class="bold">{{pci}}</span></td>
+                    </tr>
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td">
+                            <dir-pagination-controls pagination-id="pciRules" max-size="5" style="display: inline-block;"></dir-pagination-controls>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="rightCol" ng-show="isSet(2)">
+            <div class="filesBlock" style="margin-top: 35px;">
+                <table class="table-files" ng-show="isSet(2)">
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td"><input type="text" ng-model="searchFilesDecoders" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                                placeholder="Search..."></td>
+                    </tr>
+                    <tr ng-class="" class="table-files-list-tr" dir-paginate="file in filesDecoders|filter:searchFilesDecoders|itemsPerPage:6"
+                        pagination-id="filesDecoders">
+                        <td class="table-files-list-td"><span ng-click="setDecoderPathFilter(file)" ng-class="{ textFilterActive: isSetDecoderPathFilter(file) }"
+                                class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{file}}">{{formatFile(file)}}</span></td>
+                    </tr>
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td">
+                            <dir-pagination-controls pagination-id="filesDecoders" max-size="5" style="display: inline-block;"></dir-pagination-controls>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

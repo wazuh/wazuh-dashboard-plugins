@@ -1,0 +1,274 @@
+<div class="container" ng-controller="agentsController">
+   <div ng-if="load" style="text-align: center;">
+	   	<img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+  </div>
+  <div class="row containerAgents" ng-if="!load">
+    <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
+    <div class="leftCol">
+		<h2 class="container_page_title">Agents overview</h2>
+		<div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;">  
+			<div style="float: left;">
+			  <form class="form-inline ng-pristine ng-valid">
+						<div class="form-group" style="position: relative;">
+						  <i class="fa fa-search input_search_icon"></i>
+						  <input type="text" ng-model="search" class="form-control ng-pristine ng-untouched ng-valid agentSearch" placeholder="Search...">
+						</div>
+					  </form>
+			</div>
+		</div>
+		<div style="margin-left: 10px; width: 43%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
+			<div style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px;" class="agentSortFilter">
+				Sort by 			
+			</div>
+			<div class="agentSortFilter" ng-click="sort('status')">
+				<span>Status</span>
+				<span class="glyphicon sort-icon" ng-show="sortKey=='status'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+				<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='status'"></span>
+			</div>
+			<div class="agentSortFilter" ng-click="sort('ip')">	
+				<span>IP</span>
+				<span class="glyphicon sort-icon" ng-show="sortKey=='ip'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+				<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='ip'"></span>
+			</div>
+			<div class="agentSortFilter" ng-click="sort('name')">
+				<span>Name</span>
+				<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+				<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='name'"></span>
+			</div>
+			<div class="agentSortFilter" ng-click="sort('id')">
+				<span>ID</span>
+				<span class="glyphicon sort-icon" ng-show="sortKey=='id'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+				<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='id'"></span>
+			</div>
+		</div>
+		<div style="margin-left: 10px; width: 35%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
+			<div ng-class="{ agent_filter_status_active: statusFilter == 'active' }" ng-click="filter('active')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px;" class="agentSortFilter">Active		</div>
+			<div ng-class="{ agent_filter_status_active: statusFilter == 'disconnected' }" ng-click="filter('disconnected')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100px;" class="agentSortFilter">Disconnected</div>
+			<div ng-class="{ agent_filter_status_active: statusFilter == 'never connected' }" ng-click="filter('never connected')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 132px;" class="agentSortFilter">Never connected</div>
+		</div>
+		
+		
+		<div class="agent_card_list" dir-paginate="agent in agents|orderBy:sortKey:reverse|filter:{status: statusFilter}|filter:search|itemsPerPage:6" ng-init="agentFetchInfo[agent.id]=[]; tab[$index]=1" pagination-id="agents">
+			<div class="agent_card" ng-class="{ agent_card_active: showDetails }" ng-click="fetchAgent(agent,$index); showDetails = ! showDetails; ">
+				<div class="id"> {{agent.id}} </div>
+				<div class="float_left">
+					<div class="name">{{agent.name}}</div>
+					<div class="ip">{{agent.ip}}</div>
+				</div>
+				<div class="float_right">
+					<div ng-class='getAgentStatusClass(agent.status);' class="status" ng-style="{ 'border-bottom-right-radius' : (showDetails) ? '0px' : '4px' }" ></div>
+				</div>
+			</div>
+		    <div style="" class="agent_card_detail" ng-show="showDetails">
+				<ul id="agentsTabs">
+					<li><a ng-click="setTab(1,$index)" href="" ng-class="{ active: isSet(1,$index) }" class="active">Global</a></li>
+					<li><a ng-click="setTab(2,$index)" href="" ng-class="{ active: isSet(2,$index) }">File integrity</a></li>
+					<li><a ng-click="setTab(3,$index)" href="" ng-class="{ active: isSet(3,$index) }">Rootcheck</a></li>
+					<li><a ng-click="setTab(4,$index)" href="" ng-class="{ active: isSet(4,$index) }">Alerts</a></li>
+				</ul>
+				<div class="agentTabs-container">
+					<div class="agentsTabs-info" ng-show="isSet(1,$index)">
+						<div class="agentsTabs-box"> 
+							<table class="table-agent-information">
+								<tbody>
+								<tr>
+									<td class="table-agent-information-td-title">ID</td>
+									<td class="table-agent-information-td-value ng-binding">{{agent.id}}</td>
+								</tr>
+								<tr>
+									<td class="table-agent-information-td-title">Name</td>
+									<td class="table-agent-information-td-value ng-binding">{{agent.name}}</td>
+								</tr>
+								<tr>
+									<td class="table-agent-information-td-title">IP address</td>
+									<td class="table-agent-information-td-value ng-binding">{{agent.ip}}</td>
+								</tr>
+								<tr>
+									<td class="table-agent-information-td-title">Status</td>
+									<td class="table-agent-information-td-value ng-binding">{{agent.status}}</td>
+								</tr>
+								<tr>
+									<td class="table-agent-information-td-title">Operating system</td>
+									<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].os}}</td>
+								</tr>
+								<tr>
+									<td class="table-agent-information-td-title">Client version</td>
+									<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].version}}</td>
+								</tr>
+								<tr>
+									<td class="table-agent-information-td-title">Last keep alive</td>
+									<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].lastKeepAlive}}</td>
+								</tr>
+								<tr ng-class="{ hidden: (agent.id == '000') }">
+									<td class="table-agent-information-td-title">Agent key</td>
+									<td class="table-agent-information-td-value ng-binding"><input type="text" class="js-copytextarea" ng-model="agentFetchInfo[agent.id].key" ng-readonly="true"></input></td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+						<ul class="agentsTabs-controlButtons">
+							<li  ng-class="{ hidden: (agent.id == '000') }">
+								<a ng-click="copyAgentKey($index);" >
+									<span class="form-group-addon glyphicon glyphicon-copy iconControl"></span>
+									Copy key
+								</a>
+							</li>
+							<li ng-class="{ hidden: (agent.id == '000') }">
+								<a ng-click="restart(agent)" >
+									<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span>
+									Restart
+								</a>
+							</li>
+							<li ng-class="{ hidden: (agent.id == '000') }">
+								<a ng-click="delete(agent)" >
+									<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span>
+									Delete
+								</a>
+							</li>
+							<li>
+								<a ng-href="{{getAlertsUrl(agent.name)}}" target="_blank">
+									<span class="form-group-addon glyphicon glyphicon-share iconControl"></span>
+									View alerts
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="agentsTabs-file-integrity" ng-show="isSet(2,$index)">
+						<div class="agentsTabs-box"> 
+							<table class="table-agent-information">
+								<tbody>
+									<tr>
+										<td class="table-agent-information-td-title">Last scan started</td>
+										<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].syscheckTime}}</td>
+									</tr>
+									<tr>
+										<td class="table-agent-information-td-title">Last scan ended</td>
+										<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].syscheckEndTime}}</td>
+									</tr>
+									<tr>
+										<td class="table-agent-information-td-title" ng-click="loadFIM(agent.id);">File integrity overview</td>
+										<td class="table-agent-information-td-value ng-binding"><span class="glyphicon glyphicon-chevron-right" ng-click="loadFIM(agent.id);"></span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<ul class="agentsTabs-controlButtons">
+							<li>
+								<a ng-click="runSyscheck(agent);" >
+									<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span>
+									Restart scan
+								</a>
+							</li>
+							<li>
+								<a ng-click="deleteSyscheck(agent);" >
+									<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span>
+									Clear database
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="agentsTabs-file-rootcheck" ng-show="isSet(3,$index)">
+						<div class="agentsTabs-box"> 
+							<table class="table-agent-information">
+								<tbody>
+									<tr>
+										<td class="table-agent-information-td-title">Last scan started</td>
+										<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].rootcheckTime}}</td>
+									</tr>
+									<tr>
+										<td class="table-agent-information-td-title">Last scan ended</td>
+										<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].rootcheckEndTime}}</td>
+									</tr>
+									<tr>
+										<td class="table-agent-information-td-title" ng-click="loadRootcheck(agent.id);">Rootcheck overview</td>
+										<td class="table-agent-information-td-value ng-binding"><span class="glyphicon glyphicon-chevron-right" ng-click="loadRootcheck(agent.id);"></span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<ul class="agentsTabs-controlButtons">
+							<li>
+								<a ng-click="runSyscheck(agent);" >
+									<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span>
+									Restart scan
+								</a>
+							</li>
+							<li>
+								<a ng-click="deleteRootcheck(agent);" >
+									<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span>
+									Clear database
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="agentsTabs-file-alerts" ng-show="isSet(4,$index)">
+						<div class="agentsTabs-box"> 
+							<table class="table-agent-information">
+								<tbody>
+									<tr>
+										<td class="table-agent-information-td-title"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.AlertLevel:>10')}}" target="_blank">High risk level</a></td>
+										<td class="table-agent-information-td-value ng-binding"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.AlertLevel:>10')}}" target="_blank" class="glyphicon glyphicon-chevron-right"></a></td>
+									</tr>	
+									<tr>
+										<td class="table-agent-information-td-title"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:attacks')}}" target="_blank">Attacks</a></td>
+										<td class="table-agent-information-td-value ng-binding"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:attacks')}}" target="_blank" class="glyphicon glyphicon-chevron-right"></a></td>
+									</tr>																	
+									<tr>
+										<td class="table-agent-information-td-title"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:syscheck')}}" target="_blank">FIM</a></td>
+										<td class="table-agent-information-td-value ng-binding"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:syscheck')}}" target="_blank" class="glyphicon glyphicon-chevron-right"></a></td>
+									</tr>
+									<tr>
+										<td class="table-agent-information-td-title"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:rootcheck')}}" target="_blank">Rootcheck</a></td>
+										<td class="table-agent-information-td-value ng-binding"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:rootcheck')}}" target="_blank" class="glyphicon glyphicon-chevron-right"></a></td>
+									</tr>
+									<tr>
+										<td class="table-agent-information-td-title"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:sshd')}}" target="_blank">SSH</a></td>
+										<td class="table-agent-information-td-value ng-binding"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:sshd')}}" target="_blank" class="glyphicon glyphicon-chevron-right"></a></td>
+									</tr>
+									<tr>
+										<td class="table-agent-information-td-title"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:authentication_failures')}}" target="_blank">Auth failures</a></td>
+										<td class="table-agent-information-td-value ng-binding"><a ng-href="{{getAlertsUrl(agent.name, '', 'rule.groups:authentication_failures')}}" target="_blank" class="glyphicon glyphicon-chevron-right"></a></td>
+									</tr>																																					
+								</tbody>
+							</table>
+						</div>
+						<ul class="agentsTabs-controlButtons">
+							<li>
+								<a ng-href="{{getAlertsUrl(agent.name)}}" target="_blank">
+									<span class="form-group-addon glyphicon glyphicon-share iconControl"></span>
+									View alerts
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		
+		
+		
+		
+		<dir-pagination-controls max-size="5" direction-links="true" pagination-id="agents" autoHide="true">
+		</dir-pagination-controls>
+    </div>
+    
+	<div class="rightCol">
+		<div class="block">
+			<div class="titleCol">
+				<h2>ADD AGENT</h2>
+			</div>
+			<form ng-submit="addAgent()">
+				<div class="form-group add-agent-form">
+					<input type="text" ng-model="$parent.newName" class="form-control" placeholder="Agent name">
+					<input type="text" ng-model="$parent.newIp" class="form-control" placeholder="IP Address, Netmask or any">
+					<button type="submit" class="btn btn-success button_addAgent">
+					<span>Send</span>
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+  </div>
+
+</div>

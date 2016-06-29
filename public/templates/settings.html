@@ -1,0 +1,44 @@
+<div class="container" ng-controller="settingsController">
+
+
+<div class="col-md-6 col-md-offset-3">
+
+
+  <div class="page-header">
+    <h1><span class="glyphicon glyphicon-floppy-save"></span> Set Wazuh RESTful API settings</h1>
+  </div>
+
+
+  <div id="messages" class="settings-message" ng-class="messageClass" ng-bind-html="message">{{ message }}</div>
+
+<!--ng-show="message"-->
+  <form ng-submit="processForm()">
+
+    <div id="name-group" class="form-group">
+      <label>API Username</label>
+      <input type="text" name="user" class="form-control" placeholder="foo" ng-model="formData.user">
+      <span class="help-block"></span>
+    </div>
+
+
+    <div id="superhero-group" class="form-group">
+      <label>API Password</label>
+      <input type="password" name="password" class="form-control" placeholder="bar" ng-model="formData.password">
+      <span class="help-block"></span>
+    </div>
+    
+    <div id="name-group" class="form-group">
+      <label>API URL</label>
+      <input type="text" name="url" class="form-control" placeholder="https://your_api_ip:55000" ng-model="formData.url">
+      <span class="help-block"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg btn-block">
+      <span class="glyphicon glyphicon-flash"></span> Connect
+    </button>
+  </form>
+
+</div>
+
+
+</div>

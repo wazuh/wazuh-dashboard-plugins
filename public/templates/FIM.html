@@ -1,0 +1,67 @@
+<div class="container" ng-controller="fimController">
+  <div ng-if="load" style="text-align: center;">
+    <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+  </div>
+  <div class="row" ng-if="!load">
+    <div id="messages" ng-show="message" class="settings-message-error">{{ message }}</div>
+    <div style="width: 100%;">
+      <form class="form-inline" style="align: right !important">
+        <div class="form-group" style="float: right;">
+          <div ng-model="$parent.agentid" custom-select="agent.id as agent.id + ' - ' + agent.name for agent in agents | filter: $searchTerm "
+            ng-change="reloadFIM()"></div>
+        </div>
+      </form>
+      <form class="form-inline">
+        <div class="form-group">
+          <input type="text" ng-model="search" class="form-control" placeholder="Search...">
+        </div>
+      </form>
+      <div>
+        </br>
+      </div>
+      <table class="table-agents">
+        <thead>
+          <tr>
+            <th><span ng-click="sort('file')"><strong>File</strong></span>
+              <span class="glyphicon sort-icon" ng-show="sortKey=='file'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+            <th> <span ng-click="sort('Date(date)')"><strong>Date</strong></span>
+              <span class="glyphicon sort-icon" ng-show="sortKey=='Date(date)'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+            <th><span ng-click="sort('changes')"><strong>Changes</strong></span>
+              <span class="glyphicon sort-icon" ng-show="sortKey=='changes'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+          </tr>
+        </thead>
+        <tbody dir-paginate="file in files|filter:search|orderBy:sortKey:reverse|itemsPerPage:10" pagination-id="FIM" ng-init="$parent.fileFetchEvents[$index]=[]">
+          <tr ng-class="" ng-click="fetchFile(file,$index); showDetails = ! showDetails;" class="table-agents-list-tr">
+            <td class="table-agents-list-td"><span class="bold">{{file.file}}</span></td>
+            <td>{{file.date}}</td>
+            <td>{{file.changes}} changes</td>
+          </tr>
+          <tr ng-show="showDetails" style="border-top: none; width: 100%;" class="table-agents-list-tr">
+            <td class="table-agents-list-td" colspan="3" style="width: 100%; background-color: #f5f5f5;">
+              <table>
+                <tr ng-repeat="event in $parent.fileFetchEvents[$index]">
+                  <td><span class="bold">{{event.date}} - {{event.event}}:</span> <span class="bold">MD5</span>: {{event.md5}}
+                    <span class="bold">SHA1</span>: {{event.sha1}} <span class="bold">Size</span>: {{event.size}} <span class="bold">Permissions</span>:
+                    {{event.permissions}} (Mode: {{event.mode}} GID: {{event.gid}} UID: {{event.uid}})</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true" pagination-id="FIM" autoHide="true">
+    </dir-pagination-controls>
+    <form class="form-inline">
+      </br>
+      <label>Perform the following actions over all agents:</label>
+      </br>
+      <div class="form-group">
+        <button aria-label="Restart FIM scan" class="btn btn-primary ng-binding" ng-click="runSyscheck();">Restart FIM scan</button>
+        <button aria-label="Clean FIM database" class="btn btn-danger ng-binding" ng-click="deleteSyscheck(); "><i class="fa fa-trash-o"></i> Clean FIM database</button>
+      </div>
+      </br>
+    </form>
+  </div>
+
+</div>

@@ -1,0 +1,112 @@
+{
+  "name": "falafel",
+  "description": "transform the ast on a recursive walk",
+  "version": "1.2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/substack/node-falafel.git"
+  },
+  "main": "index.js",
+  "keywords": [
+    "ast",
+    "burrito",
+    "source",
+    "syntax",
+    "traversal",
+    "tree"
+  ],
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "coverage": "covert test/*.js",
+    "test": "node --harmony test/bin/run.js test/*.js"
+  },
+  "dependencies": {
+    "acorn": "^1.0.3",
+    "foreach": "^2.0.5",
+    "isarray": "0.0.1",
+    "object-keys": "^1.0.6"
+  },
+  "devDependencies": {
+    "covert": "^1.1.0",
+    "acorn-jsx": "^2.0.0",
+    "tape": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=0.4.0"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net"
+  },
+  "testling": {
+    "browsers": {
+      "chrome": [
+        "20.0"
+      ],
+      "firefox": [
+        "10.0",
+        "15.0"
+      ],
+      "iexplore": [
+        "6.0",
+        "7.0",
+        "8.0",
+        "9.0"
+      ],
+      "opera": [
+        "12.0"
+      ],
+      "safari": [
+        "5.1"
+      ]
+    },
+    "files": "test/*.js"
+  },
+  "gitHead": "75c91298fbc94d22b225f2d0866d14395faf5986",
+  "bugs": {
+    "url": "https://github.com/substack/node-falafel/issues"
+  },
+  "homepage": "https://github.com/substack/node-falafel#readme",
+  "_id": "falafel@1.2.0",
+  "_shasum": "c18d24ef5091174a497f318cd24b026a25cddab4",
+  "_from": "falafel@>=1.0.1 <2.0.0",
+  "_npmVersion": "3.0.0",
+  "_nodeVersion": "2.0.0",
+  "_npmUser": {
+    "name": "substack",
+    "email": "substack@gmail.com"
+  },
+  "dist": {
+    "shasum": "c18d24ef5091174a497f318cd24b026a25cddab4",
+    "tarball": "https://registry.npmjs.org/falafel/-/falafel-1.2.0.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "substack",
+      "email": "mail@substack.net"
+    },
+    {
+      "name": "bobthecow",
+      "email": "npm@0x7f.us"
+    },
+    {
+      "name": "nanodeath",
+      "email": "nanodeath@gmail.com"
+    },
+    {
+      "name": "alltom",
+      "email": "tom@alltom.com"
+    },
+    {
+      "name": "eugeneware",
+      "email": "eugene@noblesamurai.com"
+    }
+  ],
+  "_resolved": "https://registry.npmjs.org/falafel/-/falafel-1.2.0.tgz",
+  "readme": "ERROR: No README data found!"
+}

@@ -1,0 +1,65 @@
+<div class="container" ng-controller="rootcheckController">
+  <div ng-if="load" style="text-align: center;">
+    <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+  </div>
+  <div class="row" ng-if="!load">
+    <div id="messages" ng-show="message" class="settings-message-error">{{ message }}</div>
+    <div style="width: 100%;">
+      <form class="form-inline" style="align: right !important">
+        <div class="form-group" style="float: right;">
+          <div ng-model="$parent.agentid" custom-select="agent.id as agent.id + ' - ' + agent.name for agent in agents | filter: $searchTerm "
+            ng-change="reloadRC()"></div>
+        </div>
+      </form>
+      <form class="form-inline">
+        <div class="form-group">
+          <input type="text" ng-model="search" class="form-control" placeholder="Search...">
+        </div>
+      </form>
+      <div>
+        </br>
+      </div>
+      <table class="table-agents">
+        <thead>
+          <tr>
+            <th> <span ng-click="sort('Date(readDay)')"><strong>Date</strong></span>
+              <span class="glyphicon sort-icon" ng-show="sortKey=='Date(readDay)'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+            <th>
+              <span ng-click="sort('status')"><strong>Status</strong></span>
+              <span class="glyphicon sort-icon" ng-show="sortKey=='status'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+            </th>
+          </tr>
+        </thead>
+        <tbody dir-paginate="(key, value) in audits|filter:search|orderBy:sortKey:reverse|groupBy: '[status,readDay]'|itemsPerPage:10"
+          pagination-id="rootcheck">
+          <tr ng-class="" ng-click="showDetails = ! showDetails;" class="table-agents-list-tr">
+            <td class="table-agents-list-td"><span class="bold">{{key.split(",")[1]}}</span></td>
+            <td class="table-agents-list-td">{{key.split(",")[0]}}</td>
+          </tr>
+          <tr ng-show="showDetails" style="border-top: none; width: 100%;" class="table-agents-list-tr">
+            <td class="table-agents-list-td" colspan="2" style="width: 100%; background-color: #f5f5f5;">
+              <table>
+                <tr ng-repeat="auditRecord in value">
+                  <td><span class="bold"></span>{{auditRecord.event}}</td>
+                </tr>
+        </tbody>
+        </table>
+        </td>
+        </tr>
+      </table>
+    </div>
+    <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true" pagination-id="rootcheck" autoHide="true">
+    </dir-pagination-controls>
+    <form class="form-inline">
+      </br>
+      <label>Perform the following actions over all agents:</label>
+      </br>
+      <div class="form-group">
+        <button aria-label="Restart rootcheck scan" class="btn btn-primary ng-binding" ng-click="runSyscheck();">Restart rootcheck scan</button>
+        <button aria-label="Clean rootcheck database" class="btn btn-danger ng-binding" ng-click="deleteRootcheck(); "><i class="fa fa-trash-o"></i> Clean rootcheck database</button>
+      </div>
+      </br>
+    </form>
+  </div>
+
+</div>

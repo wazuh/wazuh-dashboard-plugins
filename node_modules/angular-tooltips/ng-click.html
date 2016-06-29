@@ -1,0 +1,32 @@
+<!doctype html>
+<html ng-app="myApp">
+  <head>
+    <link rel="stylesheet" type="text/css" href="dist/angular-tooltips.css">
+    <style media="screen">
+      body {
+
+        margin: 200px;
+      }
+    </style>
+    <title>Angularjs Tooltips</title>
+  </head>
+  <body id="demo-container">
+    <div ng-controller="MyCtrl as ctrl">
+    	<button type="text" ng-click="ctrl.clickMe()" tooltips tooltip-template="Hi">
+        click me
+      </button>
+    </div>
+    <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="dist/angular-tooltips.js"></script>
+    <script type="text/javascript">
+    var myApp = angular.module('myApp',['720kb.tooltips'])
+      .controller('MyCtrl', function MyCtrl($scope) {
+
+        this.clickMe = function clickMe() {
+
+          alert('cliked');
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html ng-app="myApp">
+  <head>
+    <link rel="stylesheet" type="text/css" href="dist/angular-tooltips.css">
+    <title>Angularjs Tooltips</title>
+  </head>
+  <body id="demo-container">
+    <div ng-controller="MyCtrl">
+    	<h1>Working</h1>
+    	Name: <input type="text" ng-model="name1"/><br>
+      Hello {{name1}}!
+    	<br><br>
+    	<h1>Did not work</h1>
+    	Name: <input type="text" ng-model="name2" tooltips tooltip-template="Hi"/><br>
+      Hello {{name2}}!
+    </div>
+    <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="dist/angular-tooltips.js"></script>
+    <script type="text/javascript">
+    var myApp = angular.module('myApp',['720kb.tooltips'])
+      .controller('MyCtrl', function MyCtrl($scope) {
+
+        $scope.name1 = 'name1';
+    		$scope.name2 = 'name2';
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+<div class="container" ng-controller="cisController">
+  <div class="row">
+    <div id="messages" ng-show="message" class="settings-message-error">{{ message }}</div>
+    <div style="width: 100%;">
+      <form class="form-inline" style="align: right !important" ng-submit="reloadCIS()">
+        <div class="form-group" style="float: right;">
+          <input type="text" ng-model="agentid" class="form-control  ng-pristine ng-valid ng-touched" placeholder="Agent ID">
+          <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-refresh"></span></button>
+        </div>
+      </form>
+      <form class="form-inline">
+        <div class="form-group">
+          <input type="text" ng-model="search" class="form-control" placeholder="Search...">
+        </div>
+      </form>
+      <div>
+        </br>
+      </div>
+      <table class="table-agents" dir-paginate="(key, value) in audits|filter:search|groupBy: 'readDay'|itemsPerPage:10">
+        <tr ng-class="" ng-click="showDetails = ! showDetails;" class="table-agents-list-tr">
+          <td class="table-agents-list-td"><span class="bold">{{key}}</span></td>
+        </tr>
+        <tr ng-show="showDetails" style="border-top: none; width: 100%;" class="table-agents-list-tr">
+          <td class="table-agents-list-td" colspan="1" style="width: 100%; background-color: #f5f5f5;">
+            <table>
+              <tr ng-repeat="auditRecord in value">
+                <td><span class="bold">{{auditRecord.status}}</span> - {{auditRecord.event}}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+    </dir-pagination-controls>
+  </div>
+
+</div>
