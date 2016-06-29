@@ -223,7 +223,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     }
 
     //Load
-    DataFactory.initialize('get', '/agents', {}, 10, 0, '/agents/total')
+    DataFactory.initialize('get', '/agents', {}, 6, 0, '/agents/total')
         .then(function (data) {
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {
