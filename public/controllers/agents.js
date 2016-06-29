@@ -25,36 +25,46 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     };
 
     $scope.isSetTab = function (tab, group) {
-        tabProvider.isSetTab($scope.pageId, tab, group);
+        return tabProvider.isSetTab($scope.pageId, tab, group);
     };
 
     //Functions
     $scope.agentsGet = function (body) {
         if (!body) {
-            DataFactory.get(objectsArray['/agents'], body)
+            DataFactory.get(objectsArray['/agents'])
                 .then(function (data) {
+                    $scope.agents.length = 0;
+                    $scope.agentFetchInfo.length = 0;
                     $scope.agents = data.data;
                 }, printError);
         } else {
-            DataFactory.get(objectsArray['/agents'])
+            DataFactory.get(objectsArray['/agents'], body)
                 .then(function (data) {
+                    $scope.agents.length = 0;
+                    $scope.agentFetchInfo.length = 0;
                     $scope.agents = data.data;
                 }, printError);
         }
     };
 
+    $scope.agentsHasNext = function () {
+        return DataFactory.hasNext(objectsArray['/agents']);
+    };
     $scope.agentsNext = function () {
         DataFactory.next(objectsArray['/agents'])
         .then(function (data) {
             $scope.agents = data.data;
-        }, printError (error));
+        }, printError);
     };
 
+    $scope.agentsHasPrev = function () {
+        return DataFactory.hasPrev(objectsArray['/agents']);
+    };
     $scope.agentsPrev = function () {
         DataFactory.prev(objectsArray['/agents'])
         .then(function (data) {
             $scope.agents = data.data;
-        }, printError (error));
+        }, printError);
     };
 
     $scope.getAgentStatusClass = function (agentStatus) {
@@ -67,14 +77,16 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     };
 
     $scope.fetchAgent = function (agent) {
-        DataFactory.getAndClean('get', '/agents/'+agent.id, {})
-        .then(function (data) {
-            $scope.agentFetchInfo[agent.id] = data.data;
-        }, printError);
-        DataFactory.getAndClean('get', '/agents/'+agent.id+'/key', {})
-        .then(function (data) {
-            $scope.agentFetchInfo[agent.id].key = data.data; 
-        }, printError);
+        DataFactory.getAndClean('get', '/agents/' + agent.id, {})
+            .then(function (data) {
+                $scope.agentFetchInfo[agent.id] = data.data;
+                if (agent.id != '000') {
+                    DataFactory.getAndClean('get', '/agents/' + agent.id + '/key', {})
+                        .then(function (data) {
+                            $scope.agentFetchInfo[agent.id].key = data.data;
+                        }, printError);
+                }
+            }, printError);
     };
 
     $scope.restart = function (agent) {
@@ -149,13 +161,23 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     };
 
     $scope.loadRootcheck = function (agentId) {
-        sharedProperties.setAgentId(agentId);
+        sharedProperties.setProperty(agentId);
         $location.path('/rootcheck');
     };
 
     $scope.loadFIM = function (agentId) {
-        sharedProperties.setAgentId(agentId);
+        sharedProperties.setProperty(agentId);
         $location.path('/FIM');
+    };
+
+    $scope.agentStatusFilter = function (status) {
+        if ($scope.statusFilter === status) {
+            $scope.statusFilter = '';
+            $scope.agentsGet({});
+        } else {
+            $scope.statusFilter = status;
+            $scope.agentsGet({ 'status': status });
+        }
     };
 
     $scope.getAlertsUrl = function (agent, time, filters) {
@@ -199,7 +221,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     }
 
     //Load
-    DataFactory.initialize('get', '/agents', {}, 1, 0, '/agents/total')
+    DataFactory.initialize('get', '/agents', {}, 10, 0, '/agents/total')
         .then(function (data) {
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {

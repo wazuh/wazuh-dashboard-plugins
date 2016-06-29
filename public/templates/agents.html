@@ -42,13 +42,13 @@
 			</div>
 		</div>
 		<div style="margin-left: 10px; width: 35%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
-			<div ng-class="{ agent_filter_status_active: statusFilter == 'active' }" ng-click="filter('active')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px;" class="agentSortFilter">Active		</div>
-			<div ng-class="{ agent_filter_status_active: statusFilter == 'disconnected' }" ng-click="filter('disconnected')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100px;" class="agentSortFilter">Disconnected</div>
-			<div ng-class="{ agent_filter_status_active: statusFilter == 'never connected' }" ng-click="filter('never connected')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 132px;" class="agentSortFilter">Never connected</div>
+			<div ng-class="{ agent_filter_status_active: statusFilter == 'active' }" ng-click="agentStatusFilter('active')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px;" class="agentSortFilter">Active		</div>
+			<div ng-class="{ agent_filter_status_active: statusFilter == 'disconnected' }" ng-click="agentStatusFilter('disconnected')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100px;" class="agentSortFilter">Disconnected</div>
+			<div ng-class="{ agent_filter_status_active: statusFilter == 'never connected' }" ng-click="agentStatusFilter('never connected')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 132px;" class="agentSortFilter">Never connected</div>
 		</div>
 		
 		
-		<div class="agent_card_list" dir-paginate="agent in agents|orderBy:sortKey:reverse|filter:{status: statusFilter}|filter:search|itemsPerPage:6" ng-init="agentFetchInfo[agent.id]=[]; tab[$index]=1" pagination-id="agents">
+		<div class="agent_card_list" ng-repeat="agent in agents" ng-init="agentFetchInfo[agent.id]=[];">
 			<div class="agent_card" ng-class="{ agent_card_active: showDetails }" ng-click="fetchAgent(agent,$index); showDetails = ! showDetails; ">
 				<div class="id"> {{agent.id}} </div>
 				<div class="float_left">
@@ -61,13 +61,13 @@
 			</div>
 		    <div style="" class="agent_card_detail" ng-show="showDetails">
 				<ul id="agentsTabs">
-					<li><a ng-click="setTab(1,$index)" href="" ng-class="{ active: isSet(1,$index) }" class="active">Global</a></li>
-					<li><a ng-click="setTab(2,$index)" href="" ng-class="{ active: isSet(2,$index) }">File integrity</a></li>
-					<li><a ng-click="setTab(3,$index)" href="" ng-class="{ active: isSet(3,$index) }">Rootcheck</a></li>
-					<li><a ng-click="setTab(4,$index)" href="" ng-class="{ active: isSet(4,$index) }">Alerts</a></li>
+					<li><a ng-click="setTab(1,$index)" href="" ng-class="{ active: isSetTab(1,$index) }" class="active">Global</a></li>
+					<li><a ng-click="setTab(2,$index)" href="" ng-class="{ active: isSetTab(2,$index) }">File integrity</a></li>
+					<li><a ng-click="setTab(3,$index)" href="" ng-class="{ active: isSetTab(3,$index) }">Rootcheck</a></li>
+					<li><a ng-click="setTab(4,$index)" href="" ng-class="{ active: isSetTab(4,$index) }">Alerts</a></li>
 				</ul>
 				<div class="agentTabs-container">
-					<div class="agentsTabs-info" ng-show="isSet(1,$index)">
+					<div class="agentsTabs-info" ng-show="isSetTab(1,$index)">
 						<div class="agentsTabs-box"> 
 							<table class="table-agent-information">
 								<tbody>
@@ -133,7 +133,7 @@
 							</li>
 						</ul>
 					</div>
-					<div class="agentsTabs-file-integrity" ng-show="isSet(2,$index)">
+					<div class="agentsTabs-file-integrity" ng-show="isSetTab(2,$index)">
 						<div class="agentsTabs-box"> 
 							<table class="table-agent-information">
 								<tbody>
@@ -167,7 +167,7 @@
 							</li>
 						</ul>
 					</div>
-					<div class="agentsTabs-file-rootcheck" ng-show="isSet(3,$index)">
+					<div class="agentsTabs-file-rootcheck" ng-show="isSetTab(3,$index)">
 						<div class="agentsTabs-box"> 
 							<table class="table-agent-information">
 								<tbody>
@@ -201,7 +201,7 @@
 							</li>
 						</ul>
 					</div>
-					<div class="agentsTabs-file-alerts" ng-show="isSet(4,$index)">
+					<div class="agentsTabs-file-alerts" ng-show="isSetTab(4,$index)">
 						<div class="agentsTabs-box"> 
 							<table class="table-agent-information">
 								<tbody>
@@ -244,13 +244,7 @@
 				</div>
 			</div>
 		</div>
-
-		
-		
-		
-		
-		<dir-pagination-controls max-size="5" direction-links="true" pagination-id="agents" autoHide="true">
-		</dir-pagination-controls>
+		<span class="glyphicon glyphicon-chevron-left" ng-click="agentsPrev()" ng-show="agentsHasPrev()"></span><span class="glyphicon glyphicon-chevron-right" ng-click="agentsNext()" ng-show="agentsHasNext()"></span>
     </div>
     
 	<div class="rightCol">

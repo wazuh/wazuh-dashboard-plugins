@@ -69,7 +69,11 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
           }
         })
         .error(function (data) {
-          defered.reject({'error': -2, 'message': 'Error doing a request to Kibana API.'});
+          if (data.error) {
+            defered.reject(data);
+          } else {
+            defered.reject({'error': -2, 'message': 'Error doing a request to Kibana API.'});
+          }
         });
 
         return promise;
@@ -251,26 +255,26 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
     var prepError = function (err) {
       if(err.error < 0) {
-        err.message = "Unexpected error located on AngularJS. Error: "+err.message+" (code "+ err.error +").";
         err['html'] = "Unexpected error located on AngularJS. Error: <b>"+err.message+" (code "+ err.error +")</b>.";
-      } else if (err.error = 1) {
-        err.message = "Error getting credentials for Wazuh API. Please, check credentials at settings tab.";
+        err.message = "Unexpected error located on AngularJS. Error: "+err.message+" (code "+ err.error +").";
+      } else if (err.error === 1) {
         err['html'] = "<b>Error getting credentials</b> for Wazuh API. Please, check credentials at settings tab.";
-      } else if (err.error = 2) {
-        err.message = "Error getting credentials for Wazuh API. Could not connect with Elasticsearch.";
+        err.message = "Error getting credentials for Wazuh API. Please, check credentials at settings tab.";
+      } else if (err.error === 2) {
         err['html'] = "<b>Error getting credentials</b> for Wazuh API. Could not connect with Elasticsearch.";
+        err.message = "Error getting credentials for Wazuh API. Could not connect with Elasticsearch.";
       } else if (err.error < 5) {
-        err.message = "Unexpected error located on Kibana server. Error: "+err.message+" (code "+ err.error +").";
         err['html'] = "Unexpected error located on Kibana server. Error: <b>"+err.message+" (code "+ err.error +")</b>.";
-      } else if (err.error = 5) {
-        err.message = "Could not connect with Wazuh API. Error: "+err.errorMessage+". Please, check the URL at settings tab.";
+        err.message = "Unexpected error located on Kibana server. Error: "+err.message+" (code "+ err.error +").";
+      } else if (err.error === 5) {
         err['html'] = "Could not connect with Wazuh API. Error: "+err.errorMessage+".</br> Please, check the URL at settings tab.";
-      } else if (err.error = 6) {
-        err.message = "Wazuh API returned an error message. Error: "+err.errorData+".";
-        err['html'] = "Wazuh API returned an error message. Error: <b>"+err.errorData+"</b>.";
+        err.message = "Could not connect with Wazuh API. Error: "+err.errorMessage+". Please, check the URL at settings tab.";
+      } else if (err.error === 6) {
+        err['html'] = "Wazuh API returned an error message. Error: <b>"+err.errorData.message+"</b>";
+        err.message = "Wazuh API returned an error message. Error: "+err.errorData.message;
       } else {
-        err.message = "Unexpected error. Please, report this to Wazuh Team.";
         err['html'] = "Unexpected error. Please, report this to Wazuh Team.";
+        err.message = "Unexpected error. Please, report this to Wazuh Team.";
       }
 
       return err;
@@ -301,8 +305,11 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         if (!tabset) {
           tabset = 0;
         }
-        if (!(_tabs[pageId] && _tabs[pageId][tabset])) {
+        if (!_tabs[pageId]) {
           return false;
+        }
+        if (!_tabs[pageId][tabset]) {
+          return (tab == 1);
         }
         return (_tabs[pageId][tabset] == tab);
       },
