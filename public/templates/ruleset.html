@@ -7,7 +7,7 @@
         <div class="leftCol">
             <h2 class="container_page_title">Ruleset</h2>
             <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;"
-                ng-show="isSet(1, 1)">
+                ng-show="isSetTab(1, 1)">
                 <div style="float: left;">
                     <form class="form-inline ng-pristine ng-valid">
                         <div class="form-group" style="position: relative;">
@@ -17,8 +17,8 @@
                     </form>
                 </div>
             </div>
-                        <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;"
-                ng-show="isSet(2, 1)">
+            <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;"
+                ng-show="isSetTab(2, 1)">
                 <div style="float: left;">
                     <form class="form-inline ng-pristine ng-valid">
                         <div class="form-group" style="position: relative;">
@@ -29,20 +29,20 @@
                 </div>
             </div>
             <div style="margin-left: 10px; width: 202px; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;"
-                ng-show="isSet(1, 1)">
-                <div ng-class="{ ruleset_button_active: rulesFilters['status'] == 'enabled' }" ng-click="setRulesFilter('status', 'enabled')" style="font-weight: bold; border-radius: 0px; width: 100px;"
-                    class="rulesetFilter">Enabled </div>
-                <div ng-class="{ ruleset_button_active: rulesFilters['status'] == 'disabled' }" ng-click="setRulesFilter('status', 'disabled')" style="font-weight: bold; border-radius: 0px; width: 100px;"
-                    class="rulesetFilter">Disabled </div>
+                ng-show="isSetTab(1, 1)">
+                <div ng-class="{ ruleset_button_active: rfStatus == 'enabled' }" ng-click="setRulesFilter('status', 'enabled')"
+                    style="font-weight: bold; border-radius: 0px; width: 100px;" class="rulesetFilter">Enabled </div>
+                <div ng-class="{ ruleset_button_active: rfStatus == 'disabled' }" ng-click="setRulesFilter('status', 'disabled')"
+                    style="font-weight: bold; border-radius: 0px; width: 100px;" class="rulesetFilter">Disabled </div>
             </div>
             <div style="margin-left: 10px; width: 202px; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;"
-                ng-show="isSet(2, 1)">
-                <div ng-class="{ ruleset_button_active: decodersFilters['type'] == 'all' }" ng-click="setDecodersFilter('type', 'all')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                ng-show="isSetTab(2, 1)">
+                <div ng-class="{ ruleset_button_active: dfType == 'all' }" ng-click="setDecodersFilter('type', 'all')" style="font-weight: bold; border-radius: 0px; width: 100px;"
                     class="rulesetFilter">All decoders </div>
-                <div ng-class="{ ruleset_button_active: decodersFilters['type'] == 'parents' }" ng-click="setDecodersFilter('type', 'parents')" style="font-weight: bold; border-radius: 0px; width: 100px;"
-                    class="rulesetFilter">Parents </div>
+                <div ng-class="{ ruleset_button_active: dfType == 'parents' }" ng-click="setDecodersFilter('type', 'parents')"
+                    style="font-weight: bold; border-radius: 0px; width: 100px;" class="rulesetFilter">Parents </div>
             </div>
-            <div class="form-group ruleLevel_div" ng-show="isSet(1, 1)">
+            <div class="form-group ruleLevel_div" ng-show="isSetTab(1, 1)">
                 <label class="ruleLevel_label">Alert level:</label>
                 <input type="number" min="0" max="{{$parent.maxLevel}}" step="1" ng-model="$parent.minLevel" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch ruleLevel_input">
                 <label class="ruleLevel_label">-</label>
@@ -51,30 +51,35 @@
             </div>
             </br>
             </br>
-            <div class="filterActive_div" ng-if="hasRulesFilter('file');" ng-show="isSet(1, 1)">
-                <span ng-click="setRulesFilter('file', rulesFilters['file'])" ng-class="{ textFilterActive_header: isSetRulesFilter('file', rulesFilter['file']) }" class="bold">Selected file: {{rulesFilter['file']}}   <span class="glyphicon glyphicon-remove"></span>   </span>
-                <a class="glyphicon glyphicon-download-alt textFilterActive_glyphicon" ng-init="downloadRuleFile(rulesFilter['file'])" ng-href="{{encodedFile}}"
+            <div class="filterActive_div" ng-if="hasRulesFilter('file');" ng-show="isSetTab(1, 1)">
+                <span ng-click="setRulesFilter('file', rfFiles)" ng-class="{ textFilterActive_header: isSetTabRulesFilter('file', rfFiles) }"
+                    class="bold">Selected file: {{rfFiles}}   <span class="glyphicon glyphicon-remove"></span>                </span>
+                <a class="glyphicon glyphicon-download-alt textFilterActive_glyphicon" ng-init="downloadRuleFile(rfFiles)" ng-href="{{encodedFile}}"
                     download="file.xml"></a>
             </div>
-            <div class="filterActive_div" ng-if="hasRulesFilter('group');" ng-show="isSet(1, 1)">
-                <span ng-click="setRulesFilter('group', rulesFilters['group'])" ng-class="{ textFilterActive_header: isSetRulesFilter('group', rulesFilter['group']) }" class="bold">Selected group: {{rulesFilter['group']}}   <span class="glyphicon glyphicon-remove"></span></span>
+            <div class="filterActive_div" ng-if="hasRulesFilter('group');" ng-show="isSetTab(1, 1)">
+                <span ng-click="setRulesFilter('group', rfGroups)" ng-class="{ textFilterActive_header: isSetTabRulesFilter('group', rfGroups) }"
+                    class="bold">Selected group: {{rfGroups}}   <span class="glyphicon glyphicon-remove"></span></span>
             </div>
-            <div class="filterActive_div" ng-if="hasRulesFilter('pci');" ng-show="isSet(1, 1)">
-                <span ng-click="setRulesFilter('pci', rulesFilters['pci'])" ng-class="{ textFilterActive_header: isSetRulesFilter('pci', rulesFilter['pci']) }" class="bold">Selected PCI group: {{rulesFilter['pci']}}   <span class="glyphicon glyphicon-remove"></span></span>
+            <div class="filterActive_div" ng-if="hasRulesFilter('pci');" ng-show="isSetTab(1, 1)">
+                <span ng-click="setRulesFilter('pci', rfPci)" ng-class="{ textFilterActive_header: isSetTabRulesFilter('pci', rfPci) }"
+                    class="bold">Selected PCI group: {{rfPci}}   <span class="glyphicon glyphicon-remove"></span></span>
             </div>
-            <div class="filterActive_div" ng-if="hasDecodersFilter('file');" ng-show="isSet(2, 1)">
-                <span ng-click="setDecodersFilter('file', decodersFilters['file'])" ng-class="{ textFilterActive_header: isSetDecodersFilter('file', decodersFilters['file']) }" class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{decodersFilters['file']}}">Selected file: {{formatFile(decodersFilters['file'])}}   <span class="glyphicon glyphicon-remove"></span></span>
+            <div class="filterActive_div" ng-if="hasDecodersFilter('file');" ng-show="isSetTab(2, 1)">
+                <span ng-click="setDecodersFilter('file', dfFile)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('file', dfFile) }"
+                    class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{dfFile}}">Selected file: {{formatFile(dfFile)}}   <span class="glyphicon glyphicon-remove"></span></span>
             </div>
-            <div class="filterActive_div" ng-if="hasDecodersFilter('id');" ng-show="isSet(2, 1)">
-                <span ng-click="setDecodersFilter('id', decodersFilters['id'])" ng-class="{ textFilterActive_header: isSetDecodersFilter('id', decodersFilters['id']) }" class="bold">Selected parent: {{decodersFilters['id']}}   <span class="glyphicon glyphicon-remove"></span></span>
+            <div class="filterActive_div" ng-if="hasDecodersFilter('id');" ng-show="isSetTab(2, 1)">
+                <span ng-click="setDecodersFilter('id', dfId)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('id', dfId) }"
+                    class="bold">Selected parent: {{dfId}}   <span class="glyphicon glyphicon-remove"></span></span>
             </div>
             <ul id="rulesetTabs">
-                <li><a ng-class="{ active: isSet(1, 1) }" href ng-click="setTab(1, 1)">Rules</a></li>
-                <li><a ng-class="{ active: isSet(2, 1) }" href ng-click="setTab(2, 1)" ng-disabled="!decoderLoad">Decoders</a></li>
-                <li><a ng-class="{ active: isSet(3, 1) }" href ng-click="setTab(3, 1)">Update</a></li>
+                <li><a ng-class="{ active: isSetTab(1, 1) }" href ng-click="setTab(1, 1)">Rules</a></li>
+                <li><a ng-class="{ active: isSetTab(2, 1) }" href ng-click="setTab(2, 1)" ng-disabled="!decoderLoad">Decoders</a></li>
+                <li><a ng-class="{ active: isSetTab(3, 1) }" href ng-click="setTab(3, 1)">Update</a></li>
             </ul>
             <div class="rulesetContentTabs">
-                <div id="rulesTab" ng-show="isSet(1, 1)">
+                <div id="rulesTab" ng-show="isSetTab(1, 1)">
                     <div class="rules_card_list" ng-repeat="rule in rules">
                         <div class="rule_card" ng-class="{ rule_card_active: showDetails }" ng-click=" showDetails = ! showDetails; ">
                             <div class="id"> {{rule.id}} </div>
@@ -130,7 +135,8 @@
                                                     <td class="table-rule-information-td-title">Advanced details</td>
                                                 </tr>
                                                 <tr ng-repeat="(detailk, detailv) in rule.details">
-                                                    <td class="table-rule-information-td-title"><span class="glyphicon glyphicon-question-sign" tooltips tooltip-size="large" tooltip-side="auto" tooltip-template="{{rulesTooltips(detailk)}}"></span></td>
+                                                    <td class="table-rule-information-td-title"><span class="glyphicon glyphicon-question-sign" tooltips tooltip-size="large"
+                                                            tooltip-side="auto" tooltip-template="{{rulesTooltips(detailk)}}"></span></td>
                                                     <td class="table-rule-information-td-title">{{detailk}}</td>
                                                     <td class="table-rule-information-td-value ng-binding">{{detailv}}</td>
                                                 </tr>
@@ -141,9 +147,11 @@
                             </div>
                         </div>
                     </div>
-                        <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules', rules)" ng-show="objHasPrev('/rules')"></span><span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules', rules)" ng-show="objHasNext('/rules')"></span>
+                    <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules', 'rules')" ng-show="objHasPrev('/rules')"></span>
+                    <span
+                        class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules', 'rules')" ng-show="objHasNext('/rules')"></span>
                 </div>
-                <div id="decodersTab" ng-show="isSet(2, 1)">
+                <div id="decodersTab" ng-show="isSetTab(2, 1)">
                     <div class="rules_card_list" ng-repeat="decoder in decoders">
                         <div class="rule_card" ng-class="{ rule_card_active: showDetails }" ng-click=" showDetails = ! showDetails; ">
                             <div class="float_left">
@@ -165,11 +173,11 @@
                                                 </tr>
                                                 <tr>
                                                     <td class="table-rule-information-td-title">File</td>
-                                                    <td class="table-rule-information-td-value ng-binding" colspan="2">{{decoder.file}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-click="setDecodersFilter('file', decoder.file);">{{decoder.file}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td class="table-rule-information-td-title">Full path</td>
-                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-click="setDecodersFilter('file', decoder.full_path);">{{decoder.full_path}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" colspan="2">{{decoder.full_path}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td class="table-rule-information-td-title">Position</td>
@@ -178,13 +186,14 @@
                                                 </tr>
                                                 <tr>
                                                     <td class="table-rule-information-td-title" ng-if="decoder.details.parent">Parent</td>
-                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-if="decoder.details.parent" ng-click="setDecodersFilter('parent', decoder.details.parent);">{{decoder.details.parent}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-if="decoder.details.parent" ng-click="setDecodersFilter('id', decoder.details.parent);">{{decoder.details.parent}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td class="table-rule-information-td-title">Advanced details</td>
                                                 </tr>
                                                 <tr ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
-                                                    <td class="table-rule-information-td-title"><span class="glyphicon glyphicon-question-sign" tooltips tooltip-size="large" tooltip-side="auto" tooltip-template="{{decoderTooltips(detailk)}}"></span></td>
+                                                    <td class="table-rule-information-td-title"><span class="glyphicon glyphicon-question-sign" tooltips tooltip-size="large"
+                                                            tooltip-side="auto" tooltip-template="{{decoderTooltips(detailk)}}"></span></td>
                                                     <td class="table-rule-information-td-title">{{detailk}}</td>
                                                     <td class="table-rule-information-td-value ng-binding" ng-if="(detailk !== 'regex') && (detailk !== 'order')">{{detailv}}</td>
                                                     <td class="table-rule-information-td-value ng-binding" ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)">{{colorRegex(detailv)}}</td>
@@ -197,9 +206,11 @@
                             </div>
                         </div>
                     </div>
-                        <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders', rules)" ng-show="objHasPrev('/decoders')"></span><span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders', rules)" ng-show="objHasNext('/decoders')"></span>
+                    <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders', 'decoders')" ng-show="objHasPrev('/decoders')"></span>
+                    <span
+                        class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders', 'decoders')" ng-show="objHasNext('/decoders')"></span>
                 </div>
-                <div id="updaterTab" ng-show="isSet(3, 1)">
+                <div id="updaterTab" ng-show="isSetTab(3, 1)">
                     <table class="updateGuideTable">
                         <tbody>
                             <tr>
@@ -247,74 +258,85 @@
                 </div>
             </div>
         </div>
-        <div class="rightCol" ng-show="isSet(1, 1)">
+        <div class="rightCol" ng-show="isSetTab(1, 1)">
             <div class="tabBlock">
                 <ul id="rulesetTabsFilters">
-                    <li><a ng-class="{ active: isSet(1, 2) }" href ng-click="setTab(1, 2)">Files</a></li>
-                    <li><a ng-class="{ active: isSet(2, 2) }" href ng-click="setTab(2, 2)">Groups</a></li>
-                    <li><a ng-class="{ active: isSet(3, 2) }" href ng-click="setTab(3, 2)">PCI</a></li>
+                    <li><a ng-class="{ active: isSetTab(1, 2) }" href ng-click="setTab(1, 2)">Files</a></li>
+                    <li><a ng-class="{ active: isSetTab(2, 2) }" href ng-click="setTab(2, 2)">Groups</a></li>
+                    <li><a ng-class="{ active: isSetTab(3, 2) }" href ng-click="setTab(3, 2)">PCI</a></li>
                 </ul>
             </div>
             <div class="filesBlock">
-                <table class="table-files" ng-show="isSet(1, 1) && isSet(1, 2)">
+                <table class="table-files" ng-show="isSetTab(1, 1) && isSetTab(1, 2)">
                     <tr class="table-files-list-tr">
                         <td class="table-files-list-td"><input type="text" ng-model="searchFilesRules" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
                                 placeholder="Search..."></td>
                     </tr>
                     <tr ng-class="" class="table-files-list-tr" ng-repeat="file in filesRules">
-                        <td class="table-files-list-td"><span ng-click="setRulesFilter('file', file.name)" ng-class="{ textFilterActive: isSetRulesFilter('file', file.name) }"
+                        <td class="table-files-list-td"><span ng-click="setRulesFilter('file', file.name)" ng-class="{ textFilterActive: isSetTabRulesFilter('file', file.name) }"
                                 class="bold">{{file.name}}</span></td>
                     </tr>
                     <tr class="table-files-list-tr">
                         <td class="table-files-list-td">
-                                                    <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/files', filesRules)" ng-show="objHasPrev('/rules/files')"></span><span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/files', filesRules)" ng-show="objHasNext('/rules/files')"></span>
+                            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/files', 'filesRules')" ng-show="objHasPrev('/rules/files')"></span>
+                            <span
+                                class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/files', 'filesRules')" ng-show="objHasNext('/rules/files')"></span>
                         </td>
                     </tr>
                 </table>
-                <table class="table-files" ng-show="isSet(1, 1) && isSetFilters(2, 2)">
+                <table class="table-files" ng-show="isSetTab(1, 1) && isSetTab(2, 2)">
                     <tr class="table-files-list-tr">
                         <td class="table-files-list-td"><input type="text" ng-model="searchGroupsRules" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
                                 placeholder="Search..."></td>
                     </tr>
                     <tr ng-class="" class="table-files-list-tr" ng-repeat="group in groupsRules">
-                        <td class="table-files-list-td"><span ng-click="setRulesFilter('group', group)" ng-class="{ textFilterActive: isSetRulesFilter('group', group) }" class="bold">{{group}}</span></td>
+                        <td class="table-files-list-td"><span ng-click="setRulesFilter('group', group)" ng-class="{ textFilterActive: isSetTabRulesFilter('group', group) }"
+                                class="bold">{{group}}</span></td>
                     </tr>
                     <tr class="table-files-list-tr">
                         <td class="table-files-list-td">
-                            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/groups', groupsRules)" ng-show="objHasPrev('/rules/groups')"></span><span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/groups', groupsRules)" ng-show="objHasNext('/rules/groups')"></span>
+                            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/groups', 'groupsRules')" ng-show="objHasPrev('/rules/groups')"></span>
+                            <span
+                                class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/groups', 'groupsRules')" ng-show="objHasNext('/rules/groups')"></span>
                         </td>
                     </tr>
                 </table>
-                <table class="table-files" ng-show="isSet(1, 1) && isSetFilters(3, 2)">
+                <table class="table-files" ng-show="isSetTab(1, 1) && isSetTab(3, 2)">
                     <tr class="table-files-list-tr">
                         <td class="table-files-list-td"><input type="text" ng-model="searchFilesPci" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
                                 placeholder="Search..."></td>
                     </tr>
                     <tr ng-class="" class="table-files-list-tr" ng-repeat="pci in pciGroupsRules">
-                        <td class="table-files-list-td"><span ng-click="setRulesFilter('pci', pci)" ng-class="{ textFilterActive: isSetRulesFilter('pci', pci) }" class="bold">{{pci}}</span></td>
+                        <td class="table-files-list-td"><span ng-click="setRulesFilter('pci', pci)" ng-class="{ textFilterActive: isSetTabRulesFilter('pci', pci) }"
+                                class="bold">{{pci}}</span></td>
                     </tr>
                     <tr class="table-files-list-tr">
                         <td class="table-files-list-td">
-                            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/pci', pciGroupsRules)" ng-show="objHasPrev('/rules/pci')"></span><span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/pci', pciGroupsRules)" ng-show="objHasNext('/rules/pci')"></span>
+                            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/pci', 'pciGroupsRules')" ng-show="objHasPrev('/rules/pci')"></span>
+                            <span
+                                class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/pci', 'pciGroupsRules')" ng-show="objHasNext('/rules/pci')"></span>
                         </td>
                     </tr>
                 </table>
             </div>
         </div>
-        <div class="rightCol" ng-show="isSet(2, 1)">
+        <div class="rightCol" ng-show="isSetTab(2, 1)">
             <div class="filesBlock" style="margin-top: 35px;">
-                <table class="table-files" ng-show="isSet(2, 1)">
+                <table class="table-files" ng-show="isSetTab(2, 1)">
                     <tr class="table-files-list-tr">
                         <td class="table-files-list-td"><input type="text" ng-model="searchFilesDecoders" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
                                 placeholder="Search..."></td>
                     </tr>
                     <tr ng-class="" class="table-files-list-tr" ng-repeat="file in filesDecoders">
-                        <td class="table-files-list-td"><span ng-click="setDecodersFilter('file', file)" ng-class="{ textFilterActive: isSetDecodersFilter('file', file) }"
+                        <td class="table-files-list-td"><span ng-click="setDecodersFilter('file', formatFile(file))" ng-class="{ textFilterActive: isSetTabDecodersFilter('file', formatFile(file)) }"
                                 class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{file}}">{{formatFile(file)}}</span></td>
                     </tr>
                     <tr class="table-files-list-tr">
                         <td class="table-files-list-td">
-                            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders/files', filesDecoders)" ng-show="objHasPrev('/decoders/files')"></span><span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders/files', filesDecoders)" ng-show="objHasNext('/decoders/files')"></span>
+                            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders/files', 'filesDecoders')" ng-show="objHasPrev('/decoders/files')"></span>
+                            <span
+                                class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders/files', 'filesDecoders')"
+                                ng-show="objHasNext('/decoders/files')"></span>
                         </td>
                     </tr>
                 </table>

@@ -10,12 +10,20 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     $scope.rules = [];
     $scope.backups = [];
     $scope.decoders = [];
+    $scope.filesRules = [];
     $scope.groupsRules = [];
+    $scope.filesDecoders = [];
     $scope.pciGroupsRules = [];
 
-    $scope.rulesFilters = {};
-    $scope.decodersFilters = {};
-    $scope.rulesFilters['status'] = 'enabled';
+    $scope.rfStatus = 'enabled';
+    $scope.rfFiles = '';
+    $scope.rfGroups = '';
+    $scope.rfPci = '';
+    $scope.rfLevel = '';
+
+    $scope.dfType = 'all';
+    $scope.dfFile = '';
+    $scope.dfId = '';
 
     $scope.maxLevel = 15;
     $scope.minLevel = 0;
@@ -47,37 +55,101 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     //Rules - Filters
 
     $scope.setRulesFilter = function (type, value) {
-        if (value === 'status') {
-            var tmpValue = $scope.rulesFilters['status'];
-            $scope.rulesFilters.length = 0;
-            $scope.rulesFilters['status'] = tmpValue;
-        }
+        var tmp;
+        switch(type) {
+            case 'status':
+                tmp = $scope.rfStatus;
+                $scope.rfStatus = '';
+                break;
+            case 'file':
+                tmp = $scope.rfFiles;
+                break;
+            case 'group':
+                tmp = $scope.rfGroups;
+                break;
+            case 'pci':
+                tmp = $scope.rfPci;
+                break;
+            case 'level':
+                tmp = $scope.rfLevel;
+                $scope.rfLevel = '';
+                break;
+        };
 
-        if ($scope.rulesFilters[type] === value) {
-            $scope.rulesFilters[type] = '';
-        } else {
-            $scope.rulesFilters[type] = value;
-        }
+        $scope.rfFiles = $scope.rfGroups = $scope.rfPci = '';
+
+        switch(type) {
+            case 'status':
+                if (tmp != value) {
+                    $scope.rfStatus = value;
+                }
+                break;
+            case 'file':
+                if (tmp != value) {
+                    $scope.rfFiles = value;
+                }
+                break;
+            case 'group':
+                if (tmp != value) {
+                    $scope.rfGroups = value;
+                }
+                break;
+            case 'pci':
+                if (tmp != value) {
+                    $scope.rfPci = value;
+                }
+                break;
+            case 'level':
+                if (tmp != value) {
+                    $scope.rfLevel = value;
+                }
+                break;
+        };
+
         _applyRulesFilters();
     };
 
     $scope.isSetRulesFilter = function (type, value) {
-        return $scope.rulesFilters[type] === value;
+        switch (type) {
+            case 'status':
+                return $scope.rfStatus === value;
+            case 'file':
+                return $scope.rfFiles === value;
+            case 'group':
+                return $scope.rfGroups === value;
+            case 'pci':
+                return $scope.rfPci === value;
+            case 'level':
+                return $scope.rfLevel === value;
+        };
+        return false;
     };
 
     $scope.setRulesFilter_outside = function (type, value) {
-        if (type == 'files') {
+        if (type == 'file') {
             $scope.setTab(1, 2);
-        } else if (type == 'groups') {
+        } else if (type == 'group') {
             $scope.setTab(2, 2);
         } else if (type == 'pci') {
             $scope.setTab(3, 2);
         }
-        setRulesFilter(type, value);
+        $scope.setRulesFilter(type, value);
     };
 
     $scope.hasRulesFilter = function (type) {
-        return ($scope.rulesFilters[type] && $scope.rulesFilters[type] != '');
+        switch (type) {
+            case 'status':
+                return $scope.rfStatus != '';
+            case 'file':
+                return $scope.rfFiles != '';
+            case 'group':
+                return $scope.rfGroups != '';
+            case 'pci':
+                return $scope.rfPci != '';
+            case 'level':
+                return $scope.rfLevel != '';
+        };
+        return false;
     };
 
     $scope.setRulesFilter_level = function () {
@@ -98,7 +170,21 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     };
 
     var _applyRulesFilters = function () {
-        $scope.objGet('rules', $scope.rules, $scope.rulesFilters);
+        var body = {};
+        if ($scope.rfStatus != '') {
+            body.status = $scope.rfStatus;
+        }
+        if ($scope.rfFiles != '') {
+            body.file = $scope.rfFiles;
+        } else if ($scope.rfGroups != '') {
+            body.group = $scope.rfGroups;
+        } else if ($scope.rfPci != '') {
+            body.pci = $scope.rfPci;
+        }
+        if ($scope.rfLevel != '') {
+            body.level = $scope.rfLevel;
+        }
+        $scope.objGet('/rules', 'rules', body);
     };
     
     //Rules - Aux functions
@@ -260,36 +346,108 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     //Decoders - Filters
 
     $scope.setDecodersFilter = function (type, value) {
-        if (value === 'type') {
-            var tmpValue = $scope.decodersFilters['type'];
-            $scope.decodersFilters.length = 0;
-            $scope.decodersFilters['type'] = tmpValue;
+        if (type === 'type') {
+            $scope.dfFile = $scope.dfId = '';
+            if (value !== $scope.dfType) {
+                $scope.dfType = value;
+            }
         }
 
-        if (value === 'id') {
-            var tmpValue = $scope.decodersFilters['id'];
-            $scope.decodersFilters.length = 0;
-            $scope.decodersFilters['id'] = tmpValue;
+        if (type === 'id') {
+            $scope.dfFile = '';
+            $scope.dfType = 'all';
+            if (value === $scope.dfId) {
+                $scope.dfId = '';
+            } else {
+                $scope.dfId = value;
+            }
         }
 
-        if ($scope.decodersFilters[type] === value) {
-            $scope.decodersFilters[type] = '';
-        } else {
-            $scope.decodersFilters[type] = value;
+        if (type === 'file') {
+            $scope.dfId = '';
+            $scope.dfType = 'all';
+            if (value === $scope.dfFile) {
+                $scope.dfFile = '';
+            } else {
+                $scope.dfFile = value;
+            }
         }
-        _applyDecodersFilters();
+
+        _applyDecodersFilters(type);
     };
 
     $scope.isSetDecodersFilter = function (type, value) {
-        return $scope.decodersFilters[type] === value;
+        if (type === 'type') {
+            return $scope.dfType === value;
+        } else if (type === 'file') {
+            return $scope.dfFile === value;
+        } else if (type === 'id') {
+            return $scope.dfId === value;
+        } else {
+            return false;
+        }
     };
 
     $scope.hasDecodersFilter = function (type) {
-        return ($scope.decodersFilters[type] && $scope.decodersFilters[type] != '');
+        if (type === 'type') {
+            return $scope.dfType != '';
+        } else if (type === 'file') {
+            return $scope.dfFile != '';
+        } else if (type === 'id') {
+            return $scope.dfId != '';
+        } else {
+            return false;
+        }
     };
 
-    var _applyDecodersFilters = function () {
-        $scope.objGet('decoders', $scope.decoders, $scope.decodersFilters);
+    var _applyDecodersFilters = function (type) {
+        if (type === 'type') {
+            var call;
+            if ($scope.dfType === 'all') {
+                call = '/decoders';
+            } else {
+                call = '/decoders/parents';
+            }
+            DataFactory.clean(objectsArray['/decoders']);
+            DataFactory.initialize('get', call, {}, 10, 0)
+                .then(function (data) {
+                    objectsArray['/decoders'] = data;
+                    DataFactory.get(data).then(function (data) {
+                        $scope.decoders = data.data.items;
+                    });
+                }, printError);
+        } else if (type === 'id') {
+            var call;
+            if ($scope.dfId === '') {
+                call = '/decoders';
+            } else {
+                call = '/decoders/' + $scope.dfId;
+            }
+            DataFactory.clean(objectsArray['/decoders']);
+            DataFactory.initialize('get', call, {}, 10, 0)
+                .then(function (data) {
+                    objectsArray['/decoders'] = data;
+                    DataFactory.get(data).then(function (data) {
+                        $scope.decoders = data.data.items;
+                    });
+                }, printError);
+
+        } else if (type === 'file') {
+            var body;
+            if ($scope.dfFile != '') {
+                body = { 'file': $scope.dfFile };
+            } else {
+                body = { };
+            }
+            DataFactory.clean(objectsArray['/decoders']);
+            DataFactory.initialize('get', '/decoders', body, 10, 0)
+                .then(function (data) {
+                    objectsArray['/decoders'] = data;
+                    DataFactory.get(data).then(function (data) {
+                        $scope.decoders = data.data.items;
+                    });
+                }, printError);
+        }
     };
 
     //Decoders - aux functions
@@ -424,36 +582,65 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     $scope.objHasNext = function (objName) {
         return DataFactory.hasNext(objectsArray[objName]);
     };
-    $scope.objNext = function (objName, container) {
+    $scope.objNext = function (objName, containerName) {
         DataFactory.next(objectsArray[objName])
             .then(function (data) {
-                container = data.data.items;
+                _applyContainer(data, containerName);
             }, printError);
     };
 
     $scope.objHasPrev = function (objName) {
         return DataFactory.hasPrev(objectsArray[objName]);
     };
-    $scope.objPrev = function (objName, container) {
+    $scope.objPrev = function (objName, containerName) {
         DataFactory.prev(objectsArray[objName])
             .then(function (data) {
-                container = data.data.items;
+                _applyContainer(data, containerName);
             }, printError);
     };
 
-    $scope.objGet = function (objName, container, body) {
+    $scope.objGet = function (objName, containerName, body) {
         if (!body) {
             DataFactory.get(objectsArray[objName])
                 .then(function (data) {
-                    container.length = 0;
-                    container = data.data.items;
+                    _applyContainer(data, containerName);
                 }, printError);
         } else {
             DataFactory.get(objectsArray[objName], body)
                 .then(function (data) {
-                    container.length = 0;
-                    container = data.data.items;
+                    _applyContainer(data, containerName);
                 }, printError);
+        }
+    };
+
+    var _applyContainer = function (data, containerName) {
+        switch(containerName) {
+            case 'rules':
+                $scope.rules.length = 0;
+                $scope.rules = data.data.items;
+                break;
+            case 'decoders':
+                $scope.decoders.length = 0;
+                $scope.decoders = data.data.items;
+                break;
+            case 'groupsRules':
+                $scope.groupsRules.length = 0;
+                $scope.groupsRules = data.data.items;
+                break;
+            case 'pciGroupsRules':
+                $scope.pciGroupsRules.length = 0;
+                $scope.pciGroupsRules = data.data.items;
+                break;
+            case 'filesRules':
+                $scope.filesRules.length = 0;
+                $scope.filesRules = data.data.items;
+                break;
+            case 'filesDecoders':
+                $scope.filesDecoders.length = 0;
+                $scope.filesDecoders = data.data.items;
+                break;
+            default: 
+                break;
         }
     };
 
@@ -466,7 +653,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     }
 
     var load_decoders_files = function () {
-        DataFactory.initialize('get', '/decoders/files', {}, 10, 0, '/rules/total')
+        DataFactory.initialize('get', '/decoders/files', {}, 10, 0)
             .then(function (data) {
                 objectsArray['/decoders/files'] = data;
                 DataFactory.get(data).then(function (data) {
@@ -477,7 +664,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     };
 
     var load_decoders = function () {
-        DataFactory.initialize('get', '/decoders', {}, 10, 0, '/rules/total')
+        DataFactory.initialize('get', '/decoders', {}, 10, 0)
             .then(function (data) {
                 objectsArray['/decoders'] = data;
                 DataFactory.get(data).then(function (data) {
@@ -488,7 +675,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     };
 
     var load_pci_groups = function () {
-        DataFactory.initialize('get', '/rules/pci', {}, 10, 0, '/rules/total')
+        DataFactory.initialize('get', '/rules/pci', {}, 10, 0)
             .then(function (data) {
                 objectsArray['/rules/pci'] = data;
                 DataFactory.get(data).then(function (data) {
@@ -499,7 +686,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     };
 
     var load_rules_groups = function () {
-        DataFactory.initialize('get', '/rules/groups', {}, 10, 0, '/rules/total')
+        DataFactory.initialize('get', '/rules/groups', {}, 10, 0)
             .then(function (data) {
                 objectsArray['/rules/groups'] = data;
                 DataFactory.get(data).then(function (data) {
@@ -510,7 +697,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     };
 
     var load_rules_files = function () {
-        DataFactory.initialize('get', '/rules/files', {}, 10, 0, '/rules/total')
+        DataFactory.initialize('get', '/rules/files', {}, 10, 0)
             .then(function (data) {
                 objectsArray['/rules/files'] = data;
                 DataFactory.get(data).then(function (data) {
@@ -521,7 +708,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     };
 
     var load_rules = function () {
-        DataFactory.initialize('get', '/rules', {}, 10, 0, '/rules/total')
+        DataFactory.initialize('get', '/rules', {}, 10, 0)
             .then(function (data) {
                 objectsArray['/rules'] = data;
                 DataFactory.get(data).then(function (data) {

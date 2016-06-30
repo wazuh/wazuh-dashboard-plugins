@@ -207,7 +207,6 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       if (newBody) {
         _instances[instanceId]['body'] = newBody;
         _instances[instanceId]['offset'] = 0;
-
       }
 
       var preparedBody = _instances[instanceId]['body'];
