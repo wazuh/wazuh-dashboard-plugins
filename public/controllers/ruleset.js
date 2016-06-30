@@ -13,7 +13,10 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     $scope.groupsRules = [];
     $scope.pciGroupsRules = [];
 
-    $scope.rulesetStatusFilter = 'enabled';
+    $scope.rulesFilters = {};
+    $scope.decodersFilters = {};
+    $scope.rulesFilters['status'] = enabled;
+
     $scope.maxLevel = 15;
     $scope.minLevel = 0;
     $scope.updateType = 'b';
@@ -40,6 +43,59 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     };
 
     //Functions
+
+    //Rules - Filters
+
+    $scope.setRulesFilter = function (type, value) {
+        if (value === 'status') {
+            var tmpValue = $scope.rulesFilters['status'];
+            $scope.rulesFilters.length = 0;
+            $scope.rulesFilters['status'] = tmpValue;
+        }
+
+        if ($scope.rulesFilters[type] === value) {
+            $scope.rulesFilters[type] = '';
+        } else {
+            $scope.rulesFilters[type] = value;
+        }
+        _applyRulesFilters();
+    };
+
+    $scope.isSetRulesFilter = function (type, value) {
+        return $scope.rulesFilters[type] === value;
+    };
+
+    $scope.setRulesFilter_outside = function (type, value) {
+        if (type == 'files') {
+            $scope.setTab(1, 2);
+        } else if (type == 'groups') {
+            $scope.setTab(2, 2);
+        } else if (type == 'pci') {
+            $scope.setTab(3, 2);
+        }
+        setRulesFilter(type, value);
+    };
+
+    $scope.hasRulesFilter = function (type) {
+        return ($scope.rulesFilters[type] && $scope.rulesFilters[type] != '');
+    };
+
+    $scope.setRulesFilter_level = function () {
+        if (($scope.minLevel == undefined) || ($scope.maxLevel == undefined)
+            || ($scope.minLevel < 0 || $scope.minLevel > 15 || $scope.maxLevel < 0 || $scope.maxLevel > 15)
+            || ($scope.maxLevel < $scope.minLevel)) {
+            $scope.minLevel = 0;
+            $scope.maxLevel = 15;
+            alertify.delay(10000).closeLogOnClick(true).error('Invalid level range');
+        } else {
+            $scope.setRulesFilter('level', $scope.minLevel + '-' + $scope.maxLevel);
+        }
+    };
+
+    var _applyRulesFilters = function () {
+        $scope.objGet('rules', $scope.rules, $scope.rulesFilters);
+    };
+    
     //Rules - Aux functions
 
     $scope.getRuleStatusClass = function (rule) {
@@ -60,7 +116,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
         if ($scope.encodedFile != '') {
             (window.URL || window.webkitURL).revokeObjectURL($scope.encodedFile);
         }
-        DataFactory.getAndClear('get', '/rules/files?download=' + filename, {})
+        DataFactory.getAndClean('get', '/rules/files?download=' + filename, {})
             .then(function (data) {
                 var blob = new Blob([data], { type: 'text/xml' });
                 $scope.encodedFile = (window.URL || window.webkitURL).createObjectURL(blob);
@@ -196,6 +252,35 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
         return '<div style="width: 250px;">' + tooltip + '</div>';
     };
 
+    //Decoders - Filters
+
+    $scope.setDecodersFilter = function (type, value) {
+        if (value === 'type') {
+            var tmpValue = $scope.decodersFilters['type'];
+            $scope.decodersFilters.length = 0;
+            $scope.decodersFilters['type'] = tmpValue;
+        }
+
+        if ($scope.decodersFilters[type] === value) {
+            $scope.decodersFilters[type] = '';
+        } else {
+            $scope.decodersFilters[type] = value;
+        }
+        _applyDecodersFilters();
+    };
+
+    $scope.isSetDecodersFilter = function (type, value) {
+        return $scope.decodersFilters[type] === value;
+    };
+
+    $scope.hasDecodersFilter = function (type) {
+        return ($scope.decodersFilters[type] && $scope.decodersFilters[type] != '');
+    };
+
+    var _applyDecodersFilters = function () {
+        $scope.objGet('decoders', $scope.decoders, $scope.decodersFilters);
+    };
+
     //Decoders - aux functions
 
     $scope.formatFile = function (file) {
@@ -286,7 +371,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
                     var path = '/manager/update-ruleset';
                 }
             }
-            DataFactory.getAndClear('put', path, {})
+            DataFactory.getAndClean('put', path, {})
                 .then(function (data) {
                     var alert = data.data.msg + '. ';
                     if (data.data.need_restart === 'yes' && (data.data.restarted === 'no' || data.data.restart_status === 'fail')) {
@@ -304,7 +389,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
 
     $scope.restoreBackup = function () {
         alertify.confirm('Are you sure you want to restore this backup?<ul style="text-align: left !important;"><li style="text-align: left !important;">This action can not be undone.</li></ul>', function () {
-            DataFactory.getAndClear('put', '/manager/update-ruleset/backups/' + $scope.selectedBackup, {})
+            DataFactory.getAndClean('put', '/manager/update-ruleset/backups/' + $scope.selectedBackup, {})
                 .then(function (data) {
                     var alert;
                     if (data.data.msg === 'Backup successfully') {
@@ -331,7 +416,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     $scope.objNext = function (objName, container) {
         DataFactory.next(objectsArray[objName])
             .then(function (data) {
-                container = data.data;
+                container = data.data.items;
             }, printError);
     };
 
@@ -341,7 +426,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     $scope.objPrev = function (objName, container) {
         DataFactory.prev(objectsArray[objName])
             .then(function (data) {
-                container = data.data;
+                container = data.data.items;
             }, printError);
     };
 
@@ -350,13 +435,13 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             DataFactory.get(objectsArray[objName])
                 .then(function (data) {
                     container.length = 0;
-                    container = data.data;
+                    container = data.data.items;
                 }, printError);
         } else {
             DataFactory.get(objectsArray[objName], body)
                 .then(function (data) {
                     container.length = 0;
-                    container = data.data;
+                    container = data.data.items;
                 }, printError);
         }
     };
@@ -374,7 +459,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             .then(function (data) {
                 objectsArray['/decoders/files'] = data;
                 DataFactory.get(data).then(function (data) {
-                    $scope.filesDecoders = data.data;
+                    $scope.filesDecoders = data.data.items;
                     load_apply_filter();
                 });
             }, printError);
@@ -385,7 +470,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             .then(function (data) {
                 objectsArray['/decoders'] = data;
                 DataFactory.get(data).then(function (data) {
-                    $scope.decoders = data.data;
+                    $scope.decoders = data.data.items;
                     load_decoders_files();
                 });
             }, printError);
@@ -396,7 +481,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             .then(function (data) {
                 objectsArray['/rules/pci'] = data;
                 DataFactory.get(data).then(function (data) {
-                    $scope.pciGroupsRules = data.data;
+                    $scope.pciGroupsRules = data.data.items;
                     load_decoders();
                 });
             }, printError);
@@ -407,7 +492,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             .then(function (data) {
                 objectsArray['/rules/groups'] = data;
                 DataFactory.get(data).then(function (data) {
-                    $scope.groupsRules = data.data;
+                    $scope.groupsRules = data.data.items;
                     load_pci_groups();
                 }, printError);
             }, printError);
@@ -418,7 +503,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             .then(function (data) {
                 objectsArray['/rules/files'] = data;
                 DataFactory.get(data).then(function (data) {
-                    $scope.filesRules = data.data;
+                    $scope.filesRules = data.data.items;
                     load_rules_groups();
                 }, printError);
             }, printError);
@@ -429,14 +514,14 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             .then(function (data) {
                 objectsArray['/rules'] = data;
                 DataFactory.get(data).then(function (data) {
-                    $scope.rules = data.data;
+                    $scope.rules = data.data.items;
                     load_rules_files();
                 }, printError);
             }, printError);
     };
 
     var load_backups = function () {
-        DataFactory.getAndClear('get', '/manager/update-ruleset/backups', {})
+        DataFactory.getAndClean('get', '/manager/update-ruleset/backups', {})
             .then(function (data) {
                 $scope.backups = data.data;
             }, printError);

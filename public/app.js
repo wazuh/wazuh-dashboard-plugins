@@ -84,7 +84,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
     var dataObj = {};
     var _instances = [];
 
-    dataObj.initialize = function (method, path, body, pageSize, offset, limitPath) {
+    dataObj.initialize = function (method, path, body, pageSize, offset) {
       var defered = $q.defer();
       var promise = defered.promise;
 
@@ -99,13 +99,13 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       }
 
       var limit;
-      if ((method === 'get') && (limitPath)) {
-        apiReq.request('get', limitPath, body)
+      if ((method === 'get') && (pageSize)) {
+        apiReq.request('get', path+'?offset=0&limit=1', body)
         .then(function (data) {
-          limit = data.data;
+          limit = data.data.totalItems;
           _instances[instance] = {
             'method': method, 'path': path, 'body': body, 'pageSize': pageSize,
-            'offset': offset, 'limit': limit, 'limitPath': limitPath, 'pagination': true
+            'offset': offset, 'limit': limit, 'pagination': true
           };
           defered.resolve(instance);
         }, function (data) {
@@ -206,14 +206,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
       if (newBody) {
         _instances[instanceId]['body'] = newBody;
-
-        if (_instances[instanceId]['pagination']) {
-          _instances[instanceId]['offset'] = 0;
-          apiReq.request('get', _instances[instanceId]['limitPath'], newBody)
-            .then(function (data) {
-              _instances[instance][limit] = data.data;
-            });
-        }
+        _instances[instanceId]['offset'] = 0;
 
       }
 
@@ -225,6 +218,9 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       
       apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
       .then(function (data) {
+        if (data.data.totalItems != _instances[instanceId]['limit']) {
+          _instances[instanceId]['limit'] = data.data.totalItems;
+        }
         defered.resolve(data);
       }, function (data) {
         defered.reject(prepError(data));

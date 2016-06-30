@@ -35,14 +35,14 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
                 .then(function (data) {
                     $scope.agents.length = 0;
                     $scope.agentFetchInfo.length = 0;
-                    $scope.agents = data.data;
+                    $scope.agents = data.data.items;
                 }, printError);
         } else {
             DataFactory.get(objectsArray['/agents'], body)
                 .then(function (data) {
                     $scope.agents.length = 0;
                     $scope.agentFetchInfo.length = 0;
-                    $scope.agents = data.data;
+                    $scope.agents = data.data.items;
                 }, printError);
         }
     };
@@ -53,7 +53,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     $scope.agentsNext = function () {
         DataFactory.next(objectsArray['/agents'])
         .then(function (data) {
-            $scope.agents = data.data;
+            $scope.agents = data.data.items;
         }, printError);
     };
 
@@ -63,7 +63,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     $scope.agentsPrev = function () {
         DataFactory.prev(objectsArray['/agents'])
         .then(function (data) {
-            $scope.agents = data.data;
+            $scope.agents = data.data.items;
         }, printError);
     };
 
@@ -227,7 +227,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
         .then(function (data) {
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {
-                $scope.agents = data.data;
+                $scope.agents = data.data.items;
                 $scope.load = false;
             }, printError);
         }, printError);
