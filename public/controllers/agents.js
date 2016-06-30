@@ -175,12 +175,36 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     $scope.agentStatusFilter = function (status) {
         if ($scope.statusFilter === status) {
             $scope.statusFilter = '';
-            $scope.agentsGet({});
+            if ($scope.searchQuery != '') {
+                $scope.agentsGet({'sort': $scope.searchQuery});
+            } else {
+                $scope.agentsGet({});
+            }
         } else {
             $scope.statusFilter = status;
-            $scope.agentsGet({ 'status': status });
+            if ($scope.searchQuery != '') {
+                $scope.agentsGet({ 'sort': $scope.searchQuery, 'status': status });
+            } else {
+                $scope.agentsGet({ 'status': status });
+            }
         }
     };
+
+    $scope.sort = function (keyname) {
+        $scope.sortKey = keyname;
+        $scope.reverse = !$scope.reverse;
+        $scope.searchQuery = '';
+        if (!$scope.reverse) {
+            $scope.searchQuery += '-';
+        }
+        
+        $scope.searchQuery += $scope.sortKey;
+        if ($scope.statusFilter != '') {
+            $scope.agentsGet({ 'sort': $scope.searchQuery, 'status': $scope.statusFilter });
+        } else {
+            $scope.agentsGet({ 'sort': $scope.searchQuery });
+        }
+    }
 
     $scope.getAlertsUrl = function (agent, time, filters) {
         if (!time) {
@@ -223,7 +247,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     }
 
     //Load
-    DataFactory.initialize('get', '/agents', {}, 6, 0, '/agents/total')
+    DataFactory.initialize('get', '/agents', {}, 10, 0, '/agents/total')
         .then(function (data) {
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {
