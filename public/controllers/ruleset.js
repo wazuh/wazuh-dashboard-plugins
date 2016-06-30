@@ -207,7 +207,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
         if ($scope.encodedFile != '') {
             (window.URL || window.webkitURL).revokeObjectURL($scope.encodedFile);
         }
-        DataFactory.getAndClean('get', '/rules/files?download=' + filename, {})
+        DataFactory.getAndClean('get', '/rules/files', {'download': fileName})
             .then(function (data) {
                 var blob = new Blob([data], { type: 'text/xml' });
                 $scope.encodedFile = (window.URL || window.webkitURL).createObjectURL(blob);
@@ -647,7 +647,13 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     //Load functions
 
     var load_apply_filter = function () {
-        //ToDo
+        var initialize = sharedProperties.getProperty();
+        if (initialize != '') {
+            if (initialize.substring(0, 1) == 'r') {
+                $scope.setRulesFilter_outside('file', initialize.substring(1));
+                sharedProperties.setProperty('');
+            }
+        }
         $scope.decoderLoad = true;
         $scope.load = false;
     }
@@ -735,7 +741,9 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
 
     //Destroy
     $scope.$on("$destroy", function () {
-        angular.forEach(objectsArray, DataFactory.clean(value));
+        angular.forEach(objectsArray, function (value) {
+            DataFactory.clean(value)
+        });
         tabProvider.clean($scope.pageId);
     });
 

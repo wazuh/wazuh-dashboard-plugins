@@ -26,7 +26,7 @@ require('ui/chrome')
 // Set up Wazuh app
 var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPagination', 'angular.filter', 'AxelSoft', 'chart.js', 'ngAlertify', '720kb.tooltips'])
   .service('sharedProperties', function () {
-    var _property;
+    var _property = '';
 
     return {
       getProperty: function () {
@@ -217,7 +217,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       
       apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
       .then(function (data) {
-        if (data.data.totalItems != _instances[instanceId]['limit']) {
+        if ((_instances[instanceId]['pagination']) && (data.data.totalItems != _instances[instanceId]['limit'])) {
           _instances[instanceId]['limit'] = data.data.totalItems;
         }
         defered.resolve(data);
