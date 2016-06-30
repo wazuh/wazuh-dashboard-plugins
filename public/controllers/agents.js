@@ -234,7 +234,8 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
 
     //Destroy
     $scope.$on("$destroy", function () {
-        angular.forEach(objectsArray, DataFactory.clean(value));
+        angular.forEach(objectsArray, function (value) {
+            DataFactory.clean(value)});
         tabProvider.clean($scope.pageId);
     });
 

@@ -15,7 +15,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
 
     $scope.rulesFilters = {};
     $scope.decodersFilters = {};
-    $scope.rulesFilters['status'] = enabled;
+    $scope.rulesFilters['status'] = 'enabled';
 
     $scope.maxLevel = 15;
     $scope.minLevel = 0;
@@ -90,6 +90,11 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
         } else {
             $scope.setRulesFilter('level', $scope.minLevel + '-' + $scope.maxLevel);
         }
+    };
+
+    $scope.setRulesFilter_level_selected = function (level) {
+        $scope.minLevel = $scope.maxLevel = level;
+        $scope.setRulesFilter_level();
     };
 
     var _applyRulesFilters = function () {
@@ -259,6 +264,12 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             var tmpValue = $scope.decodersFilters['type'];
             $scope.decodersFilters.length = 0;
             $scope.decodersFilters['type'] = tmpValue;
+        }
+
+        if (value === 'id') {
+            var tmpValue = $scope.decodersFilters['id'];
+            $scope.decodersFilters.length = 0;
+            $scope.decodersFilters['id'] = tmpValue;
         }
 
         if ($scope.decodersFilters[type] === value) {
