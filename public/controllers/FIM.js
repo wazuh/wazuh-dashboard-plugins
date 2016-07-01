@@ -1,5 +1,3 @@
-// Require utils
-var kwu = require('plugins/wazuh/utils/kibanaWazuhUtils.js');
 // Require config
 var config = require('plugins/wazuh/config/config.js');
 require('ui/notify');
@@ -13,7 +11,7 @@ var app = require('ui/modules').get('app/wazuh', [
 ]);
 
 app.controller('fimController', function ($scope, $http, Notifier, $route, $q, alertify, sharedProperties) {
-    $scope.load = true;
+ /*   $scope.load = true;
     // Load settings
     kwu.getApiCredentials($q, $http).then(function (data) {
             var authdata = data[0];
@@ -169,6 +167,6 @@ app.controller('fimController', function ($scope, $http, Notifier, $route, $q, a
 
         }, function (data) {
             $scope.message = "Unable to connect to RESTful API, please check the connection at Settings tab.";
-        });
+        });*/
 });
 

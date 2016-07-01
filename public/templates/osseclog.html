@@ -1,0 +1,32 @@
+<div class="container" ng-controller="osseclogController">
+    <div ng-if="load" style="text-align: center;">
+        <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+    </div>
+    <div class="row containerLog" ng-if="!load">
+        <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
+        <div class="leftCol">
+            <h2 class="container_page_title">ossec.log</h2>
+            <div class="logContentTabs">
+                <div id="logTab">
+                    <table class="logTable">
+                        <tbody>
+                            <tr ng-repeat="line in text">
+                                <td class="logTableNumber">{{$index}}</td>
+                                <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}">{{line}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="rightCol" ng-show="isSetTab(2, 1)">
+            <div class="filesBlock" style="margin-top: 35px;">
+                <table class="table-files" ng-show="isSetTab(2, 1)">
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -12,6 +12,7 @@ require('ui/chrome').setNavBackground('#222222').setTabs([
   { id: 'manager', title: 'Manager' },
   { id: 'agents', title: 'Agents' },
   { id: 'ruleset', title: 'Ruleset' },
+  { id: 'osseclog', title: 'Ossec.log' },
   { id: 'FIM', title: 'FIM' },
   { id: 'rootcheck', title: 'Rootcheck' },
   { id: 'settings', title: 'Settings' }
@@ -395,6 +396,12 @@ routes
       "check": settingsWizard
     }
   })
+  .when('/osseclog', {
+    template: require('plugins/wazuh/templates/osseclog.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
   .otherwise({
     redirectTo: '/settings'
   });
@@ -406,6 +413,7 @@ require('plugins/wazuh/controllers/manager.js');
 require('plugins/wazuh/controllers/FIM.js');
 require('plugins/wazuh/controllers/rootcheck.js');
 require('plugins/wazuh/controllers/ruleset.js');
+require('plugins/wazuh/controllers/osseclog.js');
 
 //External angularjs libs
 require('plugins/wazuh/../node_modules/angular-utils-pagination/dirPagination.js');
