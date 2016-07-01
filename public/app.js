@@ -37,6 +37,28 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       }
     };
   })
+  .service('testConnection', function ($q, $http) {
+    return {
+      test: function () {
+        var defered = $q.defer();
+        var promise = defered.promise;
+
+        $http.get("/api/wazuh-api/test")
+          .success(function (data) {
+            if (data.error) {
+              defered.reject(data);
+            } else {
+              defered.resolve(data);
+            }
+          })
+          .error(function (data) {
+            defered.reject(data);
+          })
+
+          return promise;
+      }
+    };
+  })
   .service('apiReq', function ($q, $http) {
     return {
       request: function (method, path, body) {
@@ -325,163 +347,15 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
     };
   })
-  //-------------------------------------------------------------------------------------------------------------------------
-  //-------------------------------------------------------------------------------------------------------------------------
-  //Service to centralize api calls details
-  //DEPRECATED
-  .service('apiCall', function() {
-    return {
-      //GET
-      getApiCall: function (api_url, apiPath, authdata, $q, $http) {
-        var defered = $q.defer();
-        var promise = defered.promise;
-
-        if (apiPath.indexOf('?') > -1) {
-          apiPath += '&limit=100000';
-        } else {
-          apiPath += '?limit=100000';
-        }
-
-        $http.get(api_url + apiPath, {
-          headers: {
-            "Authorization" : 'Basic ' + authdata,
-            "api-version": 'v1.2'
-          }
-        }).success(function (data) {
-          if (data.error != 0) {
-            defered.reject(data);
-          } else {
-            defered.resolve(data);
-          }
-        })
-        .error(function (data) {
-          defered.reject(data);
-        })
-        return promise;
-      },
-      //PUT
-      putApiCall: function (api_url, apiPath, requestData, authdata, $q, $http) {
-        var defered = $q.defer();
-        var promise = defered.promise;
-        
-        if(apiPath.indexOf('?') > -1) {
-          apiPath+='&limit=100000';
-        } else {
-          apiPath+='?limit=100000';
-        }
-
-        $http.put(api_url + apiPath, requestData, {
-          headers: {
-            "Authorization" : 'Basic ' + authdata,
-            "api-version" : 'v1.2'
-          }
-        }).success(function (data) {
-          if (data.error != 0) {
-            defered.reject(data);
-          } else {
-            defered.resolve(data);
-          }
-        })
-        .error (function (data) {
-          defered.reject(data);
-        })
-        return promise;
-      },
-      //DELETE
-      deleteApiCall: function (api_url, apiPath, authdata, $q, $http) {
-        var defered = $q.defer();
-        var promise = defered.promise;
-
-        if (apiPath.indexOf('?') > -1) {
-          apiPath += '&limit=100000';
-        } else {
-          apiPath += '?limit=100000';
-        }
-
-        $http.delete(api_url + apiPath, {
-          headers: {
-            "Authorization" : 'Basic ' + authdata,
-            "api-version": 'v1.2'
-          }
-        }).success(function (data) {
-          if (data.error != 0) {
-            defered.reject(data);
-          } else {
-            defered.resolve(data);
-          }
-        })
-        .error(function (data) {
-          defered.reject(data);
-        })
-        return promise;
-      },
-      //POST
-      postApiCall: function (api_url, apiPath, requestData, authdata, $q, $http) {
-        var defered = $q.defer();
-        var promise = defered.promise;
-
-        if (apiPath.indexOf('?') > -1) {
-          apiPath += '&limit=100000';
-        } else {
-          apiPath += '?limit=100000';
-        }
-        
-        $http.post(api_url + apiPath, requestData, {
-          headers: {
-            "Content-Type": 'application/json',
-            "Authorization" : 'Basic ' + authdata,
-            "api-version" : 'v1.2'
-          }
-        }).success(function (data) {
-          if (data.error != 0) {
-            defered.reject(data);
-          } else {
-            defered.resolve(data);
-          }
-        })
-        .error (function (data) {
-          defered.reject(data);
-        })
-        return promise;
-      },
-      errorControl: function (data) {
-        if (data.error && data.message) {
-          return "Wazuh RESTful API failed while processing the request. Advanced error message: <b>" + data.message + "</b>";
-        } else if (data.error) {
-          return "Wazuh RESTful API failed while processing the request. Error code: " + data.error + ". Unknow error message.";
-        } else {
-          return "Error doing a request to RESTful API. Please check the connection at Settings tab and the Wazuh RESTful API version.";
-        } 
-      }      
-    };
-  })
-  //-------------------------------------------------------------------------------------------------------------------------
-  //-------------------------------------------------------------------------------------------------------------------------
   .config(['$compileProvider', function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
   }]);
 
 //Installation wizard
-var base64 = require('plugins/wazuh/utils/base64.js');
-var settingsWizard = function ($location, $http) {
-  $http.get("/elasticsearch/.kibana/wazuh-configuration/1")
-    .error(function (data) {
+var settingsWizard = function ($location, testConnection) {
+  testConnection.test()
+    .then(function () { }, function () {
       $location.path('/settings');
-    }).success(function (data) {
-      var api_username = data._source.api_user;
-      var api_password = base64.decode(data._source.api_password);
-      var api_url = data._source.api_url;
-      // Get authorization token
-      var authdata = base64.encode(api_username + ':' + api_password);
-      $http.get(api_url, {
-        headers: {
-          "Authorization": 'Basic ' + authdata,
-          "api-version": 'v1.2'
-        },
-        timeout: 1000
-      }).error(function (data) {
-        $location.path('/settings');
-      });
     });
 }
 
@@ -522,7 +396,7 @@ routes
     }
   })
   .otherwise({
-    redirectTo: '/agents'
+    redirectTo: '/settings'
   });
 
 // Require controllers

@@ -3,11 +3,11 @@ var app = require('ui/modules').get('app/wazuh', []);
 // Require utils
 var base64 = require('plugins/wazuh/utils/base64.js');
 
-app.controller('settingsController', function ($scope, $http, $q, $sce) {
+app.controller('settingsController', function ($scope, $http, $q, testConnection, alertify) {
 
     $scope.formData = {};
-
     $scope.formData.user = "";
+
     // Load settings function
     $scope.loadSettings = function () {
         var defered = $q.defer();
@@ -16,147 +16,46 @@ app.controller('settingsController', function ($scope, $http, $q, $sce) {
             $scope.formData.user = data._source.api_user;
             $scope.formData.password = base64.decode(data._source.api_password);
             $scope.formData.url = data._source.api_url;
+            $scope.formData.insecure = data._source.insecure;
             defered.resolve(1);
-        })
+        }).error(function (data, status) {
+            defered.reject(1);
+        });
         return promise;
     };
 
     //Controller first steps...
     $http.get("/elasticsearch/.kibana/wazuh-configuration/1")
         .error(function (data) {
-            $scope.messageClass = "settings-message-ok";
-            $scope.message = $sce.trustAsHtml("Welcome to Wazuh application for Kibana! Please, set a Wazuh RESTful API URL and valid credentials");
+            alertify.delay(0).closeLogOnClick(true).success("Welcome to Wazuh application for Kibana! Please, set a Wazuh RESTful API URL and valid credentials.");
         }).success(function (data) {
             // Call Load settings
-            $scope.loadSettings().then(function () {
-                var authdata = base64.encode($scope.formData.user + ':' + $scope.formData.password);
-                $http.get($scope.formData.url, {
-                    headers: {
-                        "authorization": "Basic " + authdata,
-                        "api-version": 'v1.2'
-                    },
-                    timeout: 1000
-                }).error(function (data, status) {
-                    if (status == 401) {
-                        $scope.messageClass = "settings-message-error";
-                        $scope.message = $sce.trustAsHtml('API could be reached, but provided credentials are not working.');
-                    } else {
-                        $http.post("/api/wazuh/ssl/verify", {
-                            'url': $scope.formData.url
-                        })
-                            .success(function (data, status) {
-                                switch (data.result) {
-                                    case 'http':
-                                        $scope.messageClass = "settings-message-error";
-                                        $scope.message = $sce.trustAsHtml('API couldn\'t be reached with https protocol. Instead it seems to be running with http protocol.');
-                                        break;
-                                    case 'unauthorized':
-                                        $scope.messageClass = "settings-message-error";
-                                        $scope.message = $sce.trustAsHtml('API could be reached, but provided credentials are not working.');
-                                        break;
-                                    case 'not_running':
-                                        $scope.messageClass = "settings-message-error";
-                                        $scope.message = $sce.trustAsHtml('Timeout exceeded connecting to the API. Is the URL correct?');
-                                        break;
-                                    case 'self_signed':
-                                        $scope.messageClass = "settings-message-error";
-                                        $scope.message = $sce.trustAsHtml('Your browser seems to be blocking Wazuh RESTful api, because a <b>selfsigned certificate</b> is being used. Please, <a href="www.wazuh.com" location="_blank">check our docs</a> for more information.');
-                                        break;
-                                    case 'protocol_error':
-                                        $scope.messageClass = "settings-message-error";
-                                        $scope.message = $sce.trustAsHtml('Please, specify http or https protocol in the API URL.');
-                                        break;                                        
-                                    default:
-                                        $scope.messageClass = "settings-message-error";
-                                        $scope.message = $sce.trustAsHtml('Some error ocurred, API couldn\'t be reached. This error could be for several reasons. Please, <a href="www.wazuh.com" location="_blank">check our docs</a> for more information.');
-                                        break;
-                                }
-                            })
-                            .error(function (data, status) {
-                                $scope.messageClass = "settings-message-error";
-                                $scope.message = $sce.trustAsHtml('Some error ocurred, API couldn\'t be reached. This error could be for several reasons. Please, <a href="www.wazuh.com" location="_blank">check our docs</a> for more information.');
-                            })
-                    };
-                });
+            $scope.loadSettings().then(makeTest, function () {
+                alertify.delay(0).closeLogOnClick(true).error('Could not connect with elasticsearch at <a href="/elasticsearch/.kibana">/elasticsearch/.kibana/</a>.');
             });
         });
 
-    // Unable to connect to the RESTful API, please check the troubleshooting guide: http://documentation.wazuh.oom
     // Save settings function
-    $scope.saveSettings = function () {
-        //$scope.formData.password = base64.encode($scope.formData.password);
+    $scope.saveSettings = function (test) {
         var data = {
             'api_user': $scope.formData.user,
             'api_password': base64.encode($scope.formData.password),
-            'api_url': $scope.formData.url
+            'api_url': $scope.formData.url,
+            'insecure': $scope.formData.insecure
         };
 
         $http.put("/elasticsearch/.kibana/wazuh-configuration/1", data).success(function (data, status) {
-
+            if (test) {
+                makeTest();
+            }
         }).error(function (data, status) {
-            $scope.messageClass = "settings-message-error";
-            $scope.message = $sce.trustAsHtml("Some error ocurred, couldn't save data in elasticsearch");
+            alertify.delay(0).closeLogOnClick(true).error("Some error ocurred, could not save data in elasticsearch.");
         })
     };
 
     // Test connection function
     function testSaveConnection() {
-
-        var authdata = base64.encode($scope.formData.user + ':' + $scope.formData.password);
-        $http.get($scope.formData.url, {
-            headers: {
-                "authorization": "Basic " + authdata,
-                "api-version": 'v1.2'
-            }
-        }).success(function (data) {
-            $scope.messageClass = "settings-message-ok";
-            $scope.message = $sce.trustAsHtml("Connected!");
-            $scope.testResult = 1;
-            $scope.saveSettings();
-        })
-            .error(function (data, status) {
-                $scope.testResult = 0;
-                if (status == 401) {
-                    $scope.messageClass = "settings-message-error";
-                    $scope.message = $sce.trustAsHtml('API could be reached, but provided credentials are not working.');
-                } else {
-                    $http.post("/api/wazuh/ssl/verify", {
-                        'url': $scope.formData.url
-                    })
-                        .success(function (data, status) {
-                            switch (data.result) {
-                                case 'http':
-                                    $scope.messageClass = "settings-message-error";
-                                    $scope.message = $sce.trustAsHtml('API couldn\'t be reached with https protocol. Instead it seems to be running with http protocol.');
-                                    break;
-                                case 'unauthorized':
-                                    $scope.messageClass = "settings-message-error";
-                                    $scope.message = $sce.trustAsHtml('API could be reached, but provided credentials are not working.');
-                                    break;
-                                case 'not_running':
-                                    $scope.messageClass = "settings-message-error";
-                                    $scope.message = $sce.trustAsHtml('Timeout exceeded connecting to the API. Is the URL correct?');
-                                    break;
-                                case 'self_signed':
-                                    $scope.messageClass = "settings-message-error";
-                                    $scope.message = $sce.trustAsHtml('Your browser seems to be blocking Wazuh RESTful api, because a <b>selfsigned certificate</b> is being used. Please, <a href="www.wazuh.com" location="_blank">check our docs</a> for more information.');
-                                    break;
-                                case 'protocol_error':
-                                    $scope.messageClass = "settings-message-error";
-                                    $scope.message = $sce.trustAsHtml('Please, specify http or https protocol in the API URL.');
-                                    break;                                        
-                                default:
-                                    $scope.messageClass = "settings-message-error";
-                                    $scope.message = $sce.trustAsHtml('Some error ocurred, API couldn\'t be reached. This error could be for several reasons. Please, <a href="www.wazuh.com" location="_blank">check our docs</a> for more information.');
-                                    break;
-                            }
-                        })
-                        .error(function (data, status) {
-                            $scope.messageClass = "settings-message-error";
-                            $scope.message = $sce.trustAsHtml('Some error ocurred, API couldn\'t be reached. This error could be for several reasons. Please, <a href="www.wazuh.com" location="_blank">check our docs</a> for more information.');
-                        })
-                };
-            });
+        $scope.saveSettings(true);
     };
 
     // Process form
@@ -165,7 +64,44 @@ app.controller('settingsController', function ($scope, $http, $q, $sce) {
         testSaveConnection();
     };
 
+    var makeTest = function () {
+        testConnection.test()
+            .then(function (data) {
+                alertify.delay(0).closeLogOnClick(true).success('<b>Successfully connected!</b>');
+            }, printTest);
+    };
+
+    var printTest = function (data) {
+        var text;
+        switch (data.data) {
+            case 'no_elasticsearch':
+                text = 'Could not connect with elasticsearch in order to retrieve the credentials.';
+                break;
+            case 'no_credentials':
+                text = 'Valid credentials not found in elasticsearch. It seems the credentials were not saved.';
+                break;
+            case 'protocol_error':
+                text = 'Invalid protocol in the API url. Please, specify <b>http://</b> or <b>https://</b>.';
+                break;
+            case 'unauthorized':
+                text = 'Credentials were found, but they are not valid.';
+                break;
+            case 'bad_url':
+                text = 'The given URL does not contains a valid Wazuh RESTful API installation.';
+                break;
+            case 'self_signed':
+                text = 'The request to Wazuh RESTful API was blocked, because it is using a selfsigned SSL certificate. Please, enable <b>"Accept selfsigned SSL"</b> option if you want to connect anyway.';
+                break;
+            case 'not_running':
+                text = 'There are not services running in the given URL.';
+                break;
+            default:
+                text = 'Unexpected error. Please, report this to the Wazuh Team.';
+        }
+        alertify.delay(0).closeLogOnClick(true).error(text);
+    };
+
 });
 
-   
+
 

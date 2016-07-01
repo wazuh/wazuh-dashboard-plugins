@@ -7,7 +7,7 @@ module.exports = function (server, options) {
         needle.get('/elasticsearch/.kibana/wazuh-configuration/1', function (error, response) {
             if (!error) {
                 if (response.body.found) {
-                    callback({ 'user': response.body._source.api_user, 'password': new Buffer(response.body._source.api_password, 'base64').toString("ascii"), 'url': response.body._source.api_url, 'insecure': true, 'error': '', 'error_code': 0 });
+                    callback({ 'user': response.body._source.api_user, 'password': new Buffer(response.body._source.api_password, 'base64').toString("ascii"), 'url': response.body._source.api_url, 'insecure': response.body._source.insecure, 'error': '', 'error_code': 0 });
                 } else {
                     callback({ 'user': '', 'password': '', 'url': '', 'insecure': '', 'error': 'no credentials', 'error_code': 1 });
                 }
@@ -19,15 +19,19 @@ module.exports = function (server, options) {
 
     //Handlers - Test API
 
-    var testApiAux2 = function (error, response) {
+    var testApiAux2 = function (error, response, insecure) {
         if (!error && response && response.body.data == 'OSSEC-API') {
-            return { 'statusCode': 200, 'error': '', 'data': 'self_signed' };
+            return { 'statusCode': 200, 'error': '', 'data': 'ok' };
         } else if (response && response.body.statusCode == 401) {
-            return { 'statusCode': 200, 'error': '', 'data': 'unauthorized' };
+            return { 'statusCode': 200, 'error': '1', 'data': 'unauthorized' };
         } else if (!error && response && response.body.data != 'OSSEC-API') {
-            return { 'statusCode': 200, 'error': '', 'data': 'bad_url' };
+            return { 'statusCode': 200, 'error': '1', 'data': 'bad_url' };
         } else {
-            return { 'statusCode': 200, 'error': '', 'data': 'not_running' };
+            if (!insecure) {
+                return { 'statusCode': 200, 'error': '1', 'data': 'self_signed' };
+            } else {
+                return { 'statusCode': 200, 'error': '1', 'data': 'not_running' };
+            }
         }
     };
 
@@ -35,12 +39,12 @@ module.exports = function (server, options) {
         if (!error && response && response.body.data == 'OSSEC-API') {
             callback({ 'statusCode': 200, 'error': '', 'data': 'ok' });
         } else if (response && response.body.statusCode == 401) {
-            callback({ 'statusCode': 200, 'error': '', 'data': 'unauthorized' });
+            callback({ 'statusCode': 200, 'error': '1', 'data': 'unauthorized' });
         } else if (!error && response && response.body.data != 'OSSEC-API') {
-            callback({ 'statusCode': 200, 'error': '', 'data': 'bad_url' });
+            callback({ 'statusCode': 200, 'error': '1', 'data': 'bad_url' });
         } else {
-            needle.get(wapi_config.url, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: false }, function (error, response) {
-                callback(testApiAux2(error, response));
+            needle.request('get', wapi_config.url, {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
+                callback(testApiAux2(error, response, wapi_config.insecure));
             });
         }
     };
@@ -56,20 +60,20 @@ module.exports = function (server, options) {
 
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
-                reply({ 'statusCode': 200, 'error': '', 'data': 'no_elasticsearch' });
+                reply({ 'statusCode': 200, 'error': '1', 'data': 'no_elasticsearch' });
                 return;
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
-                reply({ 'statusCode': 200, 'error': '', 'data': 'no_credentials' });
+                reply({ 'statusCode': 200, 'error': '1', 'data': 'no_credentials' });
                 return;
             }
 
             if (wapi_config.url.indexOf('https://') == -1) {
                 if (wapi_config.url.indexOf('http://') == -1) {
-                    reply({ 'statusCode': 200, 'error': '', 'data': 'protocol_error' });
+                    reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
                 }
             } else {
-                needle.get(wapi_config.url, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
+                needle.request('get', wapi_config.url, {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
                     testApiAux1(error, response, wapi_config, needle, function (test_result) {
                         reply(test_result);
                     });
