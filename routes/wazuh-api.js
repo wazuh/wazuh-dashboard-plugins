@@ -20,11 +20,11 @@ module.exports = function (server, options) {
     //Handlers - Test API
 
     var testApiAux2 = function (error, response, insecure) {
-        if (!error && response && response.body.data == 'OSSEC-API') {
+        if (!error && response && response.body.data == 'Welcome to Wazuh HIDS API') {
             return { 'statusCode': 200, 'error': '', 'data': 'ok' };
         } else if (response && response.body.statusCode == 401) {
             return { 'statusCode': 200, 'error': '1', 'data': 'unauthorized' };
-        } else if (!error && response && response.body.data != 'OSSEC-API') {
+        } else if (!error && response && response.body.data != 'Welcome to Wazuh HIDS API') {
             return { 'statusCode': 200, 'error': '1', 'data': 'bad_url' };
         } else {
             if (!insecure) {
@@ -36,11 +36,11 @@ module.exports = function (server, options) {
     };
 
     var testApiAux1 = function (error, response, wapi_config, needle, callback) {
-        if (!error && response && response.body.data == 'OSSEC-API') {
+        if (!error && response && response.body.data == 'Welcome to Wazuh HIDS API') {
             callback({ 'statusCode': 200, 'error': '', 'data': 'ok' });
         } else if (response && response.body.statusCode == 401) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'unauthorized' });
-        } else if (!error && response && response.body.data != 'OSSEC-API') {
+        } else if (!error && response && response.body.data != 'Welcome to Wazuh HIDS API') {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'bad_url' });
         } else {
             needle.request('get', wapi_config.url, {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {

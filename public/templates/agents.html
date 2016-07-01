@@ -11,7 +11,7 @@
 			  <form class="form-inline ng-pristine ng-valid">
 						<div class="form-group" style="position: relative;">
 						  <i class="fa fa-search input_search_icon"></i>
-						  <input type="text" ng-model="search" class="form-control ng-pristine ng-untouched ng-valid agentSearch" placeholder="Search...">
+						  <input type="text" ng-change="agentsGet()" ng-model="$parent.search" class="form-control ng-pristine ng-untouched ng-valid agentSearch" placeholder="Search...">
 						</div>
 					  </form>
 			</div>

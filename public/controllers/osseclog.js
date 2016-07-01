@@ -35,9 +35,6 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
 
     $scope.filter = function (key, value) {
         var body;
-        if (value === 'ossec-rootcheck/rootcheck') {
-            value = 'rootcheck';
-        }
         if ((key === _fKey) && (value === _fValue)) {
             _fKey = _fValue = '';
             body = {};

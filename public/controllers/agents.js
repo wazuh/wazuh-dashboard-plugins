@@ -8,6 +8,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
     $scope.load = true;
     $scope.agentFetchInfo = [];
     $scope.agents = [];
+    $scope.search = '';
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);
