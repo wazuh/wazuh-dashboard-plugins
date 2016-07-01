@@ -12,18 +12,28 @@
                         <tbody>
                             <tr ng-repeat="line in text">
                                 <td class="logTableNumber">{{$index}}</td>
-                                <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}">{{line}}</td>
+                                <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}" ng-bind-html="colorLine(line)">{{colorLine(line)}}</td>
                             </tr>
                         </tbody>
                     </table>
+                    <span class="glyphicon glyphicon-chevron-left" ng-click="prev()" ng-show="hasPrev()"></span><span class="glyphicon glyphicon-chevron-right"
+                        ng-click="next()" ng-show="hasNext()"></span>
                 </div>
             </div>
         </div>
-        <div class="rightCol" ng-show="isSetTab(2, 1)">
+        <div class="rightCol">
             <div class="filesBlock" style="margin-top: 35px;">
-                <table class="table-files" ng-show="isSetTab(2, 1)">
+                <label>Realtime: </label>
+                <span class="glyphicon glyphicon-play" ng-show="!realtime" ng-click="playRealtime()"></span>
+                <span class="glyphicon glyphicon-stop" ng-show="realtime" ng-click="playRealtime()"></span>
+                <table class="table-files" ng-repeat="(key, value) in summary">
                     <tr class="table-files-list-tr">
-                        <td class="table-files-list-td"></td>
+                        <td class="table-files-list-td" colspan="3"><b>{{key}}</b></td>
+                    </tr>
+                    <tr class="table-files-list-tr filterClickable" ng-repeat="(subk, subv) in value" ng-click="filter(key, subk)" ng-class="{ activeRow: isSetFilter(key, subk) }">
+                        <td class="table-files-list-td"> </td>
+                        <td class="table-files-list-td">{{subk}}</td>
+                        <td class="table-files-list-td">{{subv}}</td>
                     </tr>
                 </table>
             </div>

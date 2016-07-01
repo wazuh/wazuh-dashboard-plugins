@@ -138,7 +138,7 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
                                 $scope.agentsCountActive = $filter('filter')(data.data.items, { status: 'active' }).length;
                                 $scope.agentsCountDisconnected = $filter('filter')(data.data.items, { status: 'disconnected' }).length;
                                 $scope.agentsCountNeverConnected = $filter('filter')(data.data.items, { status: 'never connected' }).length;
-                                $scope.agentsCountTotal = data.data.length;
+                                $scope.agentsCountTotal = data.data.items.length;
                                 $scope.load = false;
                             }, printError);
                     }, printError);

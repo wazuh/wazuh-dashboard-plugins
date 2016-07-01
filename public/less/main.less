@@ -824,6 +824,8 @@ ul#rulesetTabs li a:hover {
 	width: 100%;
 }
 .table-files {
+  word-wrap: break-word;
+  word-break: break-all;
   background-color: #f2f2f2;
   border-color: #ccc;
   border-image: none;
@@ -1039,7 +1041,8 @@ input.cmn-toggle-round:checked + label:after {
     color: #333;
     word-wrap: break-word;
     border-collapse: collapse;
-    width: 978px;
+    width: 900px;
+    margin-bottom: 20px;
 }
 .logTable tbody tr {
     height: 18px;
@@ -1048,7 +1051,7 @@ input.cmn-toggle-round:checked + label:after {
     padding: 0;
 }
 .logTableNumber {
-    width: 50px;
+    width: 30px;
     padding-right: 10px;
     padding-left: 10px;
     color: rgba(0,0,0,0.3);
@@ -1067,4 +1070,10 @@ input.cmn-toggle-round:checked + label:after {
 }
 .logTableCodeOdd {
     background-color: #f7f7f7;
+}
+.activeRow {
+    background: #ccc;
+}
+.filterClickable:hover {
+    background: #ccc;
 }
