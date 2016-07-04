@@ -82,6 +82,8 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
         line = line.replace('ossec-logcollector', '<span style="color:#827e7d">ossec-logcollector</span>');
         line = line.replace('ossec-execd', '<span style="color:#827e7d">ossec-execd</span>');
         line = line.replace('ossec-rootcheck', '<span style="color:#827e7d">ossec-rootcheck</span>');
+        line = line.replace('rootcheck', '<span style="color:#827e7d">rootcheck</span>');
+        line = line.replace('ossec-syscheckd', '<span style="color:#827e7d">ossec-syscheckd</span>');
         line = line.replace('ossec-analysisd', '<span style="color:#827e7d">ossec-analysisd</span>');
         line = line.replace('ossec-maild', '<span style="color:#827e7d">ossec-maild</span>');
         line = line.replace(line.substring(0, 19), '<b>'+line.substring(0, 19)+'</b>');

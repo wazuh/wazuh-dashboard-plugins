@@ -1,172 +1,229 @@
 // Require config
-var config = require('plugins/wazuh/config/config.js');
-require('ui/notify');
-var app = require('ui/modules').get('app/wazuh', [
-    'elasticsearch',
-    'ngRoute',
-    'kibana/courier',
-    'kibana/config',
-    'kibana/notify',
-    'kibana/typeahead'
-]);
+var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('fimController', function ($scope, $http, Notifier, $route, $q, alertify, sharedProperties) {
- /*   $scope.load = true;
-    // Load settings
-    kwu.getApiCredentials($q, $http).then(function (data) {
-            var authdata = data[0];
-            var api_url = data[1];
-            const notify = new Notifier({
-                location: 'Wazuh'
-            });
-            
-            $scope.fetchFilesList = function () {
-                if (sharedProperties.getAgentId() != '') {
-                    $scope.agentid = sharedProperties.getAgentId();
-                    sharedProperties.setAgentId('');
-                }
+app.controller('fimController', function ($scope, alertify, sharedProperties, DataFactory) {
+    //Initialisation
+    $scope.load = true;
+    var objectsArray = [];
 
-                if (($scope.agentid == undefined) || ($scope.agentid == null) || ($scope.agentid == '')) {
-                    $scope.files = [];
-                } else {
-                    $http.get(api_url + '/syscheck/' + $scope.agentid + '/files/changed', {
-                        headers: {
-                            "Authorization": 'Basic ' + authdata,
-                            "api-version": 'v1.2'
-                        }
-                    }).success(function (data) {
-                        if ((data.data == undefined) || (data.data == []) || (data.data == '') || (data.data == null)) {
-                            $scope.files = [];
-                            notify.error('Syscheck database is empty');
-                        } else {
-                            $scope.files = data.data;
-                            $scope.fileFetchEvents = [];
-                        }
-                    })
-                        .error(function (data) {
-                            $scope.files = [];
-                            if (data.error == 600) {
-                                notify.error('Not valid agent ID');
-                            } else if (data.error == 2) {
-                                notify.error('Syscheck database is empty');
-                            } else {
-                                $scope.message = "Unable to connect to RESTful API, please check the connection at Settings tab.";
-                            }
-                        })
-                }
-            };
+    $scope.eventsFetchInfo = [];
+    $scope.files = [];
+    $scope.agents = [];
+    $scope.search = '';
 
-            $scope.fetchAgentsList = function () {
-                var defered = $q.defer();
-                var promise = defered.promise;
-                
-                $http.get(api_url + '/agents', {
-                    headers: {
-                        "Authorization": 'Basic ' + authdata,
-                        "api-version": 'v1.2'
-                    }
-                }).success(function (data) {
-                    $scope.agents = data.data;
-                    defered.resolve(1);
-                })
-                    .error(function (data) {
-                        $scope.message = "Unable to connect to RESTful API, please check the connection at Settings tab.";
-                        defered.resolve(0);
-                    })
-                    return promise;
+    $scope.agentId = '';
+
+    //Print Error
+    var printError = function (error) {
+        alertify.delay(10000).closeLogOnClick(true).error(error.html);
+    }
+
+    //Functions
+    $scope.setTypeFilter = function (filter) {
+        if ($scope.typeFilter != filter) {
+            $scope.typeFilter = filter;
+        } else {
+            $scope.typeFilter = '';
+        }
+        _setFilter();
+    };
+
+    $scope.setEventFilter = function (filter) {
+        if ($scope.eventFilter != filter) {
+            $scope.eventFilter = filter;
+        } else {
+            $scope.eventFilter = '';
+        }
+        _setFilter();
+    };
+
+    var _setFilter = function () {
+        var body = {};
+        if ($scope.eventFilter !== '') {
+            body['event'] = $scope.eventFilter;
+        }
+        if ($scope.typeFilter !== '') {
+            body['filetype'] = $scope.typeFilter;
+        }
+        if (body != {}) {
+            $scope.getFiles(body);
+        } else {
+            $scope.getFiles();
+        }
+    };
+
+    $scope.isSetAgentFilter = function (id) {
+        return ($scope.agentId === id);
+    };
+
+    $scope.setAgentFilter = function (id) {
+        $scope.eventFilter = '';
+        $scope.typeFilter = '';
+        if (id == $scope.agentId) {
+            $scope.agentId = '';
+            DataFactory.initialize('get', '/syscheck/files', {}, 16, 0)
+                .then(function (data) {
+                    objectsArray['/syscheck/files'] = data;
+                    $scope.getFiles();
+                }, printError);
+
+        } else {
+            $scope.agentId = id;
+            DataFactory.initialize('get', '/syscheck/' + id + '/files', {}, 16, 0)
+                .then(function (data) {
+                    objectsArray['/syscheck/files'] = data;
+                    $scope.getFiles();
+                }, printError);
+        }
+    };
+
+    $scope.searchAgent = function () {
+        if ($scope.searchFilesRules === '') {
+            $scope.searchFilesRules = undefined;
+        }
+        DataFactory.get(objectsArray['/agents'], { search: $scope.searchFilesRules })
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
+
+    $scope.getFiles = function (body) {
+        if (!body) {
+            var tmpBody = DataFactory.getBody(objectsArray['/syscheck/files']);
+            if ($scope.search !== tmpBody['search']) {
+                tmpBody['search'] = $scope.search;
+                body = tmpBody;
             }
+        } else if ($scope.search !== body['search']) {
+            body['search'] = $scope.search;
+        }
+        if (body['search'] === '') {
+            body['search'] = undefined;
+        }
 
-            $scope.fetchFilesList();
-            $scope.fetchAgentsList().then( function (data){
-                $scope.load = false;
-            });
+        if (!body) {
+            DataFactory.get(objectsArray['/syscheck/files'])
+                .then(function (data) {
+                    $scope.files.length = 0;
+                    $scope.eventsFetchInfo.length = 0;
+                    $scope.files = data.data.items;
+                }, printError);
+        } else {
+            DataFactory.get(objectsArray['/syscheck/files'], body)
+                .then(function (data) {
+                    $scope.files.length = 0;
+                    $scope.eventsFetchInfo.length = 0;
+                    $scope.files = data.data.items;
+                }, printError);
+        }
+    };
 
-            $scope.fetchFile = function (file, index) {
-                $http.get(api_url + '/syscheck/' + $scope.agentid + '/files/changed?filename=' + file.file, {
-                    headers: {
-                        "Authorization": 'Basic ' + authdata,
-                        "api-version": 'v1.2'
-                    }
-                }).success(function (data) {
-                    if ((data.data == undefined) || (data.data == null)) {
-                        notify.error('Error getting info of ' + file.file + ': Nothing found');
-                    } else {
-                        var lastFive = [];
-                        if (data.data.length > 5) {
-                            lastFive = data.data.slice(-5, -1);
-                        } else {
-                            lastFive = data.data;
-                        }
-                        var eventData = [];
-                        var i = 0;
-                        angular.forEach(lastFive, function (event, key) {
-                            if (event.date <= file.date) {
-                                eventData[i] = [];
-                                eventData[i]['date'] = event.date;
-                                eventData[i]['event'] = event.attrs.event;
-                                eventData[i]['size'] = event.attrs.size;
-                                eventData[i]['mode'] = event.attrs.mode;
-                                eventData[i]['permissions'] = event.attrs.perm;
-                                eventData[i]['uid'] = event.attrs.uid;
-                                eventData[i]['gid'] = event.attrs.gid;
-                                eventData[i]['md5'] = event.attrs.md5;
-                                eventData[i]['sha1'] = event.attrs.sha1;
-                                i++;
-                            }
-                        });
-                        $scope.fileFetchEvents[index] = eventData;
-                    }
-                }).error(function (data) {
+    $scope.hasNextFiles = function () {
+        return DataFactory.hasNext(objectsArray['/syscheck/files']);
+    };
+    $scope.nextFiles = function () {
+        DataFactory.next(objectsArray['/syscheck/files'])
+            .then(function (data) {
+                $scope.files.length = 0;
+                $scope.eventsFetchInfo.length = 0;
+                $scope.files = data.data.items;
+            }, printError);
+    };
 
-                })
-            }
+    $scope.hasPrevFiles = function () {
+        return DataFactory.hasPrev(objectsArray['/syscheck/files']);
+    };
+    $scope.prevFiles = function () {
+        DataFactory.prev(objectsArray['/syscheck/files'])
+            .then(function (data) {
+                $scope.files.length = 0;
+                $scope.eventsFetchInfo.length = 0;
+                $scope.files = data.data.items;
+            }, printError);
+    };
 
-            $scope.reloadFIM = function () {
-                $scope.fetchFilesList();
-            }
+    $scope.getAgents = function () {
+        DataFactory.get(objectsArray['/agents'])
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
 
-            $scope.sort = function (keyname) {
-                $scope.sortKey = keyname;
-                $scope.reverse = !$scope.reverse;
-            }
+    $scope.hasNextAgents = function () {
+        return DataFactory.hasNext(objectsArray['/agents']);
+    };
+    $scope.nextAgents = function () {
+        DataFactory.next(objectsArray['/agents'])
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
 
-            $scope.runSyscheck = function () {
-                notify.info('Restarting syscheck and rootcheck...');
-                $http.put(api_url + '/syscheck', {}, {
-                    headers: {
-                        "Authorization": 'Basic ' + authdata,
-                        "api-version": 'v1.2'
-                    }
-                }).success(function (data) {
-                    notify.info('Syscheck and rootcheck restarted successfully');
-                })
-                    .error(function (data) {
-                        notify.error('Error restarting syscheck/rootcheck on agent');
-                        console.log('Error: ' + data);
-                    })
-            }
+    $scope.hasPrevAgents = function () {
+        return DataFactory.hasPrev(objectsArray['/agents']);
+    };
+    $scope.prevAgents = function () {
+        DataFactory.prev(objectsArray['/agents'])
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
 
-            $scope.deleteSyscheck = function () {
-                alertify.confirm("Are you sure you want to clean FIM database for all the agents?", function () {
-                    $http.delete(api_url + '/syscheck', {
-                        headers: {
-                            "Authorization": 'Basic ' + authdata,
-                            "api-version": 'v1.2'
-                        }
-                    }).success(function (data) {
-                        notify.info('Syscheck database deleted successfully');
-                    })
-                        .error(function (data) {
-                            notify.error('Error deleting syscheck database');
-                            console.log('Error: ' + data);
-                        })
-                }, function () {
+    $scope.cleandb = function () {
+        alertify.confirm("Are you sure you want to delete the syscheck database in all the agents?", function () {
+            DataFactory.getAndClean('delete', '/syscheck', {})
+                .then(function (data) {
+                    alertify.delay(10000).closeLogOnClick(true).success('Syscheck database deleted successfully.');
+                }, printError);
+        });
+    };
 
-                });
-            }
+    $scope.startfim = function () {
+        alertify.confirm("Are you sure you want to start a scan on all the agents?", function () {
+            DataFactory.getAndClean('put', '/syscheck', {})
+                .then(function (data) {
+                    alertify.delay(10000).closeLogOnClick(true).success('Syscheck started successfully.');
+                }, printError);
+        });
+    };
 
-        }, function (data) {
-            $scope.message = "Unable to connect to RESTful API, please check the connection at Settings tab.";
-        });*/
+    var load = function () {
+        DataFactory.initialize('get', '/syscheck/files', {}, 16, 0)
+            .then(function (data) {
+                objectsArray['/syscheck/files'] = data;
+                DataFactory.initialize('get', '/agents', {}, 10, 0)
+                    .then(function (data) {
+                        objectsArray['/agents'] = data;
+                        load_data();
+                    }, printError);
+            }, printError);
+    };
+
+    var load_data = function () {
+        DataFactory.get(objectsArray['/syscheck/files'])
+            .then(function (data) {
+                $scope.files = data.data.items;
+                DataFactory.get(objectsArray['/agents'])
+                    .then(function (data) {
+                        $scope.agents = data.data.items;
+                        $scope.load = false;
+                    });
+            }, printError);
+    };
+
+    //Load
+    load();
+
+    //Destroy
+    $scope.$on("$destroy", function () {
+        angular.forEach(objectsArray, function (value) {
+            DataFactory.clean(value)
+        });
+    });
+
 });
 

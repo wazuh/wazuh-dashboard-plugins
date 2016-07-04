@@ -2,66 +2,110 @@
   <div ng-if="load" style="text-align: center;">
     <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
   </div>
-  <div class="row" ng-if="!load">
-    <div id="messages" ng-show="message" class="settings-message-error">{{ message }}</div>
-    <div style="width: 100%;">
-      <form class="form-inline" style="align: right !important">
-        <div class="form-group" style="float: right;">
-          <div ng-model="$parent.agentid" custom-select="agent.id as agent.id + ' - ' + agent.name for agent in agents | filter: $searchTerm "
-            ng-change="reloadFIM()"></div>
+  <div class="row containerRuleset" ng-if="!load">
+    <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
+    <div class="leftCol">
+      <h2 class="container_page_title">File integrity monitoring</h2>
+      <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;">
+        <div style="float: left;">
+          <form class="form-inline ng-pristine ng-valid">
+            <div class="form-group" style="position: relative;">
+              <i class="fa fa-search input_search_icon"></i>
+              <input type="text" ng-model="$parent.search" ng-change="getFiles()" class="form-control ng-pristine ng-untouched ng-valid eventSearch"
+                placeholder="Search...">
+            </div>
+          </form>
         </div>
-      </form>
-      <form class="form-inline">
-        <div class="form-group">
-          <input type="text" ng-model="search" class="form-control" placeholder="Search...">
-        </div>
-      </form>
-      <div>
-        </br>
       </div>
-      <table class="table-agents">
-        <thead>
-          <tr>
-            <th><span ng-click="sort('file')"><strong>File</strong></span>
-              <span class="glyphicon sort-icon" ng-show="sortKey=='file'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-            <th> <span ng-click="sort('Date(date)')"><strong>Date</strong></span>
-              <span class="glyphicon sort-icon" ng-show="sortKey=='Date(date)'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
-            <th><span ng-click="sort('changes')"><strong>Changes</strong></span>
-              <span class="glyphicon sort-icon" ng-show="sortKey=='changes'" ng-class="{'glyphicon-chevron-up':reverse,'glyphicon-chevron-down':!reverse}"></span></th>
+      <div style="margin-left: 10px; width: 46%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
+        <div ng-class="{ event_filter_status_active: $parent.eventFilter == 'added' }" ng-click="setEventFilter('added')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px; width: 100px;"
+          class="eventFilter">Added </div>
+        <div ng-class="{ event_filter_status_active: $parent.eventFilter == 'modified' }" ng-click="setEventFilter('modified')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100px;"
+          class="eventFilter">Modified</div>
+        <div ng-class="{ event_filter_status_active: $parent.eventFilter == 'readed' }" ng-click="setEventFilter('readed')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100px;"
+          class="eventFilter">Readed</div>
+        <div ng-class="{ event_filter_status_active: $parent.eventFilter == 'deleted' }" ng-click="setEventFilter('deleted')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 101.5px;"
+          class="eventFilter">Deleted</div>
+      </div>
+            <div style="margin-left: 10px; width: 20%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
+        <div ng-class="{ event_filter_status_active: $parent.typeFilter == 'file' }" ng-click="setTypeFilter('file')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px;"
+          class="eventFilter">File </div>
+        <div ng-class="{ event_filter_status_active: $parent.typeFilter == 'registry' }" ng-click="setTypeFilter('registry')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100.5px;"
+          class="eventFilter">Registry</div>
+      </div>
+      <div class="fimContentTabs">
+        <div id="eventsTab">
+          <div class="events_card_list" ng-repeat="file in files" ng-init="eventsFetchInfo[event.file+event.agentID]=[];">
+            <div class="event_card" ng-class="{ event_card_active: showDetails }" ng-click="fetchEvent(event,$index); showDetails = ! showDetails; ">
+              <div class="id"> {{event.agentID}} </div>
+              <div class="float_left">
+                <div class="text" style="width: 535px; height: 45px; overflow: hidden;">{{event.file}}</div>
+              </div>
+              <div class="float_right">
+                <div class="level" tooltips tooltip-template="Alert level">{{event.event}}</div>
+              </div>
+              <div class="float_right">
+                <div class="level" tooltips tooltip-template="Alert level">{{event.date}}</div>
+              </div>
+
+            </div>
+            <div style="" class="event_card_detail" ng-show="showDetails">
+              <div class="eventTabs-container">
+                <div class="eventTabs-info">
+                  <div class="eventTabs-box">
+                    <table class="table-event-information">
+                      <tbody ng-repeat="event in eventsFetchInfo[event.file+event.agentID]">
+                        <tr>
+                          <td class="table-event-information-td-title">Foo</td>
+                          <td class="table-event-information-td-value ng-binding">{{event}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="glyphicon glyphicon-chevron-left" ng-click="prevFiles()" ng-show="hasPrevFiles()"></span>
+          <span class="glyphicon glyphicon-chevron-right" ng-click="nextFiles()" ng-show="hasNextFiles()"></span>
+        </div>
+      </div>
+    </div>
+    <div class="rightCol">
+      <div class="block">
+        <div class="titleCol">
+          <h2>AGENTS:</h2>
+        </div>
+        <table class="table-files">
+          <tr class="table-files-list-tr">
+            <td class="table-files-list-td"><input type="text" ng-model="$parent.searchFilesRules" ng-change="searchAgent()" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                placeholder="Search..."></td>
           </tr>
-        </thead>
-        <tbody dir-paginate="file in files|filter:search|orderBy:sortKey:reverse|itemsPerPage:10" pagination-id="FIM" ng-init="$parent.fileFetchEvents[$index]=[]">
-          <tr ng-class="" ng-click="fetchFile(file,$index); showDetails = ! showDetails;" class="table-agents-list-tr">
-            <td class="table-agents-list-td"><span class="bold">{{file.file}}</span></td>
-            <td>{{file.date}}</td>
-            <td>{{file.changes}} changes</td>
+          <tr ng-class="" class="table-files-list-tr" ng-repeat="agent in agents">
+            <td class="table-files-list-td"><span ng-click="setAgentFilter(agent.id)" ng-class="{ textFilterActive: isSetAgentFilter(agent.id) }" class="bold">{{agent.id}} - {{agent.name}}</span></td>
           </tr>
-          <tr ng-show="showDetails" style="border-top: none; width: 100%;" class="table-agents-list-tr">
-            <td class="table-agents-list-td" colspan="3" style="width: 100%; background-color: #f5f5f5;">
-              <table>
-                <tr ng-repeat="event in $parent.fileFetchEvents[$index]">
-                  <td><span class="bold">{{event.date}} - {{event.event}}:</span> <span class="bold">MD5</span>: {{event.md5}}
-                    <span class="bold">SHA1</span>: {{event.sha1}} <span class="bold">Size</span>: {{event.size}} <span class="bold">Permissions</span>:
-                    {{event.permissions}} (Mode: {{event.mode}} GID: {{event.gid}} UID: {{event.uid}})</td>
-                </tr>
-              </table>
+          <tr class="table-files-list-tr">
+            <td class="table-files-list-td">
+              <span class="glyphicon glyphicon-chevron-left" ng-click="prevAgents()" ng-show="hasPrevAgents()"></span>
+              <span class="glyphicon glyphicon-chevron-right" ng-click="nextAgents()" ng-show="hasNextAgents()"></span>
             </td>
           </tr>
-        </tbody>
-      </table>
-    </div>
-    <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true" pagination-id="FIM" autoHide="true">
-    </dir-pagination-controls>
-    <form class="form-inline">
-      </br>
-      <label>Perform the following actions over all agents:</label>
-      </br>
-      <div class="form-group">
-        <button aria-label="Restart FIM scan" class="btn btn-primary ng-binding" ng-click="runSyscheck();">Restart FIM scan</button>
-        <button aria-label="Clean FIM database" class="btn btn-danger ng-binding" ng-click="deleteSyscheck(); "><i class="fa fa-trash-o"></i> Clean FIM database</button>
+        </table>
       </div>
-      </br>
-    </form>
+      <div class="block">
+        <div class="titleCol">
+          <h2>QUICK ACTIONS:</h2>
+        </div>
+        <form ng-submit="addAgent()">
+          <label>This actions will be performed over all agents.</label>
+          <button aria-label="Clean database" ng-click="cleandb()" class="btn btn-primary">
+				  Clean database
+				</button>
+        <button aria-label="Start scan" ng-click="startfim()" class="btn btn-primary">
+				  Start scan
+				</button>
+        </form>
+      </div>
+    </div>
   </div>
-
 </div>
