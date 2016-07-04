@@ -600,6 +600,21 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     };
 
     $scope.objGet = function (objName, containerName, body) {
+        //Search body modification
+        var searchField = _getSearchField(containerName);
+        if (!body) {
+            var tmpBody = DataFactory.getBody(objectsArray[objName]);
+            if (searchField !== tmpBody['search']) {
+                tmpBody['search'] = searchField;
+                body = tmpBody;
+            }
+        } else if (searchField !== body['search']) {
+            body['search'] = searchField;
+        }
+        if (body['search'] === '') {
+            body['search'] = undefined;
+        }
+
         if (!body) {
             DataFactory.get(objectsArray[objName])
                 .then(function (data) {
@@ -610,6 +625,25 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
                 .then(function (data) {
                     _applyContainer(data, containerName);
                 }, printError);
+        }
+    };
+
+    var _getSearchField = function (containerName) {
+        switch (containerName) {
+            case 'rules':
+                return $scope.search;
+            case 'decoders':
+                return $scope.decoder_search;
+            case 'groupsRules':
+                return $scope.searchGroupsRules;
+            case 'pciGroupsRules':
+                return $scope.searchFilesPci;
+            case 'filesRules':
+                return $scope.searchFilesRules;
+            case 'filesDecoders':
+                return $scope.searchFilesDecoders;
+            default:
+                return '';
         }
     };
 

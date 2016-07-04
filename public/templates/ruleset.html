@@ -12,7 +12,7 @@
                     <form class="form-inline ng-pristine ng-valid">
                         <div class="form-group" style="position: relative;">
                             <i class="fa fa-search input_search_icon"></i>
-                            <input type="text" ng-model="search" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
+                            <input type="text" ng-model="$parent.search" ng-change="objGet('/rules', 'rules')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
                         </div>
                     </form>
                 </div>
@@ -23,7 +23,7 @@
                     <form class="form-inline ng-pristine ng-valid">
                         <div class="form-group" style="position: relative;">
                             <i class="fa fa-search input_search_icon"></i>
-                            <input type="text" ng-model="decoder_search" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
+                            <input type="text" ng-model="$parent.decoder_search" ng-change="objGet('/decoders', 'decoders')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
                         </div>
                     </form>
                 </div>
@@ -269,7 +269,7 @@
             <div class="filesBlock">
                 <table class="table-files" ng-show="isSetTab(1, 1) && isSetTab(1, 2)">
                     <tr class="table-files-list-tr">
-                        <td class="table-files-list-td"><input type="text" ng-model="searchFilesRules" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                        <td class="table-files-list-td"><input type="text" ng-model="$parent.$parent.searchFilesRules" ng-change="objGet('/rules/files', 'filesRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
                                 placeholder="Search..."></td>
                     </tr>
                     <tr ng-class="" class="table-files-list-tr" ng-repeat="file in filesRules">
@@ -286,7 +286,7 @@
                 </table>
                 <table class="table-files" ng-show="isSetTab(1, 1) && isSetTab(2, 2)">
                     <tr class="table-files-list-tr">
-                        <td class="table-files-list-td"><input type="text" ng-model="searchGroupsRules" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                        <td class="table-files-list-td"><input type="text" ng-model="$parent.$parent.searchGroupsRules" ng-change="objGet('/rules/groups', 'groupsRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
                                 placeholder="Search..."></td>
                     </tr>
                     <tr ng-class="" class="table-files-list-tr" ng-repeat="group in groupsRules">
@@ -303,7 +303,7 @@
                 </table>
                 <table class="table-files" ng-show="isSetTab(1, 1) && isSetTab(3, 2)">
                     <tr class="table-files-list-tr">
-                        <td class="table-files-list-td"><input type="text" ng-model="searchFilesPci" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                        <td class="table-files-list-td"><input type="text" ng-model="$parent.$parent.searchFilesPci" ng-change="objGet('/rules/pci', 'pciGroupsRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
                                 placeholder="Search..."></td>
                     </tr>
                     <tr ng-class="" class="table-files-list-tr" ng-repeat="pci in pciGroupsRules">
@@ -324,7 +324,7 @@
             <div class="filesBlock" style="margin-top: 35px;">
                 <table class="table-files" ng-show="isSetTab(2, 1)">
                     <tr class="table-files-list-tr">
-                        <td class="table-files-list-td"><input type="text" ng-model="searchFilesDecoders" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                        <td class="table-files-list-td"><input type="text" ng-model="$parent.$parent.searchFilesDecoders" ng-change="objGet('/decoders/files', 'filesDecoders')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
                                 placeholder="Search..."></td>
                     </tr>
                     <tr ng-class="" class="table-files-list-tr" ng-repeat="file in filesDecoders">

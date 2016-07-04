@@ -251,6 +251,10 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       return promise;
     };
 
+    dataObj.getBody = function (instanceId) {
+      return _instances[instanceId]['body'];
+    };
+
     dataObj.clean = function (instanceId) {
       _instances[instanceId].length = 0;
     };

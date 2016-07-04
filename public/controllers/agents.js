@@ -31,6 +31,20 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
 
     //Functions
     $scope.agentsGet = function (body) {
+        //Search agent body modification
+        if (!body) {
+            var tmpBody = DataFactory.getBody(objectsArray['/agents']);
+            if ($scope.search !== tmpBody['search']) {
+                tmpBody['search'] = $scope.search;
+                body = tmpBody;
+            }
+        } else if ($scope.search !== body['search']) {
+            body['search'] = $scope.search;
+        }
+        if (body['search'] === '') {
+            body['search'] = undefined;
+        }
+
         if (!body) {
             DataFactory.get(objectsArray['/agents'])
                 .then(function (data) {
@@ -205,7 +219,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
         } else {
             $scope.agentsGet({ 'sort': $scope.searchQuery });
         }
-    }
+    };
 
     $scope.getAlertsUrl = function (agent, time, filters) {
         if (!time) {
@@ -225,7 +239,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
         var kibanaTime = 'from:now' + time + ',mode:quick,to:now';
         var rulesUrl = kuf.getAlerts('ossec-*', kibanaFilter, kibanaTime);
         return rulesUrl;
-    }
+    };
 
     $scope.getDashboardUrl = function (agent, dashboard, time, filters) {
         if (!time) {
@@ -245,7 +259,7 @@ app.controller('agentsController', function ($scope, $route, $q, alertify, share
         var kibanaTime = 'from:now' + time + ',mode:quick,to:now';
         var rulesUrl = kuf.getDashboard(dashboard, kibanaFilter, kibanaTime, true);
         return rulesUrl;
-    }
+    };
 
     //Load
     DataFactory.initialize('get', '/agents', {}, 10, 0)
