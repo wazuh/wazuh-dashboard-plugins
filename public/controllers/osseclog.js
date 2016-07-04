@@ -124,6 +124,7 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
 
     //Destroy
     $scope.$on("$destroy", function () {
+        $interval.cancel(_promise);
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)
         });
