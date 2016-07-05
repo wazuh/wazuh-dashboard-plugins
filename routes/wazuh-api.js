@@ -22,7 +22,7 @@ module.exports = function (server, options) {
     var testApiAux2 = function (error, response, insecure) {
         if (!error && response && response.body.data == 'Welcome to Wazuh HIDS API') {
             return { 'statusCode': 200, 'error': '', 'data': 'ok' };
-        } else if (response && response.body.statusCode == 401) {
+        } else if (response && response.statusCode == 401) {
             return { 'statusCode': 200, 'error': '1', 'data': 'unauthorized' };
         } else if (!error && response && response.body.data != 'Welcome to Wazuh HIDS API') {
             return { 'statusCode': 200, 'error': '1', 'data': 'bad_url' };
@@ -38,7 +38,7 @@ module.exports = function (server, options) {
     var testApiAux1 = function (error, response, wapi_config, needle, callback) {
         if (!error && response && response.body.data == 'Welcome to Wazuh HIDS API') {
             callback({ 'statusCode': 200, 'error': '', 'data': 'ok' });
-        } else if (response && response.body.statusCode == 401) {
+        } else if (response && response.statusCode == 401) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'unauthorized' });
         } else if (!error && response && response.body.data != 'Welcome to Wazuh HIDS API') {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'bad_url' });

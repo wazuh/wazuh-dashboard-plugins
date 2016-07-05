@@ -11,7 +11,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     $scope.agents = [];
     $scope.search = '';
 
-    $scope.agentId = '';
+    $scope.agentId = '000';
 
     //Print Error
     var printError = function (error) {
@@ -103,13 +103,14 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         }
 
         if (!body) {
-            DataFactory.get(objectsArray['/syscheck/files'])
+            DataFactory.get(objectsArray['/syscheck/files'], {'summary': 'yes'})
                 .then(function (data) {
                     $scope.files.length = 0;
                     $scope.eventsFetchInfo.length = 0;
                     $scope.files = data.data.items;
                 }, printError);
         } else {
+            body['summary'] = 'yes';
             DataFactory.get(objectsArray['/syscheck/files'], body)
                 .then(function (data) {
                     $scope.files.length = 0;
@@ -192,7 +193,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     };
 
     var load = function () {
-        DataFactory.initialize('get', '/syscheck/files', {}, 16, 0)
+        DataFactory.initialize('get', '/syscheck/000/files', {'summary': 'yes'}, 16, 0)
             .then(function (data) {
                 objectsArray['/syscheck/files'] = data;
                 DataFactory.initialize('get', '/agents', {}, 10, 0)
