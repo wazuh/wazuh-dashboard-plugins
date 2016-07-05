@@ -1,3 +1,8 @@
+<div ng-if="!load">
+  <ul class="wazuh-submenu">
+    <li><a href="/app/wazuh#/osseclog">OSSEC Logs <span class="glyphicon glyphicon-arrow-right"></span></a></li>
+  </ul>
+</div>
 <div class="container" ng-controller="managerController">
 <div ng-if="load" style="text-align: center;">
         <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>

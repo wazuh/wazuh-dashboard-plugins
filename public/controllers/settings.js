@@ -7,33 +7,9 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
 
     $scope.formData = {};
     $scope.formData.user = "";
-
-    // Load settings function
-    $scope.loadSettings = function () {
-        var defered = $q.defer();
-        var promise = defered.promise;
-        $http.get("/elasticsearch/.kibana/wazuh-configuration/1").success(function (data, status) {
-            $scope.formData.user = data._source.api_user;
-            $scope.formData.password = base64.decode(data._source.api_password);
-            $scope.formData.url = data._source.api_url;
-            $scope.formData.insecure = data._source.insecure;
-            defered.resolve(1);
-        }).error(function (data, status) {
-            defered.reject(1);
-        });
-        return promise;
-    };
-
-    //Controller first steps...
-    $http.get("/elasticsearch/.kibana/wazuh-configuration/1")
-        .error(function (data) {
-            alertify.delay(0).closeLogOnClick(true).success("Welcome to Wazuh application for Kibana! Please, set a Wazuh RESTful API URL and valid credentials.");
-        }).success(function (data) {
-            // Call Load settings
-            $scope.loadSettings().then(makeTest, function () {
-                alertify.delay(0).closeLogOnClick(true).error('Could not connect with elasticsearch at <a href="/elasticsearch/.kibana">/elasticsearch/.kibana/</a>.');
-            });
-        });
+    $scope.formData.password = "";
+    $scope.formData.url = "";
+    $scope.formData.insecure = true;
 
     // Save settings function
     $scope.saveSettings = function (test) {

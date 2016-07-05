@@ -1254,3 +1254,57 @@ input.cmn-toggle-round:checked + label:after {
     width: 200px;
     font-weight: bold;
 }
+/* Wazuh submenu */
+.wazuh-submenu {
+    background: #222;
+    border: 1px;
+    border: 1px;
+    border-color: #222;
+    color: #fff;
+    height: 30px;
+    display: inline-block;
+    padding-left: 0px;
+}
+
+.wazuh-submenu > li {
+    float: left;
+    position: relative;
+    display: block;
+    height: 30px;
+}
+
+.wazuh-submenu > li > a {
+    padding: 10px 15px;
+    position: relative;
+    display: block;
+    line-height: 18px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #fff;
+    height: 30px;
+}
+
+.wazuh-submenu > li > a:hover {
+    color: #ffffff;
+    background-color: #555555;
+    cursor: pointer;
+}
+
+.wazuh-submenu > .active {
+    background-color: #41454c;
+    height: 30px;
+}
+
+.wazuh-submenu > .active > a:before {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    border: 7px solid transparent;
+    border-bottom-color: inherit;
+    top: 16px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 0;
+    height: 0;
+}

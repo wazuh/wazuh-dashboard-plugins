@@ -336,8 +336,14 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
             case 'check_diff':
                 tooltip = 'Used to determine when the output of a command changes.';
                 break;
+            case 'noalert': 
+                tooltip = 'Do not trigger this alert.';
+                break;
+            case 'if_fts':
+                tooltip = 'If first time seen.';
+                break;
             default:
-                tooltip = '';
+                tooltip = 'Tooltip not found for this field.';
                 break;
         }
         return '<div style="width: 250px;">' + tooltip + '</div>';
@@ -476,7 +482,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
                 tooltip = 'First time seen';
                 break;
             default:
-                tooltip = '';
+                tooltip = 'Tooltip not found for this field.';
                 break;
         }
         return '<div style="width: 250px;">' + tooltip + '</div>';

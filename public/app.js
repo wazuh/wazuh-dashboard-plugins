@@ -12,7 +12,6 @@ require('ui/chrome').setNavBackground('#222222').setTabs([
   { id: 'manager', title: 'Manager' },
   { id: 'agents', title: 'Agents' },
   { id: 'ruleset', title: 'Ruleset' },
-  { id: 'osseclog', title: 'Ossec.log' },
   { id: 'FIM', title: 'FIM' },
   { id: 'rootcheck', title: 'Rootcheck' },
   { id: 'settings', title: 'Settings' }
