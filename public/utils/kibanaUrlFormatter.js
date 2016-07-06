@@ -8,7 +8,11 @@ var dashboards = {
 
 var visualizations = {
     AlertsByCountry : {type: 'pie', data: "vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(field:GeoLocation.country_name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'Alerts:%20By%20country',type:pie))"},
-    ManagerRestarts: {type: 'histogram', data: "vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(id:'3',params:(filters:!((input:(query:(query_string:(analyze_wildcard:!t,query:'rule.sidid:502'))),label:'Manager%20started'))),schema:group,type:filters)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Manager%20restarts%20count%20last%207%20days',type:histogram))"}
+    ManagerRestarts: {type: 'histogram', data: "vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(id:'3',params:(filters:!((input:(query:(query_string:(analyze_wildcard:!t,query:'rule.sidid:502'))),label:'Manager%20started'))),schema:group,type:filters)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Manager%20restarts%20count%20last%207%20days',type:histogram))"},
+    TopAlerts: {type: 'table', data: "vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(field:rule.sidid,order:desc,orderBy:'1',size:10),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f),title:'Top%2010%20alerts',type:table))"},
+    AlertsTime: {type: 'area', data:"vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(id:'3',params:(field:rule.sidid,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alerts%20by%20time',type:area))" },
+    AverageAlertLevel: {type: 'histogram', data:"vis:(aggs:!((id:'1',params:(field:rule.AlertLevel),schema:metric,type:avg),(id:'2',params:(field:AgentName,order:desc,orderAgg:(id:'2-orderAgg',params:(field:rule.AlertLevel),schema:orderAgg,type:avg),orderBy:custom,size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Average%20alert%20level',type:histogram))"},
+    AgentsConnected: {type: 'histogram', data: "vis:(aggs:!((id:'1',params:(field:AgentName),schema:metric,type:cardinality),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(id:'3',params:(filters:!((input:(query:(query_string:(analyze_wildcard:!t,query:'rule.sidid:503'))),label:''))),schema:group,type:filters)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Agents%20Connected',type:histogram))"}
 };
 
 /*
@@ -27,9 +31,9 @@ exports.newDashboard = function (structure, filter, time, url) {
         filter = '*';
     }
     if (url) {
-        return util.format('/app/kibana#/dashboard?embed=true&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))&_a=(filters:!(),options:(darkTheme:!f),panels:!%s,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),title:\'%s\',uiState:())', time, structure, filter, 'New dashboard');
-    } else {
         return util.format('/app/kibana#/dashboard?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))&_a=(filters:!(),options:(darkTheme:!f),panels:!%s,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),title:\'%s\',uiState:())', time, structure, filter, 'New dashboard');
+    } else {
+        return util.format('/app/kibana#/dashboard?embed=true&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))&_a=(filters:!(),options:(darkTheme:!f),panels:!%s,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),title:\'%s\',uiState:())', time, structure, filter, 'New dashboard');
     }
 };
 
@@ -52,9 +56,9 @@ exports.getDashboard = function (dashboard, filter, time, url) {
         return '';
     }
     if (url) {
-        return util.format('/app/kibana#/dashboard?embed=true&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))&_a=(filters:!(),options:(darkTheme:!f),panels:!%s,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),title:\'%s\',uiState:())', time, structure, filter, dashboard);
-    } else {
         return util.format('/app/kibana#/dashboard?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))&_a=(filters:!(),options:(darkTheme:!f),panels:!%s,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),title:\'%s\',uiState:())', time, structure, filter, dashboard);
+    } else {
+        return util.format('/app/kibana#/dashboard?embed=true&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))&_a=(filters:!(),options:(darkTheme:!f),panels:!%s,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),title:\'%s\',uiState:())', time, structure, filter, dashboard);
     }
 };
 
@@ -62,13 +66,20 @@ exports.getDashboard = function (dashboard, filter, time, url) {
 Index -> Elastic index
 Query -> Query expresion (Can be blank string)
 Time -> Time selection string (Can be blank string)
+URL -> If true, the method will return an URL. Else, will return an iframe.
 */
-exports.getAlerts = function (index, query, time) {
+exports.getAlerts = function (index, query, time, url) {
     if (time == '') {
         time = 'from:now-24h,mode:quick,to:now';
     }
-
-    return util.format('/app/kibana#/discover?_a=(columns:!(_source),index:\'%s\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),sort:!(\'@timestamp\',desc))&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))', index, query, time);
+    if (query == '') {
+        query = '*';
+    }
+    if (url) {
+        return util.format('/app/kibana#/discover?_a=(columns:!(_source),index:\'%s\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),sort:!(\'@timestamp\',desc))&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))', index, query, time);
+    } else {
+        return util.format('/app/kibana#/discover?embed=true&_a=(columns:!(_source),index:\'%s\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),sort:!(\'@timestamp\',desc))&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))', index, query, time);
+    }
 };
 
 /*

@@ -13,7 +13,8 @@ require('ui/chrome').setNavBackground('#222222').setTabs([
   { id: 'agents', title: 'Agents' },
   { id: 'ruleset', title: 'Ruleset' },
   { id: 'FIM', title: 'FIM' },
-  { id: 'rootcheck', title: 'Rootcheck' },
+  { id: 'compliance', title: 'Compliance' },
+  { id: 'discover', title: 'Discover'},
   { id: 'settings', title: 'Settings' }
 ]);
 
@@ -382,13 +383,7 @@ routes
     template: require('plugins/wazuh/templates/settings.html')
   })
   .when('/FIM', {
-    template: require('plugins/wazuh/templates/FIM.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/rootcheck', {
-    template: require('plugins/wazuh/templates/rootcheck.html'),
+    template: require('plugins/wazuh/templates/fim.html'),
     resolve: {
       "check": settingsWizard
     }
@@ -399,17 +394,50 @@ routes
       "check": settingsWizard
     }
   })
-  .when('/osseclog', {
-    template: require('plugins/wazuh/templates/osseclog.html'),
+  .when('/manager/osseclog', {
+    template: require('plugins/wazuh/templates/manager-osseclog.html'),
     resolve: {
       "check": settingsWizard
     }
   })
-  .when('/managerCharts', {
-    template: require('plugins/wazuh/templates/managerCharts.html'),
+  .when('/manager/metrics', {
+    template: require('plugins/wazuh/templates/manager-metrics.html'),
     resolve: {
       "check": settingsWizard
     }
+  })
+  .when('/compliance', {
+    template: require('plugins/wazuh/templates/compliance.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/compliance/pci', {
+    template: require('plugins/wazuh/templates/compliance-pci.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/compliance/cis', {
+    template: require('plugins/wazuh/templates/compliance-cis.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/manager/dashboard', {
+    template: require('plugins/wazuh/templates/manager-dashboard.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/discover', {
+    template: require('plugins/wazuh/templates/discover.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/', {
+    redirectTo: '/manager'
   })
   .otherwise({
     redirectTo: '/settings'
@@ -423,6 +451,7 @@ require('plugins/wazuh/controllers/FIM.js');
 require('plugins/wazuh/controllers/rootcheck.js');
 require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
+require('plugins/wazuh/controllers/kibanaIntegration.js');
 
 //External angularjs libs
 require('plugins/wazuh/../node_modules/angular-utils-pagination/dirPagination.js');
