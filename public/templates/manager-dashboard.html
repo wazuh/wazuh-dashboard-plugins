@@ -7,8 +7,8 @@
     </ul>
 </div>
 <div ng-controller="kibanaIntegrationController" style="height:100vh;">
-    <h2 class="container_page_title" style="margin-left: 90px; margin-top: 30px;">Manager alerts dashboard <a ng-href="{{getDashboard('OSSECAlerts', '', 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></h2>
+    <h2 class="container_page_title" style="margin-left: 90px; margin-top: 30px;">OSSEC dashboard <a ng-href="{{getDashboard('OSSECAlerts', defDashboardFilter, 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></h2>
     <div style="margin-bottom: 25px; height: 100%;">
-        <iframe ng-src="{{getDashboard('OSSECAlerts', '', 'from:now-7d,mode:quick,to:now', false)}}" height="100%" width="100%"></iframe>
+        <iframe ng-src="{{getDashboard('OSSECAlerts', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="100%" width="100%"></iframe>
     </div>
 </div>

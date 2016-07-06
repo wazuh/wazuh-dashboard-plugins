@@ -689,8 +689,8 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
     var load_apply_filter = function () {
         var initialize = sharedProperties.getProperty();
         if (initialize != '') {
-            if (initialize.substring(0, 1) == 'r') {
-                $scope.setRulesFilter_outside('file', initialize.substring(1));
+            if (initialize.substring(0, 3) == 'r//') {
+                $scope.setRulesFilter_outside('file', initialize.substring(3));
                 sharedProperties.setProperty('');
             }
         }

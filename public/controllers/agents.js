@@ -225,44 +225,24 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         }
     };
 
-    $scope.getAlertsUrl = function (agent, time, filters) {
-        if (!time) {
-            time = '-24h';
-        }
-        else if (time == '') {
-            time = '-24h';
-        }
-        if (!filters) {
-            filters = '';
-            var kibanaFilter = 'AgentName:' + agent;
-        } else if (filters == '') {
-            var kibanaFilter = 'AgentName:' + agent;
+    $scope.loadAlertsUrl = function (agent, filters) {
+        if (filters && filters != '') {
+            var _filter = 'AgentName:'+agent + ' AND ' + filters;
         } else {
-            var kibanaFilter = 'AgentName:' + agent + ' AND ' + filters;
+            var _filter = 'AgentName:'+agent;
         }
-        var kibanaTime = 'from:now' + time + ',mode:quick,to:now';
-        var rulesUrl = kuf.getAlerts('ossec-*', kibanaFilter, kibanaTime);
-        return rulesUrl;
+        sharedProperties.setProperty('aa//'+_filter);
+        $location.path('/discover');
     };
 
-    $scope.getDashboardUrl = function (agent, dashboard, time, filters) {
-        if (!time) {
-            time = '-24h';
-        }
-        else if (time == '') {
-            time = '-24h';
-        }
-        if (!filters) {
-            filters = '';
-            var kibanaFilter = 'AgentName:' + agent;
-        } else if (filters == '') {
-            var kibanaFilter = 'AgentName:' + agent;
+    $scope.loadDashboardUrl = function (agent, filters) {
+        if (filters && filters != '') {
+            var _filter = 'AgentName:'+agent + ' AND ' + filters;
         } else {
-            var kibanaFilter = 'AgentName:' + agent + ' AND ' + filters;
+            var _filter = 'AgentName:'+agent;
         }
-        var kibanaTime = 'from:now' + time + ',mode:quick,to:now';
-        var rulesUrl = kuf.getDashboard(dashboard, kibanaFilter, kibanaTime, true);
-        return rulesUrl;
+        sharedProperties.setProperty('ad//'+_filter);
+        $location.path('/manager/dashboard');
     };
 
     //Load

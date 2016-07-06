@@ -82,9 +82,9 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 
     $scope.ruleDetail = function (file, isRule) {
         if (isRule) {
-            sharedProperties.setProperty('r' + file);
+            sharedProperties.setProperty('r//' + file);
         } else {
-            sharedProperties.setProperty('d' + file);
+            sharedProperties.setProperty('d//' + file);
         }
         $location.path('/ruleset');
     };

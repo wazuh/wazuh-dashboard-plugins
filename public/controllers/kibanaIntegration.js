@@ -3,23 +3,12 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('kibanaIntegrationController', function ($scope) {
+app.controller('kibanaIntegrationController', function ($scope, sharedProperties) {
 
     //Print Error
     var printError = function (error) {
         alertify.delay(10000).closeLogOnClick(true).error(error.html);
     }
-
-    $scope.getAlerts = function (agent, time, filters) {
-        if (!filter) {
-            filter = '';
-        }
-        if (!time) {
-            time = '';
-        }
-        var rulesUrl = kuf.getAlerts('ossec-*', filter, time);
-        return rulesUrl;
-    };
 
     $scope.getDashboard = function (dashboard, filter, time, url) {
         if (!filter) {
@@ -27,6 +16,9 @@ app.controller('kibanaIntegrationController', function ($scope) {
         }
         if (!time) {
             time = '';
+        }
+        if (url == undefined) {
+            url = false;
         }
         return kuf.getDashboard(dashboard, filter, time, url);
     };
@@ -37,6 +29,9 @@ app.controller('kibanaIntegrationController', function ($scope) {
         }
         if (!time) {
             time = '';
+        }
+        if (url == undefined) {
+            url = false;
         }
         return kuf.getAlerts(index, filter, time, url);
     };
@@ -53,5 +48,20 @@ app.controller('kibanaIntegrationController', function ($scope) {
         }
         return kuf.getVisualization(visName, filter, time, url);
     };
-    
+
+    //Load
+    var initialize = sharedProperties.getProperty();
+        if ((initialize != '') && (initialize.substring(0, 4) == 'aa//')) {
+            $scope.defAlertFilter = initialize.substring(4);
+            sharedProperties.setProperty('');
+        } else {
+            $scope.defAlertFilter = '';
+        }
+        if ((initialize != '') && (initialize.substring(0, 4) == 'ad//')) {
+            $scope.defDashboardFilter = initialize.substring(4);
+            sharedProperties.setProperty('');
+        } else {
+            $scope.defDashboardFilter = '';
+        }
+
 });

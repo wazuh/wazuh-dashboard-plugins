@@ -379,17 +379,8 @@ routes
       "check": settingsWizard
     }
   })
-  .when('/settings', {
-    template: require('plugins/wazuh/templates/settings.html')
-  })
-  .when('/FIM', {
-    template: require('plugins/wazuh/templates/fim.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/ruleset', {
-    template: require('plugins/wazuh/templates/ruleset.html'),
+  .when('/manager/dashboard', {
+    template: require('plugins/wazuh/templates/manager-dashboard.html'),
     resolve: {
       "check": settingsWizard
     }
@@ -402,6 +393,21 @@ routes
   })
   .when('/manager/metrics', {
     template: require('plugins/wazuh/templates/manager-metrics.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/settings', {
+    template: require('plugins/wazuh/templates/settings.html')
+  })
+  .when('/FIM', {
+    template: require('plugins/wazuh/templates/fim.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/ruleset', {
+    template: require('plugins/wazuh/templates/ruleset.html'),
     resolve: {
       "check": settingsWizard
     }
@@ -420,12 +426,6 @@ routes
   })
   .when('/compliance/cis', {
     template: require('plugins/wazuh/templates/compliance-cis.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/manager/dashboard', {
-    template: require('plugins/wazuh/templates/manager-dashboard.html'),
     resolve: {
       "check": settingsWizard
     }
