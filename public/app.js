@@ -405,6 +405,12 @@ routes
       "check": settingsWizard
     }
   })
+  .when('/managerCharts', {
+    template: require('plugins/wazuh/templates/managerCharts.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
   .otherwise({
     redirectTo: '/settings'
   });

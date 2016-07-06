@@ -1,0 +1,14 @@
+<div ng-if="!load">
+    <ul class="wazuh-submenu">
+        <li><a href="/app/wazuh#/manager">Overview</a></li>
+        <li><a href="/app/wazuh#/osseclog">OSSEC Logs</a></li>
+        <li class="active"><a>Charts</a></li>
+    </ul>
+</div>
+<div class="container" ng-controller="managerController">
+    <h2 class="container_page_title">Manager charts</h2>
+    <div style="margin-bottom: 25px;">
+        <label style="font-weight: bold;">Manager restarts count last 7 days</label>
+        <iframe ng-src="{{getVisualization('ManagerRestarts', '', 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
+    </div>
+</div>

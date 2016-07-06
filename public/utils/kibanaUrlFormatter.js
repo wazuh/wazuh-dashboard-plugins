@@ -7,7 +7,8 @@ var dashboards = {
 };
 
 var visualizations = {
-    AlertsByCountry : {type: 'pie', data: "vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(field:GeoLocation.country_name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'Alerts:%20By%20country',type:pie))"} 
+    AlertsByCountry : {type: 'pie', data: "vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(field:GeoLocation.country_name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'Alerts:%20By%20country',type:pie))"},
+    ManagerRestarts: {type: 'histogram', data: "vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(id:'3',params:(filters:!((input:(query:(query_string:(analyze_wildcard:!t,query:'rule.sidid:502'))),label:'Manager%20started'))),schema:group,type:filters)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Manager%20restarts%20count%20last%207%20days',type:histogram))"}
 };
 
 /*

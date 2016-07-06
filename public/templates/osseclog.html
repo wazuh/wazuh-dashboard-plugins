@@ -1,6 +1,8 @@
 <div ng-if="!load">
   <ul class="wazuh-submenu">
-    <li><a href="/app/wazuh#/manager"><span class="glyphicon glyphicon-arrow-left"></span> Back</a></li>
+    <li><a href="/app/wazuh#/manager">Overview</a></li>
+    <li class="active"><a>OSSEC Logs</a></li>
+    <li><a href="/app/wazuh#/managerCharts">Charts</a></li>
   </ul>
 </div>
 <div class="container" ng-controller="osseclogController">

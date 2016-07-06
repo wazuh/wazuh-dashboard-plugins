@@ -1,6 +1,8 @@
 <div ng-if="!load">
   <ul class="wazuh-submenu">
-    <li><a href="/app/wazuh#/osseclog">OSSEC Logs <span class="glyphicon glyphicon-arrow-right"></span></a></li>
+    <li class="active"><a>Overview</a></li>
+    <li><a href="/app/wazuh#/osseclog">OSSEC Logs</a></li>
+    <li><a href="/app/wazuh#/managerCharts">Charts</a></li>
   </ul>
 </div>
 <div class="container" ng-controller="managerController">
@@ -9,7 +11,7 @@
 </div>
   <div class="row containerManager" ng-if="!load">
     <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-    <div class="leftCol">
+    <div class="leftCol" style="margin-bottom: 25px;">
         <h2 class="container_page_title">Manager configuration</h2>
         <ul id="managerConfiguration">
             <li><a ng-class="{ active: isSetTab(1) }" href ng-click="setTab(1)" ng-if="managerConfiguration.global.jsonout_output 
@@ -504,8 +506,7 @@
 			</div>     
 		</div>		
     </div>
-    
-    
+
   </div>
 
 </div>

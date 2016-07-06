@@ -1,3 +1,5 @@
+// Require utils
+var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
@@ -123,6 +125,19 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
                 break;
         }
         return output;
+    };
+
+    $scope.getVisualization = function (visName, filter, time, url) {
+        if (!filter) {
+            filter = '';
+        }
+        if (!time) {
+            time = '';
+        }
+        if (url == undefined) {
+            url = false;
+        }
+        return kuf.getVisualization(visName, filter, time, url);
     };
 
     var load = function () {

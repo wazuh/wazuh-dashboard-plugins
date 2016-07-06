@@ -22,6 +22,11 @@ mark {
   background-color: yellow;
 }
 
+iframe {
+    border: none;
+    overflow:hidden;
+}
+
 .top-panel {
   float: left;
   margin-right: 13px;
@@ -1293,6 +1298,10 @@ input.cmn-toggle-round:checked + label:after {
 .wazuh-submenu > .active {
     background-color: #41454c;
     height: 30px;
+}
+
+.wazuh-submenu > .active > a:hover {
+    cursor: default;
 }
 
 .wazuh-submenu > .active > a:before {
