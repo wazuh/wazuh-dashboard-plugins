@@ -349,6 +349,26 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
         return '<div style="width: 250px;">' + tooltip + '</div>';
     };
 
+    $scope.loadRuleDiscover = function (rule, filters) {
+        if (filters && filters != '') {
+            var _filter = 'rule.sidid:' + rule + ' AND ' + filters;
+        } else {
+            var _filter = 'rule.sidid:' + rule;
+        }
+        sharedProperties.setProperty('aa//' + _filter);
+        $location.path('/discover');
+    };
+
+    $scope.loadRuleDashboard = function (rule, filters) {
+        if (filters && filters != '') {
+            var _filter = 'rule.sidid:' + rule + ' AND ' + filters;
+        } else {
+            var _filter = 'rule.sidid:' + rule;
+        }
+        sharedProperties.setProperty('ad//' + _filter);
+        $location.path('/dashboard');
+    };
+
     //Decoders - Filters
 
     $scope.setDecodersFilter = function (type, value) {

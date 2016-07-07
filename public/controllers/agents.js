@@ -252,10 +252,10 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             var _filter = 'AgentName:' + agent;
         }
         if (dashboard == 'pci') {
-            sharedProperties.setProperty('pcid//' + _filter);
+            sharedProperties.setProperty('ad//' + _filter);
             $location.path('/compliance/pci');
         } else if (dashboard == 'cis') {
-            sharedProperties.setProperty('cisd//' + _filter);
+            sharedProperties.setProperty('ad//' + _filter);
             $location.path('/compliance/cis');
         }
     };
