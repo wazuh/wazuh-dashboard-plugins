@@ -19,6 +19,75 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     }
 
     //Functions
+    $scope.printEventInfo = function (event) {
+        var _template = '<div style="width: auto; height: auto; overflow: hidden;"><ul class="popup-ul">';
+        _template += '<li><b>File:</b> '+event.file+'</li>';
+        _template += '<li><b>Date:</b> '+event.date+'</li>';
+        _template += '<li><b>Event:</b> '+event.event+'</li>';
+        _template += '<li><b>MD5:</b> '+event.md5+'</li>';
+        _template += '<li><b>SHA1:</b> '+event.sha1+'</li>';
+        _template += '<li><b>Size:</b> '+event.size+' bytes</li>';
+        _template += '<li><b>Permissions:</b> '+event.perm+'</li>';
+        _template += '<li><b>User ID:</b> '+event.uid+'</li>';
+        _template += '<li><b>Group ID:</b> '+event.gid+'</li>';
+        _template += '</ul></div>'
+        alertify.okBtn("Close").alert(_template);
+    };
+
+    $scope.initEvents = function (agent, file) {
+        var body = { 'file' : file };
+        var tmpBody = DataFactory.getBody(objectsArray['/syscheck/files']);
+        if (tmpBody && (tmpBody != { 'summary ': 'yes'})) {
+            angular.forEach(tmpBody, function (value, key) {
+                if (key !== 'summary')
+                body[key] = value;
+            });
+        }
+        DataFactory.initialize('get', '/syscheck/'+agent+'/files', body, 10, 0)
+            .then(function (data) {
+                objectsArray[agent+file] = data;
+                DataFactory.get(objectsArray[agent+file])
+                    .then(function (data) {
+                        $scope.eventsFetchInfo[agent + file].length = 0;
+                        $scope.eventsFetchInfo[agent + file] = data.data.items;
+                    }, printError)
+            }, printError);
+    };
+
+    $scope.getEvents = function (agent, file) {
+        DataFactory.get(objectsArray[agent + file])
+            .then(function (data) {
+                $scope.eventsFetchInfo[agent + file].length = 0;
+                $scope.eventsFetchInfo[agent + file] = data.data.items;
+            }, printError)
+    };
+
+    $scope.hasNextEvents = function (agent, file) {
+        if (!objectsArray[agent + file])
+            return false;
+        return DataFactory.hasNext(objectsArray[agent + file]);
+    };
+    $scope.nextEvents = function (agent, file) {
+        DataFactory.next(objectsArray[agent + file])
+            .then(function (data) {
+                $scope.eventsFetchInfo[agent + file].length = 0;
+                $scope.eventsFetchInfo[agent + file] = data.data.items;
+            }, printError)
+    };
+
+    $scope.hasPrevEvents = function (agent, file) {
+        if (!objectsArray[agent + file])
+            return false;
+        return DataFactory.hasPrev(objectsArray[agent + file]);
+    };
+    $scope.prevEvents = function (agent, file) {
+        DataFactory.prev(objectsArray[agent + file])
+            .then(function (data) {
+                $scope.eventsFetchInfo[agent + file].length = 0;
+                $scope.eventsFetchInfo[agent + file] = data.data.items;
+            }, printError)
+    };
+
     $scope.setTypeFilter = function (filter) {
         if ($scope.typeFilter != filter) {
             $scope.typeFilter = filter;
@@ -59,15 +128,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     $scope.setAgentFilter = function (id) {
         $scope.eventFilter = '';
         $scope.typeFilter = '';
-        if (id == $scope.agentId) {
-            $scope.agentId = '';
-            DataFactory.initialize('get', '/syscheck/files', {}, 16, 0)
-                .then(function (data) {
-                    objectsArray['/syscheck/files'] = data;
-                    $scope.getFiles();
-                }, printError);
-
-        } else {
+        if (id != $scope.agentId) {
             $scope.agentId = id;
             DataFactory.initialize('get', '/syscheck/' + id + '/files', {}, 16, 0)
                 .then(function (data) {
@@ -224,6 +285,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)
         });
+        $scope.eventsFetchInfo.length = 0;
     });
 
 });
