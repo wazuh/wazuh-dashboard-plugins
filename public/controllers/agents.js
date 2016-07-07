@@ -242,7 +242,32 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             var _filter = 'AgentName:'+agent;
         }
         sharedProperties.setProperty('ad//'+_filter);
-        $location.path('/manager/dashboard');
+        $location.path('/dashboard');
+    };
+
+    $scope.loadComplianceDashboardUrl = function (agent, dashboard, filters) {
+        if (filters && filters != '') {
+            var _filter = 'AgentName:' + agent + ' AND ' + filters;
+        } else {
+            var _filter = 'AgentName:' + agent;
+        }
+        if (dashboard == 'pci') {
+            sharedProperties.setProperty('pcid//' + _filter);
+            $location.path('/compliance/pci');
+        } else if (dashboard == 'cis') {
+            sharedProperties.setProperty('cisd//' + _filter);
+            $location.path('/compliance/cis');
+        }
+    };
+
+    $scope.loadAgentMetrics = function (agent, filters) {
+        if (filters && filters != '') {
+            var _filter = 'AgentName:' + agent + ' AND ' + filters;
+        } else {
+            var _filter = 'AgentName:' + agent;
+        }
+        sharedProperties.setProperty('av//' + _filter);
+        $location.path('/agents/metrics');
     };
 
     //Load

@@ -14,6 +14,7 @@ require('ui/chrome').setNavBackground('#222222').setTabs([
   { id: 'ruleset', title: 'Ruleset' },
   { id: 'FIM', title: 'FIM' },
   { id: 'compliance', title: 'Compliance' },
+  { id: 'dashboard', title: 'Dashboard' },
   { id: 'discover', title: 'Discover'},
   { id: 'settings', title: 'Settings' }
 ]);
@@ -373,14 +374,20 @@ routes
       "check": settingsWizard
     }
   })
+  .when('/agents/metrics', {
+    template: require('plugins/wazuh/templates/agents-metrics.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
   .when('/manager', {
     template: require('plugins/wazuh/templates/manager.html'),
     resolve: {
       "check": settingsWizard
     }
   })
-  .when('/manager/dashboard', {
-    template: require('plugins/wazuh/templates/manager-dashboard.html'),
+  .when('/dashboard', {
+    template: require('plugins/wazuh/templates/dashboard.html'),
     resolve: {
       "check": settingsWizard
     }
@@ -447,7 +454,7 @@ routes
 require('plugins/wazuh/controllers/agents.js');
 require('plugins/wazuh/controllers/settings.js');
 require('plugins/wazuh/controllers/manager.js');
-require('plugins/wazuh/controllers/FIM.js');
+require('plugins/wazuh/controllers/fim.js');
 require('plugins/wazuh/controllers/rootcheck.js');
 require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');

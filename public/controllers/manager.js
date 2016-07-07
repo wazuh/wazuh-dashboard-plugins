@@ -127,19 +127,6 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
         return output;
     };
 
-    $scope.getVisualization = function (visName, filter, time, url) {
-        if (!filter) {
-            filter = '';
-        }
-        if (!time) {
-            time = '';
-        }
-        if (url == undefined) {
-            url = false;
-        }
-        return kuf.getVisualization(visName, filter, time, url);
-    };
-
     var load = function () {
         DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {

@@ -63,5 +63,23 @@ app.controller('kibanaIntegrationController', function ($scope, sharedProperties
         } else {
             $scope.defDashboardFilter = '';
         }
+        if ((initialize != '') && (initialize.substring(0, 4) == 'av//')) {
+            $scope.defMetricsFilter = initialize.substring(4);
+            sharedProperties.setProperty('');
+        } else {
+            $scope.defMetricsFilter = '';
+        }
+        if ((initialize != '') && (initialize.substring(0, 6) == 'pcid//')) {
+            $scope.defDashboardFilter = initialize.substring(6);
+            sharedProperties.setProperty('');
+        } else {
+            $scope.defDashboardFilter = '';
+        }
+        if ((initialize != '') && (initialize.substring(0, 6) == 'cisd//')) {
+            $scope.defDashboardFilter = initialize.substring(6);
+            sharedProperties.setProperty('');
+        } else {
+            $scope.defDashboardFilter = '';
+        }
 
 });

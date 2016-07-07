@@ -1,6 +1,7 @@
 <div ng-if="!load">
 	<ul class="wazuh-submenu">
 		<li class="active"><a>Overview</a></li>
+		<li><a href="/app/wazuh#/agents/metrics">Metrics</a></li>
 	</ul>
 </div>
 <div class="container" ng-controller="agentsController">
@@ -73,7 +74,8 @@
 						<li><a ng-click="setTab(1,$index)" href="" ng-class="{ active: isSetTab(1,$index) }" class="active">Global</a></li>
 						<li><a ng-click="setTab(2,$index)" href="" ng-class="{ active: isSetTab(2,$index) }">File integrity</a></li>
 						<li><a ng-click="setTab(3,$index)" href="" ng-class="{ active: isSetTab(3,$index) }">Rootcheck</a></li>
-						<li><a ng-click="setTab(4,$index)" href="" ng-class="{ active: isSetTab(4,$index) }">Alerts</a></li>
+						<li><a ng-click="setTab(4,$index)" href="" ng-class="{ active: isSetTab(4,$index) }">Discover</a></li>
+						<li><a ng-click="setTab(5,$index)" href="" ng-class="{ active: isSetTab(5,$index) }">Dashboards</a></li>
 					</ul>
 					<div class="agentTabs-container">
 						<div class="agentsTabs-info" ng-show="isSetTab(1,$index)">
@@ -134,12 +136,12 @@
 								</li>
 								<li>
 									<a ng-click="loadAlertsUrl(agent.name)">
-										<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> View alerts
+										<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Discover alerts
 									</a>
 								</li>
 								<li>
-									<a ng-click="loadDashboardUrl(agent.name)">
-										<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> View dashboard
+									<a ng-click="loadAgentMetrics(agent.name)">
+										<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Metrics
 									</a>
 								</li>
 							</ul>
@@ -254,11 +256,34 @@
 							<ul class="agentsTabs-controlButtons">
 								<li>
 									<a ng-click="loadAlertsUrl(agent.name)">
-										<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> View alerts
+										<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Discover alerts
 									</a>
 								</li>
 							</ul>
 						</div>
+						<div class="agentsTabs-file-dashboards" ng-show="isSetTab(5,$index)">
+							<div class="agentsTabs-box">
+								<table class="table-agent-information">
+									<tbody>
+										<tr>
+											<td class="table-agent-information-td-title" ng-click="loadDashboardUrl(agent.name)">OSSEC dashboard</td>
+											<td class="table-agent-information-td-value ng-binding"><span class="glyphicon glyphicon-chevron-right" ng-click="loadDashboardUrl(agent.name)"></span></td>
+										</tr>
+										<tr>
+											<td class="table-agent-information-td-title" ng-click="loadComplianceDashboardUrl(agent.id, 'pci');">PCI dashboard</td>
+											<td class="table-agent-information-td-value ng-binding"><span class="glyphicon glyphicon-chevron-right" ng-click="loadComplianceDashboardUrl(agent.id, 'pci');"></span></td>
+										</tr>
+										<tr>
+											<td class="table-agent-information-td-title" ng-click="loadComplianceDashboardUrl(agent.id, 'cis');">CIS dashboard</td>
+											<td class="table-agent-information-td-value ng-binding"><span class="glyphicon glyphicon-chevron-right" ng-click="loadComplianceDashboardUrl(agent.id, 'cis');"></span></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<ul class="agentsTabs-controlButtons">
+							</ul>
+						</div>
+
 					</div>
 				</div>
 			</div>

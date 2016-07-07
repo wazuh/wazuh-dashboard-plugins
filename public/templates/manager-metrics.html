@@ -2,21 +2,14 @@
     <ul class="wazuh-submenu">
         <li><a href="/app/wazuh#/manager">Overview</a></li>
         <li><a href="/app/wazuh#/manager/osseclog">OSSEC Logs</a></li>
-        <li><a href="/app/wazuh#/manager/dashboard">Dashboard</a></li>
         <li class="active"><a>Metrics</a></li>
     </ul>
 </div>
-<div class="container" ng-controller="managerController">
+<div class="container" ng-controller="kibanaIntegrationController">
     <h2 class="container_page_title">Manager metrics</h2>
     <div style="margin-bottom: 25px;">
         <label style="font-weight: bold;">Count of restarts last 7 days <a ng-href="{{getVisualization('ManagerRestarts', '', 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
         <iframe ng-src="{{getVisualization('ManagerRestarts', '', 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
-        <label style="font-weight: bold;">Top 10 alerts <a ng-href="{{getVisualization('TopAlerts', '', 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
-        <iframe ng-src="{{getVisualization('TopAlerts', '', 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
-        <label style="font-weight: bold;">Alerts by time <a ng-href="{{getVisualization('AlertsTime', '', 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
-        <iframe ng-src="{{getVisualization('AlertsTime', '', 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
-        <label style="font-weight: bold;">Average alert level <a ng-href="{{getVisualization('AverageAlertLevel', '', 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
-        <iframe ng-src="{{getVisualization('AverageAlertLevel', '', 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
         <label style="font-weight: bold;">New agents connections <a ng-href="{{getVisualization('AgentsConnected', '', 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
         <iframe ng-src="{{getVisualization('AgentsConnected', '', 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
     </div>
