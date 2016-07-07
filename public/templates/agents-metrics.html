@@ -5,7 +5,7 @@
 	</ul>
 </div>
 <div class="container" ng-controller="kibanaIntegrationController">
-    <h2 class="container_page_title">Agents metrics</h2>
+    <h2 class="container_page_title">Agents metrics <span style="float: right; font-size: 16px; font-weight: bold;" ng-show="defMetricsFilter != ''">{{defMetricsFilter}}</span></h2>
     <div style="margin-bottom: 25px;">
         <label style="font-weight: bold;">Top 10 groups <a ng-href="{{getVisualization('TopGroups', defMetricsFilter, 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
         <iframe ng-src="{{getVisualization('TopGroups', defMetricsFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>

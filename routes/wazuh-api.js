@@ -1,10 +1,13 @@
 module.exports = function (server, options) {
 
+    var config = require('../config.js');
+
     //Handlers - Generic
 
     var getConfig = function (callback) {
         var needle = require('needle');
-        needle.get('/elasticsearch/.kibana/wazuh-configuration/1', function (error, response) {
+        var elasticurl = config.elasticPath+'/.kibana/wazuh-configuration/1';
+        needle.get(elasticurl, function (error, response) {
             if (!error) {
                 if (response.body.found) {
                     callback({ 'user': response.body._source.api_user, 'password': new Buffer(response.body._source.api_password, 'base64').toString("ascii"), 'url': response.body._source.api_url, 'insecure': response.body._source.insecure, 'error': '', 'error_code': 0 });
