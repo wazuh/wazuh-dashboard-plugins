@@ -578,6 +578,7 @@ app.controller('rulesetController', function ($scope, $route, $q, alertify, shar
                         alert += "The following manual steps are required: " + data.data.manual_steps_detail;
                     }
                     alertify.delay(10000).closeLogOnClick(true).success(alert);
+                    load_backups();
                 }, printError);
         });
     };

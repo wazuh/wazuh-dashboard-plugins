@@ -271,6 +271,7 @@
                             <div ng-model="$parent.selectedBackup" custom-select="backup for backup in $parent.backups | filter:$searchTerm"></div>
                             <button type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button" style="margin-left: 15px; width: 150px !important;"
                                 ng-click="restoreBackup();"><span>Restore backup</span></button>
+                            <label style="font-weight: lighter;">* When ruleset is updated, a new backup (the first in the list) will be created.</label>
                         </div>
                     </div>
                 </div>
