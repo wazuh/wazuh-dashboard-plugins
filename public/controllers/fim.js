@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('fimController', function ($scope, alertify, sharedProperties, DataFactory) {
+app.controller('fimController', function ($scope, alertify, sharedProperties, DataFactory, $location) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -46,6 +46,18 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         _template += '<li><b>Group ID:</b> '+event.gid+'</li>';
         _template += '</ul></div>'
         alertify.okBtn("Close").alert(_template);
+    };
+
+    $scope.loadDiscover = function (file) {
+        var _filter = 'AlertsFile:"'+file+'"';
+        sharedProperties.setProperty('aa//'+_filter);
+        $location.path('/discover');
+    };
+
+    $scope.loadDashboard = function (file) {
+        var _filter = 'AlertsFile:"' + file+'"';
+        sharedProperties.setProperty('ad//' + _filter);
+        $location.path('/fim/dashboard');
     };
 
     $scope.initEvents = function (agent, file) {

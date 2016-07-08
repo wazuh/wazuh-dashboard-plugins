@@ -59,7 +59,7 @@
 
 
 			<div class="agent_card_list" ng-repeat="agent in agents" ng-init="agentFetchInfo[agent.id]=[];">
-				<div class="agent_card" ng-class="{ agent_card_active: showDetails }" ng-click="fetchAgent(agent,$index); showDetails = ! showDetails; ">
+				<div class="agent_card" ng-class="{ agent_card_active: showDetails }" ng-click="showDetails = ! showDetails; showDetails ? fetchAgent(agent,$index) : null;">
 					<div class="id"> {{agent.id}} </div>
 					<div class="float_left">
 						<div class="name">{{agent.name}}</div>

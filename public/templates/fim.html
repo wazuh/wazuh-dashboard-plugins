@@ -1,6 +1,7 @@
 <div ng-if="!load">
   <ul class="wazuh-submenu">
     <li class="active"><a>Overview</a></li>
+    <li><a href="/app/wazuh#/fim/dashboard">Dashboard</a></li>
   </ul>
 </div>
 <div class="container" ng-controller="fimController">
@@ -71,6 +72,18 @@
                     <span class="glyphicon glyphicon-chevron-left" ng-click="prevEvents(agentId, file.file)" ng-show="hasPrevEvents(agentId, file.file)"></span>
                     <span class="glyphicon glyphicon-chevron-right" ng-click="nextEvents(agentId, file.file)" ng-show="hasNextEvents(agentId, file.file)"></span>
                   </div>
+                  <ul class="eventTabs-controlButtons">
+                    <li>
+                      <a ng-click="loadDiscover(file.file);">
+                        <span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Discover
+                      </a>
+                    </li>
+                    <li>
+                      <a ng-click="loadDashboard(file.file);">
+                        <span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Dashboard
+                      </a>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>

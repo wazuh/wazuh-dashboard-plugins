@@ -12,7 +12,7 @@ require('ui/chrome').setNavBackground('#222222').setTabs([
   { id: 'manager', title: 'Manager' },
   { id: 'agents', title: 'Agents' },
   { id: 'ruleset', title: 'Ruleset' },
-  { id: 'FIM', title: 'FIM' },
+  { id: 'fim', title: 'FIM' },
   { id: 'compliance', title: 'Compliance' },
   { id: 'dashboard', title: 'Dashboard' },
   { id: 'discover', title: 'Discover'},
@@ -412,8 +412,14 @@ routes
   .when('/settings', {
     template: require('plugins/wazuh/templates/settings.html')
   })
-  .when('/FIM', {
+  .when('/fim', {
     template: require('plugins/wazuh/templates/fim.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/fim/dashboard', {
+    template: require('plugins/wazuh/templates/fim-dashboard.html'),
     resolve: {
       "check": settingsWizard
     }
