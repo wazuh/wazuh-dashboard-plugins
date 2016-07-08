@@ -45,17 +45,17 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         _template += '<li><b>User ID:</b> '+event.uid+'</li>';
         _template += '<li><b>Group ID:</b> '+event.gid+'</li>';
         _template += '</ul></div>'
-        alertify.okBtn("Close").alert(_template);
+        alertify.alert(_template);
     };
 
     $scope.loadDiscover = function (file) {
-        var _filter = 'AlertsFile:"'+file+'"';
+        var _filter = 'SyscheckFile.path:"'+file+'"';
         sharedProperties.setProperty('aa//'+_filter);
         $location.path('/discover');
     };
 
     $scope.loadDashboard = function (file) {
-        var _filter = 'AlertsFile:"' + file+'"';
+        var _filter = 'SyscheckFile.path:"' + file+'"';
         sharedProperties.setProperty('ad//' + _filter);
         $location.path('/fim/dashboard');
     };
@@ -152,9 +152,9 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     };
 
     $scope.setAgentFilter = function (id) {
-        $scope.eventFilter = '';
-        $scope.typeFilter = '';
         if (id != $scope.agentId) {
+            $scope.eventFilter = '';
+            $scope.typeFilter = '';
             $scope.agentId = id;
             DataFactory.initialize('get', '/syscheck/' + id + '/files', {}, 16, 0)
                 .then(function (data) {

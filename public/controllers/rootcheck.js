@@ -19,6 +19,77 @@ app.controller('rcController', function ($scope, alertify, sharedProperties, Dat
 
     //Functions
 
+    $scope.loadDiscover = function (event) {
+        var _filter = 'full_log:"' + event + '"';
+        sharedProperties.setProperty('aa//' + _filter);
+        $location.path('/discover');
+    };
+
+    $scope.loadDashboard = function (event) {
+        var _filter = 'full_log:"' + event + '"';
+        sharedProperties.setProperty('ad//' + _filter);
+        $location.path('/compliance/dashboard');
+    };
+
+    $scope.getEvents = function (body) {
+        if (!body) {
+            var tmpBody = DataFactory.getBody(objectsArray['/rootcheck']);
+            if ($scope.search !== tmpBody['search']) {
+                tmpBody['search'] = $scope.search;
+                body = tmpBody;
+            }
+        } else if ($scope.search !== body['search']) {
+            body['search'] = $scope.search;
+        }
+        if (body['search'] === '') {
+            body['search'] = undefined;
+        }
+
+        if (!body) {
+            DataFactory.get(objectsArray['/rootcheck'])
+                .then(function (data) {
+                    $scope.events.length = 0;
+                    $scope.events = data.data.items;
+                }, printError);
+        } else {
+            DataFactory.get(objectsArray['/rootcheck'], body)
+                .then(function (data) {
+                    $scope.events.length = 0;
+                    $scope.events = data.data.items;
+                }, printError);
+        }
+    };
+
+    $scope.hasPrevEvents = function () {
+        return DataFactory.hasPrev(objectsArray['/rootcheck']);
+    };
+    $scope.prevEvents = function () {
+        DataFactory.prev(objectsArray['/rootcheck'])
+            .then(function (data) {
+                $scope.events.length = 0;
+                $scope.events = data.data.items;
+            }, printError);
+    };
+
+    $scope.hasNextEvents = function () {
+        return DataFactory.hasNext(objectsArray['/rootcheck']);
+    };
+    $scope.nextEvents = function () {
+        DataFactory.next(objectsArray['/rootcheck'])
+            .then(function (data) {
+                $scope.events.length = 0;
+                $scope.events = data.data.items;
+            }, printError);
+    };
+
+    $scope.getStatusClass = function (status) {
+        if (status === 'resolved') {
+            return "statusGreen";
+        } else {
+            return "statusRed";
+        }
+    };
+
     $scope.searchAgent = function () {
         if ($scope.searchAgents === '') {
             $scope.searchAgents = undefined;
@@ -78,6 +149,22 @@ app.controller('rcController', function ($scope, alertify, sharedProperties, Dat
         });
     };
 
+    $scope.isSetAgentFilter = function (id) {
+        return ($scope.agentId === id);
+    };
+
+    $scope.setAgentFilter = function (id) {
+        if (id != $scope.agentId) {
+            $scope.statusFilter = '';
+            $scope.agentId = id;
+            DataFactory.initialize('get', '/rootcheck/' + id, {}, 16, 0)
+                .then(function (data) {
+                    objectsArray['/rootcheck'] = data;
+                    $scope.getEvents();
+                }, printError);
+        }
+    };
+
     var load = function () {
         var _agent = '000';
         var _init = sharedProperties.getProperty();
@@ -86,6 +173,7 @@ app.controller('rcController', function ($scope, alertify, sharedProperties, Dat
             sharedProperties.setProperty('');
             $scope.agentId = _agent;
         }
+        $scope.agentId = _agent;
 
         DataFactory.initialize('get', '/rootcheck/'+_agent, {}, 16, 0)
             .then(function (data) {

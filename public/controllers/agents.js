@@ -182,8 +182,8 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     };
 
     $scope.loadRootcheck = function (agentId) {
-        sharedProperties.setProperty(agentId);
-        $location.path('/rootcheck');
+        sharedProperties.setProperty('rc//'+agentId);
+        $location.path('/compliance');
     };
 
     $scope.loadFIM = function (agentId) {
