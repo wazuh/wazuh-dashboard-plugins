@@ -1,133 +1,125 @@
 // Require config
-var config = require('plugins/wazuh/config/config.js');
-require('ui/notify');
-var app = require('ui/modules').get('app/wazuh', [
-    'elasticsearch',
-    'ngRoute',
-    'kibana/courier',
-    'kibana/config',
-    'kibana/notify',
-    'kibana/typeahead'
-]);
+var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rootcheckController', function ($scope, $http, Notifier, $route, $q, alertify, sharedProperties) {
-/*    $scope.load = true;
-    // Load settings
-    getApiCredentials($q, $http).then(function (data) {
-            var authdata = data[0];
-            var api_url = data[1];
-            const notify = new Notifier({
-                location: 'Wazuh'
-            });
-            
-            $scope.fetchAuditsList = function () {
-                if (sharedProperties.getAgentId() != '') {
-                    $scope.agentid = sharedProperties.getAgentId();
-                    sharedProperties.setAgentId('');
-                }
+app.controller('rcController', function ($scope, alertify, sharedProperties, DataFactory, $location) {
+    //Initialisation
+    $scope.load = true;
+    var objectsArray = [];
 
-                if (($scope.agentid == undefined) || ($scope.agentid == null) || ($scope.agentid == '')) {
-                    $scope.audits = [];
-                } else {
-                    $http.get(api_url + '/rootcheck/' + $scope.agentid, {
-                        headers: {
-                            "Authorization": 'Basic ' + authdata,
-                            "api-version": 'v1.2'
-                        }
-                    }).success(function (data) {
-                        if ((data.data == undefined) || (data.data == []) || (data.data == '') || (data.data == null)) {
-                            notify.error('Rootcheck database is empty');
-                            $scope.audits = [];
-                        } else {
-                            $scope.audits = data.data;
-                        }
-                    })
-                        .error(function (data) {
-                            $scope.audits = [];
-                            if (data.error == 600) {
-                                notify.warning('Please, specify a valid agent ID');
-                            } else if (data.error == 2) {
-                                notify.error('Rootcheck database is empty');
-                            } else {
-                                $scope.message = "Unable to connect to RESTful API, please check the connection at Settings tab.";
-                            }
-                        })
-                }
-            };
+    $scope.events = [];
+    $scope.agents = [];
+    $scope.search = '';
 
-            $scope.fetchAgentsList = function () {
-                var defered = $q.defer();
-                var promise = defered.promise;
+    $scope.agentId = '000';
 
-                $http.get(api_url + '/agents', {
-                    headers: {
-                        "Authorization": 'Basic ' + authdata,
-                        "api-version": 'v1.2'
-                    }
-                }).success(function (data) {
-                    $scope.agents = data.data;
-                    defered.resolve(1);
-                })
-                    .error(function (data) {
-                        $scope.message = "Unable to connect to RESTful API, please check the connection at Settings tab.";
-                        defered.resolve(0);
-                    })
-                    return promise;
-            }
+    //Print Error
+    var printError = function (error) {
+        alertify.delay(10000).closeLogOnClick(true).error(error.html);
+    }
 
+    //Functions
 
-            $scope.fetchAuditsList();
-            $scope.fetchAgentsList().then( function(data) {
-                $scope.load = false;
-            });
+    $scope.searchAgent = function () {
+        if ($scope.searchAgents === '') {
+            $scope.searchAgents = undefined;
+        }
+        DataFactory.get(objectsArray['/agents'], { search: $scope.searchAgents })
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
 
+    $scope.getAgents = function () {
+        DataFactory.get(objectsArray['/agents'])
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
 
-            $scope.reloadRC = function () {
-                $scope.fetchAuditsList();
-            }
+    $scope.hasNextAgents = function () {
+        return DataFactory.hasNext(objectsArray['/agents']);
+    };
+    $scope.nextAgents = function () {
+        DataFactory.next(objectsArray['/agents'])
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
 
-            $scope.sort = function (keyname) {
-                $scope.sortKey = keyname;
-                $scope.reverse = !$scope.reverse;
-            }
+    $scope.hasPrevAgents = function () {
+        return DataFactory.hasPrev(objectsArray['/agents']);
+    };
+    $scope.prevAgents = function () {
+        DataFactory.prev(objectsArray['/agents'])
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
 
-            $scope.runSyscheck = function () {
-                notify.info('Restarting syscheck and rootcheck...');
-                $http.put(api_url + '/syscheck', {}, {
-                    headers: {
-                        "Authorization": 'Basic ' + authdata,
-                        "api-version": 'v1.2'
-                    }
-                }).success(function (data) {
-                    notify.info('Syscheck and rootcheck restarted successfully');
-                })
-                    .error(function (data) {
-                        notify.error('Error restarting syscheck/rootcheck on agent');
-                        console.log('Error: ' + data);
-                    })
-            }
+    $scope.cleandb = function () {
+        alertify.confirm("Are you sure you want to delete the rootcheck database in all the agents?", function () {
+            DataFactory.getAndClean('delete', '/rootcheck', {})
+                .then(function (data) {
+                    alertify.delay(10000).closeLogOnClick(true).success('Rootcheck database deleted successfully.');
+                }, printError);
+        });
+    };
 
-            $scope.deleteRootcheck = function ($agent) {
-                alertify.confirm("Are you sure you want to clean rootcheck database for all the agents?", function () {
-                    $http.delete(api_url + '/rootcheck', {
-                        headers: {
-                            "Authorization": 'Basic ' + authdata,
-                            "api-version": 'v1.2'
-                        }
-                    }).success(function (data) {
-                        notify.info('Rootcheck database deleted successfully');
-                    })
-                        .error(function (data) {
-                            notify.error('Error deleting rootcheck database');
-                            console.log('Error: ' + data);
-                        })
-                }, function () {
+    $scope.startrc = function () {
+        alertify.confirm("Are you sure you want to start a scan on all the agents?", function () {
+            DataFactory.getAndClean('put', '/rootcheck', {})
+                .then(function (data) {
+                    alertify.delay(10000).closeLogOnClick(true).success('Rootcheck started successfully.');
+                }, printError);
+        });
+    };
 
-                });
-            }
+    var load = function () {
+        var _agent = '000';
+        var _init = sharedProperties.getProperty();
+        if ((_init != '') && (_init.substring(0, 4) == 'rc//')) {
+            _agent = _init.substring(4);
+            sharedProperties.setProperty('');
+            $scope.agentId = _agent;
+        }
 
-        }, function (data) {
-            $scope.message = "Unable to connect to RESTful API, please check the connection at Settings tab.";
-        });*/
-});
+        DataFactory.initialize('get', '/rootcheck/'+_agent, {}, 16, 0)
+            .then(function (data) {
+                objectsArray['/rootcheck'] = data;
+                DataFactory.initialize('get', '/agents', {}, 10, 0)
+                    .then(function (data) {
+                        objectsArray['/agents'] = data;
+                        load_data();
+                    }, printError);
+            }, printError);
+    };
 
+    var load_data = function () {
+        DataFactory.get(objectsArray['/rootcheck'])
+            .then(function (data) {
+                $scope.events = data.data.items;
+                DataFactory.get(objectsArray['/agents'])
+                    .then(function (data) {
+                        $scope.agents = data.data.items;
+                        $scope.load = false;
+                    });
+            }, printError);
+    };
+
+    //Load
+    load();
+
+    //Destroy
+    $scope.$on("$destroy", function () {
+        angular.forEach(objectsArray, function (value) {
+            DataFactory.clean(value)
+        });
+        $scope.events.length = 0;
+        $scope.agents.length = 0;
+    });
+
+})

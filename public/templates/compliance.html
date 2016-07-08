@@ -1,7 +1,121 @@
 <div ng-if="!load">
   <ul class="wazuh-submenu">
     <li class="active"><a>Rootcheck</a></li>
+    <li><a href="/app/wazuh#/compliance/dashboard">Rootcheck dashboard</a></li>
     <li><a href="/app/wazuh#/compliance/pci">PCI</a></li>
     <li><a href="/app/wazuh#/compliance/cis">CIS</a></li>
   </ul>
+</div>
+<div class="container" ng-controller="rcController">
+  <div ng-if="load" style="text-align: center;">
+    <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+  </div>
+  <div class="row containerRuleset" ng-if="!load">
+    <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
+    <div class="leftCol">
+      <h2 class="container_page_title">Rootcheck</h2>
+      <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;">
+        <div style="float: left;">
+          <form class="form-inline ng-pristine ng-valid">
+            <div class="form-group" style="position: relative;">
+              <i class="fa fa-search input_search_icon"></i>
+              <input type="text" ng-model="$parent.search" ng-change="getEvents()" class="form-control ng-pristine ng-untouched ng-valid eventSearch"
+                placeholder="Search...">
+            </div>
+          </form>
+        </div>
+      </div>
+      <div style="margin-left: 10px; width: 20%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
+        <div ng-class="{ event_filter_status_active: $parent.statusFilter == 'outstanding' }" ng-click="setStatusFilter('outstanding')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px;"
+          class="eventFilter">Outstanding </div>
+        <div ng-class="{ event_filter_status_active: $parent.statusFilter == 'solved' }" ng-click="setTypeFilter('solved')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100.5px;"
+          class="eventFilter">Solved</div>
+      </div>
+      <div class="rcContentTabs">
+        <div id="eventsTab">
+          <div class="events_card_list" ng-repeat="event in events">
+            <div class="event_card" ng-class="{ event_card_active: showDetails }" ng-click="showDetails = ! showDetails;">
+              <div class="float_left">
+                <div class="text" style="width: 460px; height: 45px; overflow: hidden; white-space: nowrap;">{{event.event}}</div>
+              </div>
+              <div class="float_left">
+                <div class="fimEvent">First scan: {{event.oldDay}}</div>
+              </div>
+              <div class="float_right">
+                <div ng-class='getStatusClass(event.status);' class="status" ng-style="{ 'border-bottom-right-radius' : (showDetails) ? '0px' : '4px' }"></div>
+              </div>
+              <div class="float_right">
+                <div class="fimDate">Last scan: {{event.readDay}}</div>
+              </div>
+            </div>
+            <div style="" class="event_card_detail" ng-show="showDetails">
+              <div class="eventTabs-container">
+                <div class="eventTabs-info">
+                  <div class="eventTabs-box">
+                    <table class="table-event-information">
+                      <tbody>
+                        <tr>
+                          <td class="table-event-information-td-value ng-binding">{{event.event}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <ul class="eventTabs-controlButtons">
+                    <li>
+                      <a ng-click="loadDiscover(event.event);">
+                        <span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Discover
+                      </a>
+                    </li>
+                    <li>
+                      <a ng-click="loadDashboard(event.event);">
+                        <span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Dashboard
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="glyphicon glyphicon-chevron-left" ng-click="prevEvents()" ng-show="hasPrevEvents()"></span>
+          <span class="glyphicon glyphicon-chevron-right" ng-click="nextEvents()" ng-show="hasNextEvents()"></span>
+        </div>
+      </div>
+    </div>
+    <div class="rightCol">
+      <div class="block">
+        <div class="titleCol">
+          <h2>AGENTS:</h2>
+        </div>
+        <table class="table-files">
+          <tr class="table-files-list-tr">
+            <td class="table-files-list-td"><input type="text" ng-model="$parent.searchAgents" ng-change="searchAgent()" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                placeholder="Search..."></td>
+          </tr>
+          <tr ng-class="" class="table-files-list-tr" ng-repeat="agent in agents">
+            <td class="table-files-list-td"><span ng-click="setAgentFilter(agent.id)" ng-class="{ textFilterActive: isSetAgentFilter(agent.id) }" class="bold">{{agent.id}} - {{agent.name}}</span></td>
+          </tr>
+          <tr class="table-files-list-tr">
+            <td class="table-files-list-td">
+              <span class="glyphicon glyphicon-chevron-left" ng-click="prevAgents()" ng-show="hasPrevAgents()"></span>
+              <span class="glyphicon glyphicon-chevron-right" ng-click="nextAgents()" ng-show="hasNextAgents()"></span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="block">
+        <div class="titleCol">
+          <h2>QUICK ACTIONS:</h2>
+        </div>
+        <form ng-submit="addAgent()">
+          <label>This actions will be performed over all agents.</label>
+          <button aria-label="Clean database" ng-click="cleandb()" class="btn btn-primary">
+				  Clean database
+				</button>
+          <button aria-label="Start scan" ng-click="startrc()" class="btn btn-primary">
+				  Start scan
+				</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

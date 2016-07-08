@@ -1,0 +1,14 @@
+<div ng-if="!load">
+  <ul class="wazuh-submenu">
+    <li><a href="/app/wazuh#/compliance">Rootcheck</a></li>
+    <li class="active"><a>Rootcheck dashboard</a></li>
+    <li><a href="/app/wazuh#/compliance/pci">PCI</a></li>
+    <li><a href="/app/wazuh#/compliance/cis">CIS</a></li>
+  </ul>
+</div>
+<div ng-controller="kibanaIntegrationController" style="height:100vh;">
+    <h2 class="container_page_title" style="margin-left: 90px; margin-top: 30px; margin-right: 90px;">Rootcheck Dashboard <a ng-href="{{getDashboard('Rootcheck', defDashboardFilter, 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a> <span style="float: right; font-size: 16px; font-weight: bold;" ng-show="defDashboardFilter != ''">{{defDashboardFilter}}</span></h2>
+    <div style="margin-bottom: 25px; height: 100%;">
+        <iframe ng-src="{{getDashboard('Rootcheck', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="100%" width="100%"></iframe>
+    </div>
+</div>

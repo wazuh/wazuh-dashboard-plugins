@@ -165,10 +165,10 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     };
 
     $scope.searchAgent = function () {
-        if ($scope.searchFilesRules === '') {
-            $scope.searchFilesRules = undefined;
+        if ($scope.searchAgents === '') {
+            $scope.searchAgents = undefined;
         }
-        DataFactory.get(objectsArray['/agents'], { search: $scope.searchFilesRules })
+        DataFactory.get(objectsArray['/agents'], { search: $scope.searchAgents })
             .then(function (data) {
                 $scope.agents.length = 0;
                 $scope.agents = data.data.items;
@@ -320,6 +320,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             DataFactory.clean(value)
         });
         $scope.eventsFetchInfo.length = 0;
+        $scope.agents.length = 0;
     });
 
 });

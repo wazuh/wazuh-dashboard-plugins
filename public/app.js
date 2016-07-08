@@ -436,6 +436,12 @@ routes
       "check": settingsWizard
     }
   })
+  .when('/compliance/dashboard', {
+    template: require('plugins/wazuh/templates/compliance-rcdashboard.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
   .when('/compliance/pci', {
     template: require('plugins/wazuh/templates/compliance-pci.html'),
     resolve: {
