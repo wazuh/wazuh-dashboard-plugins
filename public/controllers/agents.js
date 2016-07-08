@@ -187,7 +187,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     };
 
     $scope.loadFIM = function (agentId) {
-        sharedProperties.setProperty(agentId);
+        sharedProperties.setProperty('fim//'+agentId);
         $location.path('/FIM');
     };
 

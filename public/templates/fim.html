@@ -43,7 +43,7 @@
           <div class="events_card_list" ng-repeat="file in files" ng-init="eventsFetchInfo[agentId+file.file]=[];">
             <div class="event_card" ng-class="{ event_card_active: showDetails }" ng-click="showDetails = ! showDetails; showDetails ? initEvents(agentId, file.file) : null;">
               <div class="float_left">
-                <div class="text" style="width: 460px; height: 45px; overflow: hidden;">{{file.file}}</div>
+                <div class="text" style="width: 460px; height: 45px; overflow: hidden; white-space: nowrap;">{{file.file}}</div>
               </div>
               <div class="float_right">
                 <div class="fimEvent">{{file.event}}</div>
@@ -59,10 +59,12 @@
                     <table class="table-event-information">
                       <tbody ng-repeat="event in eventsFetchInfo[agentId+file.file]">
                         <tr>
-                          <td class="table-event-information-td-title">{{event.date}}</td>
-                          <td class="table-event-information-td-value ng-binding"><b>Event: </b> {{event.event}}</td>
-                          <td class="table-event-information-td-value ng-binding"><b>MD5: </b>{{event.md5}}</td>
-                          <td class="table-event-information-td-value ng-binding" ng-click="printEventInfo(event)"><span class="glyphicon glyphicon-plus"></span></td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 80px; overflow: hidden;" ng-class="getColorClass(event.event);">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 320px; overflow: hidden;"><b>MD5: </b>{{event.md5}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 60px; overflow: hidden;" tooltips tooltip-template="File permissions">{{event.perm}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 90px; overflow: hidden;" tooltips tooltip-template="U: User ID, G: Group ID"><b>U:</b>{{event.uid}} <b>G:</b>{{event.gid}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 90px; text-align: center;" ng-click="printEventInfo(event)"><span class="glyphicon glyphicon-plus"></span></td>
+                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 200px; text-align: center;">{{event.date}}</td>
                         </tr>
                       </tbody>
                     </table>

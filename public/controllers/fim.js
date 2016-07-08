@@ -19,6 +19,20 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     }
 
     //Functions
+    $scope.getColorClass = function (event) {
+        switch (event) {
+            case 'added':
+            case 'readded':
+                return 'eventGreen';
+            case 'modified':
+                return 'eventOrange';
+            case 'deleted':
+                return 'eventRed';
+            default:
+                return '';
+        }
+    };
+
     $scope.printEventInfo = function (event) {
         var _template = '<div style="width: auto; height: auto; overflow: hidden;"><ul class="popup-ul">';
         _template += '<li><b>File:</b> '+event.file+'</li>';
@@ -254,7 +268,15 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     };
 
     var load = function () {
-        DataFactory.initialize('get', '/syscheck/000/files', {'summary': 'yes'}, 16, 0)
+        var _agent = '000';
+        var _init = sharedProperties.getProperty();
+        if ((_init != '') && (_init.substring(0, 5) == 'fim//')) {
+            _agent = _init.substring(5);
+            sharedProperties.setProperty('');
+            $scope.agentId = _agent;
+        }
+
+        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 16, 0)
             .then(function (data) {
                 objectsArray['/syscheck/files'] = data;
                 DataFactory.initialize('get', '/agents', {}, 10, 0)
