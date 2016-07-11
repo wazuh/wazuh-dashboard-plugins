@@ -425,7 +425,19 @@ routes
     }
   })
   .when('/ruleset', {
-    template: require('plugins/wazuh/templates/ruleset.html'),
+    template: require('plugins/wazuh/templates/ruleset-rules.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/ruleset/decoders', {
+    template: require('plugins/wazuh/templates/ruleset-decoders.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
+  .when('/ruleset/update', {
+    template: require('plugins/wazuh/templates/ruleset-update.html'),
     resolve: {
       "check": settingsWizard
     }
