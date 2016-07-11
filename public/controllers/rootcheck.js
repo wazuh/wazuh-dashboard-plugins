@@ -19,6 +19,16 @@ app.controller('rcController', function ($scope, alertify, sharedProperties, Dat
 
     //Functions
 
+    $scope.setStatusFilter = function (status) {
+        if ($scope.statusFilter == status) {
+            $scope.statusFilter = 'all';
+        } else {
+            $scope.statusFilter = status;
+        }
+
+        $scope.getEvents({'status': $scope.statusFilter});
+    };
+
     $scope.loadDiscover = function (event) {
         var _filter = 'full_log:"' + event + '"';
         sharedProperties.setProperty('aa//' + _filter);

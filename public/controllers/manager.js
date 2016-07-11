@@ -78,6 +78,9 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
         if ($scope.managerConfiguration.rules.list) {
             if (angular.isString($scope.managerConfiguration.rules.list)) { $scope.managerConfiguration.rules.list = [$scope.managerConfiguration.rules.list] }
         }
+        if ($scope.managerConfiguration.rootcheck.system_audit) {
+            if (angular.isString($scope.managerConfiguration.rootcheck.system_audit)) { $scope.managerConfiguration.rootcheck.system_audit = [$scope.managerConfiguration.rootcheck.system_audit] }
+        }
     };
 
     $scope.ruleDetail = function (file, isRule) {

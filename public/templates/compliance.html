@@ -28,20 +28,20 @@
       <div style="margin-left: 10px; width: 25%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
         <div ng-class="{ event_filter_status_active: $parent.statusFilter == 'outstanding' }" ng-click="setStatusFilter('outstanding')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px; width: 60%;"
           class="eventFilter">Outstanding </div>
-        <div ng-class="{ event_filter_status_active: $parent.statusFilter == 'solved' }" ng-click="setTypeFilter('solved')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 40%;"
-          class="eventFilter">Resolved</div>
+        <div ng-class="{ event_filter_status_active: $parent.statusFilter == 'solved' }" ng-click="setStatusFilter('solved')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 40%;"
+          class="eventFilter">Solved</div>
       </div>
       <div class="rcContentTabs">
         <div id="eventsTab">
           <div class="events_card_list" ng-repeat="event in events">
             <div class="event_card" ng-class="{ event_card_active: showDetails }" ng-click="showDetails = ! showDetails;">
               <div class="float_left" style="width: 70%;">
-                <div class="text" style="height: 45px; overflow: hidden; white-space: nowrap;">{{event.event}}</div>
+                <div class="text" style="width: 565px; height: 50px; overflow: hidden; white-space: nowrap;">{{event.event}}</div>
               </div>
               <div class="float_right">
-                <div ng-class='getStatusClass(event.status);' class="status" ng-style="{ 'border-bottom-right-radius' : (showDetails) ? '0px' : '4px' }"></div>
+                <div ng-class='getStatusClass(event.status);' class="status" ng-style="{ 'border-bottom-right-radius' : (showDetails) ? '0px' : '4px' }" style="height: 51px;"></div>
               </div>
-              <div class="float_right" style="border-left: 1px solid #ccc;">
+              <div class="float_right" style="border-left: 1px solid #ccc; padding-bottom: 5px;">
                 <div class="dates"><span class="upperDate">First scan: {{event.oldDay}}</span><span class="bottomDate" style="padding-left: 2px;">Last scan: {{event.readDay}}</span></div>
               </div>
             </div>

@@ -60,12 +60,14 @@
                     <table class="table-event-information">
                       <tbody ng-repeat="event in eventsFetchInfo[agentId+file.file]">
                         <tr>
-                          <td class="table-event-information-td-value ng-binding" style="width: 80px; overflow: hidden;" ng-class="getColorClass(event.event);">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
-                          <td class="table-event-information-td-value ng-binding" style="width: 320px; overflow: hidden;"><b>MD5: </b>{{event.md5}}</td>
-                          <td class="table-event-information-td-value ng-binding" style="width: 60px; overflow: hidden;" tooltips tooltip-template="File permissions">{{event.perm}}</td>
-                          <td class="table-event-information-td-value ng-binding" style="width: 90px; overflow: hidden;" tooltips tooltip-template="U: User ID, G: Group ID"><b>U:</b>{{event.uid}} <b>G:</b>{{event.gid}}</td>
-                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 90px; text-align: center;" ng-click="printEventInfo(event)"><span class="glyphicon glyphicon-plus"></span></td>
-                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 200px; text-align: center;">{{event.date}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 80px; overflow: hidden; padding-top: 10px;" ng-class="getColorClass(event.event);">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 320px; overflow: hidden; padding-top: 10px;"><b>MD5: </b>{{event.md5}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 60px; padding-top: 10px;"><span tooltips tooltip-template="{{event.permissions}}">{{event.octalMode.slice(-4)}}</span></td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 90px; padding-bottom: 0px;"><span tooltips tooltip-template="User Id: {{event.uid}}</br>Group Id: {{event.gid}}">
+                            <span style="float: left; clear: left;"><b>U: </b>{{event.user}}</span>
+                            <span style="float: left; clear: left;"><b>G: </b>{{event.group}}</span></span></td>
+                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 90px; text-align: center; padding-top: 10px;" ng-click="printEventInfo(event)"><span class="glyphicon glyphicon-plus"></span></td>
+                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 200px; text-align: center; padding-top: 10px;">{{event.modificationDate}}</td>
                         </tr>
                       </tbody>
                     </table>

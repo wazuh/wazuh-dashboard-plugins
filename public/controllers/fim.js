@@ -35,15 +35,17 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
 
     $scope.printEventInfo = function (event) {
         var _template = '<div style="width: auto; height: auto; overflow: hidden;"><ul class="popup-ul">';
-        _template += '<li><b>File:</b> '+event.file+'</li>';
-        _template += '<li><b>Date:</b> '+event.date+'</li>';
-        _template += '<li><b>Event:</b> '+event.event+'</li>';
-        _template += '<li><b>MD5:</b> '+event.md5+'</li>';
-        _template += '<li><b>SHA1:</b> '+event.sha1+'</li>';
-        _template += '<li><b>Size:</b> '+event.size+' bytes</li>';
-        _template += '<li><b>Permissions:</b> '+event.perm+'</li>';
-        _template += '<li><b>User ID:</b> '+event.uid+'</li>';
-        _template += '<li><b>Group ID:</b> '+event.gid+'</li>';
+        _template += '<li><b>File:</b> '+ event.file +'</li>';
+        _template += '<li><b>Date:</b> '+ event.modificationDate +'</li>';
+        _template += '<li><b>Scan date:</b> ' + event.date + '</li>';
+        _template += '<li><b>Event:</b> '+ event.event +'</li>';
+        _template += '<li><b>MD5:</b> '+ event.md5 +'</li>';
+        _template += '<li><b>SHA1:</b> '+ event.sha1 +'</li>';
+        _template += '<li><b>Size:</b> '+ event.size +' bytes</li>';
+        _template += '<li><b>Permissions:</b> '+ event.octalMode +' ('+ event.permissions +')</li>';
+        _template += '<li><b>User:</b> '+ event.user +' (Id: '+ event.uid +')</li>';
+        _template += '<li><b>Group ID:</b> '+ event.group +' (Id: '+ event.gid +')</li>';
+        _template += '<li><b>Inode:</b> ' + event.inode + '</li>';
         _template += '</ul></div>'
         alertify.alert(_template);
     };
