@@ -1,7 +1,7 @@
 <div class="container" ng-controller="settingsController">
 
 
-  <div class="col-md-6 col-md-offset-3">
+  <div class="col-md-6 col-md-offset-3" ng-if="editConfiguration">
 
 
     <div class="page-header">
@@ -9,33 +9,33 @@
     </div>
 
 
-    <div id="messages" class="settings-message" ng-class="messageClass" ng-bind-html="message">{{ message }}</div>
+    <div id="messages" class="settings-message" ng-class="messageClass" ng-bind-html="$parent.message">{{ $parent.message }}</div>
 
     <!--ng-show="message"-->
     <form ng-submit="processForm()">
 
       <div id="name-group" class="form-group">
         <label>API Username</label>
-        <input type="text" name="user" class="form-control" placeholder="foo" ng-model="formData.user">
+        <input type="text" name="user" class="form-control" placeholder="foo" ng-model="$parent.formData.user">
         <span class="help-block"></span>
       </div>
 
 
       <div id="superhero-group" class="form-group">
         <label>API Password</label>
-        <input type="password" name="password" class="form-control" placeholder="bar" ng-model="formData.password">
+        <input type="password" name="password" class="form-control" placeholder="bar" ng-model="$parent.formData.password">
         <span class="help-block"></span>
       </div>
 
       <div id="name-group" class="form-group">
         <label>API URL</label>
-        <input type="text" name="url" class="form-control" placeholder="https://your_api_ip:55000" ng-model="formData.url">
+        <input type="text" name="url" class="form-control" placeholder="https://your_api_ip:55000" ng-model="$parent.formData.url">
         <span class="help-block"></span>
       </div>
 
       <div id="name-group" class="form-group switch">
         <label>Accept selfsigned SSL</label>
-        <input id="cmn-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox" ng-model="formData.insecure">
+        <input id="cmn-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox" ng-model="$parent.formData.insecure">
         <label for="cmn-toggle"></label>
         <span class="help-block"></span>
       </div>
@@ -44,6 +44,19 @@
       <span class="glyphicon glyphicon-flash"></span> Connect!
     </button>
     </form>
+
+  </div>
+
+  <div  class="col-md-6 col-md-offset-3" ng-if="!editConfiguration">
+
+    <div class="page-header">
+      <h1><span class="glyphicon glyphicon-floppy-save"></span> Wazuh RESTful API settings</h1>
+    </div>
+
+    <div id="messages" class="settings-message-ok" ng-class="messageClass">Wazuh RESTful API settings are configured and working. The application is ready to be used.</div>
+    <button type="submit" class="btn btn-alert btn-lg btn-block" ng-click="$parent.editConfiguration = !$parent.editConfiguration">
+      <span class="glyphicon glyphicon-pencil"></span> Edit settings
+    </button>
 
   </div>
 

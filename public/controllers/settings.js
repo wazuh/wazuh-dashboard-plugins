@@ -10,6 +10,12 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
     $scope.formData.password = "";
     $scope.formData.url = "";
     $scope.formData.insecure = true;
+    $scope.editConfiguration = true;
+
+    testConnection.test()
+        .then(function (data) {
+            $scope.editConfiguration = false;
+        });
 
     // Save settings function
     $scope.saveSettings = function (test) {
@@ -43,6 +49,7 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
     var makeTest = function () {
         testConnection.test()
             .then(function (data) {
+                $scope.editConfiguration = false;
                 alertify.delay(0).closeLogOnClick(true).success('<b>Successfully connected!</b>');
             }, printTest);
     };
