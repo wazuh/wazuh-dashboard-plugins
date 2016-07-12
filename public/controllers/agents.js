@@ -108,6 +108,20 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             }, printError);
     };
 
+    $scope.fetchFim = function (agent) {
+        DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/files', { 'offset': 0, 'limit': 5 })
+            .then(function (data) {
+                $scope.agentFetchInfo[agent.id].syscheckEvents = data.data.items;
+            }, printError);
+    };
+
+    $scope.fetchRootcheck = function (agent) {
+        DataFactory.getAndClean('get', '/rootcheck/' + agent.id, { 'offset': 0, 'limit': 5 })
+            .then(function (data) {
+                $scope.agentFetchInfo[agent.id].rootcheckEvents = data.data.items;
+            }, printError);
+    };
+
     $scope.restart = function (agent) {
         alertify.delay(5000).closeLogOnClick(true).log('Restarting agent...');
         DataFactory.getAndClean('put', '/agents/'+agent.id+'/restart', {})

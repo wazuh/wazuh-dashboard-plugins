@@ -1,65 +1,63 @@
-<div ng-controller="updateRulesetController">
-    <div ng-if="!load">
-        <ul class="wazuh-submenu">
-            <li><a href="/app/wazuh#/ruleset">Rules</a></li>
-            <li><a href="/app/wazuh#/ruleset/decoders">Decoders</a></li>
-            <li class="active"><a>Update</a></li>
-        </ul>
+<div>
+    <ul class="wazuh-submenu">
+        <li><a href="/app/wazuh#/ruleset">Rules</a></li>
+        <li><a href="/app/wazuh#/ruleset/decoders">Decoders</a></li>
+        <li class="active"><a>Update</a></li>
+    </ul>
+</div>
+<div ng-controller="updateRulesetController" class="container">
+    <div ng-if="load" style="text-align: center;">
+        <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
     </div>
-    <div class="container">
-        <div ng-if="load" style="text-align: center;">
-            <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
-        </div>
-        <div class="row containerRuleset" ng-if="!load">
-            <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-            <div class="leftCol">
-                <h2 class="container_page_title">Update</h2>
-                <div id="updaterTab">
-                    <table class="updateGuideTable">
-                        <tbody>
-                            <tr>
-                                <td colspan="2">1. Select what you want to update:</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <div ng-class="{ ruleset_button_active: $parent.updateType == 'r' }" ng-click="selectUpdateType('r')" style="font-weight: bold; border-radius: 0px; width: 100px; margin-right: 5px;"
-                                        class="rulesetFilter">Rules </div>
-                                    <div ng-class="{ ruleset_button_active: $parent.updateType == 'c' }" ng-click="selectUpdateType('c')" style="font-weight: bold; border-radius: 0px; width: 100px; margin-right: 5px;"
-                                        class="rulesetFilter">Rootcheck </div>
-                                    <div ng-class="{ ruleset_button_active: $parent.updateType == 'b' }" ng-click="selectUpdateType('b')" style="font-weight: bold; border-radius: 0px; width: 100px;"
-                                        class="rulesetFilter">Both </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">2. Do you want to force it?</td>
-                            </tr>
-                            <tr>
-                                <td style="padding-right: 5px;">
-                                    <div ng-class="{ ruleset_button_active: !$parent.updateForce }" ng-click="$parent.updateForce = false" style="font-weight: bold; border-radius: 0px; width: 100px;"
-                                        class="rulesetFilter">No </div>
-                                </td>
-                                <td>Update the outdated rules (Manager will be restarted only if enabled rules are updated)</td>
-                            </tr>
-                            <tr>
-                                <td style="padding-right: 5px;">
-                                    <div ng-class="{ ruleset_button_active: $parent.updateForce }" ng-click="$parent.updateForce = true" style="font-weight: bold; border-radius: 0px; width: 100px;"
-                                        class="rulesetFilter">Yes </div>
-                                </td>
-                                <td>Overwrite all the rules (OSSEC manager is going to be restarted)</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" style="padding-top: 10px;"><button type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button"
-                                        style="margin-left: 100px; width: 150px !important;" ng-click="updateRuleset();"><span>Update ruleset</span></button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div style="display: inline-block; border-top: 1px solid #cccccc; margin-top: 15px;">
-                        <label style="margin-top: 15px; margin-right: 15px;">Backups:</label>
-                        <div ng-model="$parent.selectedBackup" custom-select="backup for backup in $parent.backups | filter:$searchTerm"></div>
-                        <button type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button" style="margin-left: 15px; width: 150px !important;"
-                            ng-click="restoreBackup();"><span>Restore backup</span></button>
-                        <label style="font-weight: lighter;">* When ruleset is updated, a new backup (the first in the list) will be created.</label>
-                    </div>
+    <div class="row containerRuleset" ng-if="!load">
+        <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
+        <div class="leftCol">
+            <h2 class="container_page_title">Update</h2>
+            <div id="updaterTab">
+                <table class="updateGuideTable">
+                    <tbody>
+                        <tr>
+                            <td colspan="2">1. Select what you want to update:</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div ng-class="{ ruleset_button_active: $parent.updateType == 'r' }" ng-click="selectUpdateType('r')" style="font-weight: bold; border-radius: 0px; width: 100px; margin-right: 5px;"
+                                    class="rulesetFilter">Rules </div>
+                                <div ng-class="{ ruleset_button_active: $parent.updateType == 'c' }" ng-click="selectUpdateType('c')" style="font-weight: bold; border-radius: 0px; width: 100px; margin-right: 5px;"
+                                    class="rulesetFilter">Rootcheck </div>
+                                <div ng-class="{ ruleset_button_active: $parent.updateType == 'b' }" ng-click="selectUpdateType('b')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                                    class="rulesetFilter">Both </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">2. Do you want to force it?</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-right: 5px;">
+                                <div ng-class="{ ruleset_button_active: !$parent.updateForce }" ng-click="$parent.updateForce = false" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                                    class="rulesetFilter">No </div>
+                            </td>
+                            <td>Update the outdated rules (Manager will be restarted only if enabled rules are updated)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-right: 5px;">
+                                <div ng-class="{ ruleset_button_active: $parent.updateForce }" ng-click="$parent.updateForce = true" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                                    class="rulesetFilter">Yes </div>
+                            </td>
+                            <td>Overwrite all the rules (OSSEC manager is going to be restarted)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding-top: 10px;"><button type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button"
+                                    style="margin-left: 100px; width: 150px !important;" ng-click="updateRuleset();"><span>Update ruleset</span></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="display: inline-block; border-top: 1px solid #cccccc; margin-top: 15px;">
+                    <label style="margin-top: 15px; margin-right: 15px;">Backups:</label>
+                    <div ng-model="$parent.selectedBackup" custom-select="backup for backup in $parent.backups | filter:$searchTerm"></div>
+                    <button type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button" style="margin-left: 15px; width: 150px !important;"
+                        ng-click="restoreBackup();"><span>Restore backup</span></button>
+                    <label style="font-weight: lighter;">* When ruleset is updated, a new backup (the first in the list) will be created.</label>
                 </div>
             </div>
         </div>

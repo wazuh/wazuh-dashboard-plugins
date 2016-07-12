@@ -1,4 +1,4 @@
-<div ng-if="!load">
+<div>
 	<ul class="wazuh-submenu">
 		<li class="active"><a>Overview</a></li>
 		<li><a href="/app/wazuh#/agents/metrics">Metrics</a></li>
@@ -72,8 +72,8 @@
 				<div style="" class="agent_card_detail" ng-show="showDetails">
 					<ul id="agentsTabs">
 						<li><a ng-click="setTab(1,$index)" href="" ng-class="{ active: isSetTab(1,$index) }" class="active">Global</a></li>
-						<li><a ng-click="setTab(2,$index)" href="" ng-class="{ active: isSetTab(2,$index) }">File integrity</a></li>
-						<li><a ng-click="setTab(3,$index)" href="" ng-class="{ active: isSetTab(3,$index) }">Rootcheck</a></li>
+						<li><a ng-click="isSetTab(2,$index) ? null : fetchFim(agent); setTab(2,$index);" href="" ng-class="{ active: isSetTab(2,$index) }">File integrity</a></li>
+						<li><a ng-click="isSetTab(3,$index) ? null: fetchRootcheck(agent); setTab(3,$index);" href="" ng-class="{ active: isSetTab(3,$index) }">Rootcheck</a></li>
 						<li><a ng-click="setTab(4,$index)" href="" ng-class="{ active: isSetTab(4,$index) }">Discover</a></li>
 						<li><a ng-click="setTab(5,$index)" href="" ng-class="{ active: isSetTab(5,$index) }">Dashboards</a></li>
 					</ul>
@@ -158,14 +158,28 @@
 											<td class="table-agent-information-td-title">Last scan ended</td>
 											<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].syscheckEndTime}}</td>
 										</tr>
-										<tr>
-											<td class="table-agent-information-td-title" ng-click="loadFIM(agent.id);">File integrity overview</td>
-											<td class="table-agent-information-td-value ng-binding"><span class="glyphicon glyphicon-chevron-right" ng-click="loadFIM(agent.id);"></span></td>
+										<tr ng-if="agentFetchInfo[agent.id].syscheckEvents">
+											<td class="table-agent-information-td-title" colspan="2">Last events:</td>
+										</tr>
+										<tr ng-repeat="event in agentFetchInfo[agent.id].syscheckEvents" ng-if="agentFetchInfo[agent.id].syscheckEvents">
+											<td class="table-event-information-td-value ng-binding" style="width: 80px; overflow: hidden; padding-top: 10px;">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
+											<td class="table-event-information-td-value ng-binding" style="width: 320px; overflow: hidden; padding-top: 10px;"><b>MD5: </b>{{event.md5}}</td>
+											<td class="table-event-information-td-value ng-binding" style="width: 60px; padding-top: 10px;"><span tooltips tooltip-template="{{event.permissions}}">{{event.octalMode.slice(-4)}}</span></td>
+											<td class="table-event-information-td-value ng-binding" style="width: 90px; padding-bottom: 0px;"><span tooltips tooltip-template="User Id: {{event.uid}}</br>Group Id: {{event.gid}}">
+                            					<span style="float: left; clear: left;"><b>U: </b>{{event.user}}</span>
+												<span style="float: left; clear: left;"><b>G: </b>{{event.group}}</span></span>
+											</td>
+											<td class="table-event-information-td-value ng-binding" style="float: right; width: 200px; text-align: center; padding-top: 10px;">{{event.modificationDate}}</td>
 										</tr>
 									</tbody>
 								</table>
 							</div>
 							<ul class="agentsTabs-controlButtons">
+								<li>
+									<a ng-click="loadFIM(agent.id);">
+										<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
+									</a>
+								</li>
 								<li>
 									<a ng-click="runSyscheck(agent);">
 										<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart scan
@@ -190,14 +204,26 @@
 											<td class="table-agent-information-td-title">Last scan ended</td>
 											<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].rootcheckEndTime}}</td>
 										</tr>
-										<tr>
-											<td class="table-agent-information-td-title" ng-click="loadRootcheck(agent.id);">Rootcheck overview</td>
-											<td class="table-agent-information-td-value ng-binding"><span class="glyphicon glyphicon-chevron-right" ng-click="loadRootcheck(agent.id);"></span></td>
+										<tr ng-if="agentFetchInfo[agent.id].rootcheckEvents">
+											<td class="table-agent-information-td-title" colspan="2">Last events:</td>
+										</tr>
+										<tr ng-repeat="event in agentFetchInfo[agent.id].rootcheckEvents" ng-if="agentFetchInfo[agent.id].rootcheckEvents">
+											<td class="table-agent-information-td-value ng-binding" style="width: 565px; height: 50px; overflow: hidden; white-space: nowrap;">
+												{{event.event}}
+											</td>
+											<td class="table-agent-information-td-value ng-binding">
+												<span class="upperDate">First scan: {{event.oldDay}}</span><span class="bottomDate" style="padding-left: 2px;">Last scan: {{event.readDay}}</span>
+											</td>
 										</tr>
 									</tbody>
 								</table>
 							</div>
 							<ul class="agentsTabs-controlButtons">
+								<li>
+									<a ng-click="loadRootcheck(agent.id);">
+										<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
+									</a>
+								</li>
 								<li>
 									<a ng-click="runSyscheck(agent);">
 										<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart scan

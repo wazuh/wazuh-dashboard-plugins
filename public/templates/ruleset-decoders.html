@@ -1,124 +1,122 @@
-<div ng-controller="decodersController">
-    <div ng-if="!load">
-        <ul class="wazuh-submenu">
-            <li><a href="/app/wazuh#/ruleset">Rules</a></li>
-            <li class="active"><a>Decoders</a></li>
-            <li><a href="/app/wazuh#/ruleset/update">Update</a></li>
-        </ul>
+<div>
+    <ul class="wazuh-submenu">
+        <li><a href="/app/wazuh#/ruleset">Rules</a></li>
+        <li class="active"><a>Decoders</a></li>
+        <li><a href="/app/wazuh#/ruleset/update">Update</a></li>
+    </ul>
+</div>
+<div ng-controller="decodersController" class="container">
+    <div ng-if="load" style="text-align: center;">
+        <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
     </div>
-    <div class="container">
-        <div ng-if="load" style="text-align: center;">
-            <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
-        </div>
-        <div class="row containerRuleset" ng-if="!load">
-            <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-            <div class="leftCol">
-                <h2 class="container_page_title">Decoders</h2>
-                <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;">
-                    <div style="float: left;">
-                        <form class="form-inline ng-pristine ng-valid">
-                            <div class="form-group" style="position: relative;">
-                                <i class="fa fa-search input_search_icon"></i>
-                                <input type="text" ng-model="$parent.decoder_search" ng-change="objGet('/decoders', 'decoders')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch"
-                                    placeholder="Search...">
+    <div class="row containerRuleset" ng-if="!load">
+        <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
+        <div class="leftCol">
+            <h2 class="container_page_title">Decoders</h2>
+            <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;">
+                <div style="float: left;">
+                    <form class="form-inline ng-pristine ng-valid">
+                        <div class="form-group" style="position: relative;">
+                            <i class="fa fa-search input_search_icon"></i>
+                            <input type="text" ng-model="$parent.decoder_search" ng-change="objGet('/decoders', 'decoders')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch"
+                                placeholder="Search...">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div style="margin-left: 10px; width: 202px; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
+                <div ng-class="{ ruleset_button_active: dfType == 'all' }" ng-click="setDecodersFilter('type', 'all')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                    class="rulesetFilter">All decoders </div>
+                <div ng-class="{ ruleset_button_active: dfType == 'parents' }" ng-click="setDecodersFilter('type', 'parents')" style="font-weight: bold; border-radius: 0px; width: 100px;"
+                    class="rulesetFilter">Parents </div>
+            </div>
+            <div class="filterActive_div" ng-if="hasDecodersFilter('file');">
+                <span ng-click="setDecodersFilter('file', dfFile)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('file', dfFile) }"
+                    class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{dfFile}}">Selected file: {{formatFile(dfFile)}}   <span class="glyphicon glyphicon-remove"></span></span>
+            </div>
+            <div class="filterActive_div" ng-if="hasDecodersFilter('id');">
+                <span ng-click="setDecodersFilter('id', dfId)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('id', dfId) }"
+                    class="bold">Selected parent: {{dfId}}   <span class="glyphicon glyphicon-remove"></span></span>
+            </div>
+            <div class="rulesetContentTabs">
+                <div id="decodersTab">
+                    <div class="rules_card_list" ng-repeat="decoder in decoders">
+                        <div class="rule_card" ng-class="{ rule_card_active: showDetails }" ng-click=" showDetails = ! showDetails; ">
+                            <div class="float_left">
+                                <div class="text" style="width: 535px; height: 45px; overflow: hidden;">{{decoder.name}}</div>
                             </div>
-                        </form>
-                    </div>
-                </div>
-                <div style="margin-left: 10px; width: 202px; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
-                    <div ng-class="{ ruleset_button_active: dfType == 'all' }" ng-click="setDecodersFilter('type', 'all')" style="font-weight: bold; border-radius: 0px; width: 100px;"
-                        class="rulesetFilter">All decoders </div>
-                    <div ng-class="{ ruleset_button_active: dfType == 'parents' }" ng-click="setDecodersFilter('type', 'parents')" style="font-weight: bold; border-radius: 0px; width: 100px;"
-                        class="rulesetFilter">Parents </div>
-                </div>
-                <div class="filterActive_div" ng-if="hasDecodersFilter('file');">
-                    <span ng-click="setDecodersFilter('file', dfFile)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('file', dfFile) }"
-                        class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{dfFile}}">Selected file: {{formatFile(dfFile)}}   <span class="glyphicon glyphicon-remove"></span></span>
-                </div>
-                <div class="filterActive_div" ng-if="hasDecodersFilter('id');">
-                    <span ng-click="setDecodersFilter('id', dfId)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('id', dfId) }"
-                        class="bold">Selected parent: {{dfId}}   <span class="glyphicon glyphicon-remove"></span></span>
-                </div>
-                <div class="rulesetContentTabs">
-                    <div id="decodersTab">
-                        <div class="rules_card_list" ng-repeat="decoder in decoders">
-                            <div class="rule_card" ng-class="{ rule_card_active: showDetails }" ng-click=" showDetails = ! showDetails; ">
-                                <div class="float_left">
-                                    <div class="text" style="width: 535px; height: 45px; overflow: hidden;">{{decoder.name}}</div>
-                                </div>
-                                <div class="float_right">
-                                    <div class="level" tooltips tooltip-template="Position">{{decoder.position}}</div>
-                                </div>
+                            <div class="float_right">
+                                <div class="level" tooltips tooltip-template="Position">{{decoder.position}}</div>
                             </div>
-                            <div style="" class="rule_card_detail" ng-show="showDetails">
-                                <div class="ruleTabs-container">
-                                    <div class="ruleTabs-info">
-                                        <div class="ruleTabs-box">
-                                            <table class="table-rule-information">
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="table-rule-information-td-title">Name</td>
-                                                        <td class="table-rule-information-td-value ng-binding" colspan="2">{{decoder.name}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="table-rule-information-td-title">File</td>
-                                                        <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-click="setDecodersFilter('file', decoder.file);">{{decoder.file}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="table-rule-information-td-title">Full path</td>
-                                                        <td class="table-rule-information-td-value ng-binding" colspan="2">{{decoder.full_path}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="table-rule-information-td-title">Position</td>
-                                                        <td class="table-rule-information-td-value ng-binding">{{decoder.position}}</td>
-                                                        <td class="table-rule-information-td-value ng-binding" tooltips tooltip-size="large" tooltip-side="auto" tooltip-template="<div style='width: 300px;'>Place occupied by the decoder in the file.</div>"><span class="glyphicon glyphicon-question-sign"></span></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="table-rule-information-td-title" ng-if="decoder.details.parent">Parent</td>
-                                                        <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-if="decoder.details.parent" ng-click="setDecodersFilter('id', decoder.details.parent);">{{decoder.details.parent}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="table-rule-information-td-title">Advanced details</td>
-                                                    </tr>
-                                                    <tr ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
-                                                        <td class="table-rule-information-td-title"><span class="glyphicon glyphicon-question-sign" tooltips tooltip-size="large"
-                                                                tooltip-side="auto" tooltip-template="{{decoderTooltips(detailk)}}"></span></td>
-                                                        <td class="table-rule-information-td-title">{{detailk}}</td>
-                                                        <td class="table-rule-information-td-value ng-binding" ng-if="(detailk !== 'regex') && (detailk !== 'order')">{{detailv}}</td>
-                                                        <td class="table-rule-information-td-value ng-binding" ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)">{{colorRegex(detailv)}}</td>
-                                                        <td class="table-rule-information-td-value ng-binding" ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)">{{colorOrder(detailv)}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                        </div>
+                        <div style="" class="rule_card_detail" ng-show="showDetails">
+                            <div class="ruleTabs-container">
+                                <div class="ruleTabs-info">
+                                    <div class="ruleTabs-box">
+                                        <table class="table-rule-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Name</td>
+                                                    <td class="table-rule-information-td-value ng-binding" colspan="2">{{decoder.name}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">File</td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-click="setDecodersFilter('file', decoder.file);">{{decoder.file}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Full path</td>
+                                                    <td class="table-rule-information-td-value ng-binding" colspan="2">{{decoder.full_path}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Position</td>
+                                                    <td class="table-rule-information-td-value ng-binding">{{decoder.position}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" tooltips tooltip-size="large" tooltip-side="auto" tooltip-template="<div style='width: 300px;'>Place occupied by the decoder in the file.</div>"><span class="glyphicon glyphicon-question-sign"></span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title" ng-if="decoder.details.parent">Parent</td>
+                                                    <td class="table-rule-information-td-value ng-binding ng-clickable" colspan="2" ng-if="decoder.details.parent" ng-click="setDecodersFilter('id', decoder.details.parent);">{{decoder.details.parent}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="table-rule-information-td-title">Advanced details</td>
+                                                </tr>
+                                                <tr ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
+                                                    <td class="table-rule-information-td-title"><span class="glyphicon glyphicon-question-sign" tooltips tooltip-size="large"
+                                                            tooltip-side="auto" tooltip-template="{{decoderTooltips(detailk)}}"></span></td>
+                                                    <td class="table-rule-information-td-title">{{detailk}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" ng-if="(detailk !== 'regex') && (detailk !== 'order')">{{detailv}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)">{{colorRegex(detailv)}}</td>
+                                                    <td class="table-rule-information-td-value ng-binding" ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)">{{colorOrder(detailv)}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders', 'decoders')" ng-show="objHasPrev('/decoders')"></span>
-                        <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders', 'decoders')" ng-show="objHasNext('/decoders')"></span>
                     </div>
+                    <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders', 'decoders')" ng-show="objHasPrev('/decoders')"></span>
+                    <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders', 'decoders')" ng-show="objHasNext('/decoders')"></span>
                 </div>
             </div>
-            <div class="rightCol" ng-if="enableFileSearch">
-                <div class="filesBlock" style="margin-top: 35px;">
-                    <table class="table-files">
-                        <tr class="table-files-list-tr">
-                            <td class="table-files-list-td"><input type="text" ng-model="$parent.$parent.searchFilesDecoders" ng-change="objGet('/decoders/files', 'filesDecoders')"
-                                    class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search..."></td>
-                        </tr>
-                        <tr ng-class="" class="table-files-list-tr" ng-repeat="file in filesDecoders">
-                            <td class="table-files-list-td"><span ng-click="setDecodersFilter('file', formatFile(file))" ng-class="{ textFilterActive: isSetTabDecodersFilter('file', formatFile(file)) }"
-                                    class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{formatTemplate(file)}}">{{formatFile(file)}}</span></td>
-                        </tr>
-                        <tr class="table-files-list-tr">
-                            <td class="table-files-list-td">
-                                <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders/files', 'filesDecoders')" ng-show="objHasPrev('/decoders/files')"></span>
-                                <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders/files', 'filesDecoders')" ng-show="objHasNext('/decoders/files')"></span>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+        </div>
+        <div class="rightCol" ng-if="enableFileSearch">
+            <div class="filesBlock" style="margin-top: 35px;">
+                <table class="table-files">
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td"><input type="text" ng-model="$parent.$parent.searchFilesDecoders" ng-change="objGet('/decoders/files', 'filesDecoders')"
+                                class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search..."></td>
+                    </tr>
+                    <tr ng-class="" class="table-files-list-tr" ng-repeat="file in filesDecoders">
+                        <td class="table-files-list-td"><span ng-click="setDecodersFilter('file', formatFile(file))" ng-class="{ textFilterActive: isSetTabDecodersFilter('file', formatFile(file)) }"
+                                class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{formatTemplate(file)}}">{{formatFile(file)}}</span></td>
+                    </tr>
+                    <tr class="table-files-list-tr">
+                        <td class="table-files-list-td">
+                            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders/files', 'filesDecoders')" ng-show="objHasPrev('/decoders/files')"></span>
+                            <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders/files', 'filesDecoders')" ng-show="objHasNext('/decoders/files')"></span>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
