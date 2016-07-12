@@ -44,10 +44,10 @@
           <div class="events_card_list" ng-repeat="file in files" ng-init="eventsFetchInfo[agentId+file.file]=[];">
             <div class="event_card" ng-class="{ event_card_active: showDetails }" ng-click="showDetails = ! showDetails; showDetails ? initEvents(agentId, file.file) : null;">
               <div class="float_left">
-                <div class="text" style="width: 460px; height: 45px; overflow: hidden; white-space: nowrap;">{{file.file}}</div>
+                <div class="text" style="width: 460px; height: 45px; overflow: hidden; white-space: nowrap;">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</div>
               </div>
               <div class="float_right">
-                <div class="fimEvent">{{file.event}}</div>
+                <div class="fimEvent">{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</div>
               </div>
               <div class="float_right">
                 <div class="fimDate">{{file.date}}</div>

@@ -11,7 +11,7 @@
 	<div class="row containerAgents" ng-if="!load">
 		<div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
 		<div class="leftCol">
-			<h2 class="container_page_title">Agents overview</h2>
+			<h2 class="container_page_title">Agents</h2>
 			<div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;">
 				<div style="float: left;">
 					<form class="form-inline ng-pristine ng-valid">
@@ -72,8 +72,8 @@
 				<div style="" class="agent_card_detail" ng-show="showDetails">
 					<ul id="agentsTabs">
 						<li><a ng-click="setTab(1,$index)" href="" ng-class="{ active: isSetTab(1,$index) }" class="active">Global</a></li>
-						<li><a ng-click="isSetTab(2,$index) ? null : fetchFim(agent); setTab(2,$index);" href="" ng-class="{ active: isSetTab(2,$index) }">File integrity</a></li>
-						<li><a ng-click="isSetTab(3,$index) ? null: fetchRootcheck(agent); setTab(3,$index);" href="" ng-class="{ active: isSetTab(3,$index) }">Rootcheck</a></li>
+						<li><a ng-click="setTab(2,$index);" href="" ng-class="{ active: isSetTab(2,$index) }">File integrity</a></li>
+						<li><a ng-click="setTab(3,$index);" href="" ng-class="{ active: isSetTab(3,$index) }">Rootcheck</a></li>
 						<li><a ng-click="setTab(4,$index)" href="" ng-class="{ active: isSetTab(4,$index) }">Discover</a></li>
 						<li><a ng-click="setTab(5,$index)" href="" ng-class="{ active: isSetTab(5,$index) }">Dashboards</a></li>
 					</ul>
@@ -158,10 +158,10 @@
 											<td class="table-agent-information-td-title">Last scan ended</td>
 											<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].syscheckEndTime}}</td>
 										</tr>
-										<tr ng-if="agentFetchInfo[agent.id].syscheckEvents">
+										<tr ng-if="agentFetchInfo[agent.id].syscheckEvents.length > 0">
 											<td class="table-agent-information-td-title" colspan="2">Last events:</td>
 										</tr>
-										<tr ng-repeat="event in agentFetchInfo[agent.id].syscheckEvents" ng-if="agentFetchInfo[agent.id].syscheckEvents">
+										<tr ng-repeat="event in agentFetchInfo[agent.id].syscheckEvents" ng-if="agentFetchInfo[agent.id].syscheckEvents.length > 0">
 											<td class="table-event-information-td-value ng-binding" style="width: 80px; overflow: hidden; padding-top: 10px;">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
 											<td class="table-event-information-td-value ng-binding" style="width: 320px; overflow: hidden; padding-top: 10px;"><b>MD5: </b>{{event.md5}}</td>
 											<td class="table-event-information-td-value ng-binding" style="width: 60px; padding-top: 10px;"><span tooltips tooltip-template="{{event.permissions}}">{{event.octalMode.slice(-4)}}</span></td>
@@ -194,23 +194,25 @@
 						</div>
 						<div class="agentsTabs-file-rootcheck" ng-show="isSetTab(3,$index)">
 							<div class="agentsTabs-box">
-								<table class="table-agent-information">
+								<table class="table-agent-information" style="table-layout: fixed;">
 									<tbody>
 										<tr>
 											<td class="table-agent-information-td-title">Last scan started</td>
 											<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].rootcheckTime}}</td>
+											<td style="width: 25px;"></td>
 										</tr>
 										<tr>
 											<td class="table-agent-information-td-title">Last scan ended</td>
 											<td class="table-agent-information-td-value ng-binding">{{agentFetchInfo[agent.id].rootcheckEndTime}}</td>
 										</tr>
-										<tr ng-if="agentFetchInfo[agent.id].rootcheckEvents">
+										<tr ng-if="agentFetchInfo[agent.id].rootcheckEvents.length > 0">
 											<td class="table-agent-information-td-title" colspan="2">Last events:</td>
 										</tr>
-										<tr ng-repeat="event in agentFetchInfo[agent.id].rootcheckEvents" ng-if="agentFetchInfo[agent.id].rootcheckEvents">
-											<td class="table-agent-information-td-value ng-binding" style="width: 565px; height: 50px; overflow: hidden; white-space: nowrap;">
-												{{event.event}}
+										<tr ng-repeat="event in agentFetchInfo[agent.id].rootcheckEvents" ng-if="agentFetchInfo[agent.id].rootcheckEvents.length > 0">
+											<td class="table-agent-information-td-value ng-binding" style="width: 340px; height: 50px;" colspan="2">
+												<span tooltips tooltip-template="<span style=&quot;width:300px;&quot;>{{event.event}}</span>">{{event.event.length > 73 ? event.event.substring(0, 70)+'...' : event.event}}</span>
 											</td>
+											<td class="table-agent-information-td-value ng-binding"></td>
 											<td class="table-agent-information-td-value ng-binding">
 												<span class="upperDate">First scan: {{event.oldDay}}</span><span class="bottomDate" style="padding-left: 2px;">Last scan: {{event.readDay}}</span>
 											</td>

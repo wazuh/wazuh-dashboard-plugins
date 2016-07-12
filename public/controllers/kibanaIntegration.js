@@ -10,6 +10,7 @@ app.controller('kibanaIntegrationController', function ($scope, sharedProperties
         alertify.delay(10000).closeLogOnClick(true).error(error.html);
     }
 
+    //Functions
     $scope.getDashboard = function (dashboard, filter, time, url) {
         if (!filter) {
             filter = '';

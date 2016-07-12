@@ -12,7 +12,7 @@
   <div class="row containerManager" ng-if="!load">
     <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
     <div class="leftCol" style="margin-bottom: 25px;">
-        <h2 class="container_page_title">Manager configuration</h2>
+        <h2 class="container_page_title">Configuration</h2>
         <ul id="managerConfiguration">
             <li><a ng-class="{ active: isSetTab(1) }" href ng-click="setTab(1)" ng-if="managerConfiguration.global.jsonout_output 
             || managerConfiguration.global.logall || managerConfiguration.global.white_list || managerConfiguration.global.stats 
@@ -446,7 +446,7 @@
     <div class="rightCol">
 		<div class="block">
 			<div class="titleCol">
-				<h2>Manager control</h2>
+				<h2>Control</h2>
 			</div>
 			<div class="btn-manager-control">
 				<button aria-label="Start" ng-click="start();" class="btn btn-success">
@@ -462,7 +462,7 @@
 		</div>
 		<div class="block">
 			<div class="titleCol">
-				<h2>Manager status</h2>
+				<h2>Status</h2>
 			</div>
 			<table class="table-manager" ng-repeat="daemon in daemons">
 				<tr ng-class="" class="table-manager-list-tr">

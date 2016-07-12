@@ -106,6 +106,8 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
                         }, printError);
                 }
             }, printError);
+            $scope.fetchFim(agent);
+            $scope.fetchRootcheck(agent);
     };
 
     $scope.fetchFim = function (agent) {

@@ -6,7 +6,7 @@
     </ul>
 </div>
 <div class="container" ng-controller="kibanaIntegrationController">
-    <h2 class="container_page_title">Manager metrics</h2>
+    <h2 class="container_page_title">Metrics</h2>
     <div style="margin-bottom: 25px;">
         <label style="font-weight: bold;">Count of restarts last 7 days <a ng-href="{{getVisualization('ManagerRestarts', '', 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
         <iframe ng-src="{{getVisualization('ManagerRestarts', '', 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>

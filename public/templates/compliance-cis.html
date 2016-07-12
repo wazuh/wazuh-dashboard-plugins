@@ -1,14 +1,13 @@
 <div>
-  <ul class="wazuh-submenu">
+  <ul class="wazuh-submenu" style="margin-bottom: 0px;">
     <li><a href="/app/wazuh#/compliance">Rootcheck</a></li>
     <li><a href="/app/wazuh#/compliance/dashboard">Rootcheck dashboard</a></li>
     <li><a href="/app/wazuh#/compliance/pci">PCI</a></li>
     <li class="active"><a>CIS</a></li>
   </ul>
 </div>
-<div ng-controller="kibanaIntegrationController" style="height:100vh;">
-    <h2 class="container_page_title" style="margin-left: 90px; margin-top: 30px; margin-right: 90px;">CIS Dashboard <a ng-href="{{getDashboard('CISCompliance', defDashboardFilter, 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a> <span class="filterSpan" ng-show="defDashboardFilter != ''">{{defDashboardFilter}}</span></h2>
-    <div style="margin-bottom: 25px; height: 100%;">
+<div ng-controller="kibanaIntegrationController" style="height:85vh; overflow: hidden;">
+    <div class="iframeContainer">
         <iframe ng-src="{{getDashboard('CISCompliance', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="100%" width="100%"></iframe>
     </div>
 </div>
