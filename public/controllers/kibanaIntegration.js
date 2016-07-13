@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('kibanaIntegrationController', function ($scope, sharedProperties) {
+app.controller('kibanaIntegrationController', function ($scope, sharedProperties, $route) {
 
     //Print Error
     var printError = function (error) {
@@ -11,6 +11,13 @@ app.controller('kibanaIntegrationController', function ($scope, sharedProperties
     }
 
     //Functions
+
+    $scope.dashboardSearch = function () {
+        $scope.defDashboardFilter = $scope.search;
+        sharedProperties.setProperty('ad//'+$scope.defDashboardFilter);
+        $route.reload();
+    };
+
     $scope.getDashboard = function (dashboard, filter, time, url) {
         if (!filter) {
             filter = '';
@@ -61,6 +68,7 @@ app.controller('kibanaIntegrationController', function ($scope, sharedProperties
         if ((initialize != '') && (initialize.substring(0, 4) == 'ad//')) {
             $scope.defDashboardFilter = initialize.substring(4);
             sharedProperties.setProperty('');
+            $scope.search = $scope.defDashboardFilter;
         } else {
             $scope.defDashboardFilter = '';
         }
@@ -70,5 +78,7 @@ app.controller('kibanaIntegrationController', function ($scope, sharedProperties
         } else {
             $scope.defMetricsFilter = '';
         }
-
+        if ( ($scope.search == undefined) || ($scope.search == '') ){
+            $scope.search = '*';
+        }
 });

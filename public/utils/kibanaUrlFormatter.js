@@ -16,6 +16,14 @@ var visualizations = {
     AgentsConnected: {type: 'histogram', data: "vis:(aggs:!((id:'1',params:(field:AgentName),schema:metric,type:cardinality),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(id:'3',params:(filters:!((input:(query:(query_string:(analyze_wildcard:!t,query:'rule.sidid:503'))),label:''))),schema:group,type:filters)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Agents%20Connected',type:histogram))"}
 };
 
+var filterCheck = function (filter) {
+    filter = filter.replace(/\\/g, "\\\\");
+    filter = filter.replace(/!/g, "!!");
+    filter = filter.replace(/'/g, "!'");
+    filter = encodeURIComponent(filter);
+    return filter;
+};
+
 /*
 This method creates a new dashboard and returns the URL
 The dashboard is not saved anywhere
@@ -31,10 +39,7 @@ exports.newDashboard = function (structure, filter, time, url) {
     if (filter == '') {
         filter = '*';
     } else {
-        filter = filter.replace(/'/g, "!'");
-        filter = filter.replace(/\\/g, "\\\\");
-        filter = filter.replace(/!/g, "!!");
-        filter = encodeURIComponent(filter);
+        filter = filterCheck(filter);
     }
     if (url) {
         return util.format('/app/kibana#/dashboard?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))&_a=(filters:!(),options:(darkTheme:!f),panels:!%s,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),title:\'%s\',uiState:())', time, structure, filter, 'New dashboard');
@@ -56,10 +61,7 @@ exports.getDashboard = function (dashboard, filter, time, url) {
     if (filter == '') {
         filter = '*';
     } else {
-        filter = filter.replace(/'/g, "!'");
-        filter = filter.replace(/\\/g, "\\\\");
-        filter = filter.replace(/!/g, "!!");
-        filter = encodeURIComponent(filter);
+        filter = filterCheck(filter);
     }
     if (dashboards[dashboard] != undefined) {
         var structure = dashboards[dashboard];
@@ -86,10 +88,7 @@ exports.getAlerts = function (index, query, time, url) {
     if (query == '') {
         query = '*';
     } else {
-        query = query.replace(/'/g, "!'");
-        query = query.replace(/\\/g, "\\\\");
-        query = query.replace(/!/g, "!!");
-        query = encodeURIComponent(query);
+        filter = filterCheck(filter);
     }
     if (url) {
         return util.format('/app/kibana#/discover?_a=(columns:!(_source),index:\'%s\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),sort:!(\'@timestamp\',desc))&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))', index, query, time);
@@ -111,10 +110,7 @@ exports.getVisualization = function (visualization, filter, time, url) {
     if (filter == '') {
         filter = '*';
     } else {
-        filter = filter.replace(/'/g, "!'");
-        filter = filter.replace(/\\/g, "\\\\");
-        filter = filter.replace(/!/g, "!!");
-        filter = encodeURIComponent(filter);
+        filter = filterCheck(filter);
     }
     if (visualizations[visualization] != undefined) {
         var structure = visualizations[visualization];
@@ -142,10 +138,7 @@ exports.newVisualization = function (type, structuredata, filter, time, url) {
     if (filter == '') {
         filter = '*';
     } else {
-        filter = filter.replace(/'/g, "!'");
-        filter = filter.replace(/\\/g, "\\\\");
-        filter = filter.replace(/!/g, "!!");
-        filter = encodeURIComponent(filter);
+        filter = filterCheck(filter);
     }
     if (url) {
         return util.format('/app/kibana#/visualize/create?indexPattern=ossec-*&type=%s&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),uiState:(),%s', type, time, filter, structuredata);

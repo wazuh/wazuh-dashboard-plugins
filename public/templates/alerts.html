@@ -1,5 +1,20 @@
-<div ng-controller="kibanaIntegrationController"  style="height:90vh; overflow: hidden;">
-    <div class="iframeContainer">
-        <iframe ng-src="{{getDashboard('OSSECAlerts', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}"></iframe>
+<div ng-controller="kibanaIntegrationController">
+    <navbar>
+        <form name="queryInput" class="fill inline-form ng-pristine ng-valid" role="form" ng-submit="dashboardSearch()">
+            <div class="typeahead ng-isolate-scope">
+                <div class="input-group" style="height: 36px;">
+                    <input type="text" placeholder="Filter..." aria-label="Filter input" class="form-control ng-pristine ng-valid ng-isolate-scope ng-touched"
+                        ng-model="search" autocomplete="off">
+                    <button type="submit" class="btn btn-default" aria-label="Filter dashboards" style="height: 36px;">
+            <span aria-hidden="true" class="fa fa-search"></span>
+          </button>
+                </div>
+            </div>
+        </form>
+    </navbar>
+    <div style="height:2210px; overflow: hidden;">
+        <div class="iframeContainer">
+            <iframe ng-src="{{getDashboard('OSSECAlerts', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}"></iframe>
+        </div>
     </div>
 </div>
