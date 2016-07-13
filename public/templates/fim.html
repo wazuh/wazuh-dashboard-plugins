@@ -60,8 +60,11 @@
                     <table class="table-event-information">
                       <tbody ng-repeat="event in eventsFetchInfo[agentId+file.file]">
                         <tr>
-                          <td class="table-event-information-td-value ng-binding" style="width: 80px; overflow: hidden; padding-top: 10px;" ng-class="getColorClass(event.event);">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
-                          <td class="table-event-information-td-value ng-binding" style="width: 320px; overflow: hidden; padding-top: 10px;"><b>MD5: </b>{{event.md5}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 70px; overflow: hidden; padding-top: 10px;" ng-class="getColorClass(event.event);">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 330px; overflow: hidden; padding-top: 10px;">
+                            <span ng-click="searchHash(event.md5)" style="float: left; clear: left;"><b>MD5: </b>{{event.md5}}</span>
+                            <span ng-click="searchHash(event.sha1)" style="float: left; clear: left;"><b>SHA1: </b>{{event.sha1}}</span>
+                          </td>
                           <td class="table-event-information-td-value ng-binding" style="width: 60px; padding-top: 10px;"><span tooltips tooltip-template="{{event.permissions}}">{{event.octalMode.slice(-4)}}</span></td>
                           <td class="table-event-information-td-value ng-binding" style="width: 90px; padding-bottom: 0px;"><span tooltips tooltip-template="User Id: {{event.uid}}</br>Group Id: {{event.gid}}">
                             <span style="float: left; clear: left;"><b>U: </b>{{event.user}}</span>

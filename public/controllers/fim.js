@@ -33,6 +33,15 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         }
     };
 
+    $scope.searchHash = function (hash) {
+        if ($scope.search === hash) {
+            $scope.search = '';
+        } else {
+            $scope.search = hash;
+        }
+        $scope.getFiles();
+    };
+
     $scope.printEventInfo = function (event) {
         var _template = '<div style="width: auto; height: auto; overflow: hidden;"><ul class="popup-ul">';
         _template += '<li><b>File:</b> '+ event.file +'</li>';
