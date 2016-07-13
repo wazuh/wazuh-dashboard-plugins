@@ -36,8 +36,8 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     $scope.printEventInfo = function (event) {
         var _template = '<div style="width: auto; height: auto; overflow: hidden;"><ul class="popup-ul">';
         _template += '<li><b>File:</b> '+ event.file +'</li>';
-        _template += '<li><b>Date:</b> '+ event.modificationDate +'</li>';
-        _template += '<li><b>Scan date:</b> ' + event.date + '</li>';
+        _template += '<li><b>Modification date:</b> '+ event.modificationDate +'</li>';
+        _template += '<li><b>Scan date:</b> ' + event.scanDate + '</li>';
         _template += '<li><b>Event:</b> '+ event.event +'</li>';
         _template += '<li><b>MD5:</b> '+ event.md5 +'</li>';
         _template += '<li><b>SHA1:</b> '+ event.sha1 +'</li>';
