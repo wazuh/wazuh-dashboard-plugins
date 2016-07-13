@@ -26,12 +26,16 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
             'insecure': $scope.formData.insecure
         };
 
-        $http.put("/elasticsearch/.kibana/wazuh-configuration/1", data).success(function (data, status) {
+        $http.put("/api/wazuh-api/settings", data).success(function (data, status) {
             if (test) {
                 makeTest();
             }
         }).error(function (data, status) {
-            alertify.delay(0).closeLogOnClick(true).error("Some error ocurred, could not save data in elasticsearch.");
+            if (status == '400') {
+                alertify.delay(0).closeLogOnClick(true).error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
+            } else {
+                alertify.delay(0).closeLogOnClick(true).error("Some error ocurred, could not save data in elasticsearch.");
+            }
         })
     };
 
