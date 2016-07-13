@@ -1,13 +1,29 @@
 module.exports = function (server, options) {
 
-    var config = require('../config.js');
+    const config = server.config();
+    var _elurl = config.get('elasticsearch.url');
+    var _eluser = config.get('elasticsearch.username');
+    var _elpass = config.get ('elasticsearch.password');
 
     //Handlers - Generic
 
     var getConfig = function (callback) {
         var needle = require('needle');
-        var elasticurl = config.elasticPath+'/.kibana/wazuh-configuration/1';
-        needle.get(elasticurl, function (error, response) {
+
+        if (_eluser && _elpass) {
+            var options = {
+                username: _eluser,
+                password: _elpass,
+                rejectUnauthorized: false
+            };
+        } else {
+            var options = {
+                rejectUnauthorized: false
+            };
+        }
+
+        var elasticurl = _elurl+'/.kibana/wazuh-configuration/1';
+        needle.get(elasticurl, options, function (error, response) {
             if (!error) {
                 if (response.body.found) {
                     callback({ 'user': response.body._source.api_user, 'password': new Buffer(response.body._source.api_password, 'base64').toString("ascii"), 'url': response.body._source.api_url, 'insecure': response.body._source.insecure, 'error': '', 'error_code': 0 });
@@ -147,6 +163,39 @@ module.exports = function (server, options) {
         }
     };
 
+    var saveApi = function (req, reply) {
+        var needle = require('needle');
+
+        if (_eluser && _elpass) {
+            var options = {
+                username: _eluser,
+                password: _elpass,
+                rejectUnauthorized: false,
+                json: true
+            };
+        } else {
+            var options = {
+                rejectUnauthorized: false,
+                json: true
+            };
+        }
+
+        var elasticurl = _elurl+'/.kibana/wazuh-configuration/1';
+
+        if (!(req.payload.api_user && req.payload.api_password && req.payload.api_url && req.payload.insecure)) {
+            reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
+            return;
+        }
+
+        needle.request('put', elasticurl, req.payload, options, function (error, response) {
+            if (error || response.body.error) {
+                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch'}).code(500);
+            } else {
+                reply({ 'statusCode': 200, 'error': '', 'message': 'ok'});
+            }
+        });
+
+    };
 
     //Server routes
 
@@ -170,6 +219,17 @@ module.exports = function (server, options) {
         method: 'POST',
         path: '/api/wazuh-api/request',
         handler: requestApi
+    });
+
+    /*
+    * POST /api/wazuh-api/settings
+    * Save the given settings into elasticsearch
+    *
+    **/
+    server.route({
+        method: 'PUT',
+        path: '/api/wazuh-api/settings',
+        handler: saveApi
     });
 
 };
