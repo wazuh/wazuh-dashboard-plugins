@@ -39,7 +39,7 @@
                 <div class="text" style="width: 565px; height: 50px; overflow: hidden; white-space: nowrap;">{{event.event.length > 73 ? event.event.substring(0, 70)+'...' : event.event}}</div>
               </div>
               <div class="float_right">
-                <div ng-class='getStatusClass(event.status);' class="status" ng-style="{ 'border-bottom-right-radius' : (showDetails) ? '0px' : '4px' }" style="height: 51px;" tooltips tooltip-template="{{event.status.charAt(0).toUpperCase() + event.status.slice(1)}}"></div>
+                <div ng-class='getStatusClass(event.status);' class="status" ng-style="{ 'border-bottom-right-radius' : (showDetails) ? '0px' : '4px' }" style="height: 51px;" tooltips tooltip-template="&lt;div style=&quot;width: 200px; text-align: left; &quot;&gt;{{event.status.charAt(0).toUpperCase() + event.status.slice(1)}} (Status is refreshed each 24 hours)&lt;/div&gt;"></div>
               </div>
               <div class="float_right" style="border-left: 1px solid #ccc; padding-bottom: 5px;">
                 <div class="dates"><span class="upperDate">First scan: {{event.oldDay}}</span><span class="bottomDate" style="padding-left: 2px;">Last scan: {{event.readDay}}</span></div>

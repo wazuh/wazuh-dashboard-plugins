@@ -14,7 +14,7 @@ require('ui/chrome').setNavBackground('#222222').setTabs([
   { id: 'ruleset', title: 'Ruleset' },
   { id: 'fim', title: 'FIM' },
   { id: 'compliance', title: 'Compliance' },
-  { id: 'dashboard', title: 'Dashboard' },
+  { id: 'alerts', title: 'Alerts' },
   { id: 'discover', title: 'Discover'},
   { id: 'settings', title: 'Settings' }
 ]);
@@ -391,8 +391,8 @@ routes
       "check": settingsWizard
     }
   })
-  .when('/dashboard', {
-    template: require('plugins/wazuh/templates/dashboard.html'),
+  .when('/alerts', {
+    template: require('plugins/wazuh/templates/alerts.html'),
     resolve: {
       "check": settingsWizard
     }
