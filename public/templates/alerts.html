@@ -12,9 +12,7 @@
             </div>
         </form>
     </navbar>
-    <div style="height:2210px; overflow: hidden;">
-        <div class="iframeContainer">
-            <iframe ng-src="{{getDashboard('OSSECAlerts', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}"></iframe>
-        </div>
+    <div class="iframeContainer">
+        <dinamic-iframe ng-src="{{getDashboard('OSSECAlerts', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}"></dinamic-iframe>
     </div>
 </div>

@@ -20,10 +20,7 @@
       </div>
     </form>
   </navbar>
-  <div style="height:2310px; overflow: hidden;">
-    <div class="iframeContainer">
-      <iframe scroll="no" ng-src="{{getDashboard('Rootcheck', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="100%"
-        width="100%"></iframe>
-    </div>
+  <div class="iframeContainer">
+    <dinamic-iframe ng-src="{{getDashboard('Rootcheck', defDashboardFilter, 'from:now-7d,mode:quick,to:now', false)}}"></dinamic-iframe>
   </div>
 </div>

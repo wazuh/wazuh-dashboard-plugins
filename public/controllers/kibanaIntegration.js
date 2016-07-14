@@ -1,9 +1,30 @@
 // Require utils
 var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
-var app = require('ui/modules').get('app/wazuh', []);
+var app = require('ui/modules').get('app/wazuh', [])
+    .directive('dinamicIframe', function ($timeout, $interval) {
+        var resize = function (scope, element, attrs) {
+            scope.$parent._interval = $interval(function () {
+                if ((element.find('iframe')[0].src == '') || (!element.find('iframe')[0].contentWindow.document.scrollingElement)) {
+                    $interval.cancel(scope.$parent._interval);
+                } else if (element.find('iframe')[0].contentWindow.document.scrollingElement.scrollHeight > 400) {
+                    element.find('iframe')[0].height = element.find('iframe')[0].contentWindow.document.scrollingElement.scrollHeight+80;
+                    element.find('iframe')[0].style.visibility = 'visible';
+                    $interval.cancel(scope.$parent._interval);
+                }
+            }, 100);
+        }
+        return {
+            restrict: 'E',
+            scope: {
+                src: '@src'
+            },
+            template: '<iframe width="100%" scrolling="no" src="{{src}}" style="visibility: hidden;"></iframe>',
+            link: resize
+        }
+    });
 
-app.controller('kibanaIntegrationController', function ($scope, sharedProperties, $route) {
+app.controller('kibanaIntegrationController', function ($scope, sharedProperties, $route, $interval) {
 
     //Print Error
     var printError = function (error) {
@@ -11,7 +32,6 @@ app.controller('kibanaIntegrationController', function ($scope, sharedProperties
     }
 
     //Functions
-
     $scope.dashboardSearch = function () {
         $scope.defDashboardFilter = $scope.search;
         sharedProperties.setProperty('ad//'+$scope.defDashboardFilter);
@@ -81,4 +101,11 @@ app.controller('kibanaIntegrationController', function ($scope, sharedProperties
         if ( ($scope.search == undefined) || ($scope.search == '') ){
             $scope.search = '*';
         }
+
+        //Destroy
+        $scope.$on("$destroy", function () {
+            if ($scope._interval) {
+                $interval.cancel($scope._interval);
+            }
+        });
 });
