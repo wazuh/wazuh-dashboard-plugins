@@ -360,6 +360,9 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
   })
   .config(['$compileProvider', function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
+  }])
+  .config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.useApplyAsync(true);
   }]);
 
 //Installation wizard
