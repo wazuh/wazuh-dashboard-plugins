@@ -5,8 +5,13 @@ var app = require('ui/modules').get('app/wazuh', [])
     .directive('dinamicIframe', function ($timeout, $interval) {
         var resize = function (scope, element, attrs) {
             scope.$parent._interval = $interval(function () {
-                if ((element.find('iframe')[0].src == '') || ((!element.find('iframe')[0].contentWindow.document.scrollingElement)
-                    && (!element.find('iframe')[0].contentWindow.scrollMaxY) && (element.find('iframe')[0].contentWindow.scrollMaxY !== 0))) {
+                if ((element.find('iframe')[0].src == '')) {
+                    $interval.cancel(scope.$parent._interval);
+                } else if  ((!element.find('iframe')[0].contentWindow.document.scrollingElement)
+                    && (!element.find('iframe')[0].contentWindow.scrollMaxY) && (element.find('iframe')[0].contentWindow.scrollMaxY !== 0)) {
+                    //Old browser: fixed size
+                    element.find('iframe')[0].height = 2500;
+                    element.find('iframe')[0].style.visibility = 'visible';
                     $interval.cancel(scope.$parent._interval);
                 } else if ((element.find('iframe')[0].contentWindow.document.scrollingElement)
                     && (element.find('iframe')[0].contentWindow.document.scrollingElement.scrollHeight > 400)) {
@@ -18,7 +23,7 @@ var app = require('ui/modules').get('app/wazuh', [])
                     element.find('iframe')[0].style.visibility = 'visible';
                     $interval.cancel(scope.$parent._interval);
                 }
-            }, 100);
+            }, 250);
         }
         return {
             restrict: 'E',
