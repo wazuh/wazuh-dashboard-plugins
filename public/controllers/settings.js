@@ -32,9 +32,9 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
             }
         }).error(function (data, status) {
             if (status == '400') {
-                alertify.delay(0).closeLogOnClick(true).error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
+                alertify.delay(5000).closeLogOnClick(true).error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
             } else {
-                alertify.delay(0).closeLogOnClick(true).error("Some error ocurred, could not save data in elasticsearch.");
+                alertify.delay(5000).closeLogOnClick(true).error("Some error ocurred, could not save data in elasticsearch.");
             }
         })
     };
@@ -54,7 +54,7 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
         testConnection.test()
             .then(function (data) {
                 $scope.editConfiguration = false;
-                alertify.delay(0).closeLogOnClick(true).success('<b>Successfully connected!</b>');
+                alertify.delay(5000).closeLogOnClick(true).success('<b>Successfully connected!</b>');
             }, printTest);
     };
 
@@ -85,7 +85,7 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
             default:
                 text = 'Unexpected error. Please, report this to the Wazuh Team.';
         }
-        alertify.delay(0).closeLogOnClick(true).error(text);
+        alertify.delay(5000).closeLogOnClick(true).error(text);
     };
 
 });
