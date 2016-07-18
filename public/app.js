@@ -26,7 +26,7 @@ require('ui/chrome')
   })
 
 // Set up Wazuh app
-var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPagination', 'angular.filter', 'AxelSoft', 'chart.js', 'ngAlertify', '720kb.tooltips'])
+var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPagination', 'angular.filter', 'AxelSoft', 'chart.js', 'ngAlertify', '720kb.tooltips', 'ngMaterial'])
   .service('sharedProperties', function () {
     var _property = '';
 
@@ -256,6 +256,18 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       return _instances[instanceId]['body'];
     };
 
+    dataObj.getOffset = function (instanceId) {
+      return _instances[instanceId]['offset'];
+    };
+
+    dataObj.getTotalItems = function (instanceId) {
+      if (_instances[instanceId]['limit']) {
+        return _instances[instanceId]['limit'];
+      } else {
+        return 0;
+      }
+    };
+
     dataObj.clean = function (instanceId) {
       _instances[instanceId].length = 0;
     };
@@ -363,7 +375,12 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
   }])
   .config(['$httpProvider', function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
-  }]);
+  }])
+  .config(function($mdThemingProvider, $mdIconProvider){
+          $mdThemingProvider.theme('default')
+              .primaryPalette('blue-grey')
+              .accentPalette('blue');
+      });
 
 //Installation wizard
 var settingsWizard = function ($location, testConnection) {
@@ -505,3 +522,9 @@ require('plugins/wazuh/../node_modules/alertify.js/dist/js/alertify.js');
 require('plugins/wazuh/../node_modules/alertify.js/dist/js/ngAlertify.js');
 require('plugins/wazuh/../node_modules/angular-tooltips/dist/angular-tooltips.min.css');
 require('plugins/wazuh/../node_modules/angular-tooltips/dist/angular-tooltips.min.js');
+
+//Material
+require('plugins/wazuh/../node_modules/angular-material/angular-material.css');
+require('plugins/wazuh/../node_modules/angular-aria/angular-aria.js');
+require('plugins/wazuh/../node_modules/angular-animate/angular-animate.js');
+require('plugins/wazuh/../node_modules/angular-material/angular-material.js');

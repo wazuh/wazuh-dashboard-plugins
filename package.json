@@ -22,8 +22,11 @@
   },
   "dependencies": {
     "alertify.js": "^1.0.10",
+    "angular-animate": "1.4.7",
+    "angular-aria": "1.4.7",
     "angular-chart.js": "^1.0.0-alpha6",
     "angular-filter": "^0.5.8",
+    "angular-material": "1.1.0-rc.5",
     "angular-md5": "^0.1.10",
     "angular-tooltips": "^1.1.4",
     "angular-utils-pagination": "^0.11.1",

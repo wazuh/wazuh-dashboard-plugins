@@ -9,6 +9,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     $scope.agentFetchInfo = [];
     $scope.agents = [];
     $scope.search = '';
+    $scope.currentNavItem = 'overview';
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);
@@ -61,6 +62,27 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
                 }, printError);
         }
     };
+
+    //New functions
+
+    $scope.agentsObj = {
+        getItemAtIndex: function (index) {
+            if ((DataFactory.getOffset(objectsArray['/agents']) - 10) < index < (DataFactory.getOffset(objectsArray['/agents']) + 10)) {
+                return $scope.agents[index % 10];
+            } else {
+                DataFactory.next(objectsArray['/agents'])
+                    .then(function (data) {
+                        $scope.agents.length = 0;
+                        $scope.agentFetchInfo.length = 0;
+                        $scope.agents = data.data.items;
+                        return getItemAtIndex(index);
+                    }, printError);
+            }
+        },
+        getLength: function () {
+            return DataFactory.getTotalItems(objectsArray['/agents']);
+        }
+    };//
 
     $scope.agentsHasNext = function () {
         return DataFactory.hasNext(objectsArray['/agents']);
