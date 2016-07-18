@@ -138,12 +138,12 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
                     .then(function (data) {
                         $scope.managerConfiguration = data.data;
                         parseConfiguration();
-                        DataFactory.getAndClean('get', '/agents', {})
+                        DataFactory.getAndClean('get', '/agents/summary', {})
                             .then(function (data) {
-                                $scope.agentsCountActive = $filter('filter')(data.data.items, { status: 'active' }).length;
-                                $scope.agentsCountDisconnected = $filter('filter')(data.data.items, { status: 'disconnected' }).length;
-                                $scope.agentsCountNeverConnected = $filter('filter')(data.data.items, { status: 'never connected' }).length;
-                                $scope.agentsCountTotal = data.data.items.length;
+                                $scope.agentsCountActive = data.data.active;
+                                $scope.agentsCountDisconnected = data.data.disconnected;
+                                $scope.agentsCountNeverConnected = data.data.neverConnected;
+                                $scope.agentsCountTotal = data.data.total;
                                 $scope.load = false;
                             }, printError);
                     }, printError);
