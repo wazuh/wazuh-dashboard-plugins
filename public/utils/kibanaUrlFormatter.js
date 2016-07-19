@@ -88,7 +88,7 @@ exports.getAlerts = function (index, query, time, url) {
     if (query == '') {
         query = '*';
     } else {
-        filter = filterCheck(filter);
+        query = filterCheck(query);
     }
     if (url) {
         return util.format('/app/kibana#/discover?_a=(columns:!(_source),index:\'%s\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'%s\')),sort:!(\'@timestamp\',desc))&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(%s))', index, query, time);
