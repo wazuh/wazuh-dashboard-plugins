@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $route, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider) {
+app.controller('agentsController', function ($scope, $route, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.agentFetchInfo = [];
@@ -18,8 +18,12 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
 
     //Print Error
     var printError = function (error) {
-        alertify.delay(10000).closeLogOnClick(true).error(error.html);
-    }
+        $mdToast.show({
+            template: '<md-toast>' + error.html + '</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000
+        });
+    };
 
     //Tabs
     $scope.setTab = function (tab, group) {

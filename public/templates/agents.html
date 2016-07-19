@@ -12,29 +12,41 @@
 
 	<div flex layout="row" ng-if="!load">
 
-		<md-content flex id="content">
+		<div flex layout="column">
+			<md-content flex layout="row">
+				<div flex layout-align="center center" class="md-padding">
+					<label>Filter:</label>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'active' }"
+						 ng-click="agentStatusFilter('active')">Active</md-button>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'disconnected' }"
+						 ng-click="agentStatusFilter('disconnected')">Disconnected</md-button>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'never connected' }"
+						 ng-click="agentStatusFilter('never connected')">Never connected</md-button>
+				</div>
+			</md-content>
+			<md-content flex id="content">
 
-		</md-content>
+			</md-content>
+
+		</div>
 
 		<md-sidenav md-is-locked-open="true" md-disable-backdrop class="md-sidenav-right md-whiteframe-z2">
+			<md-input-container class="sideNavBox">
+				<label for="searchBox">Search</label>
+				<input type="text" id="searchBox" ng-model="$parent.search" ng-change="agentsGet()" md-autofocus>
+			</md-input-container>
 			<md-virtual-repeat-container class="vertical-repeater">
 				<div md-virtual-repeat="agent in agentsObj" md-on-demand flex>
-					<div layout="column"  layout-align="space-around stretch">
+					<div layout="column" layout-align="space-around stretch">
 						<md-card>
 							<md-card-title>
 								<md-card-title-text>
-									<span class="md-headline">{{agent.id}}</span>
-									<span class="md-subhead">{{agent.name}}</span>
+									<span class="md-title">{{agent.id}}</span>
+									<span class="md-subhead">{{agent.name}} - {{agent.ip}}</span>
 								</md-card-title-text>
-								<md-card-title-media>
-									<div class="md-media-sm card-media status" ng-class='getAgentStatusClass(agent.status);'></div>
-								</md-card-title-media>
+								<div layout="column" class="status" ng-class="getAgentStatusClass(agent.status);">
+								</div>
 							</md-card-title>
-							<md-card-actions layout="row" layout-align="end center">
-								<md-button class="md-icon-button" aria-label="Settings">
-									<md-icon class="glyphicon glyphicon-menu-hamburger"></md-icon>
-								</md-button>
-							</md-card-actions>
 						</md-card>
 					</div>
 				</div>
