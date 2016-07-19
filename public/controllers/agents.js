@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $route, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast) {
+app.controller('agentsController', function ($scope, $route, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast, $mdSidenav, $mdDialog) {
     //Initialisation
     $scope.load = true;
     $scope.agentFetchInfo = [];
@@ -35,6 +35,25 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     };
 
     //Functions
+    $scope.showFiltersDialog = function (ev) {
+        $mdDialog.show({
+            contentElement: '#filtersDialog',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true
+        });
+    };
+
+    $scope.toggleSidenav = function () {
+        $mdSidenav('agentsNav')
+          .toggle();
+    };
+
+    $scope.closeSidenav = function () {
+        $mdSidenav('agentsNav')
+            .close();
+    };
+
     $scope.agentsGet = function (body) {
         //Search agent body modification
         if (!body) {
@@ -71,20 +90,22 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
 
     $scope.agentsObj = {
         getItemAtIndex: function (index) {
-            if ((DataFactory.getOffset(objectsArray['/agents']) - 10) < index < (DataFactory.getOffset(objectsArray['/agents']) + 10)) {
+            if ((DataFactory.getOffset(objectsArray['/agents']) <= index) && (index < (DataFactory.getOffset(objectsArray['/agents']) + 10))) {
                 return $scope.agents[index % 10];
             } else {
-                DataFactory.next(objectsArray['/agents'])
-                    .then(function (data) {
-                        $scope.agents.length = 0;
-                        $scope.agentFetchInfo.length = 0;
-                        $scope.agents = data.data.items;
-                        return getItemAtIndex(index);
-                    }, printError);
+                this.fetchPage_(index);
             }
         },
         getLength: function () {
             return DataFactory.getTotalItems(objectsArray['/agents']);
+        },
+        fetchPage_: function (index) {
+            DataFactory.getPage(objectsArray['/agents'], index)
+                    .then(angular.bind(this, function (data) {
+                        $scope.agents.length = 0;
+                        $scope.agentFetchInfo.length = 0;
+                        $scope.agents = data.data.items;
+                    }), printError);
         }
     };//
 
@@ -122,6 +143,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     };
 
     $scope.fetchAgent = function (agent) {
+        $scope._agent = agent;
         DataFactory.getAndClean('get', '/agents/' + agent.id, {})
             .then(function (data) {
                 $scope.agentFetchInfo[agent.id] = data.data;

@@ -276,6 +276,34 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       _instances = 0;
     };
 
+    dataObj.getPage = function (instanceId, index) {
+      var defered = $q.defer();
+      var promise = defered.promise;
+      
+      if (!instanceId || !index) {
+        defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
+        return promise;
+      }
+
+      var preparedBody = _instances[instanceId]['body'];
+      if (_instances[instanceId]['pagination']) {
+        preparedBody['offset'] = Math.floor(index/_instances[instanceId]['pageSize'])*_instances[instanceId]['pageSize'];
+        preparedBody['limit'] = _instances[instanceId]['pageSize'];
+      } else {
+        defered.reject(prepError({'error': -10, 'message': 'Pagination disabled for this object'}));
+        return promise;
+      }
+      
+      apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
+      .then(function (data) {
+        defered.resolve(data);
+      }, function (data) {
+        defered.reject(prepError(data));
+      });
+
+      return promise;
+    };
+
     dataObj.getAndClean = function (method, path, body) {
       var defered = $q.defer();
       var promise = defered.promise;

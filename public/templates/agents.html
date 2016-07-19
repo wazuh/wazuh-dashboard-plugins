@@ -11,37 +11,25 @@
 	</div>
 
 	<div flex layout="row" ng-if="!load">
+		<md-content flex id="content">
+			<div ng-if="_agent">{{_agent.id}}</div>
+		</md-content>
 
-		<div flex layout="column">
-			<md-content flex layout="row">
-				<div flex layout-align="center center" class="md-padding">
-					<label>Filter:</label>
-					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'active' }"
-						 ng-click="agentStatusFilter('active')">Active</md-button>
-					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'disconnected' }"
-						 ng-click="agentStatusFilter('disconnected')">Disconnected</md-button>
-					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'never connected' }"
-						 ng-click="agentStatusFilter('never connected')">Never connected</md-button>
-				</div>
-			</md-content>
-			<md-content flex id="content">
-
-			</md-content>
-
-		</div>
-
-		<md-sidenav md-is-locked-open="true" md-disable-backdrop class="md-sidenav-right md-whiteframe-z2">
+		<md-sidenav md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop class="md-sidenav-right md-whiteframe-z2">
+			<span class="glyphicon glyphicon-remove" style="float: right; font-size: large; padding-top: 5%; padding-right: 5%;" ng-click="closeSidenav()"
+				hide-gt-sm></span>
 			<md-input-container class="sideNavBox">
 				<label for="searchBox">Search</label>
-				<input type="text" id="searchBox" ng-model="$parent.search" ng-change="agentsGet()" md-autofocus>
+				<input type="text" id="searchBox" ng-model="$parent.search" ng-change="agentsGet()" md-autofocus flex>
+				<md-icon md-font-icon="fa fa-cog" ng-click="showFiltersDialog()" />
 			</md-input-container>
 			<md-virtual-repeat-container class="vertical-repeater">
-				<div md-virtual-repeat="agent in agentsObj" md-on-demand flex>
+				<div md-virtual-repeat="agent in agentsObj" md-on-demand="true" flex>
 					<div layout="column" layout-align="space-around stretch">
-						<md-card>
+						<md-card ng-click="fetchAgent(agent)">
 							<md-card-title>
 								<md-card-title-text>
-									<span class="md-title">{{agent.id}}</span>
+									<span class="md-title">{{agent.id}} <span ng-if="agent.id == '000'">(Manager)</span></span>
 									<span class="md-subhead">{{agent.name}} - {{agent.ip}}</span>
 								</md-card-title-text>
 								<div layout="column" class="status" ng-class="getAgentStatusClass(agent.status);">
@@ -52,7 +40,45 @@
 				</div>
 			</md-virtual-repeat-container>
 		</md-sidenav>
+		<md-button class="md-icon-button md-primary" ng-click="toggleSidenav()" aria-label="Agents" hide-gt-sm>
+			<span class="glyphicon glyphicon-menu-hamburger"></span>
+		</md-button>
+	</div>
 
+	<div style="visibility: hidden">
+		<div class="md-dialog-container" id="filtersDialog">
+			<md-dialog layout-padding layout="column" layout-align="space-around center">
+				<div flex layout="column" layout-align="center center" md-disable-backdrop class="md-padding">
+					<label>Filter by status:</label>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'active' }" ng-click="agentStatusFilter('active')">Active</md-button>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'disconnected' }" ng-click="agentStatusFilter('disconnected')">Disconnected</md-button>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'never connected' }" ng-click="agentStatusFilter('never connected')">Never connected</md-button>
+				</div>
+				<label>Order by:</label>
+				<div flex layout="row" layout-align="space-around center" md-disable-backdrop class="md-padding">
+					<md-button class="md-primary" ng-click="sort('status')">
+						<span>Status</span>
+						<span class="glyphicon sort-icon" ng-show="sortKey=='status'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='status'"></span>
+					</md-button>
+					<md-button class="md-primary" ng-click="sort('ip')">
+						<span>IP</span>
+						<span class="glyphicon sort-icon" ng-show="sortKey=='ip'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='ip'"></span>
+					</md-button>
+					<md-button class="md-primary" ng-click="sort('name')">
+						<span>Name</span>
+						<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='name'"></span>
+					</md-button>
+					<md-button class="md-primary" ng-click="sort('id')">
+						<span>ID</span>
+						<span class="glyphicon sort-icon" ng-show="sortKey=='id'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='id'"></span>
+					</md-button>
+				</div>
+			</md-dialog>
+		</div>
 	</div>
 
 </div>
