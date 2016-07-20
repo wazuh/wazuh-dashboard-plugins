@@ -10,6 +10,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     $scope.agents = [];
     $scope.search = '';
     $scope.currentNavItem = 'overview';
+    $scope.blocked = false;
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);
@@ -90,24 +91,35 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
 
     $scope.agentsObj = {
         getItemAtIndex: function (index) {
-            if ((DataFactory.getOffset(objectsArray['/agents']) <= index) && (index < (DataFactory.getOffset(objectsArray['/agents']) + 10))) {
-                return $scope.agents[index % 10];
-            } else {
-                this.fetchPage_(index);
+            if ($scope.blocked) {
+                return null;
             }
+            var _pos = index - DataFactory.getOffset(objectsArray['/agents']);
+            if (_pos > 10) {
+                $scope.blocked = true;
+                DataFactory.scrollUp(objectsArray['/agents'])
+                    .then(function (data) {
+                        $scope.agents.length = 0;
+                        $scope.agents = data.data.items;
+                        $scope.blocked = false;
+                    }, printError);
+            } else if (_pos < 0) {
+                $scope.blocked = true;
+                DataFactory.scrollDown(objectsArray['/agents'])
+                    .then(function (data) {
+                        $scope.agents.length = 0;
+                        $scope.agents = data.data.items;
+                        $scope.blocked = false;
+                    }, printError);
+            } else {
+                return $scope.agents[_pos];
+            }
+            $scope.blocked = false;
         },
         getLength: function () {
             return DataFactory.getTotalItems(objectsArray['/agents']);
         },
-        fetchPage_: function (index) {
-            DataFactory.getPage(objectsArray['/agents'], index)
-                    .then(angular.bind(this, function (data) {
-                        $scope.agents.length = 0;
-                        $scope.agentFetchInfo.length = 0;
-                        $scope.agents = data.data.items;
-                    }), printError);
-        }
-    };//
+    };
 
     $scope.agentsHasNext = function () {
         return DataFactory.hasNext(objectsArray['/agents']);

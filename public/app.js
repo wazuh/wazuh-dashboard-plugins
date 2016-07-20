@@ -182,6 +182,39 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       return promise;
     };
 
+    dataObj.scrollUp = function (instanceId) {
+      var defered = $q.defer();
+      var promise = defered.promise;
+
+      if (!instanceId) {
+        defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
+        return promise;
+      }
+
+      if (!_instances[instanceId]['pagination']) {
+        defered.reject(prepError({ 'error': -10, 'message': 'Pagination disabled for this object' }));
+        return promise;
+      }
+
+      _instances[instanceId]['offset']++;
+
+      if ((_instances[instanceId]['offset'] < 0) ||
+        (_instances[instanceId]['offset'] >= _instances[instanceId]['limit'])) {
+        _instances[instanceId]['offset'] -= _instances[instanceId]['pageSize']
+        defered.reject(prepError({ 'error': -11, 'message': 'Pagination out of bounds' }));
+        return promise;
+      }
+
+      dataObj.get(instanceId)
+        .then(function (data) {
+          defered.resolve(data);
+        }, function (data) {
+          defered.reject(data);
+        });
+
+      return promise;
+    };
+
     dataObj.hasPrev = function (instanceId) {
       return ((_instances[instanceId]['offset'] - _instances[instanceId]['pageSize']) >= 0);
     }
@@ -218,6 +251,39 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
       return promise;
     }
+
+    dataObj.scrollDown = function (instanceId) {
+      var defered = $q.defer();
+      var promise = defered.promise;
+
+      if (!instanceId) {
+        defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
+        return promise;
+      }
+
+      if (!_instances[instanceId]['pagination']) {
+        defered.reject(prepError({ 'error': -10, 'message': 'Pagination disabled for this object' }));
+        return promise;
+      }
+
+      _instances[instanceId]['offset']--;
+
+      if ((_instances[instanceId]['offset'] < 0) ||
+        (_instances[instanceId]['offset'] >= _instances[instanceId]['limit'])) {
+        _instances[instanceId]['offset'] += _instances[instanceId]['pageSize']
+        defered.reject(prepError({ 'error': -11, 'message': 'Pagination out of bounds' }));
+        return promise;
+      }
+
+      dataObj.get(instanceId)
+        .then(function (data) {
+          defered.resolve(data);
+        }, function (data) {
+          defered.reject(data);
+        });
+
+      return promise;
+    };
 
     dataObj.get = function (instanceId, newBody) {
       var defered = $q.defer();
@@ -274,34 +340,6 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
     dataObj.cleanAll = function () {
       _instances = 0;
-    };
-
-    dataObj.getPage = function (instanceId, index) {
-      var defered = $q.defer();
-      var promise = defered.promise;
-      
-      if (!instanceId || !index) {
-        defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
-        return promise;
-      }
-
-      var preparedBody = _instances[instanceId]['body'];
-      if (_instances[instanceId]['pagination']) {
-        preparedBody['offset'] = Math.floor(index/_instances[instanceId]['pageSize'])*_instances[instanceId]['pageSize'];
-        preparedBody['limit'] = _instances[instanceId]['pageSize'];
-      } else {
-        defered.reject(prepError({'error': -10, 'message': 'Pagination disabled for this object'}));
-        return promise;
-      }
-      
-      apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
-      .then(function (data) {
-        defered.resolve(data);
-      }, function (data) {
-        defered.reject(prepError(data));
-      });
-
-      return promise;
     };
 
     dataObj.getAndClean = function (method, path, body) {
