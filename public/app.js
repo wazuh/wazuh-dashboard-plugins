@@ -182,7 +182,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       return promise;
     };
 
-    dataObj.scrollUp = function (instanceId) {
+    dataObj.scrollTo = function (instanceId, index) {
       var defered = $q.defer();
       var promise = defered.promise;
 
@@ -196,13 +196,13 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         return promise;
       }
 
-      _instances[instanceId]['offset']++;
+      _instances[instanceId]['offset'] = index - Math.floor(_instances[instanceId]['pageSize']/2);
 
-      if ((_instances[instanceId]['offset'] < 0) ||
-        (_instances[instanceId]['offset'] >= _instances[instanceId]['limit'])) {
-        _instances[instanceId]['offset'] -= _instances[instanceId]['pageSize']
-        defered.reject(prepError({ 'error': -11, 'message': 'Pagination out of bounds' }));
-        return promise;
+      if (_instances[instanceId]['offset'] > _instances[instanceId]['limit']) {
+        _instances[instanceId]['offset'] = _instances[instanceId]['limit'] - _instances[instanceId]['pageSize'];
+      }
+      if (_instances[instanceId]['offset'] < 0) {
+        _instances[instanceId]['offset'] = 0;
       }
 
       dataObj.get(instanceId)
@@ -251,39 +251,6 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
       return promise;
     }
-
-    dataObj.scrollDown = function (instanceId) {
-      var defered = $q.defer();
-      var promise = defered.promise;
-
-      if (!instanceId) {
-        defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
-        return promise;
-      }
-
-      if (!_instances[instanceId]['pagination']) {
-        defered.reject(prepError({ 'error': -10, 'message': 'Pagination disabled for this object' }));
-        return promise;
-      }
-
-      _instances[instanceId]['offset']--;
-
-      if ((_instances[instanceId]['offset'] < 0) ||
-        (_instances[instanceId]['offset'] >= _instances[instanceId]['limit'])) {
-        _instances[instanceId]['offset'] += _instances[instanceId]['pageSize']
-        defered.reject(prepError({ 'error': -11, 'message': 'Pagination out of bounds' }));
-        return promise;
-      }
-
-      dataObj.get(instanceId)
-        .then(function (data) {
-          defered.resolve(data);
-        }, function (data) {
-          defered.reject(data);
-        });
-
-      return promise;
-    };
 
     dataObj.get = function (instanceId, newBody) {
       var defered = $q.defer();
