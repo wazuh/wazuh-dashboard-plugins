@@ -2,13 +2,13 @@
 require('plugins/wazuh/config/config.js');
 
 // Require CSS
-require('plugins/wazuh/less/main.less');
+require('plugins/wazuh/less/mainold.less');
 
 // Require routes
 var routes = require('ui/routes');
 
 // Set up tabs
-require('ui/chrome').setNavBackground('#222222').setTabs([
+/*require('ui/chrome').setNavBackground('#222222').setTabs([
   { id: 'manager', title: 'Manager' },
   { id: 'agents', title: 'Agents' },
   { id: 'ruleset', title: 'Ruleset' },
@@ -17,13 +17,7 @@ require('ui/chrome').setNavBackground('#222222').setTabs([
   { id: 'alerts', title: 'Alerts' },
   { id: 'discover', title: 'Discover'},
   { id: 'settings', title: 'Settings' }
-]);
-
-// Set up logo
-require('ui/chrome')
-  .setBrand({
-    logo: 'url(/plugins/wazuh/icon.png) center no-repeat'
-  })
+]);*/
 
 // Set up Wazuh app
 var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPagination', 'angular.filter', 'AxelSoft', 'chart.js', 'ngAlertify', '720kb.tooltips', 'ngMaterial'])
@@ -432,104 +426,11 @@ routes
       "check": settingsWizard
     }
   })
-  .when('/agents/metrics/', {
-    template: require('plugins/wazuh/templates/agents-metrics.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/manager/', {
-    template: require('plugins/wazuh/templates/manager.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/alerts/', {
-    template: require('plugins/wazuh/templates/alerts.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/manager/osseclog/', {
-    template: require('plugins/wazuh/templates/manager-osseclog.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/manager/metrics/', {
-    template: require('plugins/wazuh/templates/manager-metrics.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/settings/', {
-    template: require('plugins/wazuh/templates/settings.html')
-  })
-  .when('/fim/', {
-    template: require('plugins/wazuh/templates/fim.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/fim/dashboard/', {
-    template: require('plugins/wazuh/templates/fim-dashboard.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/ruleset/', {
-    template: require('plugins/wazuh/templates/ruleset-rules.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/ruleset/decoders/', {
-    template: require('plugins/wazuh/templates/ruleset-decoders.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/ruleset/update/', {
-    template: require('plugins/wazuh/templates/ruleset-update.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/compliance/', {
-    template: require('plugins/wazuh/templates/compliance.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/compliance/dashboard/', {
-    template: require('plugins/wazuh/templates/compliance-rcdashboard.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/compliance/pci/', {
-    template: require('plugins/wazuh/templates/compliance-pci.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/compliance/cis/', {
-    template: require('plugins/wazuh/templates/compliance-cis.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
-  .when('/discover/', {
-    template: require('plugins/wazuh/templates/discover.html'),
-    resolve: {
-      "check": settingsWizard
-    }
-  })
   .when('/', {
-    redirectTo: '/manager/'
+    redirectTo: '/agents/'
   })
   .otherwise({
-    redirectTo: '/settings/'
+    redirectTo: '/agents/'
   });
 
 // Require controllers

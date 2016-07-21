@@ -1,12 +1,14 @@
 <div flex ng-controller="agentsController" layout="column">
-	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
-
 	<md-content class="md-padding">
 		<md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
 			<md-nav-item md-nav-href="#/agents" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/agents/metrics" name="metrics">Metrics</md-nav-item>
 		</md-nav-bar>
 	</md-content>
+
+	<div flex layout="row" layout-align="center center" ng-if="load">
+		<img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+	</div>
 
 	<div flex layout="row" ng-if="!load">
 		<md-content flex id="content" layout-padding>
@@ -17,7 +19,7 @@
 			</md-toolbar>
 			<md-tabs md-dynamic-height md-border-bottom ng-show="_agent" flex>
 				<md-tab label="Global" flex>
-					<div flex layout="row" layout-sm="column" layout-xs="column">
+					<div flex layout="row" layout-sm="column">
 						<md-list class="md-dense" flex>
 							<md-list-item class="md-2-line">
 								<div class="md-list-item-text" layout="column">
@@ -66,28 +68,28 @@
 							<md-list-item class="md-2-line md-offset" ng-class="{ hidden: (_agent.id == '000') }">
 								<div class="md-list-item-text" layout="column">
 									<h3>Agent key</h3>
-									<input aria-label="Agent key" ng-model="agentInfo.key" disabled></input>
+									<input aria-label="Agent key" class="js-copytextarea" ng-model="agentInfo.key" disabled></input>
 								</div>
 							</md-list-item>
 						</md-list>
 					</div>
-					<div flex layout="row" layout-sm="column" layout-xs="column">
-						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="restart(_agent)">
+					<div flex layout="row" layout-sm="column">
+						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="restart(agent)">
 							<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="delete(_agent, $event)">
+						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="delete(agent)">
 							<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span> Delete
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-click="loadAlertsUrl(_agent.name)">
+						<md-button md-no-ink class="md-primary" ng-click="loadAlertsUrl(agent.name)">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Discover alerts
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-click="loadAgentMetrics(_agent.name)">
+						<md-button md-no-ink class="md-primary" ng-click="loadAgentMetrics(agent.name)">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Metrics
 						</md-button>
 					</div>
 				</md-tab>
 				<md-tab label="File integrity" flex>
-					<div flex layout="row" layout-sm="column" layout-xs="column">
+					<div flex layout="row" layout-sm="column">
 						<md-list class="md-dense" flex>
 							<md-list-item class="md-2-line">
 								<div class="md-list-item-text" layout="column">
@@ -110,25 +112,25 @@
 							<span tooltips tooltip-template="{{event.permissions}}">{{event.octalMode.slice(-4)}}</span>
 							<span tooltips tooltip-template="User Id: {{event.uid}}</br>Group Id: {{event.gid}}" layout="column">
 								<span><b>U: </b>{{event.user}}</span>
-							<span><b>G: </b>{{event.group}}</span>
+								<span><b>G: </b>{{event.group}}</span>
 							</span>
 							<span>{{event.modificationDate}}</span>
 						</div>
 					</div>
-					<div flex layout="row" layout-sm="column" layout-xs="column">
+					<div flex layout="row" layout-sm="column">
 						<md-button md-no-ink class="md-primary" ng-click="loadFIM(_agent.id);">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
 						</md-button>
 						<md-button md-no-ink class="md-primary" ng-click="runSyscheck(_agent);">
 							<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart scan
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-click="deleteSyscheck(_agent, $event);">
+						<md-button md-no-ink class="md-primary" ng-click="deleteSyscheck(_agent);">
 							<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span> Clear database
 						</md-button>
 					</div>
 				</md-tab>
 				<md-tab label="Rootcheck" flex>
-					<div flex layout="row" layout-sm="column" layout-xs="column">
+					<div flex layout="row" layout-sm="column">
 						<md-list class="md-dense" flex>
 							<md-list-item class="md-2-line">
 								<div class="md-list-item-text" layout="column">
@@ -149,18 +151,18 @@
 							<span>{{event.event.length > 53 ? event.event.substring(0, 50)+'...' : event.event}}</span>
 							<span layout="column">
 								<span>First scan: {{event.oldDay}}</span>
-							<span>Last scan: {{event.readDay}}</span>
+								<span>Last scan: {{event.readDay}}</span>
 							</span>
 						</div>
 					</div>
-					<div flex layout="row" layout-sm="column" layout-xs="column">
+					<div flex layout="row" layout-sm="column">
 						<md-button md-no-ink class="md-primary" ng-click="loadRootcheck(_agent.id);">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
 						</md-button>
 						<md-button md-no-ink class="md-primary" ng-click="runSyscheck(_agent);">
 							<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart scan
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-click="deleteRootcheck(_agent, $event);">
+						<md-button md-no-ink class="md-primary" ng-click="deleteRootcheck(_agent);">
 							<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span> Clear database
 						</md-button>
 					</div>
@@ -216,7 +218,6 @@
 			</md-input-container>
 			<md-chips>
 				<md-chip ng-show="statusFilter">{{statusFilter}}</md-chip>
-				<md-chip ng-show="!statusFilter">all</md-chip>
 				<md-chip ng-show="sortKey">
 					{{sortKey}}
 					<span class="glyphicon sort-icon" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
@@ -247,15 +248,12 @@
 	<div style="display: none">
 		<div class="md-dialog-container" id="filtersDialog">
 			<md-dialog layout-padding layout="column" layout-align="space-around center">
-				<label>Filter by status:</label>
-				<md-input-container>
-					<md-select ng-model="statusFilter" ng-change="agentStatusFilter()" aria-label="Filter by status">
-						<md-option value="all">All</md-option>
-						<md-option value="active">Active</md-option>
-						<md-option value="disconnected">Disconnected</md-option>
-						<md-option value="never connected">Never connected</md-option>
-					</md-select>
-				</md-input-container>
+				<div flex layout="column" layout-align="center center" md-disable-backdrop class="md-padding">
+					<label>Filter by status:</label>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'active' }" ng-click="agentStatusFilter('active')">Active</md-button>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'disconnected' }" ng-click="agentStatusFilter('disconnected')">Disconnected</md-button>
+					<md-button class="md-raised" ng-class="{ 'md-primary': statusFilter == 'never connected' }" ng-click="agentStatusFilter('never connected')">Never connected</md-button>
+				</div>
 				<label>Order by:</label>
 				<div flex layout="row" layout-align="space-around center" md-disable-backdrop class="md-padding">
 					<md-button class="md-primary" ng-click="sort('status')">

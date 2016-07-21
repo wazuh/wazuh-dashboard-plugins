@@ -10,7 +10,6 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     $scope.agents = [];
     $scope.search = '';
     $scope.currentNavItem = 'overview';
-    $scope.statusFilter = 'all';
     $scope.blocked = false;
 
     $scope.pageId = (Math.random().toString(36).substring(3));
@@ -23,7 +22,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         $mdToast.show({
             template: '<md-toast>' + error.html + '</md-toast>',
             position: 'bottom left',
-            hideDelay: 5000,
+            hideDelay: 5000
         });
     };
 
@@ -92,8 +91,9 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         }
     };
 
+    //New functions
+
     $scope.agentsObj = {
-        //Obj with methods for virtual scrolling
         getItemAtIndex: function (index) {
             if ($scope.blocked) {
                 return null;
@@ -156,27 +156,18 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     };
 
     $scope.restart = function (agent) {
-        $mdToast.show($mdToast.simple().textContent('Restarting agent...'));
+        alertify.delay(5000).closeLogOnClick(true).log('Restarting agent...');
         DataFactory.getAndClean('put', '/agents/'+agent.id+'/restart', {})
         .then(function(data) {
-            $mdToast.show($mdToast.simple().textContent('Agent restarted successfully.'));
+            alertify.delay(10000).closeLogOnClick(true).success('Agent restarted successfully');
         }, printError);
     };
 
-    $scope.delete = function (agent, ev) {
-         var confirm = $mdDialog.confirm()
-          .title("Delete agent")
-          .textContent("Are you sure you want to delete the agent with ID " + agent.id + "?")
-          .ariaLabel('Delete agent')
-          .targetEvent(ev)
-          .ok('Yes')
-          .cancel('No');
-
-        $mdDialog.show(confirm).then(function () {
+    $scope.delete = function (agent) {
+        alertify.confirm("Are you sure you want to delete the agent with ID " + agent.id + "?", function () {
             DataFactory.getAndClean('delete', '/agents/'+agent.id, {})
             .then(function (data) {
-                $scope._agent = undefined;
-                $mdToast.show($mdToast.simple().textContent('Agent deleted successfully.'));
+                alertify.delay(10000).closeLogOnClick(true).success('Agent deleted successfully');
                 $scope.agentsGet();
             }, printError);
         });
@@ -188,50 +179,34 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         copyTextarea.select();
         try {
             var successful = document.execCommand('copy');
-            $mdToast.show($mdToast.simple().textContent('Key copied successfully.'));
+            alertify.delay(10000).closeLogOnClick(true).success('Key copied successfully');
         } catch (err) {
-            $mdToast.show($mdToast.simple().textContent('Error: Copy button in this browser is not supported. Please, press Ctrl+C to copy.'));
+            alertify.delay(10000).closeLogOnClick(true).error('Error: Copy button in this browser is not supported. Please, press Ctrl+C to copy');
         }
     };
 
     $scope.runSyscheck = function (agent) {
-        $mdToast.show($mdToast.simple().textContent('Restarting FIM and rootcheck scan...'));
+        alertify.delay(5000).closeLogOnClick(true).log('Restarting syscheck and rootcheck...');
         DataFactory.getAndClean('put', '/syscheck/'+agent.id, {})
         .then(function (data) {
-            $mdToast.show($mdToast.simple().textContent('FIM and rootcheck restarted successfully.'));
+            alertify.delay(10000).closeLogOnClick(true).success('Syscheck and rootcheck restarted successfully');
         }, printError);
     };
-    
-    $scope.deleteSyscheck = function (agent, ev) {
-        var confirm = $mdDialog.confirm()
-          .title("Delete file integrity monitoring database")
-          .textContent("Are you sure to clear it in the agent " + agent.id + "? You can't undo this action.")
-          .ariaLabel('Delete file integrity monitoring database')
-          .targetEvent(ev)
-          .ok('Yes')
-          .cancel('No');
 
-        $mdDialog.show(confirm).then(function () {
+    $scope.deleteSyscheck = function (agent) {
+        alertify.confirm("Are you sure you want to clear FIM database in agent with ID " + agent.id + "?", function () {
             DataFactory.getAndClean('delete', '/syscheck/'+agent.id, {})
             .then(function (data) {
-                $mdToast.show($mdToast.simple().textContent('FIM database deleted successfully.'));
+                alertify.delay(10000).closeLogOnClick(true).success('Syscheck database deleted successfully');
             }, printError);
         });
     };
 
-    $scope.deleteRootcheck = function (agent, ev) {
-        var confirm = $mdDialog.confirm()
-          .title("Delete rootcheck database")
-          .textContent("Are you sure to clear it in the agent " + agent.id + "? You can't undo this action.")
-          .ariaLabel('Delete rootcheck database')
-          .targetEvent(ev)
-          .ok('Yes')
-          .cancel('No');
-
-        $mdDialog.show(confirm).then(function () {
+    $scope.deleteRootcheck = function (agent) {
+        alertify.confirm("Are you sure you want to clear Rootcheck database in agent with ID " + agent.id + "?", function () {
             DataFactory.getAndClean('delete', '/rootcheck/'+agent.id, {})
             .then(function (data) {
-                $mdToast.show($mdToast.simple().textContent('Rootcheck database deleted successfully.'));
+                alertify.delay(10000).closeLogOnClick(true).success('Rootcheck database deleted successfully');
             }, printError);
         });
     };
@@ -248,7 +223,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
                 name: $scope.newName,
                 ip: $scope.newIp
             }).then(function (data) {
-                $mdToast.show($mdToast.simple().textContent('Agent added successfully.'));
+                alertify.delay(10000).closeLogOnClick(true).success('Agent added successfully');
                 $scope.agentsGet();
             }, printError);
         }
@@ -264,14 +239,22 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         $location.path('/fim');
     };
 
-    $scope.agentStatusFilter = function () {
-        var _status;
-        if ($scope.statusFilter === 'all') {
-            _status = undefined;
+    $scope.agentStatusFilter = function (status) {
+        if ($scope.statusFilter === status) {
+            $scope.statusFilter = '';
+            if ($scope.searchQuery != '') {
+                $scope.agentsGet({'sort': $scope.searchQuery});
+            } else {
+                $scope.agentsGet({});
+            }
         } else {
-            _status = $scope.statusFilter;
+            $scope.statusFilter = status;
+            if ($scope.searchQuery != '') {
+                $scope.agentsGet({ 'sort': $scope.searchQuery, 'status': status });
+            } else {
+                $scope.agentsGet({ 'status': status });
+            }
         }
-        $scope.agentsGet({ 'sort': $scope.searchQuery, 'status': _status });
     };
 
     $scope.sort = function (keyname) {
@@ -281,7 +264,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         if (!$scope.reverse) {
             $scope.searchQuery += '-';
         }
-        
+
         $scope.searchQuery += $scope.sortKey;
         if ($scope.statusFilter != '') {
             $scope.agentsGet({ 'sort': $scope.searchQuery, 'status': $scope.statusFilter });
@@ -341,6 +324,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {
                 $scope.agents = data.data.items;
+                $scope.fetchAgent($scope.agents[0]);
                 $scope.load = false;
             }, printError);
         }, printError);
@@ -349,9 +333,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)});
-        $scope.agents.length = $scope.agentInfo.length = 0;
         tabProvider.clean($scope.pageId);
     });
 
 });
-
