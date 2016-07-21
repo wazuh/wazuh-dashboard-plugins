@@ -1,14 +1,12 @@
 <div flex ng-controller="agentsController" layout="column">
+	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
+
 	<md-content class="md-padding">
 		<md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
 			<md-nav-item md-nav-href="#/agents" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/agents/metrics" name="metrics">Metrics</md-nav-item>
 		</md-nav-bar>
 	</md-content>
-
-	<div flex layout="row" layout-align="center center" ng-if="load">
-		<img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
-	</div>
 
 	<div flex layout="row" ng-if="!load">
 		<md-content flex id="content" layout-padding>
@@ -74,16 +72,16 @@
 						</md-list>
 					</div>
 					<div flex layout="row" layout-sm="column">
-						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="restart(agent)">
+						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="restart(_agent)">
 							<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="delete(agent)">
+						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="delete(_agent, $event)">
 							<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span> Delete
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-click="loadAlertsUrl(agent.name)">
+						<md-button md-no-ink class="md-primary" ng-click="loadAlertsUrl(_agent.name)">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Discover alerts
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-click="loadAgentMetrics(agent.name)">
+						<md-button md-no-ink class="md-primary" ng-click="loadAgentMetrics(_agent.name)">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Metrics
 						</md-button>
 					</div>
@@ -124,7 +122,7 @@
 						<md-button md-no-ink class="md-primary" ng-click="runSyscheck(_agent);">
 							<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart scan
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-click="deleteSyscheck(_agent);">
+						<md-button md-no-ink class="md-primary" ng-click="deleteSyscheck(_agent, $event);">
 							<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span> Clear database
 						</md-button>
 					</div>
@@ -162,7 +160,7 @@
 						<md-button md-no-ink class="md-primary" ng-click="runSyscheck(_agent);">
 							<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart scan
 						</md-button>
-						<md-button md-no-ink class="md-primary" ng-click="deleteRootcheck(_agent);">
+						<md-button md-no-ink class="md-primary" ng-click="deleteRootcheck(_agent, $event);">
 							<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span> Clear database
 						</md-button>
 					</div>
