@@ -66,7 +66,7 @@
 							<md-list-item class="md-2-line md-offset" ng-class="{ hidden: (_agent.id == '000') }">
 								<div class="md-list-item-text" layout="column">
 									<h3>Agent key</h3>
-									<input aria-label="Agent key" class="js-copytextarea" ng-model="agentInfo.key" disabled></input>
+									<input aria-label="Agent key" ng-model="agentInfo.key" disabled></input>
 								</div>
 							</md-list-item>
 						</md-list>
@@ -249,7 +249,7 @@
 			<md-dialog layout-padding layout="column" layout-align="space-around center">
 				<label>Filter by status:</label>
 				<md-input-container>
-					<md-select ng-model="statusFilter" ng-change="agentStatusFilter()">
+					<md-select ng-model="statusFilter" ng-change="agentStatusFilter()" aria-label="Filter by status">
 						<md-option value="all">All</md-option>
 						<md-option value="active">Active</md-option>
 						<md-option value="disconnected">Disconnected</md-option>
