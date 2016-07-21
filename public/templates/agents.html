@@ -17,7 +17,7 @@
 			</md-toolbar>
 			<md-tabs md-dynamic-height md-border-bottom ng-show="_agent" flex>
 				<md-tab label="Global" flex>
-					<div flex layout="row" layout-sm="column">
+					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-list class="md-dense" flex>
 							<md-list-item class="md-2-line">
 								<div class="md-list-item-text" layout="column">
@@ -71,7 +71,7 @@
 							</md-list-item>
 						</md-list>
 					</div>
-					<div flex layout="row" layout-sm="column">
+					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="restart(_agent)">
 							<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart
 						</md-button>
@@ -87,7 +87,7 @@
 					</div>
 				</md-tab>
 				<md-tab label="File integrity" flex>
-					<div flex layout="row" layout-sm="column">
+					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-list class="md-dense" flex>
 							<md-list-item class="md-2-line">
 								<div class="md-list-item-text" layout="column">
@@ -115,7 +115,7 @@
 							<span>{{event.modificationDate}}</span>
 						</div>
 					</div>
-					<div flex layout="row" layout-sm="column">
+					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-button md-no-ink class="md-primary" ng-click="loadFIM(_agent.id);">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
 						</md-button>
@@ -128,7 +128,7 @@
 					</div>
 				</md-tab>
 				<md-tab label="Rootcheck" flex>
-					<div flex layout="row" layout-sm="column">
+					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-list class="md-dense" flex>
 							<md-list-item class="md-2-line">
 								<div class="md-list-item-text" layout="column">
@@ -153,7 +153,7 @@
 							</span>
 						</div>
 					</div>
-					<div flex layout="row" layout-sm="column">
+					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-button md-no-ink class="md-primary" ng-click="loadRootcheck(_agent.id);">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
 						</md-button>
