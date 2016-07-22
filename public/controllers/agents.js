@@ -46,16 +46,6 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         });
     };
 
-    $scope.toggleSidenav = function () {
-        $mdSidenav('agentsNav')
-          .toggle();
-    };
-
-    $scope.closeSidenav = function () {
-        $mdSidenav('agentsNav')
-            .close();
-    };
-
     $scope.agentsGet = function (body) {
         if ($scope.blocked) {
             return null;

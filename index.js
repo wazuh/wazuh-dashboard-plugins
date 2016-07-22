@@ -7,8 +7,8 @@ module.exports = function (kibana) {
     require: ['kibana', 'elasticsearch'],
     uiExports: {
       app: {
-        title: 'Wazuh App',
-        description: 'Sample for Wazuh plugin',
+        title: 'Wazuh',
+        description: 'Wazuh UI and Kibana integrations for OSSEC',
         icon: 'plugins/wazuh/icon.svg',
         main: 'plugins/wazuh/app',
         injectVars: function (server, options) {

@@ -10,7 +10,7 @@
 
 	<div flex layout="row" ng-if="!load">
 		<md-content flex id="content" layout-padding>
-			<md-toolbar class="demo-toolbar md-primary _md" ng-show="_agent">
+			<md-toolbar class="md-primary _md" ng-show="_agent">
 				<div class="md-toolbar-tools">
 					<h3 class="ng-binding">{{_agent.id}} - {{_agent.name}}</h3>
 				</div>
@@ -206,9 +206,8 @@
 			</md-tabs>
 		</md-content>
 
-		<md-sidenav md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop class="md-sidenav-right md-whiteframe-z2">
-			<span class="glyphicon glyphicon-remove" style="float: right; font-size: large; padding-top: 5%; padding-right: 5%;" ng-click="closeSidenav()"
-				hide-gt-sm></span>
+		<md-sidenav md-is-open="isOpenSidenav" md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop layout="column" class="md-sidenav-right md-whiteframe-z2">
+			<md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm></md-icon>
 			<md-input-container class="sideNavBox">
 				<label for="searchBox">Search</label>
 				<input type="text" id="searchBox" ng-model="$parent.search" ng-change="agentsGet()" md-autofocus flex>
@@ -239,7 +238,7 @@
 				</div>
 			</md-virtual-repeat-container>
 		</md-sidenav>
-		<md-button class="md-icon-button md-primary" ng-click="toggleSidenav()" aria-label="Agents" hide-gt-sm>
+		<md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents" hide-gt-sm>
 			<span class="glyphicon glyphicon-menu-hamburger"></span>
 		</md-button>
 	</div>
