@@ -1,3 +1,27 @@
+@import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css");
+@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css");
+
+
+/* MATERIAL */
+.vertical-repeater {
+    height: 100%;
+    width: 100%;
+}
+.status {
+    width: 3%;
+}
+.status.green{
+    background-color: rgb(49, 196, 113);
+}
+.status.red{
+    background-color: red;
+}
+.sideNavBox {
+    margin-bottom: 0px;
+}
+
+
+
 body {
   overflow-y: scroll;
 }
@@ -56,7 +80,7 @@ iframe {
 }
 .table-agents-list-tr:hover{
     background-color: #f5f5f5;
-    
+
 }
 .table-agent-list-color1 {
     background-color: #f5f5f5;
@@ -124,7 +148,7 @@ iframe {
     width: 45%;
 }
 .table-agent-information tbody tr td a{
-  font-weight: bold;    
+  font-weight: bold;
   color: #444;
   text-decoration: none;
 }
@@ -139,7 +163,7 @@ iframe {
   text-decoration: none;
 }
 .settings-message{
-    
+
     text-align: center;
     font-size: 16px;
 }
@@ -265,7 +289,7 @@ iframe {
 ul#managerConfiguration {
     padding: 0;
     margin-top: 28px;
-    margin-bottom: 8px; 
+    margin-bottom: 8px;
 }
 
 ul#managerConfiguration li {
@@ -297,7 +321,7 @@ ul#managerConfiguration li a:hover {
     background-color: #f2f2f2;
 }
 .table-manager-configuration-show{
-    
+
 }
 .table-manager-configuration-hide{
     display: none;
@@ -325,7 +349,7 @@ ul#managerConfiguration li a:hover {
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
    color:    #333;
    opacity:  1;
-   font-weight: 500;   
+   font-weight: 500;
 }
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
    color:    #333;
@@ -334,7 +358,7 @@ ul#managerConfiguration li a:hover {
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
    color:    #333;
-   font-weight: 500;   
+   font-weight: 500;
 }
 .table-agents thead {
   background-color: #555;
@@ -357,18 +381,18 @@ ul#managerConfiguration li a:hover {
 }
 .agent_card{
 	width: 100%; border: 1px solid #ccc; height: 70px; margin: 10px; border-radius: 5px;
-	margin-left: 0px; 
-	clear: both; 
+	margin-left: 0px;
+	clear: both;
 	display: table;
 }
 .agent_card .id{
-	float: left; padding: 20px; font-size: 20px; border-right: 1px solid #ccc 
+	float: left; padding: 20px; font-size: 20px; border-right: 1px solid #ccc
 }
 .agent_card .name{
-	padding-top: 5px;  margin-top: 8px; padding-left: 20px; font-weight: bold; 
+	padding-top: 5px;  margin-top: 8px; padding-left: 20px; font-weight: bold;
 }
 .agent_card .ip{
-	padding: 5px; padding-left: 20px; 
+	padding: 5px; padding-left: 20px;
 }
 .agent_card .status{
 	border-bottom-right-radius: 4px;
@@ -419,7 +443,7 @@ ul#managerConfiguration li a:hover {
 }
 .agentSearch:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
   color: #333;
-  opacity: 1; 
+  opacity: 1;
 }
 .agentSearch:-ms-input-placeholder { /* Internet Explorer 10-11 */
   color: #333;
@@ -435,7 +459,7 @@ ul#managerConfiguration li a:hover {
 	width: 73px;
 }
 .agentStatusFilter {
-	background-color: #ccc; border-radius: 4px; padding: 5px; margin: 10px; text-align: center 
+	background-color: #ccc; border-radius: 4px; padding: 5px; margin: 10px; text-align: center
 }
 
 
@@ -560,7 +584,7 @@ ul.agentsTabs-controlButtons li a {
 }
 
 .agentsTabs-controlButtons .iconControl{
-	margin-right: 10px; 
+	margin-right: 10px;
 }
 .agentsTabs-box {
 	border-bottom: 1px solid #ccc;
@@ -588,15 +612,15 @@ ul.agentsTabs-controlButtons li a {
 	margin-bottom: 17px;
 	margin-top: 30px;
 	padding: 12px;
-	border-radius: 4px; 
+	border-radius: 4px;
 }
 .rightCol h2 {
   font-size: 15px;
-  font-weight: bold; 
+  font-weight: bold;
   text-transform: uppercase;
 }
 .form-group {
-  margin-bottom: 0px; 
+  margin-bottom: 0px;
 }
 .form-control {
 	background-color: #fff;
@@ -635,7 +659,7 @@ ul.agentsTabs-controlButtons li a {
 }
 .btn-manager-control .btn.btn-success {
   width: 54px;
-  margin-top: 0px; 
+  margin-top: 0px;
 }
 .block .table-manager-list-td {
   padding: 10px 1px;
@@ -680,7 +704,7 @@ ul.agentsTabs-controlButtons li a {
 }
 .rulesetSearch:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
   color: #333;
-  opacity: 1; 
+  opacity: 1;
 }
 .rulesetSearch:-ms-input-placeholder { /* Internet Explorer 10-11 */
   color: #333;
@@ -735,7 +759,7 @@ ul#rulesetTabs li a.active {
 }
 ul#rulesetTabs li a:hover {
     background-color: #f2f2f2;
-    border: 2px solid #f2f2f2;    
+    border: 2px solid #f2f2f2;
 }
 .rules_card_list {
   display: table;
@@ -743,8 +767,8 @@ ul#rulesetTabs li a:hover {
 }
 .rule_card{
 	width: 100%; border: 1px solid #ccc; height: 35px; margin: 10px; border-radius: 5px;
-	margin-left: 0px; 
-	clear: both; 
+	margin-left: 0px;
+	clear: both;
 	display: table;
 }
 .rule_card_active{
@@ -756,24 +780,24 @@ ul#rulesetTabs li a:hover {
 .rule_card .id{
 	float: left; padding: 20px; font-size: 20px; border-right: 1px solid #ccc;
     padding-top: 11px;
-    padding-bottom: 6px; 
+    padding-bottom: 6px;
     width: 97px;
 }
 .rule_card .level{
     padding: 20px; font-size: 20px; border-left: 1px solid #ccc;
-    padding-top: 10px; 
+    padding-top: 10px;
     padding-bottom: 2.5px;
     text-align: center;
     width: 64px;
 }
 .rule_card .levelName{
     padding: 20px; border-left: 1px solid #ccc;
-    padding-bottom: 1px; 
+    padding-bottom: 1px;
     padding-top: 2.5px;
     text-align: center;
 }
 .rule_card .text{
-    padding: 26px; font-weight: bold; 
+    padding: 26px; font-weight: bold;
     padding-top: 15px;
     padding-bottom: 9px;
     overflow:hidden;
@@ -813,7 +837,7 @@ ul#rulesetTabs li a:hover {
     width: 45%;
 }
 .table-rule-information tbody tr td a{
-  font-weight: bold;    
+  font-weight: bold;
   color: #444;
   text-decoration: none;
 }
@@ -831,7 +855,7 @@ ul#rulesetTabs li a:hover {
   background-color: #f2f2f2;
 }
 .rule_card_detail{
-	height: 100%; 
+	height: 100%;
     border-width: medium 1px 1px;
     border-style: none solid solid solid;
     width: 100%;
@@ -880,7 +904,7 @@ ul.ruleTabs-controlButtons li a {
 }
 
 .ruleTabs-controlButtons .iconControl{
-	margin-right: 10px; 
+	margin-right: 10px;
 }
 .table-files {
   word-wrap: break-word;
@@ -957,7 +981,7 @@ ul#rulesetTabsFilters li a.active {
 }
 ul#rulesetTabsFilters li a:hover {
     background-color: #ccc;
-    border: 2px solid #ccc;    
+    border: 2px solid #ccc;
 }
 .textFilterActive {
     font-weight: bolder !important;
@@ -990,7 +1014,7 @@ table-files-list-td a:hover {
 }
 
 .ruleLevel_button {
-    width: 75px; height: 35px; margin-bottom: 0px; text-align: center; 
+    width: 75px; height: 35px; margin-bottom: 0px; text-align: center;
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 0px;
@@ -998,7 +1022,7 @@ table-files-list-td a:hover {
 .tabBlock {
 	margin-top: 30px;
 	padding: 12px;
-	border-radius: 4px; 
+	border-radius: 4px;
 }
 .filesBlock {
 	background-color: #f2f2f2;
@@ -1006,7 +1030,7 @@ table-files-list-td a:hover {
 	margin-bottom: 17px;
 	margin-top: 0px;
 	padding: 12px;
-	border-radius: 4px; 
+	border-radius: 4px;
 }
 .ng-clickable:hover {
     font-weight: bolder !important;
@@ -1015,7 +1039,7 @@ table-files-list-td a:hover {
 .filterActive_div {
     margin-top: 28px;
     margin-bottom: 8px;
-    float: right; 
+    float: right;
     width: 350px;
     text-align: right;
 }
@@ -1164,7 +1188,7 @@ input.cmn-toggle-round:checked + label:after {
 }
 .eventSearch:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
   color: #333;
-  opacity: 1; 
+  opacity: 1;
 }
 .eventSearch:-ms-input-placeholder { /* Internet Explorer 10-11 */
   color: #333;
@@ -1188,8 +1212,8 @@ input.cmn-toggle-round:checked + label:after {
 }
 .event_card{
 	width: 100%; border: 1px solid #ccc; height: 35px; margin: 10px; border-radius: 5px;
-	margin-left: 0px; 
-	clear: both; 
+	margin-left: 0px;
+	clear: both;
 	display: table;
 }
 .event_card_active{
@@ -1201,24 +1225,24 @@ input.cmn-toggle-round:checked + label:after {
 .event_card .id{
 	float: left; padding: 20px; font-size: 20px; border-right: 1px solid #ccc;
     padding-top: 11px;
-    padding-bottom: 6px; 
+    padding-bottom: 6px;
     width: 97px;
 }
 .event_card .level{
     padding: 20px; font-size: 20px; border-left: 1px solid #ccc;
-    padding-top: 10px; 
+    padding-top: 10px;
     padding-bottom: 2.5px;
     text-align: center;
     width: 64px;
 }
 .event_card .levelName{
     padding: 20px; border-left: 1px solid #ccc;
-    padding-bottom: 1px; 
+    padding-bottom: 1px;
     padding-top: 2.5px;
     text-align: center;
 }
 .event_card .text{
-    padding: 26px; font-weight: bold; 
+    padding: 26px; font-weight: bold;
     padding-top: 15px;
     padding-bottom: 9px;
     overflow:hidden;
@@ -1258,7 +1282,7 @@ input.cmn-toggle-round:checked + label:after {
     width: 45%;
 }
 .table-event-information tbody tr td a{
-  font-weight: bold;    
+  font-weight: bold;
   color: #444;
   text-decoration: none;
 }
@@ -1276,7 +1300,7 @@ input.cmn-toggle-round:checked + label:after {
   background-color: #f2f2f2;
 }
 .event_card_detail{
-	height: 100%; 
+	height: 100%;
     border-width: medium 1px 1px;
     border-style: none solid solid solid;
     width: 100%;
@@ -1327,7 +1351,7 @@ ul.eventTabs-controlButtons li a {
 }
 
 .eventTabs-controlButtons .iconControl{
-	margin-right: 10px; 
+	margin-right: 10px;
 }
 .eventTabs-box {
 	border-bottom: 1px solid #ccc;
@@ -1337,7 +1361,7 @@ ul.eventTabs-controlButtons li a {
 }
 .event_card .fimEvent{
     padding: 26px; border-left: 1px solid #ccc;
-    padding-top: 15px; 
+    padding-top: 15px;
     padding-bottom: 9px;
     text-align: center;
     width: 100px;
@@ -1345,7 +1369,7 @@ ul.eventTabs-controlButtons li a {
 }
 .event_card .fimDate{
     padding: 26px; border-left: 1px solid #ccc;
-    padding-top: 15px; 
+    padding-top: 15px;
     padding-bottom: 9px;
     text-align: center;
     width: 200px;
@@ -1353,7 +1377,7 @@ ul.eventTabs-controlButtons li a {
 }
 .event_card .dates{
     padding: 10px;
-    padding-top: 10px; 
+    padding-top: 10px;
     text-align: center;
     font-weight: bold;
 }
@@ -1434,12 +1458,12 @@ ul.eventTabs-controlButtons li a {
 }
 
 .filterSpan {
-    float: right; 
-    font-size: 16px; 
-    font-weight: bold; 
-    width: 40%; 
-    overflow: hidden; 
-    height: 32px; 
+    float: right;
+    font-size: 16px;
+    font-weight: bold;
+    width: 40%;
+    overflow: hidden;
+    height: 32px;
     text-align: right;
 }
 
@@ -1452,7 +1476,7 @@ ul.eventTabs-controlButtons li a {
 
 /* MATERIAL */
 .vertical-repeater {
-    height: 100%; 
+    height: 100%;
     width: 100%;
 }
 .status {
