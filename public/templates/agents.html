@@ -1,8 +1,20 @@
 <div flex ng-controller="agentsController" layout="column">
+
+	<md-content class="md-padding">
+		<md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+			<md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+			<md-nav-item md-nav-href="#/compliance" name="compliance">Compliance</md-nav-item>
+			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+		</md-nav-bar>
+	</md-content>
+
 	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
 	<md-content class="md-padding">
-		<md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
+		<md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 			<md-nav-item md-nav-href="#/agents" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/agents/metrics" name="metrics">Metrics</md-nav-item>
 		</md-nav-bar>
@@ -206,7 +218,8 @@
 			</md-tabs>
 		</md-content>
 
-		<md-sidenav md-is-open="isOpenSidenav" md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop layout="column" class="md-sidenav-right md-whiteframe-z2">
+		<md-sidenav md-is-open="isOpenSidenav" md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
+			layout="column" class="md-sidenav-right md-whiteframe-z2">
 			<md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm></md-icon>
 			<md-input-container class="sideNavBox">
 				<label for="searchBox">Search</label>
@@ -238,7 +251,8 @@
 				</div>
 			</md-virtual-repeat-container>
 		</md-sidenav>
-		<md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents" hide-gt-sm>
+		<md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents"
+			hide-gt-sm>
 			<span class="glyphicon glyphicon-menu-hamburger"></span>
 		</md-button>
 	</div>

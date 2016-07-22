@@ -7,24 +7,6 @@ require('plugins/wazuh/less/main.less');
 // Require routes
 var routes = require('ui/routes');
 
-// Set up tabs
-require('ui/chrome').setNavBackground('#222222').setTabs([
-  { id: 'manager', title: 'Manager' },
-  { id: 'agents', title: 'Agents' },
-  { id: 'ruleset', title: 'Ruleset' },
-  { id: 'fim', title: 'FIM' },
-  { id: 'compliance', title: 'Compliance' },
-  { id: 'alerts', title: 'Alerts' },
-  { id: 'discover', title: 'Discover'},
-  { id: 'settings', title: 'Settings' }
-]);
-
-// Set up logo
-require('ui/chrome')
-  .setBrand({
-    logo: 'url(/plugins/wazuh/icon.png) center no-repeat'
-  })
-
 // Set up Wazuh app
 var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPagination', 'angular.filter', 'AxelSoft', 'chart.js', 'ngAlertify', '720kb.tooltips', 'ngMaterial'])
   .service('sharedProperties', function () {
@@ -555,6 +537,11 @@ require('plugins/wazuh/../node_modules/alertify.js/dist/js/alertify.js');
 require('plugins/wazuh/../node_modules/alertify.js/dist/js/ngAlertify.js');
 require('plugins/wazuh/../node_modules/angular-tooltips/dist/angular-tooltips.min.css');
 require('plugins/wazuh/../node_modules/angular-tooltips/dist/angular-tooltips.min.js');
+
+//Bootstrap and font awesome
+require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');
+require('plugins/wazuh/../node_modules/bootstrap/dist/js/bootstrap.min.js');
+require('plugins/wazuh/utils/fontawesome/css/font-awesome.min.css');
 
 //Material
 require('plugins/wazuh/../node_modules/angular-material/angular-material.css');

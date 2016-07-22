@@ -30,6 +30,7 @@
     "angular-md5": "^0.1.10",
     "angular-tooltips": "^1.1.4",
     "angular-utils-pagination": "^0.11.1",
-    "needle": "^1.0.0"
+    "needle": "^1.0.0",
+    "bootstrap": "3.3.6"
   }
 }

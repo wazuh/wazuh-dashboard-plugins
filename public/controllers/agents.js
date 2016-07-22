@@ -9,7 +9,8 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     $scope.agentInfo = [];
     $scope.agents = [];
     $scope.search = '';
-    $scope.currentNavItem = 'overview';
+    $scope.menuNavItem = 'agents';
+    $scope.submenuNavItem = 'overview';
     $scope.statusFilter = 'all';
     $scope.blocked = false;
 
@@ -331,6 +332,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {
                 $scope.agents = data.data.items;
+                $scope.fetchAgent($scope.agents[0]);
                 $scope.load = false;
             }, printError);
         }, printError);

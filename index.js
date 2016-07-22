@@ -9,7 +9,6 @@ module.exports = function (kibana) {
       app: {
         title: 'Wazuh',
         description: 'Wazuh UI and Kibana integrations for OSSEC',
-        icon: 'plugins/wazuh/icon.svg',
         main: 'plugins/wazuh/app',
         injectVars: function (server, options) {
           var config = server.config();
