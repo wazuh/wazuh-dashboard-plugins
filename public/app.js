@@ -510,6 +510,9 @@ routes
   .when('/', {
     redirectTo: '/manager/'
   })
+  .when('', {
+    redirectTo: '/manager/'
+  })
   .otherwise({
     redirectTo: '/settings/'
   });

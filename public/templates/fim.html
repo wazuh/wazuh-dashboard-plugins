@@ -1,138 +1,141 @@
-<div>
-  <ul class="wazuh-submenu">
-    <li class="active"><a>Overview</a></li>
-    <li><a href="/app/wazuh#/fim/dashboard">Dashboard</a></li>
-  </ul>
-</div>
-<div class="container" ng-controller="fimController">
-  <div ng-if="load" style="text-align: center;">
-    <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
-  </div>
-  <div class="row containerRuleset" ng-if="!load">
-    <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-    <div class="leftCol">
-      <h2 class="container_page_title">File integrity monitoring</h2>
-      <div style="width: 19%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left;">
-        <div style="float: left;">
-          <form class="form-inline ng-pristine ng-valid">
-            <div class="form-group" style="position: relative;">
-              <i class="fa fa-search input_search_icon"></i>
-              <input type="text" ng-model="$parent.search" ng-change="getFiles()" class="form-control ng-pristine ng-untouched ng-valid eventSearch"
-                placeholder="Search...">
-            </div>
-          </form>
-        </div>
-      </div>
-      <div style="margin-left: 10px; width: 46%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
-        <div ng-class="{ event_filter_status_active: $parent.eventFilter == 'added' }" ng-click="setEventFilter('added')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px; width: 100px;"
-          class="eventFilter">Added </div>
-        <div ng-class="{ event_filter_status_active: $parent.eventFilter == 'modified' }" ng-click="setEventFilter('modified')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100px;"
-          class="eventFilter">Modified</div>
-        <div ng-class="{ event_filter_status_active: $parent.eventFilter == 'readded' }" ng-click="setEventFilter('readded')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100px;"
-          class="eventFilter">Re-added</div>
-        <div ng-class="{ event_filter_status_active: $parent.eventFilter == 'deleted' }" ng-click="setEventFilter('deleted')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 101.5px;"
-          class="eventFilter">Deleted</div>
-      </div>
-      <div style="margin-left: 10px; width: 20%; height: 35px; border-radius: 4px; background-color: rgb(249, 249, 249); border: 1px solid rgb(204, 204, 204); float: left; text-align: left;">
-        <div ng-class="{ event_filter_status_active: $parent.typeFilter == 'file' }" ng-click="setTypeFilter('file')" style="font-weight: bold;border-right: 1px solid #ccc; border-radius: 0px;"
-          class="eventFilter">File </div>
-        <div ng-class="{ event_filter_status_active: $parent.typeFilter == 'registry' }" ng-click="setTypeFilter('registry')" style="font-weight: bold; border-right: 1px solid rgb(204, 204, 204); border-radius: 0px; width: 100.5px;"
-          class="eventFilter">Registry</div>
-      </div>
-      <div class="fimContentTabs">
-        <div id="eventsTab">
-          <div class="events_card_list" ng-repeat="file in files" ng-init="eventsFetchInfo[agentId+file.file]=[];">
-            <div class="event_card" ng-class="{ event_card_active: showDetails }" ng-click="showDetails = ! showDetails; showDetails ? initEvents(agentId, file.file) : null;">
-              <div class="float_left">
-                <div class="text" style="width: 460px; height: 45px; overflow: hidden; white-space: nowrap;">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</div>
-              </div>
-              <div class="float_right">
-                <div class="fimEvent">{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</div>
-              </div>
-              <div class="float_right">
-                <div class="fimDate">{{file.modificationDate}}</div>
-              </div>
-            </div>
-            <div style="" class="event_card_detail" ng-show="showDetails">
-              <div class="eventTabs-container">
-                <div class="eventTabs-info">
-                  <div class="eventTabs-box">
-                    <table class="table-event-information">
-                      <tbody ng-repeat="event in eventsFetchInfo[agentId+file.file]">
-                        <tr>
-                          <td class="table-event-information-td-value ng-binding" style="width: 70px; overflow: hidden; padding-top: 10px;" ng-class="getColorClass(event.event);">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
-                          <td class="table-event-information-td-value ng-binding" style="width: 330px; overflow: hidden; padding-top: 10px;">
-                            <span ng-click="searchHash(event.md5)" style="float: left; clear: left;"><b>MD5: </b>{{event.md5}}</span>
-                            <span ng-click="searchHash(event.sha1)" style="float: left; clear: left;"><b>SHA1: </b>{{event.sha1}}</span>
-                          </td>
-                          <td class="table-event-information-td-value ng-binding" style="width: 60px; padding-top: 10px;"><span tooltips tooltip-template="{{event.permissions}}">{{event.octalMode.slice(-4)}}</span></td>
-                          <td class="table-event-information-td-value ng-binding" style="width: 90px; padding-bottom: 0px;"><span tooltips tooltip-template="User Id: {{event.uid}}</br>Group Id: {{event.gid}}">
-                            <span style="float: left; clear: left;"><b>U: </b>{{event.user}}</span>
-                            <span style="float: left; clear: left;"><b>G: </b>{{event.group}}</span></span></td>
-                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 90px; text-align: center; padding-top: 10px;" ng-click="printEventInfo(event)"><span class="glyphicon glyphicon-plus"></span></td>
-                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 200px; text-align: center; padding-top: 10px;">{{event.modificationDate}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <span class="glyphicon glyphicon-chevron-left" ng-click="prevEvents(agentId, file.file)" ng-show="hasPrevEvents(agentId, file.file)"></span>
-                    <span class="glyphicon glyphicon-chevron-right" ng-click="nextEvents(agentId, file.file)" ng-show="hasNextEvents(agentId, file.file)"></span>
-                  </div>
-                  <ul class="eventTabs-controlButtons">
-                    <li>
-                      <a ng-click="loadDiscover(file.file);">
-                        <span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Discover
-                      </a>
-                    </li>
-                    <li>
-                      <a ng-click="loadDashboard(file.file);">
-                        <span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Dashboard
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          <span class="glyphicon glyphicon-chevron-left" ng-click="prevFiles()" ng-show="hasPrevFiles()"></span>
-          <span class="glyphicon glyphicon-chevron-right" ng-click="nextFiles()" ng-show="hasNextFiles()"></span>
-        </div>
-      </div>
-    </div>
-    <div class="rightCol">
-      <div class="block">
-        <div class="titleCol">
-          <h2>AGENTS:</h2>
-        </div>
-        <table class="table-files">
-          <tr class="table-files-list-tr">
-            <td class="table-files-list-td"><input type="text" ng-model="$parent.searchAgents" ng-change="searchAgent()" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
-                placeholder="Search..."></td>
-          </tr>
-          <tr ng-class="" class="table-files-list-tr" ng-repeat="agent in agents">
-            <td class="table-files-list-td"><span ng-click="setAgentFilter(agent.id)" ng-class="{ textFilterActive: isSetAgentFilter(agent.id) }" class="bold">{{agent.id}} - {{agent.name}}</span></td>
-          </tr>
-          <tr class="table-files-list-tr">
-            <td class="table-files-list-td">
-              <span class="glyphicon glyphicon-chevron-left" ng-click="prevAgents()" ng-show="hasPrevAgents()"></span>
-              <span class="glyphicon glyphicon-chevron-right" ng-click="nextAgents()" ng-show="hasNextAgents()"></span>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="block">
-        <div class="titleCol">
-          <h2>QUICK ACTIONS:</h2>
-        </div>
-        <form ng-submit="addAgent()">
-          <label>This actions will be performed over all agents.</label>
-          <button aria-label="Clean database" ng-click="cleandb()" class="btn btn-primary">
-				  Clean database
-				</button>
-          <button aria-label="Start scan" ng-click="startfim()" class="btn btn-primary">
-				  Start scan
-				</button>
-        </form>
-      </div>
-    </div>
-  </div>
+<div flex ng-controller="fimController" layout="column">
+
+	<md-content class="md-padding">
+		<md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+			<md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+			<md-nav-item md-nav-href="#/compliance" name="compliance">Compliance</md-nav-item>
+			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+		</md-nav-bar>
+	</md-content>
+
+	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
+
+	<md-content class="md-padding">
+		<md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+			<md-nav-item md-nav-href="#/fim" name="overview">Overview</md-nav-item>
+			<md-nav-item md-nav-href="#/fim/dashboard" name="metrics">Dashboard</md-nav-item>
+		</md-nav-bar>
+	</md-content>
+
+	<div flex layout="row" ng-if="!load">
+		<md-content flex id="content" layout-padding>
+			<md-toolbar class="md-primary _md" ng-show="_agent">
+				<div class="md-toolbar-tools">
+					<h3 class="ng-binding">{{_agent.id}} - {{_agent.name}}</h3>
+				</div>
+			</md-toolbar>
+            			<md-input-container class="sideNavBox">
+				<label for="searchBox">Search</label>
+				<input type="text" id="searchBox" ng-model="$parent.search" ng-change="agentsGet()" md-autofocus flex>
+				<md-icon md-font-icon="fa fa-cog" ng-click="showFiltersDialog()" />
+			</md-input-container>
+			<!-- scroll infinito aqui-->
+		</md-content>
+
+		<md-sidenav md-is-open="isOpenSidenav" md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
+			layout="column" class="md-sidenav-right md-whiteframe-z2">
+			<md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm></md-icon>
+			<md-input-container class="sideNavBox">
+				<label for="searchBox">Search</label>
+				<input type="text" id="searchBox" ng-model="$parent.search" ng-change="agentsGet()" md-autofocus flex>
+				<md-icon md-font-icon="fa fa-cog" ng-click="showFiltersDialog()" />
+			</md-input-container>
+			<md-chips>
+				<md-chip ng-show="statusFilter">{{statusFilter}}</md-chip>
+				<md-chip ng-show="!statusFilter">all</md-chip>
+				<md-chip ng-show="sortKey">
+					{{sortKey}}
+					<span class="glyphicon sort-icon" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+				</md-chip>
+			</md-chips>
+			<md-virtual-repeat-container class="vertical-repeater">
+				<div md-virtual-repeat="agent in agentsObj" md-on-demand flex>
+					<div layout="column" layout-align="space-around stretch">
+						<md-card ng-click="fetchAgent(agent)">
+							<md-card-title>
+								<md-card-title-text>
+									<span class="md-title">{{agent.id}} <span ng-if="agent.id == '000'">(Manager)</span></span>
+									<span class="md-subhead">{{agent.name}} - {{agent.ip}}</span>
+								</md-card-title-text>
+								<div layout="column" class="status" ng-class="getAgentStatusClass(agent.status);">
+								</div>
+							</md-card-title>
+						</md-card>
+					</div>
+				</div>
+			</md-virtual-repeat-container>
+		</md-sidenav>
+		<md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents"
+			hide-gt-sm>
+			<span class="glyphicon glyphicon-menu-hamburger"></span>
+		</md-button>
+	</div>
+
+	<div style="display: none">
+		<div class="md-dialog-container" id="filtersAgentsDialog">
+			<md-dialog layout-padding layout="column" layout-align="space-around center">
+				<label>Filter by status:</label>
+				<md-input-container>
+					<md-select ng-model="statusFilter" ng-change="agentStatusFilter()" aria-label="Filter by status">
+						<md-option value="all">All</md-option>
+						<md-option value="active">Active</md-option>
+						<md-option value="disconnected">Disconnected</md-option>
+						<md-option value="never connected">Never connected</md-option>
+					</md-select>
+				</md-input-container>
+				<label>Order by:</label>
+				<div flex layout="row" layout-align="space-around center" md-disable-backdrop class="md-padding">
+					<md-button class="md-primary" ng-click="sort('status')">
+						<span>Status</span>
+						<span class="glyphicon sort-icon" ng-show="sortKey=='status'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='status'"></span>
+					</md-button>
+					<md-button class="md-primary" ng-click="sort('ip')">
+						<span>IP</span>
+						<span class="glyphicon sort-icon" ng-show="sortKey=='ip'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='ip'"></span>
+					</md-button>
+					<md-button class="md-primary" ng-click="sort('name')">
+						<span>Name</span>
+						<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='name'"></span>
+					</md-button>
+					<md-button class="md-primary" ng-click="sort('id')">
+						<span>ID</span>
+						<span class="glyphicon sort-icon" ng-show="sortKey=='id'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='id'"></span>
+					</md-button>
+				</div>
+			</md-dialog>
+		</div>
+	</div>
+
+    	<div style="display: none">
+		<div class="md-dialog-container" id="filtersFilesDialog">
+			<md-dialog layout-padding layout="column" layout-align="space-around center">
+				<label>Filter by event:</label>
+				<md-input-container>
+					<md-select ng-model="eventFilter" ng-change="setEventFilter()" aria-label="Filter by event">
+						<md-option value="all">All</md-option>
+						<md-option value="added">Added</md-option>
+						<md-option value="modified">Modified</md-option>
+						<md-option value="readded">Re-added</md-option>
+                        <md-option value="">Deleted</md-option>
+					</md-select>
+				</md-input-container>
+                <label>Filter by type:</label>
+				<md-input-container>
+					<md-select ng-model="typeFilter" ng-change="setTypeFilter()" aria-label="Filter by type">
+						<md-option value="all">All</md-option>
+						<md-option value="file">File</md-option>
+						<md-option value="registry">Registry</md-option>
+					</md-select>
+				</md-input-container>
+			</md-dialog>
+		</div>
+	</div>
+
 </div>

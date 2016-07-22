@@ -1,0 +1,99 @@
+<!-- En los filter añadir el "all" y quitar parametro entrada -->
+<!-- Cambiar backend alertas y popups -->
+      <div class="fimContentTabs">
+        <div id="eventsTab">
+          <div class="events_card_list" ng-repeat="file in files" ng-init="eventsFetchInfo[agentId+file.file]=[];">
+            <div class="event_card" ng-class="{ event_card_active: showDetails }" ng-click="showDetails = ! showDetails; showDetails ? initEvents(agentId, file.file) : null;">
+              <div class="float_left">
+                <div class="text" style="width: 460px; height: 45px; overflow: hidden; white-space: nowrap;">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</div>
+              </div>
+              <div class="float_right">
+                <div class="fimEvent">{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</div>
+              </div>
+              <div class="float_right">
+                <div class="fimDate">{{file.modificationDate}}</div>
+              </div>
+            </div>
+            <div style="" class="event_card_detail" ng-show="showDetails">
+              <div class="eventTabs-container">
+                <div class="eventTabs-info">
+                  <div class="eventTabs-box">
+                    <table class="table-event-information">
+                      <tbody ng-repeat="event in eventsFetchInfo[agentId+file.file]">
+                        <tr>
+                          <td class="table-event-information-td-value ng-binding" style="width: 70px; overflow: hidden; padding-top: 10px;" ng-class="getColorClass(event.event);">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 330px; overflow: hidden; padding-top: 10px;">
+                            <span ng-click="searchHash(event.md5)" style="float: left; clear: left;"><b>MD5: </b>{{event.md5}}</span>
+                            <span ng-click="searchHash(event.sha1)" style="float: left; clear: left;"><b>SHA1: </b>{{event.sha1}}</span>
+                          </td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 60px; padding-top: 10px;"><span tooltips tooltip-template="{{event.permissions}}">{{event.octalMode.slice(-4)}}</span></td>
+                          <td class="table-event-information-td-value ng-binding" style="width: 90px; padding-bottom: 0px;"><span tooltips tooltip-template="User Id: {{event.uid}}</br>Group Id: {{event.gid}}">
+                            <span style="float: left; clear: left;"><b>U: </b>{{event.user}}</span>
+                            <span style="float: left; clear: left;"><b>G: </b>{{event.group}}</span></span></td>
+                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 90px; text-align: center; padding-top: 10px;" ng-click="printEventInfo(event)"><span class="glyphicon glyphicon-plus"></span></td>
+                          <td class="table-event-information-td-value ng-binding" style="float: right; width: 200px; text-align: center; padding-top: 10px;">{{event.modificationDate}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <span class="glyphicon glyphicon-chevron-left" ng-click="prevEvents(agentId, file.file)" ng-show="hasPrevEvents(agentId, file.file)"></span>
+                    <span class="glyphicon glyphicon-chevron-right" ng-click="nextEvents(agentId, file.file)" ng-show="hasNextEvents(agentId, file.file)"></span>
+                  </div>
+                  <ul class="eventTabs-controlButtons">
+                    <li>
+                      <a ng-click="loadDiscover(file.file);">
+                        <span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Discover
+                      </a>
+                    </li>
+                    <li>
+                      <a ng-click="loadDashboard(file.file);">
+                        <span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Dashboard
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="glyphicon glyphicon-chevron-left" ng-click="prevFiles()" ng-show="hasPrevFiles()"></span>
+          <span class="glyphicon glyphicon-chevron-right" ng-click="nextFiles()" ng-show="hasNextFiles()"></span>
+        </div>
+      </div>
+    </div>
+    <div class="rightCol">
+      <div class="block">
+        <div class="titleCol">
+          <h2>AGENTS:</h2>
+        </div>
+        <table class="table-files">
+          <tr class="table-files-list-tr">
+            <td class="table-files-list-td"><input type="text" ng-model="$parent.searchAgents" ng-change="searchAgent()" class="form-control ng-pristine ng-valid rulesetSearch ng-touched"
+                placeholder="Search..."></td>
+          </tr>
+          <tr ng-class="" class="table-files-list-tr" ng-repeat="agent in agents">
+            <td class="table-files-list-td"><span ng-click="setAgentFilter(agent.id)" ng-class="{ textFilterActive: isSetAgentFilter(agent.id) }" class="bold">{{agent.id}} - {{agent.name}}</span></td>
+          </tr>
+          <tr class="table-files-list-tr">
+            <td class="table-files-list-td">
+              <span class="glyphicon glyphicon-chevron-left" ng-click="prevAgents()" ng-show="hasPrevAgents()"></span>
+              <span class="glyphicon glyphicon-chevron-right" ng-click="nextAgents()" ng-show="hasNextAgents()"></span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="block">
+        <div class="titleCol">
+          <h2>QUICK ACTIONS:</h2>
+        </div>
+        <form ng-submit="addAgent()">
+          <label>This actions will be performed over all agents.</label>
+          <button aria-label="Clean database" ng-click="cleandb()" class="btn btn-primary">
+				  Clean database
+				</button>
+          <button aria-label="Start scan" ng-click="startfim()" class="btn btn-primary">
+				  Start scan
+				</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

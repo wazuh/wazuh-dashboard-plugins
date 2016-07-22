@@ -1,6 +1,6 @@
 <div flex ng-controller="managerController" layout="column">
 
-  <md-content layout-padding>
+  <md-content class="md-padding">
     <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
       <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
       <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
@@ -13,7 +13,7 @@
 
   <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-  <md-content layout-padding>
+  <md-content class="md-padding">
     <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation links">
       <md-nav-item md-nav-href="#/manager" name="general">General</md-nav-item>
       <md-nav-item md-nav-href="#/manager/configuration" name="configuration">Configuration</md-nav-item>
