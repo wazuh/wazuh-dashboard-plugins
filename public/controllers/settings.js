@@ -3,7 +3,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 // Require utils
 var base64 = require('plugins/wazuh/utils/base64.js');
 
-app.controller('settingsController', function ($scope, $http, $q, testConnection, alertify) {
+app.controller('settingsController', function ($scope, $http, $q, testConnection, alertify, $mdToast) {
 
     $scope.formData = {};
     $scope.formData.user = "";
@@ -11,6 +11,7 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
     $scope.formData.url = "";
     $scope.formData.insecure = true;
     $scope.editConfiguration = true;
+    $scope.menuNavItem = 'settings';
 
     testConnection.test()
         .then(function (data) {
@@ -32,9 +33,9 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
             }
         }).error(function (data, status) {
             if (status == '400') {
-                alertify.delay(5000).closeLogOnClick(true).error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
+                $mdToast.show($mdToast.simple().textContent("Please, fill all the fields in order to connect with Wazuh RESTful API."));
             } else {
-                alertify.delay(5000).closeLogOnClick(true).error("Some error ocurred, could not save data in elasticsearch.");
+                $mdToast.show($mdToast.simple().textContent("Some error ocurred, could not save data in elasticsearch."));
             }
         })
     };
@@ -54,7 +55,7 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
         testConnection.test()
             .then(function (data) {
                 $scope.editConfiguration = false;
-                alertify.delay(5000).closeLogOnClick(true).success('<b>Successfully connected!</b>');
+                $mdToast.show($mdToast.simple().textContent('<b>Successfully connected!</b>'));
             }, printTest);
     };
 
@@ -85,7 +86,7 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
             default:
                 text = 'Unexpected error. Please, report this to the Wazuh Team.';
         }
-        alertify.delay(5000).closeLogOnClick(true).error(text);
+        $mdToast.show($mdToast.simple().textContent(text));
     };
 
 });

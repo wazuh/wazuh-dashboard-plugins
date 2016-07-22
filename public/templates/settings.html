@@ -1,64 +1,40 @@
-<div class="container" ng-controller="settingsController">
+<div flex ng-controller="settingsController" layout="column" layout-fill>
 
+  <div class="md-padding">
+    <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+      <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+      <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+      <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+      <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+      <md-nav-item md-nav-href="#/compliance" name="compliance">Compliance</md-nav-item>
+      <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+    </md-nav-bar>
+  </div>
 
-  <div class="col-md-6 col-md-offset-3" ng-if="editConfiguration">
-
-
-    <div class="page-header">
-      <h1><span class="glyphicon glyphicon-floppy-save"></span> Set Wazuh RESTful API settings</h1>
-    </div>
-
-
-    <div id="messages" class="settings-message" ng-class="messageClass" ng-bind-html="$parent.message">{{ $parent.message }}</div>
-
-    <!--ng-show="message"-->
-    <form ng-submit="processForm()">
-
-      <div id="name-group" class="form-group">
-        <label>API Username</label>
-        <input type="text" name="user" class="form-control" placeholder="foo" ng-model="$parent.formData.user">
-        <span class="help-block"></span>
-      </div>
-
-
-      <div id="superhero-group" class="form-group">
-        <label>API Password</label>
-        <input type="password" name="password" class="form-control" placeholder="bar" ng-model="$parent.formData.password">
-        <span class="help-block"></span>
-      </div>
-
-      <div id="name-group" class="form-group">
-        <label>API URL</label>
-        <input type="text" name="url" class="form-control" placeholder="https://your_api_ip:55000" ng-model="$parent.formData.url">
-        <span class="help-block"></span>
-      </div>
-
-      <div id="name-group" class="form-group switch">
-        <label>Accept selfsigned SSL</label>
-        <input id="cmn-toggle" class="cmn-toggle cmn-toggle-round" type="checkbox" ng-model="$parent.formData.insecure">
-        <label for="cmn-toggle"></label>
-        <span class="help-block"></span>
-      </div>
-
-      <button type="submit" class="btn btn-success btn-lg btn-block">
-      <span class="glyphicon glyphicon-flash"></span> Connect!
-    </button>
+  <div flex layout="column" layout-align="center center" ng-if="editConfiguration">
+    <h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Set Wazuh RESTful API settings</h1>
+    <form ng-submit="processForm()" layout="column" layout-align="center center">
+      <md-input-container>
+        <label>Username</label>
+        <input type="text" ng-model="$parent.formData.user" aria-label="username" required></input>
+      </md-input-container>
+      <md-input-container>
+        <label>Password</label>
+        <input type="password" ng-model="$parent.formData.password" aria-label="password" required></input>
+      </md-input-container>
+      <md-input-container>
+        <label>Full url</label>
+        <input ng-model="$parent.formData.url" type="url" aria-label="full url" required></input>
+      </md-input-container>
+      <md-switch ng-model="$parent.formData.insecure" aria-label="Accept selfsigned SSL" required>Accept selfsigned SSL</md-switch>
+      <md-button type="submit" class="md-raised md-primary"><span class="glyphicon glyphicon-flash"></span> Connect!</md-button>
     </form>
-
   </div>
 
-  <div  class="col-md-6 col-md-offset-3" ng-if="!editConfiguration">
-
-    <div class="page-header">
-      <h1><span class="glyphicon glyphicon-floppy-save"></span> Wazuh RESTful API settings</h1>
-    </div>
-
-    <div id="messages" class="settings-message-ok" ng-class="messageClass">Wazuh RESTful API settings are configured and working. The application is ready to be used.</div>
-    <button type="submit" class="btn btn-alert btn-lg btn-block" ng-click="$parent.editConfiguration = !$parent.editConfiguration">
-      <span class="glyphicon glyphicon-pencil"></span> Edit settings
-    </button>
-
+  <div md-disable-backdrop flex layout="column" layout-align="center center" ng-if="!editConfiguration">
+    <h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Wazuh RESTful API settings</h1>
+    <p flex style="color: green;">Wazuh RESTful API settings are configured and working. The application is ready to be used.</p>
+    <md-button class="md-raised md-warn" ng-click="$parent.editConfiguration = !$parent.editConfiguration"><span class="glyphicon glyphicon-pencil"></span> Edit settings</md-button>
   </div>
-
 
 </div>
