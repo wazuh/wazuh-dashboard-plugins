@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('fimController', function ($scope, alertify, sharedProperties, DataFactory, $location) {
+app.controller('fimController', function ($scope, alertify, sharedProperties, DataFactory, $location, $mdDialog) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -10,8 +10,8 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     $scope.files = [];
     $scope.agents = [];
     $scope.search = '';
-
-    $scope.agentId = '000';
+    $scope.menuNavItem = 'fim';
+    $scope.submenuNavItem = 'overview';
 
     //Print Error
     var printError = function (error) {
@@ -19,15 +19,87 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     }
 
     //Functions
+    $scope.agentsObj = {
+        //Obj with methods for virtual scrolling
+        getItemAtIndex: function (index) {
+            if ($scope._agents_blocked) {
+                return null;
+            }
+            var _pos = index - DataFactory.getOffset(objectsArray['/agents']);
+            if ((_pos > 15) || (_pos < 0)) {
+                $scope._agents_blocked = true;
+                DataFactory.scrollTo(objectsArray['/agents'], index)
+                    .then(function (data) {
+                        $scope.agents.length = 0;
+                        $scope.agents = data.data.items;
+                        $scope._agents_blocked = false;
+                    }, printError);
+            } else {
+                return $scope.agents[_pos];
+            }
+        },
+        getLength: function () {
+            return DataFactory.getTotalItems(objectsArray['/agents']);
+        },
+    };
+
+    $scope.filesObj = {
+        //Obj with methods for virtual scrolling
+        getItemAtIndex: function (index) {
+            if ($scope._files_blocked) {
+                return null;
+            }
+            var _pos = index - DataFactory.getOffset(objectsArray['/syscheck/files']);
+            if ((_pos > 15) || (_pos < 0)) {
+                $scope._files_blocked = true;
+                DataFactory.scrollTo(objectsArray['/syscheck/files'], index)
+                    .then(function (data) {
+                        $scope.files.length = 0;
+                        $scope.files = data.data.items;
+                        $scope._files_blocked = false;
+                    }, printError);
+            } else {
+                return $scope.files[_pos];
+            }
+        },
+        getLength: function () {
+            return DataFactory.getTotalItems(objectsArray['/syscheck/files']);
+        },
+    };
+
+    $scope.eventsObj = {
+        //Obj with methods for virtual scrolling
+        getItemAtIndex: function (index) {
+            if ($scope._events_blocked) {
+                return null;
+            }
+            var _pos = index - DataFactory.getOffset(objectsArray[$scope._agent.id + $scope._file.file]);
+            if ((_pos > 15) || (_pos < 0)) {
+                $scope._events_blocked = true;
+                DataFactory.scrollTo(objectsArray[$scope._agent.id + $scope._file.file], index)
+                    .then(function (data) {
+                        $scope.eventsFetchInfo.length = 0;
+                        $scope.eventsFetchInfo = data.data.items;
+                        $scope._events_blocked = false;
+                    }, printError);
+            } else {
+                return $scope.eventsFetchInfo[_pos];
+            }
+        },
+        getLength: function () {
+            return DataFactory.getTotalItems(objectsArray[$scope._agent.id + $scope._file.file]);
+        },
+    };
+
     $scope.getColorClass = function (event) {
         switch (event) {
             case 'added':
             case 'readded':
-                return 'eventGreen';
+                return 'status green';
             case 'modified':
-                return 'eventOrange';
+                return 'status orange';
             case 'deleted':
-                return 'eventRed';
+                return 'status red';
             default:
                 return '';
         }
@@ -72,7 +144,8 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     };
 
     $scope.initEvents = function (agent, file) {
-        var body = { 'file' : file };
+        $scope._file = file;
+        var body = { 'file' : file.file };
         var tmpBody = DataFactory.getBody(objectsArray['/syscheck/files']);
         if (tmpBody && (tmpBody != { 'summary ': 'yes'})) {
             angular.forEach(tmpBody, function (value, key) {
@@ -80,25 +153,33 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 body[key] = value;
             });
         }
-        DataFactory.initialize('get', '/syscheck/'+agent+'/files', body, 10, 0)
+        DataFactory.initialize('get', '/syscheck/'+agent.id+'/files', body, 10, 0)
             .then(function (data) {
-                objectsArray[agent+file] = data;
-                DataFactory.get(objectsArray[agent+file])
+                objectsArray[agent.id+file.file] = data;
+                DataFactory.get(objectsArray[agent.id+file.file])
                     .then(function (data) {
-                        $scope.eventsFetchInfo[agent + file].length = 0;
-                        $scope.eventsFetchInfo[agent + file] = data.data.items;
+                        $scope.eventsFetchInfo.length = 0;
+                        $scope.eventsFetchInfo = data.data.items;
                     }, printError)
             }, printError);
     };
 
     $scope.getEvents = function (agent, file) {
+                        if ($scope._events_blocked) {
+            return null;
+        }
+        $scope._events_blocked = true;
         DataFactory.get(objectsArray[agent + file])
             .then(function (data) {
                 $scope.eventsFetchInfo[agent + file].length = 0;
                 $scope.eventsFetchInfo[agent + file] = data.data.items;
+                $scope._events_blocked = false;
             }, printError)
     };
 
+/*
+* DEPRECATED
+*/
     $scope.hasNextEvents = function (agent, file) {
         if (!objectsArray[agent + file])
             return false;
@@ -112,6 +193,9 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             }, printError)
     };
 
+/*
+* DEPRECATED
+*/
     $scope.hasPrevEvents = function (agent, file) {
         if (!objectsArray[agent + file])
             return false;
@@ -125,30 +209,20 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             }, printError)
     };
 
-    $scope.setTypeFilter = function (filter) {
-        if ($scope.typeFilter != filter) {
-            $scope.typeFilter = filter;
-        } else {
-            $scope.typeFilter = '';
-        }
+    $scope.setTypeFilter = function () {
         _setFilter();
     };
 
     $scope.setEventFilter = function (filter) {
-        if ($scope.eventFilter != filter) {
-            $scope.eventFilter = filter;
-        } else {
-            $scope.eventFilter = '';
-        }
         _setFilter();
     };
 
     var _setFilter = function () {
         var body = {};
-        if ($scope.eventFilter !== '') {
+        if (($scope.eventFilter !== '') && ($scope.eventFilter != 'all')) {
             body['event'] = $scope.eventFilter;
         }
-        if ($scope.typeFilter !== '') {
+        if (($scope.typeFilter !== '') && ($scope.typeFilter != 'all')) {
             body['filetype'] = $scope.typeFilter;
         }
         if (body != {}) {
@@ -158,16 +232,16 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         }
     };
 
-    $scope.isSetAgentFilter = function (id) {
+    /*DEPRECATED $scope.isSetAgentFilter = function (id) {
         return ($scope.agentId === id);
-    };
+    };*/
 
-    $scope.setAgentFilter = function (id) {
-        if (id != $scope.agentId) {
+    $scope.setAgentFilter = function (agent) {
+        if (agent != $scope._agent) {
+            $scope._agent = agent;
             $scope.eventFilter = '';
             $scope.typeFilter = '';
-            $scope.agentId = id;
-            DataFactory.initialize('get', '/syscheck/' + id + '/files', {}, 16, 0)
+            DataFactory.initialize('get', '/syscheck/' + agent.id + '/files', {}, 15, 0)
                 .then(function (data) {
                     objectsArray['/syscheck/files'] = data;
                     $scope.getFiles();
@@ -187,6 +261,10 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     };
 
     $scope.getFiles = function (body) {
+                if ($scope._files_blocked) {
+            return null;
+        }
+        $scope._files_blocked = true;
         if (!body) {
             var tmpBody = DataFactory.getBody(objectsArray['/syscheck/files']);
             if ($scope.search !== tmpBody['search']) {
@@ -206,6 +284,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                     $scope.files.length = 0;
                     $scope.eventsFetchInfo.length = 0;
                     $scope.files = data.data.items;
+                    $scope._files_blocked = false;
                 }, printError);
         } else {
             body['summary'] = 'yes';
@@ -214,10 +293,14 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                     $scope.files.length = 0;
                     $scope.eventsFetchInfo.length = 0;
                     $scope.files = data.data.items;
+                    $scope._files_blocked = false;
                 }, printError);
         }
     };
 
+/*
+* DEPRECATED
+*/
     $scope.hasNextFiles = function () {
         return DataFactory.hasNext(objectsArray['/syscheck/files']);
     };
@@ -230,6 +313,9 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             }, printError);
     };
 
+/*
+* DEPRECATED
+*/
     $scope.hasPrevFiles = function () {
         return DataFactory.hasPrev(objectsArray['/syscheck/files']);
     };
@@ -242,14 +328,70 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             }, printError);
     };
 
-    $scope.getAgents = function () {
-        DataFactory.get(objectsArray['/agents'])
-            .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-            }, printError);
+    $scope.agentStatusFilter = function () {
+        var _status;
+        if ($scope.statusFilter === 'all') {
+            _status = undefined;
+        } else {
+            _status = $scope.statusFilter;
+        }
+        $scope.getAgents({ 'sort': $scope.searchQuery, 'status': _status });
     };
 
+    $scope.sort = function (keyname) {
+        $scope.sortKey = keyname;
+        $scope.reverse = !$scope.reverse;
+        $scope.searchQuery = '';
+        if (!$scope.reverse) {
+            $scope.searchQuery += '-';
+        }
+        
+        $scope.searchQuery += $scope.sortKey;
+        if ($scope.statusFilter != '') {
+            $scope.getAgents({ 'sort': $scope.searchQuery, 'status': $scope.statusFilter });
+        } else {
+            $scope.getAgents({ 'sort': $scope.searchQuery });
+        }
+    };
+    $scope.getAgents = function (body) {
+        if ($scope._agents_blocked) {
+            return null;
+        }
+        $scope._agents_blocked = true;
+        //Search agent body modification
+        if (!body) {
+            var tmpBody = DataFactory.getBody(objectsArray['/agents']);
+            if ($scope.search !== tmpBody['search']) {
+                tmpBody['search'] = $scope.search;
+                body = tmpBody;
+            }
+        } else if ($scope.search !== body['search']) {
+            body['search'] = $scope.search;
+        }
+        if (body['search'] === '') {
+            body['search'] = undefined;
+        }
+
+        if (!body) {
+            DataFactory.get(objectsArray['/agents'])
+                .then(function (data) {
+                    $scope.agents.length = 0;
+                    $scope.agents = data.data.items;
+                    $scope._agents_blocked = false;
+                }, printError);
+        } else {
+            DataFactory.get(objectsArray['/agents'], body)
+                .then(function (data) {
+                    $scope.agents.length = 0;
+                    $scope.agents = data.data.items;
+                    $scope._agents_blocked = false;
+                }, printError);
+        }
+    };
+
+/*
+* DEPRECATED
+*/
     $scope.hasNextAgents = function () {
         return DataFactory.hasNext(objectsArray['/agents']);
     };
@@ -261,6 +403,9 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             }, printError);
     };
 
+/*
+* DEPRECATED
+*/
     $scope.hasPrevAgents = function () {
         return DataFactory.hasPrev(objectsArray['/agents']);
     };
@@ -290,6 +435,24 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         });
     };
 
+    $scope.showFilesFiltersDialog = function (ev) {
+        $mdDialog.show({
+            contentElement: '#filtersFilesDialog',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true
+        });
+    };
+
+    $scope.showAgentsFiltersDialog = function (ev) {
+        $mdDialog.show({
+            contentElement: '#filtersAgentsDialog',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true
+        });
+    };
+
     var load = function () {
         var _agent = '000';
         var _init = sharedProperties.getProperty();
@@ -299,10 +462,10 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             $scope.agentId = _agent;
         }
 
-        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 16, 0)
+        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 15, 0)
             .then(function (data) {
                 objectsArray['/syscheck/files'] = data;
-                DataFactory.initialize('get', '/agents', {}, 10, 0)
+                DataFactory.initialize('get', '/agents', {}, 15, 0)
                     .then(function (data) {
                         objectsArray['/agents'] = data;
                         load_data();
@@ -317,6 +480,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 DataFactory.get(objectsArray['/agents'])
                     .then(function (data) {
                         $scope.agents = data.data.items;
+                        $scope._agent = data.data.items[0];
                         $scope.load = false;
                     });
             }, printError);
@@ -330,6 +494,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)
         });
+        $scope.files.length = 0;
         $scope.eventsFetchInfo.length = 0;
         $scope.agents.length = 0;
     });
