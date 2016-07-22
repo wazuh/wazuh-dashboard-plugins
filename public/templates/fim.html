@@ -30,27 +30,24 @@
             </md-toolbar>
             <md-input-container layout="row" class="sideNavBox" ng-if="_agent">
                 <label for="searchBox">Search</label>
-                <input type="text" id="searchBox" ng-model="$parent.search" ng-change="agentsGet()" md-autofocus flex>
+                <input type="text" id="searchBox" ng-model="$parent.$parent.search" ng-change="getFiles()" md-autofocus flex>
                 <md-icon md-font-icon="fa fa-cog" ng-click="showFilesFiltersDialog($event)" />
             </md-input-container>
             <md-tabs md-dynamic-height md-border-bottom ng-if="_agent" flex>
-                <md-tab label="Files overview" flex>
-                    <md-virtual-repeat-container class="vertical-repeater">
+                <md-tab label="Last results" flex>
+                    <md-virtual-repeat-container class="vertical-repeater" style="min-height: 400px;">
                         <div md-virtual-repeat="file in filesObj" md-on-demand flex>
-                            <div layout="row" layout-align="center center" ng-click="initEvents(_agent, file)">
-                                <p>{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</p>
+                            <div layout="row" layout-align="space-between center" ng-click="initEvents(_agent, file)">
+                                <span>{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
                                 <md-divider></md-divider>
-                                <p>{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</p>
-                                <md-divider></md-divider>
-                                <p>{{file.modificationDate}}</p>
-                                <md-divider></md-divider>
+                                <span class="right-text" style="float: right;">{{file.modificationDate}} ({{file.event.charAt(0).toUpperCase() + file.event.slice(1)}})</span>
                             </div>
                             <md-divider></md-divider>
                         </div>
                     </md-virtual-repeat-container>
                 </md-tab>
                 <md-tab label="File detail" flex ng-if="_file">
-                    <md-virtual-repeat-container class="vertical-repeater">
+                    <md-virtual-repeat-container class="vertical-repeater" style="min-height: 400px;">
                         <div md-virtual-repeat="event in eventsObj" md-on-demand flex>
                             <div layout="row" layout-align="center center">
                                 <p>{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</p>

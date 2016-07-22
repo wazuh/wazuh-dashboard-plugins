@@ -50,7 +50,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 return null;
             }
             var _pos = index - DataFactory.getOffset(objectsArray['/syscheck/files']);
-            if ((_pos > 15) || (_pos < 0)) {
+            if ((_pos > 30) || (_pos < 0)) {
                 $scope._files_blocked = true;
                 DataFactory.scrollTo(objectsArray['/syscheck/files'], index)
                     .then(function (data) {
@@ -153,7 +153,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 body[key] = value;
             });
         }
-        DataFactory.initialize('get', '/syscheck/'+agent.id+'/files', body, 10, 0)
+        DataFactory.initialize('get', '/syscheck/'+agent.id+'/files', body, 35, 0)
             .then(function (data) {
                 objectsArray[agent.id+file.file] = data;
                 DataFactory.get(objectsArray[agent.id+file.file])
@@ -241,7 +241,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             $scope._agent = agent;
             $scope.eventFilter = '';
             $scope.typeFilter = '';
-            DataFactory.initialize('get', '/syscheck/' + agent.id + '/files', {}, 15, 0)
+            DataFactory.initialize('get', '/syscheck/' + agent.id + '/files', {}, 20, 0)
                 .then(function (data) {
                     objectsArray['/syscheck/files'] = data;
                     $scope.getFiles();
@@ -462,7 +462,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             $scope.agentId = _agent;
         }
 
-        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 15, 0)
+        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 35, 0)
             .then(function (data) {
                 objectsArray['/syscheck/files'] = data;
                 DataFactory.initialize('get', '/agents', {}, 15, 0)
