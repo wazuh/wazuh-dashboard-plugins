@@ -1,16 +1,26 @@
-<div flex ng-controller="agentsController" layout="column">
-	<md-content class="md-padding">
-		<md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
-			<md-nav-item md-nav-href="#/agents" name="overview">Overview</md-nav-item>
-			<md-nav-item md-nav-href="#/agents/metrics" name="metrics">Metrics</md-nav-item>
-		</md-nav-bar>
-	</md-content>
+<div flex ng-controller="agentsController" layout="column" style="height: 100%">
 
-	<div flex layout="row" layout-align="center center" ng-if="load">
-		<img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
+	<div flex layout="column">
+		<md-content class="md-padding">
+			<md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
+				<md-nav-item id="header_logo" md-nav-href="http://wazuh.com" name="wazuh" aria-label="img logo">
+					<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+				</md-nav-item>
+				<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+				<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+				<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+				<md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+				<md-nav-item md-nav-href="#/compliance" name="compliance">Policy monitoring</md-nav-item>
+				<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+			</md-nav-bar>
+		</md-content>
 	</div>
+	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-	<div flex layout="row" ng-if="!load">
+
+
+
+	<div flex layout="row" ng-if="!load" layout-fill>
 		<md-content flex id="content" layout-padding>
 			<md-toolbar class="demo-toolbar md-primary _md" ng-show="_agent">
 				<div class="md-toolbar-tools">

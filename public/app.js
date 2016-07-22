@@ -2,7 +2,7 @@
 require('plugins/wazuh/config/config.js');
 
 // Require CSS
-require('plugins/wazuh/less/mainold.less');
+require('plugins/wazuh/less/main.less');
 
 // Require routes
 var routes = require('ui/routes');
@@ -18,7 +18,7 @@ var routes = require('ui/routes');
   { id: 'discover', title: 'Discover'},
   { id: 'settings', title: 'Settings' }
 ]);*/
-
+ 
 // Set up Wazuh app
 var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPagination', 'angular.filter', 'AxelSoft', 'chart.js', 'ngAlertify', '720kb.tooltips', 'ngMaterial'])
   .service('sharedProperties', function () {
@@ -133,7 +133,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       } else {
         _instances[instance] = { 'method': method, 'path': path, 'body': body, 'pageSize': pageSize,
           'offset': offset, 'pagination': false };
-        defered.resolve(instance);  
+        defered.resolve(instance);
       }
 
       return promise;
@@ -151,7 +151,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
         return promise;
       }
-      
+
       if (!_instances[instanceId]['pagination']) {
         defered.reject(prepError({'error': -10, 'message': 'Pagination disabled for this object'}));
         return promise;
@@ -221,7 +221,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
         return promise;
       }
-      
+
       if (!_instances[instanceId]['pagination']) {
         defered.reject(prepError({'error': -10, 'message': 'Pagination disabled for this object'}));
         return promise;
@@ -265,7 +265,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         preparedBody['offset'] = _instances[instanceId]['offset'];
         preparedBody['limit'] = _instances[instanceId]['pageSize'];
       }
-      
+
       apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
       .then(function (data) {
         if ((_instances[instanceId]['pagination']) && (data.data.totalItems != _instances[instanceId]['limit'])) {
