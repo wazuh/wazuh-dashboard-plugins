@@ -6,6 +6,8 @@ var app = require('ui/modules').get('app/wazuh', []);
 app.controller('managerController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter) {
     //Initialisation
     $scope.load = true;
+    $scope.menuNavItem = 'manager';
+    $scope.submenuNavItem = 'general';
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);
@@ -30,11 +32,11 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 
     $scope.getDaemonStatusClass = function (daemonStatus) {
         if (daemonStatus == "running")
-            return "icon_agent_status_green"
+            return "status green"
         else if (daemonStatus == "stopped")
-            return "icon_agent_status_red";
+            return "status red";
         else
-            return "icon_agent_status_red";
+            return "status red";
     };
 
     $scope.start = function () {
@@ -134,10 +136,6 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
         DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {
                 $scope.daemons = data.data;
-                DataFactory.getAndClean('get', '/manager/configuration', {})
-                    .then(function (data) {
-                        $scope.managerConfiguration = data.data;
-                        parseConfiguration();
                         DataFactory.getAndClean('get', '/agents/summary', {})
                             .then(function (data) {
                                 $scope.agentsCountActive = data.data.active;
@@ -146,7 +144,6 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
                                 $scope.agentsCountTotal = data.data.total;
                                 $scope.load = false;
                             }, printError);
-                    }, printError);
             }, printError);
     };
 
@@ -161,3 +158,52 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 
 });
 
+app.controller('managerConfigurationController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter) {
+    //Initialisation
+    $scope.load = true;
+
+    $scope.pageId = (Math.random().toString(36).substring(3));
+    tabProvider.register($scope.pageId);
+
+    var objectsArray = [];
+
+    //Print Error
+    var printError = function (error) {
+        alertify.delay(10000).closeLogOnClick(true).error(error.html);
+    }
+
+    //Functions
+    var parseConfiguration = function () {
+        if ($scope.managerConfiguration.rules.decoder) {
+            if (angular.isString($scope.managerConfiguration.rules.decoder)) { $scope.managerConfiguration.rules.decoder = [$scope.managerConfiguration.rules.decoder] }
+        }
+        if ($scope.managerConfiguration.rules.rule_dir) {
+            if (angular.isString($scope.managerConfiguration.rules.rule_dir)) { $scope.managerConfiguration.rules.rule_dir = [$scope.managerConfiguration.rules.rule_dir] }
+        }
+        if ($scope.managerConfiguration.rules.list) {
+            if (angular.isString($scope.managerConfiguration.rules.list)) { $scope.managerConfiguration.rules.list = [$scope.managerConfiguration.rules.list] }
+        }
+        if ($scope.managerConfiguration.rootcheck.system_audit) {
+            if (angular.isString($scope.managerConfiguration.rootcheck.system_audit)) { $scope.managerConfiguration.rootcheck.system_audit = [$scope.managerConfiguration.rootcheck.system_audit] }
+        }
+    };
+
+    var load = function () {
+        DataFactory.getAndClean('get', '/manager/configuration', {})
+            .then(function (data) {
+                $scope.managerConfiguration = data.data;
+                parseConfiguration();
+            }, printError);
+        $scope.load = false;
+    };
+    
+    //Load
+    load();
+
+    //Destroy
+    $scope.$on("$destroy", function () {
+        //angular.forEach(objectsArray, DataFactory.clean(value));
+        tabProvider.clean($scope.pageId);
+    });
+
+});

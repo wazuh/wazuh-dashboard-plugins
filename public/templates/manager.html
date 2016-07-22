@@ -1,512 +1,121 @@
-<div>
-  <ul class="wazuh-submenu">
-    <li class="active"><a>Overview</a></li>
-    <li><a href="/app/wazuh#/manager/osseclog">OSSEC Logs</a></li>
-    <li><a href="/app/wazuh#/manager/metrics">Metrics</a></li>
-  </ul>
-</div>
-<div class="container" ng-controller="managerController">
-<div ng-if="load" style="text-align: center;">
-        <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
-</div>
-  <div class="row containerManager" ng-if="!load">
-    <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-    <div class="leftCol" style="margin-bottom: 25px;">
-        <h2 class="container_page_title">Configuration</h2>
-        <ul id="managerConfiguration">
-            <li><a ng-class="{ active: isSetTab(1) }" href ng-click="setTab(1)" ng-if="managerConfiguration.global.jsonout_output 
-            || managerConfiguration.global.logall || managerConfiguration.global.white_list || managerConfiguration.global.stats 
-            || managerConfiguration.global.host_infomation || managerConfiguration.alerts.log_alert_level">Global</a></li>
-            <li><a ng-class="{ active: isSetTab(2) }" href ng-click="setTab(2)" ng-if="managerConfiguration.global.email_notification 
-            || managerConfiguration.global.email_alert_level || managerConfiguration.global.email_to || managerConfiguration.global.email_from
-            || managerConfiguration.global.smtp_server || managerConfiguration.global.email_maxperhour || managerConfiguration.global.email_idsname
-            || managerConfiguration.email_alerts">Mail</a></li>
-            <li><a ng-class="{ active: isSetTab(3) }" href ng-click="setTab(3)" ng-if="managerConfiguration['active-response'] && (managerConfiguration['active-response'].disabled !== 'yes')">Active response</a></li>
-            <li><a ng-class="{ active: isSetTab(4) }" href ng-click="setTab(4)" ng-if="managerConfiguration.command">Commands</a></li>
-            <li><a ng-class="{ active: isSetTab(5) }" href ng-click="setTab(5)" ng-if="managerConfiguration.rules">Rules</a></li>
-            <li><a ng-class="{ active: isSetTab(6) }" href ng-click="setTab(6)" ng-if="managerConfiguration.rootcheck">Rootcheck</a></li>
-            <li><a ng-class="{ active: isSetTab(7) }" href ng-click="setTab(7)" ng-if="managerConfiguration.syscheck">Syscheck</a></li>
-            <li><a ng-class="{ active: isSetTab(8) }" href ng-click="setTab(8)" ng-if="managerConfiguration['localfile']">Log collector</a></li>
-        </ul>  
-          <div class="managerConfigurationTab">
-            <div id="managerConfigurationTab-Global" ng-show="isSetTab(1)">
-                <table class="table-manager ng-scope table-manager-configuration">
-                    <tbody>
-                     <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.jsonout_output">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">jsonout_output</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.jsonout_output }}</td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.logall">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">logall</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.logall }}</td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.white_list">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">White List</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding"><span ng-repeat="item in managerConfiguration.global.white_list|orderBy">{{ item }} <span ng-show="!$last">, </span></span></td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.stats">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Stats</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.stats }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.host_infomation">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Host information</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.host_infomation }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.alerts.log_alert_level">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Log alert level</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.alerts.log_alert_level }} </td>
-                    </tr>
-                  </tbody>
-              </table>  
-            </div>
-            <div id="managerConfigurationTab-Mail"  ng-show="isSetTab(2)">
-                <table class="table-manager ng-scope table-manager-configuration">
-                    <tbody>
-                     <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.email_notification">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Email notifications</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.email_notification }}</td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.email_alert_level">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Email alert level</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.email_alert_level }}</td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.email_to">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Email to</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.email_to }}</td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.email_from">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Email from</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.email_from }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.smtp_server">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">SMTP Server</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.smtp_server }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.email_maxperhour">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Max email per hour</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.email_maxperhour }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.global.email_idsname">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Email IDS name</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.global.email_idsname }} </td>
-                    </tr>
-                    
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.email_alerts.email_to">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Email to</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.email_alerts.email_to }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.email_alerts.level">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Alert level</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.email_alerts.level }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.email_alerts.group">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Group</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.email_alerts.group }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.email_alerts.event_location">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Event location</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.email_alerts.event_location }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.email_alerts.format">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Format</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.email_alerts.format }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.email_alerts.rule_id">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Rule ID</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.email_alerts.rule_id }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.email_alerts.do_not_delay">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Do not delay</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.email_alerts.do_not_delay }} </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.email_alerts.do_not_group">
-                      <td class="table-manager-list-td"><span class="bold ng-binding">Do not group</span></td>
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.email_alerts.do_not_group }} </td>
-                    </tr>
-                  </tbody>
-              </table>  
-            </div>
-            <div id="managerConfigurationTab-ActiveResponse"  ng-show="isSetTab(3)"  ng-if='managerConfiguration["active-response"] || (managerConfiguration["active-response"].disabled == yes)'>
-               <div ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
-                   <table class="table-manager ng-scope table-manager-configuration">
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="item.command">
-                          <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">{{ item.command }}</span></td>
-                        </tr>
-                  </table> 
-                  <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}" >
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.location">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Location</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.location }}</td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.agent_id">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Agent ID(s)</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.agent_id }}</td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.level">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Level</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.level }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.timeout">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Timeout</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.timeout }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.rules_group">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Rules group</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.rules_group }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.rules_id">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Rules ID(s)</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.rules_id }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.repeated_offenders">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Repeated offenders)</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.repeated_offenders }} </td>
-                        </tr>
-                      </tbody>
-                  </table>  
-              </div>
-            </div>
-            <div id="managerConfigurationTab-Commands"  ng-show="isSetTab(4)" ng-if="managerConfiguration.command">
-                <div ng-repeat="item in managerConfiguration.command|orderBy:'name'">
-                       <table class="table-manager ng-scope table-manager-configuration">
-                            <tbody>
-                            <tr ng-class="" class="table-manager-list-tr" ng-if="item.name">
-                              <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">{{ item.name }}</span></td>
-                            </tr>
-                      </table> 
-                      <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}" >
-                            <tbody>
-                            <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.expect">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Expect</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.expect }}</td>
-                            </tr>
-                            <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.executable">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Executable</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.executable }} </td>
-                            </tr>
-                            <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.timeout_allowed">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Timeout allowed</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.timeout_allowed }} </td>
-                            </tr>
-                          </tbody>
-                      </table>  
-                </div>
-            </div>
-            <div id="managerConfigurationTab-Rules" ng-show="isSetTab(5)" ng-if="managerConfiguration.rules">
-              <div ng-if="managerConfiguration.rules.decoder_dir">
-                <table class="table-manager ng-scope table-manager-configuration">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr">
-                      <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">Decoder directories</span></td>
-                    </tr>
-                </table>
-                <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-repeat="item in managerConfiguration.rules.decoder_dir|orderBy">
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left">{{ item }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div ng-if="managerConfiguration.rules.decoder">
-                <table class="table-manager ng-scope table-manager-configuration">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr">
-                      <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">Decoder files</span></td>
-                    </tr>
-                </table>
-                <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-repeat="item in managerConfiguration.rules.decoder|orderBy">
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left">{{ item }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div ng-if="managerConfiguration.rules.rule_dir">
-                <table class="table-manager ng-scope table-manager-configuration">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr">
-                      <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">Rule directories</span></td>
-                    </tr>
-                </table>
-                <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-repeat="item in managerConfiguration.rules.rule_dir|orderBy">
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left">{{ item }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div ng-if="managerConfiguration.rules.include">
-                <table class="table-manager ng-scope table-manager-configuration">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr">
-                      <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">Rule files</span></td>
-                    </tr>
-                </table>
-                <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr tr-expandable">
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left">
-                        <span class="glyphicon glyphicon-search"></span>
-                        <input type="text" ng-model="rulesSearch" class="table-manager-list-td-search" placeholder="Search...">
-                      </td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr tr-expandable" dir-paginate="item in managerConfiguration.rules.include|filter:rulesSearch|orderBy|itemsPerPage: 10" pagination-id="rulePaginate">
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left" ng-click="ruleDetail(item, true)">{{ item }}</td>
-                    </tr>
-                    <tr ng-class="" class="table-manager-list-tr tr-expandable">
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left" style="width: 100%; text-align: center;">
-                        <dir-pagination-controls pagination-id="rulePaginate" max-size="5" class="display: inline-block;"></dir-pagination-controls>
-                      </td>
-                    </tr>                    
-                  </tbody>
-                </table>
-              </div>
-              <div ng-if="managerConfiguration.rules.list">
-                <table class="table-manager ng-scope table-manager-configuration">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr">
-                      <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected">
-						  <span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span>
-						  <span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span>
-						  <span class="bold ng-binding">CDB lists</span></td>
-                    </tr>
-                </table>
-                <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}">
-                  <tbody>
-                    <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-repeat="item in managerConfiguration.rules.list|orderBy">
-                      <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left">{{ item }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>  
-            <div id="managerConfigurationTab-Rootcheck"  ng-show="isSetTab(6)" ng-if="managerConfiguration.rootcheck">
-                <table class="table-manager ng-scope table-manager-configuration">
-                    <tbody>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck.disabled">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Rootcheck disabled</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.rootcheck.disabled }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck.rootkit_files">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Rootkit Files</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.rootcheck.rootkit_files }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck.rootkit_trojans">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Rootkit Trojans</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.rootcheck.rootkit_trojans }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck.base_directory">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Base directory</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.rootcheck.base_directory }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck.scanall">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Scan all</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.rootcheck.scanall }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck['frequency']">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Frequency</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.rootcheck['frequency'] }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck.skip_nfs">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Skip NFS</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.rootcheck.skip_nfs }} </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div ng-if="managerConfiguration.rootcheck.system_audit">
-                   <table class="table-manager ng-scope table-manager-configuration">
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr">
-                          <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">System audit</span></td>
-                        </tr>
-                  </table> 
-                  <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}" >
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-repeat="item in managerConfiguration.rootcheck.system_audit|orderBy">
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left">{{ item }}</td>
-                        </tr>
-                      </tbody>
-                  </table>  
-                </div>
-            </div>
-            <div id="managerConfigurationTab-Syscheck"  ng-show="isSetTab(7)" ng-if="managerConfiguration.syscheck">
-                <table class="table-manager ng-scope table-manager-configuration">
-                    <tbody>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.syscheck.disabled">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Syscheck disabled</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.syscheck.disabled }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.syscheck['frequency']">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Frequency</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.syscheck.frequency }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.syscheck.scan_time">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Scan time</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.syscheck.scan_time }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.syscheck.scan_day">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Scan day</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.syscheck.scan_day }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.syscheck.auto_ignore">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Auto ignore</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.syscheck.auto_ignore }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.syscheck.alert_new_files">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Alert new files</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.syscheck.alert_new_files }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.syscheck.scan_on_start">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Scan on start</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.syscheck.scan_on_start }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr" ng-if="managerConfiguration.rootcheck.skip_nfs">
-                              <td class="table-manager-list-td"><span class="bold ng-binding">Skip NFS</span></td>
-                              <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ managerConfiguration.rootcheck.skip_nfs }} </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div ng-if="managerConfiguration.syscheck.directories">
-                   <table class="table-manager ng-scope table-manager-configuration">
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr">
-                          <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">Monitoring directories</span></td>
-                        </tr>
-                   </table> 
-                  <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}" >
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-repeat="item in managerConfiguration.syscheck.directories|orderBy">
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left">{{ item }}</td>
-                        </tr>
-                      </tbody>
-                  </table>  
-                </div>
-                <div ng-if="managerConfiguration.syscheck.ignore">
-                   <table class="table-manager ng-scope table-manager-configuration">
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr">
-                          <td colspan="2" class="table-manager-list-td headerRow" ng-class="{'table-manager-list-td headerRow active':item.selected, 'table-manager-list-td headerRow':!item.selected}" ng-click="item.selected = !item.selected"><span class="glyphicon glyphicon-menu-up" ng-show="item.selected"></span><span class="glyphicon glyphicon-menu-down" ng-show="!item.selected"></span> <span class="bold ng-binding">Ignored files</span></td>
-                        </tr>
-                   </table> 
-                  <table class="table-manager ng-scope table-manager-configuration white-row" ng-class="{'table-manager-configuration-show':item.selected, 'table-manager-configuration-hide':!item.selected}" >
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-repeat="item in managerConfiguration.syscheck.ignore|orderBy">
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding table-manager-list-td-left">{{ item }}</td>
-                        </tr>
-                      </tbody>
-                  </table>  
-                </div>
-            </div>
-            <div id="managerConfigurationTab-LogCollector"  ng-show="isSetTab(8)"  ng-if='managerConfiguration["localfile"]'>
-               <div ng-repeat='item in managerConfiguration["localfile"]|orderBy:["location", "command"]'>
-                   <table class="table-manager ng-scope table-manager-configuration">
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr">
-                          <td colspan="2" class="table-manager-list-td headerRow"><span class="bold ng-binding"></span></td>
-                        </tr>
-                  </table> 
-                  <table class="table-manager ng-scope table-manager-configuration white-row">
-                        <tbody>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.log_format">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Log format</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.log_format }}</td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.location">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Location</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.location }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.command">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Command</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.command }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.alias">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Alias</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.alias }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item['frequency']">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Frecuency</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item['frequency'] }} </td>
-                        </tr>
-                        <tr ng-class="" class="table-manager-list-tr tr-expandable" ng-if="item.check_diff">
-                          <td class="table-manager-list-td"><span class="bold ng-binding">Check diff</span></td>
-                          <td class="table-manager-list-td table-manager-list-td-status ng-binding">{{ item.check_diff }} </td>
-                        </tr>
-                      </tbody>
-                  </table>  
-              </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="rightCol">
-		<div class="block">
-			<div class="titleCol">
-				<h2>Control</h2>
-			</div>
-			<div class="btn-manager-control">
-				<button aria-label="Start" ng-click="start();" class="btn btn-success">
-				  <span class="glyphicon glyphicon-play"></span>
-				</button>
-				<button aria-label="Stop" ng-click="stop();" class="btn btn-danger">
-				  <span class="glyphicon glyphicon-stop"></span>
-				</button>
-				<button aria-label="Restart" ng-click="restart(); " class="btn btn-primary btn-manager-restart">
-				  Restart
-				</button>
-			</div>
-		</div>
-		<div class="block">
-			<div class="titleCol">
-				<h2>Status</h2>
-			</div>
-			<table class="table-manager" ng-repeat="daemon in daemons">
-				<tr ng-class="" class="table-manager-list-tr">
-				  <td class="table-manager-list-td"><span class="bold" tooltips tooltip-size="large" tooltip-side="left"
-           tooltip-template="{{getDaemonTooltip(daemon.daemon)}}">{{daemon.daemon}}</span></td>
-				  <td class="table-manager-list-td table-manager-list-td-status">
-					<div ng-class='getDaemonStatusClass(daemon.status)' class="icon_agent_status"></div>
-				  </td>
-				</tr>
-			</table>
-		</div>
-		<div class="block">
-			<div class="titleCol secondTitleCol">
-					<h2>Agents summary <span ng-click="agentsRedirect()" class="glyphicon glyphicon-share" style="float:right"></span></h2>
-			</div>       
-			<div class="managerAgentsSummaryCol">
-					<table class="table-manager ng-scope">
-						<tbody>
-						 <tr class="table-manager-list-tr" ng-class="">
-						  <td class="table-manager-list-td"><span class="bold ng-binding">Total agents</span></td>
-						  <td class="table-manager-list-td table-manager-list-td-status">{{agentsCountTotal}}
-						  </td>
-						</tr>
-						<tr class="table-manager-list-tr" ng-class="">
-						  <td class="table-manager-list-td"><span class="bold ng-binding">Active</span></td>
-						  <td class="table-manager-list-td table-manager-list-td-status">{{agentsCountActive}}
-						  </td>
-						</tr>
-						<tr class="table-manager-list-tr" ng-class="">
-						  <td class="table-manager-list-td"><span class="bold ng-binding">Disconnected</span></td>
-						  <td class="table-manager-list-td table-manager-list-td-status">{{agentsCountDisconnected}}
-						  </td>
-						</tr>
-						<tr class="table-manager-list-tr" ng-class="">
-						  <td class="table-manager-list-td"><span class="bold ng-binding">Never connected</span></td>
-						  <td class="table-manager-list-td table-manager-list-td-status">{{agentsCountNeverConnected}}
-						  </td>
-						</tr>
-					  </tbody>
-				  </table>    
-			</div>     
-		</div>		
-    </div>
+<div flex ng-controller="managerController" layout="column">
 
-  </div>
+  <md-content layout-padding>
+    <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+      <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+      <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+      <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+      <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+      <md-nav-item md-nav-href="#/compliance" name="compliance">Compliance</md-nav-item>
+      <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+    </md-nav-bar>
+  </md-content>
+
+  <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
+
+  <md-content layout-padding>
+    <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation links">
+      <md-nav-item md-nav-href="#/manager" name="general">General</md-nav-item>
+      <md-nav-item md-nav-href="#/manager/configuration" name="configuration">Configuration</md-nav-item>
+      <md-nav-item md-nav-href="#/manager/osseclog" name="logs">Logs</md-nav-item>
+    </md-nav-bar>
+  </md-content>
+
+  <md-content flex layout="column" ng-if="!load" layout-align="space-around">
+
+    <md-content layout="row" layout-padding layout-sm="column" layout-xs="column">
+        <span ng-repeat="daemon in daemons" layout="row" flex layout-align="space-around center">{{daemon.daemon}} <div ng-class="getDaemonStatusClass(daemon.status)" class="round"></div><md-divider></md-divider></span>
+    </md-content>
+
+    <md-content layout-padding flex layout="row" layout-sm="column" layout-xs="column">
+
+      <div flex layout="column">
+        <md-card>
+          <md-card-content>
+            <h3>Agents overview</h3>
+            <md-list>
+              <md-list-item>
+                <p>Total agents</p>
+                <p class="right-text">{{agentsCountTotal}}</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Active</p>
+                <p class="right-text">{{agentsCountActive}}</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Disconnected</p>
+                <p class="right-text">{{agentsCountDisconnected}}</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Never connected</p>
+                <p class="right-text">{{agentsCountNeverConnected}}</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Last agent connected</p>
+                <p class="right-text">vpc-agent-ubuntu</p>
+              </md-list-item>
+              <md-divider></md-divider>
+            </md-list>
+          </md-card-content>
+        </md-card>
+      </div>
+
+      <div flex layout="column">
+        <md-card>
+          <md-card-content>
+            <h3>Alerts overview</h3>
+            <md-list>
+              <md-list-item>
+                <p>Today alerts</p>
+                <p class="right-text">127,345</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Top source ip</p>
+                <p class="right-text">256.56.122.14</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Top alert group</p>
+                <p class="right-text">ssh_intrusion</p>
+              </md-list-item>
+              <md-divider></md-divider>
+            </md-list>
+          </md-card-content>
+        </md-card>
+      </div>
+
+      <div flex layout="column">
+        <md-card>
+          <md-card-content>
+            <h3>FIM overview</h3>
+            <md-list>
+              <md-list-item>
+                <p>Today FIM alerts</p>
+                <p class="right-text">786</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Last file change</p>
+                <p class="right-text">/etc/password</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Most agent FIM changes</p>
+                <p class="right-text">vpc-manager-newjersey</p>
+              </md-list-item>
+              <md-divider></md-divider>
+            </md-list>
+          </md-card-content>
+        </md-card>
+      </div>
+    </md-content>
+
+  </md-content>
+
 
 </div>
