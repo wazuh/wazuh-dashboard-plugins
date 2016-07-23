@@ -121,7 +121,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       } else {
         _instances[instance] = { 'method': method, 'path': path, 'body': body, 'pageSize': pageSize,
           'offset': offset, 'pagination': false };
-        defered.resolve(instance);  
+        defered.resolve(instance);
       }
 
       return promise;
@@ -139,7 +139,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
         return promise;
       }
-      
+
       if (!_instances[instanceId]['pagination']) {
         defered.reject(prepError({'error': -10, 'message': 'Pagination disabled for this object'}));
         return promise;
@@ -209,7 +209,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
         return promise;
       }
-      
+
       if (!_instances[instanceId]['pagination']) {
         defered.reject(prepError({'error': -10, 'message': 'Pagination disabled for this object'}));
         return promise;
@@ -253,7 +253,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         preparedBody['offset'] = _instances[instanceId]['offset'];
         preparedBody['limit'] = _instances[instanceId]['pageSize'];
       }
-      
+
       apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
       .then(function (data) {
         if ((_instances[instanceId]['pagination']) && (data.data.totalItems != _instances[instanceId]['limit'])) {
@@ -438,6 +438,12 @@ routes
       "check": settingsWizard
     }
   })
+  .when('/manager/configuration/', {
+    template: require('plugins/wazuh/templates/manager-configuration.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
   .when('/manager/metrics/', {
     template: require('plugins/wazuh/templates/manager-metrics.html'),
     resolve: {
@@ -521,6 +527,7 @@ routes
 require('plugins/wazuh/controllers/agents.js');
 require('plugins/wazuh/controllers/settings.js');
 require('plugins/wazuh/controllers/manager.js');
+require('plugins/wazuh/controllers/manager-configuration.js');
 require('plugins/wazuh/controllers/fim.js');
 require('plugins/wazuh/controllers/rootcheck.js');
 require('plugins/wazuh/controllers/ruleset.js');
