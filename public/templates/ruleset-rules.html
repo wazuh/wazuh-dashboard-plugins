@@ -35,12 +35,12 @@
 
                     <div flex id="content" layout="row">
 
-                        <md-input-container layout="" class="sideNavBox">
-                          <label for="searchBox1">Search</label>
-                          <input flex md-autofocus flex id="searchBox1" layout="" type="text" ng-model="$parent.search" ng-change="objGet('/rules', 'rules')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch">
+                        <md-input-container flex class="sideNavBox">
+
+                          <input md-autofocus flex id="searchBox1" layout="" type="text" ng-model="$parent.search" ng-change="objGet('/rules', 'rules')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch">
                         </md-input-container>
-                        <md-button ng-class="{ ruleset_button_active: rfStatus == 'enabled' }" ng-click="setRulesFilter('status', 'enabled')">Enabled</md-button>
-                        <md-button ng-class="{ ruleset_button_active: rfStatus == 'disabled' }" ng-click="setRulesFilter('status', 'disabled')">Disabled</md-button>
+                        <md-button ng-class="{ active: (rfStatus == 'enabled') }" ng-click="setRulesFilter('status', 'enabled')">Enabled</md-button>
+                        <md-button ng-class="{ active: (rfStatus == 'disabled') }" ng-click="setRulesFilter('status', 'disabled')">Disabled</md-button>
 
                         <div layout-align="center center" layout-padding style="margin-top: 17px">Alert level</div>
 
@@ -50,25 +50,30 @@
                     </div>
 
             <div class="filterActive_div" ng-if="hasRulesFilter('file');">
-                <span ng-click="setRulesFilter('file', rfFiles)" ng-class="{ textFilterActive_header: isSetTabRulesFilter('file', rfFiles) }"
+                <span ng-click="setRulesFilter('file', rfFiles)" ng-class="{ active: isSetTabRulesFilter('file', rfFiles) }"
                     class="bold">Selected file: {{rfFiles}}   <span class="glyphicon glyphicon-remove"></span>                </span>
                 <a class="glyphicon glyphicon-download-alt textFilterActive_glyphicon" ng-init="downloadRuleFile(rfFiles)" ng-href="{{encodedFile}}"
                     download="file.xml"></a>
             </div>
             <div class="filterActive_div" ng-if="hasRulesFilter('group');">
-                <span ng-click="setRulesFilter('group', rfGroups)" ng-class="{ textFilterActive_header: isSetTabRulesFilter('group', rfGroups) }"
+                <span ng-click="setRulesFilter('group', rfGroups)" ng-class="{ active: isSetTabRulesFilter('group', rfGroups) }"
                     class="bold">Selected group: {{rfGroups}}   <span class="glyphicon glyphicon-remove"></span></span>
             </div>
             <div class="filterActive_div" ng-if="hasRulesFilter('pci');">
-                <span ng-click="setRulesFilter('pci', rfPci)" ng-class="{ textFilterActive_header: isSetTabRulesFilter('pci', rfPci) }" class="bold">Selected PCI group: {{rfPci}}   <span class="glyphicon glyphicon-remove"></span></span>
+                <span ng-click="setRulesFilter('pci', rfPci)" ng-class="{ active: isSetTabRulesFilter('pci', rfPci) }" class="bold">Selected PCI group: {{rfPci}}   <span class="glyphicon glyphicon-remove"></span></span>
             </div>
-
+                  <md-toolbar layout="row" class="md-hue-3">
+                    <div class="md-toolbar-tools">
+                        <span flex="20">ID</span>
+                        <span flex="60">Description</span>
+                        <span flex="20">Level</span>
+                    </div>
+                  </md-toolbar>
                   <md-list ng-repeat="rule in rules">
                     <md-list-item  ng-click=" showDetails = ! showDetails; ">
-                      <span flex="10">{{rule.id}}</span>
+                      <span flex="20">{{rule.id}}</span>
                       <span flex="60">{{rule.description}}</span>
-                      <span flex="20">{{getRuleStatusClass(rule)}}</span>
-                      <span flex="10">{{rule.level}}</span>
+                      <span flex="20">{{rule.level}}</span>
                     </md-list-item>
                     <md-content flex layout="column" layout-padding ng-show="showDetails">
                       <md-list>
@@ -126,7 +131,7 @@
   <div flex ng-show="isSetTab(1, 1)">
     <input flex type="text" ng-model="$parent.$parent.searchFilesRules" ng-change="objGet('/rules/files', 'filesRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search...">
     <md-list flex>
-      <md-list-item  ng-repeat="file in filesRules" ng-click="setRulesFilter('file', file.name)" ng-class="{ textFilterActive: isSetTabRulesFilter('file', file.name) }">
+      <md-list-item  ng-repeat="file in filesRules" ng-click="setRulesFilter('file', file.name)" ng-class="{ active: isSetRulesFilter('file', file.name) }">
         <span>{{file.name}}</span>
       </md-list-item>
     </md-list>
@@ -137,7 +142,7 @@
   <div flex ng-show="isSetTab(2, 1)">
     <input flex type="text" ng-model="$parent.$parent.searchGroupsRules" ng-change="objGet('/rules/groups', 'groupsRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search...">
     <md-list flex >
-      <md-list-item  ng-repeat="group in groupsRules" ng-click="setRulesFilter('group', group)" ng-class="{ textFilterActive: isSetTabRulesFilter('group', group) }">
+      <md-list-item  ng-repeat="group in groupsRules" ng-click="setRulesFilter('group', group)" ng-class="{ active: isSetRulesFilter('group', group) }">
         <span>{{group}}</span>
       </md-list-item>
     </md-list>
@@ -148,7 +153,7 @@
   <div flex ng-show="isSetTab(3, 1)">
     <input flex type="text" ng-model="$parent.$parent.searchFilesPci" ng-change="objGet('/rules/pci', 'pciGroupsRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search...">
     <md-list flex >
-      <md-list-item  ng-repeat="pci in pciGroupsRules" ng-click="setRulesFilter('pci', pci)" ng-class="{ textFilterActive: isSetTabRulesFilter('pci', pci) }">
+      <md-list-item  ng-repeat="pci in pciGroupsRules" ng-click="setRulesFilter('pci', pci)" ng-class="{ active: isSetRulesFilter('pci', pci) }">
         <span>{{pci}}</span>
       </md-list-item>
     </md-list>

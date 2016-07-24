@@ -31,15 +31,9 @@
         <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
         <div class="leftCol">
             <div flex id="content" layout="row">
-							<md-input-container layout="" class="sideNavBox">
-								  <label for="searchBox1">Search</label>
-              		<input flex md-autofocus flex id="searchBox1" type="text" ng-model="$parent.decoder_search" ng-change="objGet('/decoders', 'decoders')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
-              </md-input-container>
-							<md-button ng-class="{ ruleset_button_active: dfType == 'all' }" ng-click="setDecodersFilter('type', 'all')" style="font-weight: bold; border-radius: 0px; width: 100px;"
-									class="rulesetFilter">All decoders </md-button>
-							<md-button ng-class="{ ruleset_button_active: dfType == 'parents' }" ng-click="setDecodersFilter('type', 'parents')" style="font-weight: bold; border-radius: 0px; width: 100px;"
-									class="rulesetFilter">Parents </md-button>
-
+              <input flex id="searchBox1" type="text" ng-model="$parent.decoder_search" ng-change="objGet('/decoders', 'decoders')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
+							<md-button ng-class="{ active: dfType == 'all' }" ng-click="setDecodersFilter('type', 'all')" class="rulesetFilter">All decoders </md-button>
+							<md-button ng-class="{ active: dfType == 'parents' }" ng-click="setDecodersFilter('type', 'parents')" class="rulesetFilter">Parents </md-button>
             </div>
 
             <div class="filterActive_div" ng-if="hasDecodersFilter('file');">
@@ -50,6 +44,13 @@
                 <span ng-click="setDecodersFilter('id', dfId)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('id', dfId) }"
                     class="bold">Selected parent: {{dfId}}   <span class="glyphicon glyphicon-remove"></span></span>
             </div>
+
+						<md-toolbar layout="row" class="md-hue-3">
+							<div class="md-toolbar-tools">
+									<span flex="80">Decoder name</span>
+									<span flex="20">Decoder position</span>
+							</div>
+						</md-toolbar>
 						<md-list ng-repeat="decoder in decoders">
 							<md-list-item  ng-click=" showDetails = ! showDetails; ">
 								<span flex="80">{{decoder.name}}</span>
@@ -99,8 +100,8 @@
         <div flex>
 					<input flex type="text" ng-model="$parent.$parent.searchFilesDecoders" ng-change="objGet('/decoders/files', 'filesDecoders')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search...">
 					<md-list flex>
-						<md-list-item  ng-repeat="file in filesDecoders" ng-click="setDecodersFilter('file', formatFile(file))" ng-class="{ textFilterActive: isSetTabDecodersFilter('file', formatFile(file)) }">
-							<span>{{formatFile(file)}}</span>
+						<md-list-item ng-repeat="file in filesDecoders" ng-click="setDecodersFilter('file', formatFile(file))" ng-class="{ active: isSetDecodersFilter('file', formatFile(file)) }">
+							<span >{{formatFile(file)}}</span>
 						</md-list-item>
 					</md-list>
 								<span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders/files', 'filesDecoders')" ng-show="objHasPrev('/decoders/files')"></span>
