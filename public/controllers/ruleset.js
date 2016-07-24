@@ -175,7 +175,7 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
         }
         $scope.objGet('/rules', 'rules', body);
     };
-    
+
     //Rules - Aux functions
 
     $scope.getRuleStatusClass = function (rule) {
@@ -325,7 +325,7 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
             case 'check_diff':
                 tooltip = 'Used to determine when the output of a command changes.';
                 break;
-            case 'noalert': 
+            case 'noalert':
                 tooltip = 'Do not trigger this alert.';
                 break;
             case 'if_fts':
@@ -442,7 +442,7 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
                 $scope.filesRules.length = 0;
                 $scope.filesRules = data.data.items;
                 break;
-            default: 
+            default:
                 break;
         }
     };
@@ -461,7 +461,7 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
     }
 
     var load_pci_groups = function () {
-        DataFactory.initialize('get', '/rules/pci', {}, 10, 0)
+        DataFactory.initialize('get', '/rules/pci', {}, 12, 0)
             .then(function (data) {
                 objectsArray['/rules/pci'] = data;
                 DataFactory.get(data).then(function (data) {
@@ -472,7 +472,7 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
     };
 
     var load_rules_groups = function () {
-        DataFactory.initialize('get', '/rules/groups', {}, 10, 0)
+        DataFactory.initialize('get', '/rules/groups', {}, 12, 0)
             .then(function (data) {
                 objectsArray['/rules/groups'] = data;
                 DataFactory.get(data).then(function (data) {
@@ -483,7 +483,7 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
     };
 
     var load_rules_files = function () {
-        DataFactory.initialize('get', '/rules/files', {}, 10, 0)
+        DataFactory.initialize('get', '/rules/files', {}, 12, 0)
             .then(function (data) {
                 objectsArray['/rules/files'] = data;
                 DataFactory.get(data).then(function (data) {
@@ -794,7 +794,7 @@ app.controller('decodersController', function ($scope, $route, $q, alertify, sha
                 $scope.filesDecoders.length = 0;
                 $scope.filesDecoders = data.data.items;
                 break;
-            default: 
+            default:
                 break;
         }
     };
@@ -840,7 +840,7 @@ app.controller('decodersController', function ($scope, $route, $q, alertify, sha
 });
 
 
-app.controller('updateRulesetController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider) { 
+app.controller('updateRulesetController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider) {
     //Initialisation
     $scope.load = true;
 

@@ -345,7 +345,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         if (!$scope.reverse) {
             $scope.searchQuery += '-';
         }
-        
+
         $scope.searchQuery += $scope.sortKey;
         if ($scope.statusFilter != '') {
             $scope.getAgents({ 'sort': $scope.searchQuery, 'status': $scope.statusFilter });
@@ -488,7 +488,6 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
 
     //Load
     load();
-
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
@@ -500,4 +499,3 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     });
 
 });
-

@@ -1,10 +1,29 @@
-<div>
-    <ul class="wazuh-submenu">
-        <li><a href="/app/wazuh#/ruleset">Rules</a></li>
-        <li><a href="/app/wazuh#/ruleset/decoders">Decoders</a></li>
-        <li class="active"><a>Update</a></li>
-    </ul>
-</div>
+<div flex layout="column">
+
+	<md-content class="md-padding">
+		<md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+			<md-nav-item id="header_logo" md-nav-href="http://wazuh.com" name="wazuh" aria-label="img logo">
+					<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+			</md-nav-item>
+			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+			<md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+			<md-nav-item md-nav-href="#/compliance" name="compliance">Compliance</md-nav-item>
+			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+		</md-nav-bar>
+	</md-content>
+
+	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
+
+	<md-content class="md-padding">
+		<md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+			<md-nav-item md-nav-href="#/ruleset" name="overview">Rules</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset/decoders" name="metrics">Decoders</md-nav-item>
+      <md-nav-item md-nav-href="#/ruleset/update" name="metrics">Update</md-nav-item>
+		</md-nav-bar>
+	</md-content>
+
 <div ng-controller="updateRulesetController" class="container">
     <div ng-if="load" style="text-align: center;">
         <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
@@ -62,4 +81,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>
