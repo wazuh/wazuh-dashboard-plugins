@@ -144,7 +144,9 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     };
 
     $scope.initEvents = function (agent, file) {
-        $scope._file = file;
+
+
+        console.log("heeey" + agent + file);
         var body = { 'file' : file.file };
         var tmpBody = DataFactory.getBody(objectsArray['/syscheck/files']);
         if (tmpBody && (tmpBody != { 'summary ': 'yes'})) {
@@ -153,19 +155,22 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 body[key] = value;
             });
         }
-        DataFactory.initialize('get', '/syscheck/'+agent.id+'/files', body, 35, 0)
+        DataFactory.initialize('get', '/syscheck/'+agent.id+'/files', body, 15, 0)
             .then(function (data) {
                 objectsArray[agent.id+file.file] = data;
                 DataFactory.get(objectsArray[agent.id+file.file])
                     .then(function (data) {
                         $scope.eventsFetchInfo.length = 0;
                         $scope.eventsFetchInfo = data.data.items;
+                        $scope._file = file;
                     }, printError)
             }, printError);
     };
-
+    $scope.unsetFile = function () {
+      $scope._file = "";
+    }
     $scope.getEvents = function (agent, file) {
-                        if ($scope._events_blocked) {
+        if ($scope._events_blocked) {
             return null;
         }
         $scope._events_blocked = true;
@@ -462,7 +467,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             $scope.agentId = _agent;
         }
 
-        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 35, 0)
+        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 15, 0)
             .then(function (data) {
                 objectsArray['/syscheck/files'] = data;
                 DataFactory.initialize('get', '/agents', {}, 15, 0)

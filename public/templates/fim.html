@@ -28,7 +28,7 @@
         <md-content flex id="content" layout="column" layout-padding>
             <md-toolbar layout="row" class="md-primary _md" ng-if="_agent">
                 <div class="md-toolbar-tools">
-                    <h3 class="ng-binding">{{_agent.id}} - {{_agent.name}}</h3>
+                    <h3 class="ng-binding"><span ng-click="unsetFile()">{{_agent.id}} - {{_agent.name}}</span> <span ng-if="_file"> > {{_file.file}}</span></h3>
                 </div>
             </md-toolbar>
             <md-input-container layout="row" class="sideNavBox" ng-if="_agent">
@@ -36,43 +36,54 @@
                 <input type="text" id="searchBox" ng-model="$parent.$parent.search" ng-change="getFiles()" md-autofocus flex>
                 <md-icon md-font-icon="fa fa-cog" ng-click="showFilesFiltersDialog($event)" />
             </md-input-container>
-            <md-tabs md-dynamic-height md-border-bottom ng-if="_agent" flex>
-                <md-tab label="Last results" flex>
-                    <md-virtual-repeat-container class="vertical-repeater" style="min-height: 400px;">
-                        <div md-virtual-repeat="file in filesObj" md-on-demand flex>
-                          <md-list>
-                            <md-list-item  ng-click=" showDetails = ! showDetails; ">
-                              <span flex="60">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
-                              <span flex="20">{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</span>
-                              <span flex="20">{{file.modificationDate}}</span>
-                            </md-list-item>
-                          </md-list>
-                            <div layout="row" layout-align="space-between center" ng-click="initEvents(_agent, file)">
-                                <span>{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
-                                <md-divider></md-divider>
-                                <span class="right-text" style="float: right;">{{file.modificationDate}} ({{file.event.charAt(0).toUpperCase() + file.event.slice(1)}})</span>
-                            </div>
-                            <md-divider></md-divider>
-                        </div>
-                    </md-virtual-repeat-container>
-                </md-tab>
-                <md-tab label="File detail" flex ng-if="_file">
-                    <md-virtual-repeat-container class="vertical-repeater" style="min-height: 400px;">
-                        <div md-virtual-repeat="event in eventsObj" md-on-demand flex>
-                            <div layout="row" layout-align="center center">
-                                <p>{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</p>
-                                <p layout="column"><span><b>MD5: </b>{{event.md5}}</span> <span><b>SHA1: </b>{{event.sha1}}</span></p>
-                                <p>{{event.octalMode.slice(-4)}}</p>
-                                <p layout="column"><span><b>U: </b>{{event.user}} </span><b>G: </b>{{event.group}}</span>
-                                </p>
-                                <p>{{event.modificationDate}}</p>
-                                <span class="glyphicon glyphicon-plus" ng-click="printEventInfo(event)"></span>
-                                <span class="glyphicon glyphicon-share" ng-click="loadDiscover(file.file);"></span> Discover
-                                <span class="glyphicon glyphicon-share" ng-click="loadDashboard(file.file);"></span> Dashboard
-                            </div>
-                        </div>
-                </md-tab>
-            </md-tabs>
+            <div flex ng-if="!(_file)">
+              <md-virtual-repeat-container class="vertical-repeater" style="min-height: 400px;">
+                <md-toolbar layout="row" class="md-hue-3">
+                  <div class="md-toolbar-tools">
+                      <span flex="60">File name</span>
+                      <span flex="20">Event</span>
+                      <span flex="20">Date</span>
+                  </div>
+                </md-toolbar>
+                  <div md-virtual-repeat="file in filesObj" md-on-demand flex>
+                    <md-list>
+                      <md-list-item  ng-click="initEvents(_agent, file)">
+                        <span flex="60">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
+                        <span flex="20">{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</span>
+                        <span flex="20">{{file.modificationDate}}</span>
+                      </md-list-item>
+                    </md-list>
+                      <md-divider></md-divider>
+                  </div>
+              </md-virtual-repeat-container>
+            </div>
+            <div flex ng-if="_file">
+                <md-virtual-repeat-container class="vertical-repeater" style="min-height: 400px;">
+                  <md-toolbar layout="row" class="md-hue-3">
+                      <div class="md-toolbar-tools">
+                          <span flex="10">Event</span>
+                          <span flex="10">User</span>
+                          <span flex="10">Group</span>
+                          <span flex="10">Permissions</span>
+                          <span flex="10">Size</span>
+                          <span flex="20">MD5</span>
+                          <span flex="10">Date</span>
+                      </div>
+                    </md-toolbar>
+                    <div md-virtual-repeat="event in eventsObj" md-on-demand flex>
+                      <md-list>
+                        <md-list-item >
+                          <span flex="10">{{event.event}}</span>
+                          <span flex="10">{{event.user}}</span>
+                          <span flex="10">{{event.group}}</span>
+                          <span flex="10">{{event.permissions}}</span>
+                          <span flex="10">{{event.size}}</span>
+                          <span flex="20">{{event.md5}}</span>
+                          <span flex="10">{{event.modificationDate}}</span>
+                        </md-list-item>
+                      </md-list>
+                    </div>
+            </div>
         </md-content>
 
         <md-sidenav md-is-open="isOpenSidenav" md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
