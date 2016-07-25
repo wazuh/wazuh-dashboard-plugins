@@ -1,168 +1,205 @@
 <div flex layout="column" ng-controller="rulesController">
 
-	<md-content class="md-padding">
-		<md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-			<md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
-					<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
-			</md-nav-item>
-			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
-			<md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-			<md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
-			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
-		</md-nav-bar>
-	</md-content>
+  <md-content class="md-padding">
+    <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+      <md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
+        <img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+      </md-nav-item>
+      <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+      <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+      <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+      <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+      <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
+      <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+    </md-nav-bar>
+  </md-content>
 
-	<md-content class="md-padding">
-		<md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-			<md-nav-item md-nav-href="#/ruleset" name="overview">Rules</md-nav-item>
-			<md-nav-item md-nav-href="#/ruleset/decoders" name="metrics">Decoders</md-nav-item>
-      <md-nav-item md-nav-href="#/ruleset/update" name="metrics">Update</md-nav-item>
-		</md-nav-bar>
-	</md-content>
+  <md-content class="md-padding">
+    <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+      <md-nav-item md-nav-href="#/ruleset" name="rules">Rules</md-nav-item>
+      <md-nav-item md-nav-href="#/ruleset/decoders" name="decoders">Decoders</md-nav-item>
+      <md-nav-item md-nav-href="#/ruleset/update" name="update">Update</md-nav-item>
+    </md-nav-bar>
+  </md-content>
 
 
-    <div ng-if="load" style="text-align: center;">
-        	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
-    </div>
-<md-content flex id="content3" layout="row" layout-padding>
+  <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
+  <md-content flex id="content3" layout="row" layout-padding ng-if="!load">
     <md-content flex id="content" layout="column" layout-padding>
 
-        <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-        <div class="leftCol">
+      <div class="leftCol">
 
 
-                    <div flex id="content" layout="row">
+        <div flex id="content" layout="row" layout-align="space-between stretch">
 
-                        <md-input-container flex class="sideNavBox">
+          <md-input-container>
+            <label for="searchBox1">Search</label>
+            <input md-autofocus flex id="searchBox1" type="text" ng-model="$parent.search" ng-change="objGet('/rules', 'rules')">
+          </md-input-container>
 
-                          <input md-autofocus flex id="searchBox1" layout="" type="text" ng-model="$parent.search" ng-change="objGet('/rules', 'rules')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch">
-                        </md-input-container>
-                        <md-button ng-class="{ active: (rfStatus == 'enabled') }" ng-click="setRulesFilter('status', 'enabled')">Enabled</md-button>
-                        <md-button ng-class="{ active: (rfStatus == 'disabled') }" ng-click="setRulesFilter('status', 'disabled')">Disabled</md-button>
+          <md-input-container>
+            <md-select ng-model="statusFilter" ng-change="setRulesFilter('status', statusFilter)" aria-label="Filter by status">
+              <md-option value="enabled">Enabled</md-option>
+              <md-option value="disabled">Disabled</md-option>
+              <md-option value="all">All</md-option>
+            </md-select>
+          </md-input-container>
 
-                        <div layout-align="center center" layout-padding style="margin-top: 17px">Alert level</div>
 
-                        <md-input-container layout=""><input layout="" type="number" min="0" max="{{$parent.maxLevel}}" step="1" ng-model="$parent.minLevel" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch ruleLevel_input"></md-input-container>
-                        <md-input-container layout="">  <input  layout="" type="number" min="{{$parent.minLevel}}" max="15" step="1" ng-model="$parent.maxLevel" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch ruleLevel_input"></md-input-container>
-                        <md-button  layout="" type="submit" class="btn btn-primary btn-manager-restart ruleLevel_input ruleLevel_button" ng-click="setRulesFilter_level();"><span>Change</span></md-button>
-                    </div>
+          <span>
+    <md-input-container><label> Min:</label><input type="number" min="0" max="{{$parent.maxLevel}}" step="1" ng-model="$parent.minLevel" ></input></md-input-container>
+    <md-input-container><label> Max:</label><input type="number" min="{{$parent.minLevel}}" max="15" step="1" ng-model="$parent.maxLevel"></input></md-input-container>
+    <md-button class="md-raised" ng-click="setRulesFilter_level();">Change level</md-button>
+    </span>
 
-            <div class="filterActive_div" ng-if="hasRulesFilter('file');">
-                <span ng-click="setRulesFilter('file', rfFiles)" ng-class="{ active: isSetTabRulesFilter('file', rfFiles) }"
-                    class="bold">Selected file: {{rfFiles}}   <span class="glyphicon glyphicon-remove"></span>                </span>
-                <a class="glyphicon glyphicon-download-alt textFilterActive_glyphicon" ng-init="downloadRuleFile(rfFiles)" ng-href="{{encodedFile}}"
-                    download="file.xml"></a>
-            </div>
-            <div class="filterActive_div" ng-if="hasRulesFilter('group');">
-                <span ng-click="setRulesFilter('group', rfGroups)" ng-class="{ active: isSetTabRulesFilter('group', rfGroups) }"
-                    class="bold">Selected group: {{rfGroups}}   <span class="glyphicon glyphicon-remove"></span></span>
-            </div>
-            <div class="filterActive_div" ng-if="hasRulesFilter('pci');">
-                <span ng-click="setRulesFilter('pci', rfPci)" ng-class="{ active: isSetTabRulesFilter('pci', rfPci) }" class="bold">Selected PCI group: {{rfPci}}   <span class="glyphicon glyphicon-remove"></span></span>
-            </div>
-                  <md-toolbar layout="row" class="md-hue-3">
-                    <div class="md-toolbar-tools">
-                        <span flex="20">ID</span>
-                        <span flex="60">Description</span>
-                        <span flex="20">Level</span>
-                    </div>
-                  </md-toolbar>
-                  <md-list ng-repeat="rule in rules">
-                    <md-list-item  ng-click=" showDetails = ! showDetails; ">
-                      <span flex="20">{{rule.id}}</span>
-                      <span flex="60">{{rule.description}}</span>
-                      <span flex="20">{{rule.level}}</span>
-                    </md-list-item>
-                    <md-content flex layout="column" layout-padding ng-show="showDetails">
-                      <md-list>
-                        <md-list-item>
-                          <span flex="30">ID</span>
-                          <span class="right-text">{{rule.id}}</span>
-                        </md-list-item>
-                        <md-list-item>
-                          <span flex="30">Description</span>
-                          <span class="right-text">{{rule.description}}</span>
-                        </md-list-item>
-                        <md-list-item ng-click="setRulesFilter_level_selected(rule.level);">
-                          <span flex="30">Level</span>
-                          <span class="right-text">{{rule.level}}</span>
-                        </md-list-item>
-                        <md-list-item  ng-click="setRulesFilter_outside('file', rule.file);">
-                          <span flex="30">File</span>
-                          <span class="right-text">{{rule.file}}</span>
-                        </md-list-item>
-                        <md-list-item >
-                          <span flex="30">Groups</span>
-                          <span class="right-text"><span ng-repeat="group in rule.groups" ng-click="setRulesFilter_outside('group', group);">{{ group }}</span></span>
-                        </md-list-item>
-                        <md-list-item ng-if="rule.pci.length > 0">
-                          <span flex="30">PCI Groups</span>
-                          <span class="right-text"><span ng-repeat="pci in rule.pci" ng-click="setRulesFilter_outside('pci', pci);">{{ pci }}</span></span>
-                        </md-list-item>
-                        <md-list-item ng-repeat="(detailk, detailv) in rule.details">
-                          <span flex="30">{{detailk}}</span>
-                          <span class="right-text">{{detailv}}</span>
-                        </md-list-item>
-                        <md-list-item>
-                          <span ng-click="loadRuleDiscover(rule.id)" class="right-text">Discover alerts</span>
-                        </md-list-item>
-
-                      </md-list>
-                    </md-content>
-                    <md-divider></md-divider>
-
-                  </md-list>
-                    <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules', 'rules')" ng-show="objHasPrev('/rules')"></span>
-                    <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules', 'rules')" ng-show="objHasNext('/rules')"></span>
         </div>
-</md-content>
-
-<md-content flex="30" id="content2" layout="column" layout-padding>
-<md-content layout="row" layout-padding layout-align="center start">
-  <md-button ng-class="{ active: isSetTab(1, 1) }" ng-click="setTab(1, 1)">Files</md-button>
-  <md-button ng-class="{ active: isSetTab(2, 1) }" ng-click="setTab(2, 1)">Groups</md-button>
-  <md-button ng-class="{ active: isSetTab(3, 1) }" ng-click="setTab(3, 1)">PCI</md-button>
-</md-content>
 
 
-<md-content flex layout="row" layout-padding layout-align="center start">
-  <div flex ng-show="isSetTab(1, 1)">
-    <input flex type="text" ng-model="$parent.$parent.searchFilesRules" ng-change="objGet('/rules/files', 'filesRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search...">
-    <md-list flex>
-      <md-list-item  ng-repeat="file in filesRules" ng-click="setRulesFilter('file', file.name)" ng-class="{ active: isSetRulesFilter('file', file.name) }">
-        <span>{{file.name}}</span>
-      </md-list-item>
-    </md-list>
-    <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/files', 'filesRules')" ng-show="objHasPrev('/rules/files')"></span>
-    <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/files', 'filesRules')" ng-show="objHasNext('/rules/files')"></span>
-  </div>
+        <md-chips readonly="true" ng-if="hasRulesFilter('file');">
+          <md-chip>
+            <span ng-click="setRulesFilter('file', rfFiles)" ng-class="{ active: isSetTabRulesFilter('file', rfFiles) }" class="bold">File: {{rfFiles}}   <span class="glyphicon glyphicon-remove"></span>            </span>
+          </md-chip>
+          <md-chip>
+            <a ng-init="downloadRuleFile(rfFiles)" ng-href="{{encodedFile}}" download="file.xml">Download file <span class="glyphicon glyphicon-download-alt"></span></a>
+          </md-chip>
+        </md-chips>
+        <md-chips readonly="true" ng-if="hasRulesFilter('group');">
+          <md-chip>
+            <span ng-click="setRulesFilter('group', rfGroups)" ng-class="{ active: isSetTabRulesFilter('group', rfGroups) }" class="bold">Group: {{rfGroups}}   <span class="glyphicon glyphicon-remove"></span></span>
+          </md-chip>
+        </md-chips>
+        <md-chips readonly="true" ng-if="hasRulesFilter('pci');">
+          <md-chip>
+            <span ng-click="setRulesFilter('pci', rfPci)" ng-class="{ active: isSetTabRulesFilter('pci', rfPci) }" class="bold">PCI group: {{rfPci}}   <span class="glyphicon glyphicon-remove"></span></span>
+          </md-chip>
+        </md-chips>
 
-  <div flex ng-show="isSetTab(2, 1)">
-    <input flex type="text" ng-model="$parent.$parent.searchGroupsRules" ng-change="objGet('/rules/groups', 'groupsRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search...">
-    <md-list flex >
-      <md-list-item  ng-repeat="group in groupsRules" ng-click="setRulesFilter('group', group)" ng-class="{ active: isSetRulesFilter('group', group) }">
-        <span>{{group}}</span>
-      </md-list-item>
-    </md-list>
-    <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/groups', 'groupsRules')" ng-show="objHasPrev('/rules/groups')"></span>
-    <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/groups', 'groupsRules')" ng-show="objHasNext('/rules/groups')"></span>
-  </div>
 
-  <div flex ng-show="isSetTab(3, 1)">
-    <input flex type="text" ng-model="$parent.$parent.searchFilesPci" ng-change="objGet('/rules/pci', 'pciGroupsRules')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search...">
-    <md-list flex >
-      <md-list-item  ng-repeat="pci in pciGroupsRules" ng-click="setRulesFilter('pci', pci)" ng-class="{ active: isSetRulesFilter('pci', pci) }">
-        <span>{{pci}}</span>
-      </md-list-item>
-    </md-list>
-    <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/pci', 'pciGroupsRules')" ng-show="objHasPrev('/rules/pci')"></span>
-    <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/pci', 'pciGroupsRules')" ng-show="objHasNext('/rules/pci')"></span>
-  </div>
+        <md-toolbar layout="row">
+          <div class="md-toolbar-tools">
+            <span flex="20">ID</span>
+            <span flex="60">Description</span>
+            <span flex="20">Level</span>
+          </div>
+        </md-toolbar>
+        <md-list ng-repeat="rule in rules">
+          <md-list-item ng-click=" showDetails = ! showDetails; ">
+            <span flex="20">{{rule.id}}</span>
+            <span flex="60">{{rule.description}}</span>
+            <span flex="20">{{rule.level}}</span>
+          </md-list-item>
+          <md-content flex layout="column" layout-padding ng-show="showDetails">
+            <md-list>
+              <md-list-item>
+                <span flex="30">ID</span>
+                <span class="right-text">{{rule.id}}</span>
+              </md-list-item>
+              <md-list-item>
+                <span flex="30">Description</span>
+                <span class="right-text">{{rule.description}}</span>
+              </md-list-item>
+              <md-list-item ng-click="setRulesFilter_level_selected(rule.level);">
+                <span flex="30">Level</span>
+                <span class="right-text">{{rule.level}}</span>
+              </md-list-item>
+              <md-list-item ng-click="setRulesFilter_outside('file', rule.file);">
+                <span flex="30">File</span>
+                <span class="right-text">{{rule.file}}</span>
+              </md-list-item>
+              <md-list-item ng-click="">
+                <span flex="30">Groups</span>
+                <span class="right-text" layout="column"><span ng-repeat="group in rule.groups" ng-click="setRulesFilter_outside('group', group);">{{ group }}</span></span>
+              </md-list-item>
+              <md-list-item ng-if="rule.pci.length > 0" ng-click="">
+                <span flex="30">PCI Groups</span>
+                <span class="right-text" layout="column"><span ng-repeat="pci in rule.pci" ng-click="setRulesFilter_outside('pci', pci);">{{ pci }}</span></span>
+              </md-list-item>
+              <md-list-item ng-repeat="(detailk, detailv) in rule.details">
+                <span flex="30">{{detailk}}</span>
+                <span class="right-text">{{detailv}}</span>
+              </md-list-item>
+              <md-list-item>
+                <md-button class="md-raised md-primary" ng-click="loadRuleDiscover(rule.id)" class="right-text">Discover alerts</span>
+              </md-list-item>
 
-</md-content>
+            </md-list>
+          </md-content>
+          <md-divider></md-divider>
+
+        </md-list>
+        <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules', 'rules')" ng-show="objHasPrev('/rules')"></span>
+        <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules', 'rules')" ng-show="objHasNext('/rules')"></span>
+      </div>
+    </md-content>
+
+    <md-sidenav md-is-open="isOpenSidenav" md-component-id="sideNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
+      layout="column" class="md-sidenav-right md-whiteframe-z2" flex="30">
+      <md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm></md-icon>
+      <md-content layout="row" layout-padding layout-align="center start">
+        <md-button ng-class="{ active: isSetTab(1, 1) }" ng-click="setTab(1, 1)">Files</md-button>
+        <md-button ng-class="{ active: isSetTab(2, 1) }" ng-click="setTab(2, 1)">Groups</md-button>
+        <md-button ng-class="{ active: isSetTab(3, 1) }" ng-click="setTab(3, 1)">PCI</md-button>
+      </md-content>
+
+
+      <md-content flex layout="row" layout-padding layout-align="center center">
+        <div flex ng-show="isSetTab(1, 1)">
+
+
+          <md-input-container>
+            <label for="searchBox2">Search</label>
+            <input flex type="text" ng-model="$parent.$parent.searchFilesRules" ng-change="objGet('/rules/files', 'filesRules')" id="searchBox2">
+          </md-input-container>
+
+
+          <md-list flex>
+            <md-list-item ng-repeat="file in filesRules" ng-click="setRulesFilter('file', file.name)" ng-class="{ active: isSetRulesFilter('file', file.name) }">
+              <span>{{file.name}}</span>
+            </md-list-item>
+          </md-list>
+          <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/files', 'filesRules')" ng-show="objHasPrev('/rules/files')"></span>
+          <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/files', 'filesRules')" ng-show="objHasNext('/rules/files')"></span>
+        </div>
+
+        <div flex ng-show="isSetTab(2, 1)">
+
+          <md-input-container>
+            <label for="searchBox3">Search</label>
+            <input flex type="text" ng-model="$parent.$parent.searchGroupsRules" ng-change="objGet('/rules/groups', 'groupsRules')" id="searchBox3">
+          </md-input-container>
+
+          <md-list flex>
+            <md-list-item ng-repeat="group in groupsRules" ng-click="setRulesFilter('group', group)" ng-class="{ active: isSetRulesFilter('group', group) }">
+              <span>{{group}}</span>
+            </md-list-item>
+          </md-list>
+          <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/groups', 'groupsRules')" ng-show="objHasPrev('/rules/groups')"></span>
+          <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/groups', 'groupsRules')" ng-show="objHasNext('/rules/groups')"></span>
+        </div>
+
+        <div flex ng-show="isSetTab(3, 1)">
+
+          <md-input-container>
+            <label for="searchBox4">Search</label>
+            <input flex type="text" ng-model="$parent.$parent.searchFilesPci" ng-change="objGet('/rules/pci', 'pciGroupsRules')" id="searchBox4">
+          </md-input-container>
+
+          <md-list flex>
+            <md-list-item ng-repeat="pci in pciGroupsRules" ng-click="setRulesFilter('pci', pci)" ng-class="{ active: isSetRulesFilter('pci', pci) }">
+              <span>{{pci}}</span>
+            </md-list-item>
+          </md-list>
+          <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/rules/pci', 'pciGroupsRules')" ng-show="objHasPrev('/rules/pci')"></span>
+          <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/rules/pci', 'pciGroupsRules')" ng-show="objHasNext('/rules/pci')"></span>
+        </div>
 
       </md-content>
-      </md-content>
+
+    </md-sidenav>
+    <md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents"
+      hide-gt-sm>
+      <span class="glyphicon glyphicon-menu-hamburger"></span>
+    </md-button>
+
+  </md-content>
 </div>

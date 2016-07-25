@@ -17,6 +17,11 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
     $scope.rfPci = '';
     $scope.rfLevel = '';
 
+    $scope.statusFilter = 'enabled';
+
+    $scope.menuNavItem = 'ruleset';
+    $scope.submenuNavItem = 'rules';
+
     $scope.maxLevel = 15;
     $scope.minLevel = 0;
 
@@ -160,7 +165,7 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
 
     var _applyRulesFilters = function () {
         var body = {};
-        if ($scope.rfStatus != '') {
+        if (($scope.rfStatus != '') && ($scope.rfStatus != 'all')) {
             body.status = $scope.rfStatus;
         }
         if ($scope.rfFiles != '') {
@@ -533,6 +538,9 @@ app.controller('decodersController', function ($scope, $route, $q, alertify, sha
     $scope.dfFile = '';
     $scope.dfId = '';
 
+    $scope.menuNavItem = 'ruleset';
+    $scope.submenuNavItem = 'decoders';
+
     $scope.decoderType = 'all';
 
     $scope.pageId = (Math.random().toString(36).substring(3));
@@ -848,6 +856,9 @@ app.controller('updateRulesetController', function ($scope, $route, $q, alertify
 
     $scope.updateType = 'b';
     $scope.updateForce = false;
+
+    $scope.menuNavItem = 'ruleset';
+    $scope.submenuNavItem = 'update';
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);

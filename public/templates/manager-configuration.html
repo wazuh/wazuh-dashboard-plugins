@@ -3,13 +3,13 @@
   <md-content class="md-padding">
     <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
       <md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
- 					<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
- 		</md-nav-item>
+        <img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+      </md-nav-item>
       <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
       <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
       <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
       <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-			<md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
+      <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
       <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
     </md-nav-bar>
   </md-content>
@@ -28,7 +28,7 @@
 
     <md-content flex layout-padding layout="row" layout-sm="column" layout-xs="column">
 
-      <div flex layout="column" ng-if="managerConfiguration.global" >
+      <div flex layout="column" ng-if="managerConfiguration.global">
         <md-card>
           <md-card-content>
             <h3>Global</h3>
@@ -45,7 +45,8 @@
               </md-list-item>
               <md-list-item ng-if="managerConfiguration.global.white_list">
                 <p>White List</p>
-                <p class="right-text"><span ng-repeat="item in managerConfiguration.global.white_list|orderBy">{{ item }} <span ng-show="!$last">, </span></span></p>
+                <p class="right-text"><span ng-repeat="item in managerConfiguration.global.white_list|orderBy">{{ item }} <span ng-show="!$last">, </span></span>
+                </p>
                 <md-divider></md-divider>
               </md-list-item>
               <md-list-item ng-if="managerConfiguration.global.stats">
@@ -156,53 +157,53 @@
           </md-card-content>
         </md-card>
       </div>
-  </md-content>
-  <md-content flex layout-padding layout="row" layout-sm="column" layout-xs="column">
+    </md-content>
+    <md-content flex layout-padding layout="row" layout-sm="column" layout-xs="column">
       <div flex layout="column" ng-if='managerConfiguration["active-response"] && (managerConfiguration["active-response"].disabled != "yes")'>
         <md-card>
           <md-card-content>
             <h3>Active response</h3>
             <md-list ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
-              <md-list-item  ng-if="item.command">
+              <md-list-item ng-if="item.command">
                 <p style="font-weight: bold"> {{ item.command }} </p>
                 <md-divider></md-divider>
               </md-list-item>
-              <md-list-item  ng-if="item.location">
+              <md-list-item ng-if="item.location">
                 <p> Location </p>
                 <p class="right-text">{{ item.location }}</p>
                 <md-divider></md-divider>
               </md-list-item>
-              <md-list-item  ng-if="item.agent_id">
+              <md-list-item ng-if="item.agent_id">
                 <p> Agent ID(s) </p>
                 <p class="right-text">{{ item.agent_id }}</p>
                 <md-divider></md-divider>
               </md-list-item>
-              <md-list-item  ng-if="item.level">
+              <md-list-item ng-if="item.level">
                 <p> Level </p>
                 <p class="right-text">{{ item.level }}</p>
                 <md-divider></md-divider>
               </md-list-item>
-              <md-list-item  ng-if="item.location">
+              <md-list-item ng-if="item.location">
                 <p> test </p>
                 <p class="right-text">{{ item.location }}</p>
                 <md-divider></md-divider>
               </md-list-item>
-              <md-list-item  ng-if="item.timeout">
+              <md-list-item ng-if="item.timeout">
                 <p> Timeout </p>
                 <p class="right-text">{{ item.timeout }}</p>
                 <md-divider></md-divider>
               </md-list-item>
-              <md-list-item  ng-if="item.rules_group">
+              <md-list-item ng-if="item.rules_group">
                 <p> Rules group </p>
                 <p class="right-text">{{ item.rules_group }}</p>
                 <md-divider></md-divider>
               </md-list-item>
-              <md-list-item  ng-if="item.rules_id">
+              <md-list-item ng-if="item.rules_id">
                 <p> Rules ID(s) </p>
                 <p class="right-text">{{ item.rules_id }}</p>
                 <md-divider></md-divider>
               </md-list-item>
-              <md-list-item  ng-if="item.repeated_offenders">
+              <md-list-item ng-if="item.repeated_offenders">
                 <p> Repeated offenders </p>
                 <p class="right-text">{{ item.repeated_offenders }}</p>
                 <md-divider></md-divider>
@@ -241,36 +242,36 @@
         </md-card>
       </div>
 
-            <div flex layout="column" ng-if="managerConfiguration.rules">
-              <md-card>
-                <md-card-content>
-                  <h3>Decoders</h3>
-                  <md-list>
-                    <md-list-item ng-if="managerConfiguration.rules.decoder_dir">
-                      <p style="font-weight: bold"> Decoder directories</p>
-                      <md-divider></md-divider>
-                    </md-list-item>
+      <div flex layout="column" ng-if="managerConfiguration.rules">
+        <md-card>
+          <md-card-content>
+            <h3>Decoders</h3>
+            <md-list>
+              <md-list-item ng-if="managerConfiguration.rules.decoder_dir">
+                <p style="font-weight: bold"> Decoder directories</p>
+                <md-divider></md-divider>
+              </md-list-item>
 
-                    <md-list-item ng-repeat="item in managerConfiguration.rules.decoder_dir|orderBy">
-                      <p> {{ item }} </p>
-                      <md-divider></md-divider>
-                    </md-list-item>
+              <md-list-item ng-repeat="item in managerConfiguration.rules.decoder_dir|orderBy">
+                <p> {{ item }} </p>
+                <md-divider></md-divider>
+              </md-list-item>
 
-                    <md-list-item ng-if="managerConfiguration.rules.decoder">
-                      <p style="font-weight: bold"> Decoder files</p>
-                      <md-divider></md-divider>
-                    </md-list-item>
+              <md-list-item ng-if="managerConfiguration.rules.decoder">
+                <p style="font-weight: bold"> Decoder files</p>
+                <md-divider></md-divider>
+              </md-list-item>
 
-                    <md-list-item ng-repeat="item in managerConfiguration.rules.decoder|orderBy">
-                      <p> {{ item }} </p>
-                      <md-divider></md-divider>
-                    </md-list-item>
+              <md-list-item ng-repeat="item in managerConfiguration.rules.decoder|orderBy">
+                <p> {{ item }} </p>
+                <md-divider></md-divider>
+              </md-list-item>
 
-                  </md-list>
-                </md-card-content>
-              </md-card>
-            </div>
-      </md-content>
+            </md-list>
+          </md-card-content>
+        </md-card>
+      </div>
+    </md-content>
     <md-content flex layout-padding flex layout="row" layout-sm="column" layout-xs="column">
 
       <div flex layout="column" ng-if="managerConfiguration.rootcheck">
