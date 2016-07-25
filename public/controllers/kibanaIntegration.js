@@ -1,39 +1,20 @@
 // Require utils
 var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
-var app = require('ui/modules').get('app/wazuh', [])
-    .directive('dinamicIframe', function ($timeout, $interval) {
-        var resize = function (scope, element, attrs) {
-            scope.$parent._interval = $interval(function () {
-                if ((element.find('iframe')[0].src == '')) {
-                    $interval.cancel(scope.$parent._interval);
-                } else if  ((!element.find('iframe')[0].contentWindow.document.scrollingElement)
-                    && (!element.find('iframe')[0].contentWindow.scrollMaxY) && (element.find('iframe')[0].contentWindow.scrollMaxY !== 0)) {
-                    //Old browser: fixed size
-                    element.find('iframe')[0].height = 2500;
-                    element.find('iframe')[0].style.visibility = 'visible';
-                    $interval.cancel(scope.$parent._interval);
-                } else if ((element.find('iframe')[0].contentWindow.document.scrollingElement)
-                    && (element.find('iframe')[0].contentWindow.document.scrollingElement.scrollHeight > 400)) {
-                    element.find('iframe')[0].height = element.find('iframe')[0].contentWindow.document.scrollingElement.scrollHeight + 80;
-                    element.find('iframe')[0].style.visibility = 'visible';
-                    $interval.cancel(scope.$parent._interval);
-                } else if ((element.find('iframe')[0].contentWindow.scrollMaxY) && (element.find('iframe')[0].contentWindow.scrollMaxY > 400)) {
-                    element.find('iframe')[0].height = element.find('iframe')[0].contentWindow.scrollMaxY + 250;
-                    element.find('iframe')[0].style.visibility = 'visible';
-                    $interval.cancel(scope.$parent._interval);
-                }
-            }, 250);
-        }
-        return {
-            restrict: 'E',
-            scope: {
-                src: '@src'
-            },
-            template: '<iframe width="100%" scrolling="no" src="{{src}}" style="visibility: hidden;"></iframe>',
-            link: resize
-        }
-    });
+var app = require('ui/modules').get('app/wazuh', []).directive('iframeSetDimensionsOnload', [function(){
+return {
+    restrict: 'A',
+    link: function(scope, element, attrs){
+        element.on('load', function(){
+            /* Set the dimensions here,
+               I think that you were trying to do something like this: */
+               var iFrameHeight = element[0].contentWindow.document.body.scrollHeight + 300 + 'px';
+               var iFrameWidth = '100%';
+               element.css('width', iFrameWidth);
+               element.css('height', iFrameHeight);
+        })
+    }
+}}]);
 
 app.controller('kibanaIntegrationController', function ($scope, sharedProperties, $route, $interval) {
 
@@ -87,6 +68,10 @@ app.controller('kibanaIntegrationController', function ($scope, sharedProperties
         }
         return kuf.getVisualization(visName, filter, time, url);
     };
+
+    $scope.resizeIframe = function (obj) {
+      obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+    }
 
     //Load
     var initialize = sharedProperties.getProperty();

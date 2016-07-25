@@ -27,7 +27,7 @@ var filterCheck = function (filter) {
 /*
 This method creates a new dashboard and returns the URL
 The dashboard is not saved anywhere
-Structure -> JSON structure of the dashboard 
+Structure -> JSON structure of the dashboard
 Filter -> Filter expresion (Can be blank string)
 Time -> Time selection string (Can be blank string)
 URL -> If true, the method will return an URL. Else, will return an iframe.

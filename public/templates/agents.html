@@ -103,14 +103,16 @@
 				</md-tab>
 				<md-tab label="File integrity" flex>
 					<div flex layout="row" layout-sm="column" layout-xs="column">
-						<md-list class="md-dense" flex>
-							<md-list-item class="md-2-line">
+						<md-list class="md-dense" flex layout="column">
+							<md-list-item class="md-2-line" layout="column">
 								<div class="md-list-item-text" layout="column">
 									<h3>Last scan started</h3>
 									<p>{{agentInfo.syscheckTime}}</p>
 								</div>
 							</md-list-item>
-							<md-list-item class="md-2-line">
+						</md-list>
+						<md-list class="md-dense" flex layout="column">
+							<md-list-item class="md-2-line" layout="column">
 								<div class="md-list-item-text" layout="column">
 									<h3>Last scan ended</h3>
 									<p>{{agentInfo.syscheckEndTime}}</p>
@@ -118,18 +120,29 @@
 							</md-list-item>
 						</md-list>
 					</div>
-					<div flex layout="column" hide-xs>
-						<div flex layout="row" ng-repeat="event in agentInfo.syscheckEvents" ng-if="agentInfo.syscheckEvents.length > 0" layout-padding>
-							<span>{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</span>
-							<span><b>MD5: </b>{{event.md5}}</span>
-							<span tooltips tooltip-template="{{event.permissions}}">{{event.octalMode.slice(-4)}}</span>
-							<span tooltips tooltip-template="User Id: {{event.uid}}</br>Group Id: {{event.gid}}" layout="column">
-								<span><b>U: </b>{{event.user}}</span>
-							<span><b>G: </b>{{event.group}}</span>
-							</span>
-							<span>{{event.modificationDate}}</span>
+
+					<md-toolbar layout="row" class="md-hue-3">
+						<div class="md-toolbar-tools">
+							<span flex="40">File</span>
+							<span flex="10">Event</span>
+							<span flex="10">Permissions</span>
+							<span flex="10">User</span>
+							<span flex="10">Group</span>
+							<span flex="10">Date</span>
 						</div>
-					</div>
+					</md-toolbar>
+					<md-list ng-repeat="event in agentInfo.syscheckEvents" ng-if="agentInfo.syscheckEvents.length > 0">
+						<md-list-item>
+							<span flex="40">{{event.file}}</span>
+							<span flex="10">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</span>
+							<span flex="10">{{event.octalMode.slice(-4)}}</span>
+							<span flex="10">{{event.user}}</span>
+							<span flex="10">{{event.group}}</span>
+							<span flex="10">{{event.modificationDate}}</span>
+						</md-list-item>
+					</md-list>
+
+
 					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-button md-no-ink class="md-primary" ng-click="loadFIM(_agent.id);">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
@@ -144,30 +157,41 @@
 				</md-tab>
 				<md-tab label="Rootcheck" flex>
 					<div flex layout="row" layout-sm="column" layout-xs="column">
-						<md-list class="md-dense" flex>
-							<md-list-item class="md-2-line">
-								<div class="md-list-item-text" layout="column">
-									<h3>Last scan started</h3>
-									<p>{{agentInfo.rootcheckTime}}</p>
-								</div>
-							</md-list-item>
-							<md-list-item class="md-2-line">
-								<div class="md-list-item-text" layout="column">
-									<h3>Last scan ended</h3>
-									<p>{{agentInfo.rootcheckEndTime}}</p>
-								</div>
-							</md-list-item>
+						<md-list class="md-dense" flex layout="column">
+								<md-list-item class="md-2-line">
+									<div class="md-list-item-text" layout="column">
+										<h3>Last scan started</h3>
+										<p>{{agentInfo.rootcheckTime}}</p>
+									</div>
+								</md-list-item>
+							</md-list>
+							<md-list class="md-dense" flex layout="column">
+								<md-list-item class="md-2-line">
+									<div class="md-list-item-text" layout="column">
+										<h3>Last scan ended</h3>
+										<p>{{agentInfo.rootcheckEndTime}}</p>
+									</div>
+								</md-list-item>
 						</md-list>
 					</div>
-					<div flex layout="column" hide-xs>
-						<div flex layout="row" ng-repeat="event in agentInfo.rootcheckEvents" ng-if="agentInfo.rootcheckEvents.length > 0" layout-padding>
-							<span>{{event.event.length > 53 ? event.event.substring(0, 50)+'...' : event.event}}</span>
-							<span layout="column">
-								<span>First scan: {{event.oldDay}}</span>
-							<span>Last scan: {{event.readDay}}</span>
-							</span>
+
+
+					<md-toolbar layout="row" class="md-hue-3">
+						<div class="md-toolbar-tools">
+							<span flex="50">Control</span>
+							<span flex="25">Detected</span>
+							<span flex="25">Last scan</span>
 						</div>
-					</div>
+					</md-toolbar>
+					<md-list ng-repeat="event in agentInfo.rootcheckEvents" ng-if="agentInfo.rootcheckEvents.length > 0">
+						<md-list-item>
+							<span flex="50">{{event.event.length > 53 ? event.event.substring(0, 50)+'...' : event.event}}</span>
+							<span flex="25">{{event.oldDay}}</span>
+							<span flex="25">{{event.readDay}}</span>
+						</md-list-item>
+					</md-list>
+
+
 					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-button md-no-ink class="md-primary" ng-click="loadRootcheck(_agent.id);">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
