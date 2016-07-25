@@ -883,10 +883,6 @@ app.controller('updateRulesetController', function ($scope, $route, $q, alertify
 
     //Backups
 
-    $scope.selectUpdateType = function (type) {
-        $scope.updateType = type;
-    };
-
     $scope.updateRuleset = function () {
         if (!$scope.updateType) {
             alertify.delay(10000).closeLogOnClick(true).error('Select an update type');
