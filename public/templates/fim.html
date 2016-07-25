@@ -62,10 +62,12 @@
                       <div class="md-toolbar-tools">
                           <span flex="10">Event</span>
                           <span flex="10">User</span>
+                          <span flex="10">UID</span>
                           <span flex="10">Group</span>
+                          <span flex="10">GID</span>
                           <span flex="10">Permissions</span>
                           <span flex="10">Size</span>
-                          <span flex="30">MD5</span>
+
                           <span flex="20">Date</span>
                       </div>
                     </md-toolbar>
@@ -74,11 +76,13 @@
                         <md-list-item >
                           <span flex="10">{{event.event}}</span>
                           <span flex="10">{{event.user}}</span>
+                          <span flex="10">{{event.uid}}</span>
                           <span flex="10">{{event.group}}</span>
+                          <span flex="10">{{event.gid}}</span>
                           <span flex="10">{{event.permissions}}</span>
                           <span flex="10">{{event.size}}</span>
-                          <span flex="30">{{event.md5}}</span>
                           <span flex="20">{{event.modificationDate}}</span>
+                          
                         </md-list-item>
                       </md-list>
                     </div>
