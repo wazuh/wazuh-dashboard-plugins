@@ -483,8 +483,8 @@ routes
       "check": settingsWizard
     }
   })
-  .when('/compliance/', {
-    template: require('plugins/wazuh/templates/compliance.html'),
+  .when('/policy_monitoring/', {
+    template: require('plugins/wazuh/templates/policy_monitoring.html'),
     resolve: {
       "check": settingsWizard
     }
@@ -529,7 +529,7 @@ require('plugins/wazuh/controllers/settings.js');
 require('plugins/wazuh/controllers/manager.js');
 require('plugins/wazuh/controllers/manager-configuration.js');
 require('plugins/wazuh/controllers/fim.js');
-require('plugins/wazuh/controllers/rootcheck.js');
+require('plugins/wazuh/controllers/policy_monitoring.js');
 require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
 require('plugins/wazuh/controllers/kibanaIntegration.js');

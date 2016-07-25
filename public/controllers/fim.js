@@ -74,7 +74,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 return null;
             }
             var _pos = index - DataFactory.getOffset(objectsArray[$scope._agent.id + $scope._file.file]);
-            if ((_pos > 15) || (_pos < 0)) {
+            if ((_pos > 30) || (_pos < 0)) {
                 $scope._events_blocked = true;
                 DataFactory.scrollTo(objectsArray[$scope._agent.id + $scope._file.file], index)
                     .then(function (data) {
@@ -155,7 +155,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 body[key] = value;
             });
         }
-        DataFactory.initialize('get', '/syscheck/'+agent.id+'/files', body, 15, 0)
+        DataFactory.initialize('get', '/syscheck/'+agent.id+'/files', body, 30, 0)
             .then(function (data) {
                 objectsArray[agent.id+file.file] = data;
                 DataFactory.get(objectsArray[agent.id+file.file])
@@ -182,37 +182,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             }, printError)
     };
 
-/*
-* DEPRECATED
-*/
-    $scope.hasNextEvents = function (agent, file) {
-        if (!objectsArray[agent + file])
-            return false;
-        return DataFactory.hasNext(objectsArray[agent + file]);
-    };
-    $scope.nextEvents = function (agent, file) {
-        DataFactory.next(objectsArray[agent + file])
-            .then(function (data) {
-                $scope.eventsFetchInfo[agent + file].length = 0;
-                $scope.eventsFetchInfo[agent + file] = data.data.items;
-            }, printError)
-    };
 
-/*
-* DEPRECATED
-*/
-    $scope.hasPrevEvents = function (agent, file) {
-        if (!objectsArray[agent + file])
-            return false;
-        return DataFactory.hasPrev(objectsArray[agent + file]);
-    };
-    $scope.prevEvents = function (agent, file) {
-        DataFactory.prev(objectsArray[agent + file])
-            .then(function (data) {
-                $scope.eventsFetchInfo[agent + file].length = 0;
-                $scope.eventsFetchInfo[agent + file] = data.data.items;
-            }, printError)
-    };
 
     $scope.setTypeFilter = function () {
         _setFilter();
@@ -303,35 +273,6 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         }
     };
 
-/*
-* DEPRECATED
-*/
-    $scope.hasNextFiles = function () {
-        return DataFactory.hasNext(objectsArray['/syscheck/files']);
-    };
-    $scope.nextFiles = function () {
-        DataFactory.next(objectsArray['/syscheck/files'])
-            .then(function (data) {
-                $scope.files.length = 0;
-                $scope.eventsFetchInfo.length = 0;
-                $scope.files = data.data.items;
-            }, printError);
-    };
-
-/*
-* DEPRECATED
-*/
-    $scope.hasPrevFiles = function () {
-        return DataFactory.hasPrev(objectsArray['/syscheck/files']);
-    };
-    $scope.prevFiles = function () {
-        DataFactory.prev(objectsArray['/syscheck/files'])
-            .then(function (data) {
-                $scope.files.length = 0;
-                $scope.eventsFetchInfo.length = 0;
-                $scope.files = data.data.items;
-            }, printError);
-    };
 
     $scope.agentStatusFilter = function () {
         var _status;
@@ -394,33 +335,6 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         }
     };
 
-/*
-* DEPRECATED
-*/
-    $scope.hasNextAgents = function () {
-        return DataFactory.hasNext(objectsArray['/agents']);
-    };
-    $scope.nextAgents = function () {
-        DataFactory.next(objectsArray['/agents'])
-            .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-            }, printError);
-    };
-
-/*
-* DEPRECATED
-*/
-    $scope.hasPrevAgents = function () {
-        return DataFactory.hasPrev(objectsArray['/agents']);
-    };
-    $scope.prevAgents = function () {
-        DataFactory.prev(objectsArray['/agents'])
-            .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-            }, printError);
-    };
 
     $scope.cleandb = function () {
         alertify.confirm("Are you sure you want to delete the syscheck database in all the agents?", function () {
@@ -467,7 +381,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             $scope.agentId = _agent;
         }
 
-        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 15, 0)
+        DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 30, 0)
             .then(function (data) {
                 objectsArray['/syscheck/files'] = data;
                 DataFactory.initialize('get', '/agents', {}, 15, 0)

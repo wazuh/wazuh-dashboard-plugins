@@ -1,6 +1,5 @@
 <div flex ng-controller="fimController" layout="column">
-    <!-- Cambiar backend alertas y popups -->
-    <!-- enerror el semaforo debe cambiar -->
+
     <md-content class="md-padding">
         <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
             <md-nav-item id="header_logo" md-nav-href="http://wazuh.com" name="wazuh" aria-label="img logo">
@@ -10,7 +9,7 @@
             <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
             <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
             <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-            <md-nav-item md-nav-href="#/compliance" name="compliance">Compliance</md-nav-item>
+			      <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
             <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
         </md-nav-bar>
     </md-content>
@@ -37,7 +36,7 @@
                 <md-icon md-font-icon="fa fa-cog" ng-click="showFilesFiltersDialog($event)" />
             </md-input-container>
             <div flex ng-if="!(_file)">
-              <md-virtual-repeat-container class="vertical-repeater" style="min-height: 400px;">
+              <md-virtual-repeat-container class="vertical-repeater" style="min-height: 600px;">
                 <md-toolbar layout="row" class="md-hue-3">
                   <div class="md-toolbar-tools">
                       <span flex="60">File name</span>
@@ -45,7 +44,7 @@
                       <span flex="20">Date</span>
                   </div>
                 </md-toolbar>
-                  <div md-virtual-repeat="file in filesObj" md-on-demand flex>
+                  <div md-virtual-repeat="file in filesObj" md-on-demand flex  layout-align="stretch">
                     <md-list>
                       <md-list-item  ng-click="initEvents(_agent, file)">
                         <span flex="60">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
@@ -66,8 +65,8 @@
                           <span flex="10">Group</span>
                           <span flex="10">Permissions</span>
                           <span flex="10">Size</span>
-                          <span flex="20">MD5</span>
-                          <span flex="10">Date</span>
+                          <span flex="30">MD5</span>
+                          <span flex="20">Date</span>
                       </div>
                     </md-toolbar>
                     <div md-virtual-repeat="event in eventsObj" md-on-demand flex>
@@ -78,8 +77,8 @@
                           <span flex="10">{{event.group}}</span>
                           <span flex="10">{{event.permissions}}</span>
                           <span flex="10">{{event.size}}</span>
-                          <span flex="20">{{event.md5}}</span>
-                          <span flex="10">{{event.modificationDate}}</span>
+                          <span flex="30">{{event.md5}}</span>
+                          <span flex="20">{{event.modificationDate}}</span>
                         </md-list-item>
                       </md-list>
                     </div>

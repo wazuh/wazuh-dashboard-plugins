@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rcController', function ($scope, alertify, sharedProperties, DataFactory, $location) {
+app.controller('pmController', function ($scope, alertify, sharedProperties, DataFactory, $location) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -11,7 +11,7 @@ app.controller('rcController', function ($scope, alertify, sharedProperties, Dat
     $scope.search = '';
 
     $scope.agentId = '000';
-
+    $scope.menuNavItem = 'policy_monitoring';
     //Print Error
     var printError = function (error) {
         alertify.delay(10000).closeLogOnClick(true).error(error.html);
@@ -68,6 +68,30 @@ app.controller('rcController', function ($scope, alertify, sharedProperties, Dat
                     $scope.events = data.data.items;
                 }, printError);
         }
+    };
+
+    $scope.agentsObj = {
+        //Obj with methods for virtual scrolling
+        getItemAtIndex: function (index) {
+            if ($scope.blocked) {
+                return null;
+            }
+            var _pos = index - DataFactory.getOffset(objectsArray['/agents']);
+            if ((_pos > 15) || (_pos < 0)) {
+                $scope.blocked = true;
+                DataFactory.scrollTo(objectsArray['/agents'], index)
+                    .then(function (data) {
+                        $scope.agents.length = 0;
+                        $scope.agents = data.data.items;
+                        $scope.blocked = false;
+                    }, printError);
+            } else {
+                return $scope.agents[_pos];
+            }
+        },
+        getLength: function () {
+            return DataFactory.getTotalItems(objectsArray['/agents']);
+        },
     };
 
     $scope.hasPrevEvents = function () {
