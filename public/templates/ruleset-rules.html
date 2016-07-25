@@ -86,7 +86,8 @@
           <md-list-item ng-click=" showDetails = ! showDetails; ">
             <span flex="20">{{rule.id}}</span>
             <span flex="60">{{rule.description}}</span>
-            <span flex="20">{{rule.level}}</span>
+            <span flex="19">{{rule.level}}</span>
+            <span flex><div class="status rectangle" ng-class="getRuleStatusClass(rule)"></div></span>
           </md-list-item>
           <md-content flex layout="column" layout-padding ng-show="showDetails">
             <md-list>
@@ -142,7 +143,7 @@
       </md-content>
 
 
-      <md-content flex layout="row" layout-padding layout-align="center center">
+      <md-content flex layout="row" layout-padding>
         <div flex ng-show="isSetTab(1, 1)">
 
 

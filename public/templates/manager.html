@@ -14,8 +14,6 @@
     </md-nav-bar>
   </md-content>
 
-  <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
-
   <md-content class="md-padding">
     <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation links">
       <md-nav-item md-nav-href="#/manager" name="general">General</md-nav-item>
@@ -23,6 +21,8 @@
       <md-nav-item md-nav-href="#/manager/osseclog" name="logs">Logs</md-nav-item>
     </md-nav-bar>
   </md-content>
+
+  <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
   <md-content flex layout="column" ng-if="!load" layout-align="space-around">
 

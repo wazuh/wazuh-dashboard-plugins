@@ -185,15 +185,15 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
 
     $scope.getRuleStatusClass = function (rule) {
         if (rule.details.overwrite) {
-            return "overwritten";
+            return "grey";
         }
         if (rule.status == 'enabled') {
             if (rule.level == 0)
-                return "warning";
+                return "orange";
             else
-                return "enabled";
+                return "green";
         } else {
-            return "disabled";
+            return "red";
         }
     };
 
