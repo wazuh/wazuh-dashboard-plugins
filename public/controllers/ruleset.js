@@ -810,7 +810,7 @@ app.controller('decodersController', function ($scope, $route, $q, alertify, sha
     //Load functions
 
     var load_decoders_files = function () {
-        DataFactory.initialize('get', '/decoders/files', {}, 10, 0)
+        DataFactory.initialize('get', '/decoders/files', {}, 15, 0)
             .then(function (data) {
                 objectsArray['/decoders/files'] = data;
                 DataFactory.get(data).then(function (data) {

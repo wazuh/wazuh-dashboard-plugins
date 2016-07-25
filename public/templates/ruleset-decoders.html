@@ -3,7 +3,7 @@
 	<md-content class="md-padding">
 		<md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
 			<md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
-					<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+				<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
 			</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
@@ -16,97 +16,128 @@
 
 	<md-content class="md-padding">
 		<md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-			<md-nav-item md-nav-href="#/ruleset" name="overview">Rules</md-nav-item>
-			<md-nav-item md-nav-href="#/ruleset/decoders" name="metrics">Decoders</md-nav-item>
-      <md-nav-item md-nav-href="#/ruleset/update" name="metrics">Update</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset" name="rules">Rules</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset/decoders" name="decoders">Decoders</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset/update" name="update">Update</md-nav-item>
 		</md-nav-bar>
 	</md-content>
 
+	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-    <div ng-if="load" style="text-align: center;">
-        	<md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
-    </div>
-<md-content flex id="content3" layout="row" layout-padding>
-    <md-content flex id="content" layout="column" layout-padding>
-        <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-        <div class="leftCol">
-            <div flex id="content" layout="row">
-              <input flex id="searchBox1" type="text" ng-model="$parent.decoder_search" ng-change="objGet('/decoders', 'decoders')" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
-							<md-button ng-class="{ active: dfType == 'all' }" ng-click="setDecodersFilter('type', 'all')" class="rulesetFilter">All decoders </md-button>
-							<md-button ng-class="{ active: dfType == 'parents' }" ng-click="setDecodersFilter('type', 'parents')" class="rulesetFilter">Parents </md-button>
-            </div>
+	<md-content flex id="content3" layout="row" layout-padding ng-if="!load">
+		<md-content flex id="content" layout="column" layout-padding>
+			<div class="leftCol">
+				<div flex id="content" layout="row">
 
-            <div class="filterActive_div" ng-if="hasDecodersFilter('file');">
-                <span ng-click="setDecodersFilter('file', dfFile)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('file', dfFile) }"
-                    class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{dfFile}}">Selected file: {{formatFile(dfFile)}}   <span class="glyphicon glyphicon-remove"></span></span>
-            </div>
-            <div class="filterActive_div" ng-if="hasDecodersFilter('id');">
-                <span ng-click="setDecodersFilter('id', dfId)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('id', dfId) }"
-                    class="bold">Selected parent: {{dfId}}   <span class="glyphicon glyphicon-remove"></span></span>
-            </div>
 
-						<md-toolbar layout="row" class="md-hue-3">
-							<div class="md-toolbar-tools">
-									<span flex="80">Decoder name</span>
-									<span flex="20">Decoder position</span>
-							</div>
-						</md-toolbar>
-						<md-list ng-repeat="decoder in decoders">
-							<md-list-item  ng-click=" showDetails = ! showDetails; ">
-								<span flex="80">{{decoder.name}}</span>
-								<span flex="20">{{decoder.position}}</span>
+					<md-input-container>
+						<label for="searchBox1">Search</label>
+						<input flex type="text" ng-model="$parent.decoder_search" ng-change="objGet('/decoders', 'decoders')" id="searchBox1">
+					</md-input-container>
+
+
+					<md-input-container>
+						<md-button ng-class="{ active: dfType == 'all' }" ng-click="setDecodersFilter('type', 'all')" class="rulesetFilter">All decoders </md-button>
+					</md-input-container>
+					<md-input-container>
+						<md-button ng-class="{ active: dfType == 'parents' }" ng-click="setDecodersFilter('type', 'parents')" class="rulesetFilter">Parents </md-button>
+					</md-input-container>
+				</div>
+
+
+
+				<md-chips readonly="true" ng-if="hasDecodersFilter('file');">
+					<md-chip>
+						<span ng-click="setDecodersFilter('file', dfFile)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('file', dfFile) }"
+							class="bold" tooltips tooltip-size="large" tooltip-side="left" tooltip-template="{{dfFile}}">File: {{formatFile(dfFile)}}   <span class="glyphicon glyphicon-remove"></span></span>
+					</md-chip>
+				</md-chips>
+				<md-chips readonly="true" ng-if="hasDecodersFilter('id');">
+					<md-chip>
+						<span ng-click="setDecodersFilter('id', dfId)" ng-class="{ textFilterActive_header: isSetTabDecodersFilter('id', dfId) }"
+							class="bold">Parent: {{dfId}}   <span class="glyphicon glyphicon-remove"></span></span>
+					</md-chip>
+				</md-chips>
+
+				<md-toolbar layout="row" class="md-hue-1">
+					<div class="md-toolbar-tools">
+						<span flex="80">Decoder name</span>
+						<span flex="20">Decoder position</span>
+					</div>
+				</md-toolbar>
+				<md-list ng-repeat="decoder in decoders">
+					<md-list-item ng-click=" showDetails = ! showDetails; ">
+						<span flex="80">{{decoder.name}}</span>
+						<span flex="20">{{decoder.position}}</span>
+					</md-list-item>
+					<md-content flex layout="column" layout-padding ng-show="showDetails">
+						<md-list>
+							<md-list-item>
+								<span flex="30">Name</span>
+								<span class="right-text">{{decoder.name}}</span>
 							</md-list-item>
-							<md-content flex layout="column" layout-padding ng-show="showDetails">
-								<md-list>
-									<md-list-item>
-										<span flex="30">Name</span>
-										<span class="right-text">{{decoder.name}}</span>
-									</md-list-item>
-									<md-list-item ng-click="setDecodersFilter('file', decoder.file);">
-										<span flex="30">File</span>
-										<span class="right-text">{{decoder.file}}</span>
-									</md-list-item>
-									<md-list-item>
-										<span flex="30">Full path</span>
-										<span class="right-text">{{decoder.full_path}}</span>
-									</md-list-item>
-									<md-list-item>
-										<span flex="30">Position</span>
-										<span class="right-text">{{decoder.position}}</span>
-									</md-list-item>
-									<md-list-item ng-if="decoder.details.parent" ng-click="setDecodersFilter('id', decoder.details.parent);">
-										<span flex="30">Parent</span>
-										<span class="right-text">{{decoder.details.parent}}</span>
-									</md-list-item>
-									<md-list-item >
-										<span flex="30">Position</span>
-										<span class="right-text">{{decoder.position}}</span>
-									</md-list-item>
-									<md-list-item ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
-										<span flex="30">{{detailk}}</span>
-										<span  ng-if="(detailk !== 'regex') && (detailk !== 'order')" class="right-text">{{detailv}}</span>
-                    <span ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)">{{colorRegex(detailv)}}</span>
-                    <span ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)">{{colorOrder(detailv)}}</span>
-									</md-list-item>
-								</md-list>
-							</md-content>
+							<md-list-item ng-click="setDecodersFilter('file', decoder.file);">
+								<span flex="30">File</span>
+								<span class="right-text">{{decoder.file}}</span>
+							</md-list-item>
+							<md-list-item>
+								<span flex="30">Full path</span>
+								<span class="right-text">{{decoder.full_path}}</span>
+							</md-list-item>
+							<md-list-item>
+								<span flex="30">Position</span>
+								<span class="right-text">{{decoder.position}}</span>
+							</md-list-item>
+							<md-list-item ng-if="decoder.details.parent" ng-click="setDecodersFilter('id', decoder.details.parent);">
+								<span flex="30">Parent</span>
+								<span class="right-text">{{decoder.details.parent}}</span>
+							</md-list-item>
+							<md-list-item>
+								<span flex="30">Position</span>
+								<span class="right-text">{{decoder.position}}</span>
+							</md-list-item>
+							<md-list-item ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
+								<span flex="30">{{detailk}}</span>
+								<span ng-if="(detailk !== 'regex') && (detailk !== 'order')" class="right-text">{{detailv}}</span>
+								<span ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)">{{colorRegex(detailv)}}</span>
+								<span ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)">{{colorOrder(detailv)}}</span>
+							</md-list-item>
 						</md-list>
-            <span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders', 'decoders')" ng-show="objHasPrev('/decoders')"></span>
-            <span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders', 'decoders')" ng-show="objHasNext('/decoders')"></span>
-        </div>
+					</md-content>
+					<md-divider></md-divider>
+				</md-list>
+				<span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders', 'decoders')" ng-show="objHasPrev('/decoders')"></span>
+				<span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders', 'decoders')" ng-show="objHasNext('/decoders')"></span>
+			</div>
 
-      </md-content>
-        <md-content flex="30" id="content2" layout="column" layout-padding>
-        <div flex>
-					<input flex type="text" ng-model="$parent.$parent.searchFilesDecoders" ng-change="objGet('/decoders/files', 'filesDecoders')" class="form-control ng-pristine ng-valid rulesetSearch ng-touched" placeholder="Search...">
-					<md-list flex>
-						<md-list-item ng-repeat="file in filesDecoders" ng-click="setDecodersFilter('file', formatFile(file))" ng-class="{ active: isSetDecodersFilter('file', formatFile(file)) }">
-							<span >{{formatFile(file)}}</span>
-						</md-list-item>
-					</md-list>
-								<span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders/files', 'filesDecoders')" ng-show="objHasPrev('/decoders/files')"></span>
-								<span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders/files', 'filesDecoders')" ng-show="objHasNext('/decoders/files')"></span>
-							</div>
-      </md-content>
-  </md-content>
+		</md-content>
+
+
+		<md-sidenav md-is-open="isOpenSidenav" md-component-id="sideNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
+			layout="column" class="md-sidenav-right md-whiteframe-z2" flex="30" ng-show="enableFileSearch">
+			<md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm></md-icon>
+
+				<md-input-container>
+					<label for="searchBox2">Search</label>
+					<input flex type="text" ng-model="$parent.$parent.searchFilesDecoders" ng-change="objGet('/decoders/files', 'filesDecoders')"
+						id="searchBox2">
+				</md-input-container>
+
+				<md-list flex>
+					<md-list-item ng-repeat="file in filesDecoders" ng-click="setDecodersFilter('file', formatFile(file))" ng-class="{ active: isSetDecodersFilter('file', formatFile(file)) }">
+						<span>{{formatFile(file)}}</span>
+					</md-list-item>
+				</md-list>
+				<div flex>
+				<span class="glyphicon glyphicon-chevron-left" ng-click="objPrev('/decoders/files', 'filesDecoders')" ng-show="objHasPrev('/decoders/files')"></span>
+				<span class="glyphicon glyphicon-chevron-right" ng-click="objNext('/decoders/files', 'filesDecoders')" ng-show="objHasNext('/decoders/files')"></span>
+				</div>
+		</md-sidenav>
+		<md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Files"
+			hide-gt-sm>
+			<span class="glyphicon glyphicon-menu-hamburger"></span>
+		</md-button>
+
+
+	</md-content>
 </div>
