@@ -70,21 +70,6 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
         });
     };
 
-    var parseConfiguration = function () {
-        if ($scope.managerConfiguration.rules.decoder) {
-            if (angular.isString($scope.managerConfiguration.rules.decoder)) { $scope.managerConfiguration.rules.decoder = [$scope.managerConfiguration.rules.decoder] }
-        }
-        if ($scope.managerConfiguration.rules.rule_dir) {
-            if (angular.isString($scope.managerConfiguration.rules.rule_dir)) { $scope.managerConfiguration.rules.rule_dir = [$scope.managerConfiguration.rules.rule_dir] }
-        }
-        if ($scope.managerConfiguration.rules.list) {
-            if (angular.isString($scope.managerConfiguration.rules.list)) { $scope.managerConfiguration.rules.list = [$scope.managerConfiguration.rules.list] }
-        }
-        if ($scope.managerConfiguration.rootcheck.system_audit) {
-            if (angular.isString($scope.managerConfiguration.rootcheck.system_audit)) { $scope.managerConfiguration.rootcheck.system_audit = [$scope.managerConfiguration.rootcheck.system_audit] }
-        }
-    };
-
     $scope.ruleDetail = function (file, isRule) {
         if (isRule) {
             sharedProperties.setProperty('r//' + file);
@@ -161,6 +146,8 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 app.controller('managerConfigurationController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter) {
     //Initialisation
     $scope.load = true;
+    $scope.menuNavItem = 'manager';
+    $scope.submenuNavItem = 'configuration';
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);

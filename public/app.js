@@ -484,7 +484,7 @@ routes
     }
   })
   .when('/policy_monitoring/', {
-    template: require('plugins/wazuh/templates/policy_monitoring.html'),
+    template: require('plugins/wazuh/templates/policy-monitoring.html'),
     resolve: {
       "check": settingsWizard
     }
@@ -514,10 +514,16 @@ routes
     }
   })
   .when('/', {
-    redirectTo: '/manager/'
+    redirectTo: '/manager/',
+    resolve: {
+      "check": settingsWizard
+    }
   })
   .when('', {
-    redirectTo: '/manager/'
+    redirectTo: '/manager/',
+    resolve: {
+      "check": settingsWizard
+    }
   })
   .otherwise({
     redirectTo: '/settings/'
@@ -527,9 +533,8 @@ routes
 require('plugins/wazuh/controllers/agents.js');
 require('plugins/wazuh/controllers/settings.js');
 require('plugins/wazuh/controllers/manager.js');
-require('plugins/wazuh/controllers/manager-configuration.js');
 require('plugins/wazuh/controllers/fim.js');
-require('plugins/wazuh/controllers/policy_monitoring.js');
+require('plugins/wazuh/controllers/policy-monitoring.js');
 require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
 require('plugins/wazuh/controllers/kibanaIntegration.js');

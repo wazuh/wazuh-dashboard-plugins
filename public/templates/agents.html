@@ -121,17 +121,17 @@
 						</md-list>
 					</div>
 
-					<md-toolbar layout="row" class="md-hue-3">
+					<md-toolbar layout="row" class="md-hue-3" ng-if="agentInfo.syscheckEvents.length > 0" hide-xs>
 						<div class="md-toolbar-tools">
 							<span flex="40">File</span>
 							<span flex="10">Event</span>
-							<span flex="10">Permissions</span>
+							<span flex="10">Perms</span>
 							<span flex="10">User</span>
 							<span flex="10">Group</span>
 							<span flex="10">Date</span>
 						</div>
 					</md-toolbar>
-					<md-list ng-repeat="event in agentInfo.syscheckEvents" ng-if="agentInfo.syscheckEvents.length > 0">
+					<md-list ng-repeat="event in agentInfo.syscheckEvents" ng-if="agentInfo.syscheckEvents.length > 0" hide-xs>
 						<md-list-item>
 							<span flex="40">{{event.file}}</span>
 							<span flex="10">{{event.event.charAt(0).toUpperCase() + event.event.slice(1)}}</span>
@@ -158,7 +158,7 @@
 				<md-tab label="Rootcheck" flex>
 					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-list class="md-dense" flex layout="column">
-								<md-list-item class="md-2-line">
+								<md-list-item class="md-2-line" layout="column">
 									<div class="md-list-item-text" layout="column">
 										<h3>Last scan started</h3>
 										<p>{{agentInfo.rootcheckTime}}</p>
@@ -166,7 +166,7 @@
 								</md-list-item>
 							</md-list>
 							<md-list class="md-dense" flex layout="column">
-								<md-list-item class="md-2-line">
+								<md-list-item class="md-2-line" layout="column">
 									<div class="md-list-item-text" layout="column">
 										<h3>Last scan ended</h3>
 										<p>{{agentInfo.rootcheckEndTime}}</p>
@@ -176,14 +176,14 @@
 					</div>
 
 
-					<md-toolbar layout="row" class="md-hue-3">
+					<md-toolbar layout="row" class="md-hue-3" ng-if="agentInfo.rootcheckEvents.length > 0" hide-xs>
 						<div class="md-toolbar-tools">
 							<span flex="50">Control</span>
 							<span flex="25">Detected</span>
 							<span flex="25">Last scan</span>
 						</div>
 					</md-toolbar>
-					<md-list ng-repeat="event in agentInfo.rootcheckEvents" ng-if="agentInfo.rootcheckEvents.length > 0">
+					<md-list ng-repeat="event in agentInfo.rootcheckEvents" ng-if="agentInfo.rootcheckEvents.length > 0" hide-xs>
 						<md-list-item>
 							<span flex="50">{{event.event.length > 53 ? event.event.substring(0, 50)+'...' : event.event}}</span>
 							<span flex="25">{{event.oldDay}}</span>

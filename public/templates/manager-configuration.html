@@ -9,7 +9,7 @@
       <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
       <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
       <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-      <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
+			<md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
       <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
     </md-nav-bar>
   </md-content>
@@ -158,7 +158,7 @@
       </div>
   </md-content>
   <md-content flex layout-padding layout="row" layout-sm="column" layout-xs="column">
-      <div flex layout="column" ng-if='managerConfiguration["active-response"] || (managerConfiguration["active-response"].disabled == yes)'>
+      <div flex layout="column" ng-if='managerConfiguration["active-response"] && (managerConfiguration["active-response"].disabled != "yes")'>
         <md-card>
           <md-card-content>
             <h3>Active response</h3>
