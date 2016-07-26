@@ -23,37 +23,39 @@
 
     <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-    <md-content layout="column" ng-if="!load" layout-align="space-around center">
-        <h2 class="container_page_title">Update</h2>
-        <md-input-container>
-            <p>1. Select what you want to update:</p>
-            <md-select ng-model="$parent.updateType">
-                <md-option value="r">Rules</md-option>
-                <md-option value="c">Rootcheck</md-option>
-                <md-option value="b">Both</md-option>
-            </md-select>
-        </md-input-container>
-        <md-input-container>
-            <p>2. Do you want to force it?</p>
-            <md-switch ng-model="$parent.updateForce" aria-label="Force update?">
-                <span ng-show="$parent.updateForce">Overwrite all the rules (OSSEC manager is going to be restarted)</span>
-                <span ng-show="!$parent.updateForce">Update the outdated rules (Manager will be restarted only if enabled rules are updated)</span>
-            </md-switch>
-        </md-input-container>
+    <md-content layout="row" ng-if="!load" layout-align="space-around start" layout-sm="column" layout-xs="column">
 
-        <md-button type="submit" ng-click="updateRuleset();" class="md-primary md-raised">Update ruleset</md-button>
+        <md-content layout="column" layout-align="space-around center">
+            <h2>Update</h2>
+            <md-input-container layout="column" layout-align="space-around center">
+                <p>1. Select what you want to update:</p>
+                <md-select ng-model="$parent.updateType">
+                    <md-option value="r">Rules</md-option>
+                    <md-option value="c">Rootcheck</md-option>
+                    <md-option value="b">Both</md-option>
+                </md-select>
+            </md-input-container>
+            <md-input-container layout="column" layout-align="space-around center">
+                <p>2. Do you want to force it?</p>
+                <md-switch ng-model="$parent.updateForce" aria-label="Force update?">
+                    <span ng-show="$parent.updateForce">Overwrite all the rules (OSSEC manager is going to be restarted)</span>
+                    <span ng-show="!$parent.updateForce">Update the outdated rules (Manager will be restarted only if enabled rules are updated)</span>
+                </md-switch>
+            </md-input-container>
+
+            <md-button type="submit" ng-click="updateRuleset();" class="md-primary md-raised">Update ruleset</md-button>
+        </md-content>
 
         <md-divider></md-divider>
 
-        <md-input-container layout="column" ng-if="$parent.backups > 0">
-            <p>Backups:</p>
-            <span layout="row">
-            <md-select ng-model="$parent.selectedBackup">
-                <md-option value="{{backup}}" ng-repeat="backup in $parent.$parent.backups">{{backup}}</md-option>
+        <md-content layout="column" layout-align="space-around center">
+            <h2>Backups</h2>
+            <md-select ng-model="$parent.selectedBackup" md-on-open="load_backups()" style="min-width: 150px;">
+                <md-option value="{{backup}}" ng-repeat="backup in backups">{{backup}}</md-option>
             </md-select>
             <md-button type="submit" class="md-primary md-raised" ng-click="restoreBackup();">Restore backup</md-button>
-            </span>
             <p style="font-weight: lighter;">* When ruleset is updated, a new backup (the first in the list) will be created.</p>
-        </md-input-container>
+        </md-content>
+
     </md-content>
 </md-content>

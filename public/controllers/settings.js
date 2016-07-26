@@ -55,7 +55,7 @@ app.controller('settingsController', function ($scope, $http, $q, testConnection
         testConnection.test()
             .then(function (data) {
                 $scope.editConfiguration = false;
-                $mdToast.show($mdToast.simple().textContent('<b>Successfully connected!</b>'));
+                $mdToast.show($mdToast.simple().textContent('Successfully connected!'));
             }, printTest);
     };
 

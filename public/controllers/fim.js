@@ -22,17 +22,17 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     $scope.agentsObj = {
         //Obj with methods for virtual scrolling
         getItemAtIndex: function (index) {
-            if ($scope._agents_blocked) {
+            if ($scope.blocked) {
                 return null;
             }
             var _pos = index - DataFactory.getOffset(objectsArray['/agents']);
-            if ((_pos > 15) || (_pos < 0)) {
-                $scope._agents_blocked = true;
+            if ((_pos > 25) || (_pos < 0)) {
+                $scope.blocked = true;
                 DataFactory.scrollTo(objectsArray['/agents'], index)
                     .then(function (data) {
                         $scope.agents.length = 0;
                         $scope.agents = data.data.items;
-                        $scope._agents_blocked = false;
+                        $scope.blocked = false;
                     }, printError);
             } else {
                 return $scope.agents[_pos];
@@ -207,9 +207,14 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         }
     };
 
-    /*DEPRECATED $scope.isSetAgentFilter = function (id) {
-        return ($scope.agentId === id);
-    };*/
+    $scope.getAgentStatusClass = function (agentStatus) {
+        if (agentStatus == "Active")
+            return "green"
+        else if (agentStatus == "Disconnected")
+            return "red";
+        else
+            return "red";
+    };
 
     $scope.setAgentFilter = function (agent) {
         if (agent != $scope._agent) {
@@ -384,7 +389,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         DataFactory.initialize('get', '/syscheck/'+_agent+'/files', {'summary': 'yes'}, 30, 0)
             .then(function (data) {
                 objectsArray['/syscheck/files'] = data;
-                DataFactory.initialize('get', '/agents', {}, 15, 0)
+                DataFactory.initialize('get', '/agents', {}, 30, 0)
                     .then(function (data) {
                         objectsArray['/agents'] = data;
                         load_data();

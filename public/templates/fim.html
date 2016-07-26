@@ -9,7 +9,7 @@
             <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
             <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
             <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-			      <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
+		    <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
             <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
         </md-nav-bar>
     </md-content>
@@ -19,15 +19,16 @@
     <md-content class="md-padding">
         <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-href="#/fim" name="overview">Overview</md-nav-item>
-            <md-nav-item md-nav-href="#/fim/dashboard" name="metrics">Dashboard</md-nav-item>
+            <md-nav-item md-nav-href="#/fim/dashboard" name="dashboard">Dashboard</md-nav-item>
         </md-nav-bar>
     </md-content>
 
     <div flex layout="row" ng-if="!load">
         <md-content flex id="content" layout="column" layout-padding>
             <md-toolbar layout="row" class="md-primary _md" ng-if="_agent">
-                <div class="md-toolbar-tools">
-                    <h3 class="ng-binding"><span ng-click="unsetFile()">{{_agent.id}} - {{_agent.name}}</span> <span ng-if="_file"> > {{_file.file}}</span></h3>
+                <div class="md-toolbar-tools" layout-align="space-between center">
+                    <h3><span ng-click="unsetFile()">{{_agent.id}} - {{_agent.name}}  <span ng-show="_agent.id == '000'">(Manager)</span></span> <span ng-if="_file"> > {{_file.file}}</span></h3>
+                    <h4 ng-click="unsetFile()" ng-if="_file">Back <i class="fa fa-undo" aria-hidden="true"></i></h4>
                 </div>
             </md-toolbar>
             <md-input-container layout="row" class="sideNavBox" ng-if="_agent">
@@ -40,16 +41,16 @@
                 <md-toolbar layout="row" class="md-hue-3">
                   <div class="md-toolbar-tools">
                       <span flex="60">File name</span>
-                      <span flex="20">Event</span>
-                      <span flex="20">Date</span>
+                      <span flex="20" hide-sm hide-xs>Event</span>
+                      <span flex="20" hide-sm hide-xs>Date</span>
                   </div>
                 </md-toolbar>
                   <div md-virtual-repeat="file in filesObj" md-on-demand flex  layout-align="stretch">
                     <md-list>
                       <md-list-item  ng-click="initEvents(_agent, file)">
                         <span flex="60">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
-                        <span flex="20">{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</span>
-                        <span flex="20">{{file.modificationDate}}</span>
+                        <span flex="20" hide-sm hide-xs>{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</span>
+                        <span flex="20" hide-sm hide-xs>{{file.modificationDate}}</span>
                       </md-list-item>
                     </md-list>
                       <md-divider></md-divider>
@@ -59,30 +60,30 @@
             <div flex ng-if="_file">
                 <md-virtual-repeat-container class="vertical-repeater" style="min-height: 400px;">
                   <md-toolbar layout="row" class="md-hue-3">
-                      <div class="md-toolbar-tools">
+                      <div class="md-toolbar-tools" style="text-align: center;">
                           <span flex="10">Event</span>
-                          <span flex="10">User</span>
-                          <span flex="10">UID</span>
-                          <span flex="10">Group</span>
-                          <span flex="10">GID</span>
-                          <span flex="10">Permissions</span>
-                          <span flex="10">Size</span>
-
+                          <span flex show-sm show-xs> </span>
                           <span flex="20">Date</span>
+                          <span flex="15" hide-sm hide-xs>User</span>
+                          <span flex="15" hide-sm hide-xs>Group</span>
+                          <span flex="20" hide-sm hide-xs>Permissions</span>
+                          <span flex="10" hide-sm hide-xs>Size</span>
+                          <span flex show-sm show-xs> </span>
+                          <span flex="10">Details</span>
                       </div>
                     </md-toolbar>
                     <div md-virtual-repeat="event in eventsObj" md-on-demand flex>
                       <md-list>
-                        <md-list-item >
+                        <md-list-item style="text-align: center;">
                           <span flex="10">{{event.event}}</span>
-                          <span flex="10">{{event.user}}</span>
-                          <span flex="10">{{event.uid}}</span>
-                          <span flex="10">{{event.group}}</span>
-                          <span flex="10">{{event.gid}}</span>
-                          <span flex="10">{{event.permissions}}</span>
-                          <span flex="10">{{event.size}}</span>
+                          <span flex show-sm show-xs> </span>
                           <span flex="20">{{event.modificationDate}}</span>
-                          
+                          <span flex="15" hide-sm hide-xs>{{event.user}} (ID: {{event.uid}})</span>
+                          <span flex="15" hide-sm hide-xs>{{event.group}} (ID: {{event.gid}})</span>
+                          <span flex="20" hide-sm hide-xs>{{event.permissions}}</span>
+                          <span flex="10" hide-sm hide-xs>{{event.size}} bits</span>
+                          <span flex show-sm show-xs> </span>
+                          <span flex="10" ng-click="printEventInfo(event)"><span class="glyphicon glyphicon-plus"></span></span>
                         </md-list-item>
                       </md-list>
                     </div>

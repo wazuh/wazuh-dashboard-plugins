@@ -1,134 +1,143 @@
 <div flex layout="column" ng-controller="pmController">
 
-	<md-content class="md-padding">
-		<md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-			<md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
-					<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
-			</md-nav-item>
-			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
-			<md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-			<md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
-			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
-		</md-nav-bar>
-	</md-content>
+  <md-content class="md-padding">
+    <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+      <md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
+        <img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+      </md-nav-item>
+      <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+      <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+      <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+      <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+      <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
+      <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+    </md-nav-bar>
+  </md-content>
 
-   <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
+  <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-  	<div flex layout="row" ng-if="!load" layout-align="stretch">
-      <md-content flex id="content" layout="column" layout-align="start" layout-padding>
-          <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-          <md-toolbar layout="row" class="md-primary _md" ng-if="agentId">
-              <div class="md-toolbar-tools">
-                  <h3 class="ng-binding"><span>{{agentId}}</span></h3>
-              </div>
-          </md-toolbar>
-          <div layout-align="start start" flex="10" id="content" layout="row">
-            <input layout-align="start start" flex type="text" ng-model="$parent.search" ng-change="getEvents()" class="form-control ng-pristine ng-untouched ng-valid rulesetSearch" placeholder="Search...">
-            <md-button layout-align="start start" ng-class="{ active: $parent.statusFilter == 'outstanding' }" ng-click="setStatusFilter('outstanding')">Outstanding </md-button >
-            <md-button layout-align="start start" ng-class="{ active: $parent.statusFilter == 'solved' }" ng-click="setStatusFilter('solved')">Solved</md-button >
-          </div>
-          <div layout-align="start">
-              <md-toolbar layout-align="start start" layout="row" class="md-hue-3">
-                <div class="md-toolbar-tools">
-                    <span flex="70">Control</span>
-                    <span flex="15">First spotted</span>
-                    <span flex="15">Last scan</span>
-                </div>
-              </md-toolbar>
-              <md-list ng-repeat="event in events" layout-align="start start">
-                <md-list-item  ng-click=" showDetails = ! showDetails; ">
-                  <span flex="70">{{event.event.length > 73 ? event.event.substring(0, 70)+'...' : event.event}}</span>
-                  <span flex="15">{{event.oldDay}}</span>
-                  <span flex="15">{{event.readDay}}</span>
-                </md-list-item>
-                <md-content flex layout="column" layout-padding ng-show="showDetails">
-                  <md-list>
-                    <md-list-item>
-                      <span flex>{{event.event}}</span>
-                    </md-list-item>
-                  </md-list>
-                </md-content>
-              </md-list>
-              <div class="glyphicon glyphicon-chevron-left" ng-click="prevEvents()" ng-show="hasPrevEvents()"></div>
-              <div class="glyphicon glyphicon-chevron-right" ng-click="nextEvents()" ng-show="hasNextEvents()"></div>
+  <div flex layout="row" ng-if="!load" layout-align="stretch">
+    <md-content flex id="content" layout="column" layout-align="start" layout-padding>
+      <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
+      <md-toolbar layout="row" class="md-primary _md" ng-if="agentId">
+        <div class="md-toolbar-tools">
+          <h3 class="ng-binding"><span>{{agentId}}</span></h3>
+        </div>
+      </md-toolbar>
+      <div flex id="content" layout="row">
+        <md-input-container>
+          <label>Search</label>
+          <input flex type="text" ng-model="$parent.search" ng-change="getEvents()">
+        </md-input-container>
+        <md-input-container>
+          <md-button ng-class="{ active: $parent.statusFilter == 'outstanding' }" ng-click="setStatusFilter('outstanding')">Outstanding </md-button>
+        </md-input-container>
+        <md-input-container>
+          <md-button ng-class="{ active: $parent.statusFilter == 'solved' }" ng-click="setStatusFilter('solved')">Solved</md-button>
+        </md-input-container>
+      </div>
+      <div>
+        <md-virtual-repeat-container class="vertical-repeater" style="min-height: 600px;">
+          <md-toolbar layout="row" class="md-hue-3">
+            <div class="md-toolbar-tools">
+              <span flex="60">Control</span>
+              <span flex="20">First spotted</span>
+              <span flex="20">Last scan</span>
             </div>
+          </md-toolbar>
+          <div md-virtual-repeat="event in eventsObj" md-on-demand flex layout-align="stretch" <md-list>
+            <md-list-item ng-click=" showDetails = ! showDetails; ">
+              <span flex="60">{{event.event.length > 53 ? event.event.substring(0, 50)+'...' : event.event}}</span>
+              <span flex="20">{{event.oldDay}}</span>
+              <span flex="20">{{event.readDay}}</span>
+            </md-list-item>
+            <md-content flex layout="column" layout-padding ng-show="showDetails">
+              <md-list>
+                <md-list-item>
+                  <span flex>{{event.event}}</span>
+                </md-list-item>
+              </md-list>
+              <md-divider></md-divider>
             </md-content>
-            <md-sidenav md-is-open="isOpenSidenav" md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
-              layout="column" class="md-sidenav-right md-whiteframe-z2" flex="30">
-              <md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm></md-icon>
-              <md-input-container class="sideNavBox">
-                <label for="searchBox">Search</label>
-                <input type="text" id="searchBox" ng-model="$parent.searchAgents" ng-change="searchAgent()" md-autofocus flex>
-                <md-icon md-font-icon="fa fa-cog" ng-click="showFiltersDialog()" />
-              </md-input-container>
-              <md-chips>
-                <md-chip ng-show="statusFilter">{{statusFilter}}</md-chip>
-                <md-chip ng-show="!statusFilter">all</md-chip>
-                <md-chip ng-show="sortKey">
-                  {{sortKey}}
-                  <span class="glyphicon sort-icon" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
-                </md-chip>
-              </md-chips>
-              <md-virtual-repeat-container class="vertical-repeater" >
-                <div md-virtual-repeat="agent in agentsObj" md-on-demand flex>
-                  <div layout="column" layout-align="space-around stretch">
-                    <md-card ng-click="setAgentFilter(agent.id)">
-                      <md-card-title>
-                        <md-card-title-text>
-                          <span class="md-title">{{agent.id}} <span ng-if="agent.id == '000'">(Manager)</span></span>
-                          <span class="md-subhead">{{agent.name}} - {{agent.ip}}</span>
-                        </md-card-title-text>
-                        <div layout="column" class="status" ng-class="getAgentStatusClass(agent.status);">
-                        </div>
-                      </md-card-title>
-                    </md-card>
-                  </div>
-                </div>
-              </md-virtual-repeat-container>
-            </md-sidenav>
-            <md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents"
-              hide-gt-sm>
-              <span class="glyphicon glyphicon-menu-hamburger"></span>
-            </md-button>
+            </md-list>
           </div>
-            <div style="display: none">
-          		<div class="md-dialog-container" id="filtersDialog">
-          			<md-dialog layout-padding layout="column" layout-align="space-around center">
-          				<label>Filter by status:</label>
-          				<md-input-container>
-          					<md-select ng-model="statusFilter" ng-change="agentStatusFilter()" aria-label="Filter by status">
-          						<md-option value="all">All</md-option>
-          						<md-option value="active">Active</md-option>
-          						<md-option value="disconnected">Disconnected</md-option>
-          						<md-option value="never connected">Never connected</md-option>
-          					</md-select>
-          				</md-input-container>
-          				<label>Order by:</label>
-          				<div flex layout="row" layout-align="space-around center" md-disable-backdrop class="md-padding">
-          					<md-button class="md-primary" ng-click="sort('status')">
-          						<span>Status</span>
-          						<span class="glyphicon sort-icon" ng-show="sortKey=='status'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
-          						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='status'"></span>
-          					</md-button>
-          					<md-button class="md-primary" ng-click="sort('ip')">
-          						<span>IP</span>
-          						<span class="glyphicon sort-icon" ng-show="sortKey=='ip'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
-          						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='ip'"></span>
-          					</md-button>
-          					<md-button class="md-primary" ng-click="sort('name')">
-          						<span>Name</span>
-          						<span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
-          						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='name'"></span>
-          					</md-button>
-          					<md-button class="md-primary" ng-click="sort('id')">
-          						<span>ID</span>
-          						<span class="glyphicon sort-icon" ng-show="sortKey=='id'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
-          						<span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='id'"></span>
-          					</md-button>
-          				</div>
-          			</md-dialog>
-          		</div>
-          	</div>
+        </md-virtual-repeat-container>
+      </div>
+    </md-content>
+    <md-sidenav md-is-open="isOpenSidenav" md-component-id="agentsNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
+      layout="column" class="md-sidenav-right md-whiteframe-z2" flex="30">
+      <md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm></md-icon>
+      <md-input-container class="sideNavBox">
+        <label for="searchBox">Search</label>
+        <input type="text" id="searchBox" ng-model="$parent.searchAgents" ng-change="searchAgent()" md-autofocus flex>
+        <md-icon md-font-icon="fa fa-cog" ng-click="showFiltersDialog()" />
+      </md-input-container>
+      <md-chips>
+        <md-chip ng-show="_agentStatusFilter">{{_agentStatusFilter}}</md-chip>
+        <md-chip ng-show="!_agentStatusFilter">all</md-chip>
+        <md-chip ng-show="sortKey">
+          {{sortKey}}
+          <span class="glyphicon sort-icon" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+        </md-chip>
+      </md-chips>
+      <md-virtual-repeat-container class="vertical-repeater">
+        <div md-virtual-repeat="agent in agentsObj" md-on-demand flex>
+          <div layout="column" layout-align="space-around stretch">
+            <md-card ng-click="setAgentFilter(agent.id)">
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-title">{{agent.id}} <span ng-if="agent.id == '000'">(Manager)</span></span>
+                  <span class="md-subhead">{{agent.name}} - {{agent.ip}}</span>
+                </md-card-title-text>
+                <div layout="column" class="status" ng-class="getAgentStatusClass(agent.status);">
+                </div>
+              </md-card-title>
+            </md-card>
+          </div>
+        </div>
+      </md-virtual-repeat-container>
+    </md-sidenav>
+    <md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents"
+      hide-gt-sm>
+      <span class="glyphicon glyphicon-menu-hamburger"></span>
+    </md-button>
+  </div>
+  <div style="display: none">
+    <div class="md-dialog-container" id="filtersDialog">
+      <md-dialog layout-padding layout="column" layout-align="space-around center">
+        <label>Filter by status:</label>
+        <md-input-container>
+          <md-select ng-model="_agentStatusFilter" ng-change="agentStatusFilter()" aria-label="Filter by status">
+            <md-option value="all">All</md-option>
+            <md-option value="active">Active</md-option>
+            <md-option value="disconnected">Disconnected</md-option>
+            <md-option value="never connected">Never connected</md-option>
+          </md-select>
+        </md-input-container>
+        <label>Order by:</label>
+        <div flex layout="row" layout-align="space-around center" md-disable-backdrop class="md-padding">
+          <md-button class="md-primary" ng-click="sort('status')">
+            <span>Status</span>
+            <span class="glyphicon sort-icon" ng-show="sortKey=='status'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+            <span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='status'"></span>
+          </md-button>
+          <md-button class="md-primary" ng-click="sort('ip')">
+            <span>IP</span>
+            <span class="glyphicon sort-icon" ng-show="sortKey=='ip'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+            <span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='ip'"></span>
+          </md-button>
+          <md-button class="md-primary" ng-click="sort('name')">
+            <span>Name</span>
+            <span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+            <span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='name'"></span>
+          </md-button>
+          <md-button class="md-primary" ng-click="sort('id')">
+            <span>ID</span>
+            <span class="glyphicon sort-icon" ng-show="sortKey=='id'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+            <span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='id'"></span>
+          </md-button>
+        </div>
+      </md-dialog>
+    </div>
+  </div>
 </div>

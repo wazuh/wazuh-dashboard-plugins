@@ -19,6 +19,30 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
 
     //Functions
 
+        $scope.eventsObj = {
+        //Obj with methods for virtual scrolling
+        getItemAtIndex: function (index) {
+            if ($scope._eblocked) {
+                return null;
+            }
+            var _pos = index - DataFactory.getOffset(objectsArray['/rootcheck']);
+            if ((_pos > 25) || (_pos < 0)) {
+                $scope._eblocked = true;
+                DataFactory.scrollTo(objectsArray['/rootcheck'], index)
+                    .then(function (data) {
+                        $scope.events.length = 0;
+                        $scope.events = data.data.items;
+                        $scope._eblocked = false;
+                    }, printError);
+            } else {
+                return $scope.events[_pos];
+            }
+        },
+        getLength: function () {
+            return DataFactory.getTotalItems(objectsArray['/rootcheck']);
+        },
+    };
+
     $scope.setStatusFilter = function (status) {
         if ($scope.statusFilter == status) {
             $scope.statusFilter = 'all';
@@ -191,12 +215,21 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
         if (id != $scope.agentId) {
             $scope.statusFilter = '';
             $scope.agentId = id;
-            DataFactory.initialize('get', '/rootcheck/' + id, {}, 16, 0)
+            DataFactory.initialize('get', '/rootcheck/' + id, {}, 30, 0)
                 .then(function (data) {
                     objectsArray['/rootcheck'] = data;
                     $scope.getEvents();
                 }, printError);
         }
+    };
+
+    $scope.getAgentStatusClass = function (agentStatus) {
+        if (agentStatus == "Active")
+            return "green"
+        else if (agentStatus == "Disconnected")
+            return "red";
+        else
+            return "red";
     };
 
     var load = function () {
@@ -209,10 +242,10 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
         }
         $scope.agentId = _agent;
 
-        DataFactory.initialize('get', '/rootcheck/'+_agent, {}, 16, 0)
+        DataFactory.initialize('get', '/rootcheck/'+_agent, {}, 30, 0)
             .then(function (data) {
                 objectsArray['/rootcheck'] = data;
-                DataFactory.initialize('get', '/agents', {}, 10, 0)
+                DataFactory.initialize('get', '/agents', {}, 30, 0)
                     .then(function (data) {
                         objectsArray['/agents'] = data;
                         load_data();

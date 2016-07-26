@@ -923,7 +923,7 @@ app.controller('updateRulesetController', function ($scope, $route, $q, alertify
                         alert += "The following manual steps are required: " + data.data.manual_steps_detail;
                     }
                     alertify.delay(10000).closeLogOnClick(true).success(alert);
-                    load_backups();
+                    $scope.load_backups();
                 }, printError);
         });
     };
@@ -951,16 +951,25 @@ app.controller('updateRulesetController', function ($scope, $route, $q, alertify
 
     //Load functions
 
-    var load_backups = function () {
+    $scope.load_backups = function () {
+        var defered = $q.defer();
+        var promise = defered.promise;
+
         DataFactory.getAndClean('get', '/manager/update-ruleset/backups', {})
             .then(function (data) {
+                defered.resolve();
+                $scope.backups.length = 0;
                 $scope.backups = data.data;
-                $scope.load = false;
-            }, printError);
+            }, function (error) {
+                printError(error);
+                defered.reject();
+            });
+
+        return promise;
     };
 
     var load = function () {
-        load_backups();
+        $scope.load = false;
     };
 
     //Load

@@ -27,7 +27,7 @@
 		<md-content flex id="content" layout-padding>
 			<md-toolbar class="md-primary _md" ng-show="_agent">
 				<div class="md-toolbar-tools">
-					<h3 class="ng-binding">{{_agent.id}} - {{_agent.name}}</h3>
+					<h3 class="ng-binding">{{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h3>
 				</div>
 			</md-toolbar>
 			<md-tabs md-dynamic-height md-border-bottom ng-show="_agent" flex>
