@@ -86,6 +86,7 @@
 							</md-list-item>
 						</md-list>
 					</div>
+					<md-divider></md-divider>
 					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-button md-no-ink class="md-primary" ng-class="{ hidden: (_agent.id == '000') }" ng-click="restart(_agent)">
 							<span class="form-group-addon glyphicon glyphicon-repeat iconControl"></span> Restart
@@ -100,6 +101,7 @@
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Metrics
 						</md-button>
 					</div>
+					<md-divider></md-divider>
 				</md-tab>
 				<md-tab label="File integrity" flex>
 					<div flex layout="row" layout-sm="column" layout-xs="column">
@@ -120,6 +122,7 @@
 							</md-list-item>
 						</md-list>
 					</div>
+					<p ng-if="agentInfo.syscheckEvents.length > 0" hide-xs><b>Last 5 events:</b></p>
 
 					<md-toolbar layout="row" class="md-hue-3" ng-if="agentInfo.syscheckEvents.length > 0" hide-xs>
 						<div class="md-toolbar-tools">
@@ -142,7 +145,7 @@
 						</md-list-item>
 					</md-list>
 
-
+					<md-divider></md-divider>
 					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-button md-no-ink class="md-primary" ng-click="loadFIM(_agent.id);">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
@@ -154,6 +157,7 @@
 							<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span> Clear database
 						</md-button>
 					</div>
+					<md-divider></md-divider>
 				</md-tab>
 				<md-tab label="Rootcheck" flex>
 					<div flex layout="row" layout-sm="column" layout-xs="column">
@@ -174,7 +178,7 @@
 							</md-list-item>
 						</md-list>
 					</div>
-
+					<p ng-if="agentInfo.rootcheckEvents.length > 0" hide-xs><b>Last 5 events:</b></p>
 
 					<md-toolbar layout="row" class="md-hue-3" ng-if="agentInfo.rootcheckEvents.length > 0" hide-xs>
 						<div class="md-toolbar-tools">
@@ -191,7 +195,7 @@
 						</md-list-item>
 					</md-list>
 
-
+					<md-divider></md-divider>
 					<div flex layout="row" layout-sm="column" layout-xs="column">
 						<md-button md-no-ink class="md-primary" ng-click="loadRootcheck(_agent.id);">
 							<span class="form-group-addon glyphicon glyphicon-share iconControl"></span> Details
@@ -203,6 +207,7 @@
 							<span class="form-group-addon glyphicon glyphicon-remove iconControl"></span> Clear database
 						</md-button>
 					</div>
+					<md-divider></md-divider>
 				</md-tab>
 				<md-tab label="Discover" flex>
 					<div flex layout="column">
