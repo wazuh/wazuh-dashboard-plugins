@@ -19,9 +19,15 @@
   <div flex layout="row" ng-if="!load" layout-align="stretch">
     <md-content flex id="content" layout="column" layout-align="start" layout-padding>
       <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-      <md-toolbar layout="row" class="md-primary _md" ng-if="agentId">
-        <div class="md-toolbar-tools">
-          <h3 class="ng-binding"><span>{{agentId}}</span></h3>
+      <md-toolbar layout="row" class="md-primary _md">
+        <div class="md-toolbar-tools" layout-align="space-between center">
+          <h3 class="ng-binding"><span>{{_agent.id}} - {{_agent.name}}  <span ng-show="_agent.id == '000'">(Manager)</span></span>
+          </h3>
+          <h4 hide-sm hide-xs>
+            <span ng-click="startrc()"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+            <md-divider style="visibility: hidden;"></md-divider>
+            <span ng-click="cleandb()"><i class="fa fa-trash" aria-hidden="true"></i></span>
+          </h4>
         </div>
       </md-toolbar>
       <div flex id="content" layout="row">

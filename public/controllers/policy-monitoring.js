@@ -10,7 +10,6 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
     $scope.agents = [];
     $scope.search = '';
 
-    $scope.agentId = '000';
     $scope.menuNavItem = 'policy_monitoring';
     //Print Error
     var printError = function (error) {
@@ -276,9 +275,7 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
         if ((_init != '') && (_init.substring(0, 4) == 'rc//')) {
             _agent = _init.substring(4);
             sharedProperties.setProperty('');
-            $scope.agentId = _agent;
         }
-        $scope.agentId = _agent;
 
         DataFactory.initialize('get', '/rootcheck/' + _agent, {}, 30, 0)
             .then(function (data) {
@@ -286,6 +283,7 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
                 DataFactory.initialize('get', '/agents', {}, 30, 0)
                     .then(function (data) {
                         objectsArray['/agents'] = data;
+
                         load_data();
                     }, printError);
             }, printError);
@@ -298,6 +296,7 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
                 DataFactory.get(objectsArray['/agents'])
                     .then(function (data) {
                         $scope.agents = data.data.items;
+                        $scope._agent = data.data.items[0];
                         $scope.load = false;
                     });
             }, printError);

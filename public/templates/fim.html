@@ -28,6 +28,11 @@
             <md-toolbar layout="row" class="md-primary _md" ng-if="_agent">
                 <div class="md-toolbar-tools" layout-align="space-between center">
                     <h3><span ng-click="unsetFile()">{{_agent.id}} - {{_agent.name}}  <span ng-show="_agent.id == '000'">(Manager)</span></span> <span ng-if="_file"> > {{_file.file}}</span></h3>
+                    <h4 ng-if="!_file" hide-sm hide-xs>
+                        <span ng-click="startfim()"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                        <md-divider style="visibility: hidden;"></md-divider>
+                        <span ng-click="cleandb()"><i class="fa fa-trash" aria-hidden="true"></i></span>
+                    </h4>
                     <h4 ng-click="unsetFile()" ng-if="_file">Back <i class="fa fa-undo" aria-hidden="true"></i></h4>
                 </div>
             </md-toolbar>
