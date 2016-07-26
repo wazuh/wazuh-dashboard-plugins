@@ -83,7 +83,7 @@
       <md-virtual-repeat-container class="vertical-repeater">
         <div md-virtual-repeat="agent in agentsObj" md-on-demand flex>
           <div layout="column" layout-align="space-around stretch">
-            <md-card ng-click="setAgentFilter(agent.id)">
+            <md-card ng-click="setAgentFilter(agent)">
               <md-card-title>
                 <md-card-title-text>
                   <span class="md-title">{{agent.id}} <span ng-if="agent.id == '000'">(Manager)</span></span>
@@ -140,4 +140,44 @@
       </md-dialog>
     </div>
   </div>
+
+  <div style="display: none">
+    <div class="md-dialog-container" id="filtersAgentsDialog">
+      <md-dialog layout-padding layout="column" layout-align="space-around center">
+        <label>Filter by status:</label>
+        <md-input-container>
+          <md-select ng-model="statusFilter" ng-change="agentStatusFilter()" aria-label="Filter by status">
+            <md-option value="all">All</md-option>
+            <md-option value="active">Active</md-option>
+            <md-option value="disconnected">Disconnected</md-option>
+            <md-option value="never connected">Never connected</md-option>
+          </md-select>
+        </md-input-container>
+        <label>Order by:</label>
+        <div flex layout="row" layout-align="space-around center" md-disable-backdrop class="md-padding">
+          <md-button class="md-primary" ng-click="sort('status')">
+            <span>Status</span>
+            <span class="glyphicon sort-icon" ng-show="sortKey=='status'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+            <span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='status'"></span>
+          </md-button>
+          <md-button class="md-primary" ng-click="sort('ip')">
+            <span>IP</span>
+            <span class="glyphicon sort-icon" ng-show="sortKey=='ip'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+            <span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='ip'"></span>
+          </md-button>
+          <md-button class="md-primary" ng-click="sort('name')">
+            <span>Name</span>
+            <span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+            <span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='name'"></span>
+          </md-button>
+          <md-button class="md-primary" ng-click="sort('id')">
+            <span>ID</span>
+            <span class="glyphicon sort-icon" ng-show="sortKey=='id'" ng-class="{'glyphicon-triangle-top':reverse,'glyphicon-triangle-bottom':!reverse}"></span>
+            <span class="glyphicon sort-icon glyphicon-minus" ng-show="sortKey!='id'"></span>
+          </md-button>
+        </div>
+      </md-dialog>
+    </div>
+  </div>
+
 </div>

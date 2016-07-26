@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('pmController', function ($scope, alertify, sharedProperties, DataFactory, $location) {
+app.controller('pmController', function ($scope, alertify, sharedProperties, DataFactory, $location, $mdDialog) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -19,7 +19,7 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
 
     //Functions
 
-        $scope.eventsObj = {
+    $scope.eventsObj = {
         //Obj with methods for virtual scrolling
         getItemAtIndex: function (index) {
             if ($scope._eblocked) {
@@ -50,7 +50,7 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
             $scope.statusFilter = status;
         }
 
-        $scope.getEvents({'status': $scope.statusFilter});
+        $scope.getEvents({ 'status': $scope.statusFilter });
     };
 
     $scope.loadDiscover = function (event) {
@@ -140,54 +140,6 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
             }, printError);
     };
 
-    $scope.getStatusClass = function (status) {
-        if (status === 'resolved') {
-            return "statusGreen";
-        } else {
-            return "statusRed";
-        }
-    };
-
-    $scope.searchAgent = function () {
-        if ($scope.searchAgents === '') {
-            $scope.searchAgents = undefined;
-        }
-        DataFactory.get(objectsArray['/agents'], { search: $scope.searchAgents })
-            .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-            }, printError);
-    };
-
-    $scope.getAgents = function () {
-        DataFactory.get(objectsArray['/agents'])
-            .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-            }, printError);
-    };
-
-    $scope.hasNextAgents = function () {
-        return DataFactory.hasNext(objectsArray['/agents']);
-    };
-    $scope.nextAgents = function () {
-        DataFactory.next(objectsArray['/agents'])
-            .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-            }, printError);
-    };
-
-    $scope.hasPrevAgents = function () {
-        return DataFactory.hasPrev(objectsArray['/agents']);
-    };
-    $scope.prevAgents = function () {
-        DataFactory.prev(objectsArray['/agents'])
-            .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-            }, printError);
-    };
 
     $scope.cleandb = function () {
         alertify.confirm("Are you sure you want to delete the rootcheck database in all the agents?", function () {
@@ -207,18 +159,104 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
         });
     };
 
-    $scope.isSetAgentFilter = function (id) {
-        return ($scope.agentId === id);
+    $scope.showFiltersDialog = function (ev) {
+        $mdDialog.show({
+            contentElement: '#filtersAgentsDialog',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true
+        });
     };
 
-    $scope.setAgentFilter = function (id) {
-        if (id != $scope.agentId) {
-            $scope.statusFilter = '';
-            $scope.agentId = id;
-            DataFactory.initialize('get', '/rootcheck/' + id, {}, 30, 0)
+    $scope.getAgentStatusClass = function (agentStatus) {
+        if (agentStatus == "Active")
+            return "green"
+        else if (agentStatus == "Disconnected")
+            return "red";
+        else
+            return "red";
+    };
+
+    $scope.setAgentFilter = function (agent) {
+        if (agent != $scope._agent) {
+            $scope._agent = agent;
+            $scope.eventFilter = '';
+            $scope.typeFilter = '';
+            DataFactory.initialize('get', '/rootcheck/' + agent.id, {}, 20, 0)
                 .then(function (data) {
                     objectsArray['/rootcheck'] = data;
-                    $scope.getEvents();
+                }, printError);
+        }
+    };
+
+    $scope.searchAgent = function () {
+        if ($scope.searchAgents === '') {
+            $scope.searchAgents = undefined;
+        }
+        DataFactory.get(objectsArray['/agents'], { search: $scope.searchAgents })
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+            }, printError);
+    };
+
+    $scope.agentStatusFilter = function () {
+        var _status;
+        if ($scope.statusFilter === 'all') {
+            _status = undefined;
+        } else {
+            _status = $scope.statusFilter;
+        }
+        $scope.getAgents({ 'sort': $scope.searchQuery, 'status': _status });
+    };
+
+    $scope.sort = function (keyname) {
+        $scope.sortKey = keyname;
+        $scope.reverse = !$scope.reverse;
+        $scope.searchQuery = '';
+        if (!$scope.reverse) {
+            $scope.searchQuery += '-';
+        }
+
+        $scope.searchQuery += $scope.sortKey;
+        if ($scope.statusFilter != '') {
+            $scope.getAgents({ 'sort': $scope.searchQuery, 'status': $scope.statusFilter });
+        } else {
+            $scope.getAgents({ 'sort': $scope.searchQuery });
+        }
+    };
+    $scope.getAgents = function (body) {
+        if ($scope._agents_blocked) {
+            return null;
+        }
+        $scope._agents_blocked = true;
+        //Search agent body modification
+        if (!body) {
+            var tmpBody = DataFactory.getBody(objectsArray['/agents']);
+            if ($scope.search !== tmpBody['search']) {
+                tmpBody['search'] = $scope.search;
+                body = tmpBody;
+            }
+        } else if ($scope.search !== body['search']) {
+            body['search'] = $scope.search;
+        }
+        if (body['search'] === '') {
+            body['search'] = undefined;
+        }
+
+        if (!body) {
+            DataFactory.get(objectsArray['/agents'])
+                .then(function (data) {
+                    $scope.agents.length = 0;
+                    $scope.agents = data.data.items;
+                    $scope._agents_blocked = false;
+                }, printError);
+        } else {
+            DataFactory.get(objectsArray['/agents'], body)
+                .then(function (data) {
+                    $scope.agents.length = 0;
+                    $scope.agents = data.data.items;
+                    $scope._agents_blocked = false;
                 }, printError);
         }
     };
@@ -242,7 +280,7 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
         }
         $scope.agentId = _agent;
 
-        DataFactory.initialize('get', '/rootcheck/'+_agent, {}, 30, 0)
+        DataFactory.initialize('get', '/rootcheck/' + _agent, {}, 30, 0)
             .then(function (data) {
                 objectsArray['/rootcheck'] = data;
                 DataFactory.initialize('get', '/agents', {}, 30, 0)
