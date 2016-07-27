@@ -180,8 +180,8 @@ app.controller('managerConfigurationController', function ($scope, $route, $q, a
             .then(function (data) {
                 $scope.managerConfiguration = data.data;
                 parseConfiguration();
+                $scope.load = false;
             }, printError);
-        $scope.load = false;
     };
     
     //Load
