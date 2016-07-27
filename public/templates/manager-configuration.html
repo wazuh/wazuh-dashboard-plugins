@@ -47,7 +47,7 @@
             </span>
             <span ng-if="managerConfiguration.global.white_list">
                 <span layout="row" layout-align="space-between center">
-                <p>White List</p>
+                <p style="font-weight: bold">White List</p>
                 <p class="right-text">
                   <i class="fa fa-caret-down" aria-hidden="true" ng-show="!show" ng-click="show = true"></i>
                   <i class="fa fa-caret-up" aria-hidden="true" ng-show="show" ng-click="show = false"></i>
@@ -550,8 +550,8 @@
 
             <span ng-repeat='item in managerConfiguration["localfile"]|orderBy:["location", "command"]'>
               <span layout="row" layout-align="space-between center">
-              <p ng-if="item.location"> {{ item.location }} </p>
-              <p ng-if="item.command" style="overflow: hidden;"> {{ item.command }} </p>
+              <p ng-if="item.location" style="font-weight: bold"> {{ item.location }} </p>
+              <p ng-if="item.command" style="overflow: hidden; font-weight: bold;"> {{ item.command }} </p>
               <p class="right-text">
                   <i class="fa fa-caret-down" aria-hidden="true" ng-show="!show" ng-click="show = true"></i>
                   <i class="fa fa-caret-up" aria-hidden="true" ng-show="show" ng-click="show = false"></i>
