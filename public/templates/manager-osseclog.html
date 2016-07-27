@@ -1,49 +1,74 @@
-<div>
-  <ul class="wazuh-submenu">
-    <li><a href="/app/wazuh#/manager">Overview</a></li>
-    <li class="active"><a>OSSEC Logs</a></li>
-    <li><a href="/app/wazuh#/manager/metrics">Metrics</a></li>
-  </ul>
-</div>
-<div class="container" ng-controller="osseclogController">
-    <div ng-if="load" style="text-align: center;">
-        <img style="display: inline-block; width: auto;" src="/plugins/wazuh/img/loading.gif"></img>
-    </div>
-    <div class="row containerLog" ng-if="!load">
-        <div id="messages" ng-show="message" class="settings-message-error" ng-bind-html="message">{{ message }}</div>
-        <div class="leftCol">
-            <h2 class="container_page_title">ossec.log</h2>
-            <div class="logContentTabs">
-                <div id="logTab">
-                    <table class="logTable">
-                        <tbody>
-                            <tr ng-repeat="line in text">
-                                <td class="logTableNumber">{{$index}}</td>
-                                <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}" ng-bind-html="colorLine(line)">{{colorLine(line)}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <span class="glyphicon glyphicon-chevron-left" ng-click="prev()" ng-show="hasPrev()"></span><span class="glyphicon glyphicon-chevron-right"
-                        ng-click="next()" ng-show="hasNext()"></span>
-                </div>
-            </div>
-        </div>
-        <div class="rightCol">
-            <div class="filesBlock" style="margin-top: 35px;">
-                <label>Realtime: </label>
-                <span class="glyphicon glyphicon-play" ng-show="!realtime" ng-click="playRealtime()"></span>
-                <span class="glyphicon glyphicon-stop" ng-show="realtime" ng-click="playRealtime()"></span>
-                <table class="table-files" ng-repeat="(key, value) in summary">
-                    <tr class="table-files-list-tr">
-                        <td class="table-files-list-td" colspan="3"><b>{{key}}</b></td>
-                    </tr>
-                    <tr class="table-files-list-tr filterClickable" ng-repeat="(subk, subv) in value" ng-click="filter(key, subk)" ng-class="{ activeRow: isSetFilter(key, subk) }">
-                        <td class="table-files-list-td"> </td>
-                        <td class="table-files-list-td">{{subk}}</td>
-                        <td class="table-files-list-td">{{subv}}</td>
-                    </tr>
+<div flex ng-controller="osseclogController" layout="column">
+
+    <md-content class="md-padding">
+        <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+            <md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
+                <img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+            </md-nav-item>
+            <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+            <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+            <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+            <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
+            <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
+            <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+        </md-nav-bar>
+    </md-content>
+
+    <md-content class="md-padding">
+        <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation links">
+            <md-nav-item md-nav-href="#/manager" name="general">General</md-nav-item>
+            <md-nav-item md-nav-href="#/manager/configuration" name="configuration">Configuration</md-nav-item>
+            <md-nav-item md-nav-href="#/manager/osseclog" name="logs">Logs</md-nav-item>
+        </md-nav-bar>
+    </md-content>
+
+    <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
+
+    <div flex layout="row" ng-if="!load">
+        <md-content flex id="content" layout-padding>
+            <md-virtual-repeat-container class="vertical-repeater">
+                <table class="logTable" flex>
+                    <tbody>
+                        <tr md-virtual-repeat="line in textObj" md-on-demand flex>
+                            <td class="logTableNumber">{{$index}}</td>
+                            <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}" ng-bind-html="colorLine(line)">{{colorLine(line)}}</td>
+                        </tr>
+                    </tbody>
                 </table>
+            </md-virtual-repeat-container>
+        </md-content>
+
+        <md-sidenav md-is-open="isOpenSidenav" md-component-id="sideNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
+            layout="column" class="md-sidenav-right md-whiteframe-z2" flex="30">
+            <md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm style="margin-top: 5px; margin-bottom: 5px;"></md-icon>
+            <div layout="row" layout-align="center center" style="margin: 5px;">
+                <b style="margin-right: 5px;">Realtime:</b>
+                <i class="fa fa-play" aria-hidden="true" ng-show="!realtime" ng-click="playRealtime()"></i>
+                <i class="fa fa-stop" aria-hidden="true" ng-show="realtime" ng-click="playRealtime()"></i>
             </div>
-        </div>
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab ng-repeat="(key, value) in summary" label="{{key}}">
+                    <md-list flex>
+                        <md-list-item class="md-2-line" ng-repeat="(subk, subv) in value" ng-click="filter(key, subk)">
+                            <div class="md-list-item-text">
+                                <h3>{{subk}}</h3>
+                                <p>{{subv}}</p>
+                            </div>
+                            <md-divider></md-divider>
+                        </md-list-item>
+                    </md-list>
+                </md-tab>
+            </md-tabs>
+            <md-chips readonly="true">
+                <md-chip>
+                    {{$parent.filterString}}
+                </md-chip>
+            </md-chips>
+        </md-sidenav>
+        <md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents"
+            hide-gt-sm>
+            <span class="glyphicon glyphicon-menu-hamburger"></span>
+        </md-button>
     </div>
+
 </div>

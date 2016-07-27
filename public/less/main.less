@@ -45,7 +45,6 @@
     background-color: #3caed2;
     padding-top: 4px;
     padding-bottom: 4px;
-    padding-rigt: 50px;
     padding-right: 13px;
     padding-left: 13px;
     color: white;
@@ -56,7 +55,6 @@
     background-color: #3caed2;
     padding-top: 4px;
     padding-bottom: 4px;
-    padding-rigt: 50px;
     padding-right: 13px;
     padding-left: 13px;
     color: white;
@@ -66,4 +64,42 @@
 }
 md-list-item.active._md-button-wrap.ng-scope._md.md-clickable{
   background-color: rgba(158,158,158,0.2);
+}
+
+.logTable {
+    font-family: Consolas, Helvetica;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #333;
+    word-wrap: break-word;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    width: 100%;
+}
+.logTable tbody tr {
+    min-height: 18px;
+}
+.logTable tbody tr td {
+    padding: 0;
+}
+.logTableNumber {
+    width: 30px;
+    padding-right: 10px;
+    padding-left: 10px;
+    color: rgba(0,0,0,0.3);
+    text-align: center;
+    border: solid #eee;
+    border-width: 1px;
+}
+.logTableCode {
+    overflow: visible;
+    position: relative;
+    padding-right: 5px !important;
+    padding-left: 10px !important;
+    vertical-align: top;
+    border: solid #eee;
+    border-width: 1px;
+}
+.logTableCodeOdd {
+    background-color: #f7f7f7;
 }

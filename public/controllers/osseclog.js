@@ -8,6 +8,11 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
     $scope.summary = [];
     $scope.realtime = false;
 
+    $scope.menuNavItem = 'manager';
+    $scope.submenuNavItem = 'logs';
+
+    $scope.filterString = 'Category: all > Type log: all';
+
     var objectsArray = [];
 
     var _fKey = '';
@@ -20,6 +25,33 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
     }
 
     //Functions
+
+    $scope.textObj = {
+        //Obj with methods for virtual scrolling
+        getItemAtIndex: function (index) {
+            if ($scope.blocked) {
+                return null;
+            }
+            var _pos = index - DataFactory.getOffset(objectsArray['/manager/logs']);
+            if ((_pos > 125) || (_pos < 0)) {
+                $scope.blocked = true;
+                DataFactory.scrollTo(objectsArray['/manager/logs'], index)
+                    .then(function (data) {
+                        $scope.text.length = 0;
+                        $scope.text = data.data.items;
+                        $scope.blocked = false;
+                    }, printError);
+            } else {
+                return $scope.text[_pos];
+            }
+        },
+        getLength: function () {
+            if ($scope.realtime) {
+                return 120;
+            }
+            return DataFactory.getTotalItems(objectsArray['/manager/logs']);
+        },
+    };
 
     var loadSummary = function () {
         DataFactory.getAndClean('get', '/manager/logs/summary', {})
@@ -46,6 +78,7 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
                 'type_log': _fValue
             }
         }
+        $scope.filterString = 'Daemon: ' + _fKey + ' > Type log: ' + _fValue;
         DataFactory.get(objectsArray['/manager/logs'], body)
             .then(function (data) {
                 $scope.text = data.data.items;
@@ -73,6 +106,9 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
     };
 
     $scope.colorLine = function (line) {
+        if ((!line) || (line == null)) {
+            return $sce.trustAsHtml('-');
+        }
         line = line.replace('INFO', '<span style="color:#0066ff">INFO</span>');
         line = line.replace('ERROR', '<span style="color:#ff0000">ERROR</span>');
         line = line.replace('ossec-remoted', '<span style="color:#827e7d">ossec-remoted</span>');
@@ -107,6 +143,7 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
                 }
                 DataFactory.get(objectsArray['/manager/logs'], body)
                     .then(function (data) {
+                        $scope.text.length = 0;
                         $scope.text = data.data.items;
                     }, printError);
             }, 1000);
@@ -114,7 +151,7 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
     };
 
     //Load
-    DataFactory.initialize('get', '/manager/logs', {}, 80, 0)
+    DataFactory.initialize('get', '/manager/logs', {}, 150, 0)
         .then(function (data) {
             objectsArray['/manager/logs'] = data;
             DataFactory.get(data).then(function (data) {
