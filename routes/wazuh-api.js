@@ -220,7 +220,7 @@ module.exports = function (server, options) {
 
         var elasticurl = _elurl+'/ossec-*/ossec/_search';
 
-        var gte = new Date().setHours(0,0,0,0);
+        var gte = new Date() - (24 * 3600);
 
         var payload = {
             "size": 0,
@@ -290,7 +290,7 @@ module.exports = function (server, options) {
 
         var elasticurl = _elurl + '/ossec-*/ossec/_search';
 
-        var gte = new Date().setHours(0,0,0,0);
+        var gte = new Date() - (24 * 3600);
 
         var payloads = [];
 
@@ -445,7 +445,7 @@ module.exports = function (server, options) {
 
         var elasticurl = _elurl + '/ossec-*/ossec/_search';
 
-        var gte = new Date().setHours(0, 0, 0, 0);
+        var gte = new Date() - (24 * 3600);
 
         var payloads = [];
 

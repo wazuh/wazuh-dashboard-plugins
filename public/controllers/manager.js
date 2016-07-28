@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter, $http) {
+app.controller('managerController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter, $http, $mdDialog) {
     //Initialisation
     $scope.load = true;
     $scope.menuNavItem = 'manager';
@@ -11,8 +11,8 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 
     $scope.stats = [];
     $scope.stats['/top/agent'] = '-';
-    $scope.stats['/overview/alerts'] = {"alerts":0,"ip":"-","group":"-"};
-    $scope.stats['/overview/fim'] = {"alerts":0,"agent":"-","file":"-"};
+    $scope.stats['/overview/alerts'] = { "alerts": 0, "ip": "-", "group": "-" };
+    $scope.stats['/overview/fim'] = { "alerts": 0, "agent": "-", "file": "-" };
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);
@@ -34,6 +34,15 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
     };
 
     //Functions
+
+    $scope.showDialog = function (ev) {
+        $mdDialog.show({
+            contentElement: '#actionsDialog',
+            parent: angular.element(document.body),
+            targetEvent: ev,
+            clickOutsideToClose: true
+        });
+    };
 
     $scope.getDaemonStatusClass = function (daemonStatus) {
         if (daemonStatus == "running")
@@ -159,15 +168,15 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
         DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {
                 $scope.daemons = data.data;
-                        DataFactory.getAndClean('get', '/agents/summary', {})
-                            .then(function (data) {
-                                $scope.agentsCountActive = data.data.active;
-                                $scope.agentsCountDisconnected = data.data.disconnected;
-                                $scope.agentsCountNeverConnected = data.data.neverConnected;
-                                $scope.agentsCountTotal = data.data.total;
-                                loadStats();
-                                $scope.load = false;
-                            }, printError);
+                DataFactory.getAndClean('get', '/agents/summary', {})
+                    .then(function (data) {
+                        $scope.agentsCountActive = data.data.active;
+                        $scope.agentsCountDisconnected = data.data.disconnected;
+                        $scope.agentsCountNeverConnected = data.data.neverConnected;
+                        $scope.agentsCountTotal = data.data.total;
+                        loadStats();
+                        $scope.load = false;
+                    }, printError);
             }, printError);
     };
 
@@ -223,7 +232,7 @@ app.controller('managerConfigurationController', function ($scope, $route, $q, a
                 $scope.load = false;
             }, printError);
     };
-    
+
     //Load
     load();
 

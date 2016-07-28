@@ -53,8 +53,8 @@
                   <i class="fa fa-caret-up" aria-hidden="true" ng-show="show" ng-click="show = false"></i>
                 </p>
                 </span>
-            <p ng-show="show" class="right-text">
-              <span ng-repeat="item in managerConfiguration.global.white_list|orderBy">{{ item }} <span ng-show="!$last">, </span></span>
+            <p ng-show="show" class="right-text" ng-repeat="item in managerConfiguration.global.white_list|orderBy">
+              {{ item }}
             </p>
             <md-divider></md-divider>
             </span>
@@ -236,10 +236,11 @@
                 <p class="right-text">{{ item.timeout }}</p>
                 </span>
             </span>
-            <span ng-show="show" ng-if="item.rules_group">
+            <span ng-show="show" ng-if="item.rules_group" ng-repeat="group in item.rules_group.split(',');">
                 <span layout="row" layout-align="space-between center">
-                <p> Rules group </p>
-                <p class="right-text" style="word-wrap: break-word; word-break: break-all;">{{ item.rules_group }}</p>
+                <p ng-show="$first"> Rules group </p>
+                <p ng-show="!$first"></p>
+                <p class="right-text">{{ group }}</p>
                 </span>
             </span>
             <span ng-show="show" ng-if="item.rules_id">

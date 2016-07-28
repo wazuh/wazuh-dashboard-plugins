@@ -3,13 +3,13 @@
   <md-content class="md-padding">
     <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
       <md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
- 					<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
- 		  </md-nav-item>
+        <img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+      </md-nav-item>
       <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
       <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
       <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
       <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-			<md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
+      <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
       <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
     </md-nav-bar>
   </md-content>
@@ -31,14 +31,17 @@
       <div flex layout="column">
         <md-card>
           <md-card-content>
-            <h3>Manager status</h3>
-              <span layout="column" ng-repeat="daemon in daemons">
+            <span layout="row" layout-align="space-between center">
+              <h3>Manager status</h3>
+              <h3 class="right-text"><md-icon md-font-icon="fa fa-cog" ng-click="showDialog()" /></h3>
+            </span>
+            <span layout="column" ng-repeat="daemon in daemons">
                 <span layout="row" layout-align="space-between center">
                   <p>{{daemon.daemon}}</p>
-                  <p class="right-text"><div ng-class="getDaemonStatusClass(daemon.status)" class="round"></div></p>
-                </span>
-                <md-divider></md-divider>
-              </span>
+                  <p class="right-text"><span ng-class="getDaemonStatusClass(daemon.status)" class="round" style="float: right"></span></p>
+            </span>
+            <md-divider></md-divider>
+            </span>
           </md-card-content>
         </md-card>
       </div>
@@ -69,7 +72,9 @@
               </md-list-item>
               <md-divider></md-divider>
               <md-list-item>
-                <p>Top reporting agent (Today)</p>
+                <p>Top reporting agent
+                  <h6>(Last 24 hours)</h6>
+                </p>
                 <p class="right-text">{{stats['/top/agent']}}</p>
               </md-list-item>
               <md-divider></md-divider>
@@ -81,7 +86,8 @@
       <div flex layout="column">
         <md-card>
           <md-card-content>
-            <h3>Alerts overview (Today stats)</h3>
+            <h3>Alerts overview</h3>
+            <h6>(Last 24h hours)</h6>
             <md-list>
               <md-list-item>
                 <p>Alerts</p>
@@ -106,7 +112,8 @@
       <div flex layout="column">
         <md-card>
           <md-card-content>
-            <h3>FIM overview (Today stats)</h3>
+            <h3>FIM overview</h3>
+            <h6>(Last 24h hours)</h6>
             <md-list>
               <md-list-item>
                 <p>FIM alerts</p>
@@ -130,6 +137,16 @@
     </md-content>
 
   </md-content>
+
+  <div style="display: none">
+    <div class="md-dialog-container" id="actionsDialog">
+      <md-dialog layout-padding layout="column" layout-align="space-around center">
+        <md-button class="md-raised md-primary" ng-click="start()">Start</md-button>
+        <md-button class="md-raised md-primary" ng-click="stop()">Stop</md-button>
+        <md-button class="md-raised md-primary" ng-click="restart()">Restart</md-button>
+      </md-dialog>
+    </div>
+  </div>
 
 
 </div>
