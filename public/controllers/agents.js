@@ -26,6 +26,9 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             position: 'bottom left',
             hideDelay: 5000,
         });
+        if ($scope.blocked) {
+            $scope.blocked = false;
+        }
     };
 
     //Tabs
@@ -48,9 +51,6 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     };
 
     $scope.agentsGet = function (body) {
-        if ($scope.blocked) {
-            return null;
-        }
         $scope.blocked = true;
         //Search agent body modification
         if (!body) {
@@ -62,7 +62,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         } else if ($scope.search !== body['search']) {
             body['search'] = $scope.search;
         }
-        if (body['search'] === '') {
+        if ((body) && (body['search'] === '')) {
             body['search'] = undefined;
         }
 

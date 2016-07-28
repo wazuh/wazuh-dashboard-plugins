@@ -16,6 +16,15 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     //Print Error
     var printError = function (error) {
         alertify.delay(10000).closeLogOnClick(true).error(error.html);
+        if ($scope.blocked) {
+            $scope.blocked = false;
+        }
+        if ($scope._files_blocked) {
+            $scope._files_blocked = false;
+        }
+        if ($scope._events_blocked) {
+            $scope._events_blocked = false;
+        }
     }
 
     //Functions
@@ -170,9 +179,6 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
       $scope._file = "";
     }
     $scope.getEvents = function (agent, file) {
-        if ($scope._events_blocked) {
-            return null;
-        }
         $scope._events_blocked = true;
         DataFactory.get(objectsArray[agent + file])
             .then(function (data) {
@@ -241,9 +247,6 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
     };
 
     $scope.getFiles = function (body) {
-                if ($scope._files_blocked) {
-            return null;
-        }
         $scope._files_blocked = true;
         if (!body) {
             var tmpBody = DataFactory.getBody(objectsArray['/syscheck/files']);
@@ -305,10 +308,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         }
     };
     $scope.getAgents = function (body) {
-        if ($scope._agents_blocked) {
-            return null;
-        }
-        $scope._agents_blocked = true;
+        $scope.blocked = true;
         //Search agent body modification
         if (!body) {
             var tmpBody = DataFactory.getBody(objectsArray['/agents']);
@@ -328,14 +328,14 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 .then(function (data) {
                     $scope.agents.length = 0;
                     $scope.agents = data.data.items;
-                    $scope._agents_blocked = false;
+                    $scope.blocked = false;
                 }, printError);
         } else {
             DataFactory.get(objectsArray['/agents'], body)
                 .then(function (data) {
                     $scope.agents.length = 0;
                     $scope.agents = data.data.items;
-                    $scope._agents_blocked = false;
+                    $scope.blocked = false;
                 }, printError);
         }
     };

@@ -22,6 +22,9 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
     //Print Error
     var printError = function (error) {
         alertify.delay(10000).closeLogOnClick(true).error(error.html);
+        if ($scope.blocked) {
+            $scope.blocked = false;
+        }
     }
 
     //Functions
@@ -66,6 +69,7 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
     };
 
     $scope.filter = function (key, value) {
+        $scope.blocked = true;
         var body;
         if ((key === _fKey) && (value === _fValue)) {
             _fKey = _fValue = '';
@@ -82,6 +86,7 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
         DataFactory.get(objectsArray['/manager/logs'], body)
             .then(function (data) {
                 $scope.text = data.data.items;
+                $scope.blocked = false;
             }, printError);
     };
 
