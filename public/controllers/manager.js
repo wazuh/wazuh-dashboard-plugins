@@ -3,11 +3,16 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter) {
+app.controller('managerController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter, $http) {
     //Initialisation
     $scope.load = true;
     $scope.menuNavItem = 'manager';
     $scope.submenuNavItem = 'general';
+
+    $scope.stats = [];
+    $scope.stats['/top/agent'] = '-';
+    $scope.stats['/overview/alerts'] = {"alerts":0,"ip":"-","group":"-"};
+    $scope.stats['/overview/fim'] = {"alerts":0,"agent":"-","file":"-"};
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);
@@ -117,6 +122,39 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
         return output;
     };
 
+    var loadStats = function () {
+        $http.get('/api/wazuh-stats/top/agent')
+            .success(function (data) {
+                $scope.stats['/top/agent'] = data.data;
+            })
+            .error(function (data) {
+                var error = [];
+                error['html'] = "Error getting top agent stats: Could not connect with Elasticsearch.";
+                error.message = "Error getting top agent stats: Could not connect with Elasticsearch.";
+                printError(error);
+            });
+        $http.get('/api/wazuh-stats/overview/alerts')
+            .success(function (data) {
+                $scope.stats['/overview/alerts'] = data.data;
+            })
+            .error(function (data) {
+                var error = [];
+                error['html'] = "Error getting alerts overview stats: Could not connect with Elasticsearch.";
+                error.message = "Error getting alerts overview stats: Could not connect with Elasticsearch.";
+                printError(error);
+            });
+        $http.get('/api/wazuh-stats/overview/syscheck')
+            .success(function (data) {
+                $scope.stats['/overview/fim'] = data.data;
+            })
+            .error(function (data) {
+                var error = [];
+                error['html'] = "Error getting FIM overview stats: Could not connect with Elasticsearch.";
+                error.message = "Error getting FIM overview stats: Could not connect with Elasticsearch.";
+                printError(error);
+            });
+    };
+
     var load = function () {
         DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {
@@ -127,6 +165,7 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
                                 $scope.agentsCountDisconnected = data.data.disconnected;
                                 $scope.agentsCountNeverConnected = data.data.neverConnected;
                                 $scope.agentsCountTotal = data.data.total;
+                                loadStats();
                                 $scope.load = false;
                             }, printError);
             }, printError);
@@ -139,6 +178,7 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
     $scope.$on("$destroy", function () {
         //angular.forEach(objectsArray, DataFactory.clean(value));
         tabProvider.clean($scope.pageId);
+        $scope.stats.length = 0;
     });
 
 });

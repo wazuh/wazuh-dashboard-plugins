@@ -26,11 +26,22 @@
 
   <md-content flex layout="column" ng-if="!load" layout-align="space-around">
 
-    <md-content layout="row" layout-padding layout-sm="column" layout-xs="column">
-        <span ng-repeat="daemon in daemons" layout="row" flex layout-align="space-around center">{{daemon.daemon}} <div ng-class="getDaemonStatusClass(daemon.status)" class="round"></div><md-divider></md-divider></span>
-    </md-content>
-
     <md-content layout-padding flex layout="row" layout-sm="column" layout-xs="column">
+
+      <div flex layout="column">
+        <md-card>
+          <md-card-content>
+            <h3>Manager status</h3>
+              <span layout="column" ng-repeat="daemon in daemons">
+                <span layout="row" layout-align="space-between center">
+                  <p>{{daemon.daemon}}</p>
+                  <p class="right-text"><div ng-class="getDaemonStatusClass(daemon.status)" class="round"></div></p>
+                </span>
+                <md-divider></md-divider>
+              </span>
+          </md-card-content>
+        </md-card>
+      </div>
 
       <div flex layout="column">
         <md-card>
@@ -58,8 +69,8 @@
               </md-list-item>
               <md-divider></md-divider>
               <md-list-item>
-                <p>Last agent connected</p>
-                <p class="right-text">vpc-agent-ubuntu</p>
+                <p>Top reporting agent (Today)</p>
+                <p class="right-text">{{stats['/top/agent']}}</p>
               </md-list-item>
               <md-divider></md-divider>
             </md-list>
@@ -70,21 +81,21 @@
       <div flex layout="column">
         <md-card>
           <md-card-content>
-            <h3>Alerts overview</h3>
+            <h3>Alerts overview (Today stats)</h3>
             <md-list>
               <md-list-item>
-                <p>Today alerts</p>
-                <p class="right-text">127,345</p>
+                <p>Alerts</p>
+                <p class="right-text">{{stats['/overview/alerts'].alerts}}</p>
               </md-list-item>
               <md-divider></md-divider>
               <md-list-item>
                 <p>Top source ip</p>
-                <p class="right-text">256.56.122.14</p>
+                <p class="right-text">{{stats['/overview/alerts'].ip}}</p>
               </md-list-item>
               <md-divider></md-divider>
               <md-list-item>
                 <p>Top alert group</p>
-                <p class="right-text">ssh_intrusion</p>
+                <p class="right-text">{{stats['/overview/alerts'].group}}</p>
               </md-list-item>
               <md-divider></md-divider>
             </md-list>
@@ -95,21 +106,21 @@
       <div flex layout="column">
         <md-card>
           <md-card-content>
-            <h3>FIM overview</h3>
+            <h3>FIM overview (Today stats)</h3>
             <md-list>
               <md-list-item>
-                <p>Today FIM alerts</p>
-                <p class="right-text">786</p>
-              </md-list-item>
-              <md-divider></md-divider>
-              <md-list-item>
-                <p>Last file change</p>
-                <p class="right-text">/etc/password</p>
+                <p>FIM alerts</p>
+                <p class="right-text">{{stats['/overview/fim'].alerts}}</p>
               </md-list-item>
               <md-divider></md-divider>
               <md-list-item>
                 <p>Most agent FIM changes</p>
-                <p class="right-text">vpc-manager-newjersey</p>
+                <p class="right-text">{{stats['/overview/fim'].agent}}</p>
+              </md-list-item>
+              <md-divider></md-divider>
+              <md-list-item>
+                <p>Most file change</p>
+                <p class="right-text">{{stats['/overview/fim'].file}}</p>
               </md-list-item>
               <md-divider></md-divider>
             </md-list>
