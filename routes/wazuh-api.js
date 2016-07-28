@@ -26,12 +26,12 @@ module.exports = function (server, options) {
         needle.get(elasticurl, options, function (error, response) {
             if (!error) {
                 if (response.body.found) {
-                    callback({ 'user': response.body._source.api_user, 'password': new Buffer(response.body._source.api_password, 'base64').toString("ascii"), 'url': response.body._source.api_url, 'insecure': response.body._source.insecure, 'error': '', 'error_code': 0 });
+                    callback({ 'user': response.body._source.api_user, 'password': new Buffer(response.body._source.api_password, 'base64').toString("ascii"), 'url': response.body._source.api_url, 'insecure': response.body._source.insecure });
                 } else {
-                    callback({ 'user': '', 'password': '', 'url': '', 'insecure': '', 'error': 'no credentials', 'error_code': 1 });
+                    callback({ 'error': 'no credentials', 'error_code': 1 });
                 }
             } else {
-                callback({ 'user': '', 'password': '', 'url': '', 'insecure': '', 'error': 'no elasticsearch', 'error_code': 2 });
+                callback({ 'error': 'no elasticsearch', 'error_code': 2 });
             }
         });
     };
@@ -40,7 +40,7 @@ module.exports = function (server, options) {
 
     var testApiAux2 = function (error, response, insecure) {
         if (!error && response && response.body.data == 'Welcome to Wazuh HIDS API') {
-            return { 'statusCode': 200, 'error': '', 'data': 'ok' };
+            return { 'statusCode': 200, 'data': 'ok' };
         } else if (response && response.statusCode == 401) {
             return { 'statusCode': 200, 'error': '1', 'data': 'unauthorized' };
         } else if (!error && response && response.body.data != 'Welcome to Wazuh HIDS API') {
@@ -56,7 +56,7 @@ module.exports = function (server, options) {
 
     var testApiAux1 = function (error, response, wapi_config, needle, callback) {
         if (!error && response && response.body.data == 'Welcome to Wazuh HIDS API') {
-            callback({ 'statusCode': 200, 'error': '', 'data': 'ok' });
+            callback({ 'statusCode': 200, 'data': 'ok' });
         } else if (response && response.statusCode == 401) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'unauthorized' });
         } else if (!error && response && response.body.data != 'Welcome to Wazuh HIDS API') {
@@ -163,6 +163,8 @@ module.exports = function (server, options) {
         }
     };
 
+    //Handlers - Save config
+
     var saveApi = function (req, reply) {
         var needle = require('needle');
 
@@ -191,11 +193,395 @@ module.exports = function (server, options) {
             if (error || response.body.error) {
                 reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch'}).code(500);
             } else {
-                reply({ 'statusCode': 200, 'error': '', 'message': 'ok'});
+                reply({ 'statusCode': 200, 'message': 'ok'});
             }
         });
 
     };
+
+    //Handlers - stats
+
+    var statsTopAgent = function(req, reply) {
+        var needle = require('needle');
+
+        if (_eluser && _elpass) {
+            var options = {
+                username: _eluser,
+                password: _elpass,
+                rejectUnauthorized: false,
+                json: true
+            };
+        } else {
+            var options = {
+                rejectUnauthorized: false,
+                json: true
+            };
+        }
+
+        var elasticurl = _elurl+'/ossec-*/ossec/_search';
+
+        var gte = new Date().setHours(0,0,0,0);
+
+        var payload = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "query_string": {
+                                "query": "*",
+                                "analyze_wildcard": true
+                            }
+                        },
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": gte,
+                                    "format": "epoch_millis"
+                                }
+                            }
+                        }
+                    ],
+                    "must_not": []
+                }
+            },
+            "aggs": {
+                "2": {
+                    "terms": {
+                        "field": "AgentName",
+                        "size": 1,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    }
+                }
+            }
+        };
+
+        needle.request('get', elasticurl, payload, options, function (error, response) {
+            if (error || response.body.error) {
+                reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch'}).code(500);
+            } else {
+                if (response.body.hits.total == 0) {
+                    reply({ 'statusCode': 200, 'data': '-'});
+                } else {
+                    reply({ 'statusCode': 200, 'data': response.body.aggregations['2'].buckets[0].key});
+                }
+            }
+        });
+    };
+
+    var statsOverviewAlerts = function (req, reply) {
+        var needle = require('needle');
+
+        if (_eluser && _elpass) {
+            var options = {
+                username: _eluser,
+                password: _elpass,
+                rejectUnauthorized: false,
+                json: true
+            };
+        } else {
+            var options = {
+                rejectUnauthorized: false,
+                json: true
+            };
+        }
+
+        var elasticurl = _elurl + '/ossec-*/ossec/_search';
+
+        var gte = new Date().setHours(0,0,0,0);
+
+        var payloads = [];
+
+        payloads[0] = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "query_string": {
+                                "query": "*",
+                                "analyze_wildcard": true
+                            }
+                        },
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": gte,
+                                    "format": "epoch_millis"
+                                }
+                            }
+                        }
+                    ],
+                    "must_not": []
+                }
+            },
+            "aggs": {}
+        };
+
+        payloads[1] = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "query_string": {
+                                "query": "*",
+                                "analyze_wildcard": true
+                            }
+                        },
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": gte,
+                                    "format": "epoch_millis"
+                                }
+                            }
+                        }
+                    ],
+                    "must_not": []
+                }
+            },
+            "aggs": {
+                "2": {
+                    "terms": {
+                        "field": "srcip",
+                        "size": 1,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    }
+                }
+            }
+        };
+
+        payloads[2] = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "query_string": {
+                                "query": "*",
+                                "analyze_wildcard": true
+                            }
+                        },
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": gte,
+                                    "format": "epoch_millis"
+                                }
+                            }
+                        }
+                    ],
+                    "must_not": []
+                }
+            },
+            "aggs": {
+                "2": {
+                    "terms": {
+                        "field": "rule.groups",
+                        "size": 1,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    }
+                }
+            }
+        };
+
+        var data = [];
+
+        needle.request('get', elasticurl, payloads[0], options, function (error, response) {
+            if (error || response.body.error) {
+                reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
+            } else {
+                data['alerts'] = response.body.hits.total;
+                needle.request('get', elasticurl, payloads[1], options, function (error, response) {
+                    if (error || response.body.error) {
+                        reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
+                    } else {
+                        if (response.body.hits.total == 0) {
+                            data['ip'] = '-';
+                        } else {
+                            data['ip'] = response.body.aggregations['2'].buckets[0].key;
+                        }
+                        needle.request('get', elasticurl, payloads[2], options, function (error, response) {
+                            if (error || response.body.error) {
+                                reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
+                            } else {
+                                if (response.body.hits.total == 0) {
+                                    data['group'] = '-';
+                                } else {
+                                    data['group'] = response.body.aggregations['2'].buckets[0].key; 
+                                }
+                                reply({ 'statusCode': 200, 'data': {'alerts': data['alerts'], 'ip': data['ip'], 'group': data['group']} });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+
+    var statsOverviewSyscheck = function (req, reply) {
+        var needle = require('needle');
+
+        if (_eluser && _elpass) {
+            var options = {
+                username: _eluser,
+                password: _elpass,
+                rejectUnauthorized: false,
+                json: true
+            };
+        } else {
+            var options = {
+                rejectUnauthorized: false,
+                json: true
+            };
+        }
+
+        var elasticurl = _elurl + '/ossec-*/ossec/_search';
+
+        var gte = new Date().setHours(0, 0, 0, 0);
+
+        var payloads = [];
+
+        payloads[0] = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "query_string": {
+                                "query": "rule.groups:syscheck",
+                                "analyze_wildcard": true
+                            }
+                        },
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": gte,
+                                    "format": "epoch_millis"
+                                }
+                            }
+                        }
+                    ],
+                    "must_not": []
+                }
+            },
+            "aggs": {}
+        };
+
+        payloads[1] = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "query_string": {
+                                "query": "rule.groups:syscheck",
+                                "analyze_wildcard": true
+                            }
+                        },
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": gte,
+                                    "format": "epoch_millis"
+                                }
+                            }
+                        }
+                    ],
+                    "must_not": []
+                }
+            },
+            "aggs": {
+                "2": {
+                    "terms": {
+                        "field": "AgentName",
+                        "size": 1,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    }
+                }
+            }
+        };
+
+        payloads[2] = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "query_string": {
+                                "query": "*",
+                                "analyze_wildcard": true
+                            }
+                        },
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": gte,
+                                    "format": "epoch_millis"
+                                }
+                            }
+                        }
+                    ],
+                    "must_not": []
+                }
+            },
+            "aggs": {
+                "2": {
+                    "terms": {
+                        "field": "SyscheckFile.path",
+                        "size": 1,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    }
+                }
+            }
+        };
+
+        var data = [];
+
+        needle.request('get', elasticurl, payloads[0], options, function (error, response) {
+            if (error || response.body.error) {
+                reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
+            } else {
+                data['alerts'] = response.body.hits.total;
+                needle.request('get', elasticurl, payloads[1], options, function (error, response) {
+                    if (error || response.body.error) {
+                        reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
+                    } else {
+                        if (response.body.hits.total == 0) {
+                            data['agent'] = '-';
+                        } else {
+                            data['agent'] = response.body.aggregations['2'].buckets[0].key;
+                        }
+                        needle.request('get', elasticurl, payloads[2], options, function (error, response) {
+                            if (error || response.body.error) {
+                                reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
+                            } else {
+                                if (response.body.hits.total == 0) {
+                                    data['file'] = '-';
+                                } else {
+                                    data['file'] = response.body.aggregations['2'].buckets[0].key;
+                                }
+                                reply({ 'statusCode': 200, 'data': { 'alerts': data['alerts'], 'agent': data['agent'], 'file': data['file'] } });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+
+    //Handlers - overview
 
     //Server routes
 
@@ -232,4 +618,36 @@ module.exports = function (server, options) {
         handler: saveApi
     });
 
+    /*
+    * GET /api/wazuh-stats/top/agent
+    * Returns the agent with most alerts
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-stats/top/agent',
+        handler: statsTopAgent
+    });
+
+    /*
+    * GET /api/wazuh-stats/overview/alerts
+    * Returns overview stats about alerts
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-stats/overview/alerts',
+        handler: statsOverviewAlerts
+    });
+
+    /*
+    * GET /api/wazuh-stats/overview/syscheck
+    * Returns overview stats about syscheck
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-stats/overview/syscheck',
+        handler: statsOverviewSyscheck
+    })
 };
