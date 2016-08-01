@@ -1,12 +1,11 @@
-//var searchApi = require('plugins/wazuh/server/api/search');
-var path = require('path');
 module.exports = function (kibana) {
-    var mainFile = 'plugins/wazuh/app';
   return new kibana.Plugin({
+    id: 'wazuh',
     name: 'wazuh',
     require: ['kibana', 'elasticsearch'],
     uiExports: {
       app: {
+        id: 'wazuh',
         title: 'Wazuh',
         description: 'Wazuh UI and Kibana integrations for OSSEC',
         main: 'plugins/wazuh/app',

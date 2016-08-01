@@ -1,0 +1,2 @@
+html
+  include ./../../../../src/plugins/kibana/public/visualize/editor/editor.html
