@@ -414,6 +414,12 @@ routes
       "check": settingsWizard
     }
   })
+  .when('/agents/metrics/', {
+    template: require('plugins/wazuh/templates/agents-metrics.html'),
+    resolve: {
+      "check": settingsWizard
+    }
+  })
   .when('/manager/', {
     template: require('plugins/wazuh/templates/manager.html'),
     resolve: {
@@ -532,7 +538,7 @@ require('plugins/wazuh/controllers/policy-monitoring.js');
 require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
 require('plugins/wazuh/controllers/kibanaIntegration.js');
-require('plugins/wazuh/controllers/editor.js');
+require('plugins/wazuh/controllers/visLoader.js');
 
 //External angularjs libs
 require('plugins/wazuh/../node_modules/angular-utils-pagination/dirPagination.js');

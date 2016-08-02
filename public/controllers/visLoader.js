@@ -1,11 +1,11 @@
 require('ui/styles/base.less');
 require('ui/styles/mixins.less');
-require('ui/typeahead/typeahead.less');
 require('ui/share/styles/index.less');
 require('ui/styles/control_group.less');
 require('ui/styles/navbar.less');
 require('plugins/kibana/visualize/styles/main.less');
 require('ui/styles/config.less');
+require('ui/styles/spinner.less');
 
 import _ from 'lodash';
 import 'plugins/kibana/visualize/saved_visualizations/saved_visualizations';
@@ -17,6 +17,7 @@ import 'ui/share';
 import 'ui/listen';
 import 'ui/bind';
 import 'ui/fancy_forms';
+import 'ui/filter_bar'
 
 import Notifier from 'ui/notify/notifier';
 import RegistryVisTypesProvider from 'ui/registry/vis_types';
@@ -49,9 +50,17 @@ import 'ui/timepicker';
 import 'ui/directives/paginate.js';
 import 'ui/directives/rows.js';
 
+import 'ui/directives/pretty_duration.js';
+import 'ui/parse_query';
+import 'ui/persisted_log';
+import 'ui/typeahead';
+
+import 'plugins/spy_modes/req_resp_stats_spy_mode';
+import 'plugins/spy_modes/table_spy_mode';
+
 require('ui/courier');
 
-uiRoutes
+/*uiRoutes
   .when('/agents/metrics', {
     template: editorTemplate,
     resolve: {
@@ -73,12 +82,61 @@ uiRoutes
           }));
       }
     }
-  });
+  });*/
+import directiveTemplate from '../templates/vis-template.html';
 
-require('ui/modules').get('app/wazuh', ['kibana/courier'])
-  .controller('VisEditor', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise) {
+var app = require('ui/modules').get('app/wazuh', [])
+  .directive('kbnVis', [function () {
+    return {
+      restrict: 'E',
+      scope: {
+        routeData: '@'
+      },
+      /*scope: {
+        savedVis: function (savedVisualizations, courier, $route, Private) {
+          const visTypes = Private(RegistryVisTypesProvider);
+          const visType = _.find(visTypes, { name: $route.current.params.type });
 
-    const savedVis = $route.current.locals.savedVis;
+          if (!visType) {
+            throw new Error('You must provide a valid visualization type');
+          }
+
+          if (visType.requiresSearch && !$route.current.params.indexPattern && !$route.current.params.savedSearchId) {
+            throw new Error('You must provide either an indexPattern or a savedSearchId');
+          }
+
+          return savedVisualizations.get($route.current.params)
+            .catch();
+        }
+      },*/
+      template: directiveTemplate
+    }
+  }]); 
+
+require('ui/modules').get('app/wazuh', [])
+  .controller('VisEditor', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations/*este ultimo sobra*/ ) {
+
+    /*Directive custom code*/
+        $scope.savedVis = function () {
+          const visTypes = Private(RegistryVisTypesProvider);
+          const visType = _.find(visTypes, { name: $scope.routeData.params.type });
+
+          if (!visType) {
+            throw new Error('You must provide a valid visualization type');
+          }
+
+          if (visType.requiresSearch && !$scope.routeData.params.indexPattern && !$scope.routeData.params.savedSearchId) {
+            throw new Error('You must provide either an indexPattern or a savedSearchId');
+          }
+
+          return savedVisualizations.get($scope.routeData.params)
+            .catch();
+        }
+    /*Directive custom code*/
+
+
+
+    const savedVis = $scope.savedVis(); //los parentesis son anadidos
 
     const vis = savedVis.vis;
     const editableVis = vis.createEditableVis();
@@ -117,9 +175,7 @@ require('ui/modules').get('app/wazuh', ['kibana/courier'])
           editableVis.setState($state.vis);
           vis.setState(editableVis.getEnabledState());
         })
-          .catch(courier.redirectWhenMissing({
-            'index-pattern-field': '/agents'
-          }));
+          .catch();
       }
 
       return $state;
@@ -236,7 +292,7 @@ require('ui/modules').get('app/wazuh', ['kibana/courier'])
     };
 
     $scope.startOver = function () {
-      kbnUrl.change('/agents', {});
+      //Nothing
     };
 
     $scope.doSave = function () {
@@ -253,7 +309,6 @@ require('ui/modules').get('app/wazuh', ['kibana/courier'])
           if (id) {
             notify.info('Saved Visualization "' + savedVis.title + '"');
             if (savedVis.id === $route.current.params.id) return;
-            kbnUrl.change('/agents/metrics/{{id}}', { id: savedVis.id });
           }
         }, notify.fatal);
     };

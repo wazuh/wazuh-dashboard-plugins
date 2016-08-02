@@ -1,75 +1,19 @@
-<div ng-controller="VisEditor" class="app-container vis-editor vis-type-{{ vis.type.name }}">
-
-  <kbn-top-nav name="visualize" config="topNavMenu">
-    <div class="vis-editor-info">
-      <span ng-show="savedVis.id" class="vis-editor-info-title">
-        <span ng-bind="::savedVis.title"></span>
-      </span>
+<div>
+	<ul class="wazuh-submenu">
+		<li><a  href="/app/wazuh#/agents">Overview</a></li>
+		<li class="active"><a>Metrics</a></li>
+	</ul>
+</div>
+<div class="container" ng-controller="kibanaIntegrationController">
+    <h2 class="container_page_title">Metrics <span class="filterSpan" ng-show="defMetricsFilter != ''">{{defMetricsFilter}}</span></h2>
+    <div style="margin-bottom: 25px;">
+        <label style="font-weight: bold;">Top 10 groups <a ng-href="{{getVisualization('TopGroups', defMetricsFilter, 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
+        <iframe ng-src="{{getVisualization('TopGroups', defMetricsFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
+        <label style="font-weight: bold;">Top 10 alerts <a ng-href="{{getVisualization('TopAlerts', defMetricsFilter, 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
+        <iframe ng-src="{{getVisualization('TopAlerts', defMetricsFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
+        <label style="font-weight: bold;">Alerts by time <a ng-href="{{getVisualization('AlertsTime', defMetricsFilter, 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
+        <iframe ng-src="{{getVisualization('AlertsTime', defMetricsFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
+        <label style="font-weight: bold;">Average alert level <a ng-href="{{getVisualization('AverageAlertLevel', defMetricsFilter, 'from:now-7d,mode:quick,to:now', true)}}" target="_blank"><span class="glyphicon glyphicon-share"></span></a></label>
+        <iframe ng-src="{{getVisualization('AverageAlertLevel', defMetricsFilter, 'from:now-7d,mode:quick,to:now', false)}}" height="350" width="100%"></iframe>
     </div>
-  </kbn-top-nav>
-  <navbar ng-if="chrome.getVisible()" name="visualize-search">
-    <div class="fill bitty-modal-container">
-
-      <form ng-if="vis.type.requiresSearch && $state.linked" class="inline-form fill" name="queryInput">
-        <div class="typeahead">
-          <div class="input-group">
-            <input
-              disabled
-              type="text"
-              class="form-control">
-
-            <button
-              class="btn btn-default" type="submit"
-              ng-disabled="true" aria-label="Search">
-              <span aria-hidden="true" class="fa fa-search"></span>
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <form
-        ng-if="vis.type.requiresSearch && !$state.linked"
-        ng-submit="fetch()"
-        class="inline-form fill"
-        name="queryInput">
-        <div class="typeahead" kbn-typeahead="visualize">
-          <div class="input-group"
-            ng-class="queryInput.$invalid ? 'has-error' : ''">
-            <input
-              ng-model="state.query"
-              parse-query
-              input-focus
-              kbn-typeahead-input
-              placeholder="Search..."
-              type="text"
-              class="form-control">
-
-            <button
-              class="btn btn-default" type="submit"
-              ng-disabled="queryInput.$invalid" aria-label="Search">
-              <span aria-hidden="true" class="fa fa-search"></span>
-            </button>
-          </div>
-          <kbn-typeahead-items></kbn-typeahead-items>
-        </div>
-      </form>
-    </div>
-    <div class="button-group"></div>
-  </navbar>
-
-  <filter-bar state="state"></filter-bar>
-
-  <div class="vis-editor-content">
-
-    <div class="vis-editor-canvas" ng-class="{ embedded: !chrome.getVisible() }">
-      <visualize
-        vis="vis"
-        ui-state="uiState"
-        show-spy-panel="chrome.getVisible()"
-        editable-vis="editableVis"
-        search-source="savedVis.searchSource">
-      </visualize>
-    </div>
-  </div>
-
 </div>
