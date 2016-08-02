@@ -17,6 +17,7 @@ import 'ui/share';
 import 'ui/listen';
 import 'ui/bind';
 import 'ui/fancy_forms';
+
 import Notifier from 'ui/notify/notifier';
 import RegistryVisTypesProvider from 'ui/registry/vis_types';
 require('plugins/metric_vis/metric_vis');
@@ -45,7 +46,8 @@ import RegistryFieldFormatsProvider from 'ui/registry/field_formats';
 
 import 'ui/kbn_top_nav';
 import 'ui/timepicker';
-import 'ui/directives/paginate.js'
+import 'ui/directives/paginate.js';
+import 'ui/directives/rows.js';
 
 require('ui/courier');
 
