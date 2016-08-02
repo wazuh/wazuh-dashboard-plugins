@@ -1,3 +1,12 @@
+require('ui/styles/base.less');
+require('ui/styles/mixins.less');
+require('ui/typeahead/typeahead.less');
+require('ui/share/styles/index.less');
+require('ui/styles/control_group.less');
+require('ui/styles/navbar.less');
+require('plugins/kibana/visualize/styles/main.less');
+require('ui/styles/config.less');
+
 import _ from 'lodash';
 import 'plugins/kibana/visualize/saved_visualizations/saved_visualizations';
 import 'plugins/kibana/visualize/editor/sidebar';
@@ -33,6 +42,10 @@ import 'plugins/kibana/discover/saved_searches/saved_searches.js';
 
 import 'ui/stringify/register';
 import RegistryFieldFormatsProvider from 'ui/registry/field_formats';
+
+import 'ui/kbn_top_nav';
+import 'ui/timepicker';
+import 'ui/directives/paginate.js'
 
 require('ui/courier');
 
@@ -74,6 +87,12 @@ require('ui/modules').get('app/wazuh', ['kibana/courier'])
     };
 
     const searchSource = savedVis.searchSource;
+
+    $scope.topNavMenu = [{
+      key: 'refresh',
+      description: 'Refresh',
+      run: function () { $scope.fetch(); }
+    }];
 
     if (savedVis.id) {
       docTitle.change(savedVis.title);
