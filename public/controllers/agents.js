@@ -3,14 +3,13 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $route, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast, $mdSidenav, $mdDialog) {
+app.controller('agentsController', function ($scope, $q, $route, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast, $mdSidenav, $mdDialog) {
     //Initialisation
     $scope.load = true;
     $scope.agentInfo = [];
     $scope.agents = [];
     $scope.search = '';
     $scope.menuNavItem = 'agents';
-    $scope.submenuNavItem = 'overview';
     $scope.statusFilter = 'all';
     $scope.blocked = false;
 
@@ -18,6 +17,14 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     tabProvider.register($scope.pageId);
 
     var objectsArray = [];
+
+
+    var self = $scope;
+    self.selectedItemChange = selectedItemChange;
+
+    function selectedItemChange(item) {
+      console.log('Item changed to ' + JSON.stringify(item));
+    }
 
     //Print Error
     var printError = function (error) {
@@ -49,9 +56,12 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             clickOutsideToClose: true
         });
     };
-
-    $scope.agentsGet = function (body) {
+    self.agentsGet   = agentsGet;
+    function agentsGet (body) {
+        var deferred = $q.defer();
         $scope.blocked = true;
+        if(body)
+           body = { 'search': body }
         //Search agent body modification
         if (!body) {
             var tmpBody = DataFactory.getBody(objectsArray['/agents']);
@@ -69,18 +79,23 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         if (!body) {
             DataFactory.get(objectsArray['/agents'])
                 .then(function (data) {
-                    $scope.agents.length = 0;
+                    //$scope.agents.length = 0;
                     $scope.agents = data.data.items;
                     $scope.blocked = false;
+                    deferred.resolve( $scope.agents  );
                 }, printError);
         } else {
             DataFactory.get(objectsArray['/agents'], body)
                 .then(function (data) {
-                    $scope.agents.length = 0;
+                    //$scope.agents.length = 0;
                     $scope.agents = data.data.items;
                     $scope.blocked = false;
+                    console.log($scope.agents);
+                    deferred.resolve( $scope.agents  );
                 }, printError);
         }
+
+        return deferred.promise;
     };
 
     $scope.agentsObj = {
@@ -192,7 +207,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             $mdToast.show($mdToast.simple().textContent('FIM and rootcheck restarted successfully.'));
         }, printError);
     };
-    
+
     $scope.deleteSyscheck = function (agent, ev) {
         var confirm = $mdDialog.confirm()
           .title("Delete file integrity monitoring database")
@@ -272,7 +287,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         if (!$scope.reverse) {
             $scope.searchQuery += '-';
         }
-        
+
         $scope.searchQuery += $scope.sortKey;
         if ($scope.statusFilter != '') {
             $scope.agentsGet({ 'sort': $scope.searchQuery, 'status': $scope.statusFilter });
@@ -333,6 +348,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
             DataFactory.get(data).then(function (data) {
                 $scope.agents = data.data.items;
                 $scope.fetchAgent($scope.agents[0]);
+                $scope.agentsGet();
                 $scope.load = false;
             }, printError);
         }, printError);
@@ -345,5 +361,5 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         tabProvider.clean($scope.pageId);
     });
 
-});
 
+});

@@ -393,7 +393,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
   }])
   .config(function($mdThemingProvider, $mdIconProvider){
           $mdThemingProvider.theme('default')
-              .primaryPalette('blue-grey')
+              .primaryPalette('blue')
               .accentPalette('blue');
       });
 
