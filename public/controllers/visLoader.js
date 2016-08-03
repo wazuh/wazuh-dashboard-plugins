@@ -210,8 +210,6 @@ require('ui/modules').get('app/wazuh', [])
 
         $scope.$listen($state, 'fetch_with_changes', function (keys) {
           if (_.contains(keys, 'linked') && $state.linked === true) {
-            // abort and reload route
-            $route.reload();
             return;
           }
 
