@@ -136,10 +136,13 @@
       </div>
     </md-content>
 
-    <!-- kbn vis (wip)-->
-   <!-- <div flex>
-    <kbn-vis route-data="type=histogram&indexPattern=ossec-*&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:'*',uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.AlertLevel,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"></kbn-vis>
-    </div>-->
+    <!-- kbn vis-->
+   <div flex>
+    <kbn-vis vis-height="600px;" vis-type="histogram" vis-index-pattern="ossec-*" 
+    vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.AlertLevel,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))" 
+    vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="syscheck" vis-searchable="true">
+    </kbn-vis>
+    </div>
 
   </md-content>
 
