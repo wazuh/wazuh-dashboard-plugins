@@ -79,7 +79,11 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 require('ui/modules').get('app/wazuh', [])
   .controller('VisEditorW', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
-
+    console.log("-2");
+    console.log($route);
+    $route.current.params._a = "(filters:!(),linked:!f,query:'*',uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New Visualization',type:pie))";
+    $route.updateParams({ '_a' : $route.current.params._a});
+    console.log(kbnUrl);
     $scope.chrome = {};
     $scope.chrome.getVisible = function () {
       return true;
@@ -108,6 +112,9 @@ require('ui/modules').get('app/wazuh', [])
 
       const savedVis = _sVis;
 
+      console.log("-1");
+      console.log(_sVis);
+
       const vis = savedVis.vis;
       const editableVis = vis.createEditableVis();
       vis.requesting = function () {
@@ -129,48 +136,51 @@ require('ui/modules').get('app/wazuh', [])
       }
 
       let $state = $scope.$state = (function initState() {
-        const savedVisState = $scope.visA.substring($scope.visA.search('vis:')+4);
-        vis.setState(savedVisState);
+        const savedVisState = "(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentIP,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie)";
+        //vis.setState(savedVisState);
+        console.log("1");
+        console.log(savedVisState);
+        console.log("2");
+        console.log(vis);
         const stateDefaults = {
-          /*uiState: savedVis.uiStateJSON ? JSON.parse(savedVis.uiStateJSON) : {},
-          linked: !!savedVis.savedSearchId,
-          query: searchSource.getOwn('query') || { query_string: { query: '*' } },
-          filters: searchSource.getOwn('filter') || [],
-          vis: savedVisState*/
           uiState: {},
           linked: false,
-          query: {query_string : { query: '*' } },
+          query: {query_string : { analyze_wildcard: '!t', query:'*' } },
           filters: [],
-          vis: savedVisState
+          vis: {}
         };
 
         $state = new AppState(stateDefaults);
+        // query:(query_string:(analyze_wildcard:!t,query:'*'))
+        console.log("3");
+        console.log($state);
 
         if ($scope.visFilter) {
           $state.query = $scope.visFilter;
         }
         editableVis.setState(savedVisState);
-        /*if (!angular.equals($state.vis, savedVisState)) {
-          Promise.try(function () {
-            editableVis.setState($state.vis);
-            vis.setState(editableVis.getEnabledState());
-          })
-            .catch();
-        }*/
-
+        //$state.emit('fetch_with_changes');
         return $state;
       } ());
 
       function init() {
         // export some objects
         $scope.savedVis = savedVis;
+        console.log("4");
+        console.log(savedVis);
         $scope.searchSource = searchSource;
         $scope.vis = vis;
+        console.log("5");
+        console.log(vis);
         $scope.indexPattern = vis.indexPattern;
         $scope.editableVis = editableVis;
         $scope.state = $state;
         $scope.uiState = $state.makeStateful('uiState');
+        console.log("6");
+        console.log(vis);
         vis.setUiState($scope.uiState);
+        console.log("7");
+        console.log(vis);
         $scope.timefilter = timefilter;
         $scope.opts = _.pick($scope, 'doSave', 'savedVis', 'shareData', 'timefilter');
 
@@ -182,6 +192,8 @@ require('ui/modules').get('app/wazuh', [])
         // track state of editable vis vs. "actual" vis
         $scope.stageEditableVis = transferVisState(editableVis, vis, true);
         $scope.resetEditableVis = transferVisState(vis, editableVis);
+
+
         $scope.$watch(function () {
           return editableVis.getEnabledState();
         }, function (newState) {
@@ -201,6 +213,8 @@ require('ui/modules').get('app/wazuh', [])
 
         $state.replace();
 
+        //$state.emit('fetch_with_changes');
+
         $scope.$watch('searchSource.get("index").timeFieldName', function (timeField) {
           timefilter.enabled = !!timeField;
         });
@@ -217,22 +231,29 @@ require('ui/modules').get('app/wazuh', [])
 
 
         $scope.$listen($state, 'fetch_with_changes', function (keys) {
+          console.log("8");
           if (_.contains(keys, 'linked') && $state.linked === true) {
             return;
           }
+          console.log("Aqui el estado fuera");
+          console.log($state.vis);
+          //if (_.contains(keys, 'vis')) {
+              console.log("9");
 
-          if (_.contains(keys, 'vis')) {
             $state.vis.listeners = _.defaults($state.vis.listeners || {}, vis.listeners);
 
             // only update when we need to, otherwise colors change and we
             // risk loosing an in-progress result
+            console.log("Aqui el estado dentro");
+            console.log($state.vis);
             vis.setState($state.vis);
             editableVis.setState($state.vis);
-          }
+          //}
 
           // we use state to track query, must write before we fetch
           if ($state.query && !$state.linked) {
             //REALLY UPDATE THE QUERY OVER THE DEFAULT STATE
+            console.log("10");
             searchSource.set('query', $state.query);
           } else {
             searchSource.set('query', null);
@@ -247,11 +268,12 @@ require('ui/modules').get('app/wazuh', [])
         });
 
         // Without this manual emission, we'd miss filters and queries that were on the $state initially
-        $state.emit('fetch_with_changes');
+        //$state.emit('fetch_with_changes');
 
         $scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
 
         $scope.$on('ready:vis', function () {
+          console.log("11");
           $scope.$emit('application.load');
           $state.emit('fetch_with_changes');
         });
@@ -259,6 +281,7 @@ require('ui/modules').get('app/wazuh', [])
         $scope.$on('$destroy', function () {
           savedVis.destroy();
         });
+        //$state.emit('fetch_with_changes');
       }
 
       $scope.fetch = function () {
@@ -328,6 +351,7 @@ require('ui/modules').get('app/wazuh', [])
 
       function transferVisState(fromVis, toVis, stage) {
         return function () {
+          console.log("12");
           const view = fromVis.getEnabledState();
           const full = fromVis.getState();
           toVis.setState(view);

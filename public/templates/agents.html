@@ -42,4 +42,17 @@
     </form>
   </md-content>
 
+	<!-- kbn vis-->
+ <div flex>
+	<kbn-vis vis-height="600px;" vis-type="pie" vis-index-pattern="ossec-*"
+	vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentID,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="*" vis-searchable="true">
+	</kbn-vis>
+	</div>
+
+	<!--<kbn-vis vis-height="600px;" vis-type="histogram" vis-index-pattern="ossec-*"
+	vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.sidid,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="syscheck" vis-searchable="true">
+	</kbn-vis>-->
+
 </div>
