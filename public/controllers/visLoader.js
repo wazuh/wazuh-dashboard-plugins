@@ -78,7 +78,7 @@ var app = require('ui/modules').get('app/wazuh', [])
   }]);
 
 require('ui/modules').get('app/wazuh', [])
-  .controller('VisEditor', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
+  .controller('VisEditorW', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
 
     $scope.chrome = {};
     $scope.chrome.getVisible = function () {
@@ -97,8 +97,10 @@ require('ui/modules').get('app/wazuh', [])
         throw new Error('You must provide either an indexPattern');
       }
 
-      return savedVisualizations.get({ 'type': $scope.visType, 'indexPattern': $scope.visIndexPattern, '_a': $scope.visA, '_g': $scope.visG })
-        .catch();
+      return savedVisualizations.get({ 'type': $scope.visType, 'indexPattern': $scope.visIndexPattern, '_g': $scope.visG, '_a': $scope.visA })
+        .catch(courier.redirectWhenMissing({
+          '*': '/'
+        }));
     }
 
     _savedVis().then(function (_sVis) {
@@ -127,12 +129,18 @@ require('ui/modules').get('app/wazuh', [])
       }
 
       let $state = $scope.$state = (function initState() {
-        const savedVisState = vis.getState();
+        const savedVisState = $scope.visA.substring($scope.visA.search('vis:')+4);
+        vis.setState(savedVisState);
         const stateDefaults = {
-          uiState: savedVis.uiStateJSON ? JSON.parse(savedVis.uiStateJSON) : {},
+          /*uiState: savedVis.uiStateJSON ? JSON.parse(savedVis.uiStateJSON) : {},
           linked: !!savedVis.savedSearchId,
           query: searchSource.getOwn('query') || { query_string: { query: '*' } },
           filters: searchSource.getOwn('filter') || [],
+          vis: savedVisState*/
+          uiState: {},
+          linked: false,
+          query: {query_string : { query: '*' } },
+          filters: [],
           vis: savedVisState
         };
 
@@ -141,14 +149,14 @@ require('ui/modules').get('app/wazuh', [])
         if ($scope.visFilter) {
           $state.query = $scope.visFilter;
         }
-
-        if (!angular.equals($state.vis, savedVisState)) {
+        editableVis.setState(savedVisState);
+        /*if (!angular.equals($state.vis, savedVisState)) {
           Promise.try(function () {
             editableVis.setState($state.vis);
             vis.setState(editableVis.getEnabledState());
           })
             .catch();
-        }
+        }*/
 
         return $state;
       } ());
@@ -224,6 +232,7 @@ require('ui/modules').get('app/wazuh', [])
 
           // we use state to track query, must write before we fetch
           if ($state.query && !$state.linked) {
+            //REALLY UPDATE THE QUERY OVER THE DEFAULT STATE
             searchSource.set('query', $state.query);
           } else {
             searchSource.set('query', null);

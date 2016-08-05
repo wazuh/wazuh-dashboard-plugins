@@ -1,4 +1,4 @@
-<div ng-controller="VisEditor">
+<div ng-controller="VisEditorW">
 <div ng-if="_loadVisAsync" class="app-container vis-editor vis-type-{{ vis.type.name }}" style="height: {{visHeight}}">
 
   <kbn-top-nav name="visualize" config="topNavMenu" ng-if="visSearchable">
@@ -26,7 +26,7 @@
       <form ng-if="vis.type.requiresSearch && !$state.linked" ng-submit="fetch()" class="inline-form fill" name="queryInput">
         <div class="typeahead" kbn-typeahead="visualize">
           <div class="input-group" ng-class="queryInput.$invalid ? 'has-error' : ''">
-            <input ng-model="state.query" parse-query input-focus kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
+            <input ng-model="visFilter" parse-query input-focus kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
 
             <button class="btn btn-default" type="submit" ng-disabled="queryInput.$invalid" aria-label="Search">
               <span aria-hidden="true" class="fa fa-search"></span>
