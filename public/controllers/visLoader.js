@@ -79,17 +79,21 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 require('ui/modules').get('app/wazuh', [])
   .controller('VisEditorW', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
-    //console.log("-2");
+    console.log("hola");
+
     //console.log($route);
-    $route.current.params._a = $scope.visA;
-    $route.updateParams({ '_a' : $scope.visA});
+
     //console.log(kbnUrl);
     $scope.chrome = {};
     $scope.chrome.getVisible = function () {
       return true;
     }
 
+
+
     var _savedVis = function () {
+
+
       const visTypes = Private(RegistryVisTypesProvider);
       const visType = _.find(visTypes, { name: $scope.visType });
 
@@ -136,15 +140,6 @@ require('ui/modules').get('app/wazuh', [])
       }
 
       let $state = $scope.$state = (function initState() {
-        const savedVisState = "(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentIP,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie)";
-        //vis.setState(savedVisState);
-        $route.current.params._a = $scope.visA;
-        $route.updateParams({ '_a' : $scope.visA});
-        console.log($scope.visA);
-        //console.log("1");
-        //console.log(savedVisState);
-        //console.log("2");
-        //console.log(vis);
         const stateDefaults = {
           uiState: {},
           linked: false,
@@ -154,36 +149,25 @@ require('ui/modules').get('app/wazuh', [])
         };
 
         $state = new AppState(stateDefaults);
-        // query:(query_string:(analyze_wildcard:!t,query:'*'))
-        //console.log("3");
-        //console.log($state);
 
-        if ($scope.visFilter) {
-          $state.query = $scope.visFilter;
-        }
-        editableVis.setState(savedVisState);
-        //$state.emit('fetch_with_changes');
         return $state;
       } ());
 
       function init() {
         // export some objects
         $scope.savedVis = savedVis;
-        //console.log("4");
-        //console.log(savedVis);
+
         $scope.searchSource = searchSource;
         $scope.vis = vis;
-        //console.log("5");
-        //console.log(vis);
+
         $scope.indexPattern = vis.indexPattern;
         $scope.editableVis = editableVis;
         $scope.state = $state;
+
         $scope.uiState = $state.makeStateful('uiState');
-        //console.log("6");
-        //console.log(vis);
+
         vis.setUiState($scope.uiState);
-        //console.log("7");
-        //console.log(vis);
+
         $scope.timefilter = timefilter;
         $scope.opts = _.pick($scope, 'doSave', 'savedVis', 'shareData', 'timefilter');
 
@@ -197,26 +181,7 @@ require('ui/modules').get('app/wazuh', [])
         $scope.resetEditableVis = transferVisState(vis, editableVis);
 
 
-        $scope.$watch(function () {
-          return editableVis.getEnabledState();
-        }, function (newState) {
-          editableVis.dirty = !angular.equals(newState, vis.getEnabledState());
-
-          $scope.responseValueAggs = null;
-          try {
-            $scope.responseValueAggs = editableVis.aggs.getResponseAggs().filter(function (agg) {
-              return _.get(agg, 'schema.group') === 'metrics';
-            });
-          }
-          // this can fail when the agg.type is changed but the
-          // params have not been set yet. watcher will trigger again
-          // when the params update
-          catch (e) { } // eslint-disable-line no-empty
-        }, true);
-
-        $state.replace();
-
-        //$state.emit('fetch_with_changes');
+        //$state.replace();
 
         $scope.$watch('searchSource.get("index").timeFieldName', function (timeField) {
           timefilter.enabled = !!timeField;
@@ -236,21 +201,34 @@ require('ui/modules').get('app/wazuh', [])
         $scope.$listen($state, 'fetch_with_changes', function (keys) {
 
 
-          //console.log("8");
+          let $state = $scope.$state = (function initState() {
+            $route.current.params._a = $scope.visA;
+            $route.updateParams({ '_a' : $scope.visA});
+            $route.current.params._g = $scope.visG;
+            $route.updateParams({ '_g' : $scope.visG});
+            const stateDefaults = {
+              uiState: {},
+              linked: false,
+              query: {query_string : { analyze_wildcard: '!t', query:'*' } },
+              filters: [],
+              vis: {}
+            };
+            $state = new AppState(stateDefaults);
+            return $state;
+          } ());
+
+          $scope.state = $state;
+
+
+          console.log($state);
           if (_.contains(keys, 'linked') && $state.linked === true) {
             return;
           }
-          //console.log("Aqui el estado fuera");
-          //console.log($state.vis);
-          //if (_.contains(keys, 'vis')) {
-              //console.log("9");
 
             $state.vis.listeners = _.defaults($state.vis.listeners || {}, vis.listeners);
 
-            // only update when we need to, otherwise colors change and we
-            // risk loosing an in-progress result
-            //console.log("Aqui el estado dentro");
-            //console.log($state.vis);
+
+            console.log($state.vis);
             vis.setState($state.vis);
             editableVis.setState($state.vis);
           //}
@@ -278,7 +256,7 @@ require('ui/modules').get('app/wazuh', [])
         $scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
 
         $scope.$on('ready:vis', function () {
-          //console.log("11");
+          console.log("11");
           $scope.$emit('application.load');
           $state.emit('fetch_with_changes');
         });
@@ -290,7 +268,8 @@ require('ui/modules').get('app/wazuh', [])
       }
 
       $scope.fetch = function () {
-        $state.save();
+        //$state.save();
+
         const queryFilter = Private(FilterBarQueryFilterProvider);
         searchSource.set('filter', queryFilter.getFilters());
         if (!$state.linked) searchSource.set('query', $state.query);
@@ -367,8 +346,8 @@ require('ui/modules').get('app/wazuh', [])
           if (stage) $scope.fetch();
         };
       }
-
       init();
+
     });
 
   });
