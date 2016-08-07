@@ -150,6 +150,7 @@ require('ui/modules').get('app/wazuh', [])
 
         $state = new AppState(stateDefaults);
 
+
         return $state;
       } ());
 
@@ -202,6 +203,7 @@ require('ui/modules').get('app/wazuh', [])
 
 
           let $state = $scope.$state = (function initState() {
+            $scope.visA = $scope.visA.replace("vpc-agent-centos-public","NO");
             $route.current.params._a = $scope.visA;
             $route.updateParams({ '_a' : $scope.visA});
             $route.current.params._g = $scope.visG;
@@ -214,6 +216,8 @@ require('ui/modules').get('app/wazuh', [])
               vis: {}
             };
             $state = new AppState(stateDefaults);
+
+            console.log($state);
             return $state;
           } ());
 
