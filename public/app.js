@@ -271,24 +271,29 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       if (!name || !type || !instanceId) {
         return prepError({ 'error': -1, 'message': 'Missing parameters' });
       }
-      
+
       switch (type) {
         case 'string': break;
         case 'boolean': break;
         case 'array': break;
-        default: 
+        default:
           return prepError({ 'error': 7, 'message': 'Filter type must be one of the following: String, boolean, array.' });
       };
 
       if (_instances[instanceId]['filters'][name] != undefined) {
-        return prepError({ 'error': 7, 'message': 'Attempt to register duplicate filter'});
+        return prepError({ 'error': 7, 'message': 'Attempt to register duplicated filter' });
       }
 
       if (required && !defValue) {
         return prepError({ 'error': 7, 'message': 'Required filters must have a default value.' });
-      }  
+      }
 
-      _instances[instanceId]['filters'][name] = {'type': type, 'required': required, 'defValue': defValue};
+      _instances[instanceId]['filters'][name] = { 'type': type, 'required': required, 'defValue': defValue };
+
+      _instances[instanceId]['body'][name.replace('filter-', '')] = _instances[instanceId]['filters'][name]['required'] ?
+        _instances[instanceId]['filters'][name]['defValue'] : null;
+
+      return true;
     };
 
     dataObj.filters.unregister = function (instanceId, name) {
@@ -297,11 +302,14 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       }
 
       if (!_instances[instanceId]['filters']) {
-        return prepError({ 'error': 7, 'message': 'Attempt to delete an undefined filter'});
+        return prepError({ 'error': 7, 'message': 'Attempt to delete an undefined filter' });
       }
-      //ToDo: Delete relationships
+
+      _instances[instanceId]['body'][name.replace('filter-', '')] = undefined;
       _instances[instanceId]['filters'][name].length = 0;
       _instances[instanceId]['filters'][name] = undefined;
+
+      return true;
     };
 
     dataObj.filters.setOr = function (instanceId, name, filtersArray) {
@@ -309,16 +317,30 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         return prepError({ 'error': -1, 'message': 'Missing parameters' });
       }
 
-      if (typeof(filtersArray) == 'String') {
+      if (!dataObj.filters.exist(instanceId, name)) {
+        return prepError({ 'error': 7, 'message': 'Filters must be registered before setting a value or relation' });
+      }
+
+      if (typeof (filtersArray) == 'String') {
         filtersArray = [filtersArray];
       }
-      //ToDo: Check if OR elements exists
-      _instances[instanceId]['filters'][name]['or'] = filtersArray;
+      _instances[instanceId]['filters'][name]['or'] = [];
+      angular.forEach(filtersArray, function (element) {
+        if (dataObj.filters.exist(instanceId, name)) {
+          _instances[instanceId]['filters'][name]['or'].push(element);
+        }
+      });
+
+      return true;
     };
 
     dataObj.filters.setAnd = function (instanceId, name, filtersArray) {
       if (!instanceId || !name || !filtersArray) {
         return prepError({ 'error': -1, 'message': 'Missing parameters' });
+      }
+
+      if (!dataObj.filters.exist(instanceId, name)) {
+        return prepError({ 'error': 7, 'message': 'Filters must be registered before setting a value or relation' });
       }
 
       if (typeof (filtersArray) == 'String') {
@@ -327,11 +349,14 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
 
       angular.forEach(filtersArray, function (element) {
         if (!_instances[instanceId]['filters'][element]['required']) {
-          return prepError({ 'error': 7, 'message': 'Attempt to relate not required filters with "AND" expression.'});
+          return prepError({ 'error': 7, 'message': 'Attempt to relate not required filters with "AND" expression.' });
+        }
+        if (dataObj.filters.exist(instanceId, name)) {
+          _instances[instanceId]['filters'][name]['and'].push(element);
         }
       });
-      //ToDo: Check if AND elements exists
-      _instances[instanceId]['filters'][name]['and'] = filtersArray;
+
+      return true;
     };
 
     dataObj.filters.set = function (instanceId, name, value) {
@@ -339,62 +364,94 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         return prepError({ 'error': -1, 'message': 'Missing parameters' });
       }
 
-      if ((_instances[instanceId]['filters'][name]['type'] == 'boolean') && (typeof(value) != 'boolean')) {
-        return prepError({ 'error': 7, 'message': 'Attempt to set non-boolean value in boolean filter'});
+      if (!dataObj.filters.exist(instanceId, name)) {
+        return prepError({ 'error': 7, 'message': 'Filters must be registered before setting a value or relation' });
+      }
+
+      if ((_instances[instanceId]['filters'][name]['type'] == 'boolean') && (typeof (value) != 'boolean')) {
+        return prepError({ 'error': 7, 'message': 'Attempt to set non-boolean value in boolean filter' });
       }
 
       if (_instances[instanceId]['filters'][name]['type'] == 'array') {
         _instances[instanceId]['filters'][name] = ((_instances[instanceId]['filters'][name].split(',')).push(value)).toString();
       } else {
-        _instances[instanceId]['filters'][name]['value'] = value;
+        _instances[instanceId]['body'][name.replace('filter-', '')] = value;
       }
 
       angular.forEach(_instances[instanceId]['filters'][name]['or'], function (element) {
-        dataObj.filters.unset(instanceId, element);
+        if (dataObj.filters.exist(instanceId, element)) {
+          dataObj.filters.unset(instanceId, element);
+        } else {
+          _instances[instanceId]['filters'][name]['or'][_instances[instanceId]['filters'][name]['or'].indexOf(element)] = undefined;
+        }
       });
 
       angular.forEach(_instances[instanceId]['filters'][name]['and'], function (element) {
-        //ToDo: If hasValue, then unset
-        if (_instances[instanceId]['filters'][element] == null) {
-          dataObj.filters.unset(instanceId, element);
+        if (!dataObj.filters.exist(instanceId, element)) {
+           _instances[instanceId]['filters'][name]['and'][_instances[instanceId]['filters'][name]['and'].indexOf(element)] = undefined;
+        } else if (!dataObj.filters.hasValue(instanceId, element)) {
+          _instances[instanceId]['body'][element.replace('filter-', '')] = _instances[instanceId]['filters'][element]['defValue'];
         }
       });
+
+      return true;
     };
 
     dataObj.filters.unset = function (instanceId, name) {
-      //ToDo: set null or default value
+      if (!instanceId || !name) {
+        return prepError({ 'error': -1, 'message': 'Missing parameters' });
+      }
+
+      if (!dataObj.filters.exist(instanceId, name)) {
+        return prepError({ 'error': 7, 'message': 'Filters must be registered before setting a value or relation' });
+      }
+
+      _instances[instanceId]['body'][name.replace('filter-', '')] =
+        _instances[instanceId]['filters'][name]['defValue'] ? _instances[instanceId]['filters'][name]['defValue'] : null;
+
+      return true;
     };
 
     dataObj.filters.alternateSet = function (instanceId, name, value) {
       if (!instanceId || !name || !value) {
         return prepError({ 'error': -1, 'message': 'Missing parameters' });
       }
-      
+
+      if (!dataObj.filters.exist(instanceId, name)) {
+        return prepError({ 'error': 7, 'message': 'Filters must be registered before setting a value or relation' });
+      }
+
       if (dataObj.filters.isSet(instanceId, name, value)) {
         dataObj.filters.unset(instanceId, name, value);
       } else {
         dataObj.filters.set(instanceId, name, value);
       }
+
+      return true;
     };
 
     dataObj.filters.exist = function (instanceId, name) {
       if (!instanceId || !name) {
         return prepError({ 'error': -1, 'message': 'Missing parameters' });
       }
-      //ToDo: Separate exist and hasValue
-      return ((_instances[instanceId]['filters'][name] != undefined) && (_instances[instanceId]['filters'][name] != null));
+
+      return (_instances[instanceId]['filters'][name] != undefined);
+    };
+
+    dataObj.filters.hasValue = function (instanceId, name) {
+      if (!instanceId || !name) {
+        return prepError({ 'error': -1, 'message': 'Missing parameters' });
+      }
+
+      return dataObj.filters.exist(instanceId, name) ? (_instances[instanceId]['body'][name.replace('filter-', '')] != null) : false;
     };
 
     dataObj.filters.isSet = function (instanceId, name, value) {
       if (!instanceId || !name || !value) {
         return prepError({ 'error': -1, 'message': 'Missing parameters' });
       }
-      //ToDo: Use exist and hasValue
-      if (dataObj.filters.exist(instanceId, name)) {
-        return (_instances[instanceId]['filters'][name]['value'] == value);
-      } else {
-        return false;
-      }
+
+      return dataObj.filters.hasValue(instanceId, name) ? (_instances[instanceId]['body'][name.replace('filter-', '')] == value) : false;
     };
     /*Filters end*/
 
@@ -468,8 +525,8 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
           err.message = "Wazuh API returned an error message. Error: " + err.errorData.message;
         }
       } else if (err.error === 7) {
-        err['html'] = "Unexpected error filtering the data. Error <b>" + err.errorMessage + "</b>.";
-        err.message = "Unexpected error filtering the data. Error " + err.errorMessage + ".";
+        err['html'] = "Unexpected error filtering the data. Error <b>" + err.message + "</b>.";
+        err.message = "Unexpected error filtering the data. Error " + err.message + ".";
       } else {
         err['html'] = "Unexpected error. Please, report this to Wazuh Team.";
         err.message = "Unexpected error. Please, report this to Wazuh Team.";
