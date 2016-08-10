@@ -46,28 +46,28 @@
  <div flex>
 	<kbn-vis vis-height="600px;" vis-type="line" vis-index-pattern="ossec-*"
 	vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'NewVisualization',type:line))"
-	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="AgentName:vpc-centos-public" vis-searchable="true">
+	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="{{selectedItem.name ? 'AgentName:'+selectedItem.name : '*'}}" vis-searchable="true">
 	</kbn-vis>
 	</div>
 
 	<div flex>
  	<kbn-vis vis-height="600px;" vis-type="pie" vis-index-pattern="ossec-*"
  	vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'NewVisualization',type:pie))"
- 	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="*">
+ 	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="{{selectedItem.name ? 'AgentName:'+selectedItem.name : '*'}}">
  	</kbn-vis>
  	</div>
 
 	<div flex>
 	<kbn-vis vis-height="600px;" vis-type="pie" vis-index-pattern="ossec-*"
 	vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcuser,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'NewVisualization',type:pie))"
-	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="*">
+	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="{{selectedItem.name ? 'AgentName:'+selectedItem.name : '*'}}">
 	</kbn-vis>
 	</div>
 
 	<div flex>
 	<kbn-vis vis-height="600px;" vis-type="pie" vis-index-pattern="ossec-*"
 	vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'NewVisualization',type:pie))"
-	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="*">
+	vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-5y,mode:quick,to:now))" vis-filter="{{selectedItem.name ? 'AgentName:'+selectedItem.name : '*'}}">
 	</kbn-vis>
 	</div>
 

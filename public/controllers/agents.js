@@ -24,6 +24,7 @@ app.controller('agentsController', function ($scope, $q, $route, alertify, share
 
     function selectedItemChange(item) {
       console.log('Item changed to ' + JSON.stringify(item));
+      console.log('SelectedItem ' + JSON.stringify($scope.selectedItem));
     }
 
     //Print Error
