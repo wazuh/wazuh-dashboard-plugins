@@ -353,41 +353,46 @@ app.controller('agentsController', function ($scope, $q, $route, alertify, share
                 DataFactory.get(instanceId).then(function (data) {
                     console.log('BODY 1' + JSON.stringify(DataFactory.getBody(instanceId)));
                     console.log('TEST 1 ' + JSON.stringify(data));
+                    DataFactory.filters.alternateSet(instanceId, 'filter-sort', '-status');
+                    DataFactory.get(instanceId).then(function (data) {
+                        console.log('BODY 2' + JSON.stringify(DataFactory.getBody(instanceId)));
+                        console.log('TEST 2 ' + JSON.stringify(data));
+                        DataFactory.filters.unset(instanceId, 'filter-sort');
+                        DataFactory.filters.set(instanceId, 'search', 'agent');
+                        DataFactory.get(instanceId).then(function (data) {
+                            console.log('BODY 3' + JSON.stringify(DataFactory.getBody(instanceId)));
+                            console.log('TEST 3 ' + JSON.stringify(data));
+                            DataFactory.filters.set(instanceId, 'search', '16');
+                            DataFactory.get(instanceId).then(function (data) {
+                                console.log('BODY 4' + JSON.stringify(DataFactory.getBody(instanceId)));
+                                console.log('TEST 4 ' + JSON.stringify(data));
+                                DataFactory.filters.set(instanceId, 'search', 'Kibana');
+                                DataFactory.get(instanceId).then(function (data) {
+                                    console.log('BODY 5' + JSON.stringify(DataFactory.getBody(instanceId)));
+                                    console.log('TEST 5 ' + JSON.stringify(data));
+                                    DataFactory.filters.set(instanceId, 'status', 'enabled');
+                                    DataFactory.get(instanceId).then(function (data) {
+                                        console.log('BODY 6' + JSON.stringify(DataFactory.getBody(instanceId)));
+                                        console.log('TEST 6 ' + JSON.stringify(data));
+                                        console.log('TEST 7 ' + DataFactory.filters.isSet(instanceId, 'status', 'enabled'));
+                                        DataFactory.filters.unregister(instanceId, 'search');
+                                        DataFactory.filters.unregister(instanceId, 'status');
+                                        DataFactory.filters.unregister(instanceId, 'filter-sort');
+                                        DataFactory.get(instanceId).then(function (data) {
+                                            console.log('BODY 8' + JSON.stringify(DataFactory.getBody(instanceId)));
+                                            console.log('TEST 8 ' + JSON.stringify(data));
+                                        }, printError);
+                                    }, printError);
+
+                                }, printError);
+
+                            }, printError);
+
+                        }, printError);
+
+                    }, printError);
+
                 }, printError);
-                DataFactory.filters.alternateSet(instanceId, 'filter-sort', '-status');
-                DataFactory.get(instanceId).then(function (data) {
-                    console.log('BODY 2' + JSON.stringify(DataFactory.getBody(instanceId)));
-                    console.log('TEST 2 ' + JSON.stringify(data));
-                }, printError);
-                DataFactory.filters.unset(instanceId, 'filter-sort');
-                DataFactory.filters.set(instanceId, 'search', 'agent');
-                DataFactory.get(instanceId).then(function (data) {
-                    console.log('BODY 3' + JSON.stringify(DataFactory.getBody(instanceId)));
-                    console.log('TEST 3 ' + JSON.stringify(data));
-                }, printError);
-                DataFactory.filters.set(instanceId, 'search', '16');
-                DataFactory.get(instanceId).then(function (data) {
-                    console.log('BODY 4' + JSON.stringify(DataFactory.getBody(instanceId)));
-                    console.log('TEST 4 ' + JSON.stringify(data));
-                }, printError);
-                DataFactory.filters.set(instanceId, 'search', 'Kibana');
-                DataFactory.get(instanceId).then(function (data) {
-                    console.log('BODY 5' + JSON.stringify(DataFactory.getBody(instanceId)));
-                    console.log('TEST 5 ' + JSON.stringify(data));
-                }, printError);
-                DataFactory.filters.set(instanceId, 'status', 'enabled');
-                DataFactory.get(instanceId).then(function (data) {
-                    console.log('BODY 6' + JSON.stringify(DataFactory.getBody(instanceId)));
-                    console.log('TEST 6 ' + JSON.stringify(data));
-                }, printError);
-                console.log('TEST 7 ' + DataFactory.filters.isSet(instanceId, 'status', 'enabled'));
-                DataFactory.filters.unregister(instanceId, 'search');
-                DataFactory.filters.unregister(instanceId, 'status');
-                DataFactory.filters.unregister(instanceId, 'filter-sort');
-                DataFactory.get(instanceId).then(function (data) {
-                    console.log('BODY 8' + JSON.stringify(DataFactory.getBody(instanceId)));
-                    console.log('TEST 8 ' + JSON.stringify(data));
-                }, printError);                
             }, printError);
     };
 

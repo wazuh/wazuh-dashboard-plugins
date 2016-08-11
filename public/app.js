@@ -291,7 +291,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       _instances[instanceId]['filters'][name] = { 'type': type, 'required': required, 'defValue': defValue };
 
       _instances[instanceId]['body'][name.replace('filter-', '')] = _instances[instanceId]['filters'][name]['required'] ?
-        _instances[instanceId]['filters'][name]['defValue'] : null;
+        _instances[instanceId]['filters'][name]['defValue'] : undefined;
 
       return true;
     };
@@ -407,7 +407,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
       }
 
       _instances[instanceId]['body'][name.replace('filter-', '')] =
-        _instances[instanceId]['filters'][name]['defValue'] ? _instances[instanceId]['filters'][name]['defValue'] : null;
+        _instances[instanceId]['filters'][name]['defValue'] ? _instances[instanceId]['filters'][name]['defValue'] : undefined;
 
       return true;
     };
@@ -443,7 +443,7 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
         return prepError({ 'error': -1, 'message': 'Missing parameters' });
       }
 
-      return dataObj.filters.exist(instanceId, name) ? (_instances[instanceId]['body'][name.replace('filter-', '')] != null) : false;
+      return dataObj.filters.exist(instanceId, name) ? (_instances[instanceId]['body'][name.replace('filter-', '')] != undefined) : false;
     };
 
     dataObj.filters.isSet = function (instanceId, name, value) {
