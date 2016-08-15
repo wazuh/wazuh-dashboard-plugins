@@ -5,6 +5,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('agentsController', function ($scope, $q, $route, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast, $mdSidenav, $mdDialog) {
     //Initialisation
+
     $scope.load = true;
     $scope.agentInfo = [];
     $scope.agents = [];
