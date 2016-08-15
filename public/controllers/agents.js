@@ -10,6 +10,7 @@ app.controller('agentsController', function ($scope, $q, $route, alertify, share
     $scope.agents = [];
     $scope.search = '';
     $scope.menuNavItem = 'agents';
+    $scope.submenuNavItem = 'overview';
     $scope.statusFilter = 'all';
     $scope.blocked = false;
 
@@ -17,14 +18,6 @@ app.controller('agentsController', function ($scope, $q, $route, alertify, share
     tabProvider.register($scope.pageId);
 
     var objectsArray = [];
-
-
-    var self = $scope;
-    self.selectedItemChange = selectedItemChange;
-
-    function selectedItemChange(item) {
-      console.log('Item changed to ' + JSON.stringify(item));
-    }
 
     //Print Error
     var printError = function (error) {
@@ -56,12 +49,9 @@ app.controller('agentsController', function ($scope, $q, $route, alertify, share
             clickOutsideToClose: true
         });
     };
-    self.agentsGet   = agentsGet;
-    function agentsGet (body) {
-        var deferred = $q.defer();
+
+    $scope.agentsGet = function (body) {
         $scope.blocked = true;
-        if(body)
-           body = { 'search': body }
         //Search agent body modification
         if (!body) {
             var tmpBody = DataFactory.getBody(objectsArray['/agents']);
@@ -79,23 +69,45 @@ app.controller('agentsController', function ($scope, $q, $route, alertify, share
         if (!body) {
             DataFactory.get(objectsArray['/agents'])
                 .then(function (data) {
-                    //$scope.agents.length = 0;
+                    $scope.agents.length = 0;
                     $scope.agents = data.data.items;
                     $scope.blocked = false;
-                    deferred.resolve( $scope.agents  );
                 }, printError);
         } else {
             DataFactory.get(objectsArray['/agents'], body)
                 .then(function (data) {
-                    //$scope.agents.length = 0;
+                    $scope.agents.length = 0;
                     $scope.agents = data.data.items;
                     $scope.blocked = false;
-                    console.log($scope.agents);
-                    deferred.resolve( $scope.agents  );
                 }, printError);
         }
+    };
 
-        return deferred.promise;
+    $scope.agentsSearch = function (search) {
+        var defered = $q.defer();
+        var promise = defered.promise;
+
+        if (search) {
+            DataFactory.filters.set(objectsArray['/agents'], 'search', search);
+        } else {
+            DataFactory.filters.unset(objectsArray['/agents'], 'search');
+        }
+
+        DataFactory.get(objectsArray['/agents'])
+            .then(function (data) {
+                $scope.agents.length = 0;
+                $scope.agents = data.data.items;
+                $scope.blocked = false;
+                if (data.data.items.length > 0) {
+                    defered.resolve(data.data.items);
+                } else {
+                    defered.reject();
+                }
+            }, function (data) {
+                defered.reject();
+                printError(data);
+            });
+        return promise;
     };
 
     $scope.agentsObj = {
@@ -132,7 +144,6 @@ app.controller('agentsController', function ($scope, $q, $route, alertify, share
     };
 
     $scope.fetchAgent = function (agent) {
-        $scope._agent = agent;
         DataFactory.getAndClean('get', '/agents/' + agent.id, {})
             .then(function (data) {
                 $scope.agentInfo = data.data;
@@ -402,10 +413,10 @@ app.controller('agentsController', function ($scope, $q, $route, alertify, share
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {
                 $scope.agents = data.data.items;
-                $scope.fetchAgent($scope.agents[0]);
                 $scope.agentsGet();
+                DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
                 $scope.load = false;
-                $scope.unitTest();
+                //$scope.unitTest();
             }, printError);
         }, printError);
 

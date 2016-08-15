@@ -15,7 +15,8 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
   .config(function ($mdThemingProvider, $mdIconProvider) {
     $mdThemingProvider.theme('default')
       .primaryPalette('blue')
-      .accentPalette('blue');
+      .accentPalette('blue')
+      .warnPalette('blue');
   });
 
 // Require services and factories
