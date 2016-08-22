@@ -37,7 +37,6 @@ import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_cli
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 
-import editorTemplate from 'plugins/wazuh/templates/agents-metrics.html';
 import 'ui/state_management/app_state';
 import StateManagementAppStateProvider from 'ui/state_management/app_state';
 import 'plugins/kibana/discover/saved_searches/saved_searches.js';
@@ -131,6 +130,10 @@ require('ui/modules').get('app/wazuh', [])
       }
 
       let $state = $scope.$state = (function initState() {
+        $route.current.params._a = $scope.visA;
+        $route.updateParams({ '_a': $scope.visA });
+        $route.current.params._g = $scope.visG;
+        $route.updateParams({ '_g': $scope.visG });
         const stateDefaults = {
           uiState: {},
           linked: false,

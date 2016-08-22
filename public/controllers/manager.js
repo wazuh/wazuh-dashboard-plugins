@@ -4,6 +4,8 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('managerController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter, $http, $mdDialog) {
+    console.log('yeah');
+    
     //Initialisation
     $scope.load = true;
     $scope.menuNavItem = 'manager';
