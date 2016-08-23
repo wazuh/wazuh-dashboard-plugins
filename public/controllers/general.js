@@ -10,7 +10,7 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
     $scope.agents = [];
     $scope.search = '';
     $scope.menuNavItem = 'agents';
-    $scope.submenuNavItem = 'overview';
+    $scope.submenuNavItem = '';
 
     var objectsArray = [];
 
@@ -86,7 +86,7 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
     };
 
     //Load
-    DataFactory.initialize('get', '/agents', {}, 20, 0)
+    DataFactory.initialize('get', '/agents', {}, 256, 0)
         .then(function (data) {
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {
