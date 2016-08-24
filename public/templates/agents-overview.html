@@ -4,7 +4,7 @@
 		<md-content layout="row" layout-align="space-between start">
 			<md-content layout="row" layout-align="start start">
 				<md-button class="md-raised md-primary" ng-disabled="_agent.id == '000'" ng-click="restart(_agent)"><i class="fa fa-repeat" aria-hidden="true"></i> Restart</md-button>
-				<md-button class="md-raised md-primary"><i class="fa fa-external-link" aria-hidden="true"></i> Discover alerts</md-button>
+				<md-button class="md-raised md-primary" ng-href="{{getDiscoverByAgent(_agent)}}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Discover alerts</md-button>
 			</md-content>
 			<md-content layout="row" layout-align="end start">
 				<div class="statusBox md-whiteframe-3dp" layout="row" layout-align="space-between center">Time window: Last 7 days</div>
