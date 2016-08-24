@@ -5,8 +5,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.agentInfo = [];
-    $scope.menuNavItem = 'agents';
-    $scope.submenuNavItem = 'overview';
+    $scope.$parent.submenuNavItem = 'overview';
 
     var objectsArray = [];
 
@@ -98,7 +97,11 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     };
 
     //Load
-    $scope.fetchAgent($scope.$parent._agent);
+    $scope.$watch(function () {
+        return $scope.$parent._agent;
+    }, function () {
+        $scope.fetchAgent($scope.$parent._agent);
+    });
 
     //Destroy
     $scope.$on("$destroy", function () {

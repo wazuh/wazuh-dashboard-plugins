@@ -100,7 +100,7 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)});
-        $scope.agents.length = $scope.agentInfo.length = 0;
+        $scope.agents.length = 0;
         tabProvider.clean($scope.pageId);
     });
 

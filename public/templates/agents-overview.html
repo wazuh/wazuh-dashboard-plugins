@@ -8,7 +8,7 @@
 			</md-content>
 			<md-content layout="row" layout-align="end start">
 				<div class="statusBox md-whiteframe-3dp" layout="row" layout-align="space-between center">Time window: Last 7 days</div>
-				<div class="statusBox md-whiteframe-3dp" layout="row" layout-align="space-between center"><span>{{_agent.status}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
+				<div class="statusBox md-whiteframe-3dp" ng-class="_agent.status == 'Active' ? null : (_agent.status == 'Never connected' ? 'extraLarge' : 'large')" layout="row" layout-align="space-between center"><span>{{_agent.status}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
 			</md-content>
 		</md-content>
 
@@ -40,7 +40,7 @@
 						</p>
 						<p ng-show="_agent.id != '000'"><b style="margin-right: 5px;">Last keep alive:</b> {{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</p>
 						<p ng-show="_agent.id != '000'" ng-click="showKey = !showKey"><b style="margin-right: 5px;">Agent key <i ng-show="!showKey" class="fa fa-caret-down" aria-hidden="true"></i><i ng-show="showKey" class="fa fa-caret-up" aria-hidden="true"></i></b></p>
-						<pre ng-if="showKey" style="overflow: hidden; height: 80px; word-break: break-all; word-wrap: break-word;">{{agentInfo.key}}</pre>
+						<pre ng-if="showKey && _agent.id != '000'" flex="80">{{agentInfo.key}}</pre>
 					</div>
 				</md-card-content>
 			</md-card>
