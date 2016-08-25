@@ -1,7 +1,111 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('fimController', function ($scope, alertify, sharedProperties, DataFactory, $location, $mdDialog) {
+app.controller('fimController', function ($scope, DataFactory, $q) {
+    //Initialisation
+    $scope.load = true;
+    var objectsArray = [];
+
+    $scope.eventsFetchInfo = [];
+    $scope._events_blocked = false;
+
+    $scope.$parent.submenuNavItem = 'fim';
+
+    //Print error
+    var printError = function (error) {
+        $mdToast.show({
+            template: '<md-toast>' + error.html + '</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        if ($scope.blocked) {
+            $scope.blocked = false;
+        }
+    };
+
+    //Functions
+    $scope.filesSearch = function (search) {
+        var defered = $q.defer();
+        var promise = defered.promise;
+
+        if (search) {
+            DataFactory.filters.set(objectsArray['/files'], 'search', search);
+        } else {
+            DataFactory.filters.unset(objectsArray['/files'], 'search');
+        }
+
+        DataFactory.get(objectsArray['/files'])
+            .then(function (data) {
+                if (data.data.items.length > 0) {
+                    defered.resolve(data.data.items);
+                } else {
+                    defered.reject();
+                }
+            }, function (data) {
+                printError(data);
+                defered.reject();
+            });
+        return promise;
+    };
+
+    $scope.eventsObj = {
+        getItemAtIndex: function (index) {
+            if ($scope._events_blocked) {
+                return null;
+            }
+            var _pos = index - DataFactory.getOffset(objectsArray['/files/events']);
+            if ((_pos > 40) || (_pos < 0)) {
+                $scope._events_blocked = true;
+                DataFactory.scrollTo(objectsArray['/files/events'], index)
+                    .then(function (data) {
+                        $scope.eventsFetchInfo.length = 0;
+                        $scope.eventsFetchInfo = data.data.items;
+                        $scope._events_blocked = false;
+                    }, function (data) {
+                        $scope._events_blocked = false;
+                        printError(data);
+                    });
+            } else {
+                return $scope.eventsFetchInfo[_pos];
+            }
+        },
+        getLength: function () {
+            return DataFactory.getTotalItems(objectsArray['/files/events']);
+        },
+    };
+
+    $scope.setFileSelected = function (file) {
+        DataFactory.filters.set(objectsArray['/files/events'], 'file', file.file);
+    };
+
+    var load = function () {
+        DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id + '/files', { 'summary': 'yes' }, 100, 0)
+            .then(function (data) {
+                objectsArray['/files'] = data;
+                $scope.load = true;
+                DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id + '/files', {}, 60, 0)
+                    .then(function (data) {
+                        objectsArray['/files/events'] = data;
+                        DataFactory.filters.register(objectsArray['/files/events'], 'file', 'string');
+                    }, printError);
+            }, printError);
+    };
+
+    //Load
+    load();
+
+    //Destroy
+    $scope.$on("$destroy", function () {
+        angular.forEach(objectsArray, function (value) {
+            DataFactory.clean(value)
+        });
+        $scope.eventsFetchInfo.length = 0;
+        $scope._eventSelected.length = 0;
+    });
+
+});
+
+/*app.controller('fimController', function ($scope, alertify, sharedProperties, DataFactory, $location, $mdDialog) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -422,4 +526,4 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
         $scope.agents.length = 0;
     });
 
-});
+});*/

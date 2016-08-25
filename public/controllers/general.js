@@ -7,7 +7,6 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
     //Initialisation
 
     $scope.load = true;
-    $scope.agents = [];
     $scope.search = '';
     $scope.menuNavItem = 'agents';
     $scope.submenuNavItem = '';
@@ -52,17 +51,14 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
 
         DataFactory.get(objectsArray['/agents'])
             .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-                $scope.blocked = false;
                 if (data.data.items.length > 0) {
                     defered.resolve(data.data.items);
                 } else {
                     defered.reject();
                 }
             }, function (data) {
-                defered.reject();
                 printError(data);
+                defered.reject();
             });
         return promise;
     };
@@ -90,7 +86,6 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
         .then(function (data) {
             objectsArray['/agents'] = data;
             DataFactory.get(data).then(function (data) {
-                $scope.agents = data.data.items;
                 DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
                 $scope.load = false;
             }, printError);
@@ -100,7 +95,6 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)});
-        $scope.agents.length = 0;
         tabProvider.clean($scope.pageId);
     });
 

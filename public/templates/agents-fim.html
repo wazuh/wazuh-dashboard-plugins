@@ -176,5 +176,62 @@
             </md-card>
         </md-content>
 
+
+
+
+        <md-content layout="row">
+            <md-card flex="35">
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">FIM records</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content layout="column" layout-align="space-around stretch" layout-padding  style="min-height: 400px;">
+
+                                        <md-autocomplete flex md-no-cache="true" md-selected-item="_file" md-selected-item-change="setFileSelected(_file)" md-search-text="fileSearch"
+                        md-items="item in filesSearch(fileSearch)" md-item-text="item.file" md-min-length="1" md-no-asterisk="true"
+                        md-menu-class="autocomplete-custom-agents-bar" placeholder="Search file name, last event or last event date">
+                        <md-item-template>
+                            <span class="item-title">
+            <span><strong md-highlight-text="fileSearch" md-highlight-flags="i"> {{item.file}} </strong></span>
+                            </span>
+                            <span class="item-metadata">
+								<span class="item-metastat" md-highlight-text="fileSearch" md-highlight-flags="i"> Last report: {{item.modificationDate}} ({{item.event}}) </span>
+                            </span>
+                        </md-item-template>
+                        <md-not-found>
+                            No files matching "{{fileSearch}}" were found.
+                        </md-not-found>
+                    </md-autocomplete>
+
+                    <div style="margin: 10px;">
+                    <md-virtual-repeat-container ng-if="_file" class="vertical-repeater">
+                        <div md-virtual-repeat="event in eventsObj" md-on-demand flex>
+                            <div ng-click="$parent._eventSelected = event;" style="margin: 4px;" layout="row" layout-align="start space-between">
+                                <span flex="20">{{event.event}}</span>
+                                    <span flex="50">{{event.modificationDate}}</span>
+                                    <span flex="30"> </span>
+                            </div>
+                        </div>
+                    </md-virtual-repeat-container>
+                    </div>
+
+                </md-card-content>
+            </md-card>
+            <md-card flex="75">
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">Report</span>
+                        <span class="md-subhead" ng-if="!_eventSelected">Select a file and click over a record in order to see a report</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content ng-if="_eventSelected">
+                    {{_eventSelected}}
+                </md-card-content>
+            </md-card>
+        </md-content>
+
+
+
     </div>
 </md-content>
