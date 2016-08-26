@@ -11,15 +11,10 @@ var app = require('ui/modules').get('app/wazuh', ['angularUtils.directives.dirPa
   }])
   .config(['$httpProvider', function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
-  }])
-  .config(function ($mdThemingProvider, $mdIconProvider) {
-    $mdThemingProvider.theme('default')
-      .primaryPalette('blue')
-      .accentPalette('blue')
-      .warnPalette('blue');
-  });
+  }]);
 
 // Require services and factories
+require('plugins/wazuh/objects/theming.js');
 require('plugins/wazuh/objects/apiReq.js');
 require('plugins/wazuh/objects/dataFactory.js');
 require('plugins/wazuh/objects/sharedProperties.js');
