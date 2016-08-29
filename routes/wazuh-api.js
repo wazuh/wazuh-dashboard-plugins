@@ -87,10 +87,8 @@ module.exports = function (server, options) {
                 return;
             }
 
-            if (wapi_config.url.indexOf('https://') == -1) {
-                if (wapi_config.url.indexOf('http://') == -1) {
-                    reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
-                }
+            if ((wapi_config.url.indexOf('https://') == -1) && (wapi_config.url.indexOf('http://') == -1)) {
+                reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
                 needle.request('get', wapi_config.url, {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
                     testApiAux1(error, response, wapi_config, needle, function (test_result) {
