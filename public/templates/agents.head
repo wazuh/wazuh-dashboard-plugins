@@ -16,7 +16,7 @@
 
 	<div flex layout="row" ng-if="!load">
 		<md-content flex id="content" layout-padding>
-			<md-toolbar md-colors="::{background: 'accent-A200'}" style="height: 64px;">
+			<md-toolbar style="height: 64px;">
 				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
 					<h2 ng-show="_agent">{{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h2>
 					<h2 ng-show="!_agent">Select an agent to start visualizing data</h2>
@@ -36,7 +36,7 @@
 						No agents matching "{{search}}" were found.
 					</md-not-found>
 					</md-autocomplete>
-					<md-button md-colors="::{background: 'accent-200'}" class="md-fab md-primary md-mini" aria-label="Add agent">
+					<md-button class="md-hue-2 md-fab md-primary md-mini" aria-label="Add agent">
 						<i class="fa fa-plus" aria-hidden="true"></i>
 					</md-button>
 					</span>
