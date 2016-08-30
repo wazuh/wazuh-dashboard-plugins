@@ -2,7 +2,7 @@
 <div flex ng-controller="fimController" layout="column">
 
 
-<md-virtual-repeat-container  style="min-height: 600px;" >
+
 <md-content layout="row">
 		    <md-card flex="40">
                 <md-card-title>
@@ -51,7 +51,7 @@
                 <md-icon md-font-icon="fa fa-cog" ng-click="showFilesFiltersDialog($event)" />
             </md-input-container>
             <div flex ng-if="!(_file)">
-              
+              <md-virtual-repeat-container  style="min-height: 700px;" >
                 <md-toolbar layout="row" class="md-hue-3">
                   <div class="md-toolbar-tools">
 					<span flex="10" hide-sm hide-xs>Date</span>	
@@ -74,9 +74,10 @@
 						<span flex="10" hide-sm hide-xs>{{file.group}}</span>
 						<span flex="15" hide-sm hide-xs>{{file.permissions}}</span>
 						<span flex="15" hide-sm hide-xs>{{file.size}} bits</span>
+
                       </md-list-item>
                     </md-list>
-					<md-list ng-show="showFile[$index]">
+						<md-list ng-if="showFile[$index]">
 						<md-list-item>
 							<span style="font-weight: bold" flex="10" hide-sm hide-xs>User ID</span>
 							<span flex="10" hide-sm hide-xs>{{file.uid}}</span>
@@ -104,6 +105,7 @@
 					</md-list>
                       <md-divider></md-divider>
                   </div>
+				  </md-virtual-repeat-container>
             </div>
         </md-content>
     </div>
@@ -133,6 +135,6 @@
             </md-dialog>
         </div>
     </div>
-</md-virtual-repeat-container>
+
 </div>
    

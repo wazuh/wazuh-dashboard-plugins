@@ -46,7 +46,8 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                 return null;
             }
             var _pos = index - DataFactory.getOffset(objectsArray['/files']);
-            if ((_pos > 30) || (_pos < 0)) {
+			console.log(_pos);
+            if ((_pos > 50) || (_pos < 0)) {
                 $scope._files_blocked = true;
                 DataFactory.scrollTo(objectsArray['/files'], index)
                     .then(function (data) {
@@ -59,7 +60,9 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
             }
         },
         getLength: function () {
-
+			if (!objectsArray['/files']) {
+                return null;
+            }
             return DataFactory.getTotalItems(objectsArray['/files']);
         },
     };
@@ -201,7 +204,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
 
 	
     var load = function () {
-        DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id + '/files', { 'summary': 'no' }, 30, 0)
+        DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id + '/files', { 'summary': 'no' }, 80, 0)
             .then(function (data) {
                 objectsArray['/files'] = data;
 
