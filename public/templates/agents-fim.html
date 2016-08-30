@@ -1,237 +1,113 @@
 <md-content ng-if="submenuNavItem == 'fim'" ng-show="_agent" class="md-padding">
-    <div ng-controller="fimController">
+<div flex ng-controller="fimController" layout="column">
 
-        <md-content layout="row" layout-align="end start">
-            <md-content layout="row" layout-align="end start">
-                <div class="statusBox md-whiteframe-3dp" layout="row" layout-align="space-between center">Time window: Last 7 days</div>
-            </md-content>
+
+<md-virtual-repeat-container  style="min-height: 600px;" >
+<md-content layout="row">
+		    <md-card flex="40">
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">Events</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                    <kbn-vis vis-height="100px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20syscheck')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
+                    vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+                    </kbn-vis>
+                </md-card-content>
+            </md-card>
+			<md-card flex="30">
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">Top users</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                    <kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                        vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{'AgentName:'+_agent.name}}">
+                    </kbn-vis>
+                </md-card-content>
+            </md-card>
+			
+			<md-card flex="30">
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">Top files</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                    <kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                        vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{'AgentName:'+_agent.name}}">
+                    </kbn-vis>
+                </md-card-content>
+            </md-card>
+		</md-content>	
+    <div flex layout="row">
+        <md-content flex id="content" layout="column">
+
+            <md-input-container layout="row" class="sideNavBox" ng-if="_agent">
+                <label for="searchBox">Search</label>
+                <input type="text" id="searchBox" ng-model="$parent.search" md-autofocus flex>
+                <md-icon md-font-icon="fa fa-cog" ng-click="showFilesFiltersDialog($event)" />
+            </md-input-container>
+            <div flex ng-if="!(_file)">
+              
+                <md-toolbar layout="row" class="md-hue-3">
+                  <div class="md-toolbar-tools">
+					<span flex="10" hide-sm hide-xs>Date</span>	
+                      <span flex="30">File name</span>
+                      <span flex="10" hide-sm hide-xs>Event</span>
+						<span flex="10" hide-sm hide-xs>User</span>
+						<span flex="10" hide-sm hide-xs>Group</span>
+						<span flex="15" hide-sm hide-xs>Permissions</span>
+						<span flex="15" hide-sm hide-xs>Size</span>
+                  </div>
+                </md-toolbar>
+                  <div md-virtual-repeat="file in filesObj" md-on-demand flex  layout-align="stretch">
+                    <md-list>
+                      <md-list-item  ng-click="initEvents(_agent, file)">
+					  <span flex="10" hide-sm hide-xs>{{file.modificationDate}}</span>
+                        <span flex="30">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
+                        <span flex="10" hide-sm hide-xs>{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</span>
+                        
+						<span flex="10" hide-sm hide-xs>{{file.user}}</span>
+						<span flex="10" hide-sm hide-xs>{{file.group}}</span>
+						<span flex="15" hide-sm hide-xs>{{file.permissions}}</span>
+						<span flex="15" hide-sm hide-xs>{{file.size}} bits</span>
+                      </md-list-item>
+                    </md-list>
+                      <md-divider></md-divider>
+                  </div>
+              
+            </div>
         </md-content>
-
-        <md-content layout="row">
-            <md-card flex="50">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">FIM Alerts by hour of day</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="line" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups: &quot;syscheck &quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(),schema:radius,type:count),(enabled:!t,id:'4',params:(extended_bounds:(),field:hour_of_day,interval:1),schema:segment,type:histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!f,interpolate:linear,radiusRatio:'13',scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'FIM Alerts by hour of day',type:line))"
-                        vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="50">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline"> Top 5 files changed at the same time</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:syscheck')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'FIM Top 5 files changed at the same time',type:histogram))"
-                        vis-filter="{{_agent.name ? 'rule.groups:syscheck AND AgentName:'+_agent.name : 'rule.groups:syscheck'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-        </md-content>
-
-        <md-content layout="row">
-            <md-card flex="33">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 10 files changed</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups: &quot;syscheck &quot; AND full_log: &quot;Integrity checksum changed &quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM Top 10 Changed',type:pie))"
-                        vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{_agent.name ? 'rule.groups: &quot;syscheck &quot; AND full_log: &quot;Integrity checksum changed &quot; AND AgentName:'+_agent.name : 'rule.groups: &quot;syscheck &quot; AND full_log: &quot;Integrity checksum changed &quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="33">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 10 files added</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups: &quot;syscheck &quot; AND full_log: &quot;added &quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM Top 10 Added',type:pie))"
-                        vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{_agent.name ? 'rule.groups: &quot;syscheck &quot; AND full_log: &quot;added &quot; AND AgentName:'+_agent.name : 'rule.groups: &quot;syscheck &quot; AND full_log: &quot;added &quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="33">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 10 files deleted</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups: &quot;syscheck &quot; AND full_log: &quot;was deleted &quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM Top 10 Deleted',type:pie))"
-                        vis-filter="{{_agent.name ? 'rule.groups: &quot;syscheck &quot; AND full_log: &quot;was deleted &quot; AND AgentName:'+_agent.name : 'rule.groups: &quot;syscheck &quot; AND full_log: &quot;was deleted &quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-        </md-content>
-
-        <md-content layout="row">
-            <md-card flex="25">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 15 changed users</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Ownership was&quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_before,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM Top 15 changed users',type:pie))"
-                        vis-filter="{{_agent.name ? '&quot;syscheck&quot; AND full_log:&quot;Ownership was&quot; AND AgentName:'+_agent.name : '&quot;syscheck&quot; AND full_log:&quot;Ownership was&quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 15 new users</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Ownership was&quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM Top 15 new users',type:pie))"
-                        vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{_agent.name ? 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Ownership was&quot; AND AgentName:'+_agent.name : 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Ownership was&quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 15 changed groups</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Group ownership was&quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.gname_before,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM Top 15 changed groups',type:pie))"
-                        vis-filter="{{_agent.name ? 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Group ownership was&quot; AND AgentName:'+_agent.name : 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Group ownership was&quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 15 new groups</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Group ownership was&quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.gname_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM Top 15 new groups',type:pie))"
-                        vis-filter="{{_agent.name ? 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Group ownership was&quot; AND AgentName:'+_agent.name : 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Group ownership was&quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-        </md-content>
-
-
-        <md-content layout="row">
-            <md-card flex="25">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 15 changed permissions</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Permissions changed from&quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.perm_before,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM Top 15 changed permissions',type:pie))"
-                        vis-filter="{{_agent.name ? 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Permissions changed from&quot; AND AgentName:'+_agent.name : 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Permissions changed from&quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 15 new permissions</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Permissions changed from&quot;')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.perm_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM Top 15 new permissions',type:pie))"
-                        vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{_agent.name ? 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Permissions changed from&quot; AND AgentName:'+_agent.name : 'rule.groups:&quot;syscheck&quot; AND full_log:&quot;Permissions changed from&quot;'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 10 files with Root/Admin owner</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:&quot;syscheck&quot; AND (SyscheckFile.owner_after:&quot;0&quot; OR SyscheckFile.owner_before:&quot;0&quot; or SyscheckFile.gowner_after:&quot;root&quot; or SyscheckFile.gowner_before:&quot;0&quot;)')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM Top 10 files with Root/Admin owner',type:pie))"
-                        vis-filter="{{_agent.name ? 'rule.groups:&quot;syscheck&quot; AND (SyscheckFile.owner_after:&quot;0&quot; OR SyscheckFile.owner_before:&quot;0&quot; or SyscheckFile.gowner_after:&quot;root&quot; or SyscheckFile.gowner_before:&quot;0&quot;) AND AgentName:'+_agent.name : 'rule.groups:&quot;syscheck&quot; AND (SyscheckFile.owner_after:&quot;0&quot; OR SyscheckFile.owner_before:&quot;0&quot; or SyscheckFile.gowner_after:&quot;root&quot; or SyscheckFile.gowner_before:&quot;0&quot;)'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Top 10 Files converted to executable</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content>
-                    <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:&quot;syscheck&quot; AND _exists_:SyscheckFile.perm_before AND  (SyscheckFile.perm_after:/[0-7]{3}([1357]%7C[0-7]([1357]%7C[0-7][1357])).*/) AND NOT (SyscheckFile.perm_before:/[0-7]{3}([1357]%7C[0-7]([1357]%7C[0-7][1357])).*/)')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM Top 10 Files converted to executable',type:pie))"
-                        vis-filter="{{_agent.name ? 'rule.groups:&quot;syscheck&quot; AND _exists_:SyscheckFile.perm_before AND  (SyscheckFile.perm_after:/[0-7]{3}([1357]%7C[0-7]([1357]%7C[0-7][1357])).*/) AND NOT (SyscheckFile.perm_before:/[0-7]{3}([1357]%7C[0-7]([1357]%7C[0-7][1357])).*/) AND AgentName:'+_agent.name : 'rule.groups:&quot;syscheck&quot; AND _exists_:SyscheckFile.perm_before AND  (SyscheckFile.perm_after:/[0-7]{3}([1357]%7C[0-7]([1357]%7C[0-7][1357])).*/) AND NOT (SyscheckFile.perm_before:/[0-7]{3}([1357]%7C[0-7]([1357]%7C[0-7][1357])).*/)'}}">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-        </md-content>
-
-
-
-
-        <md-content layout="row">
-            <md-card flex="35">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">FIM records</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content layout="column" layout-align="space-around stretch" layout-padding  style="min-height: 400px;">
-
-                                        <md-autocomplete flex md-no-cache="true" md-selected-item="_file" md-selected-item-change="setFileSelected(_file)" md-search-text="fileSearch"
-                        md-items="item in filesSearch(fileSearch)" md-item-text="item.file" md-min-length="1" md-no-asterisk="true"
-                        md-menu-class="autocomplete-custom-agents-bar" placeholder="Search file name, last event or last event date">
-                        <md-item-template>
-                            <span class="item-title">
-            <span><strong md-highlight-text="fileSearch" md-highlight-flags="i"> {{item.file}} </strong></span>
-                            </span>
-                            <span class="item-metadata">
-								<span class="item-metastat" md-highlight-text="fileSearch" md-highlight-flags="i"> Last report: {{item.modificationDate}} ({{item.event}}) </span>
-                            </span>
-                        </md-item-template>
-                        <md-not-found>
-                            No files matching "{{fileSearch}}" were found.
-                        </md-not-found>
-                    </md-autocomplete>
-
-                    <div style="margin: 10px;">
-                    <md-virtual-repeat-container ng-if="_file" class="vertical-repeater">
-                        <div md-virtual-repeat="event in eventsObj" md-on-demand flex>
-                            <div ng-click="$parent._eventSelected = event;" style="margin: 4px;" layout="row" layout-align="start space-between">
-                                <span flex="20">{{event.event}}</span>
-                                    <span flex="50">{{event.modificationDate}}</span>
-                                    <span flex="30"> </span>
-                            </div>
-                        </div>
-                    </md-virtual-repeat-container>
-                    </div>
-
-                </md-card-content>
-            </md-card>
-            <md-card flex="75">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Report</span>
-                        <span class="md-subhead" ng-if="!_eventSelected">Select a file and click over a record in order to see a report</span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content ng-if="_eventSelected">
-                    {{_eventSelected}}
-                </md-card-content>
-            </md-card>
-        </md-content>
-
-
-
     </div>
-</md-content>
+
+
+    <div style="display: none">
+        <div class="md-dialog-container" id="filtersFilesDialog">
+            <md-dialog layout-padding layout="column" layout-align="space-around center">
+                <label>Filter by event:</label>
+                <md-input-container>
+                    <md-select ng-model="eventFilter" ng-change="setEventFilter()" aria-label="Filter by event">
+                        <md-option value="all">All</md-option>
+                        <md-option value="added">Added</md-option>
+                        <md-option value="modified">Modified</md-option>
+                        <md-option value="readded">Re-added</md-option>
+                        <md-option value="">Deleted</md-option>
+                    </md-select>
+                </md-input-container>
+                <label>Filter by type:</label>
+                <md-input-container>
+                    <md-select ng-model="typeFilter" ng-change="setTypeFilter()" aria-label="Filter by type">
+                        <md-option value="all">All</md-option>
+                        <md-option value="file">File</md-option>
+                        <md-option value="registry">Registry</md-option>
+                    </md-select>
+                </md-input-container>
+            </md-dialog>
+        </div>
+    </div>
+</md-virtual-repeat-container>
+</div>
+   
