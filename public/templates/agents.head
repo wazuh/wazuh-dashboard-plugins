@@ -1,9 +1,9 @@
 <div flex ng-controller="generalController" layout="column">
 
-	<md-content class="md-padding" ng-init="menuNavItem = 'agents'">
-		<md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+	<md-content ng-init="menuNavItem = 'agents'" style="height: 70px;">
+		<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
 			<md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-label="img logo">
-				<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+				<img aria-label="Logo image" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
 			</md-nav-item>
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
@@ -16,13 +16,9 @@
 
 	<div flex layout="row" ng-if="!load">
 		<md-content flex id="content" layout-padding>
-			<md-toolbar style="height: 64px;">
-				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-					<h2 ng-show="_agent">{{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h2>
-					<h2 ng-show="!_agent">Select an agent to start visualizing data</h2>
-					<span layout="row" flex="40">
-					<md-autocomplete flex md-no-cache="true" md-selected-item="_agent" md-selected-item-change="submenuNavItem == '' ? submenuNavItem = 'overview' : null" md-search-text="search"
-						md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="1" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
+			<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
+					<md-autocomplete class="md-whiteframe-3dp" style="width: 500px;" md-no-cache="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
+						md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
 						placeholder="Search agent hostname, ID or IP address">
 						<md-item-template>
 							<span class="item-title">
@@ -36,10 +32,14 @@
 						No agents matching "{{search}}" were found.
 					</md-not-found>
 					</md-autocomplete>
+					</span>
+			<md-toolbar style="height: 50px;">
+				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+					<h2 ng-show="$parent._agent">{{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h2>
+					<h2 ng-show="!_agent">Select an agent to start visualizing data</h2>
 					<md-button class="md-hue-2 md-fab md-primary md-mini" aria-label="Add agent">
 						<i class="fa fa-plus" aria-hidden="true"></i>
 					</md-button>
-					</span>
 				</div>
 			</md-toolbar>
 			<md-content ng-show="_agent" class="md-padding">

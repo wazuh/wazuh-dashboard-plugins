@@ -1,57 +1,43 @@
 <md-content ng-if="!_agent" class="md-padding" layout="column" layout-align="center">
 
-    <md-card>
-        <md-card-title>
-            <md-card-title-text>
-                <span class="md-headline">Alerts by top 10 agents</span>
-            </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-            <kbn-vis vis-height="400px;" vis-type="area" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'Alerts by top 10 agents',type:area))"
-                vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-searchable="true">
-            </kbn-vis>
-        </md-card-content>
-    </md-card>
+	<md-card>
+		<md-card-title>
+			<md-card-title-text>
+				<span class="md-headline">Alerts by top 10 agents</span>
+			</md-card-title-text>
+		</md-card-title>
+		<md-card-content>
+			<kbn-vis vis-height="400px;" vis-type="area" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'Alerts by top 10 agents',type:area))"
+				vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-searchable="true">
+			</kbn-vis>
+		</md-card-content>
+	</md-card>
 
-    		<md-content layout="row">
-			<md-card flex="50">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 10 groups by agent</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="400px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:segment,type:terms),(enabled:!t,id:'3',params:(field:rule.groups,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Top 10 groups by agent',type:histogram))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
+	<md-content layout="row">
+		<md-card flex="50">
+			<md-card-title>
+				<md-card-title-text>
+					<span class="md-headline">Top 10 groups by agent</span>
+				</md-card-title-text>
+			</md-card-title>
+			<md-card-content>
+				<kbn-vis vis-height="400px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:segment,type:terms),(enabled:!t,id:'3',params:(field:rule.groups,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Top 10 groups by agent',type:histogram))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
 
-			<md-card flex="50">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 10 level by agent</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="400px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:segment,type:terms),(enabled:!t,id:'3',params:(field:rule.AlertLevel,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Top 10 level by agent',type:histogram))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-		</md-content>
-
-
-    <md-card>
-        <md-card-title>
-            <md-card-title-text>
-                <span class="md-headline">Alert level evolution of top 5 agents</span>
-            </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-            <kbn-vis vis-height="1000px;" vis-type="line" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.AlertLevel,order:desc,orderBy:'1',size:15),schema:group,type:terms),(enabled:!t,id:'4',params:(field:AgentName,order:desc,orderBy:'1',row:!t,size:5),schema:split,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert level evolution of top 5 agents',type:line))"
-                vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))">
-            </kbn-vis>
-        </md-card-content>
-    </md-card>
+		<md-card flex="50">
+			<md-card-title>
+				<md-card-title-text>
+					<span class="md-headline">Top 10 level by agent</span>
+				</md-card-title-text>
+			</md-card-title>
+			<md-card-content>
+				<kbn-vis vis-height="400px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:segment,type:terms),(enabled:!t,id:'3',params:(field:rule.AlertLevel,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Top 10 level by agent',type:histogram))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+	</md-content>
 </md-content>
