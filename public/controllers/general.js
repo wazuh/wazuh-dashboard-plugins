@@ -63,6 +63,13 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
         return promise;
     };
 
+    $scope.applyAgent = function (agent) {
+        if (agent) {
+            $scope.submenuNavItem == '' ? $scope.submenuNavItem = 'overview' : null;
+            $scope._agent = agent;
+        }        
+    };
+
     $scope.addAgent = function () {
         if ($scope.newName == undefined) {
             notify.error('Error adding agent: Specify an agent name');
