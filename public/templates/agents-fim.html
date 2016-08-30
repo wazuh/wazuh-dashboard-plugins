@@ -65,7 +65,7 @@
                 </md-toolbar>
                   <div md-virtual-repeat="file in filesObj" md-on-demand flex  layout-align="stretch">
                     <md-list>
-                      <md-list-item  ng-click="initEvents(_agent, file)">
+                      <md-list-item  ng-click="showFile[$index] = !showFile[$index]">
 					  <span flex="10" hide-sm hide-xs>{{file.modificationDate}}</span>
                         <span flex="30">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
                         <span flex="10" hide-sm hide-xs>{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</span>
@@ -76,9 +76,34 @@
 						<span flex="15" hide-sm hide-xs>{{file.size}} bits</span>
                       </md-list-item>
                     </md-list>
+					<md-list ng-show="showFile[$index]">
+						<md-list-item>
+							<span style="font-weight: bold" flex="10" hide-sm hide-xs>User ID</span>
+							<span flex="10" hide-sm hide-xs>{{file.uid}}</span>
+						</md-list-item>
+						<md-list-item>
+							<span style="font-weight: bold" flex="10" hide-sm hide-xs>Group ID</span>
+							<span flex="10" hide-sm hide-xs>{{file.gid}}</span>
+						</md-list-item>
+						<md-list-item>
+							<span style="font-weight: bold" flex="10" hide-sm hide-xs>Octal permissions</span>
+							<span flex="10" hide-sm hide-xs>{{file.octalMode}}</span>
+						</md-list-item>
+						<md-list-item>
+							<span style="font-weight: bold" flex="10" hide-sm hide-xs>Inode</span>
+							<span flex="10" hide-sm hide-xs>{{file.inode}}</span>
+						</md-list-item>
+						<md-list-item>
+							<span style="font-weight: bold" flex="10" hide-sm hide-xs>SHA1</span>
+							<span flex="10" hide-sm hide-xs>{{file.sha1}}</span>
+						</md-list-item>
+						<md-list-item>
+							<span style="font-weight: bold" flex="10" hide-sm hide-xs>MD5</span>
+							<span flex="10" hide-sm hide-xs>{{file.md5}}</span>
+						</md-list-item>
+					</md-list>
                       <md-divider></md-divider>
                   </div>
-              
             </div>
         </md-content>
     </div>
