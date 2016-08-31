@@ -5,10 +5,11 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
-
+	var loadWatch;
+	
     $scope.events = [];
     $scope.agents = [];
-    $scope.search = '';
+    $scope.rootcheckSearch = '';
 
     $scope.menuNavItem = 'policy_monitoring';
     //Print Error
@@ -31,7 +32,16 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
                 return null;
             }
             var _pos = index - DataFactory.getOffset(objectsArray['/rootcheck']);
-            if ((_pos > 25) || (_pos < 0)) {
+            if (DataFactory.filters.flag(objectsArray['/rootcheck'])) {
+                $scope._eblocked = true;
+                DataFactory.scrollTo(objectsArray['/rootcheck'], 200)
+                    .then(function (data) {
+                        $scope.events.length = 0;
+                        $scope.events = data.data.items;
+                        DataFactory.filters.unflag(objectsArray['/rootcheck']);
+                        $scope._eblocked = false;
+                    }, printError);
+            } else if ((_pos > 50) || (_pos < 0)) {
                 $scope._eblocked = true;
                 DataFactory.scrollTo(objectsArray['/rootcheck'], index)
                     .then(function (data) {
@@ -58,17 +68,6 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
         $scope.getEvents({ 'status': $scope.statusFilter });
     };
 
-    $scope.loadDiscover = function (event) {
-        var _filter = 'full_log:"' + event + '"';
-        sharedProperties.setProperty('aa//' + _filter);
-        $location.path('/discover');
-    };
-
-    $scope.loadDashboard = function (event) {
-        var _filter = 'full_log:"' + event + '"';
-        sharedProperties.setProperty('ad//' + _filter);
-        $location.path('/compliance/dashboard');
-    };
 
     $scope.getEvents = function (body) {
         $scope._eblocked = true;
@@ -102,29 +101,6 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
         }
     };
 
-    $scope.agentsObj = {
-        //Obj with methods for virtual scrolling
-        getItemAtIndex: function (index) {
-            if ($scope.blocked) {
-                return null;
-            }
-            var _pos = index - DataFactory.getOffset(objectsArray['/agents']);
-            if ((_pos > 15) || (_pos < 0)) {
-                $scope.blocked = true;
-                DataFactory.scrollTo(objectsArray['/agents'], index)
-                    .then(function (data) {
-                        $scope.agents.length = 0;
-                        $scope.agents = data.data.items;
-                        $scope.blocked = false;
-                    }, printError);
-            } else {
-                return $scope.agents[_pos];
-            }
-        },
-        getLength: function () {
-            return DataFactory.getTotalItems(objectsArray['/agents']);
-        },
-    };
 
     $scope.hasPrevEvents = function () {
         return DataFactory.hasPrev(objectsArray['/rootcheck']);
@@ -176,136 +152,46 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
         });
     };
 
-    $scope.getAgentStatusClass = function (agentStatus) {
-        if (agentStatus == "Active")
-            return "green"
-        else if (agentStatus == "Disconnected")
-            return "red";
-        else
-            return "red";
-    };
-
-    $scope.setAgentFilter = function (agent) {
-        if (agent != $scope._agent) {
-            $scope._agent = agent;
-            $scope.eventFilter = '';
-            $scope.typeFilter = '';
-            DataFactory.initialize('get', '/rootcheck/' + agent.id, {}, 20, 0)
-                .then(function (data) {
-                    objectsArray['/rootcheck'] = data;
-                }, printError);
-        }
-    };
-
-    $scope.searchAgent = function () {
-        if ($scope.searchAgents === '') {
-            $scope.searchAgents = undefined;
-        }
-        DataFactory.get(objectsArray['/agents'], { search: $scope.searchAgents })
-            .then(function (data) {
-                $scope.agents.length = 0;
-                $scope.agents = data.data.items;
-            }, printError);
-    };
-
-    $scope.agentStatusFilter = function () {
-        var _status;
-        if ($scope.statusFilter === 'all') {
-            _status = undefined;
+	$scope.rootcheckSearchFilter = function (search) {
+        if (search) {
+            DataFactory.filters.set(objectsArray['/rootcheck'], 'search', search);
         } else {
-            _status = $scope.statusFilter;
-        }
-        $scope.getAgents({ 'sort': $scope.searchQuery, 'status': _status });
-    };
-
-    $scope.sort = function (keyname) {
-        $scope.sortKey = keyname;
-        $scope.reverse = !$scope.reverse;
-        $scope.searchQuery = '';
-        if (!$scope.reverse) {
-            $scope.searchQuery += '-';
-        }
-
-        $scope.searchQuery += $scope.sortKey;
-        if ($scope.statusFilter != '') {
-            $scope.getAgents({ 'sort': $scope.searchQuery, 'status': $scope.statusFilter });
-        } else {
-            $scope.getAgents({ 'sort': $scope.searchQuery });
+            DataFactory.filters.unset(objectsArray['/rootcheck'], 'search');
         }
     };
-    $scope.getAgents = function (body) {
-        $scope.blocked = true;
-        //Search agent body modification
-        if (!body) {
-            var tmpBody = DataFactory.getBody(objectsArray['/agents']);
-            if ($scope.search !== tmpBody['search']) {
-                tmpBody['search'] = $scope.search;
-                body = tmpBody;
-            }
-        } else if ($scope.search !== body['search']) {
-            body['search'] = $scope.search;
-        }
-        if (body['search'] === '') {
-            body['search'] = undefined;
-        }
-
-        if (!body) {
-            DataFactory.get(objectsArray['/agents'])
-                .then(function (data) {
-                    $scope.agents.length = 0;
-                    $scope.agents = data.data.items;
-                    $scope.blocked = false;
-                }, printError);
-        } else {
-            DataFactory.get(objectsArray['/agents'], body)
-                .then(function (data) {
-                    $scope.agents.length = 0;
-                    $scope.agents = data.data.items;
-                    $scope.blocked = false;
-                }, printError);
-        }
+	
+	var createWatch = function () {
+        loadWatch = $scope.$watch(function () {
+            return $scope.$parent._agent;
+        }, function () {
+		DataFactory.initialize('get', '/rootcheck/' + $scope.$parent._agent.id, {}, 200, 0)
+			.then(function (data) {
+				DataFactory.clean(objectsArray['/rootcheck']);
+				objectsArray['/rootcheck'] = data;
+				DataFactory.get(objectsArray['/rootcheck'])
+				.then(function (data) {
+					$scope.events = data.data.items;
+				}, printError);
+			}, printError);
+        });
     };
-
-    $scope.getAgentStatusClass = function (agentStatus) {
-        if (agentStatus == "Active")
-            return "green"
-        else if (agentStatus == "Disconnected")
-            return "red";
-        else
-            return "red";
-    };
-
+	
     var load = function () {
-        var _agent = '000';
-        var _init = sharedProperties.getProperty();
-        if ((_init != '') && (_init.substring(0, 4) == 'rc//')) {
-            _agent = _init.substring(4);
-            sharedProperties.setProperty('');
-        }
-
-        DataFactory.initialize('get', '/rootcheck/' + _agent, {}, 30, 0)
-            .then(function (data) {
-                objectsArray['/rootcheck'] = data;
-                DataFactory.initialize('get', '/agents', {}, 30, 0)
-                    .then(function (data) {
-                        objectsArray['/agents'] = data;
-
-                        load_data();
-                    }, printError);
-            }, printError);
-    };
-
-    var load_data = function () {
-        DataFactory.get(objectsArray['/rootcheck'])
-            .then(function (data) {
-                $scope.events = data.data.items;
-                DataFactory.get(objectsArray['/agents'])
-                    .then(function (data) {
-                        $scope.agents = data.data.items;
-                        $scope._agent = data.data.items[0];
-                        $scope.load = false;
-                    });
-            }, printError);
+		$scope._agent = $scope.$parent._agent;
+		$scope.eventFilter = '';
+		$scope.typeFilter = '';
+		DataFactory.initialize('get', '/rootcheck/' + $scope.$parent._agent.id, {}, 200, 0)
+			.then(function (data) {
+				objectsArray['/rootcheck'] = data;
+				DataFactory.get(objectsArray['/rootcheck'])
+				.then(function (data) {
+					$scope.events = data.data.items;
+					DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
+					$scope.rootcheckSearchFilter($scope._rootcheckSearch);
+					createWatch();
+					$scope.load = false;
+				}, printError);
+			}, printError);
     };
 
     //Load
@@ -317,7 +203,7 @@ app.controller('pmController', function ($scope, alertify, sharedProperties, Dat
             DataFactory.clean(value)
         });
         $scope.events.length = 0;
-        $scope.agents.length = 0;
+        loadWatch();
     });
 
 })
