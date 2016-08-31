@@ -532,7 +532,7 @@ app.controller('decodersController', function ($scope, $route, $q, alertify, sha
 });
 
 
-app.controller('updateRulesetController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider) {
+app.controller('updateRulesetController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdDialog, $mdToast) {
     //Initialisation
     $scope.load = true;
 
@@ -551,7 +551,11 @@ app.controller('updateRulesetController', function ($scope, $route, $q, alertify
 
     //Print Error
     var printError = function (error) {
-        alertify.delay(10000).closeLogOnClick(true).error(error.html);
+        $mdToast.show({
+            template: '<md-toast>' + error.html + '</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
     }
 
     //Tabs
@@ -567,17 +571,28 @@ app.controller('updateRulesetController', function ($scope, $route, $q, alertify
 
     //Backups
 
-    $scope.updateRuleset = function () {
+    $scope.updateRuleset = function (ev) {
         if (!$scope.updateType) {
-            alertify.delay(10000).closeLogOnClick(true).error('Select an update type');
+            $mdToast.show({
+                template: '<md-toast>Select an update type</md-toast>',
+                position: 'bottom left',
+                hideDelay: 5000,
+            });
         }
         if ($scope.updateForce) {
-            var template = 'Are you sure you want to update the ruleset?<ul style="text-align: left !important;"><li style="text-align: left !important;">The ruleset will be overwritten, except local_rules and local_decoders file.</li><li style="text-align: left !important;">OSSEC manager is going to be restarted.</li><li style="text-align: left !important;">Before the update, backup of the ruleset will be done.</li></ul>';
+            var template = 'Are you sure you want to update the ruleset? The ruleset will be overwritten, except local_rules and local_decoders file. OSSEC manager is going to be restarted. Before the update, backup of the ruleset will be done.';
         }
         else {
-            var template = 'Are you sure you want to update the ruleset?<ul style="text-align: left !important;"><li style="text-align: left !important;">The ruleset will be overwritten, except local_rules and local_decoders file.</li><li style="text-align: left !important;">If any rule included in ossec.conf is updated, OSSEC manager will be restarted.</li><li style="text-align: left !important;">Before the update, backup of the ruleset will be done.</li></ul>';
+            var template = 'Are you sure you want to update the ruleset? The ruleset will be overwritten, except local_rules and local_decoders file. If any rule included in ossec.conf is updated, OSSEC manager will be restarted. Before the update, backup of the ruleset will be done.';
         }
-        alertify.confirm(template, function () {
+        var confirm = $mdDialog.confirm()
+            .title('Update ruleset')
+            .textContent(template)
+            .targetEvent(ev)
+            .ok('Update')
+            .cancel('Cancel');
+
+        $mdDialog.show(confirm).then(function () {
             if ($scope.updateForce) {
                 if ($scope.updateType == 'r') {
                     var path = '/manager/update-ruleset?force=yes&type=rules';
@@ -606,14 +621,26 @@ app.controller('updateRulesetController', function ($scope, $route, $q, alertify
                     if (data.data.manual_steps !== 'no') {
                         alert += "The following manual steps are required: " + data.data.manual_steps_detail;
                     }
-                    alertify.delay(10000).closeLogOnClick(true).success(alert);
+                    $mdToast.show({
+                        template: '<md-toast>' + alert + '</md-toast>',
+                        position: 'bottom left',
+                        hideDelay: 5000,
+                    });
                     $scope.load_backups();
                 }, printError);
         });
     };
 
-    $scope.restoreBackup = function () {
-        alertify.confirm('Are you sure you want to restore this backup?<ul style="text-align: left !important;"><li style="text-align: left !important;">This action can not be undone.</li></ul>', function () {
+    $scope.restoreBackup = function (ev) {
+        var template = 'Are you sure you want to restore this backup? This action can not be undone.';
+        var confirm = $mdDialog.confirm()
+            .title('Restore backup')
+            .textContent(template)
+            .targetEvent(ev)
+            .ok('Restore')
+            .cancel('Cancel');
+
+        $mdDialog.show(confirm).then(function () {
             DataFactory.getAndClean('put', '/manager/update-ruleset/backups/' + $scope.selectedBackup, {})
                 .then(function (data) {
                     var alert;
@@ -628,7 +655,11 @@ app.controller('updateRulesetController', function ($scope, $route, $q, alertify
                     if (data.data.manual_steps !== 'no') {
                         alert += "The following manual steps are required: " + data.data.manual_steps_detail;
                     }
-                    alertify.delay(10000).closeLogOnClick(true).success(alert);
+                    $mdToast.show({
+                        template: '<md-toast>' + alert + '</md-toast>',
+                        position: 'bottom left',
+                        hideDelay: 5000,
+                    });
                 }, printError);
         });
     };
