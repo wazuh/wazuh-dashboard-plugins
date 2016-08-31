@@ -3,16 +3,24 @@
 
     <div flex id="content" layout="row" layout-align="space-between start">
 
+      <span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="20">
+          <md-input-container style="margin: 0px;">
+            <label for="searchBox1">Search file</label>
+            <input md-autofocus flex id="searchBox1" type="text" ng-model="fileSearch" ng-change="fileSearchFilter(fileSearch)">
+          </md-input-container>
+      </span>
+
       <span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
 					<md-autocomplete flex md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="search"
 						md-items="item in filtersSearch(search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
-						placeholder="Search rule, file, group or PCI control">
+						placeholder="Search file, group or PCI control">
 						<md-item-template>
 							<span class="item-title">
             <span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.value}} </strong></span>
       </span>
       <span class="item-metadata">
-								<span class="item-metastat"> {{item.type}} </span>
+								<span class="item-metastat" ng-if="item.type != 'pci'"> Type: {{item.type}} </span>
+                <span class="item-metastat" ng-if="item.type == 'pci'"> Type: PCI control</span>
       </span>
       </md-item-template>
       <md-not-found>
@@ -38,25 +46,15 @@
 
     </div>
 
-
-    <md-chips readonly="true" ng-if="rulesHasFilter('rule');">
-      <md-chip md-removable="true" md-on-remove="rulesUnset('rule')">
-        <span class="bold">File: {{rulesGetFilter('rule')}}</span>
+    <md-chips readonly="true" ng-show="rulesHasFilter('file') || rulesHasFilter('group') || rulesHasFilter('pci')">
+      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('file')" ng-if="rulesHasFilter('file');">
+        <span class="bold">File: {{rulesGetFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
-    </md-chips>
-    <md-chips readonly="true" ng-if="rulesHasFilter('file');">
-      <md-chip md-removable="true" md-on-remove="rulesUnset('file')">
-        <span class="bold">File: {{rulesGetFilter('file')}}</span>
+      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('group')" ng-if="rulesHasFilter('group');">
+        <span class="bold">Group: {{rulesGetFilter('group')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
-    </md-chips>
-    <md-chips readonly="true" ng-if="rulesHasFilter('group');">
-      <md-chip md-removable="true" md-on-remove="rulesUnset('group')">
-        <span class="bold">Group: {{rulesGetFilter('group')}}</span>
-      </md-chip>
-    </md-chips>
-    <md-chips readonly="true" ng-if="rulesHasFilter('pci');">
-      <md-chip md-removable="true" md-on-remove="rulesUnset('pci')">
-        <span>PCI control: {{rulesGetFilter('pci')}}</span>
+      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('pci')" ng-if="rulesHasFilter('pci');">
+        <span>PCI control: {{rulesGetFilter('pci')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
     </md-chips>
 

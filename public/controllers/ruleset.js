@@ -13,6 +13,9 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
     $scope.maxLevel = 15;
     $scope.minLevel = 0;
 
+    var _file;
+    var _group;
+    var _pci;
     var objectsArray = [];
 
     //Print Error
@@ -28,6 +31,106 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
     };
 
     //Functions
+
+    $scope.fileSearchFilter = function (search) {
+        if (search) {
+            DataFactory.filters.set(objectsArray['/rules'], 'search', search);
+        } else {
+            DataFactory.filters.unset(objectsArray['/rules'], 'search');
+        }
+    };
+
+    $scope.rulesApplyFilter = function (filterObj) {
+        if (!filterObj) {
+            return null;
+        }
+        if (filterObj.type == 'file') {
+            _file = filterObj.value;
+            DataFactory.filters.set(objectsArray['/rules'], 'file', filterObj.value);
+        } else if (filterObj.type == 'group') {
+            _group = filterObj.value;
+            DataFactory.filters.set(objectsArray['/rules'], 'group', filterObj.value);
+        } else if (filterObj.type == 'pci') {
+            _pci = filterObj.value;
+            DataFactory.filters.set(objectsArray['/rules'], 'pci', filterObj.value);
+        }
+    };
+
+    $scope.rulesHasFilter = function (type) {
+        if (type == 'file') {
+            return _file && _file != null;
+        } else if (type == 'group') {
+            return _group && _group != null;
+        } else if (type == 'pci') {
+            return _pci && _pci != null;
+        } 
+    };
+
+    $scope.rulesUnset = function (type) {
+        if (type == 'file') {
+            _file = null;
+            DataFactory.filters.unset(objectsArray['/rules'], 'file');
+        } else if (type == 'group') {
+            _group = null;
+            DataFactory.filters.unset(objectsArray['/rules'], 'group');
+        } else if (type == 'pci') {
+            _pci = null;
+            DataFactory.filters.unset(objectsArray['/rules'], 'pci');
+        }
+    };
+
+    $scope.rulesGetFilter = function (type) {
+        if (type == 'file') {
+            return _file;
+        } else if (type == 'group') {
+            return _group;
+        } else if (type == 'pci') {
+            return _pci;
+        } 
+    };
+
+    $scope.filtersSearch = function (search) {
+        var defered = $q.defer();
+        var promise = defered.promise;
+
+        var result = [];
+
+        if (!search) {
+            defered.reject();
+            return promise;
+        }
+
+        DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 100, 'search': search })
+            .then(function (data) {
+                angular.forEach(data.data.items, function (value) {
+                    result.push({'type': 'file', 'value': value.name});
+                });
+                DataFactory.getAndClean('get', '/rules/groups', { 'offset': 0, 'limit': 100, 'search': search })
+                    .then(function (data) {
+                        angular.forEach(data.data.items, function (value) {
+                            result.push({ 'type': 'group', 'value': value });
+                        });
+                        DataFactory.getAndClean('get', '/rules/pci', { 'offset': 0, 'limit': 100, 'search': search })
+                            .then(function (data) {
+                                angular.forEach(data.data.items, function (value) {
+                                    result.push({ 'type': 'pci', 'value': value });
+                                });
+                                defered.resolve(result);
+                            }, function (data) {
+                                printError(data);
+                                defered.reject();
+                            })
+                    }, function (data) {
+                        printError(data);
+                        defered.reject();
+                    })
+            }, function (data) {
+                printError(data);
+                defered.reject();
+            })
+
+        return promise;
+    };
 
     $scope.rulesLevelFilter = function () {
         if (!$scope.minLevel || !$scope.maxLevel || $scope.minLevel == null || $scope.maxLevel == null) {
@@ -74,52 +177,6 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
             return DataFactory.getTotalItems(objectsArray['/rules']);
         },
     };
-
-    //Load functions
-
- /*   var load_pci_groups = function () {
-        DataFactory.initialize('get', '/rules/pci', {}, 12, 0)
-            .then(function (data) {
-                objectsArray['/rules/pci'] = data;
-                DataFactory.get(data).then(function (data) {
-                    $scope.pciGroupsRules = data.data.items;
-                    load_apply_filter();
-                });
-            }, printError);
-    };
-
-    var load_rules_groups = function () {
-        DataFactory.initialize('get', '/rules/groups', {}, 12, 0)
-            .then(function (data) {
-                objectsArray['/rules/groups'] = data;
-                DataFactory.get(data).then(function (data) {
-                    $scope.groupsRules = data.data.items;
-                    load_pci_groups();
-                }, printError);
-            }, printError);
-    };
-
-    var load_rules_files = function () {
-        DataFactory.initialize('get', '/rules/files', {}, 12, 0)
-            .then(function (data) {
-                objectsArray['/rules/files'] = data;
-                DataFactory.get(data).then(function (data) {
-                    $scope.filesRules = data.data.items;
-                    load_rules_groups();
-                }, printError);
-            }, printError);
-    };
-
-    var load_rules = function () {
-        DataFactory.initialize('get', '/rules', {}, 10, 0)
-            .then(function (data) {
-                objectsArray['/rules'] = data;
-                DataFactory.get(data).then(function (data) {
-                    $scope.rules = data.data.items;
-                    load_rules_files();
-                }, printError);
-            }, printError);
-    };*/
 
     var load = function () {
         DataFactory.initialize('get', '/rules', {}, 100, 0)
