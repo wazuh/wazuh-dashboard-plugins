@@ -43,19 +43,7 @@ routes
         }
     })
     .when('/ruleset/', {
-        template: require('plugins/wazuh/templates/ruleset-rules.html'),
-        resolve: {
-            "check": settingsWizard
-        }
-    })
-    .when('/ruleset/decoders/', {
-        template: require('plugins/wazuh/templates/ruleset-decoders.html'),
-        resolve: {
-            "check": settingsWizard
-        }
-    })
-    .when('/ruleset/update/', {
-        template: require('plugins/wazuh/templates/ruleset-update.html'),
+        template: require('plugins/wazuh/templates/ruleset.jade'),
         resolve: {
             "check": settingsWizard
         }
@@ -64,13 +52,13 @@ routes
         template: require('plugins/wazuh/templates/settings.html')
     })
     .when('/', {
-        redirectTo: '/manager/',
+        redirectTo: '/agents/',
         resolve: {
             "check": settingsWizard
         }
     })
     .when('', {
-        redirectTo: '/manager/',
+        redirectTo: '/agents/',
         resolve: {
             "check": settingsWizard
         }
