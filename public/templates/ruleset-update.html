@@ -1,11 +1,10 @@
 <md-content ng-controller="updateRulesetController" layout="column">
     
-    <md-content class="md-padding">
-		<md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-			<md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
-				<img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
+    <md-content ng-init="menuNavItem = 'ruleset'" style="height: 70px;">
+		<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+			<md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
+				<img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
 			</md-nav-item>
-			<md-nav-item md-nav-href="#/dashboards" name="dashboards">Dashboards</md-nav-item>
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
 			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
