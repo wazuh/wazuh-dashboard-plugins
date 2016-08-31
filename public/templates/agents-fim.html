@@ -45,11 +45,11 @@
                 <div layout="row" layout-align="space-between stretch">
                     <md-input-container layout="row" class="sideNavBox" flex="40">
                         <label for="searchBox">Search</label>
-                        <input type="text" id="searchBox" ng-model="_fileSearch" ng-change="fileSearchFilter(_fileSearch)" flex>
+                        <input type="text" id="searchBox" ng-model="$parent._fileSearch" ng-change="fileSearchFilter($parent._fileSearch)" flex>
                     </md-input-container>
                     <div flex="40"></div>
                     <md-input-container flex="20">
-                        <md-select id="eventBox" ng-model="_fimEvent" ng-change="fileEventFilter(_fimEvent)" aria-label="Filter by event">
+                        <md-select id="eventBox" ng-model="$parent._fimEvent" ng-change="fileEventFilter($parent._fimEvent)" aria-label="Filter by event">
                             <md-option value="all">All</md-option>
                             <md-option value="added">Added</md-option>
                             <md-option value="modified">Modified</md-option>
@@ -74,7 +74,7 @@
             </div>
             <div md-virtual-repeat="file in filesObj" md-on-demand flex layout-align="start stretch">
                 <md-list>
-                    <md-list-item ng-click="showFile[$index] = !showFile[$index]">
+                    <md-list-item ng-click="showFile[file.file] = !showFile[file.file]">
                         <span flex="10" hide-sm hide-xs>{{file.modificationDate}}</span>
                         <span flex="30">{{file.file.length > 58 ? file.file.substring(0, 55)+'...' : file.file}}</span>
                         <span flex="10" hide-sm hide-xs>{{file.event.charAt(0).toUpperCase() + file.event.slice(1)}}</span>
@@ -82,11 +82,11 @@
                         <span flex="10" hide-sm hide-xs>{{file.user}}</span>
                         <span flex="10" hide-sm hide-xs>{{file.group}}</span>
                         <span flex="15" hide-sm hide-xs>{{file.permissions}}</span>
-                        <span flex="15" hide-sm hide-xs>{{file.size}} bits</span>
+                        <span flex="15" hide-sm hide-xs>{{file.size}} <span ng-show="file.size">bits</span></span>
 
                     </md-list-item>
                 </md-list>
-                <md-list ng-if="showFile[$index]">
+                <md-list ng-if="showFile[file.file]">
                     <md-list-item>
                         <span style="font-weight: bold" flex="10" hide-sm hide-xs>User ID</span>
                         <span flex="10" hide-sm hide-xs>{{file.uid}}</span>

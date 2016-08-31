@@ -51,11 +51,7 @@ app.controller('generalController', function ($scope, $q, $route, alertify, shar
 
         DataFactory.get(objectsArray['/agents'])
             .then(function (data) {
-                if (data.data.items.length > 0) {
-                    defered.resolve(data.data.items);
-                } else {
-                    defered.reject();
-                }
+                defered.resolve(data.data.items);
             }, function (data) {
                 printError(data);
                 defered.reject();

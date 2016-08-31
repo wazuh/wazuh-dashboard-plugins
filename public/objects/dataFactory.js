@@ -147,7 +147,7 @@ require('ui/modules').get('app/wazuh', [])
                 });
 
             return promise;
-        }
+        };
 
         dataObj.get = function (instanceId) {
             var defered = $q.defer();
@@ -163,7 +163,7 @@ require('ui/modules').get('app/wazuh', [])
                 preparedBody['offset'] = _instances[instanceId]['offset'];
                 preparedBody['limit'] = _instances[instanceId]['pageSize'];
             }
-
+            console.log(preparedBody);
             apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
                 .then(function (data) {
                     if ((_instances[instanceId]['pagination']) && (data.data.totalItems != _instances[instanceId]['limit'])) {
@@ -307,6 +307,8 @@ require('ui/modules').get('app/wazuh', [])
                 }
             });
 
+            _instances[instanceId]['filterFlag'] = true;
+
             return true;
         };
 
@@ -322,6 +324,23 @@ require('ui/modules').get('app/wazuh', [])
             _instances[instanceId]['body'][name.replace('filter-', '')] =
                 _instances[instanceId]['filters'][name]['defValue'] ? _instances[instanceId]['filters'][name]['defValue'] : undefined;
 
+            _instances[instanceId]['filterFlag'] = true;
+
+            return true;
+        };
+
+        dataObj.filters.flag = function (instanceId) {
+            if (!instanceId) {
+                return prepError({ 'error': -1, 'message': 'Missing parameters' });
+            }
+            return _instances[instanceId]['filterFlag'];
+        };
+
+        dataObj.filters.unflag = function (instanceId) {
+            if (!instanceId) {
+                return prepError({ 'error': -1, 'message': 'Missing parameters' });
+            }
+            _instances[instanceId]['filterFlag'] = false;
             return true;
         };
 

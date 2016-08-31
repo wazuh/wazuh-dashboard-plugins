@@ -8,6 +8,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     $scope.$parent.submenuNavItem = 'overview';
 
     var objectsArray = [];
+    var loadWatch;
 
     //Print Error
     var printError = function (error) {
@@ -105,7 +106,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     };
 
     //Load
-    $scope.$watch(function () {
+    loadWatch = $scope.$watch(function () {
         return $scope.$parent._agent;
     }, function () {
         $scope.fetchAgent($scope.$parent._agent);
@@ -116,6 +117,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)
         });
+        loadWatch();
     });
 
 });
