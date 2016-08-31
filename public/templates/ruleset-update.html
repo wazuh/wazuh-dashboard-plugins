@@ -1,28 +1,4 @@
-<md-content ng-controller="updateRulesetController" layout="column">
-    
-    <md-content ng-init="menuNavItem = 'ruleset'" style="height: 70px;">
-		<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-			<md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
-				<img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
-			</md-nav-item>
-			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
-			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
-		</md-nav-bar>
-	</md-content>
-
-    <md-content class="md-padding">
-        <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-            <md-nav-item md-nav-href="#/ruleset" name="rules">Rules</md-nav-item>
-            <md-nav-item md-nav-href="#/ruleset/decoders" name="decoders">Decoders</md-nav-item>
-            <md-nav-item md-nav-href="#/ruleset/update" name="update">Update</md-nav-item>
-        </md-nav-bar>
-    </md-content>
-
-    <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
-
-    <md-content layout="row" ng-if="!load" layout-align="space-around start" layout-sm="column" layout-xs="column">
+   <md-content layout="row" ng-if="!load && submenuNavItem == 'update'" layout-align="space-around start" layout-sm="column" layout-xs="column" ng-controller="updateRulesetController">
 
         <md-content layout="column" layout-align="space-around center">
             <h2>Update</h2>
