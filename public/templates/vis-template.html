@@ -1,13 +1,15 @@
-<div ng-controller="VisEditor" class="app-container vis-editor vis-type-{{ vis.type.name }}">
+<div ng-controller="VisEditorW">
+<div ng-if="_loadVisAsync" class="app-container vis-editor vis-type-{{ vis.type.name }}" style="height: {{visHeight}}">
 
-  <kbn-top-nav name="visualize" config="topNavMenu">
+  <kbn-top-nav name="visualize" config="topNavMenu" ng-if="visSearchable">
     <div class="vis-editor-info">
       <span ng-show="savedVis.id" class="vis-editor-info-title">
         <span ng-bind="::savedVis.title"></span>
       </span>
     </div>
   </kbn-top-nav>
-  <navbar ng-if="chrome.getVisible()" name="visualize-search">
+
+  <navbar ng-if="chrome.getVisible() && visSearchable" name="visualize-search">
     <div class="fill bitty-modal-container">
 
       <form ng-if="vis.type.requiresSearch && $state.linked" class="inline-form fill" name="queryInput">
@@ -25,7 +27,7 @@
       <form ng-if="vis.type.requiresSearch && !$state.linked" ng-submit="fetch()" class="inline-form fill" name="queryInput">
         <div class="typeahead" kbn-typeahead="visualize">
           <div class="input-group" ng-class="queryInput.$invalid ? 'has-error' : ''">
-            <input ng-model="state.query" parse-query input-focus kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
+            <input ng-model="v.filter" parse-query kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
 
             <button class="btn btn-default" type="submit" ng-disabled="queryInput.$invalid" aria-label="Search">
               <span aria-hidden="true" class="fa fa-search"></span>
@@ -38,7 +40,7 @@
     <div class="button-group"></div>
   </navbar>
 
-  <filter-bar state="state"></filter-bar>
+  <filter-bar state="state" ng-if="visSearchable"></filter-bar>
 
   <div class="vis-editor-content">
 
@@ -48,4 +50,5 @@
     </div>
   </div>
 
+</div>
 </div>

@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('osseclogController', function ($scope, alertify, DataFactory, $sce, $interval) {
+app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.text = [];
@@ -21,9 +21,16 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
 
     //Print Error
     var printError = function (error) {
-        alertify.delay(10000).closeLogOnClick(true).error(error.html);
+        $mdToast.show({
+            template: '<md-toast>' + error.html + '</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         if ($scope.blocked) {
             $scope.blocked = false;
+        }
+        if (DataFactory.filters.flag(objectsArray['/manager/logs'])) {
+            DataFactory.filters.unflag(objectsArray['/manager/logs']);
         }
     }
 
@@ -36,7 +43,16 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
                 return null;
             }
             var _pos = index - DataFactory.getOffset(objectsArray['/manager/logs']);
-            if ((_pos > 125) || (_pos < 0)) {
+            if (DataFactory.filters.flag(objectsArray['/manager/logs'])) {
+                $scope.blocked = true;
+                DataFactory.scrollTo(objectsArray['/manager/logs'], 10)
+                    .then(function (data) {
+                        $scope.text.length = 0;
+                        $scope.text = data.data.items;
+                        DataFactory.filters.unflag(objectsArray['/manager/logs']);
+                        $scope.blocked = false;
+                    }, printError);
+            } else if ((_pos > 125) || (_pos < 0)) {
                 $scope.blocked = true;
                 DataFactory.scrollTo(objectsArray['/manager/logs'], index)
                     .then(function (data) {
@@ -70,20 +86,19 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
 
     $scope.filter = function (key, value) {
         $scope.blocked = true;
-        var body;
         if ((key === _fKey) && (value === _fValue)) {
-            _fKey = _fValue = '';
-            body = {};
+            _fKey = 'all';
+            _fValue = 'all';
+            DataFactory.filters.unset(objectsArray['/manager/logs'], 'category');
+            DataFactory.filters.unset(objectsArray['/manager/logs'], 'type_log');
         } else {
             _fKey = key;
             _fValue = value;
-            body = {
-                'category': _fKey,
-                'type_log': _fValue
-            }
+            DataFactory.filters.set(objectsArray['/manager/logs'], 'category', _fKey);
+            DataFactory.filters.set(objectsArray['/manager/logs'], 'type_log', _fValue);
         }
         $scope.filterString = 'Daemon: ' + _fKey + ' > Type log: ' + _fValue;
-        DataFactory.get(objectsArray['/manager/logs'], body)
+        DataFactory.get(objectsArray['/manager/logs'])
             .then(function (data) {
                 $scope.text = data.data.items;
                 $scope.blocked = false;
@@ -137,16 +152,7 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
             $interval.cancel(_promise);
         } else {
             _promise = $interval(function () {
-                var body;
-                if ((_fKey != '') && (_fValue != '')) {
-                    body = {
-                        'category': _fKey,
-                        'type_log': _fValue
-                    }
-                } else {
-                    body = {};
-                }
-                DataFactory.get(objectsArray['/manager/logs'], body)
+                DataFactory.get(objectsArray['/manager/logs'])
                     .then(function (data) {
                         $scope.text.length = 0;
                         $scope.text = data.data.items;
@@ -159,6 +165,8 @@ app.controller('osseclogController', function ($scope, alertify, DataFactory, $s
     DataFactory.initialize('get', '/manager/logs', {}, 150, 0)
         .then(function (data) {
             objectsArray['/manager/logs'] = data;
+            DataFactory.filters.register(objectsArray['/manager/logs'], 'category', 'string');
+            DataFactory.filters.register(objectsArray['/manager/logs'], 'type_log', 'string');
             DataFactory.get(data).then(function (data) {
                 $scope.text = data.data.items;
                 loadSummary();

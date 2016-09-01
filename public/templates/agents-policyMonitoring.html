@@ -1,0 +1,66 @@
+<md-content ng-if="submenuNavItem == 'policy_monitoring'" ng-show="_agent" class="md-padding">
+    <div flex ng-controller="pmController" layout="column">
+        <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
+        <md-virtual-repeat-container class="vertical-repeater" style="min-height: 800px;" ng-if="!load">
+            <md-content layout="row">
+                <md-card flex="40">
+                    <md-card-title>
+                        <md-card-title-text>
+                            <span class="md-headline">Events</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                    <md-card-content>
+                        <kbn-vis vis-height="100px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20rootcheck')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+                        </kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="30">
+                    <md-card-title>
+                        <md-card-title-text>
+                            <span class="md-headline">Top alerts</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                    <md-card-content>
+                        <kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{'AgentName:'+_agent.name}}">
+                        </kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </md-content>
+            <div flex layout="column" layout-align="space-between stretch">
+                <div layout="row" layout-align="space-between stretch">
+                    <md-input-container layout="row" class="sideNavBox" flex="40">
+                        <label for="searchBox">Search</label>
+                        <input type="text" id="searchBox" ng-model="$parent._eventSearch" ng-change="eventSearchFilter($parent._eventSearch)" flex>
+                    </md-input-container>
+                    <div flex="60"></div>
+                </div>
+                <div>
+                    <md-toolbar layout="row">
+                        <div class="md-toolbar-tools">
+                            <span flex="60">Control</span>
+                            <span flex="20">First time seen</span>
+                            <span flex="20">Last time seen</span>
+                        </div>
+                    </md-toolbar>
+                </div>
+            </div>
+            <div md-virtual-repeat="event in eventsObj" md-on-demand flex layout-align="stretch">
+                <md-list>
+                    <md-list-item ng-click=" showDetails[event.event] = ! showDetails[event.event]; ">
+                        <span flex="60">{{event.event.length > 100 ? event.event.substring(0, 100)+'...' : event.event}}</span>
+                        <span flex="20">{{event.oldDay}}</span>
+                        <span flex="20">{{event.readDay}}</span>
+                    </md-list-item>
+                </md-list>
+                <md-list ng-if="showDetails[event.event]">
+                    <md-list-item>
+                        <span flex>{{event.event}}</span>
+                    </md-list-item>
+                </md-list>
+                <md-divider></md-divider>
+            </div>
+        </md-virtual-repeat-container>
+    </div>
+</md-content>

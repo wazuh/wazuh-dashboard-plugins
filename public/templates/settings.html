@@ -1,20 +1,18 @@
-<md-content flex ng-controller="settingsController" layout="column" layout-fill>
+<md-content flex ng-controller="settingsController" layout="column">
 
-  <div class="md-padding">
-    <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-      <md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
-          <img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
-      </md-nav-item>
-      <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-      <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-      <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
-      <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-      <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy Monitoring</md-nav-item>
-      <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
-    </md-nav-bar>
-  </div>
+  <md-content ng-init="menuNavItem = 'settings'" style="height: 70px;">
+		<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+			<md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
+				<img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
+			</md-nav-item>
+			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+		</md-nav-bar>
+	</md-content>
 
-  <div flex layout="column" layout-align="center center" ng-if="editConfiguration">
+  <div layout="column" layout-align="center center" ng-if="editConfiguration">
     <h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Set Wazuh RESTful API settings</h1>
     <form ng-submit="processForm()" layout="column" layout-align="center center">
       <md-input-container>
@@ -34,10 +32,12 @@
     </form>
   </div>
 
-  <div md-disable-backdrop flex layout="column" layout-align="center center" ng-if="!editConfiguration">
+  <div layout="column" layout-align="center center" ng-if="!editConfiguration">
     <h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Wazuh RESTful API settings</h1>
     <p flex style="color: green;">Wazuh RESTful API settings are configured and working. The application is ready to be used.</p>
     <md-button class="md-raised md-warn" ng-click="$parent.editConfiguration = !$parent.editConfiguration"><span class="glyphicon glyphicon-pencil"></span> Edit settings</md-button>
   </div>
+
+  <div flex></div>
 
 </md-content>

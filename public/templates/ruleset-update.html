@@ -1,49 +1,16 @@
-<md-content ng-controller="updateRulesetController" layout="column">
-    <md-content class="md-padding">
-        <md-nav-bar md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-            <md-nav-item id="header_logo" md-nav-href="#/" name="wazuh" aria-label="img logo">
-                <img aria-label="Logo image" src="/plugins/wazuh/icon.png" height="44" weight="252"></img>
-            </md-nav-item>
-            <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-            <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-            <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
-            <md-nav-item md-nav-href="#/fim" name="fim">File integrity</md-nav-item>
-            <md-nav-item md-nav-href="#/policy_monitoring" name="policy_monitoring">Policy monitoring</md-nav-item>
-            <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
-        </md-nav-bar>
-    </md-content>
-
-    <md-content class="md-padding">
-        <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-            <md-nav-item md-nav-href="#/ruleset" name="rules">Rules</md-nav-item>
-            <md-nav-item md-nav-href="#/ruleset/decoders" name="decoders">Decoders</md-nav-item>
-            <md-nav-item md-nav-href="#/ruleset/update" name="update">Update</md-nav-item>
-        </md-nav-bar>
-    </md-content>
-
-    <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
-
-    <md-content layout="row" ng-if="!load" layout-align="space-around start" layout-sm="column" layout-xs="column">
+   <md-content layout="row" ng-if="!load && submenuNavItem == 'update'" layout-align="space-around start" layout-sm="column" layout-xs="column" ng-controller="updateRulesetController">
 
         <md-content layout="column" layout-align="space-around center">
             <h2>Update</h2>
             <md-input-container layout="column" layout-align="space-around center">
-                <p>1. Select what you want to update:</p>
-                <md-select ng-model="$parent.updateType">
-                    <md-option value="r">Rules</md-option>
-                    <md-option value="c">Rootcheck</md-option>
-                    <md-option value="b">Both</md-option>
-                </md-select>
-            </md-input-container>
-            <md-input-container layout="column" layout-align="space-around center">
-                <p>2. Do you want to force it?</p>
+                <p>1. Do you want to force it?</p>
                 <md-switch ng-model="$parent.updateForce" aria-label="Force update?">
                     <span ng-show="$parent.updateForce">Overwrite all the rules (OSSEC manager is going to be restarted)</span>
                     <span ng-show="!$parent.updateForce">Update the outdated rules (Manager will be restarted only if enabled rules are updated)</span>
                 </md-switch>
             </md-input-container>
 
-            <md-button type="submit" ng-click="updateRuleset();" class="md-primary md-raised">Update ruleset</md-button>
+            <md-button type="submit" ng-click="updateRuleset($event);" class="md-primary md-raised">Update ruleset</md-button>
         </md-content>
 
         <md-divider></md-divider>
@@ -52,8 +19,9 @@
             <h2>Backups</h2>
             <md-select ng-model="$parent.selectedBackup" md-on-open="load_backups()" style="min-width: 150px;">
                 <md-option value="{{backup}}" ng-repeat="backup in backups">{{backup}}</md-option>
+                <md-option-empty ng-if="backups.length == 0">No backups where found</md-option-empty>
             </md-select>
-            <md-button type="submit" class="md-primary md-raised" ng-click="restoreBackup();">Restore backup</md-button>
+            <md-button type="submit" class="md-primary md-raised" ng-click="restoreBackup($event);">Restore backup</md-button>
             <p style="font-weight: lighter;">* When ruleset is updated, a new backup (the first in the list) will be created.</p>
         </md-content>
 

@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter, $http, $mdDialog) {
+app.controller('managerController', function ($scope, DataFactory, tabProvider, $mdDialog, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.menuNavItem = 'manager';
@@ -21,8 +21,12 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 
     //Print Error
     var printError = function (error) {
-        alertify.delay(10000).closeLogOnClick(true).error(error.html);
-    }
+        $mdToast.show({
+            template: '<md-toast>' + error.html + '</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+    };
 
     //Tabs
     $scope.setTab = function (tab, group) {
@@ -35,15 +39,6 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 
     //Functions
 
-    $scope.showDialog = function (ev) {
-        $mdDialog.show({
-            contentElement: '#actionsDialog',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: true
-        });
-    };
-
     $scope.getDaemonStatusClass = function (daemonStatus) {
         if (daemonStatus == "running")
             return "status green"
@@ -54,47 +49,72 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
     };
 
     $scope.start = function () {
-        alertify.delay(10000).closeLogOnClick(true).log('Starting manager');
+        $mdToast.show({
+            template: '<md-toast>Starting manager...</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         DataFactory.getAndClean('put', '/manager/start', {})
             .then(function (data) {
                 load();
-                alertify.delay(10000).closeLogOnClick(true).success('Manager started successfully');
+                $mdToast.show({
+                    template: '<md-toast>Manager started successfully</md-toast>',
+                    position: 'bottom left',
+                    hideDelay: 5000,
+                });
             }, printError);
     };
 
-    $scope.stop = function () {
-        alertify.confirm("Are you sure you want to stop the manager? You will not receive OSSEC alerts while the manager remains stopped.", function () {
-            alertify.delay(10000).closeLogOnClick(true).log('Stopping manager...');
+    $scope.stop = function (ev) {
+        var confirm = $mdDialog.confirm()
+            .title('Stop manager')
+            .textContent('Are you sure you want to stop the manager? You will not receive OSSEC alerts while the manager remains stopped.')
+            .targetEvent(ev)
+            .ok('Stop')
+            .cancel('Cancel');
+
+        $mdDialog.show(confirm).then(function () {
+            $mdToast.show({
+                template: '<md-toast>Stopping manager...</md-toast>',
+                position: 'bottom left',
+                hideDelay: 5000,
+            });
             DataFactory.getAndClean('put', '/manager/stop', {})
                 .then(function (data) {
                     load();
-                    alertify.delay(10000).closeLogOnClick(true).success('Manager stopped successfully');
+                    $mdToast.show({
+                        template: '<md-toast>Manager stopped successfully</md-toast>',
+                        position: 'bottom left',
+                        hideDelay: 5000,
+                    });
                 }, printError);
         });
     };
 
-    $scope.restart = function () {
-        alertify.confirm("Are you sure you want to restart the manager?", function () {
-            alertify.delay(10000).closeLogOnClick(true).log('Restarting manager...');
+    $scope.restart = function (ev) {
+        var confirm = $mdDialog.confirm()
+            .title('Stop manager')
+            .textContent('Do you want to restart the manager? You will not receive OSSEC alerts while the manager is restarting.')
+            .targetEvent(ev)
+            .ok('Restart')
+            .cancel('Cancel');
+
+        $mdDialog.show(confirm).then(function () {
+            $mdToast.show({
+                template: '<md-toast>Restarting manager...</md-toast>',
+                position: 'bottom left',
+                hideDelay: 5000,
+            });
             DataFactory.getAndClean('put', '/manager/restart', {})
                 .then(function (data) {
                     load();
-                    alertify.delay(10000).closeLogOnClick(true).success('Manager restarted successfully');
+                    $mdToast.show({
+                        template: '<md-toast>Manager restarted successfully</md-toast>',
+                        position: 'bottom left',
+                        hideDelay: 5000,
+                    });
                 }, printError);
         });
-    };
-
-    $scope.ruleDetail = function (file, isRule) {
-        if (isRule) {
-            sharedProperties.setProperty('r//' + file);
-        } else {
-            sharedProperties.setProperty('d//' + file);
-        }
-        $location.path('/ruleset');
-    };
-
-    $scope.agentsRedirect = function () {
-        $location.path('/agents');
     };
 
     $scope.getDaemonTooltip = function (daemon) {
@@ -131,39 +151,6 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
         return output;
     };
 
-    var loadStats = function () {
-        $http.get('/api/wazuh-stats/top/agent')
-            .success(function (data) {
-                $scope.stats['/top/agent'] = data.data;
-            })
-            .error(function (data) {
-                var error = [];
-                error['html'] = "Error getting top agent stats: Could not connect with Elasticsearch.";
-                error.message = "Error getting top agent stats: Could not connect with Elasticsearch.";
-                printError(error);
-            });
-        $http.get('/api/wazuh-stats/overview/alerts')
-            .success(function (data) {
-                $scope.stats['/overview/alerts'] = data.data;
-            })
-            .error(function (data) {
-                var error = [];
-                error['html'] = "Error getting alerts overview stats: Could not connect with Elasticsearch.";
-                error.message = "Error getting alerts overview stats: Could not connect with Elasticsearch.";
-                printError(error);
-            });
-        $http.get('/api/wazuh-stats/overview/syscheck')
-            .success(function (data) {
-                $scope.stats['/overview/fim'] = data.data;
-            })
-            .error(function (data) {
-                var error = [];
-                error['html'] = "Error getting FIM overview stats: Could not connect with Elasticsearch.";
-                error.message = "Error getting FIM overview stats: Could not connect with Elasticsearch.";
-                printError(error);
-            });
-    };
-
     var load = function () {
         DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {
@@ -174,7 +161,6 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
                         $scope.agentsCountDisconnected = data.data.disconnected;
                         $scope.agentsCountNeverConnected = data.data.neverConnected;
                         $scope.agentsCountTotal = data.data.total;
-                        loadStats();
                         $scope.load = false;
                     }, printError);
             }, printError);
@@ -192,7 +178,7 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 
 });
 
-app.controller('managerConfigurationController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter) {
+app.controller('managerConfigurationController', function ($scope, DataFactory, tabProvider) {
     //Initialisation
     $scope.load = true;
     $scope.menuNavItem = 'manager';
@@ -205,8 +191,12 @@ app.controller('managerConfigurationController', function ($scope, $route, $q, a
 
     //Print Error
     var printError = function (error) {
-        alertify.delay(10000).closeLogOnClick(true).error(error.html);
-    }
+        $mdToast.show({
+            template: '<md-toast>' + error.html + '</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+    };
 
     //Functions
     var parseConfiguration = function () {

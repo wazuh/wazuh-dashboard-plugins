@@ -1,23 +1,14 @@
-// Require utils
-var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $route, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast, $mdSidenav, $mdDialog) {
+app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.agentInfo = [];
-    $scope.agents = [];
-    $scope.search = '';
-    $scope.menuNavItem = 'agents';
-    $scope.submenuNavItem = 'overview';
-    $scope.statusFilter = 'all';
-    $scope.blocked = false;
-
-    $scope.pageId = (Math.random().toString(36).substring(3));
-    tabProvider.register($scope.pageId);
+    $scope.$parent.submenuNavItem = 'overview';
 
     var objectsArray = [];
+    var loadWatch;
 
     //Print Error
     var printError = function (error) {
@@ -31,81 +22,7 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         }
     };
 
-    //Tabs
-    $scope.setTab = function (tab, group) {
-        tabProvider.setTab($scope.pageId, tab, group);
-    };
-
-    $scope.isSetTab = function (tab, group) {
-        return tabProvider.isSetTab($scope.pageId, tab, group);
-    };
-
     //Functions
-    $scope.showFiltersDialog = function (ev) {
-        $mdDialog.show({
-            contentElement: '#filtersDialog',
-            parent: angular.element(document.body),
-            targetEvent: ev,
-            clickOutsideToClose: true
-        });
-    };
-
-    $scope.agentsGet = function (body) {
-        $scope.blocked = true;
-        //Search agent body modification
-        if (!body) {
-            var tmpBody = DataFactory.getBody(objectsArray['/agents']);
-            if ($scope.search !== tmpBody['search']) {
-                tmpBody['search'] = $scope.search;
-                body = tmpBody;
-            }
-        } else if ($scope.search !== body['search']) {
-            body['search'] = $scope.search;
-        }
-        if ((body) && (body['search'] === '')) {
-            body['search'] = undefined;
-        }
-
-        if (!body) {
-            DataFactory.get(objectsArray['/agents'])
-                .then(function (data) {
-                    $scope.agents.length = 0;
-                    $scope.agents = data.data.items;
-                    $scope.blocked = false;
-                }, printError);
-        } else {
-            DataFactory.get(objectsArray['/agents'], body)
-                .then(function (data) {
-                    $scope.agents.length = 0;
-                    $scope.agents = data.data.items;
-                    $scope.blocked = false;
-                }, printError);
-        }
-    };
-
-    $scope.agentsObj = {
-        //Obj with methods for virtual scrolling
-        getItemAtIndex: function (index) {
-            if ($scope.blocked) {
-                return null;
-            }
-            var _pos = index - DataFactory.getOffset(objectsArray['/agents']);
-            if ((_pos > 15) || (_pos < 0)) {
-                $scope.blocked = true;
-                DataFactory.scrollTo(objectsArray['/agents'], index)
-                    .then(function (data) {
-                        $scope.agents.length = 0;
-                        $scope.agents = data.data.items;
-                        $scope.blocked = false;
-                    }, printError);
-            } else {
-                return $scope.agents[_pos];
-            }
-        },
-        getLength: function () {
-            return DataFactory.getTotalItems(objectsArray['/agents']);
-        },
-    };
 
     $scope.getAgentStatusClass = function (agentStatus) {
         if (agentStatus == "Active")
@@ -117,7 +34,6 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     };
 
     $scope.fetchAgent = function (agent) {
-        $scope._agent = agent;
         DataFactory.getAndClean('get', '/agents/' + agent.id, {})
             .then(function (data) {
                 $scope.agentInfo = data.data;
@@ -125,11 +41,12 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
                     DataFactory.getAndClean('get', '/agents/' + agent.id + '/key', {})
                         .then(function (data) {
                             $scope.agentInfo.key = data.data;
+                            $scope.load = false;
                         }, printError);
                 }
             }, printError);
-            $scope.fetchFim(agent);
-            $scope.fetchRootcheck(agent);
+        $scope.fetchFim(agent);
+        $scope.fetchRootcheck(agent);
     };
 
     $scope.fetchFim = function (agent) {
@@ -147,85 +64,28 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
     };
 
     $scope.restart = function (agent) {
-        $mdToast.show($mdToast.simple().textContent('Restarting agent...'));
-        DataFactory.getAndClean('put', '/agents/'+agent.id+'/restart', {})
-        .then(function(data) {
-            $mdToast.show($mdToast.simple().textContent('Agent restarted successfully.'));
-        }, printError);
-    };
-
-    $scope.delete = function (agent, ev) {
-         var confirm = $mdDialog.confirm()
-          .title("Delete agent")
-          .textContent("Are you sure you want to delete the agent with ID " + agent.id + "?")
-          .ariaLabel('Delete agent')
-          .targetEvent(ev)
-          .ok('Yes')
-          .cancel('No');
-
-        $mdDialog.show(confirm).then(function () {
-            DataFactory.getAndClean('delete', '/agents/'+agent.id, {})
-            .then(function (data) {
-                $scope._agent = undefined;
-                $mdToast.show($mdToast.simple().textContent('Agent deleted successfully.'));
-                $scope.agentsGet();
-            }, printError);
+        $mdToast.show({
+            template: '<md-toast>Restarting agent...</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
         });
-    };
-
-    //DEPRECATED
-    $scope.copyAgentKey = function () {
-        var copyTextarea = document.querySelectorAll('.js-copytextarea')[0];
-        copyTextarea.select();
-        try {
-            var successful = document.execCommand('copy');
-            $mdToast.show($mdToast.simple().textContent('Key copied successfully.'));
-        } catch (err) {
-            $mdToast.show($mdToast.simple().textContent('Error: Copy button in this browser is not supported. Please, press Ctrl+C to copy.'));
-        }
-    };
-
-    $scope.runSyscheck = function (agent) {
-        $mdToast.show($mdToast.simple().textContent('Restarting FIM and rootcheck scan...'));
-        DataFactory.getAndClean('put', '/syscheck/'+agent.id, {})
-        .then(function (data) {
-            $mdToast.show($mdToast.simple().textContent('FIM and rootcheck restarted successfully.'));
-        }, printError);
-    };
-    
-    $scope.deleteSyscheck = function (agent, ev) {
-        var confirm = $mdDialog.confirm()
-          .title("Delete file integrity monitoring database")
-          .textContent("Are you sure to clear it in the agent " + agent.id + "? You can't undo this action.")
-          .ariaLabel('Delete file integrity monitoring database')
-          .targetEvent(ev)
-          .ok('Yes')
-          .cancel('No');
-
-        $mdDialog.show(confirm).then(function () {
-            DataFactory.getAndClean('delete', '/syscheck/'+agent.id, {})
+        DataFactory.getAndClean('put', '/agents/' + agent.id + '/restart', {})
             .then(function (data) {
-                $mdToast.show($mdToast.simple().textContent('FIM database deleted successfully.'));
+                $mdToast.show({
+                    template: '<md-toast>Restarted successfully.</md-toast>',
+                    position: 'bottom left',
+                    hideDelay: 5000,
+                });
             }, printError);
-        });
     };
 
-    $scope.deleteRootcheck = function (agent, ev) {
-        var confirm = $mdDialog.confirm()
-          .title("Delete rootcheck database")
-          .textContent("Are you sure to clear it in the agent " + agent.id + "? You can't undo this action.")
-          .ariaLabel('Delete rootcheck database')
-          .targetEvent(ev)
-          .ok('Yes')
-          .cancel('No');
-
-        $mdDialog.show(confirm).then(function () {
-            DataFactory.getAndClean('delete', '/rootcheck/'+agent.id, {})
-            .then(function (data) {
-                $mdToast.show($mdToast.simple().textContent('Rootcheck database deleted successfully.'));
-            }, printError);
-        });
-    };
+    $scope.getDiscoverByAgent = function (agent) {
+        var _urlStr = '/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),filters:!((\'$state\':(store:appState),meta:(alias:!n,disabled:!f,index:\'ossec-*\',key:AgentName,negate:!f,value:\'';
+        var _urlStrSf = '\'),query:(match:(AgentName:(query:\'';
+        var _urlStrSSf = '\',type:phrase))))),index:\'ossec-*\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'*\')),sort:!(\'@timestamp\',desc),vis:(aggs:!((params:(field:AgentName,orderBy:\'2\',size:20),schema:segment,type:terms),(id:\'2\',schema:metric,type:count)),type:histogram))&indexPattern=ossec-*&type=histogram';
+        
+        return _urlStr + agent.name + _urlStrSf + agent.name + _urlStrSSf;
+    }
 
     $scope.addAgent = function () {
         if ($scope.newName == undefined) {
@@ -245,105 +105,19 @@ app.controller('agentsController', function ($scope, $route, alertify, sharedPro
         }
     };
 
-    $scope.loadRootcheck = function (agentId) {
-        sharedProperties.setProperty('rc//'+agentId);
-        $location.path('/compliance');
-    };
-
-    $scope.loadFIM = function (agentId) {
-        sharedProperties.setProperty('fim//'+agentId);
-        $location.path('/fim');
-    };
-
-    $scope.agentStatusFilter = function () {
-        var _status;
-        if ($scope.statusFilter === 'all') {
-            _status = undefined;
-        } else {
-            _status = $scope.statusFilter;
-        }
-        $scope.agentsGet({ 'sort': $scope.searchQuery, 'status': _status });
-    };
-
-    $scope.sort = function (keyname) {
-        $scope.sortKey = keyname;
-        $scope.reverse = !$scope.reverse;
-        $scope.searchQuery = '';
-        if (!$scope.reverse) {
-            $scope.searchQuery += '-';
-        }
-        
-        $scope.searchQuery += $scope.sortKey;
-        if ($scope.statusFilter != '') {
-            $scope.agentsGet({ 'sort': $scope.searchQuery, 'status': $scope.statusFilter });
-        } else {
-            $scope.agentsGet({ 'sort': $scope.searchQuery });
-        }
-    };
-
-    $scope.loadAlertsUrl = function (agent, filters) {
-        if (filters && filters != '') {
-            var _filter = 'AgentName:'+agent + ' AND ' + filters;
-        } else {
-            var _filter = 'AgentName:'+agent;
-        }
-        sharedProperties.setProperty('aa//'+_filter);
-        $location.path('/discover');
-    };
-
-    $scope.loadDashboardUrl = function (agent, filters) {
-        if (filters && filters != '') {
-            var _filter = 'AgentName:'+agent + ' AND ' + filters;
-        } else {
-            var _filter = 'AgentName:'+agent;
-        }
-        sharedProperties.setProperty('ad//'+_filter);
-        $location.path('/dashboard');
-    };
-
-    $scope.loadComplianceDashboardUrl = function (agent, dashboard, filters) {
-        if (filters && filters != '') {
-            var _filter = 'AgentName:' + agent + ' AND ' + filters;
-        } else {
-            var _filter = 'AgentName:' + agent;
-        }
-        if (dashboard == 'pci') {
-            sharedProperties.setProperty('ad//' + _filter);
-            $location.path('/compliance/pci');
-        } else if (dashboard == 'cis') {
-            sharedProperties.setProperty('ad//' + _filter);
-            $location.path('/compliance/cis');
-        }
-    };
-
-    $scope.loadAgentMetrics = function (agent, filters) {
-        if (filters && filters != '') {
-            var _filter = 'AgentName:' + agent + ' AND ' + filters;
-        } else {
-            var _filter = 'AgentName:' + agent;
-        }
-        sharedProperties.setProperty('av//' + _filter);
-        $location.path('/agents/metrics');
-    };
-
     //Load
-    DataFactory.initialize('get', '/agents', {}, 20, 0)
-        .then(function (data) {
-            objectsArray['/agents'] = data;
-            DataFactory.get(data).then(function (data) {
-                $scope.agents = data.data.items;
-                $scope.fetchAgent($scope.agents[0]);
-                $scope.load = false;
-            }, printError);
-        }, printError);
+    loadWatch = $scope.$watch(function () {
+        return $scope.$parent._agent;
+    }, function () {
+        $scope.fetchAgent($scope.$parent._agent);
+    });
 
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
-            DataFactory.clean(value)});
-        $scope.agents.length = $scope.agentInfo.length = 0;
-        tabProvider.clean($scope.pageId);
+            DataFactory.clean(value)
+        });
+        loadWatch();
     });
 
 });
-

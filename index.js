@@ -14,7 +14,8 @@ module.exports = function (kibana) {
           return {
             kbnIndex: config.get('kibana.index'),
             esApiVersion: config.get('elasticsearch.apiVersion'),
-            esShardTimeout: config.get('elasticsearch.shardTimeout')
+            esShardTimeout: config.get('elasticsearch.shardTimeout'),
+            tilemap: config.get('tilemap')
           };
         }
       }

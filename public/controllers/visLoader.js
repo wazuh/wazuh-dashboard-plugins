@@ -37,7 +37,6 @@ import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_cli
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 
-import editorTemplate from 'plugins/wazuh/templates/agents-metrics.html';
 import 'ui/state_management/app_state';
 import StateManagementAppStateProvider from 'ui/state_management/app_state';
 import 'plugins/kibana/discover/saved_searches/saved_searches.js';
@@ -60,304 +59,276 @@ import 'plugins/spy_modes/table_spy_mode';
 
 require('ui/courier');
 
-/*uiRoutes
-  .when('/agents/metrics', {
-    template: editorTemplate,
-    resolve: {
-      savedVis: function (savedVisualizations, courier, $route, Private) {
-        const visTypes = Private(RegistryVisTypesProvider);
-        const visType = _.find(visTypes, { name: $route.current.params.type });
-
-        if (!visType) {
-          throw new Error('You must provide a valid visualization type');
-        }
-
-        if (visType.requiresSearch && !$route.current.params.indexPattern && !$route.current.params.savedSearchId) {
-          throw new Error('You must provide either an indexPattern or a savedSearchId');
-        }
-
-        return savedVisualizations.get($route.current.params)
-          .catch(courier.redirectWhenMissing({
-            '*': '/agents'
-          }));
-      }
-    }
-  });*/
-import directiveTemplate from '../templates/vis-template.html';
-
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnVis', [function () {
     return {
       restrict: 'E',
       scope: {
-        routeData: '@'
+        visType: '@visType',
+        visIndexPattern: '@visIndexPattern',
+        visA: '@visA',
+        visG: '@visG',
+        visFilter: '@visFilter',
+        visHeight: '@visHeight',
+        visSearchable: '@visSearchable'
       },
-      /*scope: {
-        savedVis: function (savedVisualizations, courier, $route, Private) {
-          const visTypes = Private(RegistryVisTypesProvider);
-          const visType = _.find(visTypes, { name: $route.current.params.type });
-
-          if (!visType) {
-            throw new Error('You must provide a valid visualization type');
-          }
-
-          if (visType.requiresSearch && !$route.current.params.indexPattern && !$route.current.params.savedSearchId) {
-            throw new Error('You must provide either an indexPattern or a savedSearchId');
-          }
-
-          return savedVisualizations.get($route.current.params)
-            .catch();
-        }
-      },*/
-      template: directiveTemplate
+      template: require('../templates/vis-template.html')
     }
-  }]); 
+  }]);
 
 require('ui/modules').get('app/wazuh', [])
-  .controller('VisEditor', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations/*este ultimo sobra*/ ) {
-
-    /*Directive custom code*/
-        $scope.savedVis = function () {
-          const visTypes = Private(RegistryVisTypesProvider);
-          const visType = _.find(visTypes, { name: $scope.routeData.params.type });
-
-          if (!visType) {
-            throw new Error('You must provide a valid visualization type');
-          }
-
-          if (visType.requiresSearch && !$scope.routeData.params.indexPattern && !$scope.routeData.params.savedSearchId) {
-            throw new Error('You must provide either an indexPattern or a savedSearchId');
-          }
-
-          return savedVisualizations.get($scope.routeData.params)
-            .catch();
-        }
-    /*Directive custom code*/
-
-
-
-    const savedVis = $scope.savedVis(); //los parentesis son anadidos
-
-    const vis = savedVis.vis;
-    const editableVis = vis.createEditableVis();
-    vis.requesting = function () {
-      const requesting = editableVis.requesting;
-      requesting.call(vis);
-      requesting.call(editableVis);
-    };
-
-    const searchSource = savedVis.searchSource;
-
-    $scope.topNavMenu = [{
-      key: 'refresh',
-      description: 'Refresh',
-      run: function () { $scope.fetch(); }
-    }];
-
-    if (savedVis.id) {
-      docTitle.change(savedVis.title);
+  .controller('VisEditorW', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
+    $scope.v = {};
+    $scope.v.filter = $scope.visFilter;
+    $scope.chrome = {};
+    $scope.chrome.getVisible = function () {
+      return true;
     }
 
-    let $state = $scope.$state = (function initState() {
-      const savedVisState = vis.getState();
-      const stateDefaults = {
-        uiState: savedVis.uiStateJSON ? JSON.parse(savedVis.uiStateJSON) : {},
-        linked: !!savedVis.savedSearchId,
-        query: searchSource.getOwn('query') || { query_string: { query: '*' } },
-        filters: searchSource.getOwn('filter') || [],
-        vis: savedVisState
-      };
+    var _savedVis = function () {
 
-      $state = new AppState(stateDefaults);
+      const visTypes = Private(RegistryVisTypesProvider);
+      const visType = _.find(visTypes, { name: $scope.visType });
 
-      if (!angular.equals($state.vis, savedVisState)) {
-        Promise.try(function () {
-          editableVis.setState($state.vis);
-          vis.setState(editableVis.getEnabledState());
-        })
-          .catch();
+      if (!visType) {
+        throw new Error('You must provide a valid visualization type');
       }
 
-      return $state;
-    } ());
+      if (visType.requiresSearch && !$scope.visIndexPattern) {
+        throw new Error('You must provide either an indexPattern');
+      }
 
-    function init() {
-      // export some objects
-      $scope.savedVis = savedVis;
-      $scope.searchSource = searchSource;
-      $scope.vis = vis;
-      $scope.indexPattern = vis.indexPattern;
-      $scope.editableVis = editableVis;
-      $scope.state = $state;
-      $scope.uiState = $state.makeStateful('uiState');
-      vis.setUiState($scope.uiState);
-      $scope.timefilter = timefilter;
-      $scope.opts = _.pick($scope, 'doSave', 'savedVis', 'shareData', 'timefilter');
+      return savedVisualizations.get({ 'type': $scope.visType, 'indexPattern': $scope.visIndexPattern, '_g': $scope.visG, '_a': $scope.visA })
+        .catch(courier.redirectWhenMissing({
+          '*': '/'
+        }));
+    }
 
-      const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
-      editableVis.listeners.click = vis.listeners.click = filterBarClickHandler($state);
-      const brushEvent = Private(UtilsBrushEventProvider);
-      editableVis.listeners.brush = vis.listeners.brush = brushEvent;
+    _savedVis().then(function (_sVis) {
+      $scope._loadVisAsync = true;
 
-      // track state of editable vis vs. "actual" vis
-      $scope.stageEditableVis = transferVisState(editableVis, vis, true);
-      $scope.resetEditableVis = transferVisState(vis, editableVis);
-      $scope.$watch(function () {
-        return editableVis.getEnabledState();
-      }, function (newState) {
-        editableVis.dirty = !angular.equals(newState, vis.getEnabledState());
+      const savedVis = _sVis;
 
-        $scope.responseValueAggs = null;
-        try {
-          $scope.responseValueAggs = editableVis.aggs.getResponseAggs().filter(function (agg) {
-            return _.get(agg, 'schema.group') === 'metrics';
-          });
-        }
-        // this can fail when the agg.type is changed but the
-        // params have not been set yet. watcher will trigger again
-        // when the params update
-        catch (e) { } // eslint-disable-line no-empty
-      }, true);
+      const vis = savedVis.vis;
+      const editableVis = vis.createEditableVis();
+      vis.requesting = function () {
+        const requesting = editableVis.requesting;
+        requesting.call(vis);
+        requesting.call(editableVis);
+      };
 
-      $state.replace();
+      const searchSource = savedVis.searchSource;
 
-      $scope.$watch('searchSource.get("index").timeFieldName', function (timeField) {
-        timefilter.enabled = !!timeField;
-      });
+      $scope.topNavMenu = [{
+        key: 'refresh',
+        description: 'Refresh',
+        run: function () { $scope.fetch(); }
+      }];
 
-      // update the searchSource when filters update
-      const queryFilter = Private(FilterBarQueryFilterProvider);
-      $scope.$listen(queryFilter, 'update', function () {
-        searchSource.set('filter', queryFilter.getFilters());
-        $state.save();
-      });
+      if (savedVis.id) {
+        docTitle.change(savedVis.title);
+      }
 
-      // fetch data when filters fire fetch event
-      $scope.$listen(queryFilter, 'fetch', $scope.fetch);
+      let $state = $scope.$state = (function initState() {
+        $route.current.params._a = $scope.visA;
+        $route.updateParams({ '_a': $scope.visA });
+        $route.current.params._g = $scope.visG;
+        $route.updateParams({ '_g': $scope.visG });
+        const stateDefaults = {
+          uiState: {},
+          linked: false,
+          query: $scope.visFilter ? $scope.visFilter : { query_string: { analyze_wildcard: '!t', query: '*' } },
+          filters: [],
+          vis: {}
+        };
+
+        $state = new AppState(stateDefaults);
+
+        return $state;
+      } ());
+
+      function init() {
+        // export some objects
+        $scope.savedVis = savedVis;
+
+        $scope.searchSource = searchSource;
+        $scope.vis = vis;
+
+        $scope.indexPattern = vis.indexPattern;
+        $scope.editableVis = editableVis;
+        $scope.state = $state;
+
+        $scope.uiState = $state.makeStateful('uiState');
+
+        vis.setUiState($scope.uiState);
+
+        $scope.timefilter = timefilter;
+        $scope.opts = _.pick($scope, 'doSave', 'savedVis', 'shareData', 'timefilter');
+
+        const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
+        editableVis.listeners.click = vis.listeners.click = filterBarClickHandler($state);
+        const brushEvent = Private(UtilsBrushEventProvider);
+        editableVis.listeners.brush = vis.listeners.brush = brushEvent;
+
+        // track state of editable vis vs. "actual" vis
+        $scope.stageEditableVis = transferVisState(editableVis, vis, true);
+        $scope.resetEditableVis = transferVisState(vis, editableVis);
+
+        $scope.$watch('searchSource.get("index").timeFieldName', function (timeField) {
+          timefilter.enabled = !!timeField;
+        });
+
+        // update the searchSource when filters update
+        const queryFilter = Private(FilterBarQueryFilterProvider);
+        $scope.$listen(queryFilter, 'update', function () {
+          searchSource.set('filter', queryFilter.getFilters());
+          $state.save();
+        });
+
+        // fetch data when filters fire fetch event
+        $scope.$listen(queryFilter, 'fetch', $scope.fetch);
 
 
-      $scope.$listen($state, 'fetch_with_changes', function (keys) {
-        if (_.contains(keys, 'linked') && $state.linked === true) {
-          // abort and reload route
-          $route.reload();
-          return;
-        }
+        $scope.$listen($state, 'fetch_with_changes', function (keys) {
 
-        if (_.contains(keys, 'vis')) {
+          let $state = $scope.$state = (function initState() {
+            $route.current.params._a = $scope.visA;
+            $route.updateParams({ '_a': $scope.visA });
+            $route.current.params._g = $scope.visG;
+            $route.updateParams({ '_g': $scope.visG });
+            const stateDefaults = {
+              uiState: {},
+              linked: false,
+              query: $scope.visFilter ? $scope.visFilter : { query_string: { analyze_wildcard: '!t', query: '*' } },
+              filters: [],
+              vis: {}
+            };
+            $state = new AppState(stateDefaults);
+
+            return $state;
+          } ());
+
+          $scope.state = $state;
+
+          if (_.contains(keys, 'linked') && $state.linked === true) {
+            return;
+          }
+
           $state.vis.listeners = _.defaults($state.vis.listeners || {}, vis.listeners);
 
-          // only update when we need to, otherwise colors change and we
-          // risk loosing an in-progress result
           vis.setState($state.vis);
           editableVis.setState($state.vis);
-        }
 
-        // we use state to track query, must write before we fetch
-        if ($state.query && !$state.linked) {
-          searchSource.set('query', $state.query);
-        } else {
-          searchSource.set('query', null);
-        }
-
-        if (_.isEqual(keys, ['filters'])) {
-          // updates will happen in filter watcher if needed
-          return;
-        }
-
-        $scope.fetch();
-      });
-
-      // Without this manual emission, we'd miss filters and queries that were on the $state initially
-      $state.emit('fetch_with_changes');
-
-      $scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
-
-      $scope.$on('ready:vis', function () {
-        $scope.$emit('application.load');
-      });
-
-      $scope.$on('$destroy', function () {
-        savedVis.destroy();
-      });
-    }
-
-    $scope.fetch = function () {
-      $state.save();
-      const queryFilter = Private(FilterBarQueryFilterProvider);
-      searchSource.set('filter', queryFilter.getFilters());
-      if (!$state.linked) searchSource.set('query', $state.query);
-      if ($scope.vis.type.requiresSearch) {
-        courier.fetch();
-      }
-    };
-
-    $scope.startOver = function () {
-      //Nothing
-    };
-
-    $scope.doSave = function () {
-      savedVis.id = savedVis.title;
-      // vis.title was not bound and it's needed to reflect title into visState
-      $state.vis.title = savedVis.title;
-      savedVis.visState = $state.vis;
-      savedVis.uiStateJSON = angular.toJson($scope.uiState.getChanges());
-
-      savedVis.save()
-        .then(function (id) {
-          $scope.kbnTopNav.close('save');
-
-          if (id) {
-            notify.info('Saved Visualization "' + savedVis.title + '"');
-            if (savedVis.id === $route.current.params.id) return;
+          // we use state to track query, must write before we fetch
+          if ($scope.v.filter && !$state.linked) {
+            searchSource.set('query', $scope.v.filter);
+          } else {
+            searchSource.set('query', null);
           }
-        }, notify.fatal);
-    };
 
-    $scope.unlink = function () {
-      if (!$state.linked) return;
+          if (_.isEqual(keys, ['filters'])) {
+            // updates will happen in filter watcher if needed
+            return;
+          }
 
-      $state.linked = false;
-      const parent = searchSource.getParent(true);
-      const parentsParent = parent.getParent(true);
+          $scope.$watch("visFilter", function (newValue, oldValue) {
+            $scope.v.filter = newValue;
+            $scope.fetch();
+          });
 
-      // display unlinking for 2 seconds, unless it is double clicked
-      $scope.unlinking = $timeout($scope.clearUnlinking, 2000);
+          $scope.fetch();
+        });
 
-      delete savedVis.savedSearchId;
-      parent.set('filter', _.union(searchSource.getOwn('filter'), parent.getOwn('filter')));
+        $scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
 
-      // copy over all state except "aggs" and filter, which is already copied
-      _(parent.toJSON())
-        .omit('aggs')
-        .forOwn(function (val, key) {
-          searchSource.set(key, val);
-        })
-        .commit();
+        $scope.$on('ready:vis', function () {
+          $scope.$emit('application.load');
+          $state.emit('fetch_with_changes');
+        });
 
-      $state.query = searchSource.get('query');
-      $state.filters = searchSource.get('filter');
-      searchSource.inherits(parentsParent);
-    };
-
-    $scope.clearUnlinking = function () {
-      if ($scope.unlinking) {
-        $timeout.cancel($scope.unlinking);
-        $scope.unlinking = null;
+        $scope.$on('$destroy', function () {
+          savedVis.destroy();
+        });
       }
-    };
 
-    function transferVisState(fromVis, toVis, stage) {
-      return function () {
-        const view = fromVis.getEnabledState();
-        const full = fromVis.getState();
-        toVis.setState(view);
-        editableVis.dirty = false;
-        $state.vis = full;
-        $state.save();
-
-        if (stage) $scope.fetch();
+      $scope.fetch = function () {
+        const queryFilter = Private(FilterBarQueryFilterProvider);
+        searchSource.set('filter', queryFilter.getFilters());
+        if (!$state.linked) searchSource.set('query', $scope.v.filter);
+        if ($scope.vis.type.requiresSearch) {
+          courier.fetch();
+        }
       };
-    }
 
-    init();
+      $scope.startOver = function () {
+        //Nothing
+      };
+
+      $scope.doSave = function () {
+        savedVis.id = savedVis.title;
+        // vis.title was not bound and it's needed to reflect title into visState
+        $state.vis.title = savedVis.title;
+        savedVis.visState = $state.vis;
+        savedVis.uiStateJSON = angular.toJson($scope.uiState.getChanges());
+
+        savedVis.save()
+          .then(function (id) {
+            $scope.kbnTopNav.close('save');
+
+            if (id) {
+              notify.info('Saved Visualization "' + savedVis.title + '"');
+              if (savedVis.id === $route.current.params.id) return;
+            }
+          }, notify.fatal);
+      };
+
+      $scope.unlink = function () {
+        if (!$state.linked) return;
+
+        $state.linked = false;
+        const parent = searchSource.getParent(true);
+        const parentsParent = parent.getParent(true);
+
+        // display unlinking for 2 seconds, unless it is double clicked
+        $scope.unlinking = $timeout($scope.clearUnlinking, 2000);
+
+        delete savedVis.savedSearchId;
+        parent.set('filter', _.union(searchSource.getOwn('filter'), parent.getOwn('filter')));
+
+        // copy over all state except "aggs" and filter, which is already copied
+        _(parent.toJSON())
+          .omit('aggs')
+          .forOwn(function (val, key) {
+            searchSource.set(key, val);
+          })
+          .commit();
+
+        $scope.query = searchSource.get('query');
+        $state.filters = searchSource.get('filter');
+        searchSource.inherits(parentsParent);
+      };
+
+      $scope.clearUnlinking = function () {
+        if ($scope.unlinking) {
+          $timeout.cancel($scope.unlinking);
+          $scope.unlinking = null;
+        }
+      };
+
+      function transferVisState(fromVis, toVis, stage) {
+        return function () {
+          const view = fromVis.getEnabledState();
+          const full = fromVis.getState();
+          toVis.setState(view);
+          editableVis.dirty = false;
+          $state.vis = full;
+          $state.save();
+
+          if (stage) $scope.fetch();
+        };
+      }
+      init();
+
+    });
+
   });
