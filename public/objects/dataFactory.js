@@ -163,7 +163,6 @@ require('ui/modules').get('app/wazuh', [])
                 preparedBody['offset'] = _instances[instanceId]['offset'];
                 preparedBody['limit'] = _instances[instanceId]['pageSize'];
             }
-            console.log(preparedBody);
             apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
                 .then(function (data) {
                     if ((_instances[instanceId]['pagination']) && (data.data.totalItems != _instances[instanceId]['limit'])) {
