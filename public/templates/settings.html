@@ -1,4 +1,4 @@
-<md-content flex ng-controller="settingsController" layout="column" layout-fill>
+<md-content flex ng-controller="settingsController" layout="column">
 
   <md-content ng-init="menuNavItem = 'settings'" style="height: 70px;">
 		<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
@@ -12,7 +12,7 @@
 		</md-nav-bar>
 	</md-content>
 
-  <div flex layout="column" layout-align="center center" ng-if="editConfiguration">
+  <div layout="column" layout-align="center center" ng-if="editConfiguration">
     <h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Set Wazuh RESTful API settings</h1>
     <form ng-submit="processForm()" layout="column" layout-align="center center">
       <md-input-container>
@@ -32,10 +32,12 @@
     </form>
   </div>
 
-  <div md-disable-backdrop flex layout="column" layout-align="center center" ng-if="!editConfiguration">
+  <div layout="column" layout-align="center center" ng-if="!editConfiguration">
     <h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Wazuh RESTful API settings</h1>
     <p flex style="color: green;">Wazuh RESTful API settings are configured and working. The application is ready to be used.</p>
     <md-button class="md-raised md-warn" ng-click="$parent.editConfiguration = !$parent.editConfiguration"><span class="glyphicon glyphicon-pencil"></span> Edit settings</md-button>
   </div>
+
+  <div flex></div>
 
 </md-content>
