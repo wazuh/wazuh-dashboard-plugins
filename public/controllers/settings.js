@@ -3,7 +3,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 // Require utils
 var base64 = require('plugins/wazuh/utils/base64.js');
 
-app.controller('settingsController', function ($scope, $http, $q, testConnection, alertify, $mdToast) {
+app.controller('settingsController', function ($scope, $http, testConnection, $mdToast) {
 
     $scope.formData = {};
     $scope.formData.user = "";

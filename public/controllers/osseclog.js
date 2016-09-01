@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('osseclogController', function ($scope, alertify, DataFactory, $sce, $interval, $mdToast) {
+app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.text = [];

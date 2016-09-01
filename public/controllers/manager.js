@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter, $http, $mdDialog, $mdToast) {
+app.controller('managerController', function ($scope, DataFactory, tabProvider, $mdDialog, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.menuNavItem = 'manager';
@@ -178,7 +178,7 @@ app.controller('managerController', function ($scope, $route, $q, alertify, shar
 
 });
 
-app.controller('managerConfigurationController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $filter) {
+app.controller('managerConfigurationController', function ($scope, DataFactory, tabProvider) {
     //Initialisation
     $scope.load = true;
     $scope.menuNavItem = 'manager';

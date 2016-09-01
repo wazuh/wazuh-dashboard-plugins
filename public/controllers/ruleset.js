@@ -2,7 +2,7 @@
 var config = require('plugins/wazuh/config/config.js');
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast) {
+app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
     //Initialisation
     $scope.load = true;
 
@@ -209,7 +209,7 @@ app.controller('rulesController', function ($scope, $route, $q, alertify, shared
 
 });
 
-app.controller('decodersController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdToast) {
+app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast) {
 
     //Initialisation
     $scope.load = true;
@@ -369,7 +369,7 @@ app.controller('decodersController', function ($scope, $route, $q, alertify, sha
 });
 
 
-app.controller('updateRulesetController', function ($scope, $route, $q, alertify, sharedProperties, $location, $sce, DataFactory, tabProvider, $mdDialog, $mdToast) {
+app.controller('updateRulesetController', function ($scope, $q, DataFactory, tabProvider, $mdDialog, $mdToast) {
     //Initialisation
     $scope.load = true;
 

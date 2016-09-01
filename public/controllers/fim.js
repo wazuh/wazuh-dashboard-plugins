@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('fimController', function ($scope, alertify, sharedProperties, DataFactory, $location, $mdDialog, $q, $mdToast) {
+app.controller('fimController', function ($scope, DataFactory, $mdToast) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -86,6 +86,7 @@ app.controller('fimController', function ($scope, alertify, sharedProperties, Da
                     objectsArray['/files'] = data;
                     DataFactory.get(objectsArray['/files'])
                         .then(function (data) {
+                            $scope.files.length = 0;
                             $scope.files = data.data.items;
                             DataFactory.filters.register(objectsArray['/files'], 'search', 'string');
                             DataFactory.filters.register(objectsArray['/files'], 'event', 'string');
