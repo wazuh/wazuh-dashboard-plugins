@@ -39,6 +39,15 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
 
     //Functions
 
+    $scope.getAgentStatusClass = function (agentStatus) {
+        if (agentStatus == "Active")
+            return "green"
+        else if (agentStatus == "Disconnected")
+            return "red";
+        else
+            return "red";
+    };
+
     $scope.agentsSearch = function (search) {
         var defered = $q.defer();
         var promise = defered.promise;

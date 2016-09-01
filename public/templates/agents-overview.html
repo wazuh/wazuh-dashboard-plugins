@@ -1,15 +1,6 @@
 <md-content ng-if="submenuNavItem == 'overview'" ng-show="_agent" class="md-padding">
 	<div ng-controller="agentsController">
 
-		<md-content layout="row" layout-align="end start">
-			<md-content layout="row" layout-align="end start">
-				<md-button class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-href="{{getDiscoverByAgent(_agent)}}"
-					target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Discover alerts</md-button>
-				<div class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'Active' ? null : (_agent.status == 'Never connected' ? 'extraLarge' : 'large')"
-					layout="row" layout-align="space-between center"><span>{{_agent.status}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
-			</md-content>
-		</md-content>
-
 		<md-card>
 			<md-card-title>
 				<md-card-title-text>
