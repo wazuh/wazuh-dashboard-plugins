@@ -61,13 +61,18 @@
                 <div>
                     <md-toolbar layout="row">
                         <div class="md-toolbar-tools">
-                            <span flex="10" hide-sm hide-xs>Date</span>
-                            <span flex="30">File name</span>
+                            <span flex="10" ng-click="setSort('modificationDate')" hide-sm hide-xs>Date 
+                                <i class="fa" ng-class="_sort === 'modificationDate' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="30" ng-click="setSort('file')">File name 
+                                <i class="fa" ng-class="_sort === 'file' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
                             <span flex="10" hide-sm hide-xs>Event</span>
-                            <span flex="10" hide-sm hide-xs>User</span>
-                            <span flex="10" hide-sm hide-xs>Group</span>
+                            <span flex="10" ng-click="setSort('user')" hide-sm hide-xs>User 
+                                <i class="fa" ng-class="_sort === 'user' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="10" ng-click="setSort('group')" hide-sm hide-xs>Group 
+                                <i class="fa" ng-class="_sort === 'group' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
                             <span flex="15" hide-sm hide-xs>Permissions</span>
-                            <span flex="15" hide-sm hide-xs>Size</span>
+                            <span flex="15" ng-click="setSort('size')" hide-sm hide-xs>Size 
+                                <i class="fa" ng-class="_sort === 'size' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
                         </div>
                     </md-toolbar>
                 </div>

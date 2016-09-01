@@ -27,6 +27,23 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
 
     //Functions
 
+    $scope.setSort = function (field) {
+        if ($scope._sort === field) {
+            if ($scope._sortOrder) {
+                $scope._sortOrder = false;
+                $scope._sort = '';
+                DataFactory.filters.unset(objectsArray['/files'], 'filter-sort');
+            } else {
+                $scope._sortOrder = true;
+                DataFactory.filters.set(objectsArray['/files'], 'filter-sort', field);
+            }
+        } else {
+            $scope._sortOrder = false;
+            $scope._sort = field;
+            DataFactory.filters.set(objectsArray['/files'], 'filter-sort', '-'+field);
+        }
+    }
+
     $scope.fileSearchFilter = function (search) {
         if (search) {
             DataFactory.filters.set(objectsArray['/files'], 'search', search);
@@ -90,6 +107,8 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
                             $scope.files = data.data.items;
                             DataFactory.filters.register(objectsArray['/files'], 'search', 'string');
                             DataFactory.filters.register(objectsArray['/files'], 'event', 'string');
+                            DataFactory.filters.register(objectsArray['/files'], 'filter-sort', 'string');
+                            $scope._sort = '';
                             $scope.fileSearchFilter($scope._fileSearch);
                             $scope.fileEventFilter($scope._fimEvent);
                         }, printError);
@@ -106,6 +125,7 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
                         $scope.files = data.data.items;
                         DataFactory.filters.register(objectsArray['/files'], 'search', 'string');
                         DataFactory.filters.register(objectsArray['/files'], 'event', 'string');
+                        DataFactory.filters.register(objectsArray['/files'], 'filter-sort', 'string');
                         createWatch();
                         $scope.load = false;
                     }, printError);

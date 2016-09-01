@@ -40,8 +40,12 @@
                     <md-toolbar layout="row">
                         <div class="md-toolbar-tools">
                             <span flex="60">Control</span>
-                            <span flex="20">First time seen</span>
-                            <span flex="20">Last time seen</span>
+                            <span flex="20" ng-click="setSort('oldDay')">First time seen 
+                                <i class="fa" ng-class="_sort === 'oldDay' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                            </span>
+                            <span flex="20" ng-click="setSort('readDay')">Last time seen 
+                                <i class="fa" ng-class="_sort === 'readDay' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                            </span>
                         </div>
                     </md-toolbar>
                 </div>

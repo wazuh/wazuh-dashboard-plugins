@@ -23,6 +23,23 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog) {
 
     //Functions
 
+    $scope.setSort = function (field) {
+        if ($scope._sort === field) {
+            if ($scope._sortOrder) {
+                $scope._sortOrder = false;
+                $scope._sort = '';
+                DataFactory.filters.unset(objectsArray['/rootcheck'], 'filter-sort');
+            } else {
+                $scope._sortOrder = true;
+                DataFactory.filters.set(objectsArray['/rootcheck'], 'filter-sort', field);
+            }
+        } else {
+            $scope._sortOrder = false;
+            $scope._sort = field;
+            DataFactory.filters.set(objectsArray['/rootcheck'], 'filter-sort', '-'+field);
+        }
+    }
+
     $scope.eventSearchFilter = function (search) {
         console.log(search);
         if (search) {
@@ -78,6 +95,8 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog) {
                     $scope.events.length = 0;
 					$scope.events = data.data.items;
                     DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
+                    DataFactory.filters.register(objectsArray['/rootcheck'], 'filter-sort', 'string');
+                    $scope._sort = '';                    
                     $scope.eventSearchFilter($scope._eventSearch);
 				}, printError);
 			}, printError);
@@ -92,6 +111,7 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog) {
 				.then(function (data) {
 					$scope.events = data.data.items;
 					DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
+                    DataFactory.filters.register(objectsArray['/rootcheck'], 'filter-sort', 'string');
 					createWatch();
 					$scope.load = false;
 				}, printError);

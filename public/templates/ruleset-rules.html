@@ -62,10 +62,14 @@
 
     <md-toolbar layout="row">
       <div class="md-toolbar-tools">
-        <span flex="10">ID</span>
+        <span flex="10"  ng-click="setSort('id')">ID 
+          <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+        </span>
         <span flex="60">Description</span>
-        <span flex="5">Level</span>
-        <span flex="15">File</span>
+        <span flex="10" ng-click="setSort('level')">Level 
+          <i class="fa" ng-class="_sort === 'level' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+        </span>
+        <span flex="20">File</span>
       </div>
     </md-toolbar>
     <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
@@ -73,8 +77,8 @@
         <md-list-item ng-click=" showDetails[rule.id] = ! showDetails[rule.id]; ">
           <span flex="10">{{rule.id}}</span>
           <span flex="60">{{rule.description}}</span>
-          <span flex="5">{{rule.level}}</span>
-          <span flex="15">{{rule.file}}</span>
+          <span flex="10">{{rule.level}}</span>
+          <span flex="20">{{rule.file}}</span>
         </md-list-item>
       </md-list>
       <md-list ng-if="showDetails[rule.id]">

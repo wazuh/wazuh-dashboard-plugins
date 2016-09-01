@@ -32,6 +32,23 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
 
     //Functions
 
+    $scope.setSort = function (field) {
+        if ($scope._sort === field) {
+            if ($scope._sortOrder) {
+                $scope._sortOrder = false;
+                $scope._sort = '';
+                DataFactory.filters.unset(objectsArray['/rules'], 'filter-sort');
+            } else {
+                $scope._sortOrder = true;
+                DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', field);
+            }
+        } else {
+            $scope._sortOrder = false;
+            $scope._sort = field;
+            DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-'+field);
+        }
+    }
+
     $scope.fileSearchFilter = function (search) {
         if (search) {
             DataFactory.filters.set(objectsArray['/rules'], 'search', search);
@@ -132,7 +149,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
     };
 
     $scope.rulesLevelFilter = function () {
-        if (!$scope.minLevel || !$scope.maxLevel || $scope.minLevel == null || $scope.maxLevel == null) {
+        if ((!$scope.minLevel && $scope.minLevel !== 0) || (!$scope.maxLevel && $scope.maxLevel !== 0) || $scope.minLevel == null || $scope.maxLevel == null) {
             return null;
         }
         if (0 <= parseInt($scope.minLevel) <= parseInt($scope.maxLevel) <= 15) {
@@ -192,6 +209,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
                         DataFactory.filters.register(objectsArray['/rules'], 'status', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'filter-sort', 'string');
                         DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-level');
+                        $scope._sort = 'level';
                         $scope.load = false;
                     }, printError);
             }, printError);
