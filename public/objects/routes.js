@@ -19,25 +19,7 @@ routes
         }
     })
     .when('/manager/', {
-        template: require('plugins/wazuh/templates/manager.html'),
-        resolve: {
-            "check": settingsWizard
-        }
-    })
-    .when('/manager/osseclog/', {
-        template: require('plugins/wazuh/templates/manager-osseclog.html'),
-        resolve: {
-            "check": settingsWizard
-        }
-    })
-    .when('/manager/configuration/', {
-        template: require('plugins/wazuh/templates/manager-configuration.html'),
-        resolve: {
-            "check": settingsWizard
-        }
-    })
-    .when('/manager/metrics/', {
-        template: require('plugins/wazuh/templates/manager-metrics.html'),
+        template: require('plugins/wazuh/templates/manager.jade'),
         resolve: {
             "check": settingsWizard
         }
@@ -64,5 +46,5 @@ routes
         }
     })
     .otherwise({
-        redirectTo: '/settings/'
+        redirectTo: '/agents/'
     });

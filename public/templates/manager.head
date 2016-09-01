@@ -1,6 +1,6 @@
 <div flex layout="column">
 
-    <md-content ng-init="menuNavItem = 'ruleset'" style="height: 70px;">
+    <md-content ng-init="menuNavItem = 'manager'" style="height: 70px;">
         <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
             <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
                 <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
@@ -12,11 +12,11 @@
         </md-nav-bar>
     </md-content>
 
-    <md-content class="md-padding" ng-init="submenuNavItem = 'rules'">
+    <md-content class="md-padding" ng-init="submenuNavItem = 'general'">
         <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-            <md-nav-item md-nav-click="submenuNavItem = 'rules'" name="rules">Rules</md-nav-item>
-            <md-nav-item md-nav-click="submenuNavItem = 'decoders'" name="decoders">Decoders</md-nav-item>
-            <md-nav-item md-nav-click="submenuNavItem = 'update'" name="update">Update</md-nav-item>
+            <md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
+            <md-nav-item md-nav-click="submenuNavItem = 'configuration'" name="configuration">Configuration</md-nav-item>
+            <md-nav-item md-nav-click="submenuNavItem = 'logs'" name="logs">Logs</md-nav-item>
         </md-nav-bar>
     </md-content>
 

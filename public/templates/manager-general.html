@@ -1,28 +1,4 @@
-<div flex ng-controller="managerController" layout="column">
-
-  <md-content ng-init="menuNavItem = 'manager'" style="height: 70px;">
-		<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-			<md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
-				<img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
-			</md-nav-item>
-			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
-			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
-		</md-nav-bar>
-	</md-content>
-
-  <md-content class="md-padding">
-    <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation links">
-      <md-nav-item md-nav-href="#/manager" name="general">General</md-nav-item>
-      <md-nav-item md-nav-href="#/manager/configuration" name="configuration">Configuration</md-nav-item>
-      <md-nav-item md-nav-href="#/manager/osseclog" name="logs">Logs</md-nav-item>
-    </md-nav-bar>
-  </md-content>
-
-  <md-progress-linear md-mode="indeterminate" ng-show="load"></md-progress-linear>
-
-  <md-content flex layout="column" ng-if="!load" layout-align="space-around">
+  <md-content flex layout="column" ng-if="!load && submenuNavItem == 'general'" ng-controller="managerController" layout-align="space-around">
 	<div flex="10" layout="row"  layout-align=" center">
 		<md-card flex>
 			<md-card-title>
@@ -56,7 +32,7 @@
           <md-card-content>
             <span layout="row" layout-align="space-between center">
               <h3>Manager status</h3>
-              <h3 class="right-text"><md-icon md-font-icon="fa fa-cog" ng-click="showDialog()" /></h3>
+              <h3 class="right-text"><i class="fa fa-repeat" aria-hidden="true" ng-click="restart($event)"></i></h3>
             </span>
             <span layout="column" ng-repeat="daemon in daemons">
                 <span layout="row" layout-align="space-between center">
@@ -123,16 +99,6 @@
       </div>
 
   </md-content>
-
-  <div style="display: none">
-    <div class="md-dialog-container" id="actionsDialog">
-      <md-dialog layout-padding layout="column" layout-align="space-around center">
-        <md-button class="md-raised md-primary" ng-click="start()">Start</md-button>
-        <md-button class="md-raised md-primary" ng-click="stop()">Stop</md-button>
-        <md-button class="md-raised md-primary" ng-click="restart()">Restart</md-button>
-      </md-dialog>
-    </div>
-  </div>
 
 
 </div>
