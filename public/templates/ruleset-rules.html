@@ -1,4 +1,5 @@
 <md-content layout="row" flex layout-padding ng-if="!load && submenuNavItem == 'rules'" ng-controller="rulesController">
+  <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
   <md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding>
 
     <div flex id="content" layout="row" layout-align="space-between start">
@@ -61,24 +62,22 @@
 
     <md-toolbar layout="row">
       <div class="md-toolbar-tools">
-        <span flex="20">ID</span>
+        <span flex="10">ID</span>
         <span flex="60">Description</span>
-        <span flex="20">Level</span>
+        <span flex="5">Level</span>
+        <span flex="15">File</span>
       </div>
     </md-toolbar>
     <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
       <md-list>
         <md-list-item ng-click=" showDetails[rule.id] = ! showDetails[rule.id]; ">
-          <span flex="20">{{rule.id}}</span>
+          <span flex="10">{{rule.id}}</span>
           <span flex="60">{{rule.description}}</span>
-          <span flex="19">{{rule.level}}</span>
+          <span flex="5">{{rule.level}}</span>
+          <span flex="15">{{rule.file}}</span>
         </md-list-item>
       </md-list>
       <md-list ng-if="showDetails[rule.id]">
-        <md-list-item>
-          <span style="font-weight: bold" flex="15">File</span>
-          <span flex="40">{{rule.file}}</span>
-        </md-list-item>
         <md-list-item>
           <span style="font-weight: bold" flex="15">Groups</span>
           <span flex="35" layout="column"><span ng-repeat="group in rule.groups">{{ group }}</span></span>
