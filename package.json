@@ -1,13 +1,13 @@
 {
-  "name": "wazuh_kibana_ui",
+  "name": "wazuh",
   "version": "5.0.0",
-  "description": "Wazuh plugin",
+  "description": "Wazuh App",
   "main": "index.js",
   "scripts": {
     "install": "npm install"
   },
   "keywords": ["kibana", "wazuh", "ossec"],
-  "author": "Wazuh team",
+  "author": "Wazuh",
   "license": "GPL-2.0",
   "repository": {
     "type": "git",
