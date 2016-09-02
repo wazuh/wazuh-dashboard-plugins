@@ -23,7 +23,7 @@
 					<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
 					<md-autocomplete flex md-no-cache="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
 						md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
-						placeholder="Search agent hostname, ID or IP address">
+						placeholder="Search agent hostname, ID or IP address"> 
 						<md-item-template>
 							<span class="item-title">
             <span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.name}} ({{item.id}}) </strong></span>

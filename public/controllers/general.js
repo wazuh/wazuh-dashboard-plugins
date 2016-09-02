@@ -72,6 +72,7 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
         if (agent) {
             $scope.submenuNavItem == '' ? $scope.submenuNavItem = 'overview' : null;
             $scope._agent = agent;
+			$scope.search = agent.name;
         }        
     };
 

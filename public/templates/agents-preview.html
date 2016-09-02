@@ -5,7 +5,7 @@
             <div flex layout="column" layout-align="space-between stretch">
                 <div layout="row" layout-align="space-between stretch">
                     <md-input-container layout="row" class="sideNavBox" flex="40">
-                        <label for="searchBox">Search</label>
+                        <label for="searchBox">Filter</label>
                         <input type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)" flex>
                     </md-input-container>
                     <div flex="40"></div>
@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div md-virtual-repeat="agent in agentsObj" md-on-demand flex layout-align="start stretch">
-                <md-list>
+                <md-list ng-click="applyAgent(agent)">
                     <md-list-item>
                         <span flex="10">{{agent.id}}</span>
                         <span flex="30">{{agent.name}}</span>
