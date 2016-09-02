@@ -5,11 +5,11 @@
             <div flex layout="column" layout-align="space-between stretch">
                 <div layout="row" layout-align="space-between stretch">
                     <md-input-container layout="row" class="sideNavBox" flex="40">
-                        <label for="searchBox">Filter</label>
-                        <input type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)" flex>
+                        
+                        <input placeholder="Search" type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)" flex>
                     </md-input-container>
                     <div flex="40"></div>
-                    <md-input-container flex="20">
+                    <md-input-container flex="20"  class="md-whiteframe-z1" style="margin-right: 10px; ">
                         <md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
                             <md-option value="all">All</md-option>
                             <md-option value="active">Active</md-option>
