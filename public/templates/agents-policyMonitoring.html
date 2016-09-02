@@ -29,6 +29,7 @@
                 </md-card>
             </md-content>
             <div flex layout="column" layout-align="space-between stretch">
+              <div ng-if="totalEvents > 0">
                 <div layout="row" layout-align="space-between stretch">
                     <md-input-container layout="row" class="sideNavBox" flex="40">
                         <label for="searchBox">Search</label>
@@ -36,34 +37,37 @@
                     </md-input-container>
                     <div flex="60"></div>
                 </div>
-                <div>
-                    <md-toolbar layout="row">
-                        <div class="md-toolbar-tools">
-                            <span flex="60">Control</span>
-                            <span flex="20" ng-click="setSort('oldDay')">First time seen 
-                                <i class="fa" ng-class="_sort === 'oldDay' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
-                            </span>
-                            <span flex="20" ng-click="setSort('readDay')">Last time seen 
-                                <i class="fa" ng-class="_sort === 'readDay' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
-                            </span>
-                        </div>
-                    </md-toolbar>
-                </div>
-            </div>
-            <div md-virtual-repeat="event in eventsObj" md-on-demand flex layout-align="stretch">
-                <md-list>
-                    <md-list-item ng-click=" showDetails[event.event] = ! showDetails[event.event]; ">
-                        <span flex="60">{{event.event.length > 100 ? event.event.substring(0, 100)+'...' : event.event}}</span>
-                        <span flex="20">{{event.oldDay}}</span>
-                        <span flex="20">{{event.readDay}}</span>
-                    </md-list-item>
-                </md-list>
-                <md-list ng-if="showDetails[event.event]">
-                    <md-list-item>
-                        <span flex>{{event.event}}</span>
-                    </md-list-item>
-                </md-list>
-                <md-divider></md-divider>
+
+                  <div>
+                      <md-toolbar layout="row">
+                          <div class="md-toolbar-tools">
+                              <span flex="60">Control</span>
+                              <span flex="20" ng-click="setSort('oldDay')">First time seen
+                                  <i class="fa" ng-class="_sort === 'oldDay' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                              </span>
+                              <span flex="20" ng-click="setSort('readDay')">Last time seen
+                                  <i class="fa" ng-class="_sort === 'readDay' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                              </span>
+                          </div>
+                      </md-toolbar>
+                  </div>
+
+              <div md-virtual-repeat="event in eventsObj" md-on-demand flex layout-align="stretch">
+                  <md-list>
+                      <md-list-item ng-click=" showDetails[event.event] = ! showDetails[event.event]; ">
+                          <span flex="60">{{event.event.length > 100 ? event.event.substring(0, 100)+'...' : event.event}}</span>
+                          <span flex="20">{{event.oldDay}}</span>
+                          <span flex="20">{{event.readDay}}</span>
+                      </md-list-item>
+                  </md-list>
+                  <md-list ng-if="showDetails[event.event]">
+                      <md-list-item>
+                          <span flex>{{event.event}}</span>
+                      </md-list-item>
+                  </md-list>
+                  <md-divider></md-divider>
+              </div>
+              </div>
             </div>
         </md-virtual-repeat-container>
     </div>

@@ -6,7 +6,7 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog) {
     $scope.load = true;
     var objectsArray = [];
 	var loadWatch;
-	
+
     $scope.events = [];
 
     //Print Error
@@ -81,7 +81,7 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog) {
             return DataFactory.getTotalItems(objectsArray['/rootcheck']);
         },
     };
-	
+
 	var createWatch = function () {
         loadWatch = $scope.$watch(function () {
             return $scope.$parent._agent;
@@ -96,13 +96,13 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog) {
 					$scope.events = data.data.items;
                     DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
                     DataFactory.filters.register(objectsArray['/rootcheck'], 'filter-sort', 'string');
-                    $scope._sort = '';                    
+                    $scope._sort = '';
                     $scope.eventSearchFilter($scope._eventSearch);
 				}, printError);
 			}, printError);
         });
     };
-	
+
     var load = function () {
 		DataFactory.initialize('get', '/rootcheck/' + $scope.$parent._agent.id, {}, 200, 0)
 			.then(function (data) {
@@ -110,6 +110,7 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog) {
 				DataFactory.get(objectsArray['/rootcheck'])
 				.then(function (data) {
 					$scope.events = data.data.items;
+          $scope.totalEvents = data.data.totalItems;
 					DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
                     DataFactory.filters.register(objectsArray['/rootcheck'], 'filter-sort', 'string');
 					createWatch();
