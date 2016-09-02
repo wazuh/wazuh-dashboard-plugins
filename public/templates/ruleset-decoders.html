@@ -1,19 +1,11 @@
 <md-content layout="row" flex layout-padding ng-if="!load && submenuNavItem == 'decoders'" ng-controller="decodersController">
 	<md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding>
 
-		<div flex id="content" layout="row" layout-align="space-between start">
+		<div flex id="content" layout="row" layout-align="space-between center">
 
-
-			<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="20">
-					<md-input-container style="margin: 0px;">
-						<label for="searchBox1">Search</label>
-						<input flex type="text" ng-model="decoderSearch" ng-change="decoderSearchFilter(decoderSearch)" id="searchBox1">
-					</md-input-container>
-		 </span>
-
-			<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
+			<span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
 					<md-autocomplete ng-disabled="typeFilter != 'all'" flex md-no-cache="true" md-selected-item="_file" md-selected-item-change="decoderFileFilter(_file.split('/').slice(-1)[0])" md-search-text="search"
-						md-items="item in fileSearch(search)" md-item-text="item" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
+						md-items="item in fileSearch(search)" md-item-text="item" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar" md-search-text-change="decoderSearchFilter(search)" 
 						placeholder="Search file">
 						<md-item-template>
 							<span class="item-title">
@@ -26,7 +18,7 @@
 			</md-autocomplete>
 			</span>
 
-			<md-input-container style="margin: 0px;">
+			<md-input-container flex="15" style="margin-left: 20px; padding: 5px" class="md-whiteframe-z1">
 				<md-select ng-model="typeFilter" ng-change="decoderTypeFilter(typeFilter)" aria-label="Filter by type">
 					<md-option value="all">All</md-option>
 					<md-option value="parents">Parents only</md-option>
