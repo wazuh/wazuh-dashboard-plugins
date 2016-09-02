@@ -621,31 +621,31 @@ module.exports = function (server, options) {
     * Returns the agent with most alerts
     *
     **/
-    server.route({
+    /*server.route({
         method: 'GET',
         path: '/api/wazuh-stats/top/agent',
         handler: statsTopAgent
-    });
+    });*/
 
     /*
     * GET /api/wazuh-stats/overview/alerts
     * Returns overview stats about alerts
     *
     **/
-    server.route({
+    /*server.route({
         method: 'GET',
         path: '/api/wazuh-stats/overview/alerts',
         handler: statsOverviewAlerts
-    });
+    });*/
 
     /*
     * GET /api/wazuh-stats/overview/syscheck
     * Returns overview stats about syscheck
     *
     **/
-    server.route({
+    /*server.route({
         method: 'GET',
         path: '/api/wazuh-stats/overview/syscheck',
         handler: statsOverviewSyscheck
-    })
+    })*/
 };

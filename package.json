@@ -6,7 +6,11 @@
   "scripts": {
     "install": "npm install"
   },
-  "keywords": ["kibana", "wazuh", "ossec"],
+  "keywords": [
+    "kibana",
+    "wazuh",
+    "ossec"
+  ],
   "author": "Wazuh",
   "license": "GPL-2.0",
   "repository": {
@@ -34,7 +38,8 @@
     "angular-aria": "1.4.7",
     "angular-material": "1.1.0-rc.5",
     "angular-md5": "^0.1.10",
+    "bootstrap": "3.3.6",
     "needle": "^1.0.0",
-    "bootstrap": "3.3.6"
+    "node-cron": "^1.1.2"
   }
 }
