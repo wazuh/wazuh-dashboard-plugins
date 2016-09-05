@@ -4,8 +4,8 @@
 		<div flex id="content" layout="row" layout-align="space-between center">
 
 			<span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
-					<md-autocomplete ng-disabled="typeFilter != 'all'" flex md-no-cache="true" md-selected-item="_file" md-selected-item-change="decoderFileFilter(_file.split('/').slice(-1)[0])" md-search-text="search"
-						md-items="item in fileSearch(search)" md-item-text="item" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar" md-search-text-change="decoderSearchFilter(search)" 
+					<md-autocomplete ng-disabled="typeFilter != 'all'" flex md-no-cache="true" md-selected-item="_file" md-selected-item-change="decoderFileFilter(_file.split('/').slice(-1)[0])" md-search-text="$parent.search"
+						md-items="item in fileSearch($parent.search)" md-item-text="item" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
 						placeholder="Search file">
 						<md-item-template>
 							<span class="item-title">

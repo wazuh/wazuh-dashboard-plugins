@@ -12,6 +12,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
 
     $scope.maxLevel = 15;
     $scope.minLevel = 0;
+    $scope._filter = null;
 
     var _file;
     var _group;
@@ -87,11 +88,17 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
         if (type == 'file') {
             _file = null;
             DataFactory.filters.unset(objectsArray['/rules'], 'file');
+            $scope._filter = undefined;
+            $scope.search = undefined;
         } else if (type == 'group') {
             _group = null;
+            $scope._filter = undefined;
+            $scope.search = undefined;
             DataFactory.filters.unset(objectsArray['/rules'], 'group');
         } else if (type == 'pci') {
             _pci = null;
+            $scope._filter = undefined;
+            $scope.search = undefined;
             DataFactory.filters.unset(objectsArray['/rules'], 'pci');
         }
     };
@@ -109,24 +116,24 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
     $scope.filtersSearch = function (search) {
         var defered = $q.defer();
         var promise = defered.promise;
-
+        //$scope.load = true;
         var result = [];
 
         if (!search) {
             search = undefined;
         }
 
-        DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 100, 'search': search })
+        DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 5, 'search': search })
             .then(function (data) {
                 angular.forEach(data.data.items, function (value) {
                     result.push({ 'type': 'file', 'value': value.name });
                 });
-                DataFactory.getAndClean('get', '/rules/groups', { 'offset': 0, 'limit': 100, 'search': search })
+                DataFactory.getAndClean('get', '/rules/groups', { 'offset': 0, 'limit': 5, 'search': search })
                     .then(function (data) {
                         angular.forEach(data.data.items, function (value) {
                             result.push({ 'type': 'group', 'value': value });
                         });
-                        DataFactory.getAndClean('get', '/rules/pci', { 'offset': 0, 'limit': 100, 'search': search })
+                        DataFactory.getAndClean('get', '/rules/pci', { 'offset': 0, 'limit': 5, 'search': search })
                             .then(function (data) {
                                 angular.forEach(data.data.items, function (value) {
                                     result.push({ 'type': 'pci', 'value': value });
@@ -286,6 +293,8 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
     $scope.decoderFileFilter = function (file) {
         if (!file) {
             DataFactory.filters.unset(objectsArray['/decoders'], 'file');
+            $scope._filter = undefined;
+            $scope.search = undefined;
         } else {
             _lastFile = file;
             DataFactory.filters.set(objectsArray['/decoders'], 'file', file);

@@ -5,8 +5,8 @@
     <div flex id="content" layout="row" layout-align="space-between center">
 
       <span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
-			<md-autocomplete flex md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="search"
-			md-items="item in filtersSearch(search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
+			<md-autocomplete flex md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="$parent.search"
+			md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
 			placeholder="Search for rule file, group or PCI requirement" md-search-text-change="fileSearchFilter(search)">
 				<md-item-template>
 					<span class="item-title">
@@ -48,11 +48,11 @@
 
     <md-toolbar layout="row">
       <div class="md-toolbar-tools">
-        <span flex="10"  ng-click="setSort('id')">ID 
+        <span flex="10"  ng-click="setSort('id')">ID
           <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
         </span>
         <span flex="60">Description</span>
-        <span flex="10" ng-click="setSort('level')">Level 
+        <span flex="10" ng-click="setSort('level')">Level
           <i class="fa" ng-class="_sort === 'level' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
         </span>
         <span flex="20">File</span>
