@@ -1,5 +1,5 @@
   <md-content flex layout="column" ng-if="!load && submenuNavItem == 'general'" ng-controller="managerController" layout-align="space-around">
-	<div flex="10" layout="row"  layout-align=" center">
+	<div layout="row"  layout-align=" center" style="height: 300px">
 		<md-card flex>
 			<md-card-title>
 				<md-card-title-text>
@@ -12,7 +12,7 @@
 				</kbn-vis>
 			</md-card-content>
 		</md-card>
-		
+
 		<md-card flex>
 			<md-card-title>
 				<md-card-title-text>
@@ -25,9 +25,9 @@
 				</kbn-vis>
 			</md-card-content>
 		</md-card>
-	</div>	
-	
-      <div flex="90" layout="row" layout-align="start stretch">
+	</div>
+
+      <div layout="row" layout-align="start stretch">
         <md-card flex layout="column">
           <md-card-content>
             <span layout="row" layout-align="space-between center">
@@ -43,9 +43,9 @@
             </span>
           </md-card-content>
         </md-card>
-		
+
 		<md-card flex  layout="column">
-		
+
 			<md-card-content>
 			<span class="md-headline">Top 5 Agents</span>
 				<kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Agents%20total%20alerts',type:pie))"
@@ -53,7 +53,7 @@
 				</kbn-vis>
 			</md-card-content>
 		</md-card>
-				
+
 		<md-card flex layout="column">
           <md-card-content>
             <h3>Agents overview</h3>
@@ -82,7 +82,7 @@
             </md-list>
           </md-card-content>
         </md-card>
-		
+
 		<md-card flex  layout="column"  layout-align="start stretch">
 			<md-card-content>
 				<span class="md-headline">Top 5 Groups</span>
@@ -90,13 +90,10 @@
 					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="*">
 				</kbn-vis>
 			</md-card-content>
-		</md-card>	
-		
-		
+		</md-card>
 
-	
-		
       </div>
+      <div flex></div>
 
   </md-content>
 
