@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="!load && submenuNavItem == 'general'" ng-controller="managerController" layout-align="space-around">
-  <div flex="10" layout="row" layout-align=" center">
+  <div layout="row"  layout-align="center start">
     <md-card flex>
       <md-card-title>
         <md-card-title-text>
@@ -27,7 +27,7 @@
     </md-card>
   </div>
 
-  <div flex="90" layout="row" layout-align="start stretch">
+  <div layout="row" layout-align="start stretch">
     <md-card flex layout="column">
       <md-card-content>
         <span layout="row" layout-align="space-between center">
@@ -97,5 +97,7 @@
 
 
   </div>
+
+  <div flex></div>
 
 </md-content>
