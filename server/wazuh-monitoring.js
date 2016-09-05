@@ -4,6 +4,7 @@ module.exports = function (server, options) {
     var _elurl = config.get('elasticsearch.url');
     var _eluser = config.get('elasticsearch.username');
     var _elpass = config.get('elasticsearch.password');
+    const client = server.plugins.elasticsearch.client;
 
     var api_user;
     var api_pass;
@@ -95,11 +96,51 @@ module.exports = function (server, options) {
     };
 
     var saveStatus = function () {
-        //Save the data to wazuh-monitoring index pattern, and do it well formatted!
-        console.log(agentsArray);
+        var fDate = new Date().toISOString().replace(/T/, '-')
+            .replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
+
+        var todayIndex = 'wazuh-monitoring-'+fDate;
+
+        client.indices.exists(false, false, false, todayIndex).then(
+            function () {
+                _elCreateIndex(todayIndex);
+            }, function () {
+                _elInsertData(todayIndex);
+            }
+        );
     };
 
-    //This method should be reused from wazuh-api
+    var _elCreateIndex = function (todayIndex) {
+        client.indices.create({ index: todayIndex, type: 'agent', body: '{"agent": {"properties": {"@timestamp": {"type": "date" }, "status": {"type": "string","index": "not_analyzed"},"ip": {"type": "string","index": "not_analyzed"},"name": {"type": "string","index": "not_analyzed"},"id": {"type": "string","index": "not_analyzed"}}}}' }).then(
+            function () {
+                client.indices.putMapping({index: todayIndex, type: 'agent', body: '{"agent": {"properties": {"@timestamp": {"type": "date" }, "status": {"type": "string","index": "not_analyzed"},"ip": {"type": "string","index": "not_analyzed"},"name": {"type": "string","index": "not_analyzed"},"id": {"type": "string","index": "not_analyzed"}}}}' }).then(function () {
+                    _elInsertData(todayIndex);
+                }, function () {
+                    console.log('Error setting mapping while creating ' + todayIndex + ' index on elasticsearch.');
+                });
+            }, function () {
+                console.log('Could not create ' + todayIndex + ' index on elasticsearch.');
+            }
+        );
+    };
+
+    var _elInsertData = function (todayIndex) {
+        var body = '';
+        agentsArray.forEach(function (element) {
+            body += '{ "index":  { "_index": "'+todayIndex+'", "_type": "agent" } }\n';
+            element["@timestamp"] = Date.now();
+            body += JSON.stringify(element) + "\n";
+        });
+        client.bulk({
+            index: todayIndex,
+            type: 'agent',
+            body: body
+        }).then(function () { }, function (err) {
+            console.log('Error inserting agent data into elasticsearch. Bulk request failed.');
+        });
+        agentsArray.length = 0;
+    };
+
     var getConfig = function (callback) {
         var needle = require('needle');
 
