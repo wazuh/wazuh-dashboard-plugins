@@ -16,20 +16,14 @@ module.exports = function (server, options) {
 
     var agentsArray = [];
 
-    /*cron.schedule('* 0,30 * * * *', function () {
+    cron.schedule('* */30 * * * *', function () {
         agentsArray.length = 0;
         getConfig(loadCredentials);
-    }, true);*/
-
-    //UNCOMMENT IN ORDER TO DEBUG
-    /*cron.schedule('0 * * * * *', function () {
-        agentsArray.length = 0;
-        getConfig(loadCredentials);
-    }, true);*/
+    }, true);
 
     var loadCredentials = function (json) {
         if (json.error) {
-            console.log('Error getting wazuh-api data: ' + json.error);
+            console.log('[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
             return;
         }
         api_user = json.user;
@@ -45,7 +39,6 @@ module.exports = function (server, options) {
             'limit': 1,
         };
 
-
         var options = {
             headers: { 'api-version': 'v1.2' },
             username: api_user,
@@ -57,7 +50,7 @@ module.exports = function (server, options) {
             if (!error) {
                 checkStatus(response.body.data.totalItems);
             } else {
-                console.log('Could not get data from Wazuh api. Reason: ' + response.body.message);
+                console.log('[Wazuh agents monitoring] Wazuh api credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
                 return;
             }
         });
@@ -65,7 +58,7 @@ module.exports = function (server, options) {
 
     var checkStatus = function (maxSize, offset) {
         if (!maxSize) {
-            console.log('You must provide a max size');
+            console.log('[Wazuh agents monitoring] You must provide a max size');
         }
 
         var payload = {
@@ -89,7 +82,7 @@ module.exports = function (server, options) {
                     saveStatus();
                 }
             } else {
-                console.log('Could not get data from Wazuh api. Reason: ' + response.body.message);
+                console.log('[Wazuh agents monitoring] Wazuh api credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
                 return;
             }
         });
@@ -99,27 +92,32 @@ module.exports = function (server, options) {
         var fDate = new Date().toISOString().replace(/T/, '-')
             .replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
 
-        var todayIndex = 'wazuh-monitoring-'+fDate;
+        var todayIndex = 'wazuh-monitoring-' + fDate;
 
-        client.indices.exists(false, false, false, todayIndex).then(
-            function () {
-                _elCreateIndex(todayIndex);
+        client.indices.exists({ index: todayIndex }).then(
+            function (result) {
+                if (result) {
+                    _elInsertData(todayIndex);
+                } else {
+                    _elCreateIndex(todayIndex);
+                }
             }, function () {
-                _elInsertData(todayIndex);
+                console.log('[Wazuh agents monitoring] Could not check if the index ' + todayIndex + ' exists.');
             }
         );
     };
 
     var _elCreateIndex = function (todayIndex) {
-        client.indices.create({ index: todayIndex, type: 'agent', body: '{"agent": {"properties": {"@timestamp": {"type": "date" }, "status": {"type": "string","index": "not_analyzed"},"ip": {"type": "string","index": "not_analyzed"},"name": {"type": "string","index": "not_analyzed"},"id": {"type": "string","index": "not_analyzed"}}}}' }).then(
+        client.indices.create({ index: todayIndex }).then(
             function () {
-                client.indices.putMapping({index: todayIndex, type: 'agent', body: '{"agent": {"properties": {"@timestamp": {"type": "date" }, "status": {"type": "string","index": "not_analyzed"},"ip": {"type": "string","index": "not_analyzed"},"name": {"type": "string","index": "not_analyzed"},"id": {"type": "string","index": "not_analyzed"}}}}' }).then(function () {
-                    _elInsertData(todayIndex);
-                }, function () {
-                    console.log('Error setting mapping while creating ' + todayIndex + ' index on elasticsearch.');
-                });
+                client.indices.putMapping({ index: todayIndex, type: 'agent', body: { properties: { '@timestamp': { 'type': "date" }, 'status': { 'type': "string", 'index': "not_analyzed" }, 'ip': { 'type': "string", 'index': "not_analyzed" }, 'name': { 'type': "string", 'index': "not_analyzed" }, 'id': { 'type': "string", 'index': "not_analyzed" } } } }).then(
+                    function () {
+                        _elInsertData(todayIndex);
+                    }, function () {
+                        console.log('[Wazuh agents monitoring] Error setting mapping while creating ' + todayIndex + ' index on elasticsearch.');
+                    });
             }, function () {
-                console.log('Could not create ' + todayIndex + ' index on elasticsearch.');
+                console.log('[Wazuh agents monitoring] Could not create ' + todayIndex + ' index on elasticsearch.');
             }
         );
     };
@@ -127,7 +125,7 @@ module.exports = function (server, options) {
     var _elInsertData = function (todayIndex) {
         var body = '';
         agentsArray.forEach(function (element) {
-            body += '{ "index":  { "_index": "'+todayIndex+'", "_type": "agent" } }\n';
+            body += '{ "index":  { "_index": "' + todayIndex + '", "_type": "agent" } }\n';
             element["@timestamp"] = Date.now();
             body += JSON.stringify(element) + "\n";
         });
@@ -136,7 +134,7 @@ module.exports = function (server, options) {
             type: 'agent',
             body: body
         }).then(function () { }, function (err) {
-            console.log('Error inserting agent data into elasticsearch. Bulk request failed.');
+            console.log('[Wazuh agents monitoring] Error inserting agent data into elasticsearch. Bulk request failed.');
         });
         agentsArray.length = 0;
     };
