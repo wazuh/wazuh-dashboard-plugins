@@ -97,7 +97,7 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
         loadWatch = $scope.$watch(function () {
             return $scope.$parent._agent;
         }, function () {
-            DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id + '/files', {}, 100, 0)
+            DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id, {}, 100, 0)
                 .then(function (data) {
                     DataFactory.clean(objectsArray['/files']);
                     objectsArray['/files'] = data;
@@ -117,7 +117,7 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
     };
 
     var load = function () {
-        DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id + '/files', {}, 100, 0)
+        DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id, {}, 100, 0)
             .then(function (data) {
                 objectsArray['/files'] = data;
                 DataFactory.get(objectsArray['/files'])
