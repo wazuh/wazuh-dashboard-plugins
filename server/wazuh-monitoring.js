@@ -63,7 +63,7 @@ module.exports = function (server, options) {
 
         var payload = {
             'offset': offset ? offset : 0,
-            'limit': (10 < maxSize) ? 10 : maxSize
+            'limit': (250 < maxSize) ? 250 : maxSize
         };
 
         var options = {
