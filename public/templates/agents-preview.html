@@ -2,49 +2,10 @@
     <div flex ng-controller="agentsPreviewController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
         <md-virtual-repeat-container style="min-height: 700px;" ng-if="!load">
-            <div flex layout="column" layout-align="space-between stretch">
-                <div layout="row" layout-align="space-between stretch">
-                    <md-input-container layout="row" class="sideNavBox" flex="40">
 
-                        <input placeholder="Filter" type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)" flex>
-                    </md-input-container>
-                    <div flex="40"></div>
-                    <md-input-container flex="20"  class="md-whiteframe-z1" style="margin-right: 10px; ">
-                        <md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
-                            <md-option value="all">All</md-option>
-                            <md-option value="active">Active</md-option>
-                            <md-option value="disconnected">Disconnected</md-option>
-                            <md-option value="never+connected">Never connected</md-option>
-                        </md-select>
-                    </md-input-container>
-                </div>
-                <div>
-                    <md-toolbar layout="row">
-                        <div class="md-toolbar-tools">
-                            <span flex="10" ng-click="setSort('id')">ID
-                                <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-                            <span flex="30" ng-click="setSort('name')">Name
-                                <i class="fa" ng-class="_sort === 'name' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-                            <span flex="30" ng-click="setSort('ip')">IP
-                                <i class="fa" ng-class="_sort === 'ip' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-                            <span flex="30" ng-click="setSort('status')">Status
-                                <i class="fa" ng-class="_sort === 'status' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-                        </div>
-                    </md-toolbar>
-                </div>
-            </div>
-            <div md-virtual-repeat="agent in agentsObj" md-on-demand flex layout-align="start stretch">
-                <md-list class="agents-preview-table" ng-click="applyAgent(agent)">
-                    <md-list-item>
-                        <span flex="10">{{agent.id}}</span>
-                        <span flex="30">{{agent.name}}</span>
-                        <span flex="30">{{agent.ip}}</span>
-                        <span flex="20">{{agent.status}}</span>
-                        <span flex="10"> <span ng-class="getAgentStatusClass(agent.status)" class="round status"></span></span>
-                    </md-list-item>
-                </md-list>
-                <md-divider></md-divider>
-            </div>
+            <kbn-dis></kbn-dis>
+            ESTO ES UNA MARCA
+
         </md-virtual-repeat-container>
     </div>
 </md-content>
