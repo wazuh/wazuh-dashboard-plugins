@@ -49,27 +49,31 @@ import 'ui/doc_table/components/table_row';
 import savedObjectRegistry from 'ui/saved_objects/saved_object_registry';
 savedObjectRegistry.register(require('plugins/kibana/discover/saved_searches/saved_search_register'));
 
-//
-
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnDis', [function () {
     return {
       restrict: 'E',
-      /*scope: {
-        visType: '@visType',
-        visIndexPattern: '@visIndexPattern',
-        visA: '@visA',
-        visG: '@visG',
-        visFilter: '@visFilter',
-        visHeight: '@visHeight',
-        visSearchable: '@visSearchable'
-      },*/
+      scope: {
+        disA: '@disA',
+        disG: '@disG',
+        disFilter: '@disFilter',
+        tableHeight: '@tableHeight',
+        disSearchable: '@disSearchable',
+        disColumn: '@disColumn',
+        disVisualization: '@disVisualization',
+        infiniteScroll: '@infiniteScroll'
+      },
       template: require('../templates/dis-template.html')
     }
   }]);
 
-require('ui/modules').get('app/wazuh', ['kibana/notify']).controller('discoverW', function ($scope, config, courier, $route, $window, Notifier,
+require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($scope, config, courier, $route, $window, Notifier,
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches) {
+
+  $scope.chrome = {};
+  $scope.chrome.getVisible = function () {
+    return true;
+  }
 
   const notify = new Notifier({
     location: '*'
@@ -135,10 +139,16 @@ require('ui/modules').get('app/wazuh', ['kibana/notify']).controller('discoverW'
 
           const $state = $scope.state = new AppState(getStateDefaults());
           $scope.uiState = $state.makeStateful('uiState');
+          $state.query = ($scope.disFilter ? $scope.disFilter : '*');
+          $state.save();
 
           function getStateDefaults() {
+            $route.current.params._a = $scope.disA;
+            $route.updateParams({ '_a': $scope.disA });
+            $route.current.params._g = $scope.disG;
+            $route.updateParams({ '_g': $scope.disG });
             return {
-              query: $scope.searchSource.get('query') || '',
+              query: $scope.searchSource.get('query') || '*',
               sort: getSort.array(savedSearch.sort, $scope.indexPattern),
               columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns'),
               index: $scope.indexPattern.id,
