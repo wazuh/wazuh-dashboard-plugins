@@ -8,6 +8,7 @@ require('ui/styles/truncate.less');
 require('ui/style_compile/style_compile.js');
 require('ui/registry/doc_views.js');
 require('plugins/kbn_doc_views/kbn_doc_views.js');
+require('ui/tooltip/tooltip.js');
 import 'plugins/kibana/discover/components/field_chooser';
 import _ from 'lodash';
 import moment from 'moment';
@@ -286,6 +287,7 @@ require('ui/modules').get('app/wazuh', ['kibana/notify']).controller('discoverW'
                     init.complete = true;
                     $state.replace();
                     $scope.$emit('application.load');
+                    $scope.fetch();
                   });
               });
           });
