@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, DataFactory, tabProvider, $mdDialog, $mdToast) {
+app.controller('managerController', function ($scope, DataFactory, genericReq, tabProvider, $mdDialog, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.menuNavItem = 'manager';
@@ -38,8 +38,7 @@ app.controller('managerController', function ($scope, DataFactory, tabProvider, 
     };
 
     //Functions
-
-
+				
     $scope.start = function () {
         $mdToast.show({
             template: '<md-toast>Starting manager...</md-toast>',
@@ -110,7 +109,29 @@ app.controller('managerController', function ($scope, DataFactory, tabProvider, 
     };
 
 
-
+	var load_tops = function () { 
+		$scope.topsrcuser = "";
+		$scope.topsrcip = "";
+		$scope.topgroup = "";
+		$scope.toppci = "";
+		genericReq.request('GET', '/api/wazuh-elastic/top/srcuser')
+                .then(function (data) {
+                    $scope.topsrcuser = data.data;
+                }, printError);
+		genericReq.request('GET', '/api/wazuh-elastic/top/srcip')
+                .then(function (data) {
+                    $scope.topsrcip = data.data;
+                }, printError);
+		genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups')
+                .then(function (data) {
+                    $scope.topgroup = data.data;
+                }, printError);
+		genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS')
+                .then(function (data) {
+                    $scope.toppci = data.data;
+                }, printError);		
+	}
+	load_tops();			
     var load = function () {
 		DataFactory.getAndClean('get', '/agents/summary', {})
 			.then(function (data) {

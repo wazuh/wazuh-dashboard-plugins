@@ -16,6 +16,7 @@ var app = require('ui/modules').get('app/wazuh', ['ngMaterial'])
 // Require services and factories
 require('plugins/wazuh/objects/theming.js');
 require('plugins/wazuh/objects/apiReq.js');
+require('plugins/wazuh/objects/genericReq.js');
 require('plugins/wazuh/objects/dataFactory.js');
 require('plugins/wazuh/objects/sharedProperties.js');
 require('plugins/wazuh/objects/tabProvider.js');
