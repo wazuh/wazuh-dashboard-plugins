@@ -40,12 +40,21 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
     //Functions
 
     $scope.getAgentStatusClass = function (agentStatus) {
-        if (agentStatus == "Active")
+        if (agentStatus == "active")
             return "green"
-        else if (agentStatus == "Disconnected")
+        else if (agentStatus == "disconnected")
             return "red";
         else
             return "red";
+    };
+	
+	$scope.formatAgentStatus = function (agentStatus) {
+        if (agentStatus == "active")
+            return "Active"
+        else if (agentStatus == "disconnected")
+            return "Disconnected";
+        else
+            return "Never connected";
     };
 
     $scope.agentsSearch = function (search) {

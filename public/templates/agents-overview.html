@@ -19,14 +19,9 @@
 				<md-card-content>
 					<div layout="column" flex>
 						<p><b style="margin-right: 5px;">Hostname:</b> {{_agent.name ? _agent.name : '-'}}</p>
-						<p><b style="margin-right: 5px;">IP address:</b> {{_agent.ip ? _agent.ip : '-'}}</p>
+						<p ng-if="_agent.ip"><b style="margin-right: 5px;">IP address:</b> {{_agent.ip ? _agent.ip : '-'}}</p>
 						<p><b style="margin-right: 5px;">Agent version:</b> {{agentInfo.version ? agentInfo.version : '-'}}</p>
 						<p><b style="margin-right: 5px;">Operating system:</b> {{agentInfo.os ? agentInfo.os : '-'}}</p>
-						<p><b style="margin-right: 5px;">Last file integrity scan:</b> {{agentInfo.syscheckEndTime ? agentInfo.syscheckEndTime
-							: '-' }}</p>
-						<p><b style="margin-right: 5px;">Last rootcheck scan:</b> {{agentInfo.rootcheckEndTime ? agentInfo.rootcheckEndTime :
-							'-'}}
-						</p>
 						<p ng-show="_agent.id != '000'"><b style="margin-right: 5px;">Last keep alive:</b> {{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</p>
 						<p ng-show="_agent.id != '000'" ng-click="showKey = !showKey"><b style="margin-right: 5px;">Agent key <i ng-show="!showKey" class="fa fa-caret-down" aria-hidden="true"></i><i ng-show="showKey" class="fa fa-caret-up" aria-hidden="true"></i></b></p>
 						<pre ng-if="showKey && _agent.id != '000'" flex="80">{{agentInfo.key}}</pre>

@@ -25,9 +25,9 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     //Functions
 
     $scope.getAgentStatusClass = function (agentStatus) {
-        if (agentStatus == "Active")
+        if (agentStatus == "active")
             return "green"
-        else if (agentStatus == "Disconnected")
+        else if (agentStatus == "disconnected")
             return "red";
         else
             return "red";
@@ -50,7 +50,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     };
 
     $scope.fetchFim = function (agent) {
-        DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/files', { 'offset': 0, 'limit': 5 })
+        DataFactory.getAndClean('get', '/syscheck/' + agent.id, { 'offset': 0, 'limit': 5 })
             .then(function (data) {
                 $scope.agentInfo.syscheckEvents = data.data.items;
             }, printError);
@@ -144,9 +144,9 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
     //Functions
 
     $scope.getAgentStatusClass = function (agentStatus) {
-        if (agentStatus == "Active")
+        if (agentStatus == "active")
             return "green"
-        else if (agentStatus == "Disconnected")
+        else if (agentStatus == "disconnected")
             return "red";
         else
             return "red";

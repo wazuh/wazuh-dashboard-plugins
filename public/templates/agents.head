@@ -43,15 +43,15 @@
 				</div>
 			</md-toolbar>
 			<md-content layout="row" layout-align="center start" ng-show="_agent" layout-padding>
-				<md-nav-bar flex="66" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+				<md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 					<md-nav-item md-nav-click="submenuNavItem = 'overview'" name="overview">Overview</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File Integrity</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'policy_monitoring'" name="policy_monitoring">Policy Monitoring</md-nav-item>
 				</md-nav-bar>
-				<md-content flex="33" class="subNavLine" layout="row" layout-align="end start">
+				<md-content flex="40" class="subNavLine" layout="row" layout-align="end start">
 				<md-button ng-if="_agent" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-href="{{getDiscoverByAgent(_agent)}}"
 					target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Discover alerts</md-button>
-				<div ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'Active' ? null : (_agent.status == 'Never connected' ? 'extraLarge' : 'large')"
-					layout="row" layout-align="space-between center"><span>{{_agent.status}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
+				<div ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'active' ? null : (_agent.status == 'neverConnected' ? 'extraLarge' : 'large')"
+					layout="row" layout-align="space-between center"><span>{{formatAgentStatus(_agent.status)}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
 			</md-content>
 			</md-content>
