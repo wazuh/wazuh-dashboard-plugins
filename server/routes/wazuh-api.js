@@ -132,7 +132,7 @@ module.exports = function (server, options) {
             }
 
             var options = {
-                headers: { 'api-version': 'v1.2' },
+                headers: { 'api-version': 'v1.3.0' },
                 username: wapi_config.user,
                 password: wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
