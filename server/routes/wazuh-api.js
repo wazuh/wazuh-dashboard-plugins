@@ -199,9 +199,8 @@ module.exports = function (server, options) {
 
     //Handlers - stats
 
-    var statsTopAgent = function(req, reply) {
+    var getFieldTop = function(req, reply) {
         var needle = require('needle');
-
         if (_eluser && _elpass) {
             var options = {
                 username: _eluser,
@@ -218,10 +217,12 @@ module.exports = function (server, options) {
 
         var elasticurl = _elurl+'/ossec-*/ossec/_search';
 
-        var gte = new Date() - (24 * 3600);
+        var date = new Date();
+		date.setDate(date.getDate()-1);
+		date = date.getTime();
 
         var payload = {
-            "size": 0,
+            "size": 1,
             "query": {
                 "bool": {
                     "must": [
@@ -234,7 +235,7 @@ module.exports = function (server, options) {
                         {
                             "range": {
                                 "@timestamp": {
-                                    "gte": gte,
+                                    "gte": date,
                                     "format": "epoch_millis"
                                 }
                             }
@@ -246,7 +247,7 @@ module.exports = function (server, options) {
             "aggs": {
                 "2": {
                     "terms": {
-                        "field": "AgentName",
+                        "field": req.params.field,
                         "size": 1,
                         "order": {
                             "_count": "desc"
@@ -260,8 +261,9 @@ module.exports = function (server, options) {
             if (error || response.body.error) {
                 reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch'}).code(500);
             } else {
-                if (response.body.hits.total == 0) {
-                    reply({ 'statusCode': 200, 'data': '-'});
+				console.log(response.body);
+                if (response.body.hits.total == 0 || typeof response.body.aggregations['2'].buckets[0] === 'undefined') {
+                    reply({ 'statusCode': 200, 'data': ''});
                 } else {
                     reply({ 'statusCode': 200, 'data': response.body.aggregations['2'].buckets[0].key});
                 }
@@ -621,11 +623,11 @@ module.exports = function (server, options) {
     * Returns the agent with most alerts
     *
     **/
-    /*server.route({
+    server.route({
         method: 'GET',
-        path: '/api/wazuh-stats/top/agent',
-        handler: statsTopAgent
-    });*/
+        path: '/api/wazuh-elastic/top/{field}',
+        handler: getFieldTop
+    });
 
     /*
     * GET /api/wazuh-stats/overview/alerts
