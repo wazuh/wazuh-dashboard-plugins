@@ -3,7 +3,7 @@
 		<md-card flex layout="column">
 		  <md-card-content>
 			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization',type:metric))"
-			  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+			  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="*">
 			</kbn-vis>
 		  </md-card-content>
 		</md-card>

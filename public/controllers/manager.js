@@ -8,7 +8,9 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
     $scope.load = true;
     $scope.menuNavItem = 'manager';
     $scope.submenuNavItem = 'general';
-
+	$scope.timerFilterString = "Last 24 hours";
+	$scope.timerFilterValue = "24h";
+	
     $scope.stats = [];
     $scope.stats['/top/agent'] = '-';
     $scope.stats['/overview/alerts'] = { "alerts": 0, "ip": "-", "group": "-" };
@@ -106,6 +108,20 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
                     });
                 }, printError);
         });
+    };
+	
+	
+	$scope.setTimer = function (time) {
+        if(time == "24h"){
+			$scope.timerFilterString = "Last 24 hours";
+			$scope.timerFilterValue = "24h";
+		}else if(time == "48h"){
+			$scope.timerFilterString = "Last 48 hours";
+			$scope.timerFilterValue = "48h";
+		}else{
+			$scope.timerFilterString = "Last 7 days";
+			$scope.timerFilterValue = "7d";
+		}
     };
 
 

@@ -1,4 +1,4 @@
-<div flex layout="column">
+<div flex layout="column" ng-controller="managerController">
 
     <md-content ng-init="menuNavItem = 'manager'" style="height: 70px;">
         <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
@@ -12,13 +12,34 @@
         </md-nav-bar>
     </md-content>
 
-    <md-content class="md-padding" ng-init="submenuNavItem = 'general'">
-        <md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+	<div flex layout="row">
+	<md-content flex id="content">
+	<md-content layout="row" layout-align="center start" layout-padding  ng-init="submenuNavItem = 'general'">
+        <md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'configuration'" name="configuration">Configuration</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'logs'" name="logs">Logs</md-nav-item>
         </md-nav-bar>
+		<md-content flex="40" class="subNavLine" layout="row" layout-align="end start">
+			<md-button ng-show="!show_timer" ng-click="show_timer = !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+				<i class="fa fa-clock-o" aria-hidden="true"></i> {{ timerFilterString }}
+			</md-button>
+			<md-content ng-show="show_timer" layout="row" layout-align="end start">
+				<md-button ng-click="show_timer = !show_timer; setTimer('24h');" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+					<i class="fa fa-clock-o" aria-hidden="true"></i> Last 24 hours
+				</md-button>
+				<md-button ng-click="show_timer = !show_timer;setTimer('48h');" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+					<i class="fa fa-clock-o" aria-hidden="true"></i> Last 48 hours
+				</md-button>
+				<md-button ng-click="show_timer = !show_timer;setTimer('7d');" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+					<i class="fa fa-clock-o" aria-hidden="true"></i> Last 7 days
+				</md-button>
+			</md-content>
+		</md-content>
+	
     </md-content>
+	 </md-content>
+	</div>
 
 
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
