@@ -3,10 +3,8 @@
         <md-content layout="column" layout-align="space-around center">
             <h2>Update</h2>
             <md-input-container layout="column" layout-align="space-around center">
-                <p>1. Do you want to force it?</p>
                 <md-switch ng-model="$parent.updateForce" aria-label="Force update?">
-                    <span ng-show="$parent.updateForce">Overwrite all the rules (OSSEC manager is going to be restarted)</span>
-                    <span ng-show="!$parent.updateForce">Update the outdated rules (Manager will be restarted only if enabled rules are updated)</span>
+                    <span ng-show="!$parent.updateForce">Force update, restart if necessary.</span>
                 </md-switch>
             </md-input-container>
 
@@ -22,7 +20,6 @@
                 <md-option-empty ng-if="backups.length == 0">No backups where found</md-option-empty>
             </md-select>
             <md-button type="submit" class="md-primary md-raised" ng-click="restoreBackup($event);">Restore backup</md-button>
-            <p style="font-weight: lighter;">* When ruleset is updated, a new backup (the first in the list) will be created.</p>
         </md-content>
 
     </md-content>

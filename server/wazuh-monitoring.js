@@ -67,14 +67,14 @@ module.exports = function (server, options) {
         };
 
         var options = {
-            headers: { 'api-version': 'v1.2' },
+            headers: { 'api-version': 'v1.3.0' },
             username: api_user,
             password: api_pass,
             rejectUnauthorized: !api_insecure
         };
 
         needle.request('get', api_url + '/agents', payload, options, function (error, response) {
-            if (!error) {
+            if (!error  && response.body.data.items) {
                 agentsArray = agentsArray.concat(response.body.data.items);
                 if ((payload.limit + payload.offset) < maxSize) {
                     checkStatus(response.body.data.totalItems, payload.limit + payload.offset);

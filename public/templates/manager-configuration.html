@@ -2,6 +2,22 @@
   layout-align="space-around">
 
   <md-content flex layout-padding layout="row" layout-sm="column" layout-xs="column">
+          <md-card flex layout="column">
+          <md-card-content>
+            <span layout="row" layout-align="space-between center">
+                  <h3>Manager status</h3>
+                  <h3 class="right-text"><i class="fa fa-repeat" aria-hidden="true" ng-click="restart($event)"></i></h3>
+                </span>
+            <span layout="column" ng-repeat="daemon in daemons">
+                    <span layout="row" layout-align="space-between center">
+                      <p>{{daemon.daemon}}</p>
+                      <p class="right-text"><span ng-class="getDaemonStatusClass(daemon.status)" class="round" style="float: right"></span></p>
+            </span>
+            <md-divider></md-divider>
+            </span>
+          </md-card-content>
+        </md-card>
+		
     <div flex layout="column" ng-if="managerConfiguration.global">
       <md-card>
         <md-card-content>

@@ -1,102 +1,127 @@
 <md-content flex layout="column" ng-if="!load && submenuNavItem == 'general'" ng-controller="managerController" layout-align="space-around">
+	<div layout="row" layout-align="center stretch">
+		<md-card flex layout="column">
+		  <md-card-content>
+			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization',type:metric))"
+			  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+			</kbn-vis>
+		  </md-card-content>
+		</md-card>
+		
+		<md-card flex layout="column">
+		  <md-card-content>
+			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 10 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization22',type:metric))" vis-filter="rule.AlertLevel:[7 TO *]">
+			</kbn-vis>
+		  </md-card-content>
+		</md-card>
+		
+		<md-card flex layout="column">
+		  <md-card-content>
+			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_failed')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failed'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: authentication_failed">
+			</kbn-vis>
+		  </md-card-content>
+		</md-card>
+		
+		<md-card flex layout="column">
+		  <md-card-content>
+			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_success')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication success'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: authentication_success">
+			</kbn-vis>
+		  </md-card-content>
+		</md-card>
+	</div>	
+	
   <div layout="row" layout-align="center stretch">
-    <md-card flex="50">
+    <md-card flex="60">
       <md-card-title>
         <md-card-title-text>
           <span class="md-headline">Events</span>
         </md-card-title-text>
       </md-card-title>
       <md-card-content>
-        <kbn-vis vis-height="300px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="*">
+        <kbn-vis vis-height="220px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
+          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
         </kbn-vis>
       </md-card-content>
     </md-card>
-
-    <md-card flex layout="column">
-      <md-card-content>
-        <span class="md-headline">Top 5 Groups</span>
-        <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'Alerts:%20Top%205%20Groups',type:pie))"
-          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="*">
-        </kbn-vis>
-      </md-card-content>
-    </md-card>
-
-
-
-        <md-card flex layout="column">
-          <md-card-content>
-            <span layout="row" layout-align="space-between center">
-                  <h3>Manager status</h3>
-                  <h3 class="right-text"><i class="fa fa-repeat" aria-hidden="true" ng-click="restart($event)"></i></h3>
-                </span>
-            <span layout="column" ng-repeat="daemon in daemons">
-                    <span layout="row" layout-align="space-between center">
-                      <p>{{daemon.daemon}}</p>
-                      <p class="right-text"><span ng-class="getDaemonStatusClass(daemon.status)" class="round" style="float: right"></span></p>
-            </span>
-            <md-divider></md-divider>
-            </span>
-          </md-card-content>
-        </md-card>
-
-  </div>
-
-  <div layout="row" layout-align="center stretch">
-
-    <md-card flex="50">
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">Signatures</span>
-        </md-card-title-text>
-      </md-card-title>
-      <md-card-content>
-        <kbn-vis vis-height="200px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:10),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!f,times:!(),yAxis:()),title:'Signature:%20Area%20Chart',type:area))"
-          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="*">
-        </kbn-vis>
-      </md-card-content>
-    </md-card>
-
-
-    <md-card flex layout="column">
-
-      <md-card-content>
+	
+	<md-card flex layout="column">
+     <md-card-content>
         <span class="md-headline">Top 5 Agents</span>
-        <kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Agents%20total%20alerts',type:pie))"
-          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="*">
+        <kbn-vis vis-height="220px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Agents%20total%20alerts',type:pie))"
+          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
         </kbn-vis>
       </md-card-content>
     </md-card>
-
+	
+	
     <md-card flex layout="column">
       <md-card-content>
-        <h3>Agents overview</h3>
+        <h3>Agents status</h3>
         <md-list>
           <md-list-item>
             <p>Total agents</p>
             <p class="right-text">{{agentsCountTotal}}</p>
           </md-list-item>
-          <md-divider></md-divider>
           <md-list-item>
             <p>Active</p>
             <p class="right-text">{{agentsCountActive}}</p>
           </md-list-item>
-          <md-divider></md-divider>
           <md-list-item>
             <p>Disconnected</p>
             <p class="right-text">{{agentsCountDisconnected}}</p>
           </md-list-item>
-          <md-divider></md-divider>
           <md-list-item>
             <p>Never connected</p>
             <p class="right-text">{{agentsCountNeverConnected}}</p>
           </md-list-item>
-          <md-divider></md-divider>
-          <md-divider></md-divider>
         </md-list>
       </md-card-content>
     </md-card>
 
+
+  </div>
+
+  <div layout="row" layout-align="center stretch">
+	<md-card flex layout="column">
+		  <md-card-content style="text-align: center;">
+			<div class="metric-value ng-binding" style="font-size: 19pt;">root</div>
+			<div class="ng-binding">Top user</div>
+		  </md-card-content>
+	</md-card>
+	<md-card flex layout="column">
+		  <md-card-content style="text-align: center;">
+			<div class="metric-value ng-binding" style="font-size: 19pt;">10.0.98.14</div>
+			<div class="ng-binding">Top source ip</div>
+		  </md-card-content>
+	</md-card>
+	<md-card flex layout="column">
+		  <md-card-content style="text-align: center;">
+			<div class="metric-value ng-binding" style="font-size: 19pt;">syslog</div>
+			<div class="ng-binding">Top group</div>
+		  </md-card-content>
+	</md-card>
+	<md-card flex layout="column">
+		  <md-card-content style="text-align: center;">
+			<div class="metric-value ng-binding" style="font-size: 19pt;">11.4</div>
+			<div class="ng-binding">Top PCI DSS requirement</div>
+		  </md-card-content>
+	</md-card>
+	</div layout="row" layout-align="center stretch">	
+	
+  <div layout="row" layout-align="center stretch">
+
+    <md-card flex>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Alerts</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <kbn-vis vis-height="300px;" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Timestamp,field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:500),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Agent,field:AgentName,order:desc,orderBy:'1',size:500),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:IP,field:AgentIP,order:desc,orderBy:'1',size:500),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Level,field:rule.AlertLevel,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+        </kbn-vis>
+      </md-card-content>
+    </md-card>
 
 
   </div>

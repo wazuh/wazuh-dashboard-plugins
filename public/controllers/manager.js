@@ -39,14 +39,6 @@ app.controller('managerController', function ($scope, DataFactory, tabProvider, 
 
     //Functions
 
-    $scope.getDaemonStatusClass = function (daemonStatus) {
-        if (daemonStatus == "running")
-            return "status green"
-        else if (daemonStatus == "stopped")
-            return "status red";
-        else
-            return "status red";
-    };
 
     $scope.start = function () {
         $mdToast.show({
@@ -117,53 +109,17 @@ app.controller('managerController', function ($scope, DataFactory, tabProvider, 
         });
     };
 
-    $scope.getDaemonTooltip = function (daemon) {
-        var output = '';
-        switch (daemon) {
-            case 'ossec-monitord':
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">Monitors agent connectivity and compress daily log files.</span>';
-                break;
-            case 'ossec-logcollector':
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">Monitors configured files and commands for new log messages.</span>';
-                break;
-            case 'ossec-remoted':
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">The server side daemon that communicates with the agents.</span>';
-                break;
-            case 'ossec-syscheckd':
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">Checks configured files for changes to the checksums, permissions or ownership.</span>';
-                break;
-            case 'ossec-analysisd':
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">Receives the log messages and compares them to the rules. It will create alerts when a log message matches an applicable rule.</span>';
-                break;
-            case 'ossec-maild':
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">Sends OSSEC alerts via email. Is started by ossec-control when email alerts are configured.</span>';
-                break;
-            case 'ossec-execd':
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">Executes active responses by running the configured scripts.</span>';
-                break;
-            case 'wazuh-moduled':
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">Is on charge of load different Wazuh modules outside of OSSEC code.</span>';
-                break;
-            default:
-                output = '<span style="width: 200px; display: inline-block; text-align: left;">Not description found for this daemon</span>';
-                break;
-        }
-        return output;
-    };
+
 
     var load = function () {
-        DataFactory.getAndClean('get', '/manager/status', {})
-            .then(function (data) {
-                $scope.daemons = data.data;
-                DataFactory.getAndClean('get', '/agents/summary', {})
-                    .then(function (data) {
-                        $scope.agentsCountActive = data.data.active;
-                        $scope.agentsCountDisconnected = data.data.disconnected;
-                        $scope.agentsCountNeverConnected = data.data.neverConnected;
-                        $scope.agentsCountTotal = data.data.total;
-                        $scope.load = false;
-                    }, printError);
-            }, printError);
+		DataFactory.getAndClean('get', '/agents/summary', {})
+			.then(function (data) {
+				$scope.agentsCountActive = data.data.active;
+				$scope.agentsCountDisconnected = data.data.disconnected;
+				$scope.agentsCountNeverConnected = data.data.neverConnected;
+				$scope.agentsCountTotal = data.data.total;
+				$scope.load = false;
+		}, printError);
     };
 
     //Load
@@ -198,6 +154,15 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
         });
     };
 
+	$scope.getDaemonStatusClass = function (daemonStatus) {
+        if (daemonStatus == "running")
+            return "status green"
+        else if (daemonStatus == "stopped")
+            return "status red";
+        else
+            return "status red";
+    };
+	
     //Functions
     var parseConfiguration = function () {
         if ($scope.managerConfiguration.rules.decoder) {
@@ -214,13 +179,53 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
         }
     };
 
+	    $scope.getDaemonTooltip = function (daemon) {
+        var output = '';
+        switch (daemon) {
+            case 'ossec-monitord':
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">Monitors agent connectivity and compress daily log files.</span>';
+                break;
+            case 'ossec-logcollector':
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">Monitors configured files and commands for new log messages.</span>';
+                break;
+            case 'ossec-remoted':
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">The server side daemon that communicates with the agents.</span>';
+                break;
+            case 'ossec-syscheckd':
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">Checks configured files for changes to the checksums, permissions or ownership.</span>';
+                break;
+            case 'ossec-analysisd':
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">Receives the log messages and compares them to the rules. It will create alerts when a log message matches an applicable rule.</span>';
+                break;
+            case 'ossec-maild':
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">Sends OSSEC alerts via email. Is started by ossec-control when email alerts are configured.</span>';
+                break;
+            case 'ossec-execd':
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">Executes active responses by running the configured scripts.</span>';
+                break;
+            case 'wazuh-moduled':
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">Is on charge of load different Wazuh modules outside of OSSEC code.</span>';
+                break;
+            default:
+                output = '<span style="width: 200px; display: inline-block; text-align: left;">Not description found for this daemon</span>';
+                break;
+        }
+        return output;
+    };
+	
+	
+	
     var load = function () {
-        DataFactory.getAndClean('get', '/manager/configuration', {})
+		DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {
-                $scope.managerConfiguration = data.data;
-                parseConfiguration();
-                $scope.load = false;
-            }, printError);
+				$scope.daemons = data.data;
+				DataFactory.getAndClean('get', '/manager/configuration', {})
+					.then(function (data) {
+						$scope.managerConfiguration = data.data;
+						parseConfiguration();
+						$scope.load = false;
+					}, printError);
+			}, printError);
     };
 
     //Load
