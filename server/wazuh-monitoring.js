@@ -40,17 +40,17 @@ module.exports = function (server, options) {
         };
 
         var options = {
-            headers: { 'api-version': 'v1.2' },
+            headers: { 'api-version': 'v1.3.0' },
             username: api_user,
             password: api_pass,
             rejectUnauthorized: !api_insecure
         };
 
         needle.request('get', api_url + '/agents', payload, options, function (error, response) {
-            if (!error) {
+            if (!error && response.body.data.totalItems) {
                 checkStatus(response.body.data.totalItems);
             } else {
-                console.log('[Wazuh agents monitoring] Wazuh api credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
+                console.log('[Wazuh agents monitoring] Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
                 return;
             }
         });
