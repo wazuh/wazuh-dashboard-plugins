@@ -160,9 +160,9 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
           $state.index = $scope.indexPattern.id;
           $state.sort = getSort.array($state.sort, $scope.indexPattern);
 
-          $scope.$watchCollection('state.columns', function () {
+          /*$scope.$watchCollection('state.columns', function () {
             $state.save();
-          });
+          });*/
 
           $scope.opts = {
             // number of records to fetch, then paginate through
@@ -187,9 +187,9 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 
             $scope.updateDataSource()
               .then(function () {
-                $scope.$listen(timefilter, 'fetch', function () {
+                 $scope.$listen(timefilter, 'fetch', function () {
                   $scope.fetch();
-                });
+                 });
 
                 $scope.$watchCollection('state.sort', function (sort) {
                   if (!sort) return;
@@ -202,16 +202,9 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                 });
 
                 // update data source when filters update
-                $scope.$listen(queryFilter, 'update', function () {
-                  return $scope.updateDataSource().then(function () {
-                    $state.save();
-                  });
-                });
-
-                // update data source when hitting forward/back and the query changes
-                $scope.$listen($state, 'fetch_with_changes', function (diff) {
-                  if (diff.indexOf('query') >= 0) $scope.fetch();
-                });
+                 $scope.$listen(queryFilter, 'update', function () {
+                   return $scope.updateDataSource();
+                 });
 
                 // fetch data when filters fire fetch event
                 $scope.$listen(queryFilter, 'fetch', $scope.fetch);
@@ -316,7 +309,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                     if (id) {
                       notify.info('Saved Data Source "' + savedSearch.title + '"');
                       if (savedSearch.id !== $route.current.params.id) {
-                        kbnUrl.change('/discover/{{id}}', { id: savedSearch.id });
                       } else {
                         // Update defaults so that "reload saved query" functions correctly
                         $state.setDefaults(getStateDefaults());
@@ -336,7 +328,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             $scope.updateDataSource()
               .then(setupVisualization)
               .then(function () {
-                $state.save();
+                //$state.save();
                 return courier.fetch();
               })
               .catch(notify.error);
@@ -451,14 +443,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
               from: dateMath.parse(timefilter.time.from),
               to: dateMath.parse(timefilter.time.to, true)
             };
-          };
-
-          $scope.resetQuery = function () {
-            kbnUrl.change('/discover/{{id}}', { id: $route.current.params.id });
-          };
-
-          $scope.newQuery = function () {
-            kbnUrl.change('/discover');
           };
 
           $scope.updateDataSource = Promise.method(function () {
