@@ -122,23 +122,36 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
 
 
 	var load_tops = function () { 
-		$scope.topsrcuser = "";
-		$scope.topsrcip = "";
-		$scope.topgroup = "";
-		$scope.toppci = "";
-		genericReq.request('GET', '/api/wazuh-elastic/top/srcuser')
+
+		var daysAgo = 1;
+		
+		if($scope.timerFilterValue == "7d"){
+			var daysAgo = 7;
+		}else if($scope.timerFilterValue == "48h"){
+			var daysAgo = 2;
+		}else{
+			var daysAgo = 1;
+		}
+		
+		var date = new Date();
+		date.setDate(date.getDate()-daysAgo);
+		var timeAgo = date.getTime();
+		
+		//timeAgo = "";
+		
+		genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/'+timeAgo)
                 .then(function (data) {
                     $scope.topsrcuser = data.data;
                 }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/srcip')
+		genericReq.request('GET', '/api/wazuh-elastic/top/srcip/'+timeAgo)
                 .then(function (data) {
                     $scope.topsrcip = data.data;
                 }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups')
+		genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/'+timeAgo)
                 .then(function (data) {
                     $scope.topgroup = data.data;
                 }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS')
+		genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/'+timeAgo)
                 .then(function (data) {
                     $scope.toppci = data.data;
                 }, printError);		
@@ -163,6 +176,7 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
         return $scope.$parent.timeFilter;
     }, function () {
         $scope.setTimer($scope.$parent.timeFilter);
+		load_tops();
     });
 	
 

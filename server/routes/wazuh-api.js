@@ -216,10 +216,14 @@ module.exports = function (server, options) {
         }
 
         var elasticurl = _elurl+'/ossec-*/ossec/_search';
-
-        var date = new Date();
+		
+		// is date defined? or must use 24h ?
+		var date = new Date();
 		date.setDate(date.getDate()-1);
 		date = date.getTime();
+		
+		const timeAgo = req.params.time ? encodeURIComponent(req.params.time) : date;
+        
 
         var payload = {
             "size": 1,
@@ -235,7 +239,7 @@ module.exports = function (server, options) {
                         {
                             "range": {
                                 "@timestamp": {
-                                    "gte": date,
+                                    "gte": timeAgo,
                                     "format": "epoch_millis"
                                 }
                             }
@@ -262,7 +266,7 @@ module.exports = function (server, options) {
                 reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch'}).code(500);
             } else {
                 if (response.body.hits.total == 0 || typeof response.body.aggregations['2'].buckets[0] === 'undefined') {
-                    reply({ 'statusCode': 200, 'data': ''});
+                    reply({ 'statusCode': 200, 'data': '(no data)'});
                 } else {
                     reply({ 'statusCode': 200, 'data': response.body.aggregations['2'].buckets[0].key});
                 }
@@ -624,7 +628,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/top/{field}',
+        path: '/api/wazuh-elastic/top/{field}/{time?}',
         handler: getFieldTop
     });
 
