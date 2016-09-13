@@ -8,8 +8,7 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
     $scope.load = true;
     $scope.menuNavItem = 'manager';
     $scope.submenuNavItem = 'general';
-	$scope.timerFilterString = "Last 24 hours";
-	$scope.timerFilterValue = "24h";
+	$scope.timeFilter = "24h";
 	
     $scope.stats = [];
     $scope.stats['/top/agent'] = '-';
@@ -111,15 +110,12 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
     };
 	
 	
-	$scope.setTimer = function (time) {
+	$scope.setTimer = function (time) {			
         if(time == "24h"){
-			$scope.timerFilterString = "Last 24 hours";
 			$scope.timerFilterValue = "24h";
 		}else if(time == "48h"){
-			$scope.timerFilterString = "Last 48 hours";
 			$scope.timerFilterValue = "48h";
 		}else{
-			$scope.timerFilterString = "Last 7 days";
 			$scope.timerFilterValue = "7d";
 		}
     };
@@ -162,11 +158,20 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
     //Load
     load();
 
+	// Timer filter watch
+	var loadWatch = $scope.$watch(function () {
+        return $scope.$parent.timeFilter;
+    }, function () {
+        $scope.setTimer($scope.$parent.timeFilter);
+    });
+	
+
     //Destroy
     $scope.$on("$destroy", function () {
         //angular.forEach(objectsArray, DataFactory.clean(value));
         tabProvider.clean($scope.pageId);
         $scope.stats.length = 0;
+		loadWatch();
     });
 
 });

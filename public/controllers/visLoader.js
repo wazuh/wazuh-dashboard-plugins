@@ -146,6 +146,13 @@ require('ui/modules').get('app/wazuh', [])
 
         return $state;
       } ());
+	  
+	  $scope.$watch("visG",function() {
+        //This gets called when data changes.
+		console.log('a');
+		$route.current.params._g = $scope.visG;
+		$route.updateParams({ '_g': $scope.visG});
+    });
 
       function init() {
         // export some objects

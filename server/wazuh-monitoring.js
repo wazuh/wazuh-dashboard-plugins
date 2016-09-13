@@ -89,8 +89,7 @@ module.exports = function (server, options) {
     };
 
     var saveStatus = function () {
-        var fDate = new Date().toISOString().replace(/T/, '-')
-            .replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
+        var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
 
         var todayIndex = 'wazuh-monitoring-' + fDate;
 
@@ -110,7 +109,7 @@ module.exports = function (server, options) {
     var _elCreateIndex = function (todayIndex) {
         client.indices.create({ index: todayIndex }).then(
             function () {
-                client.indices.putMapping({ index: todayIndex, type: 'agent', body: { properties: { '@timestamp': { 'type': "date" }, 'status': { 'type': "string", 'index': "not_analyzed" }, 'ip': { 'type': "string", 'index': "not_analyzed" }, 'name': { 'type': "string", 'index': "not_analyzed" }, 'id': { 'type': "string", 'index': "not_analyzed" } } } }).then(
+                client.indices.putMapping({ index: todayIndex, type: 'agent', body: { properties: { '@timestamp': { 'type': "date" }, 'status': { 'type': "keyword" }, 'ip': { 'type': "keyword" }, 'name': { 'type': "keyword" }, 'id': { 'type': "keyword" } } } }).then(
                     function () {
                         _elInsertData(todayIndex);
                     }, function () {
