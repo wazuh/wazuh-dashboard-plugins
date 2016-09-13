@@ -5,10 +5,11 @@
             <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
                 <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
             </md-nav-item>
-            <md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-            <md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-            <md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
-            <md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
+			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+			<md-nav-item md-nav-href="#/dashboards" name="ruleset">Dashboards</md-nav-item>
+			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
         </md-nav-bar>
     </md-content>
 

@@ -46,5 +46,5 @@ routes
         }
     })
     .otherwise({
-        redirectTo: '/agents/'
+        redirectTo: '/manager/'
     });
