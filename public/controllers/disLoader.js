@@ -58,9 +58,6 @@ var app = require('ui/modules').get('app/wazuh', [])
         disG: '@disG',
         disFilter: '@disFilter',
         tableHeight: '@tableHeight',
-        disSearchable: '@disSearchable',
-        disColumn: '@disColumn',
-        disVisualization: '@disVisualization',
         infiniteScroll: '@infiniteScroll'
       },
       template: require('../templates/dis-template.html')
@@ -70,6 +67,7 @@ var app = require('ui/modules').get('app/wazuh', [])
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($scope, config, courier, $route, $window, Notifier,
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches) {
 
+  $scope.stateQuery = $scope.disFilter;
   $scope.chrome = {};
   $scope.chrome.getVisible = function () {
     return true;
@@ -100,7 +98,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
         stateValFound: specified && exists
       }).then(function (result) {
         $scope._ip = result;
-        savedSearches.get($route.current.params.id).then(function (result) {
+        savedSearches.get().then(function (result) {
           $scope._savedSearch = result;
 
           const Vis = Private(VisProvider);
@@ -139,7 +137,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 
           const $state = $scope.state = new AppState(getStateDefaults());
           $scope.uiState = $state.makeStateful('uiState');
-          $state.query = ($scope.disFilter ? $scope.disFilter : '*');
+          $state.query = ($scope.stateQuery ? $scope.stateQuery : '*');
           $state.save();
 
           function getStateDefaults() {
@@ -160,9 +158,9 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
           $state.index = $scope.indexPattern.id;
           $state.sort = getSort.array($state.sort, $scope.indexPattern);
 
-          /*$scope.$watchCollection('state.columns', function () {
+          $scope.$watchCollection('state.columns', function () {
             $state.save();
-          });*/
+          });
 
           $scope.opts = {
             // number of records to fetch, then paginate through
@@ -188,6 +186,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             $scope.updateDataSource()
               .then(function () {
                  $scope.$listen(timefilter, 'fetch', function () {
+                   $state.save();
                   $scope.fetch();
                  });
 
@@ -201,13 +200,24 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                   if (!angular.equals(sort, currentSort)) $scope.fetch();
                 });
 
-                // update data source when filters update
-                 $scope.$listen(queryFilter, 'update', function () {
-                   return $scope.updateDataSource();
-                 });
+                /*START*/
+      // update data source when filters update
+      $scope.$listen(queryFilter, 'update', function () {
+        return $scope.updateDataSource().then(function () {
+          $state.save();
+        });
+      });
 
-                // fetch data when filters fire fetch event
-                $scope.$listen(queryFilter, 'fetch', $scope.fetch);
+      // update data source when hitting forward/back and the query changes
+      $scope.$listen($state, 'fetch_with_changes', function (diff) {
+        $state.save();
+        $scope.fetch();
+      });
+
+      // fetch data when filters fire fetch event
+      $scope.$listen(queryFilter, 'fetch', $scope.fetch);
+
+                /*END*/
 
                 $scope.$watch('opts.timefield', function (timefield) {
                   timefilter.enabled = !!timefield;
@@ -328,7 +338,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             $scope.updateDataSource()
               .then(setupVisualization)
               .then(function () {
-                //$state.save();
+                $state.save();
                 return courier.fetch();
               })
               .catch(notify.error);
@@ -449,7 +459,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             $scope.searchSource
               .size($scope.opts.sampleSize)
               .sort(getSort($state.sort, $scope.indexPattern))
-              .query(!$state.query ? null : $state.query)
+              .query(!$scope.stateQuery ? null : $scope.stateQuery)
               .set('filter', queryFilter.getFilters());
 
             if (config.get('doc_table:highlight')) {
