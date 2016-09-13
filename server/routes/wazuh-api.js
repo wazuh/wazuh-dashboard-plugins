@@ -261,7 +261,6 @@ module.exports = function (server, options) {
             if (error || response.body.error) {
                 reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch'}).code(500);
             } else {
-				console.log(response.body);
                 if (response.body.hits.total == 0 || typeof response.body.aggregations['2'].buckets[0] === 'undefined') {
                     reply({ 'statusCode': 200, 'data': ''});
                 } else {
