@@ -60,7 +60,40 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
         }
     };
 
-    $scope.filesObj = {
+    $scope.registryObj = {
+        //Obj with methods for virtual scrolling
+        getItemAtIndex: function (index) {
+            if ($scope._files_blocked) {
+                return null;
+            }
+            var _pos = index - DataFactory.getOffset(objectsArray['/registry']);
+            if (DataFactory.filters.flag(objectsArray['/registry'])) {
+                $scope._files_blocked = true;
+                DataFactory.scrollTo(objectsArray['/registry'], 50)
+                    .then(function (data) {
+                        $scope.registry.length = 0;
+                        $scope.registry = data.data.items;
+                        DataFactory.filters.unflag(objectsArray['/registry']);
+                        $scope._files_blocked = false;
+                    }, printError);
+            } else if ((_pos > 70) || (_pos < 0)) {
+                $scope._files_blocked = true;
+                DataFactory.scrollTo(objectsArray['/registry'], index)
+                    .then(function (data) {
+                        $scope.registry.length = 0;
+                        $scope.registry = data.data.items;
+                        $scope._files_blocked = false;
+                    }, printError);
+            } else {
+                return $scope.registry[_pos];
+            }
+        },
+        getLength: function () {
+            return DataFactory.getTotalItems(objectsArray['/registry']);
+        },
+    };
+
+	    $scope.filesObj = {
         //Obj with methods for virtual scrolling
         getItemAtIndex: function (index) {
             if ($scope._files_blocked) {
@@ -92,7 +125,7 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
             return DataFactory.getTotalItems(objectsArray['/files']);
         },
     };
-
+	
     var createWatch = function () {
         loadWatch = $scope.$watch(function () {
             return $scope.$parent._agent;

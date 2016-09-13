@@ -48,9 +48,17 @@
                         <input type="text" id="searchBox" ng-model="$parent._fileSearch" ng-change="fileSearchFilter($parent._fileSearch)" flex>
                     </md-input-container>
                     <div flex="40"></div>
-                    <md-input-container flex="20">
+					<md-content flex="40" class="subNavLine" layout="row" layout-align="end center">
+						<md-button ng-click="showFilesRegistry = !showFilesRegistry" class="md-primary" ng-class="!showFilesRegistry ? 'button-disabled' : 'button-active'">
+							Files
+							</md-button>
+						<md-button ng-click="showFilesRegistry = !showFilesRegistry" class="md-primary" ng-class="showFilesRegistry ? 'button-disabled' : 'button-active'">
+							Registry keys
+							</md-button>
+					</md-content>
+                    <md-input-container style="margin-top: 12px;" flex="20">
                         <md-select id="eventBox" ng-model="$parent._fimEvent" ng-change="fileEventFilter($parent._fimEvent)" aria-label="Filter by event">
-                            <md-option value="all">All</md-option>
+                            <md-option value="all">Filter events</md-option>
                             <md-option value="added">Added</md-option>
                             <md-option value="modified">Modified</md-option>
                             <md-option value="readded">Re-added</md-option>
@@ -77,7 +85,7 @@
                     </md-toolbar>
                 </div>
             </div>
-            <div md-virtual-repeat="file in filesObj" md-on-demand flex layout-align="start stretch">
+            <div ng-show="!showFilesRegistry" md-virtual-repeat="file in filesObj" md-on-demand flex layout-align="start stretch">
                 <md-list>
                     <md-list-item ng-click="showFile[file.file] = !showFile[file.file]">
                         <span flex="10" hide-sm hide-xs>{{file.modificationDate}}</span>
@@ -115,6 +123,10 @@
                 </md-list>
                 <md-divider></md-divider>
             </div>
+			
+						
+
+			
         </md-virtual-repeat-container>
     </div>
 </md-content>

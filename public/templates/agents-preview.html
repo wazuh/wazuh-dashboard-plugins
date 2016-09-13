@@ -4,6 +4,7 @@
         <md-virtual-repeat-container style="min-height: 700px;" ng-if="!load">
             <div flex layout="column" layout-align="space-between stretch">
                 <div layout="row" layout-align="space-between stretch">
+				
                     <md-input-container layout="row" class="sideNavBox" flex="40">
 
                         <input placeholder="Filter" type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)" flex>
