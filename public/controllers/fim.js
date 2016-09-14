@@ -11,7 +11,7 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
     $scope.files = [];
     $scope.fileSearch = '';
 
-    $scope.$parent.submenuNavItem = 'fim';
+    $scope.$parent.state.setAgentsState('fim');
 
     //Print error
     var printError = function (error) {

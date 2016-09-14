@@ -3,15 +3,20 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('generalController', function ($scope, $q, DataFactory, tabProvider, $mdToast) {
+app.controller('generalController', function ($scope, $q, DataFactory, tabProvider, $mdToast, sharedProperties) {
     //Initialisation
 
     $scope.load = true;
     $scope.search = '';
     $scope.menuNavItem = 'agents';
     $scope.submenuNavItem = '';
-	
-	
+    $scope.state = sharedProperties;
+
+    if ($scope.state.getAgentsState().data) {
+        $scope.submenuNavItem = $scope.state.getAgentsState().subtab;
+        $scope._agent = $scope.state.getAgentsState().data;
+        $scope.search = $scope._agent.name;
+    }
 	
     var objectsArray = [];
 
@@ -81,10 +86,15 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
 
     $scope.applyAgent = function (agent) {
         if (agent) {
-            $scope.submenuNavItem == '' ? $scope.submenuNavItem = 'overview' : null;
+            if ($scope.submenuNavItem == '') {
+                $scope.submenuNavItem = 'overview';
+                $scope.state.setAgentsState('overview', agent);
+            } else {
+                $scope.state.setAgentsState(null, agent);
+            }
             $scope._agent = agent;
-			$scope.search = agent.name;
-        }        
+            $scope.search = agent.name;
+        }
     };
 
     $scope.addAgent = function () {
@@ -123,4 +133,8 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
     });
 
 
+});
+
+app.controller('stateController', function ($scope, sharedProperties) {
+    $scope.state = sharedProperties;
 });

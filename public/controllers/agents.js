@@ -5,7 +5,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.agentInfo = [];
-    $scope.$parent.submenuNavItem = 'overview';
+    $scope.$parent.state.setAgentsState('overview');
 
     var objectsArray = [];
     var loadWatch;

@@ -6,8 +6,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 app.controller('managerController', function ($scope, DataFactory, genericReq, tabProvider, $mdDialog, $mdToast) {
     //Initialisation
     $scope.load = true;
-    $scope.menuNavItem = 'manager';
-    $scope.submenuNavItem = 'general';
+    $scope.$parent.state.setManagerState('general');
 	$scope.timeFilter = "24h";
 	
     $scope.stats = [];
@@ -193,8 +192,7 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
 app.controller('managerConfigurationController', function ($scope, DataFactory, tabProvider) {
     //Initialisation
     $scope.load = true;
-    $scope.menuNavItem = 'manager';
-    $scope.submenuNavItem = 'configuration';
+    $scope.$parent.state.setManagerState('configuration');
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);

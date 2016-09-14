@@ -8,7 +8,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
     $scope.summary = [];
     $scope.realtime = false;
 
-    $scope.$parent.submenuNavItem = 'osseclog';
+    $scope.$parent.state.setManagerState('logs');
 
     var objectsArray = [];
 

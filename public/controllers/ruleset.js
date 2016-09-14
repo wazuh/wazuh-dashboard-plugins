@@ -5,6 +5,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
     //Initialisation
     $scope.load = true;
+    $scope.$parent.state.setRulesetState('rules');
 
     $scope.rules = [];
 
@@ -238,6 +239,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 
     //Initialisation
     $scope.load = true;
+    $scope.$parent.state.setRulesetState('decoders');
 
     $scope.decoders = [];
 
@@ -413,6 +415,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 app.controller('updateRulesetController', function ($scope, $q, DataFactory, tabProvider, $mdDialog, $mdToast) {
     //Initialisation
     $scope.load = true;
+    $scope.$parent.state.setRulesetState('update');
 
     $scope.backups = [];
 

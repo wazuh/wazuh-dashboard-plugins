@@ -7,6 +7,8 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog) {
     var objectsArray = [];
 	var loadWatch;
 
+    $scope.$parent.state.setAgentsState('policy_monitoring');
+
     $scope.events = [];
 
     //Print Error
