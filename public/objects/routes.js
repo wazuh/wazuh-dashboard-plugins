@@ -34,13 +34,13 @@ routes
         template: require('plugins/wazuh/templates/settings.html')
     })
     .when('/', {
-        redirectTo: '/agents/',
+        redirectTo: '/manager/',
         resolve: {
             "check": settingsWizard
         }
     })
     .when('', {
-        redirectTo: '/agents/',
+        redirectTo: '/manager/',
         resolve: {
             "check": settingsWizard
         }
