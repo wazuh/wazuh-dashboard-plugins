@@ -37,6 +37,7 @@ require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
 require('plugins/wazuh/controllers/visLoader.js');
 require('plugins/wazuh/controllers/disLoader.js');
+require('plugins/wazuh/controllers/dashLoader.js');
 
 //Bootstrap and font awesome
 require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');

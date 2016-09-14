@@ -1,0 +1,49 @@
+<div class="app-container dashboard-container">
+  <kbn-top-nav name="dashboard" config="topNavMenu" ng-show="dashTimepicker">
+    <div class="kibana-nav-info">
+      <span ng-show="dash.id" class="kibana-nav-info-title">
+        <span ng-bind="::dash.title"></span>
+      </span>
+    </div>
+  </kbn-top-nav>
+
+  <navbar ng-show="chrome.getVisible() && dashSearchable" name="dashboard-search">
+    <form name="queryInput"
+      class="fill inline-form"
+      ng-submit="filterResults()"
+      role="form">
+
+      <div class="typeahead" kbn-typeahead="dashboard">
+        <div class="input-group"
+          ng-class="queryInput.$invalid ? 'has-error' : ''">
+
+          <input
+            type="text"
+            placeholder="Filter..."
+            aria-label="Filter input"
+            class="form-control"
+            ng-model="state.query"
+            input-focus
+            kbn-typeahead-input
+            parse-query>
+          <button type="submit" class="btn btn-default" ng-disabled="queryInput.$invalid" aria-label="Filter dashboards">
+            <span aria-hidden="true" class="fa fa-search"></span>
+          </button>
+        </div>
+
+        <kbn-typeahead-items></kbn-typeahead-items>
+      </div>
+
+    </form>
+    <div class="button-group"></div>
+  </navbar>
+
+  <filter-bar state="state"></filter-bar>
+
+  <div ng-show="!state.panels.length" class="text-center start-screen">
+    <h2>Dashboard not found</h2>
+    <p>In order to enjoy fully usage of this application, you need the Wazuh dashboards and visualizations imported on Kibana.<br/>Please, read the <a href="http://documentation.wazuh.com/" target="_blank">documentation</a> for more details.</p>
+  </div>
+
+  <dashboard-grid></dashboard-grid>
+</div>
