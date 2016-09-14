@@ -12,19 +12,19 @@ var settingsWizard = function ($location, testConnection) {
 //Routes
 routes.enable();
 routes
-    .when('/agents/', {
+    .when('/agents/:submenu?', {
         template: require('plugins/wazuh/templates/agents.jade'),
         resolve: {
             "check": settingsWizard
         }
     })
-    .when('/manager/', {
+    .when('/manager/:submenu?', {
         template: require('plugins/wazuh/templates/manager.jade'),
         resolve: {
             "check": settingsWizard
         }
     })
-    .when('/ruleset/', {
+    .when('/ruleset/:submenu?', {
         template: require('plugins/wazuh/templates/ruleset.jade'),
         resolve: {
             "check": settingsWizard
