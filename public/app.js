@@ -5,7 +5,7 @@ require('plugins/wazuh/config/config.js');
 require('plugins/wazuh/less/main.less');
 
 // Set up Wazuh app
-var app = require('ui/modules').get('app/wazuh', ['ngMaterial'])
+var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial'])
   .config(['$compileProvider', function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
   }])
@@ -19,6 +19,7 @@ require('plugins/wazuh/objects/apiReq.js');
 require('plugins/wazuh/objects/genericReq.js');
 require('plugins/wazuh/objects/dataFactory.js');
 require('plugins/wazuh/objects/sharedProperties.js');
+require('plugins/wazuh/objects/appState.js');
 require('plugins/wazuh/objects/tabProvider.js');
 require('plugins/wazuh/objects/testConnection.js');
 
@@ -49,3 +50,6 @@ require('plugins/wazuh/../node_modules/angular-material/angular-material.css');
 require('plugins/wazuh/../node_modules/angular-aria/angular-aria.js');
 require('plugins/wazuh/../node_modules/angular-animate/angular-animate.js');
 require('plugins/wazuh/../node_modules/angular-material/angular-material.js');
+
+//Cookies
+require('plugins/wazuh/../node_modules/angular-cookies/angular-cookies.min.js');

@@ -3,9 +3,6 @@
   "version": "5.0.0",
   "description": "Wazuh App",
   "main": "index.js",
-  "scripts": {
-    "install": "npm install"
-  },
   "keywords": [
     "kibana",
     "wazuh",
@@ -36,6 +33,7 @@
   "dependencies": {
     "angular-animate": "1.4.7",
     "angular-aria": "1.4.7",
+    "angular-cookies": "1.4.7",
     "angular-material": "1.1.0-rc.5",
     "angular-md5": "^0.1.10",
     "bootstrap": "3.3.6",
