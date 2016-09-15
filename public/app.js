@@ -22,6 +22,7 @@ require('plugins/wazuh/objects/sharedProperties.js');
 require('plugins/wazuh/objects/appState.js');
 require('plugins/wazuh/objects/tabProvider.js');
 require('plugins/wazuh/objects/testConnection.js');
+require('plugins/wazuh/objects/errlog.js');
 
 // Set up routes and views
 require('plugins/wazuh/objects/routes.js');

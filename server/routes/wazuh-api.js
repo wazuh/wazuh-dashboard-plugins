@@ -584,7 +584,24 @@ module.exports = function (server, options) {
         });
     };
 
-    //Handlers - overview
+    //Handlers - error loggin
+
+    var postErrorLog = function (req, reply) {
+        var colors = require('ansicolors');
+        var blueWazuh = colors.blue('wazuh');
+
+        if (!req.payload.message) {
+            server.log([blueWazuh, 'server', 'error'], 'Error logging failed:');
+            server.log([blueWazuh, 'server', 'error'], 'You must provide at least one error message to log');
+            reply({ 'statusCode': 500, 'message': 'You must provide at least one error message to log' });
+        } else {
+            server.log([blueWazuh, 'client', 'error'], req.payload.message);
+            if (req.payload.details) {
+                server.log([blueWazuh, 'client', 'error'], req.payload.details);
+            }
+            reply({ 'statusCode': 200, 'message': 'Error logged succesfully' });
+        }
+    };
 
     //Server routes
 
@@ -630,6 +647,17 @@ module.exports = function (server, options) {
         method: 'GET',
         path: '/api/wazuh-elastic/top/{field}/{time?}',
         handler: getFieldTop
+    });
+
+    /*
+    * POST /api/wazuh/debug
+    * Write in debug log
+    *
+    **/
+    server.route({
+        method: 'POST',
+        path: '/api/wazuh/errlog',
+        handler: postErrorLog
     });
 
     /*

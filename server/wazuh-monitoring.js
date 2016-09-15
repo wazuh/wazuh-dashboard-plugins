@@ -11,6 +11,9 @@ module.exports = function (server, options) {
     var api_url;
     var api_insecure;
 
+    var colors = require('ansicolors');
+    var blueWazuh = colors.blue('wazuh');
+
     var cron = require('node-cron');
     var needle = require('needle');
 
@@ -23,7 +26,7 @@ module.exports = function (server, options) {
 
     var loadCredentials = function (json) {
         if (json.error) {
-            console.log('[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
+            server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
             return;
         }
         api_user = json.user;
@@ -50,7 +53,7 @@ module.exports = function (server, options) {
             if (!error && response.body.data.totalItems) {
                 checkStatus(response.body.data.totalItems);
             } else {
-                console.log('[Wazuh agents monitoring] Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
+                server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
                 return;
             }
         });
@@ -58,7 +61,7 @@ module.exports = function (server, options) {
 
     var checkStatus = function (maxSize, offset) {
         if (!maxSize) {
-            console.log('[Wazuh agents monitoring] You must provide a max size');
+            server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] You must provide a max size');
         }
 
         var payload = {
@@ -82,7 +85,7 @@ module.exports = function (server, options) {
                     saveStatus();
                 }
             } else {
-                console.log('[Wazuh agents monitoring] Wazuh api credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
+                server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Wazuh api credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
                 return;
             }
         });
@@ -101,7 +104,7 @@ module.exports = function (server, options) {
                     _elCreateIndex(todayIndex);
                 }
             }, function () {
-                console.log('[Wazuh agents monitoring] Could not check if the index ' + todayIndex + ' exists.');
+                server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Could not check if the index ' + todayIndex + ' exists.');
             }
         );
     };
@@ -113,10 +116,10 @@ module.exports = function (server, options) {
                     function () {
                         _elInsertData(todayIndex);
                     }, function () {
-                        console.log('[Wazuh agents monitoring] Error setting mapping while creating ' + todayIndex + ' index on elasticsearch.');
+                        server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error setting mapping while creating ' + todayIndex + ' index on elasticsearch.');
                     });
             }, function () {
-                console.log('[Wazuh agents monitoring] Could not create ' + todayIndex + ' index on elasticsearch.');
+                server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Could not create ' + todayIndex + ' index on elasticsearch.');
             }
         );
     };
@@ -138,7 +141,7 @@ module.exports = function (server, options) {
                 return;
             }, 60000);
         }, function (err) {
-            console.log('[Wazuh agents monitoring] Error inserting agent data into elasticsearch. Bulk request failed.');
+            server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error inserting agent data into elasticsearch. Bulk request failed.');
         });
     };
 
