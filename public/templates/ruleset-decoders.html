@@ -4,12 +4,15 @@
 		<div flex id="content" layout="row" layout-align="space-between center">
 
 			<span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
-					<md-autocomplete ng-disabled="typeFilter != 'all'" flex md-no-cache="true" md-selected-item="_file" md-selected-item-change="decoderFileFilter(_file.split('/').slice(-1)[0])" md-search-text="$parent.search"
-						md-items="item in fileSearch($parent.search)" md-item-text="item" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
+					<md-autocomplete ng-hide="$parent.typeFilter != 'all'" flex md-no-cache="true" md-selected-item="_filter" md-selected-item-change="decodersApplyFilter(_filter)" md-search-text="$parent.search"
+						md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
 						placeholder="Search file">
 						<md-item-template>
 							<span class="item-title">
-            <span><strong md-highlight-text="search" md-highlight-flags="i"> {{item}} </strong></span>
+            <span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.value}} </strong></span>
+			</span>
+			<span class="item-metadata">
+					<span class="item-metastat"> {{item.type}} </span>
 			</span>
 			</md-item-template>
 			<md-not-found>
@@ -25,6 +28,15 @@
 				</md-select>
 			</md-input-container>
 		</div>
+
+		<md-chips readonly="true" ng-show="decodersHasFilter('search') || decodersHasFilter('file')">
+			<md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="decodersUnset('search')" ng-if="decodersHasFilter('search')">
+				<span class="bold">Search: {{decodersGetFilter('search')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+			</md-chip>
+			<md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="decodersUnset('file')" ng-if="decodersHasFilter('file');">
+				<span class="bold">File: {{decodersGetFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+			</md-chip>
+		</md-chips>
 
 		<md-toolbar layout="row">
 			<div class="md-toolbar-tools">

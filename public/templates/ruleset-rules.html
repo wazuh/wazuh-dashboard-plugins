@@ -11,16 +11,16 @@
 				<md-item-template>
 					<span class="item-title">
 						<span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.value}} </strong></span>
-					</span>
-					<span class="item-metadata">
+      </span>
+      <span class="item-metadata">
 					<span class="item-metastat" ng-if="item.type != 'pci'"> {{item.type}} </span>
-					<span class="item-metastat" ng-if="item.type == 'pci'">PCI control</span>
-					</span>
-				</md-item-template>
-				<md-not-found>
-				No results matching "{{search}}" were found.
-				</md-not-found>
-			</md-autocomplete>
+      <span class="item-metastat" ng-if="item.type == 'pci'">PCI control</span>
+      </span>
+      </md-item-template>
+      <md-not-found>
+        No results matching "{{search}}" were found.
+      </md-not-found>
+      </md-autocomplete>
       </span>
 
       <md-input-container flex="15" style="margin-left: 20px; padding: 5px; margin-right: 10px;" class="md-whiteframe-z1">
@@ -33,7 +33,10 @@
 
     </div>
 
-    <md-chips readonly="true" ng-show="rulesHasFilter('file') || rulesHasFilter('group') || rulesHasFilter('pci')">
+    <md-chips readonly="true" ng-show="rulesHasFilter('search') || rulesHasFilter('file') || rulesHasFilter('group') || rulesHasFilter('pci')">
+      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('search')" ng-if="rulesHasFilter('search')">
+        <span class="bold">Search: {{rulesGetFilter('search')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+      </md-chip>
       <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('file')" ng-if="rulesHasFilter('file');">
         <span class="bold">File: {{rulesGetFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
@@ -48,7 +51,7 @@
 
     <md-toolbar layout="row">
       <div class="md-toolbar-tools">
-        <span flex="10"  ng-click="setSort('id')">ID
+        <span flex="10" ng-click="setSort('id')">ID
           <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
         </span>
         <span flex="60">Description</span>

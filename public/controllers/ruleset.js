@@ -7,6 +7,8 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
 
+    $scope.search = undefined;
+
     $scope.rules = [];
 
     $scope.statusFilter = 'enabled';
@@ -18,6 +20,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
     var _file;
     var _group;
     var _pci;
+    var _search;
     var objectsArray = [];
 
     //Print Error
@@ -47,17 +50,9 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
         } else {
             $scope._sortOrder = false;
             $scope._sort = field;
-            DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-'+field);
+            DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-' + field);
         }
     }
-
-    $scope.fileSearchFilter = function (search) {
-        if (search) {
-            DataFactory.filters.set(objectsArray['/rules'], 'search', search);
-        } else {
-            DataFactory.filters.unset(objectsArray['/rules'], 'search');
-        }
-    };
 
     $scope.rulesApplyFilter = function (filterObj) {
         if (!filterObj) {
@@ -72,6 +67,9 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
         } else if (filterObj.type == 'pci') {
             _pci = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'pci', filterObj.value);
+        } else if (filterObj.type == 'search') {
+            _search = filterObj.value;
+            DataFactory.filters.set(objectsArray['/rules'], 'search', filterObj.value);
         }
     };
 
@@ -82,6 +80,8 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
             return _group && _group != null;
         } else if (type == 'pci') {
             return _pci && _pci != null;
+        } else if (type == 'search') {
+            return _search && _search != null;
         }
     };
 
@@ -101,6 +101,11 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
             $scope._filter = undefined;
             $scope.search = undefined;
             DataFactory.filters.unset(objectsArray['/rules'], 'pci');
+        } else if (type == 'search') {
+            _search = null;
+            $scope._filter = undefined;
+            $scope.search = undefined;
+            DataFactory.filters.unset(objectsArray['/rules'], 'search');
         }
     };
 
@@ -111,17 +116,20 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
             return _group;
         } else if (type == 'pci') {
             return _pci;
+        } else if (type == 'search') {
+            return _search;
         }
     };
 
     $scope.filtersSearch = function (search) {
         var defered = $q.defer();
         var promise = defered.promise;
-        //$scope.load = true;
         var result = [];
 
         if (!search) {
             search = undefined;
+        } else {
+            result.push({ 'type': 'search', 'value': search });
         }
 
         DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 5, 'search': search })
@@ -244,8 +252,9 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
     $scope.decoders = [];
 
     $scope.typeFilter = 'all';
+    var _file;
+    var _search;
 
-    var _lastFile = undefined;
     var objectsArray = [];
 
     //Print Error
@@ -298,26 +307,10 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
         return $sce.trustAsHtml(coloredString);
     };
 
-    $scope.decoderSearchFilter = function (search) {
-        if (!search) {
-            DataFactory.filters.unset(objectsArray['/decoders'], 'search');
-        } else {
-            DataFactory.filters.set(objectsArray['/decoders'], 'search', search);
-        }
-    }
-
-    $scope.decoderFileFilter = function (file) {
-        if (!file) {
-            DataFactory.filters.unset(objectsArray['/decoders'], 'file');
-            $scope._filter = undefined;
-            $scope.search = undefined;
-        } else {
-            _lastFile = file;
-            DataFactory.filters.set(objectsArray['/decoders'], 'file', file);
-        }
-    }
-
     $scope.decoderTypeFilter = function (type) {
+        $scope.typeFilter = type;
+        $scope.decodersUnset('file');
+        $scope.decodersUnset('search');
         DataFactory.clean(objectsArray['/decoders']);
         DataFactory.initialize('get', (type == 'parents') ? '/decoders/parents' : '/decoders', {}, 100, 0)
             .then(function (data) {
@@ -327,23 +320,71 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
                         $scope.decoders = data.data.items;
                         DataFactory.filters.register(objectsArray['/decoders'], 'search', 'string');
                         (type != 'parents') ? DataFactory.filters.register(objectsArray['/decoders'], 'file', 'string') : null;
-                        $scope.decoderSearchFilter($scope.decoderSearch);
-                        (type != 'parents') ? $scope.decoderFileFilter(_lastFile) : null;
                     }, printError);
             }, printError);
-    }
+    };
 
-    $scope.fileSearch = function (search) {
+    $scope.decodersApplyFilter = function (filterObj) {
+        if (!filterObj) {
+            return null;
+        }
+        if (filterObj.type == 'file') {
+            _file = filterObj.value.split('/').slice(-1)[0];
+            DataFactory.filters.set(objectsArray['/decoders'], 'file', filterObj.value.split('/').slice(-1)[0]);
+        } else if (filterObj.type == 'search') {
+            _search = filterObj.value;
+            DataFactory.filters.set(objectsArray['/decoders'], 'search', filterObj.value);
+        }
+    };
+
+    $scope.decodersHasFilter = function (type) {
+        if (type == 'file') {
+            return _file && _file != null;
+        } else if (type == 'search') {
+            return _search && _search != null;
+        }
+    };
+
+    $scope.decodersUnset = function (type) {
+        if (type == 'file') {
+            _file = null;
+            DataFactory.filters.unset(objectsArray['/decoders'], 'file');
+            $scope._filter = undefined;
+            $scope.search = undefined;
+        } else if (type == 'search') {
+            _search = null;
+            $scope._search = undefined;
+            DataFactory.filters.unset(objectsArray['/decoders'], 'search');
+            $scope._filter = undefined;
+            $scope.search = undefined;
+        }
+    };
+
+    $scope.decodersGetFilter = function (type) {
+        if (type == 'file') {
+            return _file;
+        } else if (type == 'search') {
+            return _search;
+        }
+    };
+
+    $scope.filtersSearch = function (search) {
         var defered = $q.defer();
         var promise = defered.promise;
+        var result = [];
 
         if (!search) {
             search = undefined;
+        } else {
+            result.push({ 'type': 'search', 'value': search });
         }
 
-        DataFactory.getAndClean('get', '/decoders/files', { 'offset': 0, 'limit': 100, 'search': search })
+        DataFactory.getAndClean('get', '/decoders/files', { 'offset': 0, 'limit': 14, 'search': search })
             .then(function (data) {
-                defered.resolve(data.data.items);
+                angular.forEach(data.data.items, function (value) {
+                    result.push({ 'type': 'file', 'value': value });
+                });
+                defered.resolve(result);
             }, function (data) {
                 printError(data);
                 defered.reject();
