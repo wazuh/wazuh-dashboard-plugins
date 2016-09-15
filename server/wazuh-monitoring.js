@@ -16,7 +16,7 @@ module.exports = function (server, options) {
 
     var agentsArray = [];
 
-    cron.schedule('0 */30 * * * *', function () {
+    cron.schedule('0 */3 * * * *', function () {
         agentsArray.length = 0;
         getConfig(loadCredentials);
     }, true);
@@ -132,13 +132,14 @@ module.exports = function (server, options) {
             index: todayIndex,
             type: 'agent',
             body: body
-        }).then(function () { }, function (err) {
+        }).then(function () {
+            agentsArray.length = 0;
+            setTimeout(function () {
+                return;
+            }, 60000);
+        }, function (err) {
             console.log('[Wazuh agents monitoring] Error inserting agent data into elasticsearch. Bulk request failed.');
         });
-        agentsArray.length = 0;
-        setTimeout(function () {
-            return;
-        }, 2000);
     };
 
     var getConfig = function (callback) {
