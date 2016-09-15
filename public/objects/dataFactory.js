@@ -1,5 +1,5 @@
 require('ui/modules').get('app/wazuh', [])
-    .factory('DataFactory', function (apiReq, $q) {
+    .factory('DataFactory', function (apiReq, $q, errlog) {
         var dataObj = {};
         var _instances = [];
 
@@ -463,6 +463,7 @@ require('ui/modules').get('app/wazuh', [])
                 err.message = "Unexpected error. Please, report this error.";
             }
 
+            errlog.log(err.message, JSON.stringify(err));
             return err;
         };
 

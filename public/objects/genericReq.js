@@ -36,7 +36,7 @@ require('ui/modules').get('app/wazuh', [])
     });
 
 require('ui/modules').get('app/wazuh', [])
-    .service('genericRequest', function (genericReq, $q) {
+    .service('genericRequest', function (genericReq, $q, errlog) {
 
         var prepError = function (err) {
             if (err.error < 0) {
@@ -70,6 +70,7 @@ require('ui/modules').get('app/wazuh', [])
                 err.message = "Unexpected error. Please, report this error.";
             }
 
+            errlog.log(err.message, JSON.stringify(err));
             return err;
         };
 

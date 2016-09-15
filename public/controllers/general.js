@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('generalController', function ($scope, $q, DataFactory, tabProvider, $mdToast, appState, errlog) {
+app.controller('generalController', function ($scope, $q, DataFactory, tabProvider, $mdToast, appState) {
     //Initialisation
     $scope.load = true;
     $scope.search = '';
