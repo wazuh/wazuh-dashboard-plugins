@@ -16,7 +16,7 @@ module.exports = function (server, options) {
 
     var agentsArray = [];
 
-    cron.schedule('0 */3 * * * *', function () {
+    cron.schedule('0 */30 * * * *', function () {
         agentsArray.length = 0;
         getConfig(loadCredentials);
     }, true);
