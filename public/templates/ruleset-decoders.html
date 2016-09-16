@@ -5,7 +5,7 @@
 
 			<span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
 					<md-autocomplete ng-hide="$parent.typeFilter != 'all'" flex md-no-cache="true" md-selected-item="_filter" md-selected-item-change="decodersApplyFilter(_filter)" md-search-text="$parent.search"
-						md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
+						md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-select-on-match="true" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
 						placeholder="Search file">
 						<md-item-template>
 							<span class="item-title">
