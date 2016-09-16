@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('generalController', function ($scope, $q, DataFactory, tabProvider, $mdToast, appState) {
+app.controller('generalController', function ($scope, $q, DataFactory, tabProvider, $mdToast, appState, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.search = '';
@@ -114,15 +114,24 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
         }
     };
 
-    //Load
-    DataFactory.initialize('get', '/agents', {}, 256, 0)
-        .then(function (data) {
-            objectsArray['/agents'] = data;
-            DataFactory.get(data).then(function (data) {
-                DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
-                $scope.load = false;
+    
+    var load = function () {
+        DataFactory.initialize('get', '/agents', {}, 256, 0)
+            .then(function (data) {
+                objectsArray['/agents'] = data;
+                DataFactory.get(data).then(function (data) {
+                    DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
+                    $scope.load = false;
+                }, printError);
             }, printError);
-        }, printError);
+    };
+
+    //Load
+    try {
+        load();
+    } catch (e) {
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {
