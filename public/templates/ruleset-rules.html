@@ -67,19 +67,26 @@
           <span flex="10">{{rule.id}}</span>
           <span flex="60">{{rule.description}}</span>
           <span flex="10">{{rule.level}}</span>
-          <span flex="20">{{rule.file}}</span>
+          <md-button md-no-ink class="invisibleButton" flex="20" ng-click="rulesApplyFilter({type: 'file', value: rule.file}); $event.stopPropagation();">{{rule.file}}</md-button>
         </md-list-item>
       </md-list>
       <md-list ng-if="showDetails[rule.id]">
         <md-list-item>
           <span style="font-weight: bold" flex="15">Groups</span>
-          <span flex="35" layout="column"><span ng-repeat="group in rule.groups">{{ group }}</span></span>
+          <span flex="35" layout="column"><span ng-repeat="group in rule.groups" ng-click="rulesApplyFilter({type: 'group', value: group})"><i>{{ group }}</i></span></span>
           <span style="font-weight: bold" flex="15" ng-if="rule.pci.length > 0">PCI Groups</span>
-          <span flex="35" layout="column" ng-if="rule.pci.length > 0"><span ng-repeat="pci in rule.pci">{{ pci }}</span></span>
+          <span flex="35" layout="column" ng-if="rule.pci.length > 0"><span ng-repeat="pci in rule.pci" ng-click="rulesApplyFilter({type: 'pci', value: pci})"><i>{{ pci }}</i></span></span>
         </md-list-item>
         <md-list-item ng-repeat="(detailk, detailv) in rule.details">
           <span style="font-weight: bold" flex="15">{{detailk}}</span>
           <span flex="40">{{detailv}}</span>
+        </md-list-item>
+        <md-list-item>
+          <span style="font-weight: bold">
+            <md-button ng-href="/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.sidid:{{rule.id}}')),sort:!('@timestamp',desc))" target="_blank">
+            Discover <i class="fa fa-external-link" aria-hidden="true"></i>
+            </md-button>
+            </span>
         </md-list-item>
 
       </md-list>

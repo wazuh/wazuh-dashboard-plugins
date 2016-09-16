@@ -41,14 +41,15 @@
 		<md-toolbar layout="row">
 			<div class="md-toolbar-tools">
 				<span flex="70">Name</span>
-				<span flex="30">File</span>
+				<span flex="30" >File</span>
 			</div>
 		</md-toolbar>
 		<div md-virtual-repeat="decoder in decodersObj" md-on-demand flex layout="column" layout-align="start stretch">
 			<md-list>
 				<md-list-item ng-click=" showDetails[decoder.name] = ! showDetails[decoder.name]; ">
 					<span flex="70">{{decoder.name}}</span>
-					<span flex="30">{{decoder.file}}</span>
+					<md-button md-no-ink class="invisibleButton" flex="30" ng-if="$parent.typeFilter == 'all'" ng-click="decodersApplyFilter({type: 'file', value: decoder.file}); $event.stopPropagation();">{{decoder.file}}</md-button>
+					<span flex="30" ng-if="$parent.typeFilter != 'all'">{{decoder.file}}</span>
 				</md-list-item>
 			</md-list>
 			<md-list ng-if="showDetails[decoder.name]">
