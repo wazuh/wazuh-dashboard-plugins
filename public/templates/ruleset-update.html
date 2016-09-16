@@ -1,4 +1,4 @@
-   <md-content layout="row" ng-if="!load && submenuNavItem2 == 'update'" layout-align="space-around start" layout-sm="column" layout-xs="column" ng-controller="updateRulesetController">
+   <md-content layout="row" ng-if="!load && submenuNavItem2 == 'update'" layout-align="space-around start" layout-sm="column" layout-xs="column" ng-controller="updateRulesetController" style="min-height: 500px;">
 
         <md-content layout="column" layout-align="space-around center">
             <h2>Update</h2>
@@ -9,6 +9,7 @@
             </md-input-container>
 
             <md-button type="submit" ng-click="updateRuleset($event);" class="md-primary md-raised">Update ruleset</md-button>
+            <div flex></div>
         </md-content>
 
         <md-divider></md-divider>
@@ -20,6 +21,7 @@
                 <md-option-empty ng-if="backups.length == 0">No backups where found</md-option-empty>
             </md-select>
             <md-button type="submit" class="md-primary md-raised" ng-click="restoreBackup($event);">Restore backup</md-button>
+            <div flex></div>
         </md-content>
 
     </md-content>
