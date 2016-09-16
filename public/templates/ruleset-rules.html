@@ -1,7 +1,9 @@
-<md-content layout="column" flex layout-padding ng-if="!load && submenuNavItem2 == 'rules'" ng-controller="rulesController"  layout-align="space-around">
+<md-content layout="column" flex layout-padding ng-if="!load && submenuNavItem2 == 'rules'" ng-controller="rulesController"  layout-align="start space-around">
   <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
   
-  <md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding style="min-height: 500px;">
+  
+	
+  <md-virtual-repeat-container layout-align="start start" ng-if="!load" flex layout="column" layout-padding style="min-height: 2000px;">
 
     <div flex id="content" layout="row" layout-align="center stretch">
 
@@ -24,7 +26,7 @@
       </md-autocomplete>
       </span>
 
-      <md-input-container flex="15" style="margin-left: 20px; padding: 5px; margin-right: 10px;" class="md-whiteframe-z1">
+      <md-input-container flex="15" style="margin-right: 0px !important; margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);" class="md-whiteframe-z1">
         <md-select style="border: none;" ng-model="statusFilter" ng-change="rulesStatusFilter(statusFilter)" aria-label="Filter by status">
           <md-option value="enabled">Enabled</md-option>
           <md-option value="disabled">Disabled</md-option>

@@ -13,8 +13,8 @@
         </md-nav-bar>
     </md-content>
 
-	<div flex layout="row">
-	<md-content flex id="content">
+	<div flex layout="row" style="max-height: 90px;">
+	<md-content flex id="content" style="max-height: 90px;">
 	<md-content layout="row"  layout-align="center start" layout-padding  ng-init="submenuNavItem = (state.getManagerState() ? state.getManagerState() : 'status')">
         <md-nav-bar flex style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-click="submenuNavItem = 'status'" name="status">Status</md-nav-item>

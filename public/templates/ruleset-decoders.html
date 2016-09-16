@@ -1,5 +1,5 @@
-<md-content layout="row" flex layout-padding ng-if="!load && submenuNavItem2 == 'decoders'" ng-controller="decodersController">
-	<md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding style="min-height: 500px;">
+<md-content layout="row" flex layout-padding ng-if="!load && submenuNavItem2 == 'decoders'" ng-controller="decodersController" >
+	<md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding style="min-height: 2000px;">
 
 		<div flex id="content" layout="row" layout-align="space-between center">
 
@@ -21,7 +21,7 @@
 			</md-autocomplete>
 			</span>
 
-			<md-input-container flex="15" style="margin-left: 20px; padding: 5px; margin-right: 10px;" class="md-whiteframe-z1">
+			<md-input-container flex="15" style="margin-right: 0px;margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);" class="md-whiteframe-z1">
 				<md-select ng-model="typeFilter" ng-change="decoderTypeFilter(typeFilter)" aria-label="Filter by type">
 					<md-option value="all">All</md-option>
 					<md-option value="parents">Parents only</md-option>
