@@ -12,6 +12,10 @@ require('ui/modules').get('app/wazuh', [])
                     $cookies.putObject('_agentsState_data', data);
                 }
             },
+			unsetAgentsState: function () {
+                    $cookies.putObject('_agentsState_subtab', "");
+                    $cookies.putObject('_agentsState_data', "");
+            },
             getManagerState: function () {
                 return $cookies.getObject('_managerState');
             },

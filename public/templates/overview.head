@@ -15,7 +15,7 @@
 
 	<div flex layout="row">
 	<md-content flex id="content">
-	<md-content layout="row" layout-align="center start" layout-padding  ng-init="submenuNavItem = (state.getOverviewState() ? state.getOverviewState() : 'general')" style="max-height: 64px;">
+	<md-content layout="row" layout-align="center start" layout-padding ng-init="submenuNavItem = (state.getOverviewState() ? state.getOverviewState() : 'general')" style="max-height: 64px;">
         <md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>

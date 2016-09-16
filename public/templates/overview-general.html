@@ -2,7 +2,7 @@
 	<div layout="row" layout-align="center stretch">
 		<md-card flex layout="column">
 		  <md-card-content>
-			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization',type:metric))"
+			<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))"
 			  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="*">
 			</kbn-vis>
 		  </md-card-content>
@@ -10,28 +10,28 @@
 		
 		<md-card flex layout="column">
 		  <md-card-content>
-			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 10 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization22',type:metric))" vis-filter="rule.AlertLevel:[7 TO *]">
+			<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 10 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization22',type:metric))" vis-filter="rule.AlertLevel:[7 TO *]">
 			</kbn-vis>
 		  </md-card-content>
 		</md-card>
 		
 		<md-card flex layout="column">
 		  <md-card-content>
-			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_failed')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failed'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: authentication_failed">
+			<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_failed')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failed'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: authentication_failed">
 			</kbn-vis>
 		  </md-card-content>
 		</md-card>
 		
 		<md-card flex layout="column">
 		  <md-card-content>
-			<kbn-vis vis-height="80px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_success')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication success'),schema:metric,type:count)),listeners:(),params:(fontSize:30,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: authentication_success">
+			<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_success')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication success'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: authentication_success">
 			</kbn-vis>
 		  </md-card-content>
 		</md-card>
 	</div>	
 	
   <div layout="row" layout-align="center stretch">
-    <md-card flex="55">
+    <md-card flex="50">
       <md-card-content>
 	  <span class="md-headline">Events</span>
         <kbn-vis vis-height="215px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
@@ -40,37 +40,11 @@
       </md-card-content>
     </md-card>
 	
-	<md-card layout="column" flex="30">
+	<md-card layout="column" flex="50">
      <md-card-content>
-        <span class="md-headline">Top 5 Agents</span>
-        <kbn-vis vis-height="215px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Agents%20total%20alerts',type:pie))"
-          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+        <span class="md-headline">Agents</span>
+        <kbn-vis vis-height="215px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:AgentName,order:desc,orderBy:'1',size:100),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'New%20Visualization',type:line))" vis-filter="*">
         </kbn-vis>
-      </md-card-content>
-    </md-card>
-	
-	
-    <md-card layout="column" flex="15" >
-      <md-card-content>
-        <span class="md-headline">Agents status</span>
-        <md-list>
-          <md-list-item>
-            <p>Total agents</p>
-            <p class="right-text">{{agentsCountTotal}}</p>
-          </md-list-item>
-          <md-list-item>
-            <p>Active</p>
-            <p class="right-text">{{agentsCountActive}}</p>
-          </md-list-item>
-          <md-list-item>
-            <p>Disconnected</p>
-            <p class="right-text">{{agentsCountDisconnected}}</p>
-          </md-list-item>
-          <md-list-item>
-            <p>Never connected</p>
-            <p class="right-text">{{agentsCountNeverConnected}}</p>
-          </md-list-item>
-        </md-list>
       </md-card-content>
     </md-card>
 
@@ -113,11 +87,16 @@
         </md-card-title-text>
       </md-card-title>
       <md-card-content>
-        <kbn-vis vis-height="300px;" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Timestamp,field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:500),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Agent,field:AgentName,order:desc,orderBy:'1',size:500),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:IP,field:AgentIP,order:desc,orderBy:'1',size:500),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Level,field:rule.AlertLevel,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
-        </kbn-vis>
+        <kbn-dis table-height="300px;"
+dis-a="(columns:!(AgentName,AgentIP,rule.description,rule.AlertLevel,rule.PCI_DSS),index:'ossec-*',interval:auto,query:'',sort:!('@timestamp',desc))"
+          dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
+		  dis-filter="*"
+		  infinite-scroll="true"
+		  >
+        </kbn-dis>
       </md-card-content>
     </md-card>
+
 
 
   </div>

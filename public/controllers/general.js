@@ -11,11 +11,13 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
     $scope.submenuNavItem = '';
     $scope.state = appState;
 
+	/*
     if ($scope.state.getAgentsState().data) {
         $scope.submenuNavItem = $scope.state.getAgentsState().subtab;
         $scope._agent = $scope.state.getAgentsState().data;
         $scope.search = $scope._agent.name;
     }
+	*/
 	
     var objectsArray = [];
 
@@ -66,7 +68,7 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
     $scope.agentsSearch = function (search) {
         var defered = $q.defer();
         var promise = defered.promise;
-
+		
         if (search) {
             DataFactory.filters.set(objectsArray['/agents'], 'search', search);
         } else {

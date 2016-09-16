@@ -16,6 +16,34 @@
           </md-card-content>
         </md-card>
 
+			
+	
+    <md-card layout="column" flex="50" >
+      <md-card-content>
+        <span class="md-headline">Agents status</span>
+        <md-list>
+          <md-list-item>
+            <p>Total agents</p>
+            <p class="right-text">{{agentsCountTotal}}</p>
+          </md-list-item>
+          <md-list-item>
+            <p>Active</p>
+            <p class="right-text">{{agentsCountActive}}</p>
+          </md-list-item>
+          <md-list-item>
+            <p>Disconnected</p>
+            <p class="right-text">{{agentsCountDisconnected}}</p>
+          </md-list-item>
+          <md-list-item>
+            <p>Never connected</p>
+            <p class="right-text">{{agentsCountNeverConnected}}</p>
+          </md-list-item>
+        </md-list>
+      </md-card-content>
+    </md-card>
+
+	
+	
   <div flex></div>
 
 </md-content>

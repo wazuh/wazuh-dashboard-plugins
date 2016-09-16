@@ -6,7 +6,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
-
+	$scope.$parent.state.setManagerState('ruleset');
     $scope.search = undefined;
 
     $scope.rules = [];
