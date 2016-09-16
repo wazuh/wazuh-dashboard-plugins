@@ -147,6 +147,11 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
     try {
         load();
     } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         errlog.log('Unexpected exception loading controller', e);
     }
 

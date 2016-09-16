@@ -235,6 +235,11 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
     try {
         load();
     } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         errlog.log('Unexpected exception loading controller', e);
     }
 
@@ -448,6 +453,11 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
     try {
         load();
     } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         errlog.log('Unexpected exception loading controller', e);
     }
 
@@ -621,6 +631,11 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
     try {
         load();
     } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         errlog.log('Unexpected exception loading controller', e);
     }
 

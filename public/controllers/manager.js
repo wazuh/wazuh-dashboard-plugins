@@ -171,6 +171,11 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
     try {
         load();
     } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         errlog.log('Unexpected exception loading controller', e);
     }
 
@@ -290,6 +295,11 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
     try {
         load();
     } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         errlog.log('Unexpected exception loading controller', e);
     }
 

@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, DataFactory, $mdToast, errlog) {
+app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     //Initialisation
     $scope.load = true;
     $scope.agentInfo = [];
@@ -122,7 +122,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast, errl
 
 });
 
-app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToast) {
+app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.agents = [];
@@ -237,6 +237,11 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
     try {
         load();
     } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
         errlog.log('Unexpected exception loading controller', e);
     }
 
