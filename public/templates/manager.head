@@ -5,9 +5,9 @@
             <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
                 <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
             </md-nav-item>
+			<md-nav-item md-nav-href="#/manager" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
 			<md-nav-item md-nav-href="#/dashboards" name="ruleset">Dashboards</md-nav-item>
 			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
         </md-nav-bar>
@@ -15,28 +15,13 @@
 
 	<div flex layout="row">
 	<md-content flex id="content">
-	<md-content layout="row" layout-align="center start" layout-padding  ng-init="submenuNavItem = (state.getManagerState() ? state.getManagerState() : 'general')">
-        <md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-            <md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
-            <md-nav-item md-nav-click="submenuNavItem = 'configuration'" name="configuration">Configuration</md-nav-item>
+	<md-content layout="row"  layout-align="center start" layout-padding  ng-init="submenuNavItem = (state.getManagerState() ? state.getManagerState() : 'status')">
+        <md-nav-bar flex style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+            <md-nav-item md-nav-click="submenuNavItem = 'status'" name="status">Status</md-nav-item>
+			<md-nav-item md-nav-click="submenuNavItem = 'ruleset'" name="ruleset">Ruleset</md-nav-item>
+			<md-nav-item md-nav-click="submenuNavItem = 'configuration'" name="configuration">Configuration</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'logs'" name="logs">Logs</md-nav-item>
         </md-nav-bar>
-		<md-content style="margin-top: -6px" flex="40" class="subNavLine" layout="row" layout-align="end start">
-			<md-button ng-show="!show_timer" ng-click="show_timer = !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
-				<i class="fa fa-clock-o" aria-hidden="true"></i> {{ (!timeFilter) ? '24h' : timeFilter}}
-			</md-button>
-			<md-content ng-show="show_timer" layout="row" layout-align="end start">
-				<md-button ng-click="show_timer = !show_timer; timeFilter='24h';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
-					<i class="fa fa-clock-o" aria-hidden="true"></i> Last 24 hours
-				</md-button>
-				<md-button ng-click="show_timer = !show_timer;timeFilter='48h';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
-					<i class="fa fa-clock-o" aria-hidden="true"></i> Last 48 hours
-				</md-button>
-				<md-button ng-click="show_timer = !show_timer;timeFilter='7d';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
-					<i class="fa fa-clock-o" aria-hidden="true"></i> Last 7 days
-				</md-button>
-			</md-content>
-		</md-content>
 	
     </md-content>
 	 </md-content>

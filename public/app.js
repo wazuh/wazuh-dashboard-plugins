@@ -30,6 +30,7 @@ require('plugins/wazuh/objects/routes.js');
 
 // Require controllers
 require('plugins/wazuh/controllers/general.js');
+require('plugins/wazuh/controllers/overview.js');
 require('plugins/wazuh/controllers/agents.js');
 require('plugins/wazuh/controllers/settings.js');
 require('plugins/wazuh/controllers/manager.js');

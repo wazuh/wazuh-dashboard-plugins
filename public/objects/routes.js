@@ -24,6 +24,12 @@ routes
             "check": settingsWizard
         }
     })
+	.when('/overview/:submenu?', {
+        template: require('plugins/wazuh/templates/overview.jade'),
+        resolve: {
+            "check": settingsWizard
+        }
+    })
     .when('/ruleset/:submenu?', {
         template: require('plugins/wazuh/templates/ruleset.jade'),
         resolve: {
@@ -40,11 +46,11 @@ routes
         }
     })
     .when('', {
-        redirectTo: '/manager/',
+        redirectTo: '/overview/',
         resolve: {
             "check": settingsWizard
         }
     })
     .otherwise({
-        redirectTo: '/manager/'
+        redirectTo: '/overview/'
     });
