@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, $mdToast) {
+app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.text = [];
@@ -130,17 +130,25 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
         }
     };
 
-    //Load
-    DataFactory.initialize('get', '/manager/logs', {}, 150, 0)
-        .then(function (data) {
-            objectsArray['/manager/logs'] = data;
-            DataFactory.filters.register(objectsArray['/manager/logs'], 'category', 'string');
-            DataFactory.filters.register(objectsArray['/manager/logs'], 'type_log', 'string');
-            DataFactory.get(data).then(function (data) {
-                $scope.text = data.data.items;
-                loadSummary();
+    var load = function () {
+        DataFactory.initialize('get', '/manager/logs', {}, 150, 0)
+            .then(function (data) {
+                objectsArray['/manager/logs'] = data;
+                DataFactory.filters.register(objectsArray['/manager/logs'], 'category', 'string');
+                DataFactory.filters.register(objectsArray['/manager/logs'], 'type_log', 'string');
+                DataFactory.get(data).then(function (data) {
+                    $scope.text = data.data.items;
+                    loadSummary();
+                }, printError);
             }, printError);
-        }, printError);
+    }
+
+    //Load
+    try {
+        load();
+    } catch (e) {
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
 
     //Destroy

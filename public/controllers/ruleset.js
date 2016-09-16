@@ -2,7 +2,7 @@
 var config = require('plugins/wazuh/config/config.js');
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
+app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
@@ -232,7 +232,11 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {
@@ -243,7 +247,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
 
 });
 
-app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast) {
+app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast, errlog) {
 
     //Initialisation
     $scope.load = true;
@@ -441,7 +445,11 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {
@@ -453,7 +461,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 });
 
 
-app.controller('updateRulesetController', function ($scope, $q, DataFactory, tabProvider, $mdDialog, $mdToast) {
+app.controller('updateRulesetController', function ($scope, $q, DataFactory, tabProvider, $mdDialog, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('update');
@@ -610,7 +618,11 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {

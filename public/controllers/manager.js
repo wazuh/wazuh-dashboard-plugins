@@ -3,7 +3,7 @@ var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, DataFactory, genericReq, tabProvider, $mdDialog, $mdToast) {
+app.controller('managerController', function ($scope, DataFactory, genericReq, tabProvider, $mdDialog, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setManagerState('status');
@@ -168,7 +168,11 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
 	// Timer filter watch
 	var loadWatch = $scope.$watch(function () {
@@ -189,7 +193,7 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, t
 
 });
 
-app.controller('managerConfigurationController', function ($scope, DataFactory, tabProvider) {
+app.controller('managerConfigurationController', function ($scope, DataFactory, tabProvider, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setManagerState('configuration');
@@ -283,7 +287,11 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {

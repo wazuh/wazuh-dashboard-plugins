@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('fimController', function ($scope, $q, DataFactory, $mdToast) {
+app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -181,7 +181,11 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast) {
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {
