@@ -6,7 +6,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 app.controller('overviewController', function ($scope, DataFactory, genericReq, tabProvider, $mdDialog, $mdToast) {
     //Initialisation
     $scope.load = true;
-    $scope.$parent.state.setManagerState('general');
+    $scope.$parent.state.setOverviewState('general');
 	$scope.timeFilter = "24h";
 	
     $scope.stats = [];

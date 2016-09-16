@@ -27,6 +27,14 @@ require('ui/modules').get('app/wazuh', [])
                 if (subtab) {
                     $cookies.putObject('_rulesetState', subtab);
                 }
+            },
+			getOverviewState: function () {
+                return $cookies.getObject('_overviewState');
+            },
+            setOverviewState: function (subtab) {
+                if (subtab) {
+                    $cookies.putObject('_overviewState', subtab);
+                }
             }
         };
     });
