@@ -48,7 +48,7 @@
                         <input type="text" id="searchBox" ng-model="$parent._fileSearch" ng-change="fileSearchFilter($parent._fileSearch)" flex>
                     </md-input-container>
                     <div flex="40"></div>
-					<md-content flex="40" class="subNavLine" layout="row" layout-align="end center">
+					<md-content flex="40" class="subNavLine" layout="row" layout-align="end center" ng-show="isWindows">
 						<md-button ng-click="showFilesRegistry = !showFilesRegistry" class="md-primary" ng-class="!showFilesRegistry ? 'button-disabled' : 'button-active'">
 							Files
 							</md-button>
