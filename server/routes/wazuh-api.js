@@ -1,11 +1,33 @@
 module.exports = function (server, options) {
 
+    const MIN_VERSION = [1,3,0];
+    const MAX_VERSION = [1,3,0];
+
     const config = server.config();
     var _elurl = config.get('elasticsearch.url');
     var _eluser = config.get('elasticsearch.username');
     var _elpass = config.get ('elasticsearch.password');
 
     //Handlers - Generic
+
+    var checkVersion = function (version) {
+        version = version.replace('v', '');
+        var _current = version.split('.');
+
+        if (_current.length == 3) {
+            for (var i = 0; i < 3; i++) {
+                var tmp = parseInt(_current[i]);
+                if (tmp == NaN) {
+                    return false;
+                } else if (!( (MIN_VERSION[i] <= tmp) && (tmp <= MAX_VERSION[i]) )) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
 
     var getConfig = function (callback) {
         var needle = require('needle');
@@ -39,11 +61,11 @@ module.exports = function (server, options) {
     //Handlers - Test API
 
     var testApiAux2 = function (error, response, insecure) {
-        if (!error && response && response.body.data == 'Welcome to Wazuh HIDS API') {
+        if (!error && response && response.body.data && checkVersion(response.body.data)) {
             return { 'statusCode': 200, 'data': 'ok' };
         } else if (response && response.statusCode == 401) {
             return { 'statusCode': 200, 'error': '1', 'data': 'unauthorized' };
-        } else if (!error && response && response.body.data != 'Welcome to Wazuh HIDS API') {
+        } else if (!error && response && (!response.body.data || !checkVersion(response.body.data)) ) {
             return { 'statusCode': 200, 'error': '1', 'data': 'bad_url' };
         } else {
             if (!insecure) {
@@ -55,14 +77,14 @@ module.exports = function (server, options) {
     };
 
     var testApiAux1 = function (error, response, wapi_config, needle, callback) {
-        if (!error && response && response.body.data == 'Welcome to Wazuh HIDS API') {
+        if (!error && response && response.body.data && checkVersion(response.body.data)) {
             callback({ 'statusCode': 200, 'data': 'ok' });
         } else if (response && response.statusCode == 401) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'unauthorized' });
-        } else if (!error && response && response.body.data != 'Welcome to Wazuh HIDS API') {
+        } else if (!error && response && (!response.body.data || !checkVersion(response.body.data)) ) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'bad_url' });
         } else {
-            needle.request('get', wapi_config.url, {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
+            needle.request('get', wapi_config.url+'/version', {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
                 callback(testApiAux2(error, response, wapi_config.insecure));
             });
         }
@@ -90,7 +112,7 @@ module.exports = function (server, options) {
             if ((wapi_config.url.indexOf('https://') == -1) && (wapi_config.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
-                needle.request('get', wapi_config.url, {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
+                needle.request('get', wapi_config.url+'/version', {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
                     testApiAux1(error, response, wapi_config, needle, function (test_result) {
                         reply(test_result);
                     });

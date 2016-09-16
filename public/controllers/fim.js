@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('fimController', function ($scope, DataFactory, $mdToast) {
+app.controller('fimController', function ($scope, $q, DataFactory, $mdToast) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -40,7 +40,7 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
         } else {
             $scope._sortOrder = false;
             $scope._sort = field;
-            DataFactory.filters.set(objectsArray['/files'], 'filter-sort', '-'+field);
+            DataFactory.filters.set(objectsArray['/files'], 'filter-sort', '-' + field);
         }
     }
 
@@ -93,7 +93,7 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
         },
     };
 
-	    $scope.filesObj = {
+    $scope.filesObj = {
         //Obj with methods for virtual scrolling
         getItemAtIndex: function (index) {
             if ($scope._files_blocked) {
@@ -125,7 +125,19 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
             return DataFactory.getTotalItems(objectsArray['/files']);
         },
     };
-	
+
+    var isWindows = function () {
+        var defered = $q.defer();
+        var promise = defered.promise;
+
+        DataFactory.getAndClean('get', '/agents/' + $scope.$parent._agent.id, {})
+            .then(function (data) {
+                defered.resolve(data.data.os.toLowerCase().indexOf('windows') > -1);
+            }, printError);
+
+        return promise;
+    }
+
     var createWatch = function () {
         loadWatch = $scope.$watch(function () {
             return $scope.$parent._agent;
@@ -144,6 +156,9 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
                             $scope._sort = '';
                             $scope.fileSearchFilter($scope._fileSearch);
                             $scope.fileEventFilter($scope._fimEvent);
+                            isWindows().then(function (value) {
+                                $scope.isWindows = value;
+                            });
                         }, printError);
                 }, printError);
         });
