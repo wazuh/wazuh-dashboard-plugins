@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="!load && submenuNavItem == 'general'" ng-controller="overviewController" layout-align="space-around">
+<md-content flex layout="column" ng-if="!load && submenuNavItem == 'general'" ng-controller="overviewGeneralController" layout-align="space-around">
 	<div layout="row" layout-align="center stretch">
 		<md-card flex layout="column">
 		  <md-card-content>
@@ -10,7 +10,7 @@
 		
 		<md-card flex layout="column">
 		  <md-card-content>
-			<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 10 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization22',type:metric))" vis-filter="rule.AlertLevel:[7 TO *]">
+			<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 10 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization22',type:metric))" vis-filter="rule.AlertLevel:[10 TO *]">
 			</kbn-vis>
 		  </md-card-content>
 		</md-card>
