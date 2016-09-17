@@ -84,15 +84,17 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
             });
         return promise;
     };
+	
+	$scope.watchAgents = function(){
+		  $scope.$watch('[]', function () {}, true);    
+		  $scope.submenuNavItem = 'preview';
+		  $scope._agent = "";
+          $scope.search = "";
+	}	
 
     $scope.applyAgent = function (agent) {
         if (agent) {
-            if ($scope.submenuNavItem == '') {
-                $scope.submenuNavItem = 'overview';
-                $scope.state.setAgentsState('overview', agent);
-            } else {
-                $scope.state.setAgentsState(null, agent);
-            }
+            $scope.submenuNavItem = 'overview';
             $scope._agent = agent;
             $scope.search = agent.name;
         }

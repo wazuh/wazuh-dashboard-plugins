@@ -7,7 +7,7 @@
             </md-nav-item>
 			<md-nav-item md-nav-href="#/overview" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+			<md-nav-item ng-click="watchAgents()" md-nav-href="#/agents" name="agents" >Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/dashboards" name="ruleset">Dashboards</md-nav-item>
 			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
         </md-nav-bar>
@@ -43,7 +43,7 @@
 					</span>
 				</div>
 			</md-toolbar>
-			<md-content layout="row" layout-align="center start" ng-show="_agent" layout-padding>
+			<md-content layout="row" layout-align="center start" ng-show="_agent" layout-padding">
 				<md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 					<md-nav-item md-nav-click="submenuNavItem = 'overview'" name="overview">Overview</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File Integrity</md-nav-item>
