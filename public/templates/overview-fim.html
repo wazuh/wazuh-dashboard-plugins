@@ -1,66 +1,88 @@
-<md-content flex layout="column" ng-if="!load && submenuNavItem == 'fim'" ng-controller="overviewFimController" layout-align="start start">
-	<md-content layout="row" layout-align="start start">
-		<div flex = "15" layout="column" layout-align="start start">
-			<md-card  layout="row">
+<md-content flex layout="column" ng-if="!load && submenuNavItem == 'fim'" ng-controller="overviewFimController">
+	<md-content flex layout="row">
+	
+		<div flex="10" layout="column" >
+			<md-card>
 			  <md-card-content>
-				<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Events'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))"
-				  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="*">
+					<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Events),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))"
+				  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+				  vis-filter='rule.groups:"syscheck"'>
 				</kbn-vis>
 			  </md-card-content>
 			</md-card>
-			
-			<md-card  layout="row">
+			<md-card>
 			  <md-card-content>
-				<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Files changes'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization22',type:metric))" vis-filter="rule.AlertLevel:[7 TO *]">
+					<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Changed'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))"
+				  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+				  vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry'>
 				</kbn-vis>
 			  </md-card-content>
 			</md-card>
-			
-			<md-card  layout="row">
+			<md-card>
 			  <md-card-content>
-				<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_failed')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Files deleted'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: authentication_failed">
+					<kbn-vis vis-height="70px;" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22was%20deleted%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Deleted),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))"
+				  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+				  vis-filter='rule.groups:"syscheck" AND full_log:"was deleted" NOT location: syscheck-registry'>
 				</kbn-vis>
 			  </md-card-content>
 			</md-card>
+
 		</div>	
 		
-		<div flex = "60" layout="column" layout-align="center stretch">
-		
-		<md-card>
-		  <md-card-content>
-		  <span class="md-headline">Events overtime</span>
-			<kbn-vis vis-height="215px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-			  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+		<div flex layout="column" >
+			<md-card>
+			  <md-card-content>
+			    <span class="md-headline">Events over time</span>
+				<kbn-vis vis-height="280px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:100),schema:group,type:terms),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'FIM%20Alerts%20over%20time',type:area))"
+				vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+				vis-filter='rule.groups:"syscheck"'>
 			</kbn-vis>
-		  </md-card-content>
-		</md-card>
+			  </md-card-content>
+			</md-card>
+
+		</div>
 		
+		<div flex="20" layout="column" >
+			<md-card>
+			  <md-card-content>
+			    <span class="md-headline">Top user owners</span>
+				<kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
+				vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+				vis-filter='rule.groups:"syscheck" AND full_log: Ownership was'>
+			  </md-card-content>
+			</md-card>
+			<md-card>
+			  <md-card-content>
+				<span class="md-headline">Top group owners</span>
+				<kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.gname_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))" vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+				vis-filter='rule.groups:"syscheck" AND full_log: Group ownership was'>
+			  </md-card-content>	
+			</md-card>
+
 		</div>	
 
-		<div flex = "25" layout="column" layout-align="center stretch">
-		
-		<md-card flex layout="row">
-		  <md-card-content>
-		  <span class="md-headline">Top user owners</span>
-			<kbn-vis vis-height="215px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Ownership%20was%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
-			  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
-			</kbn-vis>
-		  </md-card-content>
-		</md-card>
-		
-		<md-card flex layout="row">
-		  <md-card-content>
-		  <span class="md-headline">Top group owners</span>
-			<kbn-vis vis-height="215px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Ownership%20was%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
-			  vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
-			</kbn-vis>
-		  </md-card-content>
-		</md-card>
-		
-		</div>	
+			
 	</md-content>
-  
+    <md-content flex layout="row">
+	
+		<md-card flex>
+			<md-card-title>
+				<md-card-title-text>
+				<span class="md-headline">Alerts</span>
+				</md-card-title-text>
+			</md-card-title>
+			<md-card-content>
+				<kbn-dis table-height="300px;"
+				dis-a="(columns:!(AgentName,AgentIP,SyscheckFile.path,SyscheckFile.uname_after,SyscheckFile.gname_after),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:syscheck%20NOT%20location:%20syscheck-registry')),sort:!('@timestamp',desc))"
+				dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
+				dis-filter="rule.groups:syscheck NOT location: syscheck-registry"
+				infinite-scroll="true"
+				>
+				</kbn-dis>
+			</md-card-content>
+		</md-card>
+	
+	</md-content>
 
-  <div flex layout="row"></div>
 
 </md-content>

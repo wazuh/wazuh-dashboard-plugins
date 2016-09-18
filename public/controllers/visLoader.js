@@ -70,6 +70,7 @@ var app = require('ui/modules').get('app/wazuh', [])
         visG: '@visG',
         visFilter: '@visFilter',
         visHeight: '@visHeight',
+		visWidth: '@visWidth',
         visSearchable: '@visSearchable'
       },
       template: require('../templates/vis-template.html')
