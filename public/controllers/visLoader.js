@@ -238,10 +238,14 @@ require('ui/modules').get('app/wazuh', [])
             return;
           }
 
-          $scope.$watch("visFilter", function (newValue, oldValue) {
+        $scope.$watch("visFilter", function (newValue, oldValue) {
             $scope.v.filter = newValue;
             $scope.fetch();
-          });
+        });
+		
+		$scope.$watch("visWidth", function (newValue, oldValue) {
+            $scope.fetch();
+        });
 
           $scope.fetch();
         });
