@@ -141,15 +141,16 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
           $state.save();
 
           function getStateDefaults() {
+            var _aJson = rison.decode($scope.disA);
             $route.current.params._a = $scope.disA;
             $route.updateParams({ '_a': $scope.disA });
             $route.current.params._g = $scope.disG;
             $route.updateParams({ '_g': $scope.disG });
             return {
-              query: $scope.searchSource.get('query') || '*',
-              sort: getSort.array(savedSearch.sort, $scope.indexPattern),
-              columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns'),
-              index: $scope.indexPattern.id,
+              query: $scope.disFilter ? $scope.disFilter : { query_string: { analyze_wildcard: '!t', query: '*' } },
+              sort: _aJson.sort.length > 0 ? _aJson.sort : getSort.array(savedSearch.sort, $scope.indexPattern),
+              columns: _aJson.columns.length > 0 ? _aJson.columns : (savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns')),
+              index: _aJson.index ? _aJson.index : $scope.indexPattern.id,
               interval: 'auto',
               filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
             };
