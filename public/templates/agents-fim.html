@@ -49,10 +49,10 @@
                     </md-input-container>
                     <div flex="40"></div>
 					<md-content flex="40" class="subNavLine" layout="row" layout-align="end center" ng-show="isWindows">
-						<md-button ng-click="showFilesRegistry = !showFilesRegistry" class="md-primary" ng-class="!showFilesRegistry ? 'button-disabled' : 'button-active'">
+						<md-button ng-click="changeType()" class="md-primary" ng-class="!$parent.showFilesRegistry ? 'button-disabled' : 'button-active'">
 							Files
 							</md-button>
-						<md-button ng-click="showFilesRegistry = !showFilesRegistry" class="md-primary" ng-class="showFilesRegistry ? 'button-disabled' : 'button-active'">
+						<md-button ng-click="changeType()" class="md-primary" ng-class="$parent.showFilesRegistry ? 'button-disabled' : 'button-active'">
 							Registry keys
 							</md-button>
 					</md-content>
@@ -85,7 +85,7 @@
                     </md-toolbar>
                 </div>
             </div>
-            <div ng-show="!showFilesRegistry" md-virtual-repeat="file in filesObj" md-on-demand flex layout-align="start stretch">
+            <div md-virtual-repeat="file in filesObj" md-on-demand flex layout-align="start stretch">
                 <md-list>
                     <md-list-item ng-click="showFile[file.file] = !showFile[file.file]">
                         <span flex="10" hide-sm hide-xs>{{file.modificationDate}}</span>

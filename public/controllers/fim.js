@@ -136,7 +136,16 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
             }, printError);
 
         return promise;
-    }
+    };
+
+    $scope.changeType = function () {
+        $scope.showFilesRegistry = !$scope.showFilesRegistry;
+        fileTypeFilter();
+    };
+
+    var fileTypeFilter = function () {
+        DataFactory.filters.set(objectsArray['/files'], 'filetype', $scope.showFilesRegistry ? 'registry' : 'file');
+    };
 
     var createWatch = function () {
         loadWatch = $scope.$watch(function () {
@@ -153,9 +162,11 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
                             DataFactory.filters.register(objectsArray['/files'], 'search', 'string');
                             DataFactory.filters.register(objectsArray['/files'], 'event', 'string');
                             DataFactory.filters.register(objectsArray['/files'], 'filter-sort', 'string');
+                            DataFactory.filters.register(objectsArray['/files'], 'filetype', 'string');
                             $scope._sort = '';
                             $scope.fileSearchFilter($scope._fileSearch);
                             $scope.fileEventFilter($scope._fimEvent);
+                            fileTypeFilter();
                             isWindows().then(function (value) {
                                 $scope.isWindows = value;
                             });
@@ -174,6 +185,7 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
                         DataFactory.filters.register(objectsArray['/files'], 'search', 'string');
                         DataFactory.filters.register(objectsArray['/files'], 'event', 'string');
                         DataFactory.filters.register(objectsArray['/files'], 'filter-sort', 'string');
+                        DataFactory.filters.register(objectsArray['/files'], 'filetype', 'string');
                         createWatch();
                         $scope.load = false;
                     }, printError);
