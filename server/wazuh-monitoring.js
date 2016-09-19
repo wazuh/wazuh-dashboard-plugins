@@ -19,11 +19,6 @@ module.exports = function (server, options) {
 
     var agentsArray = [];
 
-    cron.schedule('0 */30 * * * *', function () {
-        agentsArray.length = 0;
-        getConfig(loadCredentials);
-    }, true);
-
     var loadCredentials = function (json) {
         if (json.error) {
             server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
@@ -77,7 +72,7 @@ module.exports = function (server, options) {
         };
 
         needle.request('get', api_url + '/agents', payload, options, function (error, response) {
-            if (!error  && response.body.data.items) {
+            if (!error && response.body.data.items) {
                 agentsArray = agentsArray.concat(response.body.data.items);
                 if ((payload.limit + payload.offset) < maxSize) {
                     checkStatus(response.body.data.totalItems, payload.limit + payload.offset);
@@ -131,6 +126,9 @@ module.exports = function (server, options) {
             element["@timestamp"] = Date.now();
             body += JSON.stringify(element) + "\n";
         });
+        if (body == '') {
+            return;
+        }
         client.bulk({
             index: todayIndex,
             type: 'agent',
@@ -173,5 +171,26 @@ module.exports = function (server, options) {
             }
         });
     };
+
+    var configureKibana = function () {
+        return client.create({ index: '.kibana', type: 'index-pattern', id: 'wazuh-monitoring-*', body: { title: 'wazuh-monitoring-*', timeFieldName: '@timestamp'} });
+    };
+
+    server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Creating today index...');
+    saveStatus();
+    server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Configuring Kibana for working with "wazuh-monitoring-*" index pattern...');
+    configureKibana().then(function () {
+        server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Successfully initialized!');
+    }, function (response) {
+        if (response.statusCode != '409') {
+            server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Could not configure "wazuh-monitoring-*" index pattern. Please, configure it manually on Kibana.');
+        } else {
+            server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Skipping "wazuh-monitoring-*" index pattern configuration: Already configured.');
+        }
+    });
+    cron.schedule('0 */30 * * * *', function () {
+        agentsArray.length = 0;
+        getConfig(loadCredentials);
+    }, true);
 
 }
