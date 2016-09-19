@@ -186,6 +186,7 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
                         DataFactory.filters.register(objectsArray['/files'], 'event', 'string');
                         DataFactory.filters.register(objectsArray['/files'], 'filter-sort', 'string');
                         DataFactory.filters.register(objectsArray['/files'], 'filetype', 'string');
+                        DataFactory.filters.set(objectsArray['/files'], 'filetype', 'file');
                         createWatch();
                         $scope.load = false;
                     }, printError);
