@@ -10,8 +10,8 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
 
     $scope.load = true;
     $scope.agentInfo = [];
-	$scope._agent = "";
-	
+    $scope._agent = "";
+
     //$scope.$parent.state.setAgentsState('overview');
     var objectsArray = [];
     var loadWatch;
@@ -107,7 +107,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
         var _urlStr = '/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),filters:!((\'$state\':(store:appState),meta:(alias:!n,disabled:!f,index:\'ossec-*\',key:AgentName,negate:!f,value:\'';
         var _urlStrSf = '\'),query:(match:(AgentName:(query:\'';
         var _urlStrSSf = '\',type:phrase))))),index:\'ossec-*\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'*\')),sort:!(\'@timestamp\',desc),vis:(aggs:!((params:(field:AgentName,orderBy:\'2\',size:20),schema:segment,type:terms),(id:\'2\',schema:metric,type:count)),type:histogram))&indexPattern=ossec-*&type=histogram';
-       
+
         return _urlStr + agent.name + _urlStrSf + agent.name + _urlStrSSf;
 
     }
@@ -171,9 +171,9 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';
-	
-	$scope.submenuNavItem = "preview";
-	
+
+    $scope.submenuNavItem = "preview";
+
     var objectsArray = [];
 
 

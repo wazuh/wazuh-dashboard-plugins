@@ -10,14 +10,6 @@ app.controller('generalController', function ($scope, $q, DataFactory, tabProvid
     $scope.menuNavItem = 'agents';
     $scope.submenuNavItem = '';
     $scope.state = appState;
-
-	/*
-    if ($scope.state.getAgentsState().data) {
-        $scope.submenuNavItem = $scope.state.getAgentsState().subtab;
-        $scope._agent = $scope.state.getAgentsState().data;
-        $scope.search = $scope._agent.name;
-    }
-	*/
 	
     var objectsArray = [];
 

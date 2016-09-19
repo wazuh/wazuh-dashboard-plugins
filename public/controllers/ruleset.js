@@ -481,8 +481,8 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
     $scope.updateType = 'b';
     $scope.updateForce = false;
 
-    $scope.menuNavItem = 'ruleset';
-    $scope.submenuNavItem = 'update';
+    $scope.submenuNavItem = 'ruleset';
+    $scope.submenuNavItem2 = 'update';
 
     $scope.pageId = (Math.random().toString(36).substring(3));
     tabProvider.register($scope.pageId);

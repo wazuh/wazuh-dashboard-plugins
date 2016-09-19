@@ -201,7 +201,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                   if (!angular.equals(sort, currentSort)) $scope.fetch();
                 });
 
-                /*START*/
       // update data source when filters update
       $scope.$listen(queryFilter, 'update', function () {
         return $scope.updateDataSource().then(function () {
@@ -217,8 +216,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 
       // fetch data when filters fire fetch event
       $scope.$listen(queryFilter, 'fetch', $scope.fetch);
-
-                /*END*/
 
                 $scope.$watch('opts.timefield', function (timefield) {
                   timefilter.enabled = !!timefield;
