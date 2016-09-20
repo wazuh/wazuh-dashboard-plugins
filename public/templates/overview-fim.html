@@ -133,17 +133,14 @@
 		<md-card flex>
 			<md-card-title>
 				<md-card-title-text>
-					<span class="md-headline">Alerts</span>
+					<span class="md-headline">Events summary</span>
 				</md-card-title-text>
 			</md-card-title>
 			<md-card-content>
-				<kbn-dis table-height="300px;"
-				dis-a="(columns:!(AgentName,AgentIP,SyscheckFile.path,SyscheckFile.event,SyscheckFile.uname_after,SyscheckFile.gname_after),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:syscheck%20NOT%20location:%20syscheck-registry')),sort:!('@timestamp',desc))"
-				dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
-				dis-filter="rule.groups:syscheck NOT location: syscheck-registry"
-				infinite-scroll="true">
-				
-				</kbn-dis>
+				<kbn-vis vis-height="460px;" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20NOT%20location:%20%22syscheck-registry%22')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:Agent,field:AgentName,order:desc,orderBy:'1',size:100),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:File,field:SyscheckFile.path,order:desc,orderBy:'1',size:500),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Event,field:SyscheckFile.event,order:desc,orderBy:'1',size:10),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:10),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+				vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
+					vis-filter='rule.groups:"syscheck" NOT location: "syscheck-registry"'>
+				</kbn-vis>
 			</md-card-content>
 		</md-card>
 

@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('generalController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window) {
+app.controller('generalController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window,$location) {
     //Initialisation
     $scope.load = true;
     $scope.search = '';
@@ -78,7 +78,7 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 	
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
-        $window.open('#/dashboards/', '_blank');
+		$window.location.href = '#/dashboards/';
     }
 
 
@@ -123,7 +123,8 @@ app.controller('stateLocationController', function ($scope, appState, $window) {
 
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
-        $window.open('#/dashboards/', '_blank');
+		$window.location.href = '#/dashboards/';
+		
     }
 	
 	$scope.getDiscoverAll = function () {

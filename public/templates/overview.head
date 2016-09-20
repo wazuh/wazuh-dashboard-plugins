@@ -36,10 +36,9 @@
 					<i class="fa fa-clock-o" aria-hidden="true"></i> Last month
 				</md-button>
 			</md-content>
-			<md-button ng-if="submenuNavItem == 'general'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-href="{{getDiscoverAll()}}"
-					target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-			<md-button ng-if="submenuNavItem == 'fim'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-href="{{getDiscoverFIM()}}"
-					target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>		
+			<md-button ng-if="submenuNavItem == 'general'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-href="{{getDiscoverAll()}}">
+			<i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+			<md-button ng-if="submenuNavItem == 'fim'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-href="{{getDiscoverFIM()}}"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>		
 			<md-button class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'general'" ng-click="openDashboard('ossecalerts','*')">
 				<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 			</md-button>
