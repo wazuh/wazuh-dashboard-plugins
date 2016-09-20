@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('generalController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window,$location) {
+app.controller('generalController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window) {
     //Initialisation
     $scope.load = true;
     $scope.search = '';
@@ -80,6 +80,11 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
         $scope.state.setDashboardsState(dashboard, filter);
 		$window.location.href = '#/dashboards/';
     }
+	
+	$scope.openDiscover = function (template, filter) {
+        $scope.state.setDiscoverState(template, filter);
+		$window.location.href = '#/discover/';
+    }
 
 
     var load = function () {
@@ -127,17 +132,10 @@ app.controller('stateLocationController', function ($scope, appState, $window) {
 		
     }
 	
-	$scope.getDiscoverAll = function () {
-
-        var _urlStr = "/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(AgentName,AgentIP,rule.description,rule.AlertLevel,rule.groups,full_log),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))";
-
-        return _urlStr;
+	$scope.openDiscover = function (template, filter) {
+        $scope.state.setDiscoverState(template, filter);
+		$window.location.href = '#/discover/';
     }
-
-	$scope.getDiscoverFIM = function () {
-        var _urlStr = "/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(AgentName,AgentIP,rule.description,rule.AlertLevel,rule.groups,full_log),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'location: syscheck')),sort:!('@timestamp',desc))";
-
-        return _urlStr;
-    }	
+	
 
 });

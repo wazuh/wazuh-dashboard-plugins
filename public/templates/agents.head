@@ -48,7 +48,8 @@
 					<md-nav-item md-nav-click="submenuNavItem = 'policy_monitoring'" name="policy_monitoring">Policy Monitoring</md-nav-item>
 				</md-nav-bar>
 				<md-content flex="40" class="subNavLine" layout="row" layout-align="end start">
-				<md-button ng-if="_agent" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-href="{{getDiscoverByAgent(_agent)}}"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button ng-if="_agent && submenuNavItem == 'overview'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('generic','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button ng-if="_agent && submenuNavItem == 'fim'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('fim','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
 				<md-button style="margin-bottom: 0px !important;" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'overview'" ng-click="openDashboard('ossecalerts', 'AgentName:'+_agent.name)">
 					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 				</md-button>
