@@ -19,25 +19,22 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
 
     //Functions
     $scope.setTimer = function (time) {
-        if (time == "24h") {
-            $scope.timerFilterValue = "24h";
-        } else if (time == "48h") {
-            $scope.timerFilterValue = "48h";
-        } else {
-            $scope.timerFilterValue = "7d";
-        }
+            $scope.timerFilterValue = time;
     };
 
 
     var load_tops = function () {
         var daysAgo = 1;
-        if ($scope.timerFilterValue == "7d") {
-            var daysAgo = 7;
-        } else if ($scope.timerFilterValue == "48h") {
-            var daysAgo = 2;
+        if ($scope.timerFilterValue == "24h") {
+            daysAgo = 1;
+        } else if ($scope.timerFilterValue == "7d") {
+            daysAgo = 7;
+		} else if ($scope.timerFilterValue == "30d") {
+            daysAgo = 30;	
         } else {
-            var daysAgo = 1;
+            daysAgo = 1;
         }
+		
         var date = new Date();
         date.setDate(date.getDate() - daysAgo);
         var timeAgo = date.getTime();
@@ -131,14 +128,18 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
 
 
     var load_tops = function () {
+		
         var daysAgo = 1;
-        if ($scope.timerFilterValue == "7d") {
-            var daysAgo = 7;
-        } else if ($scope.timerFilterValue == "48h") {
-            var daysAgo = 2;
+        if ($scope.timerFilterValue == "24h") {
+            daysAgo = 1;
+        } else if ($scope.timerFilterValue == "7d") {
+            daysAgo = 7;
+		} else if ($scope.timerFilterValue == "30d") {
+            daysAgo = 30;	
         } else {
-            var daysAgo = 1;
+            daysAgo = 1;
         }
+		
         var date = new Date();
         date.setDate(date.getDate() - daysAgo);
         var timeAgo = date.getTime();

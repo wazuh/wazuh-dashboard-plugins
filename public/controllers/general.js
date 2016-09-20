@@ -75,7 +75,7 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 
         return _urlStr + agent.name + _urlStrSf + agent.name + _urlStrSSf;
     }
-
+	
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
         $window.open('#/dashboards/', '_blank');
@@ -125,5 +125,18 @@ app.controller('stateLocationController', function ($scope, appState, $window) {
         $scope.state.setDashboardsState(dashboard, filter);
         $window.open('#/dashboards/', '_blank');
     }
+	
+	$scope.getDiscoverAll = function () {
+
+        var _urlStr = "/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(AgentName,AgentIP,rule.description,rule.AlertLevel,rule.groups,full_log),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))";
+
+        return _urlStr;
+    }
+
+	$scope.getDiscoverFIM = function () {
+        var _urlStr = "/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(AgentName,AgentIP,rule.description,rule.AlertLevel,rule.groups,full_log),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'location: syscheck')),sort:!('@timestamp',desc))";
+
+        return _urlStr;
+    }	
 
 });

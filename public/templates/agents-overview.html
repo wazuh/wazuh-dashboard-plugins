@@ -1,14 +1,54 @@
 <md-content ng-if="submenuNavItem == 'overview'" ng-if="_agent" class="md-padding">
 	<div ng-controller="agentsController">
 
+	<md-content layout="row">
+			<md-card flex="33">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Top 10 signatures</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="130px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 10',type:pie))"
+						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="33">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Top 10 groups</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="130px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top',type:pie))"
+						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="33">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Top 10 PCI Controls</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="130px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.PCI_DSS,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top',type:pie))"
+						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+
+		</md-content>
+		
 		<md-card>
 			<md-card-title>
 				<md-card-title-text>
-					<span class="md-headline">Agent alerts</span>
+					<span class="md-headline">Alerts</span>
 				</md-card-title-text>
 			</md-card-title>
 			<md-card-content>
-				<kbn-vis vis-height="200px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',customLabel:'Agent alerts last 7 days',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Agentbalerts last 7 days',type:histogram))"
+				<kbn-vis vis-height="200px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',customLabel:'Agent alerts last 7 days',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Agentbalerts last 24 days',type:histogram))"
 					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
 				</kbn-vis>
 			</md-card-content>
@@ -41,46 +81,23 @@
 				</md-card-content>
 			</md-card>
 		</md-content>
+		
+			
+	<md-content layout="row">
+		<md-card flex>
+			<md-card-title>
+				<md-card-title-text>
+					<span class="md-headline">Alerts</span>
+				</md-card-title-text>
+			</md-card-title>
+			<md-card-content>
+				<kbn-dis table-height="800px;" dis-a="(columns:!(rule.description,rule.AlertLevel,rule.groups,rule.PCI_DSS,full_log),index:'ossec-*',interval:auto,query:'',sort:!('@timestamp',desc))"
+					dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" dis-filter="AgentName: {{_agent.name}} " infinite-scroll="true">
+				</kbn-dis>
+			</md-card-content>
+		</md-card>
+	</md-content>
 
-		<md-content layout="row">
-			<md-card flex="33">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 10 alerts by type</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'Top 10 alerts by type',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="33">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 10 file changes</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="200px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'Top 10 file changes',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="33">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 10 source IP</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="200px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'Top 10 source IP',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-
-		</md-content>
 
 
 	</div>
