@@ -738,7 +738,29 @@ var getLastField = function(req, reply) {
         path: '/api/wazuh-elastic/top/{field}/{time?}',
         handler: getFieldTop
     });
-
+    /*
+    * GET /api/wazuh-stats/last/AgentName
+    * Return last field value
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/last/{field}',
+        handler: getLastField
+    });	
+    /*
+	
+	/*
+    * GET /api/wazuh-stats/last/AgentName/ID/005
+    * Return last field value
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/last/{field}/{fieldFilter}/{fieldValue}',
+        handler: getLastField
+    });	
+    
     /*
     * POST /api/wazuh/debug
     * Write in debug log
