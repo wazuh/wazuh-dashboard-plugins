@@ -142,22 +142,40 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
         var date = new Date();
         date.setDate(date.getDate() - daysAgo);
         var timeAgo = date.getTime();
-        genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/' + timeAgo)
+        
+        // Top fields
+        genericReq.request('GET', '/api/wazuh-elastic/top/AgentName/'+timeAgo)
             .then(function (data) {
-                $scope.topsrcuser = data.data;
+                $scope.topagent = data.data;
             }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/srcip/' + timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/SyscheckFile.perm_before/'+timeAgo)
             .then(function (data) {
-                $scope.topsrcip = data.data;
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/' + timeAgo)
-            .then(function (data) {
-                $scope.topgroup = data.data;
+                $scope.toppermissions = data.data;
             }, printError);
         genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/' + timeAgo)
             .then(function (data) {
                 $scope.toppci = data.data;
             }, printError);
+            
+        // Last fields
+
+        genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/modified')
+            .then(function (data) {
+            if(data.data != "")
+                $scope.last_file_changed = (data.data != "") ? data.data.path : "(no data)";
+        }, printError);
+        
+        genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/addded')
+        .then(function (data) {
+                $scope.last_file_added = (data.data != "") ? data.data.path : "(no data)";
+        }, printError);
+        
+        genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/deleted')
+        .then(function (data) {
+            if(data.data != "")
+                $scope.last_file_deleted = (data.data != "") ? data.data.path : "(no data)";
+        }, printError);
+
     };
 
     var load = function () {
