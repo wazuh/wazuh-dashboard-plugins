@@ -3,10 +3,11 @@
   "version": "5.0.0",
   "description": "Wazuh App",
   "main": "index.js",
-  "scripts": {
-    "install": "npm install"
-  },
-  "keywords": ["kibana", "wazuh", "ossec"],
+  "keywords": [
+    "kibana",
+    "wazuh",
+    "ossec"
+  ],
   "author": "Wazuh",
   "license": "GPL-2.0",
   "repository": {
@@ -17,24 +18,14 @@
     "url": "https://github.com/wazuh/wazuh-kibana-ui/issues"
   },
   "homepage": "http://www.wazuh.com/",
-  "devDependencies": {
-    "bluebird": "^3.0.5",
-    "gulp": "^3.9.0",
-    "gulp-eslint": "^1.1.1",
-    "gulp-gzip": "^1.2.0",
-    "gulp-tar": "^1.6.0",
-    "gulp-util": "^3.0.7",
-    "lodash": "^3.10.1",
-    "mkdirp": "^0.5.1",
-    "rimraf": "^2.4.4",
-    "rsync": "^0.4.0"
-  },
   "dependencies": {
     "angular-animate": "1.4.7",
     "angular-aria": "1.4.7",
+    "angular-cookies": "1.4.7",
     "angular-material": "1.1.0-rc.5",
     "angular-md5": "^0.1.10",
+    "bootstrap": "3.3.6",
     "needle": "^1.0.0",
-    "bootstrap": "3.3.6"
+    "node-cron": "^1.1.2"
   }
 }

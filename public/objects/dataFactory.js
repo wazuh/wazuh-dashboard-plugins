@@ -1,5 +1,5 @@
 require('ui/modules').get('app/wazuh', [])
-    .factory('DataFactory', function (apiReq, $q) {
+    .factory('DataFactory', function (apiReq, $q, errlog) {
         var dataObj = {};
         var _instances = [];
 
@@ -163,7 +163,6 @@ require('ui/modules').get('app/wazuh', [])
                 preparedBody['offset'] = _instances[instanceId]['offset'];
                 preparedBody['limit'] = _instances[instanceId]['pageSize'];
             }
-            console.log(preparedBody);
             apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
                 .then(function (data) {
                     if ((_instances[instanceId]['pagination']) && (data.data.totalItems != _instances[instanceId]['limit'])) {
@@ -434,8 +433,8 @@ require('ui/modules').get('app/wazuh', [])
 
         var prepError = function (err) {
             if (err.error < 0) {
-                err['html'] = "Unexpected error located on AngularJS. Error: <b>" + err.message + " (code " + err.error + ")</b>.";
-                err.message = "Unexpected error located on AngularJS. Error: " + err.message + " (code " + err.error + ").";
+                err['html'] = "Unexpected error located on controller. Error: <b>" + err.message + " (code " + err.error + ")</b>.";
+                err.message = "Unexpected error located on controller. Error: " + err.message + " (code " + err.error + ").";
             } else if (err.error === 1) {
                 err['html'] = "<b>Error getting credentials</b> for Wazuh API. Please, check credentials at settings tab.";
                 err.message = "Error getting credentials for Wazuh API. Please, check credentials at settings tab.";
@@ -460,12 +459,16 @@ require('ui/modules').get('app/wazuh', [])
                 err['html'] = "Unexpected error filtering the data. Error <b>" + err.message + "</b>.";
                 err.message = "Unexpected error filtering the data. Error " + err.message + ".";
             } else {
-                err['html'] = "Unexpected error. Please, report this to Wazuh Team.";
-                err.message = "Unexpected error. Please, report this to Wazuh Team.";
+                err['html'] = "Unexpected error. Please, report this error.";
+                err.message = "Unexpected error. Please, report this error.";
             }
 
+            errlog.log(err.message, JSON.stringify(err));
             return err;
         };
 
         return dataObj;
     });
+	
+
+	

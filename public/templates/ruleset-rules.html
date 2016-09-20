@@ -1,27 +1,24 @@
-<md-content layout="row" flex layout-padding ng-if="!load && submenuNavItem == 'rules'" ng-controller="rulesController">
+<md-content layout="column" flex layout-padding ng-if="!load && submenuNavItem == 'ruleset' && submenuNavItem2 == 'rules'"
+  ng-controller="rulesController" layout-align="start space-around">
   <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-  <md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding>
 
-    <div flex id="content" layout="row" layout-align="space-between start">
 
-      <span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="20">
-          <md-input-container style="margin: 0px;">
-            <label for="searchBox1">Search file</label>
-            <input md-autofocus flex id="searchBox1" type="text" ng-model="fileSearch" ng-change="fileSearchFilter(fileSearch)">
-          </md-input-container>
-      </span>
 
-      <span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-					<md-autocomplete flex md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="search"
-						md-items="item in filtersSearch(search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
-						placeholder="Search file, group or PCI control">
-						<md-item-template>
-							<span class="item-title">
-            <span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.value}} </strong></span>
+  <md-virtual-repeat-container layout-align="start start" ng-if="!load" flex layout="column" layout-padding style="min-height: 2000px;">
+
+    <div flex id="content" layout="row" layout-align="center stretch">
+
+      <span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
+			<md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="$parent.search"
+			md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
+			placeholder="Search for rule file, group or PCI requirement" md-search-text-change="fileSearchFilter(search)">
+				<md-item-template>
+					<span class="item-title">
+						<span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.value}} </strong></span>
       </span>
       <span class="item-metadata">
-								<span class="item-metastat" ng-if="item.type != 'pci'"> Type: {{item.type}} </span>
-                <span class="item-metastat" ng-if="item.type == 'pci'"> Type: PCI control</span>
+					<span class="item-metastat" ng-if="item.type != 'pci'"> {{item.type}} </span>
+      <span class="item-metastat" ng-if="item.type == 'pci'">PCI control</span>
       </span>
       </md-item-template>
       <md-not-found>
@@ -30,24 +27,21 @@
       </md-autocomplete>
       </span>
 
-      <md-input-container style="margin: 0px;">
-        <md-select ng-model="statusFilter" ng-change="rulesStatusFilter(statusFilter)" aria-label="Filter by status">
+      <md-input-container flex="15" style="margin-right: 0px !important; margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);"
+        class="md-whiteframe-z1">
+        <md-select style="border: none;" ng-model="statusFilter" ng-change="rulesStatusFilter(statusFilter)" aria-label="Filter by status">
           <md-option value="enabled">Enabled</md-option>
           <md-option value="disabled">Disabled</md-option>
           <md-option value="all">All</md-option>
         </md-select>
       </md-input-container>
 
-
-    <span>
-    <md-input-container style="margin: 0px;"><label> Min:</label><input type="number" min="0" max="{{maxLevel}}" step="1" ng-model="$parent.minLevel" ></input></md-input-container>
-    <md-input-container style="margin: 0px;"><label> Max:</label><input type="number" min="{{minLevel}}" max="15" step="1" ng-model="$parent.maxLevel"></input></md-input-container>
-    <md-button class="md-raised" ng-click="rulesLevelFilter()">Change level</md-button>
-    </span>
-
     </div>
 
-    <md-chips readonly="true" ng-show="rulesHasFilter('file') || rulesHasFilter('group') || rulesHasFilter('pci')">
+    <md-chips readonly="true" ng-show="rulesHasFilter('search') || rulesHasFilter('file') || rulesHasFilter('group') || rulesHasFilter('pci')">
+      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('search')" ng-if="rulesHasFilter('search')">
+        <span class="bold">Search: {{rulesGetFilter('search')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+      </md-chip>
       <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('file')" ng-if="rulesHasFilter('file');">
         <span class="bold">File: {{rulesGetFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
@@ -62,10 +56,14 @@
 
     <md-toolbar layout="row">
       <div class="md-toolbar-tools">
-        <span flex="10">ID</span>
+        <span flex="10" ng-click="setSort('id')">ID
+          <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+        </span>
         <span flex="60">Description</span>
-        <span flex="5">Level</span>
-        <span flex="15">File</span>
+        <span flex="10" ng-click="setSort('level')">Level
+          <i class="fa" ng-class="_sort === 'level' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+        </span>
+        <span flex="20">File</span>
       </div>
     </md-toolbar>
     <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
@@ -73,20 +71,27 @@
         <md-list-item ng-click=" showDetails[rule.id] = ! showDetails[rule.id]; ">
           <span flex="10">{{rule.id}}</span>
           <span flex="60">{{rule.description}}</span>
-          <span flex="5">{{rule.level}}</span>
-          <span flex="15">{{rule.file}}</span>
+          <span flex="10">{{rule.level}}</span>
+          <md-button md-no-ink class="invisibleButton" flex="20" ng-click="rulesApplyFilter({type: 'file', value: rule.file}); $event.stopPropagation();">{{rule.file}}</md-button>
         </md-list-item>
       </md-list>
       <md-list ng-if="showDetails[rule.id]">
         <md-list-item>
           <span style="font-weight: bold" flex="15">Groups</span>
-          <span flex="35" layout="column"><span ng-repeat="group in rule.groups">{{ group }}</span></span>
+          <span flex="35" layout="column"><span ng-repeat="group in rule.groups" ng-click="rulesApplyFilter({type: 'group', value: group})"><i>{{ group }}</i></span></span>
           <span style="font-weight: bold" flex="15" ng-if="rule.pci.length > 0">PCI Groups</span>
-          <span flex="35" layout="column" ng-if="rule.pci.length > 0"><span ng-repeat="pci in rule.pci">{{ pci }}</span></span>
+          <span flex="35" layout="column" ng-if="rule.pci.length > 0"><span ng-repeat="pci in rule.pci" ng-click="rulesApplyFilter({type: 'pci', value: pci})"><i>{{ pci }}</i></span></span>
         </md-list-item>
         <md-list-item ng-repeat="(detailk, detailv) in rule.details">
           <span style="font-weight: bold" flex="15">{{detailk}}</span>
           <span flex="40">{{detailv}}</span>
+        </md-list-item>
+        <md-list-item>
+          <span style="font-weight: bold">
+            <md-button ng-href="/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.sidid:{{rule.id}}')),sort:!('@timestamp',desc))" target="_blank">
+            Discover <i class="fa fa-external-link" aria-hidden="true"></i>
+            </md-button>
+            </span>
         </md-list-item>
 
       </md-list>

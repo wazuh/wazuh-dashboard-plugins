@@ -1,22 +1,18 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, $mdToast) {
+app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.text = [];
-    $scope.summary = [];
     $scope.realtime = false;
 
-    $scope.menuNavItem = 'manager';
-    $scope.submenuNavItem = 'logs';
-
-    $scope.filterString = 'Category: all > Type log: all';
+    $scope.$parent.state.setManagerState('logs');
 
     var objectsArray = [];
 
-    var _fKey = '';
-    var _fValue = '';
+    var _category = 'all';
+    var _level = 'all';
     var _promise;
 
     //Print Error
@@ -29,13 +25,9 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
         if ($scope.blocked) {
             $scope.blocked = false;
         }
-        if (DataFactory.filters.flag(objectsArray['/manager/logs'])) {
-            DataFactory.filters.unflag(objectsArray['/manager/logs']);
-        }
     }
 
     //Functions
-
     $scope.textObj = {
         //Obj with methods for virtual scrolling
         getItemAtIndex: function (index) {
@@ -45,7 +37,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
             var _pos = index - DataFactory.getOffset(objectsArray['/manager/logs']);
             if (DataFactory.filters.flag(objectsArray['/manager/logs'])) {
                 $scope.blocked = true;
-                DataFactory.scrollTo(objectsArray['/manager/logs'], 10)
+                DataFactory.scrollTo(objectsArray['/manager/logs'], 75)
                     .then(function (data) {
                         $scope.text.length = 0;
                         $scope.text = data.data.items;
@@ -68,8 +60,28 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
             if ($scope.realtime) {
                 return 120;
             }
-            return DataFactory.getTotalItems(objectsArray['/manager/logs']);
+            var tmpLength = DataFactory.getTotalItems(objectsArray['/manager/logs']);
+            if (tmpLength === 0) {
+                return 120;
+            }
+            return tmpLength;
         },
+    };
+
+    $scope.categoryFilter = function (category) {
+        if (category) {
+            DataFactory.filters.set(objectsArray['/manager/logs'], 'category', category);
+        } else {
+            DataFactory.filters.unset(objectsArray['/manager/logs'], 'category');
+        }
+    };
+
+    $scope.levelFilter = function (level) {
+        if (level) {
+            DataFactory.filters.set(objectsArray['/manager/logs'], 'type_log', level);
+        } else {
+            DataFactory.filters.unset(objectsArray['/manager/logs'], 'type_log');
+        }
     };
 
     var loadSummary = function () {
@@ -77,51 +89,6 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
             .then(function (data) {
                 $scope.summary = data.data;
                 $scope.load = false;
-            }, printError);
-    };
-
-    $scope.isSetFilter = function (key, value) {
-        return ((key === _fKey) && (value === _fValue));
-    };
-
-    $scope.filter = function (key, value) {
-        $scope.blocked = true;
-        if ((key === _fKey) && (value === _fValue)) {
-            _fKey = 'all';
-            _fValue = 'all';
-            DataFactory.filters.unset(objectsArray['/manager/logs'], 'category');
-            DataFactory.filters.unset(objectsArray['/manager/logs'], 'type_log');
-        } else {
-            _fKey = key;
-            _fValue = value;
-            DataFactory.filters.set(objectsArray['/manager/logs'], 'category', _fKey);
-            DataFactory.filters.set(objectsArray['/manager/logs'], 'type_log', _fValue);
-        }
-        $scope.filterString = 'Daemon: ' + _fKey + ' > Type log: ' + _fValue;
-        DataFactory.get(objectsArray['/manager/logs'])
-            .then(function (data) {
-                $scope.text = data.data.items;
-                $scope.blocked = false;
-            }, printError);
-    };
-
-    $scope.hasNext = function () {
-        return DataFactory.hasNext(objectsArray['/manager/logs']);
-    };
-    $scope.next = function () {
-        DataFactory.next(objectsArray['/manager/logs'])
-            .then(function (data) {
-                $scope.text = data.data.items;
-            }, printError);
-    };
-
-    $scope.hasPrev = function () {
-        return DataFactory.hasPrev(objectsArray['/manager/logs']);
-    };
-    $scope.prev = function () {
-        DataFactory.prev(objectsArray['/manager/logs'])
-            .then(function (data) {
-                $scope.text = data.data.items;
             }, printError);
     };
 
@@ -142,7 +109,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
         line = line.replace('ossec-syscheckd', '<span style="color:#827e7d">ossec-syscheckd</span>');
         line = line.replace('ossec-analysisd', '<span style="color:#827e7d">ossec-analysisd</span>');
         line = line.replace('ossec-maild', '<span style="color:#827e7d">ossec-maild</span>');
-        line = line.replace(line.substring(0, 19), '<b>'+line.substring(0, 19)+'</b>');
+        line = line.replace(line.substring(0, 19), '<b>' + line.substring(0, 19) + '</b>');
         return $sce.trustAsHtml(line);
     };
 
@@ -161,18 +128,30 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
         }
     };
 
-    //Load
-    DataFactory.initialize('get', '/manager/logs', {}, 150, 0)
-        .then(function (data) {
-            objectsArray['/manager/logs'] = data;
-            DataFactory.filters.register(objectsArray['/manager/logs'], 'category', 'string');
-            DataFactory.filters.register(objectsArray['/manager/logs'], 'type_log', 'string');
-            DataFactory.get(data).then(function (data) {
-                $scope.text = data.data.items;
-                loadSummary();
+    var load = function () {
+        DataFactory.initialize('get', '/manager/logs', {}, 150, 0)
+            .then(function (data) {
+                objectsArray['/manager/logs'] = data;
+                DataFactory.filters.register(objectsArray['/manager/logs'], 'category', 'string');
+                DataFactory.filters.register(objectsArray['/manager/logs'], 'type_log', 'string');
+                DataFactory.get(data).then(function (data) {
+                    $scope.text = data.data.items;
+                    loadSummary();
+                }, printError);
             }, printError);
-        }, printError);
+    }
 
+    //Load
+    try {
+        load();
+    } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {

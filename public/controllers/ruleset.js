@@ -1,21 +1,22 @@
-// Require config
-var config = require('plugins/wazuh/config/config.js');
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
+app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
+    $scope.$parent.state.setRulesetState('rules');
+    $scope.$parent.state.setManagerState('ruleset');
+    $scope.search = undefined;
 
     $scope.rules = [];
 
     $scope.statusFilter = 'enabled';
 
-    $scope.maxLevel = 15;
-    $scope.minLevel = 0;
+    $scope._filter = null;
 
     var _file;
     var _group;
     var _pci;
+    var _search;
     var objectsArray = [];
 
     //Print Error
@@ -32,13 +33,22 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
 
     //Functions
 
-    $scope.fileSearchFilter = function (search) {
-        if (search) {
-            DataFactory.filters.set(objectsArray['/rules'], 'search', search);
+    $scope.setSort = function (field) {
+        if ($scope._sort === field) {
+            if ($scope._sortOrder) {
+                $scope._sortOrder = false;
+                $scope._sort = '';
+                DataFactory.filters.unset(objectsArray['/rules'], 'filter-sort');
+            } else {
+                $scope._sortOrder = true;
+                DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', field);
+            }
         } else {
-            DataFactory.filters.unset(objectsArray['/rules'], 'search');
+            $scope._sortOrder = false;
+            $scope._sort = field;
+            DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-' + field);
         }
-    };
+    }
 
     $scope.rulesApplyFilter = function (filterObj) {
         if (!filterObj) {
@@ -53,6 +63,9 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
         } else if (filterObj.type == 'pci') {
             _pci = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'pci', filterObj.value);
+        } else if (filterObj.type == 'search') {
+            _search = filterObj.value;
+            DataFactory.filters.set(objectsArray['/rules'], 'search', filterObj.value);
         }
     };
 
@@ -63,6 +76,8 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
             return _group && _group != null;
         } else if (type == 'pci') {
             return _pci && _pci != null;
+        } else if (type == 'search') {
+            return _search && _search != null;
         }
     };
 
@@ -70,12 +85,23 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
         if (type == 'file') {
             _file = null;
             DataFactory.filters.unset(objectsArray['/rules'], 'file');
+            $scope._filter = undefined;
+            $scope.search = undefined;
         } else if (type == 'group') {
             _group = null;
+            $scope._filter = undefined;
+            $scope.search = undefined;
             DataFactory.filters.unset(objectsArray['/rules'], 'group');
         } else if (type == 'pci') {
             _pci = null;
+            $scope._filter = undefined;
+            $scope.search = undefined;
             DataFactory.filters.unset(objectsArray['/rules'], 'pci');
+        } else if (type == 'search') {
+            _search = null;
+            $scope._filter = undefined;
+            $scope.search = undefined;
+            DataFactory.filters.unset(objectsArray['/rules'], 'search');
         }
     };
 
@@ -86,30 +112,33 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
             return _group;
         } else if (type == 'pci') {
             return _pci;
+        } else if (type == 'search') {
+            return _search;
         }
     };
 
     $scope.filtersSearch = function (search) {
         var defered = $q.defer();
         var promise = defered.promise;
-
         var result = [];
 
         if (!search) {
             search = undefined;
+        } else {
+            result.push({ 'type': 'search', 'value': search });
         }
 
-        DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 100, 'search': search })
+        DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 5, 'search': search })
             .then(function (data) {
                 angular.forEach(data.data.items, function (value) {
                     result.push({ 'type': 'file', 'value': value.name });
                 });
-                DataFactory.getAndClean('get', '/rules/groups', { 'offset': 0, 'limit': 100, 'search': search })
+                DataFactory.getAndClean('get', '/rules/groups', { 'offset': 0, 'limit': 5, 'search': search })
                     .then(function (data) {
                         angular.forEach(data.data.items, function (value) {
                             result.push({ 'type': 'group', 'value': value });
                         });
-                        DataFactory.getAndClean('get', '/rules/pci', { 'offset': 0, 'limit': 100, 'search': search })
+                        DataFactory.getAndClean('get', '/rules/pci', { 'offset': 0, 'limit': 5, 'search': search })
                             .then(function (data) {
                                 angular.forEach(data.data.items, function (value) {
                                     result.push({ 'type': 'pci', 'value': value });
@@ -129,15 +158,6 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
             })
 
         return promise;
-    };
-
-    $scope.rulesLevelFilter = function () {
-        if (!$scope.minLevel || !$scope.maxLevel || $scope.minLevel == null || $scope.maxLevel == null) {
-            return null;
-        }
-        if (0 <= parseInt($scope.minLevel) <= parseInt($scope.maxLevel) <= 15) {
-            DataFactory.filters.set(objectsArray['/rules'], 'level', $scope.minLevel + '-' + $scope.maxLevel);
-        }
     };
 
     $scope.rulesStatusFilter = function (status) {
@@ -188,17 +208,26 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
                         DataFactory.filters.register(objectsArray['/rules'], 'file', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'group', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'pci', 'string');
-                        DataFactory.filters.register(objectsArray['/rules'], 'level', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'status', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'filter-sort', 'string');
                         DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-level');
+                        $scope._sort = 'level';
                         $scope.load = false;
                     }, printError);
             }, printError);
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {
@@ -209,16 +238,18 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast) {
 
 });
 
-app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast) {
+app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast, errlog) {
 
     //Initialisation
     $scope.load = true;
+    $scope.$parent.state.setRulesetState('decoders');
 
     $scope.decoders = [];
 
     $scope.typeFilter = 'all';
+    var _file;
+    var _search;
 
-    var _lastFile = undefined;
     var objectsArray = [];
 
     //Print Error
@@ -235,8 +266,15 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 
     $scope.colorRegex = function (regex) {
         regex = regex.toString();
-        var colors = ['blue', 'cadetblue', 'chocolate', 'darkgoldenrod', 'darkmagenta', 'darkred', 'darksalmon', 'dodgerblue', 'green',
-            'indigo', 'orange', 'purple', 'sienna', 'yellowgreen'];
+        var colors = [
+            '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6
+            '#508642', '#CCA300', '#447EBC', '#C15C17', '#890F02', '#0A437C', '#6D1F62', '#584477', //2
+            '#629E51', '#E5AC0E', '#64B0C8', '#E0752D', '#BF1B00', '#0A50A1', '#962D82', '#614D93', //4
+            '#7EB26D', '#EAB839', '#6ED0E0', '#EF843C', '#E24D42', '#1F78C1', '#BA43A9', '#705DA0', // Normal
+            '#9AC48A', '#F2C96D', '#65C5DB', '#F9934E', '#EA6460', '#5195CE', '#D683CE', '#806EB7', //5
+            '#B7DBAB', '#F4D598', '#70DBED', '#F9BA8F', '#F29191', '#82B5D8', '#E5A8E2', '#AEA2E0', //3
+            '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7'  //7
+        ];
         var valuesArray = regex.match(/\(((?!<\/span>).)*?\)(?!<\/span>)/gmi);
         var coloredString = regex;
         for (var i = 0; i < valuesArray.length; i++) {
@@ -247,8 +285,15 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 
     $scope.colorOrder = function (order) {
         order = order.toString();
-        var colors = ['blue', 'cadetblue', 'chocolate', 'darkgoldenrod', 'darkmagenta', 'darkred', 'darksalmon', 'dodgerblue', 'green',
-            'indigo', 'orange', 'purple', 'sienna', 'yellowgreen'];
+        var colors = [
+            '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6
+            '#508642', '#CCA300', '#447EBC', '#C15C17', '#890F02', '#0A437C', '#6D1F62', '#584477', //2
+            '#629E51', '#E5AC0E', '#64B0C8', '#E0752D', '#BF1B00', '#0A50A1', '#962D82', '#614D93', //4
+            '#7EB26D', '#EAB839', '#6ED0E0', '#EF843C', '#E24D42', '#1F78C1', '#BA43A9', '#705DA0', // Normal
+            '#9AC48A', '#F2C96D', '#65C5DB', '#F9934E', '#EA6460', '#5195CE', '#D683CE', '#806EB7', //5
+            '#B7DBAB', '#F4D598', '#70DBED', '#F9BA8F', '#F29191', '#82B5D8', '#E5A8E2', '#AEA2E0', //3
+            '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7'  //7
+        ];
         var valuesArray = order.split(',');
         var coloredString = order;
         for (var i = 0; i < valuesArray.length; i++) {
@@ -257,24 +302,10 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
         return $sce.trustAsHtml(coloredString);
     };
 
-    $scope.decoderSearchFilter = function (search) {
-        if (!search) {
-            DataFactory.filters.unset(objectsArray['/decoders'], 'search');
-        } else {
-            DataFactory.filters.set(objectsArray['/decoders'], 'search', search);
-        }
-    }
-
-    $scope.decoderFileFilter = function (file) {
-        if (!file) {
-            DataFactory.filters.unset(objectsArray['/decoders'], 'file');
-        } else {
-            _lastFile = file;
-            DataFactory.filters.set(objectsArray['/decoders'], 'file', file);
-        }
-    }
-
     $scope.decoderTypeFilter = function (type) {
+        $scope.typeFilter = type;
+        $scope.decodersUnset('file');
+        $scope.decodersUnset('search');
         DataFactory.clean(objectsArray['/decoders']);
         DataFactory.initialize('get', (type == 'parents') ? '/decoders/parents' : '/decoders', {}, 100, 0)
             .then(function (data) {
@@ -284,23 +315,71 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
                         $scope.decoders = data.data.items;
                         DataFactory.filters.register(objectsArray['/decoders'], 'search', 'string');
                         (type != 'parents') ? DataFactory.filters.register(objectsArray['/decoders'], 'file', 'string') : null;
-                        $scope.decoderSearchFilter($scope.decoderSearch);
-                        (type != 'parents') ? $scope.decoderFileFilter(_lastFile) : null;
                     }, printError);
             }, printError);
-    }
+    };
 
-    $scope.fileSearch = function (search) {
+    $scope.decodersApplyFilter = function (filterObj) {
+        if (!filterObj) {
+            return null;
+        }
+        if (filterObj.type == 'file') {
+            _file = filterObj.value.split('/').slice(-1)[0];
+            DataFactory.filters.set(objectsArray['/decoders'], 'file', filterObj.value.split('/').slice(-1)[0]);
+        } else if (filterObj.type == 'search') {
+            _search = filterObj.value;
+            DataFactory.filters.set(objectsArray['/decoders'], 'search', filterObj.value);
+        }
+    };
+
+    $scope.decodersHasFilter = function (type) {
+        if (type == 'file') {
+            return _file && _file != null;
+        } else if (type == 'search') {
+            return _search && _search != null;
+        }
+    };
+
+    $scope.decodersUnset = function (type) {
+        if (type == 'file') {
+            _file = null;
+            DataFactory.filters.unset(objectsArray['/decoders'], 'file');
+            $scope._filter = undefined;
+            $scope.search = undefined;
+        } else if (type == 'search') {
+            _search = null;
+            $scope._search = undefined;
+            DataFactory.filters.unset(objectsArray['/decoders'], 'search');
+            $scope._filter = undefined;
+            $scope.search = undefined;
+        }
+    };
+
+    $scope.decodersGetFilter = function (type) {
+        if (type == 'file') {
+            return _file;
+        } else if (type == 'search') {
+            return _search;
+        }
+    };
+
+    $scope.filtersSearch = function (search) {
         var defered = $q.defer();
         var promise = defered.promise;
+        var result = [];
 
         if (!search) {
             search = undefined;
+        } else {
+            result.push({ 'type': 'search', 'value': search });
         }
 
-        DataFactory.getAndClean('get', '/decoders/files', { 'offset': 0, 'limit': 100, 'search': search })
+        DataFactory.getAndClean('get', '/decoders/files', { 'offset': 0, 'limit': 14, 'search': search })
             .then(function (data) {
-                defered.resolve(data.data.items);
+                angular.forEach(data.data.items, function (value) {
+                    result.push({ 'type': 'file', 'value': value });
+                });
+                defered.resolve(result);
             }, function (data) {
                 printError(data);
                 defered.reject();
@@ -357,7 +436,16 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {
@@ -369,22 +457,15 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 });
 
 
-app.controller('updateRulesetController', function ($scope, $q, DataFactory, tabProvider, $mdDialog, $mdToast) {
+app.controller('updateRulesetController', function ($scope, $q, DataFactory, $mdDialog, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
+    $scope.$parent.state.setRulesetState('update');
 
     $scope.backups = [];
 
     $scope.updateType = 'b';
     $scope.updateForce = false;
-
-    $scope.menuNavItem = 'ruleset';
-    $scope.submenuNavItem = 'update';
-
-    $scope.pageId = (Math.random().toString(36).substring(3));
-    tabProvider.register($scope.pageId);
-
-    var objectsArray = [];
 
     //Print Error
     var printError = function (error) {
@@ -395,18 +476,7 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
         });
     }
 
-    //Tabs
-    $scope.setTab = function (tab, group) {
-        tabProvider.setTab($scope.pageId, tab, group);
-    };
-
-    $scope.isSetTab = function (tab, group) {
-        return tabProvider.isSetTab($scope.pageId, tab, group);
-    };
-
     //Functions
-
-    //Backups
 
     $scope.updateRuleset = function (ev) {
         if (!$scope.updateType) {
@@ -502,7 +572,6 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
     };
 
     //Load functions
-
     $scope.load_backups = function () {
         var defered = $q.defer();
         var promise = defered.promise;
@@ -525,14 +594,20 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {
-        angular.forEach(objectsArray, function (value) {
-            DataFactory.clean(value)
-        });
-        tabProvider.clean($scope.pageId);
+        $scope.backups.length = 0;
     });
 
 });

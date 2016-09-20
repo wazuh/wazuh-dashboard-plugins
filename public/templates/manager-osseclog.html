@@ -1,48 +1,36 @@
-    <div flex layout="row" ng-if="!load && submenuNavItem =='logs'" ng-controller="osseclogController">
-        <md-content flex id="content" layout-padding>
-            <md-virtual-repeat-container class="vertical-repeater">
-                <table class="logTable" flex>
-                    <tbody>
-                        <tr md-virtual-repeat="line in textObj" md-on-demand flex>
-                            <td class="logTableNumber">{{$index}}</td>
-                            <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}" ng-bind-html="colorLine(line)">{{colorLine(line)}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </md-virtual-repeat-container>
-        </md-content>
-
-        <md-sidenav md-is-open="isOpenSidenav" md-component-id="sideNav" md-is-locked-open="$mdMedia('gt-sm')" md-disable-backdrop
-            layout="column" class="md-sidenav-right md-whiteframe-z2" flex="30">
-            <md-icon md-font-icon="fa fa-times" aria-label="close lateral menu" ng-click="isOpenSidenav = !isOpenSidenav" hide-gt-sm style="margin-top: 5px; margin-bottom: 5px;"></md-icon>
-            <div layout="row" layout-align="center center" style="margin: 5px;">
-                <b style="margin-right: 5px;">Realtime:</b>
-                <i class="fa fa-play" aria-hidden="true" ng-show="!realtime" ng-click="playRealtime()"></i>
-                <i class="fa fa-stop" aria-hidden="true" ng-show="realtime" ng-click="playRealtime()"></i>
+<md-content ng-if="!load && submenuNavItem =='logs'" ng-controller="osseclogController" layout="row" flex layout-padding>
+    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
+    <md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding style="min-height: 500px;">
+        <div flex layout="row" layout-align="start start">
+            <md-input-container class="md-whiteframe-z1" style="margin-right: 15px; " flex="20">
+                <label for="categoryBox">Choose daemon</label>
+                <md-select id="categoryBox" ng-model="$parent._category" ng-change="categoryFilter(_category)" aria-label="Logs category">
+                    <md-option value="all">All</md-option>
+                    <md-option ng-repeat="(key, value) in summary" value="{{key}}">{{key}}</md-option>
+                </md-select>
+            </md-input-container>
+            <md-input-container class="md-whiteframe-z1" flex="20">
+                <label for="levelBox">Choose log level</label>
+                <md-select id="levelBox" ng-model="$parent._level" ng-change="levelFilter(_level)" aria-label="Logs level">
+                    <md-option value="all">All</md-option>
+                    <md-option value="info">Info</md-option>
+                    <md-option value="error">Error</md-option>
+                </md-select>
+            </md-input-container>
+            <div flex layout="row" layout-align="end start">
+                <span><md-button ng-if="!realtime" class="md-primary md-whiteframe-z1" ng-click="playRealtime()" style="color: #000"><i class="fa fa-play" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i> Play realtime</md-button>
+                <md-button style="color: #000" ng-if="realtime" class="md-primary md-whiteframe-z1"
+                    ng-click="playRealtime()"><i class="fa fa-stop" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i> Stop realtime</md-button></span>
             </div>
-            <md-tabs md-dynamic-height md-border-bottom>
-                <md-tab ng-repeat="(key, value) in summary" label="{{key}}">
-                    <md-list flex>
-                        <md-list-item class="md-2-line" ng-repeat="(subk, subv) in value" ng-click="filter(key, subk)">
-                            <div class="md-list-item-text">
-                                <h3>{{subk}}</h3>
-                                <p>{{subv}}</p>
-                            </div>
-                            <md-divider></md-divider>
-                        </md-list-item>
-                    </md-list>
-                </md-tab>
-            </md-tabs>
-            <md-chips readonly="true">
-                <md-chip>
-                    {{$parent.filterString}}
-                </md-chip>
-            </md-chips>
-        </md-sidenav>
-        <md-button ng-show="!isOpenSidenav" class="md-icon-button md-primary" ng-click="isOpenSidenav = !isOpenSidenav" aria-label="Agents"
-            hide-gt-sm>
-            <span class="glyphicon glyphicon-menu-hamburger"></span>
-        </md-button>
-    </div>
+        </div>
 
-</div>
+        <table class="logTable" flex>
+            <tbody>
+                <tr md-virtual-repeat="line in textObj" md-on-demand flex>
+                    <td class="logTableNumber">{{$index}}</td>
+                    <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}" ng-bind-html="colorLine(line)">{{colorLine(line)}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </md-virtual-repeat-container>
+</md-content>

@@ -70,9 +70,10 @@ var app = require('ui/modules').get('app/wazuh', [])
         visG: '@visG',
         visFilter: '@visFilter',
         visHeight: '@visHeight',
+		visWidth: '@visWidth',
         visSearchable: '@visSearchable'
       },
-      template: require('../templates/vis-template.html')
+      template: require('../templates/directives/vis-template.html')
     }
   }]);
 
@@ -146,6 +147,12 @@ require('ui/modules').get('app/wazuh', [])
 
         return $state;
       } ());
+	  
+	  $scope.$watch("visG",function() {
+        //This gets called when data changes.
+		$route.current.params._g = $scope.visG;
+		$route.updateParams({ '_g': $scope.visG});
+    });
 
       function init() {
         // export some objects
@@ -231,10 +238,14 @@ require('ui/modules').get('app/wazuh', [])
             return;
           }
 
-          $scope.$watch("visFilter", function (newValue, oldValue) {
+        $scope.$watch("visFilter", function (newValue, oldValue) {
             $scope.v.filter = newValue;
             $scope.fetch();
-          });
+        });
+		
+		$scope.$watch("visWidth", function (newValue, oldValue) {
+            $scope.fetch();
+        });
 
           $scope.fetch();
         });

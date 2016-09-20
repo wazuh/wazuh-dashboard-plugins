@@ -1,4 +1,4 @@
-<md-content ng-if="submenuNavItem == 'fim'" ng-show="_agent" class="md-padding">
+<md-content ng-if="submenuNavItem == 'fim'" ng-if="_agent" class="md-padding">
     <div flex ng-controller="fimController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
         <md-virtual-repeat-container style="min-height: 700px;" ng-if="!load">
@@ -11,7 +11,7 @@
                     </md-card-title>
                     <md-card-content>
                         <kbn-vis vis-height="100px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20syscheck')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
@@ -23,7 +23,7 @@
                     </md-card-title>
                     <md-card-content>
                         <kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{'AgentName:'+_agent.name}}">
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{'AgentName:'+_agent.name}}">
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
@@ -36,7 +36,7 @@
                     </md-card-title>
                     <md-card-content>
                         <kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))" vis-filter="{{'AgentName:'+_agent.name}}">
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="{{'AgentName:'+_agent.name}}">
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
@@ -48,9 +48,17 @@
                         <input type="text" id="searchBox" ng-model="$parent._fileSearch" ng-change="fileSearchFilter($parent._fileSearch)" flex>
                     </md-input-container>
                     <div flex="40"></div>
-                    <md-input-container flex="20">
+                    <md-content flex="40" class="subNavLine" layout="row" layout-align="end center" ng-show="isWindows">
+                        <md-button ng-click="changeType()" class="md-primary" ng-class="!$parent.showFilesRegistry ? 'button-disabled' : 'button-active'">
+                            Files
+                        </md-button>
+                        <md-button ng-click="changeType()" class="md-primary" ng-class="$parent.showFilesRegistry ? 'button-disabled' : 'button-active'">
+                            Registry keys
+                        </md-button>
+                    </md-content>
+                    <md-input-container style="margin-top: 12px;" flex="20">
                         <md-select id="eventBox" ng-model="$parent._fimEvent" ng-change="fileEventFilter($parent._fimEvent)" aria-label="Filter by event">
-                            <md-option value="all">All</md-option>
+                            <md-option value="all">Filter events</md-option>
                             <md-option value="added">Added</md-option>
                             <md-option value="modified">Modified</md-option>
                             <md-option value="readded">Re-added</md-option>
@@ -61,13 +69,18 @@
                 <div>
                     <md-toolbar layout="row">
                         <div class="md-toolbar-tools">
-                            <span flex="10" hide-sm hide-xs>Date</span>
-                            <span flex="30">File name</span>
+                            <span flex="10" ng-click="setSort('modificationDate')" hide-sm hide-xs>Date 
+                                <i class="fa" ng-class="_sort === 'modificationDate' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="30" ng-click="setSort('file')">File name 
+                                <i class="fa" ng-class="_sort === 'file' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
                             <span flex="10" hide-sm hide-xs>Event</span>
-                            <span flex="10" hide-sm hide-xs>User</span>
-                            <span flex="10" hide-sm hide-xs>Group</span>
+                            <span flex="10" ng-click="setSort('user')" hide-sm hide-xs>User 
+                                <i class="fa" ng-class="_sort === 'user' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="10" ng-click="setSort('group')" hide-sm hide-xs>Group 
+                                <i class="fa" ng-class="_sort === 'group' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
                             <span flex="15" hide-sm hide-xs>Permissions</span>
-                            <span flex="15" hide-sm hide-xs>Size</span>
+                            <span flex="15" ng-click="setSort('size')" hide-sm hide-xs>Size 
+                                <i class="fa" ng-class="_sort === 'size' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
                         </div>
                     </md-toolbar>
                 </div>
@@ -110,6 +123,10 @@
                 </md-list>
                 <md-divider></md-divider>
             </div>
+
+
+
+
         </md-virtual-repeat-container>
     </div>
 </md-content>

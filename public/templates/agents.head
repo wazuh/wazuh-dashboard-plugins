@@ -1,16 +1,18 @@
 <div flex ng-controller="generalController" layout="column">
 
-	<md-content ng-init="menuNavItem = 'agents'" style="height: 70px;">
-		<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-			<md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
-				<img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
-			</md-nav-item>
-			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
+    <md-content ng-init="menuNavItem = 'agents'" style="height: 70px;">
+        <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+            <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
+                <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
+            </md-nav-item>
+			<md-nav-item md-nav-href="#/overview" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
-			<md-nav-item md-nav-href="#/ruleset" name="ruleset">Ruleset</md-nav-item>
+			<md-nav-item md-nav-href="#/agents" name="agents" >Agents</md-nav-item>
+			<md-nav-item md-nav-href="#/discover" name="discover">Discover</md-nav-item>
+			<md-nav-item md-nav-href="#/dashboards" name="dashboards">Dashboards</md-nav-item>
 			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
-		</md-nav-bar>
-	</md-content>
+        </md-nav-bar>
+    </md-content>
 
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
@@ -19,11 +21,11 @@
 			<md-toolbar style="height: 50px;">
 				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
 					<h2 ng-show="$parent._agent">{{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h2>
-					<h2 ng-show="!_agent">Please, choose an agent</h2>
+					<h2 ng-show="!_agent">Choose or search an agent</h2>
 					<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-					<md-autocomplete flex md-no-cache="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
-						md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="true" md-menu-class="autocomplete-custom-agents-bar"
-						placeholder="Search agent hostname, ID or IP address">
+					<md-autocomplete flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
+						md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
+						placeholder="Search agent hostname, ID or IP address"> 
 						<md-item-template>
 							<span class="item-title">
             <span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.name}} ({{item.id}}) </strong></span>
@@ -36,16 +38,25 @@
 						No agents matching "{{search}}" were found.
 					</md-not-found>
 					</md-autocomplete>
-					<md-button class="md-hue-2 md-fab md-primary md-mini" aria-label="Add agent">
-						<i class="fa fa-plus" aria-hidden="true"></i>
-					</md-button>
 					</span>
 				</div>
 			</md-toolbar>
-			<md-content ng-show="_agent" class="md-padding">
-				<md-nav-bar md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+			<md-content layout="row" layout-align="center start" ng-show="_agent" layout-padding">
+				<md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 					<md-nav-item md-nav-click="submenuNavItem = 'overview'" name="overview">Overview</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File Integrity</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'policy_monitoring'" name="policy_monitoring">Policy Monitoring</md-nav-item>
 				</md-nav-bar>
+				<md-content flex="40" class="subNavLine" layout="row" layout-align="end start">
+				<md-button ng-if="_agent && submenuNavItem == 'overview'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('generic','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button ng-if="_agent && submenuNavItem == 'fim'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('fim','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button style="margin-bottom: 0px !important;" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'overview'" ng-click="openDashboard('ossecalerts', 'AgentName:'+_agent.name)">
+					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
+				</md-button>
+				<md-button style="margin-bottom: 0px !important;" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'fim'" ng-click="openDashboard('fim', 'AgentName:'+_agent.name)">
+					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
+				</md-button>
+				<div ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'active' ? null : (_agent.status == 'neverConnected' ? 'extraLarge' : 'large')"
+					layout="row" layout-align="space-between center"><span>{{formatAgentStatus(_agent.status)}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
+			</md-content>
 			</md-content>

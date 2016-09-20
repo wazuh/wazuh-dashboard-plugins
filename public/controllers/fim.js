@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('fimController', function ($scope, DataFactory, $mdToast) {
+app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
@@ -9,9 +9,6 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
 
     $scope._fimEvent = 'all'
     $scope.files = [];
-    $scope.fileSearch = '';
-
-    $scope.$parent.submenuNavItem = 'fim';
 
     //Print error
     var printError = function (error) {
@@ -26,6 +23,23 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
     };
 
     //Functions
+
+    $scope.setSort = function (field) {
+        if ($scope._sort === field) {
+            if ($scope._sortOrder) {
+                $scope._sortOrder = false;
+                $scope._sort = '';
+                DataFactory.filters.unset(objectsArray['/files'], 'filter-sort');
+            } else {
+                $scope._sortOrder = true;
+                DataFactory.filters.set(objectsArray['/files'], 'filter-sort', field);
+            }
+        } else {
+            $scope._sortOrder = false;
+            $scope._sort = field;
+            DataFactory.filters.set(objectsArray['/files'], 'filter-sort', '-' + field);
+        }
+    }
 
     $scope.fileSearchFilter = function (search) {
         if (search) {
@@ -76,11 +90,32 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
         },
     };
 
+    var isWindows = function () {
+        var defered = $q.defer();
+        var promise = defered.promise;
+
+        DataFactory.getAndClean('get', '/agents/' + $scope.$parent._agent.id, {})
+            .then(function (data) {
+                defered.resolve(data.data.os.toLowerCase().indexOf('windows') > -1);
+            }, printError);
+
+        return promise;
+    };
+
+    $scope.changeType = function () {
+        $scope.showFilesRegistry = !$scope.showFilesRegistry;
+        fileTypeFilter();
+    };
+
+    var fileTypeFilter = function () {
+        DataFactory.filters.set(objectsArray['/files'], 'filetype', $scope.showFilesRegistry ? 'registry' : 'file');
+    };
+
     var createWatch = function () {
         loadWatch = $scope.$watch(function () {
             return $scope.$parent._agent;
         }, function () {
-            DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id + '/files', {}, 100, 0)
+            DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id, {}, 100, 0)
                 .then(function (data) {
                     DataFactory.clean(objectsArray['/files']);
                     objectsArray['/files'] = data;
@@ -90,15 +125,22 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
                             $scope.files = data.data.items;
                             DataFactory.filters.register(objectsArray['/files'], 'search', 'string');
                             DataFactory.filters.register(objectsArray['/files'], 'event', 'string');
+                            DataFactory.filters.register(objectsArray['/files'], 'filter-sort', 'string');
+                            DataFactory.filters.register(objectsArray['/files'], 'filetype', 'string');
+                            $scope._sort = '';
                             $scope.fileSearchFilter($scope._fileSearch);
                             $scope.fileEventFilter($scope._fimEvent);
+                            fileTypeFilter();
+                            isWindows().then(function (value) {
+                                $scope.isWindows = value;
+                            });
                         }, printError);
                 }, printError);
         });
     };
 
     var load = function () {
-        DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id + '/files', {}, 100, 0)
+        DataFactory.initialize('get', '/syscheck/' + $scope.$parent._agent.id, {}, 100, 0)
             .then(function (data) {
                 objectsArray['/files'] = data;
                 DataFactory.get(objectsArray['/files'])
@@ -106,6 +148,9 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
                         $scope.files = data.data.items;
                         DataFactory.filters.register(objectsArray['/files'], 'search', 'string');
                         DataFactory.filters.register(objectsArray['/files'], 'event', 'string');
+                        DataFactory.filters.register(objectsArray['/files'], 'filter-sort', 'string');
+                        DataFactory.filters.register(objectsArray['/files'], 'filetype', 'string');
+                        DataFactory.filters.set(objectsArray['/files'], 'filetype', 'file');
                         createWatch();
                         $scope.load = false;
                     }, printError);
@@ -113,7 +158,16 @@ app.controller('fimController', function ($scope, DataFactory, $mdToast) {
     };
 
     //Load
-    load();
+    try {
+        load();
+    } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
     //Destroy
     $scope.$on("$destroy", function () {
