@@ -30,9 +30,9 @@
 			<md-card>
 				<md-card-content>
 					<span class="md-headline">Events over time</span>
-					<kbn-vis vis-height="280px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:100),schema:group,type:terms),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'FIM%20Alerts%20over%20time',type:area))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"syscheck"'>
-					</kbn-vis>
+					<kbn-vis vis-height="280px;" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.event,order:desc,orderBy:'1',size:100),schema:group,type:terms),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'FIM%20Alerts%20over%20time',type:area))"
+				vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+				vis-filter='rule.groups:"syscheck"'>
 				</md-card-content>
 			</md-card>
 
@@ -62,37 +62,37 @@
 	<md-content flex layout="row">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">{{topsrcuser}}</div>
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{topagent}}</div>
 				<div class="ng-binding">Top agent</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">11.4</div>
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{toppci}}</div>
 				<div class="ng-binding">Top PCI Requirement</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">ossec.conf</div>
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{last_file_changed}}</div>
 				<div class="ng-binding">Last file changed</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">config.conf</div>
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{last_file_added}}</div>
 				<div class="ng-binding">Last file added</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">internal.conf</div>
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{last_file_deleted}}</div>
 				<div class="ng-binding">Last file deleted</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">0666</div>
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{toppermissions}}</div>
 				<div class="ng-binding">Most common permissions</div>
 			</md-card-content>
 		</md-card>
@@ -137,9 +137,12 @@
 				</md-card-title-text>
 			</md-card-title>
 			<md-card-content>
-				<kbn-dis table-height="300px;" dis-a="(columns:!(AgentName,AgentIP,SyscheckFile.path,SyscheckFile.uname_after,SyscheckFile.gname_after),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:syscheck%20NOT%20location:%20syscheck-registry')),sort:!('@timestamp',desc))"
-					dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" dis-filter="rule.groups:syscheck NOT location: syscheck-registry"
-					infinite-scroll="true">
+				<kbn-dis table-height="300px;"
+				dis-a="(columns:!(AgentName,AgentIP,SyscheckFile.path,SyscheckFile.event,SyscheckFile.uname_after,SyscheckFile.gname_after),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:syscheck%20NOT%20location:%20syscheck-registry')),sort:!('@timestamp',desc))"
+				dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
+				dis-filter="rule.groups:syscheck NOT location: syscheck-registry"
+				infinite-scroll="true">
+				
 				</kbn-dis>
 			</md-card-content>
 		</md-card>
