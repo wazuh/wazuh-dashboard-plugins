@@ -12,6 +12,17 @@ require('ui/modules').get('app/wazuh', [])
                     $cookies.putObject('_dashboardsState_filter', filter);
                 }
             },
+			getDiscoverState: function () {
+                return { name: $cookies.getObject('_discoverState_name'), filter: $cookies.getObject('_discoverState_filter') };
+            },
+            setDiscoverState: function (name, filter) {
+                if (name) {
+                    $cookies.putObject('_discoverState_name', name);
+                }
+                if (filter) {
+                    $cookies.putObject('_discoverState_filter', filter);
+                }
+            },
             getManagerState: function () {
                 return $cookies.getObject('_managerState');
             },

@@ -64,6 +64,21 @@ var app = require('ui/modules').get('app/wazuh', [])
     }
   }]);
 
+  var app = require('ui/modules').get('app/wazuh', [])
+  .directive('kbnDisfull', [function () {
+    return {
+      restrict: 'E',
+      scope: {
+        disA: '@disA',
+        disG: '@disG',
+        disFilter: '@disFilter',
+        tableHeight: '@tableHeight',
+        infiniteScroll: '@infiniteScroll'
+      },
+      template: require('../templates/directives/dis-full-template.html')
+    }
+  }]);
+  
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($scope, config, courier, $route, $window, Notifier,
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches) {
 

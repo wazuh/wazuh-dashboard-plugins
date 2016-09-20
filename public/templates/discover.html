@@ -1,0 +1,9 @@
+<md-content flex layout="column" layout-align="start space-around">
+
+<kbn-disfull table-height="800px;" dis-a="(columns:!(rule.description,rule.AlertLevel,rule.groups,rule.PCI_DSS,full_log),index:'ossec-*',interval:auto,query:'',sort:!('@timestamp',desc))"
+dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
+dis-filter="*"
+infinite-scroll="true">
+</kbn-disfull>
+
+</md-content>
