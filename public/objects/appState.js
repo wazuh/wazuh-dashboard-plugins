@@ -1,20 +1,16 @@
 require('ui/modules').get('app/wazuh', [])
     .service('appState', function ($cookies) {
         return {
-            getAgentsState: function () {
-                    return { subtab: $cookies.getObject('_agentsState_subtab'), data: $cookies.getObject('_agentsState_data') };
+            getDashboardsState: function () {
+                return { name: $cookies.getObject('_dashboardsState_name'), filter: $cookies.getObject('_dashboardsState_filter') };
             },
-            setAgentsState: function (subtab, data) {
-                if (subtab) {
-                    $cookies.putObject('_agentsState_subtab', subtab);
+            setDashboardsState: function (name, filter) {
+                if (name) {
+                    $cookies.putObject('_dashboardsState_name', name);
                 }
-                if (data) {
-                    $cookies.putObject('_agentsState_data', data);
+                if (filter) {
+                    $cookies.putObject('_dashboardsState_filter', filter);
                 }
-            },
-			unsetAgentsState: function () {
-                    $cookies.putObject('_agentsState_subtab', "");
-                    $cookies.putObject('_agentsState_data', "");
             },
             getManagerState: function () {
                 return $cookies.getObject('_managerState');
@@ -32,7 +28,7 @@ require('ui/modules').get('app/wazuh', [])
                     $cookies.putObject('_rulesetState', subtab);
                 }
             },
-			getOverviewState: function () {
+            getOverviewState: function () {
                 return $cookies.getObject('_overviewState');
             },
             setOverviewState: function (subtab) {

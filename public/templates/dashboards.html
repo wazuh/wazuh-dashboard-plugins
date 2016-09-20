@@ -1,0 +1,11 @@
+<md-content flex layout="row" ng-if="submenuNavItem == 'ossecalerts'" layout-align="space-around">
+
+    <kbn-dash dash-id="OSSEC-Alerts" dash-filter="{{state.getDashboardsState().filter ? state.getDashboardsState().filter : '*'}}" dash-time-from="now-7d" dash-time-to="now" dash-searchable="true" dash-timepicker="true" ng-init="setDashboardsState('ossecalerts', '*')"></kbn-dash>
+
+</md-content>
+
+<md-content flex layout="row" ng-if="submenuNavItem == 'fim'" layout-align="space-around">
+
+    <kbn-dash dash-id="File-Integrity-Monitoring" dash-filter="{{state.getDashboardsState().filter ? state.getDashboardsState().filter : '*'}}" dash-time-from="now-7d" dash-time-to="now" dash-searchable="true" dash-timepicker="true" ng-init="setDashboardsState('fim', '*')"></kbn-dash>
+
+</md-content>

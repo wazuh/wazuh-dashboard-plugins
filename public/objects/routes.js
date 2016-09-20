@@ -12,26 +12,26 @@ var settingsWizard = function ($location, testConnection) {
 //Routes
 routes.enable();
 routes
-    .when('/agents/:submenu?', {
+    .when('/agents/', {
         template: require('plugins/wazuh/templates/agents.jade'),
         resolve: {
             "check": settingsWizard
         }
     })
-    .when('/manager/:submenu?', {
+    .when('/manager/', {
         template: require('plugins/wazuh/templates/manager.jade'),
         resolve: {
             "check": settingsWizard
         }
     })
-	.when('/overview/:submenu?', {
+	.when('/overview/', {
         template: require('plugins/wazuh/templates/overview.jade'),
         resolve: {
             "check": settingsWizard
         }
     })
-    .when('/ruleset/:submenu?', {
-        template: require('plugins/wazuh/templates/ruleset.jade'),
+    .when('/dashboards/', {
+        template: require('plugins/wazuh/templates/dashboards.jade'),
         resolve: {
             "check": settingsWizard
         }
@@ -40,7 +40,7 @@ routes
         template: require('plugins/wazuh/templates/settings.html')
     })
     .when('/', {
-        redirectTo: '/manager/',
+        redirectTo: '/overview/',
         resolve: {
             "check": settingsWizard
         }
