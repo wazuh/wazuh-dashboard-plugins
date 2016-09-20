@@ -296,6 +296,74 @@ module.exports = function (server, options) {
         });
     };
 
+var getLastField = function(req, reply) {
+        var needle = require('needle');
+		var elasticurl = _elurl+'/ossec-*/ossec/_search';
+		var filtering = false;
+        if (_eluser && _elpass) {
+            var options = {
+                username: _eluser,
+                password: _elpass,
+                rejectUnauthorized: false,
+                json: true
+            };
+        } else {
+            var options = {
+                rejectUnauthorized: false,
+                json: true
+            };
+        }
+
+       
+	if(req.params.fieldValue && req.params.fieldFilter)
+			filtering = true;
+		
+        var payload = {
+	  "size": 1,
+	  "query": {
+		
+		"bool": {
+		  "must": [
+			{
+			"exists": {
+			  "field": req.params.field
+			  }
+			},
+			{
+			  "query_string": {
+				"query": "*"
+			  }
+			}
+		  ],
+		  "must_not": [{}]
+		}
+		
+	  },
+	  "sort":[{"@timestamp":{"order":"desc","unmapped_type":"boolean"}}]
+	};
+
+	if(filtering){
+			var filterArray;
+			var filterArray = {};
+			filterArray[req.params.fieldFilter] = req.params.fieldValue;
+			var termArray = { "term" : filterArray};
+			payload.query.bool.must.push(termArray);
+		}
+		
+        needle.request('get', elasticurl, payload, options, function (error, response) {
+
+            if (error || response.body.error) {
+                reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch'}).code(500);
+            } else {
+                if (response.body.hits.total == 0 || typeof response.body.hits.hits[0] === 'undefined') {
+                    reply({ 'statusCode': 200, 'data': ''});
+                }else{
+                    reply({ 'statusCode': 200, 'data': response.body.hits.hits[0]._source[req.params.field]});
+				}
+            }
+        });
+    };
+    
     var statsOverviewAlerts = function (req, reply) {
         var needle = require('needle');
 
