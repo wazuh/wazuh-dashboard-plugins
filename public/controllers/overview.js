@@ -1,21 +1,12 @@
-// Require utils
-var kuf = require('plugins/wazuh/utils/kibanaUrlFormatter.js');
-// Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, tabProvider, $mdDialog, $mdToast) {
+app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setOverviewState('general');
-	$scope.timeFilter = "24h";
+    $scope.timeFilter = "24h";
 
     $scope.stats = [];
-
-
-    $scope.pageId = (Math.random().toString(36).substring(3));
-    tabProvider.register($scope.pageId);
-
-    var objectsArray = [];
 
     //Print Error
     var printError = function (error) {
@@ -26,110 +17,97 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
         });
     };
 
-    //Tabs
-    $scope.setTab = function (tab, group) {
-        tabProvider.setTab($scope.pageId, tab, group);
-    };
-
-    $scope.isSetTab = function (tab, group) {
-        return tabProvider.isSetTab($scope.pageId, tab, group);
-    };
-
-	
-	$scope.setTimer = function (time) {			
-        if(time == "24h"){
-			$scope.timerFilterValue = "24h";
-		}else if(time == "48h"){
-			$scope.timerFilterValue = "48h";
-		}else{
-			$scope.timerFilterValue = "7d";
-		}
+    //Functions
+    $scope.setTimer = function (time) {
+        if (time == "24h") {
+            $scope.timerFilterValue = "24h";
+        } else if (time == "48h") {
+            $scope.timerFilterValue = "48h";
+        } else {
+            $scope.timerFilterValue = "7d";
+        }
     };
 
 
-	var load_tops = function () { 
+    var load_tops = function () {
+        var daysAgo = 1;
+        if ($scope.timerFilterValue == "7d") {
+            var daysAgo = 7;
+        } else if ($scope.timerFilterValue == "48h") {
+            var daysAgo = 2;
+        } else {
+            var daysAgo = 1;
+        }
+        var date = new Date();
+        date.setDate(date.getDate() - daysAgo);
+        var timeAgo = date.getTime();
+        genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/' + timeAgo)
+            .then(function (data) {
+                $scope.topsrcuser = data.data;
+            }, printError);
+        genericReq.request('GET', '/api/wazuh-elastic/top/srcip/' + timeAgo)
+            .then(function (data) {
+                $scope.topsrcip = data.data;
+            }, printError);
+        genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/' + timeAgo)
+            .then(function (data) {
+                $scope.topgroup = data.data;
+            }, printError);
+        genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/' + timeAgo)
+            .then(function (data) {
+                $scope.toppci = data.data;
+            }, printError);
+    };
 
-		var daysAgo = 1;
-		
-		if($scope.timerFilterValue == "7d"){
-			var daysAgo = 7;
-		}else if($scope.timerFilterValue == "48h"){
-			var daysAgo = 2;
-		}else{
-			var daysAgo = 1;
-		}
-		
-		var date = new Date();
-		date.setDate(date.getDate()-daysAgo);
-		var timeAgo = date.getTime();
-		
-		//timeAgo = "";
-		
-		genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/'+timeAgo)
-                .then(function (data) {
-                    $scope.topsrcuser = data.data;
-                }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/srcip/'+timeAgo)
-                .then(function (data) {
-                    $scope.topsrcip = data.data;
-                }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/'+timeAgo)
-                .then(function (data) {
-                    $scope.topgroup = data.data;
-                }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/'+timeAgo)
-                .then(function (data) {
-                    $scope.toppci = data.data;
-                }, printError);		
-	}
-	load_tops();			
     var load = function () {
-		DataFactory.getAndClean('get', '/agents/summary', {})
-			.then(function (data) {
-				$scope.agentsCountActive = data.data.active;
-				$scope.agentsCountDisconnected = data.data.disconnected;
-				$scope.agentsCountNeverConnected = data.data.neverConnected;
-				$scope.agentsCountTotal = data.data.total;
-				$scope.load = false;
-		}, printError);
+        DataFactory.getAndClean('get', '/agents/summary', {})
+            .then(function (data) {
+                $scope.agentsCountActive = data.data.active;
+                $scope.agentsCountDisconnected = data.data.disconnected;
+                $scope.agentsCountNeverConnected = data.data.neverConnected;
+                $scope.agentsCountTotal = data.data.total;
+                $scope.load = false;
+            }, printError);
     };
 
     //Load
-    load();
+    try {
+        load();
+        load_tops();
+    } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
-	// Timer filter watch
-	var loadWatch = $scope.$watch(function () {
+    // Timer filter watch
+    var loadWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {
         $scope.setTimer($scope.$parent.timeFilter);
-		load_tops();
+        load_tops();
     });
-	
+
 
     //Destroy
     $scope.$on("$destroy", function () {
-        //angular.forEach(objectsArray, DataFactory.clean(value));
-        tabProvider.clean($scope.pageId);
         $scope.stats.length = 0;
-		loadWatch();
+        loadWatch();
     });
 
 });
 
 
-app.controller('overviewFimController', function ($scope, DataFactory, genericReq, tabProvider, $mdDialog, $mdToast) {
+app.controller('overviewFimController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setOverviewState('fim');
-	$scope.timeFilter = "24h";
-	
+    $scope.timeFilter = "24h";
+
     $scope.stats = [];
-
-
-    $scope.pageId = (Math.random().toString(36).substring(3));
-    tabProvider.register($scope.pageId);
-
-    var objectsArray = [];
 
     //Print Error
     var printError = function (error) {
@@ -140,92 +118,84 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
         });
     };
 
-    //Tabs
-    $scope.setTab = function (tab, group) {
-        tabProvider.setTab($scope.pageId, tab, group);
-    };
-
-    $scope.isSetTab = function (tab, group) {
-        return tabProvider.isSetTab($scope.pageId, tab, group);
-    };
-
-	
-	$scope.setTimer = function (time) {			
-        if(time == "24h"){
-			$scope.timerFilterValue = "24h";
-		}else if(time == "48h"){
-			$scope.timerFilterValue = "48h";
-		}else{
-			$scope.timerFilterValue = "7d";
-		}
+    //Functions
+    $scope.setTimer = function (time) {
+        if (time == "24h") {
+            $scope.timerFilterValue = "24h";
+        } else if (time == "48h") {
+            $scope.timerFilterValue = "48h";
+        } else {
+            $scope.timerFilterValue = "7d";
+        }
     };
 
 
-	var load_tops = function () { 
+    var load_tops = function () {
+        var daysAgo = 1;
+        if ($scope.timerFilterValue == "7d") {
+            var daysAgo = 7;
+        } else if ($scope.timerFilterValue == "48h") {
+            var daysAgo = 2;
+        } else {
+            var daysAgo = 1;
+        }
+        var date = new Date();
+        date.setDate(date.getDate() - daysAgo);
+        var timeAgo = date.getTime();
+        genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/' + timeAgo)
+            .then(function (data) {
+                $scope.topsrcuser = data.data;
+            }, printError);
+        genericReq.request('GET', '/api/wazuh-elastic/top/srcip/' + timeAgo)
+            .then(function (data) {
+                $scope.topsrcip = data.data;
+            }, printError);
+        genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/' + timeAgo)
+            .then(function (data) {
+                $scope.topgroup = data.data;
+            }, printError);
+        genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/' + timeAgo)
+            .then(function (data) {
+                $scope.toppci = data.data;
+            }, printError);
+    };
 
-		var daysAgo = 1;
-		
-		if($scope.timerFilterValue == "7d"){
-			var daysAgo = 7;
-		}else if($scope.timerFilterValue == "48h"){
-			var daysAgo = 2;
-		}else{
-			var daysAgo = 1;
-		}
-		
-		var date = new Date();
-		date.setDate(date.getDate()-daysAgo);
-		var timeAgo = date.getTime();
-		
-		//timeAgo = "";
-		
-		genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/'+timeAgo)
-                .then(function (data) {
-                    $scope.topsrcuser = data.data;
-                }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/srcip/'+timeAgo)
-                .then(function (data) {
-                    $scope.topsrcip = data.data;
-                }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/'+timeAgo)
-                .then(function (data) {
-                    $scope.topgroup = data.data;
-                }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/'+timeAgo)
-                .then(function (data) {
-                    $scope.toppci = data.data;
-                }, printError);		
-	}
-	load_tops();			
     var load = function () {
-		DataFactory.getAndClean('get', '/agents/summary', {})
-			.then(function (data) {
-				$scope.agentsCountActive = data.data.active;
-				$scope.agentsCountDisconnected = data.data.disconnected;
-				$scope.agentsCountNeverConnected = data.data.neverConnected;
-				$scope.agentsCountTotal = data.data.total;
-				$scope.load = false;
-		}, printError);
+        DataFactory.getAndClean('get', '/agents/summary', {})
+            .then(function (data) {
+                $scope.agentsCountActive = data.data.active;
+                $scope.agentsCountDisconnected = data.data.disconnected;
+                $scope.agentsCountNeverConnected = data.data.neverConnected;
+                $scope.agentsCountTotal = data.data.total;
+                $scope.load = false;
+            }, printError);
     };
 
     //Load
-    load();
+    try {
+        load();
+        load_tops();
+    } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        errlog.log('Unexpected exception loading controller', e);
+    }
 
-	// Timer filter watch
-	var loadWatch = $scope.$watch(function () {
+    // Timer filter watch
+    var loadWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {
         $scope.setTimer($scope.$parent.timeFilter);
-		load_tops();
+        load_tops();
     });
-	
 
     //Destroy
     $scope.$on("$destroy", function () {
-        //angular.forEach(objectsArray, DataFactory.clean(value));
-        tabProvider.clean($scope.pageId);
         $scope.stats.length = 0;
-		loadWatch();
+        loadWatch();
     });
 
 });

@@ -48,14 +48,14 @@
                         <input type="text" id="searchBox" ng-model="$parent._fileSearch" ng-change="fileSearchFilter($parent._fileSearch)" flex>
                     </md-input-container>
                     <div flex="40"></div>
-					<md-content flex="40" class="subNavLine" layout="row" layout-align="end center" ng-show="isWindows">
-						<md-button ng-click="changeType()" class="md-primary" ng-class="!$parent.showFilesRegistry ? 'button-disabled' : 'button-active'">
-							Files
-							</md-button>
-						<md-button ng-click="changeType()" class="md-primary" ng-class="$parent.showFilesRegistry ? 'button-disabled' : 'button-active'">
-							Registry keys
-							</md-button>
-					</md-content>
+                    <md-content flex="40" class="subNavLine" layout="row" layout-align="end center" ng-show="isWindows">
+                        <md-button ng-click="changeType()" class="md-primary" ng-class="!$parent.showFilesRegistry ? 'button-disabled' : 'button-active'">
+                            Files
+                        </md-button>
+                        <md-button ng-click="changeType()" class="md-primary" ng-class="$parent.showFilesRegistry ? 'button-disabled' : 'button-active'">
+                            Registry keys
+                        </md-button>
+                    </md-content>
                     <md-input-container style="margin-top: 12px;" flex="20">
                         <md-select id="eventBox" ng-model="$parent._fimEvent" ng-change="fileEventFilter($parent._fimEvent)" aria-label="Filter by event">
                             <md-option value="all">Filter events</md-option>
@@ -123,10 +123,10 @@
                 </md-list>
                 <md-divider></md-divider>
             </div>
-			
-						
 
-			
+
+
+
         </md-virtual-repeat-container>
     </div>
 </md-content>

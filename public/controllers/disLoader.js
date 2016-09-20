@@ -36,7 +36,7 @@ import FilterManagerProvider from 'ui/filter_manager';
 import AggTypesBucketsIntervalOptionsProvider from 'ui/agg_types/buckets/_interval_options';
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
-import indexTemplate from 'plugins/wazuh/templates/dis-template.html';
+import indexTemplate from 'plugins/wazuh/templates/directives/dis-template.html';
 import StateProvider from 'ui/state_management/state';
 
 import 'plugins/kibana/discover/saved_searches/saved_searches';
@@ -60,7 +60,7 @@ var app = require('ui/modules').get('app/wazuh', [])
         tableHeight: '@tableHeight',
         infiniteScroll: '@infiniteScroll'
       },
-      template: require('../templates/dis-template.html')
+      template: require('../templates/directives/dis-template.html')
     }
   }]);
 

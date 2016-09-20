@@ -1,6 +1,3 @@
-// Require config
-require('plugins/wazuh/config/config.js');
-
 // Require CSS
 require('plugins/wazuh/less/main.less');
 

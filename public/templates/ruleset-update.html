@@ -1,28 +1,29 @@
-   <md-content layout="row" ng-if="!load && submenuNavItem2 == 'update'" layout-align="space-around start" layout-sm="column" layout-xs="column" ng-controller="updateRulesetController" style="min-height: 500px;">
+<md-content layout="row" ng-if="!load && submenuNavItem2 == 'update'" layout-align="space-around start" layout-sm="column"
+    layout-xs="column" ng-controller="updateRulesetController" style="min-height: 500px;">
 
-        <md-content layout="column" layout-align="space-around center">
-            <h2>Update</h2>
-            <md-input-container layout="column" layout-align="space-around center">
-                <md-switch ng-model="$parent.updateForce" aria-label="Force update?">
-                    <span ng-show="!$parent.updateForce">Force update, restart if necessary.</span>
-                </md-switch>
-            </md-input-container>
+    <md-content layout="column" layout-align="space-around center">
+        <h2>Update</h2>
+        <md-input-container layout="column" layout-align="space-around center">
+            <md-switch ng-model="$parent.updateForce" aria-label="Force update?">
+                <span ng-show="!$parent.updateForce">Force update, restart if necessary.</span>
+            </md-switch>
+        </md-input-container>
 
-            <md-button type="submit" ng-click="updateRuleset($event);" class="md-primary md-raised">Update ruleset</md-button>
-            <div flex></div>
-        </md-content>
-
-        <md-divider></md-divider>
-
-        <md-content layout="column" layout-align="space-around center">
-            <h2>Backups</h2>
-            <md-select ng-model="$parent.selectedBackup" md-on-open="load_backups()" style="min-width: 150px;">
-                <md-option value="{{backup}}" ng-repeat="backup in backups">{{backup}}</md-option>
-                <md-option-empty ng-if="backups.length == 0">No backups where found</md-option-empty>
-            </md-select>
-            <md-button type="submit" class="md-primary md-raised" ng-click="restoreBackup($event);">Restore backup</md-button>
-            <div flex></div>
-        </md-content>
-
+        <md-button type="submit" ng-click="updateRuleset($event);" class="md-primary md-raised">Update ruleset</md-button>
+        <div flex></div>
     </md-content>
+
+    <md-divider></md-divider>
+
+    <md-content layout="column" layout-align="space-around center">
+        <h2>Backups</h2>
+        <md-select ng-model="$parent.selectedBackup" md-on-open="load_backups()" style="min-width: 150px;">
+            <md-option value="{{backup}}" ng-repeat="backup in backups">{{backup}}</md-option>
+            <md-option-empty ng-if="backups.length == 0">No backups where found</md-option-empty>
+        </md-select>
+        <md-button type="submit" class="md-primary md-raised" ng-click="restoreBackup($event);">Restore backup</md-button>
+        <div flex></div>
+    </md-content>
+
+</md-content>
 </md-content>

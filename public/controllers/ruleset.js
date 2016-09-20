@@ -1,20 +1,16 @@
-// Require config
-var config = require('plugins/wazuh/config/config.js');
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
-	$scope.$parent.state.setManagerState('ruleset');
+    $scope.$parent.state.setManagerState('ruleset');
     $scope.search = undefined;
 
     $scope.rules = [];
 
     $scope.statusFilter = 'enabled';
 
-    $scope.maxLevel = 15;
-    $scope.minLevel = 0;
     $scope._filter = null;
 
     var _file;
@@ -164,15 +160,6 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
         return promise;
     };
 
-    $scope.rulesLevelFilter = function () {
-        if ((!$scope.minLevel && $scope.minLevel !== 0) || (!$scope.maxLevel && $scope.maxLevel !== 0) || $scope.minLevel == null || $scope.maxLevel == null) {
-            return null;
-        }
-        if (0 <= parseInt($scope.minLevel) <= parseInt($scope.maxLevel) <= 15) {
-            DataFactory.filters.set(objectsArray['/rules'], 'level', $scope.minLevel + '-' + $scope.maxLevel);
-        }
-    };
-
     $scope.rulesStatusFilter = function (status) {
         DataFactory.filters.set(objectsArray['/rules'], 'status', status);
     };
@@ -221,7 +208,6 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
                         DataFactory.filters.register(objectsArray['/rules'], 'file', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'group', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'pci', 'string');
-                        DataFactory.filters.register(objectsArray['/rules'], 'level', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'status', 'string');
                         DataFactory.filters.register(objectsArray['/rules'], 'filter-sort', 'string');
                         DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-level');
@@ -471,7 +457,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 });
 
 
-app.controller('updateRulesetController', function ($scope, $q, DataFactory, tabProvider, $mdDialog, $mdToast, errlog) {
+app.controller('updateRulesetController', function ($scope, $q, DataFactory, $mdDialog, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('update');
@@ -480,14 +466,6 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
 
     $scope.updateType = 'b';
     $scope.updateForce = false;
-
-    $scope.submenuNavItem = 'ruleset';
-    $scope.submenuNavItem2 = 'update';
-
-    $scope.pageId = (Math.random().toString(36).substring(3));
-    tabProvider.register($scope.pageId);
-
-    var objectsArray = [];
 
     //Print Error
     var printError = function (error) {
@@ -498,18 +476,7 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
         });
     }
 
-    //Tabs
-    $scope.setTab = function (tab, group) {
-        tabProvider.setTab($scope.pageId, tab, group);
-    };
-
-    $scope.isSetTab = function (tab, group) {
-        return tabProvider.isSetTab($scope.pageId, tab, group);
-    };
-
     //Functions
-
-    //Backups
 
     $scope.updateRuleset = function (ev) {
         if (!$scope.updateType) {
@@ -605,7 +572,6 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
     };
 
     //Load functions
-
     $scope.load_backups = function () {
         var defered = $q.defer();
         var promise = defered.promise;
@@ -641,10 +607,7 @@ app.controller('updateRulesetController', function ($scope, $q, DataFactory, tab
 
     //Destroy
     $scope.$on("$destroy", function () {
-        angular.forEach(objectsArray, function (value) {
-            DataFactory.clean(value)
-        });
-        tabProvider.clean($scope.pageId);
+        $scope.backups.length = 0;
     });
 
 });

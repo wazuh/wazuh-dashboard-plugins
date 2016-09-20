@@ -73,7 +73,7 @@ var app = require('ui/modules').get('app/wazuh', [])
 		visWidth: '@visWidth',
         visSearchable: '@visSearchable'
       },
-      template: require('../templates/vis-template.html')
+      template: require('../templates/directives/vis-template.html')
     }
   }]);
 

@@ -13,7 +13,7 @@ import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
 import DocTitleProvider from 'ui/doc_title';
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
-import indexTemplate from 'plugins/wazuh/templates/dash-template.html';
+import indexTemplate from 'plugins/wazuh/templates/directives/dash-template.html';
 
 
 require('plugins/kibana/management/saved_object_registry').register({

@@ -5,7 +5,6 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
     //Initialisation
     $scope.load = true;
     $scope.text = [];
-    $scope.summary = [];
     $scope.realtime = false;
 
     $scope.$parent.state.setManagerState('logs');
@@ -29,7 +28,6 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
     }
 
     //Functions
-
     $scope.textObj = {
         //Obj with methods for virtual scrolling
         getItemAtIndex: function (index) {
@@ -154,7 +152,6 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
         });
         errlog.log('Unexpected exception loading controller', e);
     }
-
 
     //Destroy
     $scope.$on("$destroy", function () {

@@ -18,18 +18,6 @@
     "url": "https://github.com/wazuh/wazuh-kibana-ui/issues"
   },
   "homepage": "http://www.wazuh.com/",
-  "devDependencies": {
-    "bluebird": "^3.0.5",
-    "gulp": "^3.9.0",
-    "gulp-eslint": "^1.1.1",
-    "gulp-gzip": "^1.2.0",
-    "gulp-tar": "^1.6.0",
-    "gulp-util": "^3.0.7",
-    "lodash": "^3.10.1",
-    "mkdirp": "^0.5.1",
-    "rimraf": "^2.4.4",
-    "rsync": "^0.4.0"
-  },
   "dependencies": {
     "angular-animate": "1.4.7",
     "angular-aria": "1.4.7",

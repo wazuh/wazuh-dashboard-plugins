@@ -1,13 +1,11 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('pmController', function ($scope, DataFactory, $mdDialog, errlog) {
+app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
     var objectsArray = [];
-	var loadWatch;
-
-    $scope.$parent.state.setAgentsState('policy_monitoring');
+    var loadWatch;
 
     $scope.events = [];
 
@@ -24,7 +22,6 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog, errlog)
     }
 
     //Functions
-
     $scope.setSort = function (field) {
         if ($scope._sort === field) {
             if ($scope._sortOrder) {
@@ -38,12 +35,11 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog, errlog)
         } else {
             $scope._sortOrder = false;
             $scope._sort = field;
-            DataFactory.filters.set(objectsArray['/rootcheck'], 'filter-sort', '-'+field);
+            DataFactory.filters.set(objectsArray['/rootcheck'], 'filter-sort', '-' + field);
         }
     }
 
     $scope.eventSearchFilter = function (search) {
-        console.log(search);
         if (search) {
             DataFactory.filters.set(objectsArray['/rootcheck'], 'search', search);
         } else {
@@ -84,41 +80,41 @@ app.controller('pmController', function ($scope, DataFactory, $mdDialog, errlog)
         },
     };
 
-	var createWatch = function () {
+    var createWatch = function () {
         loadWatch = $scope.$watch(function () {
             return $scope.$parent._agent;
         }, function () {
-		DataFactory.initialize('get', '/rootcheck/' + $scope.$parent._agent.id, {}, 200, 0)
-			.then(function (data) {
-				DataFactory.clean(objectsArray['/rootcheck']);
-				objectsArray['/rootcheck'] = data;
-				DataFactory.get(objectsArray['/rootcheck'])
-				.then(function (data) {
-                    $scope.events.length = 0;
-					$scope.events = data.data.items;
-                    DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
-                    DataFactory.filters.register(objectsArray['/rootcheck'], 'filter-sort', 'string');
-                    $scope._sort = '';
-                    $scope.eventSearchFilter($scope._eventSearch);
-				}, printError);
-			}, printError);
+            DataFactory.initialize('get', '/rootcheck/' + $scope.$parent._agent.id, {}, 200, 0)
+                .then(function (data) {
+                    DataFactory.clean(objectsArray['/rootcheck']);
+                    objectsArray['/rootcheck'] = data;
+                    DataFactory.get(objectsArray['/rootcheck'])
+                        .then(function (data) {
+                            $scope.events.length = 0;
+                            $scope.events = data.data.items;
+                            DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
+                            DataFactory.filters.register(objectsArray['/rootcheck'], 'filter-sort', 'string');
+                            $scope._sort = '';
+                            $scope.eventSearchFilter($scope._eventSearch);
+                        }, printError);
+                }, printError);
         });
     };
 
     var load = function () {
-		DataFactory.initialize('get', '/rootcheck/' + $scope.$parent._agent.id, {}, 200, 0)
-			.then(function (data) {
-				objectsArray['/rootcheck'] = data;
-				DataFactory.get(objectsArray['/rootcheck'])
-				.then(function (data) {
-					$scope.events = data.data.items;
-          $scope.totalEvents = data.data.totalItems;
-					DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
-                    DataFactory.filters.register(objectsArray['/rootcheck'], 'filter-sort', 'string');
-					createWatch();
-					$scope.load = false;
-				}, printError);
-			}, printError);
+        DataFactory.initialize('get', '/rootcheck/' + $scope.$parent._agent.id, {}, 200, 0)
+            .then(function (data) {
+                objectsArray['/rootcheck'] = data;
+                DataFactory.get(objectsArray['/rootcheck'])
+                    .then(function (data) {
+                        $scope.events = data.data.items;
+                        $scope.totalEvents = data.data.totalItems;
+                        DataFactory.filters.register(objectsArray['/rootcheck'], 'search', 'string');
+                        DataFactory.filters.register(objectsArray['/rootcheck'], 'filter-sort', 'string');
+                        createWatch();
+                        $scope.load = false;
+                    }, printError);
+            }, printError);
     };
 
     //Load
