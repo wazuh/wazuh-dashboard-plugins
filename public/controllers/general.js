@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('generalController', function ($scope, $q, DataFactory, $mdToast, appState, errlog) {
+app.controller('generalController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window) {
     //Initialisation
     $scope.load = true;
     $scope.search = '';
@@ -76,6 +76,11 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
         return _urlStr + agent.name + _urlStrSf + agent.name + _urlStrSSf;
     }
 
+    $scope.openDashboard = function (dashboard, filter) {
+        $scope.state.setDashboardsState(dashboard, filter);
+        $window.open('#/dashboards/', '_blank');
+    }
+
 
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 256, 0)
@@ -111,4 +116,14 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 
 app.controller('stateController', function ($scope, appState) {
     $scope.state = appState;
+});
+
+app.controller('stateLocationController', function ($scope, appState, $window) {
+    $scope.state = appState;
+
+    $scope.openDashboard = function (dashboard, filter) {
+        $scope.state.setDashboardsState(dashboard, filter);
+        $window.open('#/dashboards/', '_blank');
+    }
+
 });

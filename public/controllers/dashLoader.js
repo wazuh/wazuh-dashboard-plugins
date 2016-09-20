@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import $ from 'jquery';
 import chrome from 'ui/chrome';
+import rison from 'rison-node';
 import 'ui/courier';
 import 'ui/config';
 import 'ui/notify';
@@ -51,6 +52,9 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
             savedDashboards.get($scope.dashId).then(function (_dash) {
                 $scope.dash = _dash;
                 const dash = _dash;
+
+                $route.current.params._a = rison.encode([]);
+                $route.updateParams({ '_a': rison.encode([]) });
 
                 const queryFilter = Private(FilterBarQueryFilterProvider);
 

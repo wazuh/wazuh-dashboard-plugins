@@ -37,9 +37,6 @@
 						No agents matching "{{search}}" were found.
 					</md-not-found>
 					</md-autocomplete>
-					<md-button class="md-hue-2 md-fab md-primary md-mini" aria-label="Add agent">
-						<i class="fa fa-plus" aria-hidden="true"></i>
-					</md-button>
 					</span>
 				</div>
 			</md-toolbar>
@@ -52,6 +49,12 @@
 				<md-content flex="40" class="subNavLine" layout="row" layout-align="end start">
 				<md-button ng-if="_agent" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-href="{{getDiscoverByAgent(_agent)}}"
 					target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Discover alerts</md-button>
+				<md-button style="margin-bottom: 0px !important;" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'overview'" ng-click="openDashboard('ossecalerts', 'AgentName:'+_agent.name)">
+					<i class="fa fa-external-link" aria-hidden="true"></i> Full dashboard
+				</md-button>
+				<md-button style="margin-bottom: 0px !important;" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'fim'" ng-click="openDashboard('fim', 'AgentName:'+_agent.name)">
+					<i class="fa fa-external-link" aria-hidden="true"></i> Full dashboard
+				</md-button>
 				<div ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'active' ? null : (_agent.status == 'neverConnected' ? 'extraLarge' : 'large')"
 					layout="row" layout-align="space-between center"><span>{{formatAgentStatus(_agent.status)}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
 			</md-content>
