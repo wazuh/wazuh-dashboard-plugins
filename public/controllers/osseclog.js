@@ -44,7 +44,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
                         DataFactory.filters.unflag(objectsArray['/manager/logs']);
                         $scope.blocked = false;
                     }, printError);
-            } else if ((_pos > 125) || (_pos < 0)) {
+            } else if ((_pos > 225) || (_pos < 0)) {
                 $scope.blocked = true;
                 DataFactory.scrollTo(objectsArray['/manager/logs'], index)
                     .then(function (data) {
@@ -129,7 +129,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
     };
 
     var load = function () {
-        DataFactory.initialize('get', '/manager/logs', {}, 150, 0)
+        DataFactory.initialize('get', '/manager/logs', {}, 250, 0)
             .then(function (data) {
                 objectsArray['/manager/logs'] = data;
                 DataFactory.filters.register(objectsArray['/manager/logs'], 'category', 'string');

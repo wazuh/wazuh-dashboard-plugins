@@ -24,13 +24,15 @@
             </div>
         </div>
 
+        <div md-virtual-repeat="line in textObj" md-on-demand>
         <table class="logTable" flex>
             <tbody>
-                <tr md-virtual-repeat="line in textObj" md-on-demand flex>
+                <tr flex>
                     <td class="logTableNumber">{{$index}}</td>
                     <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}" ng-bind-html="colorLine(line)">{{colorLine(line)}}</td>
                 </tr>
             </tbody>
         </table>
+        </div>
     </md-virtual-repeat-container>
 </md-content>
