@@ -15,6 +15,7 @@ import DocTitleProvider from 'ui/doc_title';
 import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import indexTemplate from 'plugins/wazuh/templates/directives/dash-template.html';
+import 'ui/directives/saved_object_finder.js';
 
 
 require('plugins/kibana/management/saved_object_registry').register({
@@ -47,6 +48,12 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
         controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState, savedDashboards) {
             $scope.chrome = {};
             $scope.chrome.getVisible = function () {return true};
+
+            $scope.topNavMenu = [{
+                key: 'open',
+                description: 'Load Saved Dashboard',
+                template: require('plugins/kibana/dashboard/partials/load_dashboard.html')
+            }];
 
             $route.requireDefaultIndex = true;
             savedDashboards.get($scope.dashId).then(function (_dash) {
@@ -102,12 +109,6 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                     if (!angular.equals(newVal, oldVal)) $state.save();
                 });
                 $scope.$watch('state.options.darkTheme', setDarkTheme);
-
-                $scope.topNavMenu = [{
-                        key: 'share',
-                        description: 'Link To Dashboard',
-                        template: require('plugins/kibana/dashboard/partials/share.html')
-                    }];
 
                 $scope.refresh = _.bindKey(courier, 'fetch');
 
