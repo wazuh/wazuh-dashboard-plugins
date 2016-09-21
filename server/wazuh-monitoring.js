@@ -188,7 +188,7 @@ module.exports = function (server, options) {
             server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Skipping "wazuh-monitoring-*" index pattern configuration: Already configured.');
         }
     });
-    cron.schedule('0 */30 * * * *', function () {
+    cron.schedule('0 */10 * * * *', function () {
         agentsArray.length = 0;
         getConfig(loadCredentials);
     }, true);
