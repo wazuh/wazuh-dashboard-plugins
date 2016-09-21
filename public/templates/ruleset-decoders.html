@@ -1,5 +1,5 @@
 <md-content layout="row" flex layout-padding ng-if="!load && submenuNavItem2 == 'decoders'" ng-controller="decodersController">
-	<md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding style="min-height: 2000px;">
+	<md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding auto-size-container ng-style="autoSizeStyle">
 
 		<div flex id="content" layout="row" layout-align="space-between center">
 

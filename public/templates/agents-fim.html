@@ -1,7 +1,7 @@
 <md-content ng-if="submenuNavItem == 'fim'" ng-if="_agent" class="md-padding">
     <div flex ng-controller="fimController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-        <md-virtual-repeat-container style="min-height: 700px;" ng-if="!load">
+        <md-virtual-repeat-container auto-size-container ng-style="autoSizeStyle" ng-if="!load">
             <md-content layout="row">
                 <md-card flex="40">
                     <md-card-title>

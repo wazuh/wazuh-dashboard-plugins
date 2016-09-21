@@ -1,7 +1,7 @@
 <md-content ng-if="!_agent || submenuNavItem == 'preview'" class="md-padding">
     <div flex ng-controller="agentsPreviewController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-        <md-virtual-repeat-container style="min-height: 700px;" ng-if="!load">
+        <md-virtual-repeat-container auto-size-container ng-style="autoSizeStyle" ng-if="!load">
             <div flex layout="column" layout-align="space-between stretch">
                 <div layout="row" layout-align="space-between stretch">
 
