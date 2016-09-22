@@ -222,6 +222,7 @@ module.exports = function (server, options) {
     //Handlers - stats
 
     var getFieldTop = function(req, reply) {
+		var filtering = false;
         var needle = require('needle');
         if (_eluser && _elpass) {
             var options = {
@@ -246,6 +247,8 @@ module.exports = function (server, options) {
 		
 		const timeAgo = req.params.time ? encodeURIComponent(req.params.time) : date;
         
+		if(req.params.fieldValue && req.params.fieldFilter)
+			filtering = true;	
 
         var payload = {
             "size": 1,
@@ -282,6 +285,10 @@ module.exports = function (server, options) {
                 }
             }
         };
+		
+		if(filtering){
+			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue;
+		}
 
         needle.request('get', elasticurl, payload, options, function (error, response) {
             if (error || response.body.error) {
@@ -296,7 +303,8 @@ module.exports = function (server, options) {
         });
     };
 
-var getLastField = function(req, reply) {
+	var getLastField = function(req, reply) {
+		var filtering = false;
         var needle = require('needle');
 		var elasticurl = _elurl+'/ossec-*/ossec/_search';
 		var filtering = false;
@@ -316,9 +324,9 @@ var getLastField = function(req, reply) {
 
        
 	if(req.params.fieldValue && req.params.fieldFilter)
-			filtering = true;
-		
-        var payload = {
+		filtering = true;	
+	
+     var payload = {
 	  "size": 1,
 	  "query": {
 		
@@ -348,7 +356,7 @@ var getLastField = function(req, reply) {
 			filterArray[req.params.fieldFilter] = req.params.fieldValue;
 			var termArray = { "term" : filterArray};
 			payload.query.bool.must.push(termArray);
-		}
+	}
 		
         needle.request('get', elasticurl, payload, options, function (error, response) {
 
@@ -738,6 +746,18 @@ var getLastField = function(req, reply) {
         path: '/api/wazuh-elastic/top/{field}/{time?}',
         handler: getFieldTop
     });
+	
+	/*
+    * GET /api/wazuh-stats/top/agent
+    * Returns the agent with most alerts
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/top/{field}/{time}/{fieldFilter}/{fieldValue}',
+        handler: getFieldTop
+    });
+	
     /*
     * GET /api/wazuh-stats/last/AgentName
     * Return last field value

@@ -43,14 +43,14 @@
 				<md-card-content>
 					<span class="md-headline">Top user owners</span>
 					<kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"syscheck" AND full_log: Ownership was'>
+						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"syscheck"'>
 				</md-card-content>
 			</md-card>
 			<md-card>
 				<md-card-content>
 					<span class="md-headline">Top group owners</span>
 					<kbn-vis vis-height="100px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.gname_after,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"syscheck" AND full_log: Group ownership was'>
+						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"syscheck"'>
 				</md-card-content>
 			</md-card>
 
@@ -60,18 +60,6 @@
 	</md-content>
 
 	<md-content flex layout="row">
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">{{topagent}}</div>
-				<div class="ng-binding">Top agent</div>
-			</md-card-content>
-		</md-card>
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">{{toppci}}</div>
-				<div class="ng-binding">Top PCI Requirement</div>
-			</md-card-content>
-		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				<div class="metric-value ng-binding" style="font-size: 19pt;">{{last_file_changed}}</div>
@@ -88,12 +76,6 @@
 			<md-card-content style="text-align: center;">
 				<div class="metric-value ng-binding" style="font-size: 19pt;">{{last_file_deleted}}</div>
 				<div class="ng-binding">Last file deleted</div>
-			</md-card-content>
-		</md-card>
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				<div class="metric-value ng-binding" style="font-size: 19pt;">{{toppermissions}}</div>
-				<div class="ng-binding">Most common permissions</div>
 			</md-card-content>
 		</md-card>
 
@@ -124,10 +106,38 @@
 					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"syscheck" AND _exists_:SyscheckFile.perm_after AND (SyscheckFile.perm_after:/[0-7]{5}([2367]).*/) '>
 			</md-card-content>
 		</md-card>
+		
 
 	</md-content>
 
+	<md-content flex layout="row">
+		<md-card flex="20" layout="column">
+			<md-card-content style="text-align: center;">
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{topagent}}</div>
+				<div class="ng-binding">Top agent</div>
+			</md-card-content>
+		</md-card>
+		<md-card flex="20" layout="column">
+			<md-card-content style="text-align: center;">
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{toppci}}</div>
+				<div class="ng-binding">Top PCI Requirement</div>
+			</md-card-content>
+		</md-card>
+		<md-card flex="20" layout="column">
+			<md-card-content style="text-align: center;">
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{toppermissions}}</div>
+				<div class="ng-binding">Most common permissions</div>
+			</md-card-content>
+		</md-card>
+		<md-card flex="40" layout="column">
+			<md-card-content style="text-align: center;">
+				<div class="metric-value ng-binding" style="font-size: 19pt;">{{topfile}}</div>
+				<div class="ng-binding">Most changed file</div>
+			</md-card-content>
+		</md-card>
 
+	</md-content>
+	
 	<md-content flex layout="row">
 
 		<md-card flex>

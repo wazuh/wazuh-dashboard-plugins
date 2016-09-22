@@ -157,6 +157,10 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
             .then(function (data) {
                 $scope.toppci = data.data;
             }, printError);
+		genericReq.request('GET', '/api/wazuh-elastic/top/SyscheckFile.path/' + timeAgo + '/location/syscheck')
+            .then(function (data) {
+                $scope.topfile = data.data;
+            }, printError);	
             
         // Last fields
 
