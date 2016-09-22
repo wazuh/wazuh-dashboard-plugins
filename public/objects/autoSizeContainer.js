@@ -12,11 +12,6 @@ require('ui/modules').get('app/wazuh', [])
                 var elTop = $element.offset().top;
                 var remaining = winBottom - elTop - 10;
 
-                console.log(winHeight);
-                console.log(winBottom);
-                console.log(elTop);
-                console.log(remaining);
-
                 $scope.autoSizeStyle = {'height': remaining+'px'};
             }
         }

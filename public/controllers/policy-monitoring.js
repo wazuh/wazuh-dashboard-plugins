@@ -22,6 +22,12 @@ app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog) 
     }
 
     //Functions
+	
+	$scope.setTimer = function (time) {
+        $scope.timerFilterValue = time;
+    };
+	
+	
     $scope.setSort = function (field) {
         if ($scope._sort === field) {
             if ($scope._sortOrder) {
@@ -120,6 +126,7 @@ app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog) 
     //Load
     try {
         load();
+		$scope.setTimer($scope.$parent.timeFilter);
     } catch (e) {
         $mdToast.show({
             template: '<md-toast> Unexpected exception loading controller </md-toast>',
@@ -129,6 +136,13 @@ app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog) 
         errlog.log('Unexpected exception loading controller', e);
     }
 
+	// Timer filter watch
+    var loadWatch2 = $scope.$watch(function () {
+        return $scope.$parent.timeFilter;
+    }, function () {
+        $scope.setTimer($scope.$parent.timeFilter);
+    });
+	
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
@@ -136,6 +150,7 @@ app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog) 
         });
         $scope.events.length = 0;
         loadWatch();
+		loadWatch2();
     });
 
 })

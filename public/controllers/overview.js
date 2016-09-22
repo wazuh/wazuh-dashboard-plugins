@@ -151,7 +151,7 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
                 $scope.last_file_changed = (data.data != "") ? data.data.path : "(no data)";
         }, printError);
         
-        genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/addded')
+        genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/added')
         .then(function (data) {
                 $scope.last_file_added = (data.data != "") ? data.data.path : "(no data)";
         }, printError);
