@@ -4,7 +4,6 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setOverviewState('general');
-    $scope.timeFilter = "24h";
 
     $scope.stats = [];
 
@@ -19,7 +18,7 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
 
     //Functions
     $scope.setTimer = function (time) {
-            $scope.timerFilterValue = time;
+        $scope.timerFilterValue = time;
     };
 
 
@@ -57,14 +56,7 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
     };
 
     var load = function () {
-        DataFactory.getAndClean('get', '/agents/summary', {})
-            .then(function (data) {
-                $scope.agentsCountActive = data.data.active;
-                $scope.agentsCountDisconnected = data.data.disconnected;
-                $scope.agentsCountNeverConnected = data.data.neverConnected;
-                $scope.agentsCountTotal = data.data.total;
-                $scope.load = false;
-            }, printError);
+
     };
 
     //Load
@@ -81,6 +73,7 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
     }
 
     // Timer filter watch
+	$scope.setTimer($scope.$parent.timeFilter);
     var loadWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {
@@ -102,7 +95,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setOverviewState('fim');
-    $scope.timeFilter = "24h";
 
     $scope.stats = [];
 
@@ -117,13 +109,7 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
 
     //Functions
     $scope.setTimer = function (time) {
-        if (time == "24h") {
-            $scope.timerFilterValue = "24h";
-        } else if (time == "48h") {
-            $scope.timerFilterValue = "48h";
-        } else {
-            $scope.timerFilterValue = "7d";
-        }
+		$scope.timerFilterValue = time;
     };
 
 
@@ -184,14 +170,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
     };
 
     var load = function () {
-        DataFactory.getAndClean('get', '/agents/summary', {})
-            .then(function (data) {
-                $scope.agentsCountActive = data.data.active;
-                $scope.agentsCountDisconnected = data.data.disconnected;
-                $scope.agentsCountNeverConnected = data.data.neverConnected;
-                $scope.agentsCountTotal = data.data.total;
-                $scope.load = false;
-            }, printError);
     };
 
     //Load
@@ -208,6 +186,117 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
     }
 
     // Timer filter watch
+	$scope.setTimer($scope.$parent.timeFilter);
+    var loadWatch = $scope.$watch(function () {
+        return $scope.$parent.timeFilter;
+    }, function () {
+        $scope.setTimer($scope.$parent.timeFilter);
+        load_tops();
+    });
+
+    //Destroy
+    $scope.$on("$destroy", function () {
+        $scope.stats.length = 0;
+        loadWatch();
+    });
+
+});
+
+
+app.controller('overviewPMController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
+    //Initialisation
+    $scope.load = true;
+    $scope.$parent.state.setOverviewState('pm');
+
+    $scope.stats = [];
+
+    //Print Error
+    var printError = function (error) {
+        $mdToast.show({
+            template: '<md-toast>' + error.html + '</md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+    };
+
+    //Functions
+    $scope.setTimer = function (time) {
+		$scope.timerFilterValue = time;
+    };
+
+
+    var load_tops = function () {
+		
+        var daysAgo = 1;
+        if ($scope.timerFilterValue == "24h") {
+            daysAgo = 1;
+        } else if ($scope.timerFilterValue == "7d") {
+            daysAgo = 7;
+		} else if ($scope.timerFilterValue == "30d") {
+            daysAgo = 30;	
+        } else {
+            daysAgo = 1;
+        }
+		
+        var date = new Date();
+        date.setDate(date.getDate() - daysAgo);
+        var timeAgo = date.getTime();
+        
+        // Top fields
+        genericReq.request('GET', '/api/wazuh-elastic/top/AgentName/'+timeAgo)
+            .then(function (data) {
+                $scope.topagent = data.data;
+            }, printError);
+
+            
+        // Last fields
+
+        genericReq.request('GET', '/api/wazuh-elastic/last/title/location/rootcheck')
+            .then(function (data) {
+            if(data.data != "")
+                $scope.lastEventTitle = (data.data != "") ? data.data : "(no data)";
+        }, printError);
+		
+		genericReq.request('GET', '/api/wazuh-elastic/last/AgentName/location/rootcheck')
+            .then(function (data) {
+            if(data.data != "")
+                $scope.lastEventAgentName = (data.data != "") ? data.data : "(no data)";
+        }, printError);
+		
+		genericReq.request('GET', '/api/wazuh-elastic/last/AgentID/location/rootcheck')
+            .then(function (data) {
+            if(data.data != "")
+                $scope.lastEventAgentID = (data.data != "") ? data.data : "(no data)";
+        }, printError);
+		
+		genericReq.request('GET', '/api/wazuh-elastic/last/AgentIP/location/rootcheck')
+            .then(function (data) {
+            if(data.data != "")
+                $scope.lastEventAgentIP = (data.data != "") ? data.data : "";
+        }, printError);
+        
+
+
+    };
+
+    var load = function () {
+    };
+
+    //Load
+    try {
+        load();
+        load_tops();
+    } catch (e) {
+        $mdToast.show({
+            template: '<md-toast> Unexpected exception loading controller </md-toast>',
+            position: 'bottom left',
+            hideDelay: 5000,
+        });
+        errlog.log('Unexpected exception loading controller', e);
+    }
+
+    // Timer filter watch
+	$scope.setTimer($scope.$parent.timeFilter);
     var loadWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {

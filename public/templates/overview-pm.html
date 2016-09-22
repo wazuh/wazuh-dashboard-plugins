@@ -1,0 +1,83 @@
+<md-content flex layout="column" ng-if="!load && submenuNavItem == 'pm'" ng-controller="overviewPMController">
+	<md-content layout="row">
+
+		<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 19pt;">{{lastEventAgentID}} - {{lastEventAgentName}} - {{lastEventAgentIP}}: {{lastEventTitle}}</div>
+					<div class="ng-binding">Last event</div>
+				</md-card-content>
+		</md-card>
+
+	</md-content>
+	
+	<div layout="row" layout-align="center stretch">
+		<md-card flex="50">
+			<md-card-content>
+				<span class="md-headline">Events over time</span>
+				<kbn-vis vis-height="220px;" vis-type="area" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:100),schema:group,type:terms),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'PM%20Alerts%20over%20time',type:area))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"rootcheck"'>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		
+		<md-card flex="25">
+			<md-card-content>
+				<span class="md-headline">Top 5 CIS Requirements</span>
+				<kbn-vis vis-height="220px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.CIS,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20CIS%20Requirements',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"rootcheck"'>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+
+		
+		<md-card flex="25">
+			<md-card-content>
+				<span class="md-headline">Top 5 PCI DSS Requirements</span>
+				<kbn-vis vis-height="220px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.PCI_DSS,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20PCI%20DSS%20Requirements',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"rootcheck"'>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+
+	</div>
+	
+<div layout="row" layout-align="center stretch">
+		<md-card flex="70">
+			<md-card-content>
+				<span class="md-headline">Events per agent evolution</span>
+				<kbn-vis vis-height="220px;" vis-type="line" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'New%20Visualization',type:line))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter='rule.groups:"rootcheck"'>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		
+		
+		<md-card layout="column" flex="30">
+			<md-card-content>
+				<span class="md-headline">Top 5 monitored files</span>
+				<kbn-vis vis-height="160px;" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AlertsFile,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20monitored%20files',type:pie))"
+				vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+					vis-filter='rule.groups:"rootcheck"'>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+
+	</div>
+	
+	<div layout="row" layout-align="center stretch">
+		<md-card flex>
+			<md-card-title>
+				<md-card-title-text>
+					<span class="md-headline">Alerts summary</span>
+				</md-card-title-text>
+			</md-card-title>
+			<md-card-content>
+				<kbn-vis vis-height="460px;" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'location:%20rootcheck')),uiState:(vis:(params:(sort:(columnIndex:3,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5000),schema:bucket,type:terms),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'4',params:(field:title,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+				vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+					vis-filter='location: rootcheck'>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+	</div>
+
+</md-content>
