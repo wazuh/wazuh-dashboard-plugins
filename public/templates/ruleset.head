@@ -9,10 +9,6 @@
 			ng-class="button-disabled" ng-click="submenuNavItem2 = 'decoders'" class="md-primary">
 			Decoders
 		</md-button>
-		<md-button ng-class="(submenuNavItem2 == 'update') ? 'button-active' : 'button-disabled'" style="background-color: rgb(207,216,220); color: #000;"
-			ng-class="button-disabled" ng-click="submenuNavItem2 = 'update'" class="md-primary">
-			Update
-		</md-button>
 	</div>
 
 
