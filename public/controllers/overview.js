@@ -55,13 +55,9 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
             }, printError);
     };
 
-    var load = function () {
-
-    };
-
     //Load
     try {
-        load();
+        $scope.setTimer($scope.$parent.timeFilter);
         load_tops();
     } catch (e) {
         $mdToast.show({
@@ -73,7 +69,6 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
     }
 
     // Timer filter watch
-	$scope.setTimer($scope.$parent.timeFilter);
     var loadWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {
@@ -169,12 +164,9 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
 
     };
 
-    var load = function () {
-    };
-
     //Load
     try {
-        load();
+        $scope.setTimer($scope.$parent.timeFilter);
         load_tops();
     } catch (e) {
         $mdToast.show({
@@ -186,7 +178,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
     }
 
     // Timer filter watch
-	$scope.setTimer($scope.$parent.timeFilter);
     var loadWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {
@@ -279,12 +270,9 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
 
     };
 
-    var load = function () {
-    };
-
     //Load
     try {
-        load();
+	    $scope.setTimer($scope.$parent.timeFilter);
         load_tops();
     } catch (e) {
         $mdToast.show({
@@ -296,7 +284,6 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
     }
 
     // Timer filter watch
-	$scope.setTimer($scope.$parent.timeFilter);
     var loadWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {
