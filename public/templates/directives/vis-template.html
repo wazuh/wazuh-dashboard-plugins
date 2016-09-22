@@ -40,12 +40,12 @@
     <div class="button-group"></div>
   </navbar>
 
-  <filter-bar state="state"></filter-bar>
+  <filter-bar state="$state" ng-if="visClickable"></filter-bar>
 
   <div class="vis-editor-content">
 
     <div class="vis-editor-canvas" ng-class="{ embedded: !chrome.getVisible() }">
-      <visualize vis="vis" ui-state="uiState" show-spy-panel="chrome.getVisible()" editable-vis="editableVis" search-source="savedVis.searchSource">
+      <visualize vis="vis" ui-state="uiState" show-spy-panel="chrome.getVisible()" editable-vis="editableVis" search-source="savedVis.searchSource" ng-class="visClickable ? 'null' : 'noClickVis'">
       </visualize>
     </div>
   </div>
