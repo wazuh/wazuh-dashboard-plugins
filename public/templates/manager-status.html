@@ -5,10 +5,10 @@
       <span layout="row" layout-align="space-between center">
                   <h3>Manager status</h3>
                 </span>
-      <span layout="column" ng-repeat="daemon in daemons">
+      <span layout="column" ng-repeat="(k,v) in daemons">
                     <span layout="row" layout-align="space-between center">
-                      <p>{{daemon.daemon}}</p>
-                      <p class="right-text"><span ng-class="getDaemonStatusClass(daemon.status)" class="round" style="float: right"></span></p>
+                      <p>{{k}}</p>
+                      <p class="right-text"><span ng-class="getDaemonStatusClass(v)" class="round" style="float: right"></span></p>
       </span>
       <md-divider></md-divider>
       </span>
