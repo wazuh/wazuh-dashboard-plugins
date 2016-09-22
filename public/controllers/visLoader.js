@@ -70,8 +70,9 @@ var app = require('ui/modules').get('app/wazuh', [])
         visG: '@visG',
         visFilter: '@visFilter',
         visHeight: '@visHeight',
-		visWidth: '@visWidth',
-        visSearchable: '@visSearchable'
+        visWidth: '@visWidth',
+        visSearchable: '@visSearchable',
+        visClickable: '@visClickable'
       },
       template: require('../templates/directives/vis-template.html')
     }
@@ -147,12 +148,14 @@ require('ui/modules').get('app/wazuh', [])
 
         return $state;
       } ());
-	  
-	  $scope.$watch("visG",function() {
+
+      $scope.state = $state;
+
+      $scope.$watch("visG", function () {
         //This gets called when data changes.
-		$route.current.params._g = $scope.visG;
-		$route.updateParams({ '_g': $scope.visG});
-    });
+        $route.current.params._g = $scope.visG;
+        $route.updateParams({ '_g': $scope.visG });
+      });
 
       function init() {
         // export some objects
@@ -186,14 +189,16 @@ require('ui/modules').get('app/wazuh', [])
         });
 
         // update the searchSource when filters update
-        const queryFilter = Private(FilterBarQueryFilterProvider);
-        $scope.$listen(queryFilter, 'update', function () {
-          searchSource.set('filter', queryFilter.getFilters());
-          $state.save();
-        });
+        if ($scope.visClickable) {
+          const queryFilter = Private(FilterBarQueryFilterProvider);
+          $scope.$listen(queryFilter, 'update', function () {
+            searchSource.set('filter', queryFilter.getFilters());
+            $state.save();
+          });
 
-        // fetch data when filters fire fetch event
-        $scope.$listen(queryFilter, 'fetch', $scope.fetch);
+          // fetch data when filters fire fetch event
+          $scope.$listen(queryFilter, 'fetch', $scope.fetch);
+        }
 
 
         $scope.$listen($state, 'fetch_with_changes', function (keys) {
@@ -238,14 +243,14 @@ require('ui/modules').get('app/wazuh', [])
             return;
           }
 
-        $scope.$watch("visFilter", function (newValue, oldValue) {
+          $scope.$watch("visFilter", function (newValue, oldValue) {
             $scope.v.filter = newValue;
             $scope.fetch();
-        });
-		
-		$scope.$watch("visWidth", function (newValue, oldValue) {
+          });
+
+          $scope.$watch("visWidth", function (newValue, oldValue) {
             $scope.fetch();
-        });
+          });
 
           $scope.fetch();
         });
@@ -264,7 +269,7 @@ require('ui/modules').get('app/wazuh', [])
 
       $scope.fetch = function () {
         const queryFilter = Private(FilterBarQueryFilterProvider);
-        searchSource.set('filter', queryFilter.getFilters());
+        if ($scope.visClickable) searchSource.set('filter', queryFilter.getFilters());
         if (!$state.linked) searchSource.set('query', $scope.v.filter);
         if ($scope.vis.type.requiresSearch) {
           courier.fetch();
