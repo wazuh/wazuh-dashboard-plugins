@@ -137,7 +137,7 @@ app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog) 
     }
 
 	// Timer filter watch
-    var loadWatch2 = $scope.$watch(function () {
+    var timerWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {
         $scope.setTimer($scope.$parent.timeFilter);
@@ -150,7 +150,7 @@ app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog) 
         });
         $scope.events.length = 0;
         loadWatch();
-		loadWatch2();
+		timerWatch();
     });
 
 })

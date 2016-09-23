@@ -9,3 +9,9 @@
     <kbn-dash dash-id="File-Integrity-Monitoring" dash-filter="{{state.getDashboardsState().filter ? state.getDashboardsState().filter : '*'}}" dash-time-from="now-24h" dash-time-to="now" dash-searchable="true" dash-timepicker="true" ng-init="setDashboardsState('fim', '*')"></kbn-dash>
 
 </md-content>
+
+<md-content flex layout="column" ng-if="submenuNavItem == 'policy_monitoring'" layout-align="start space-around">
+
+    <kbn-dash dash-id="Policy-Monitoring" dash-filter="{{state.getDashboardsState().filter ? state.getDashboardsState().filter : '*'}}" dash-time-from="now-24h" dash-time-to="now" dash-searchable="true" dash-timepicker="true" ng-init="setDashboardsState('policy_monitoring', '*')"></kbn-dash>
+
+</md-content>

@@ -62,7 +62,7 @@
       <div class="discover-wrapper col-md-10">
         <div class="discover-content">
           <div ng-show="resultState === 'none'">
-            <div class="discover-overlay">
+            <div class="discover-overlay" style="position: relative !important; opacity: 1 !important;">
               <h2 aria-hidden="true"><i aria-hidden="true" class="fa fa-meh-o"></i></h2>
               <h4>No results found</h4>
             </div>
@@ -70,7 +70,7 @@
 
           <!-- loading -->
           <div ng-show="resultState === 'loading'">
-            <div class="discover-overlay">
+            <div class="discover-overlay" style="position: relative !important; opacity: 1 !important;">
               <h2>Searching</h2>
               <div ng-show="fetchStatus">{{fetchStatus.complete}}/{{fetchStatus.total}}</div>
             </div>

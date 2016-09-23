@@ -67,14 +67,6 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
             $scope.search = agent.name;
         }
     };
-
-    $scope.getDiscoverByAgent = function (agent) {
-        var _urlStr = '/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),filters:!((\'$state\':(store:appState),meta:(alias:!n,disabled:!f,index:\'ossec-*\',key:AgentName,negate:!f,value:\'';
-        var _urlStrSf = '\'),query:(match:(AgentName:(query:\'';
-        var _urlStrSSf = '\',type:phrase))))),index:\'ossec-*\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'*\')),sort:!(\'@timestamp\',desc),vis:(aggs:!((params:(field:AgentName,orderBy:\'2\',size:20),schema:segment,type:terms),(id:\'2\',schema:metric,type:count)),type:histogram))&indexPattern=ossec-*&type=histogram';
-
-        return _urlStr + agent.name + _urlStrSf + agent.name + _urlStrSSf;
-    }
 	
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
@@ -85,7 +77,6 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
         $scope.state.setDiscoverState(template, filter);
 		$window.location.href = '#/discover/';
     }
-
 
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 256, 0)

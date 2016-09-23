@@ -176,7 +176,7 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
 
 	
     // Timer filter watch
-    var loadWatch2 = $scope.$watch(function () {
+    var timerWatch = $scope.$watch(function () {
         return $scope.$parent.timeFilter;
     }, function () {
         $scope.setTimer($scope.$parent.timeFilter);
@@ -189,7 +189,7 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
         });
         $scope.files.length = 0;
         loadWatch();
-		loadWatch2();
+		timerWatch();
     });
 
 });
