@@ -110,8 +110,9 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 
 });
 
-app.controller('stateController', function ($scope, appState) {
+app.controller('stateController', function ($scope, appState, $route) {
     $scope.state = appState;
+    $scope.select = $route.current.params.select;
 });
 
 app.controller('stateLocationController', function ($scope, appState, $window) {

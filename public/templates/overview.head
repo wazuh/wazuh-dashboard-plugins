@@ -37,11 +37,15 @@
 			</md-content>
 			<md-button ng-if="submenuNavItem == 'general'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('generic','*')">
 			<i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-			<md-button ng-if="submenuNavItem == 'fim'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('fim','rule.groups: syscheck')"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>		
-			<md-button class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'general'" ng-click="openDashboard('ossecalerts','*')">
+			<md-button ng-if="submenuNavItem == 'fim'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('fim','rule.groups: syscheck')"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+			<md-button ng-if="submenuNavItem == 'pm'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('rootcheck','rule.groups: rootcheck')"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>		
+			<md-button class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'general'" ng-click="openDashboard('OSSEC-Alerts','*')">
 				<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 			</md-button>
-			<md-button class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'fim'" ng-click="openDashboard('fim','*')">
+			<md-button class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'fim'" ng-click="openDashboard('File-Integrity-Monitoring','*')">
+				<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
+			</md-button>
+			<md-button class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'pm'" ng-click="openDashboard('Policy-Monitoring','*')">
 				<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 			</md-button>
 		</md-content>

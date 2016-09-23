@@ -36,6 +36,12 @@ routes
             "check": settingsWizard
         }
     })
+    .when('/dashboard/:select?', {
+        template: require('plugins/wazuh/templates/dashboards.jade'),
+        resolve: {
+            "check": settingsWizard
+        }
+    })
 	.when('/discover/', {
         template: require('plugins/wazuh/templates/discover.jade'),
         resolve: {
