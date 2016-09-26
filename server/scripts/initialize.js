@@ -52,9 +52,9 @@ module.exports = function (server, options) {
     };
 
     var insertSampleData = function (todayIndex) {
-        var SAMPLE_DATA = {"rule": { "group": "", "sidid": 0, "firedtimes": 1, "groups": [ ], "PCI_DSS": [ ], "description": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash sever to start ship alerts.", "AlertLevel": 0 }, "full_log": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash sever to start ship alerts.", "decoder": { }, "location": "", "@version": "1", "@timestamp": new Date().toISOString(), "path": "", "host": "", "type": "ossec-alerts", "AgentName": "" };
+        var SAMPLE_DATA = {"rule": { "group": "", "sidid": 0, "firedtimes": 1, "groups": [ ], "PCI_DSS": [ ], "description": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash server to start shipping alerts.", "AlertLevel": 0 }, "full_log": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash server to start shipping alerts.", "decoder": { }, "location": "", "@version": "1", "@timestamp": new Date().toISOString(), "path": "", "host": "", "type": "ossec-alerts", "AgentName": "" };
 
-        client.create({ index: todayIndex, type: 'ossec', id: 'sample', body: { SAMPLE_DATA } }).then(
+        client.create({ index: todayIndex, type: 'ossec', id: 'sample', body: SAMPLE_DATA }).then(
             function () {
                 server.log([blueWazuh, 'initialize', 'info'], 'Sample data was inserted successfully.');
                 configureKibana();
@@ -87,8 +87,7 @@ module.exports = function (server, options) {
         };
 
         var payload = {"value":"{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}"};
-        //NEEDS TO FIX THE ADDRESS USED
-        needle.request('post', ADD+':'+PORT+'/api/kibana/settings/timepicker:timeDefaults', payload, options, function (error, response) {
+        needle.request('post', server.info.uri+'/api/kibana/settings/timepicker:timeDefaults', payload, options, function (error, response) {
             if (!error) {
                 importObjects();
             } else {
