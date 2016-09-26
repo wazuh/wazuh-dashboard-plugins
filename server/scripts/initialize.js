@@ -97,14 +97,36 @@ module.exports = function (server, options) {
         uiSettings.set('defaultIndex', 'ossec-*')
             .then(function () {
                 importObjects();
-            }).catch(function () {
+            }).catch(function (e) {
+                console.log(e);
                 server.log([blueWazuh, 'initialize', 'error'], 'Could not set default index.');
             });
     };
 
     var importObjects = function () {
-        //ToDo
-        server.log([blueWazuh, 'initialize', 'info'], 'Your ELK deployment was successfully configured, and is ready to be used!');
+        server.log([blueWazuh, 'initialize', 'info'], 'Importing objects into elasticsearch...');
+        try {
+            var objects = JSON.parse(fs.readFileSync(OBJECTS_FILE, 'utf8'));
+        } catch (e) {
+            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
+            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + OBJECTS_FILE);
+            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+        }
+
+        var body = '';
+        objects.forEach(function (element) {
+            body += '{ "index":  { "_index": ".kibana", "_type": "'+element._type+'", "_id": "'+element._id+'" } }\n';
+            body += JSON.stringify(element._source) + "\n";
+        });
+
+        client.bulk({
+            index: '.kibana',
+            body: body
+        }).then(function () {
+            server.log([blueWazuh, 'initialize', 'info'], 'Your ELK deployment was successfully configured, and is ready to be used!');
+        }, function (err) {
+            server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch. Bulk request failed.');
+        });
     };
 
     setTemplate();
