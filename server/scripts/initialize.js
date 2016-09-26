@@ -67,9 +67,9 @@ module.exports = function (server, options) {
 
     var configureKibana = function () {
         server.log([blueWazuh, 'initialize', 'info'], 'Configuring Kibana for working with "ossec-*" index pattern...');
-        client.create({ index: '.kibana', type: 'index-pattern', id: 'ossec-*', body: { title: 'ossec-*', timeFieldName: '@timestamp' } })
+        client.create({ index: '.kibana', type: 'index-pattern', id: 'ossec-*', body: { title: 'ossec-*', timeFieldName: '@timestamp'} })
             .then(function () {
-                server.log([blueWazuh, 'initialize', 'info'], 'Successfully configured!');
+                server.log([blueWazuh, 'initialize', 'info'], 'Successfully configured.');
                 setDefaultTime();
             }, function (response) {
                 if (response.statusCode != '409') {
@@ -104,7 +104,7 @@ module.exports = function (server, options) {
     };
 
     var importObjects = function () {
-        server.log([blueWazuh, 'initialize', 'info'], 'Importing objects into elasticsearch...');
+        server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searchs, visualizations and dashboards) into Elasticsearch...');
         try {
             var objects = JSON.parse(fs.readFileSync(OBJECTS_FILE, 'utf8'));
         } catch (e) {
@@ -123,7 +123,8 @@ module.exports = function (server, options) {
             index: '.kibana',
             body: body
         }).then(function () {
-            server.log([blueWazuh, 'initialize', 'info'], 'Your ELK deployment was successfully configured, and is ready to be used!');
+            client.indices.refresh({ index: ['.kibana', 'ossec-*'] });
+            server.log([blueWazuh, 'initialize', 'info'], 'Templates, mappings, index patterns, visualizations, searches and dashboards were successfully installed. App ready to be used.');
         }, function (err) {
             server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch. Bulk request failed.');
         });
