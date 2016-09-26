@@ -1,13 +1,14 @@
 module.exports = function (server, options) {
 
     const client = server.plugins.elasticsearch.client;
+    const uiSettings = server.uiSettings();
 
     const colors = require('ansicolors');
     const blueWazuh = colors.blue('wazuh');
 
     const fs = require('fs');
-    const OBJECTS_FILE = 'integration_files/objects_file.json';
-    const MAPPING_FILE = 'integration_files/template_file.json';
+    const OBJECTS_FILE = 'plugins/wazuh/server/scripts/integration_files/objects_file.json';
+    const MAPPING_FILE = 'plugins/wazuh/server/scripts/integration_files/template_file.json';
 
     var setTemplate = function () {
         client.indices.exists({ index: 'ossec-*' }).then(
@@ -31,6 +32,7 @@ module.exports = function (server, options) {
 
         client.indices.create({ index: todayIndex }).then(
             function () {
+                var jsondata = {};
                 try {
                     var jsondata = JSON.parse(fs.readFileSync(MAPPING_FILE, 'utf8'));
                 } catch (e) {
@@ -38,7 +40,7 @@ module.exports = function (server, options) {
                     server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + MAPPING_FILE);
                     server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
                 };
-                client.indices.putMapping({ index: 'ossec-*', type: 'ossec', body: { properties: { jsondata }}}).then(
+                client.indices.putMapping({ index: 'ossec-*', type: 'ossec', body: jsondata}).then(
                     function () {
                         server.log([blueWazuh, 'initialize', 'info'], 'Index pattern "ossec-*" was initialized successfully.');
                         insertSampleData(todayIndex);
@@ -71,7 +73,7 @@ module.exports = function (server, options) {
                 setDefaultTime();
             }, function (response) {
                 if (response.statusCode != '409') {
-                    server.log([blueWazuh, 'initialize', 'error'], 'Could not configure "ossec-*" index pattern. Please, configure it manually on Kibana.');
+                    server.log([blueWazuh, 'initialize', 'error'], 'Could not configure "ossec-*" index pattern.');
                 } else {
                     server.log([blueWazuh, 'initialize', 'info'], 'Skipping "ossec-*" index pattern configuration: Already configured.');
                 }
@@ -79,22 +81,25 @@ module.exports = function (server, options) {
     };
 
     var setDefaultTime = function () {
-        var needle = require('needle');
         server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default time to last 24h...');
 
-        var options = {
-            rejectUnauthorized: false
-        };
+        uiSettings.set('timepicker:timeDefaults', '{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}')
+            .then(function () {
+                setDefaultIndex();
+            }).catch(function () {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not set default time.');
+            });
+    };
 
-        var payload = {"value":"{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}"};
-        needle.request('post', server.info.uri+'/api/kibana/settings/timepicker:timeDefaults', payload, options, function (error, response) {
-            if (!error) {
+    var setDefaultIndex = function () {
+        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default index pattern to "ossec-*"...');
+        
+        uiSettings.set('defaultIndex', 'ossec-*')
+            .then(function () {
                 importObjects();
-            } else {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not set default time. Please, configure it manually on Kibana.');
-            }
-        });
-
+            }).catch(function () {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not set default index.');
+            });
     };
 
     var importObjects = function () {
