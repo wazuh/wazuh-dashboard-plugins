@@ -9,6 +9,7 @@ module.exports = function (server, options) {
     const fs = require('fs');
     const OBJECTS_FILE = 'plugins/wazuh/server/scripts/integration_files/objects_file.json';
     const MAPPING_FILE = 'plugins/wazuh/server/scripts/integration_files/template_file.json';
+    var map_jsondata = {};
 
     var setTemplate = function () {
         client.indices.exists({ index: 'ossec-*' }).then(
@@ -32,15 +33,14 @@ module.exports = function (server, options) {
 
         client.indices.create({ index: todayIndex }).then(
             function () {
-                var jsondata = {};
                 try {
-                    var jsondata = JSON.parse(fs.readFileSync(MAPPING_FILE, 'utf8'));
+                    map_jsondata = JSON.parse(fs.readFileSync(MAPPING_FILE, 'utf8'));
                 } catch (e) {
                     server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
                     server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + MAPPING_FILE);
                     server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
                 };
-                client.indices.putMapping({ index: 'ossec-*', type: 'ossec', body: jsondata}).then(
+                client.indices.putMapping({ index: 'ossec-*', type: 'ossec', body: map_jsondata}).then(
                     function () {
                         server.log([blueWazuh, 'initialize', 'info'], 'Index pattern "ossec-*" was initialized successfully.');
                         insertSampleData(todayIndex);
@@ -54,7 +54,7 @@ module.exports = function (server, options) {
     };
 
     var insertSampleData = function (todayIndex) {
-        var SAMPLE_DATA = {"rule": { "group": "", "sidid": 0, "firedtimes": 1, "groups": [ ], "PCI_DSS": [ ], "description": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash server to start shipping alerts.", "AlertLevel": 0 }, "full_log": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash server to start shipping alerts.", "decoder": { }, "location": "", "@version": "1", "@timestamp": new Date().toISOString(), "path": "", "host": "", "type": "ossec-alerts", "AgentName": "" };
+        var SAMPLE_DATA = {"rule": { "sidid": 0, "firedtimes": 1, "groups": [ ], "PCI_DSS": [ ], "description": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash server to start shipping alerts.", "AlertLevel": 0 }, "full_log": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash server to start shipping alerts.", "decoder": { }, "@timestamp": new Date().toISOString() };
 
         client.create({ index: todayIndex, type: 'ossec', id: 'sample', body: SAMPLE_DATA }).then(
             function () {
@@ -67,7 +67,7 @@ module.exports = function (server, options) {
 
     var configureKibana = function () {
         server.log([blueWazuh, 'initialize', 'info'], 'Configuring Kibana for working with "ossec-*" index pattern...');
-        client.create({ index: '.kibana', type: 'index-pattern', id: 'ossec-*', body: { title: 'ossec-*', timeFieldName: '@timestamp'} })
+        client.create({ index: '.kibana', type: 'index-pattern', id: 'ossec-*', body: { title: 'ossec-*', timeFieldName: '@timestamp', fields: prepareMappingCache() } })
             .then(function () {
                 server.log([blueWazuh, 'initialize', 'info'], 'Successfully configured.');
                 setDefaultTime();
@@ -78,6 +78,70 @@ module.exports = function (server, options) {
                     server.log([blueWazuh, 'initialize', 'info'], 'Skipping "ossec-*" index pattern configuration: Already configured.');
                 }
             });
+    };
+
+    var prepareMappingCache = function () {
+        if (!map_jsondata.ossec) {
+            try {
+                map_jsondata = JSON.parse(fs.readFileSync(MAPPING_FILE, 'utf8'));
+            } catch (e) {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
+                server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + MAPPING_FILE);
+                server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+            };
+        }
+        var cacheJson = [];
+        for (var key in map_jsondata.ossec.properties) {
+            if (!Object.prototype.hasOwnProperty.call(map_jsondata.ossec.properties, key)) continue;
+            var element = map_jsondata.ossec.properties[key];
+            var tmpObj = {};
+            if (element.properties) {
+                for (var _subKey in element.properties) {
+                    tmpObj = {};
+                    if (!Object.prototype.hasOwnProperty.call(element.properties, _subKey)) continue;
+                    var _subEle = element.properties[_subKey];
+                    if (_subEle.type == 'long') tmpObj.type = 'number';
+                    else if (_subEle.type == 'date') tmpObj.type = 'date';
+                    else if (_subEle.type == 'geo_point') tmpObj.type = 'geo_point';
+                    else tmpObj.type = 'string';
+                    if (_subEle.index == 'analyzed') tmpObj.analyzed = true;
+                    else if (_subEle.type == 'text') tmpObj.analyzed = true;
+                    else tmpObj.analyzed = false;
+                    if (_subEle.index != 'no') tmpObj.indexed = true;
+                    else tmpObj.index = false;
+                    if (_subEle.doc_values) tmpObj.doc_values = _subEle.doc_values;
+                    else tmpObj.doc_values = false;
+                    tmpObj.count = 0;
+                    tmpObj.scripted = false;
+                    tmpObj.name = key + '.' + _subKey;
+                    cacheJson.push(tmpObj);
+                };
+            } else {
+                var tmpObj = {};
+                if (element.type == 'long') tmpObj.type = 'number';
+                else if (element.type == 'date') tmpObj.type = 'date';
+                else if (element.type == 'geo_point') tmpObj.type = 'geo_point';
+                else tmpObj.type = 'string';
+                if (element.index == 'analyzed') tmpObj.analyzed = true;
+                else if (element.type == 'text') tmpObj.analyzed = true;
+                else tmpObj.analyzed = false;
+                if (element.index != 'no') tmpObj.indexed = true;
+                else tmpObj.index = false;
+                if (element.doc_values) tmpObj.doc_values = element.doc_values;
+                else tmpObj.doc_values = false;
+                tmpObj.count = 0;
+                tmpObj.scripted = false;
+                tmpObj.name = key;
+                cacheJson.push(tmpObj);
+            }
+        };
+        cacheJson.push({ name: '_score', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'number' });
+        cacheJson.push({ name: '_index', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'string' });
+        cacheJson.push({ name: '_type', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'string' });
+        cacheJson.push({ name: '_id', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'string' });
+        cacheJson.push({ name: '@version', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'string' });
+        cacheJson.push({ name: '_source', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: '_source' });
+        return JSON.stringify(cacheJson);
     };
 
     var setDefaultTime = function () {
