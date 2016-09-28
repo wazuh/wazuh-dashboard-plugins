@@ -94,18 +94,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
         },
     };
 
-    var isWindows = function () {
-        var defered = $q.defer();
-        var promise = defered.promise;
-
-        DataFactory.getAndClean('get', '/agents/' + $scope.$parent._agent.id, {})
-            .then(function (data) {
-                defered.resolve(data.data.os.toLowerCase().indexOf('windows') > -1);
-            }, printError);
-
-        return promise;
-    };
-
     $scope.changeType = function () {
         $scope.showFilesRegistry = !$scope.showFilesRegistry;
         fileTypeFilter();
@@ -135,9 +123,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
                             $scope.fileSearchFilter($scope._fileSearch);
                             $scope.fileEventFilter($scope._fimEvent);
                             fileTypeFilter();
-                            isWindows().then(function (value) {
-                                $scope.isWindows = value;
-                            });
                         }, printError);
                 }, printError);
         });

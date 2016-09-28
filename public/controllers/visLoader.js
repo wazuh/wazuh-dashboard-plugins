@@ -258,7 +258,7 @@ require('ui/modules').get('app/wazuh', [])
         $scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
 
         $scope.$on('ready:vis', function () {
-          $scope.$emit('application.load');
+          $state.emit('application.load');
           $state.emit('fetch_with_changes');
         });
 
