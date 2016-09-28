@@ -147,7 +147,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
 
         genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/modified')
             .then(function (data) {
-            if(data.data != "")
                 $scope.last_file_changed = (data.data != "") ? data.data.path : "(no data)";
         }, printError);
         
@@ -158,7 +157,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
         
         genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/deleted')
         .then(function (data) {
-            if(data.data != "")
                 $scope.last_file_deleted = (data.data != "") ? data.data.path : "(no data)";
         }, printError);
 
@@ -244,25 +242,21 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
 
         genericReq.request('GET', '/api/wazuh-elastic/last/title/location/rootcheck')
             .then(function (data) {
-            if(data.data != "")
                 $scope.lastEventTitle = (data.data != "") ? data.data : "(no data)";
         }, printError);
 		
 		genericReq.request('GET', '/api/wazuh-elastic/last/AgentName/location/rootcheck')
             .then(function (data) {
-            if(data.data != "")
                 $scope.lastEventAgentName = (data.data != "") ? data.data : "(no data)";
         }, printError);
 		
 		genericReq.request('GET', '/api/wazuh-elastic/last/AgentID/location/rootcheck')
             .then(function (data) {
-            if(data.data != "")
-                $scope.lastEventAgentID = (data.data != "") ? data.data : "(no data)";
+                $scope.lastEventAgentID = (data.data != "") ? data.data : "";
         }, printError);
 		
 		genericReq.request('GET', '/api/wazuh-elastic/last/AgentIP/location/rootcheck')
             .then(function (data) {
-            if(data.data != "")
                 $scope.lastEventAgentIP = (data.data != "") ? data.data : "";
         }, printError);
         
