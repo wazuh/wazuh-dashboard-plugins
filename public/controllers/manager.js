@@ -75,10 +75,10 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
     var load = function () {
         DataFactory.getAndClean('get', '/agents/summary', {})
             .then(function (data) {
-                $scope.agentsCountActive = data.data.active;
-                $scope.agentsCountDisconnected = data.data.disconnected;
-                $scope.agentsCountNeverConnected = data.data.neverConnected;
-                $scope.agentsCountTotal = data.data.total;
+                $scope.agentsCountActive = data.data.Active;
+                $scope.agentsCountDisconnected = data.data.Disconnected;
+                $scope.agentsCountNeverConnected = data.data['Never connected'];
+                $scope.agentsCountTotal = data.data.Total;
                 DataFactory.getAndClean('get', '/manager/status', {})
                     .then(function (data) {
                         $scope.daemons = data.data;
