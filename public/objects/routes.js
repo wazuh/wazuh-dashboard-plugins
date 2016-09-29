@@ -2,9 +2,14 @@
 var routes = require('ui/routes');
 
 //Installation wizard
-var settingsWizard = function ($location, testConnection) {
+var settingsWizard = function ($location, testConnection, $mdToast) {
     testConnection.test()
-        .then(function () { }, function () {
+        .then(function () { }, function (data) {
+            $mdToast.show({
+                template: '<md-toast>Could not connect with Wazuh API. Please, configure it on settings tab.</md-toast>',
+                position: 'bottom left',
+                hideDelay: 5000,
+            });
             $location.path('/settings');
         });
 }
@@ -53,15 +58,9 @@ routes
     })
     .when('/', {
         redirectTo: '/overview/',
-        resolve: {
-            "check": settingsWizard
-        }
     })
     .when('', {
         redirectTo: '/overview/',
-        resolve: {
-            "check": settingsWizard
-        }
     })
     .otherwise({
         redirectTo: '/overview/'
