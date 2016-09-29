@@ -39,19 +39,19 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
         var timeAgo = date.getTime();
         genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/' + timeAgo)
             .then(function (data) {
-                $scope.topsrcuser = data.data;
+                $scope.topsrcuser = (data.data != "") ? data.data : "(no data)";
             }, printError);
         genericReq.request('GET', '/api/wazuh-elastic/top/srcip/' + timeAgo)
             .then(function (data) {
-                $scope.topsrcip = data.data;
+                $scope.topsrcip = (data.data != "") ? data.data : "(no data)";
             }, printError);
         genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/' + timeAgo)
             .then(function (data) {
-                $scope.topgroup = data.data;
+                $scope.topgroup = (data.data != "") ? data.data : "(no data)";
             }, printError);
         genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/' + timeAgo)
             .then(function (data) {
-                $scope.toppci = data.data;
+                $scope.toppci = (data.data != "") ? data.data : "(no data)";
             }, printError);
     };
 
@@ -128,19 +128,19 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
         // Top fields
         genericReq.request('GET', '/api/wazuh-elastic/top/AgentName/'+timeAgo)
             .then(function (data) {
-                $scope.topagent = data.data;
+                $scope.topagent = (data.data != "") ? data.data : "(no data)";
             }, printError);
         genericReq.request('GET', '/api/wazuh-elastic/top/SyscheckFile.perm_before/'+timeAgo)
             .then(function (data) {
-                $scope.toppermissions = data.data;
+                $scope.toppermissions = (data.data != "") ? data.data : "(no data)";
             }, printError);
         genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/' + timeAgo)
             .then(function (data) {
-                $scope.toppci = data.data;
+                $scope.toppci = (data.data != "") ? data.data : "(no data)";
             }, printError);
 		genericReq.request('GET', '/api/wazuh-elastic/top/SyscheckFile.path/' + timeAgo + '/location/syscheck')
             .then(function (data) {
-                $scope.topfile = data.data;
+                $scope.topfile = (data.data != "") ? data.data : "(no data)";
             }, printError);	
             
         // Last fields
