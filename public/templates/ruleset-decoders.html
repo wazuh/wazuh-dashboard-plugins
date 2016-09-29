@@ -46,14 +46,14 @@
 			</div>
 		</md-toolbar>
 		<div md-virtual-repeat="decoder in decodersObj" md-on-demand flex layout="column" layout-align="start stretch">
-			<md-list>
-				<md-list-item ng-click=" showDetails[decoder.name] = ! showDetails[decoder.name]; ">
+			<md-list ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
+				<md-list-item ng-click=" showDetails[decoder.name] = ! showDetails[decoder.name]; " ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
 					<span flex="70">{{decoder.name}}</span>
 					<md-button md-no-ink class="invisibleButton" flex="30" ng-if="$parent.typeFilter == 'all'" ng-click="decodersApplyFilter({type: 'file', value: decoder.file}); $event.stopPropagation();">{{decoder.file}}</md-button>
 					<span flex="30" ng-if="$parent.typeFilter != 'all'">{{decoder.file}}</span>
 				</md-list-item>
 			</md-list>
-			<md-list ng-if="showDetails[decoder.name]">
+			<md-list ng-if="showDetails[decoder.name]" ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
 				<md-list-item>
 					<span style="font-weight: bold" flex="15">Full path</span>
 					<span flex="35">{{decoder.full_path}}</span>

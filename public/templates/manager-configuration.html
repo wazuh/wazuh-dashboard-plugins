@@ -7,6 +7,7 @@
         <div flex layout="column" ng-if="managerConfiguration.global">
             <md-card>
                 <md-card-content>
+
                     <h3>Global</h3>
                     <span ng-if="managerConfiguration.global.white_list">
                 <span layout="row" layout-align="space-between center">
@@ -157,7 +158,10 @@
               <p> Do not group </p>
               <p class="right-text">{{ managerConfiguration.email_alerts.do_not_group }}</p>
               </span>
-                    <md-divider></md-divider>
+                    				</md-card-content>
+            </md-card>
+            <md-card>
+                <md-card-content>
                     </span>
                     <h3>Active response</h3>
                     <span ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
@@ -214,6 +218,10 @@
                     <md-divider></md-divider>
                     </span>
                     </span>
+									</md-card-content>
+            </md-card>
+            <md-card>
+                <md-card-content>
                     <h3>Commands</h3>
                     <span ng-repeat="item in managerConfiguration.command|orderBy:'name'">
               <span ng-if="item.name">
@@ -245,69 +253,16 @@
                     </span>
                     <md-divider></md-divider>
                     </span>
-                    <h3>Rootcheck</h3>
-                    <span ng-if="managerConfiguration.rootcheck.disabled">
-              <span layout="row" layout-align="space-between center">
-              <p> Rootcheck disabled </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.disabled}}</p>
-              </span>
-                    <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.rootcheck.rootkit_files">
-              <span layout="row" layout-align="space-between center">
-              <p> Rootkit Files </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.rootkit_files}}</p>
-              </span>
-                    <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.rootcheck.rootkit_trojans">
-              <span layout="row" layout-align="space-between center">
-              <p> Rootkit Trojans </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.rootkit_trojans}}</p>
-              </span>
-                    <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.rootcheck.base_directory">
-              <span layout="row" layout-align="space-between center">
-              <p> Base directory </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.base_directory}}</p>
-              </span>
-                    <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.rootcheck.scanall">
-              <span layout="row" layout-align="space-between center">
-              <p> Scan all </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.scanall}}</p>
-              </span>
-                    <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.rootcheck['frequency']">
-              <span layout="row" layout-align="space-between center">
-              <p> Frequency </p>
-              <p class="right-text">{{managerConfiguration.rootcheck['frequency']}}</p>
-              </span>
-                    <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.rootcheck.skip_nfs">
-              <span layout="row" layout-align="space-between center">
-              <p> Skip NFS </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.skip_nfs}}</p>
-              </span>
-                    <md-divider></md-divider>
-                    </span>
 
+                    
+                </md-card-content>
+            </md-card>
+        </div>
 
-                    <span ng-if="managerConfiguration.rootcheck.system_audit">
-              <span layout="row" layout-align="space-between center">
-              <p style="font-weight: bold"> System audit files</p>
- 
-              </span>
-                    <span ng-repeat="item in managerConfiguration.rootcheck.system_audit|orderBy">
-              <p> {{ item }} </p>
-            </span>
-                    <md-divider></md-divider>
-                    </span>
-                    <h3>Syscheck</h3>
+		<div flex layout="column">
+		<md-card>
+			<md-card-content>
+				<h3>Syscheck</h3>
                     <span ng-if="managerConfiguration.syscheck.disabled">
               <span layout="row" layout-align="space-between center">
               <p> Syscheck disabled </p>
@@ -378,6 +333,77 @@
             </span>
                     <md-divider></md-divider>
                     </span>
+									</md-card-content>
+            </md-card>
+            <md-card>
+                <md-card-content>
+					
+					                    <h3>Rootcheck</h3>
+                    <span ng-if="managerConfiguration.rootcheck.disabled">
+              <span layout="row" layout-align="space-between center">
+              <p> Rootcheck disabled </p>
+              <p class="right-text">{{managerConfiguration.rootcheck.disabled}}</p>
+              </span>
+                    <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.rootcheck.rootkit_files">
+              <span layout="row" layout-align="space-between center">
+              <p> Rootkit Files </p>
+              <p class="right-text">{{managerConfiguration.rootcheck.rootkit_files}}</p>
+              </span>
+                    <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.rootcheck.rootkit_trojans">
+              <span layout="row" layout-align="space-between center">
+              <p> Rootkit Trojans </p>
+              <p class="right-text">{{managerConfiguration.rootcheck.rootkit_trojans}}</p>
+              </span>
+                    <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.rootcheck.base_directory">
+              <span layout="row" layout-align="space-between center">
+              <p> Base directory </p>
+              <p class="right-text">{{managerConfiguration.rootcheck.base_directory}}</p>
+              </span>
+                    <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.rootcheck.scanall">
+              <span layout="row" layout-align="space-between center">
+              <p> Scan all </p>
+              <p class="right-text">{{managerConfiguration.rootcheck.scanall}}</p>
+              </span>
+                    <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.rootcheck['frequency']">
+              <span layout="row" layout-align="space-between center">
+              <p> Frequency </p>
+              <p class="right-text">{{managerConfiguration.rootcheck['frequency']}}</p>
+              </span>
+                    <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.rootcheck.skip_nfs">
+              <span layout="row" layout-align="space-between center">
+              <p> Skip NFS </p>
+              <p class="right-text">{{managerConfiguration.rootcheck.skip_nfs}}</p>
+              </span>
+                    <md-divider></md-divider>
+                    </span>
+
+
+                    <span ng-if="managerConfiguration.rootcheck.system_audit">
+              <span layout="row" layout-align="space-between center">
+              <p style="font-weight: bold"> System audit files</p>
+ 
+              </span>
+                    <span ng-repeat="item in managerConfiguration.rootcheck.system_audit|orderBy">
+              <p> {{ item }} </p>
+            </span>
+                    <md-divider></md-divider>
+                    </span>
+									</md-card-content>
+            </md-card>
+            <md-card>
+                <md-card-content>
                     <h3>Logcollector</h3>
 
                     <span ng-repeat='item in managerConfiguration["localfile"]|orderBy:["location", "command"]'>
@@ -408,11 +434,11 @@
 
                     <md-divider></md-divider>
                     </span>
-                </md-card-content>
-            </md-card>
-        </div>
 
-
+			</md-card-content>
+		</md-card>
+		
+		</div>
         <div flex layout="column" ng-if="managerConfiguration.rules">
             <md-card>
                 <md-card-content>
@@ -445,7 +471,10 @@
             </span>
                     <md-divider></md-divider>
                     </span>
-
+				</md-card-content>
+            </md-card>
+            <md-card>
+                <md-card-content>
                     <h3>Rules</h3>
                     <span ng-if="managerConfiguration.rules.rule_dir">
               <span layout="row" layout-align="space-between center">
