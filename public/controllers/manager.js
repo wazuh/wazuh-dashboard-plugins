@@ -71,7 +71,7 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
                 $scope.toppci = data.data;
             }, printError);
     };
-
+	//$scope.load = false;
     var load = function () {
         DataFactory.getAndClean('get', '/agents/summary', {})
             .then(function (data) {
@@ -79,10 +79,35 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
                 $scope.agentsCountDisconnected = data.data.Disconnected;
                 $scope.agentsCountNeverConnected = data.data['Never connected'];
                 $scope.agentsCountTotal = data.data.Total;
+				$scope.agentsCoverity = (data.data.Active / data.data.Total) * 100;
                 DataFactory.getAndClean('get', '/manager/status', {})
                     .then(function (data) {
                         $scope.daemons = data.data;
-                        $scope.load = false;
+						DataFactory.getAndClean('get', '/manager/info', {})
+						.then(function (data) {
+							$scope.managerInfo = data.data;
+							DataFactory.getAndClean('get', '/rules', {})
+							.then(function (data) {
+								$scope.totalRules = data.data.totalItems;
+								DataFactory.getAndClean('get', '/decoders', {})
+								.then(function (data) {
+									$scope.totalDecoders = data.data.totalItems;
+									DataFactory.getAndClean('get', '/agents', {})
+									.then(function (data) {
+										DataFactory.getAndClean('get', '/agents?offset=' + (data.data.totalItems - 1), {})
+										.then(function (data) {
+											$scope.agentID = data.data.items[0].id;
+											console.log($scope.agentID);
+											DataFactory.getAndClean('get', '/agents/'+$scope.agentID, {})
+											.then(function (data) {
+												$scope.agentInfo = data.data;
+												$scope.load = false;
+											}, printError);
+										}, printError);
+									}, printError);
+								}, printError);
+							}, printError);
+						}, printError);
                     }, printError);
             }, printError);
     };
