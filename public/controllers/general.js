@@ -23,18 +23,16 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
     //Functions
 
     $scope.getAgentStatusClass = function (agentStatus) {
-        if (agentStatus == "active")
+        if (agentStatus == "Active")
             return "green"
-        else if (agentStatus == "disconnected")
-            return "red";
         else
             return "red";
     };
 
     $scope.formatAgentStatus = function (agentStatus) {
-        if (agentStatus == "active")
+        if (agentStatus == "Active")
             return "Active"
-        else if (agentStatus == "disconnected")
+        else if (agentStatus == "Disconnected")
             return "Disconnected";
         else
             return "Never connected";
