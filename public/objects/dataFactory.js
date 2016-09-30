@@ -18,15 +18,9 @@ require('ui/modules').get('app/wazuh', [])
             }
 
             var limit;
-			var url_params = "?offset=0&limit=1";
-			
-			if (path.indexOf("?") != -1)
-				url_params = "&offset=0&limit=1";
-			else
-				url_params = "?offset=0&limit=1";
 
             if ((method === 'get') && (pageSize)) {
-                apiReq.request('get', path + url_params, body)
+                apiReq.request('get', path + "?offset=0&limit=1", body)
                     .then(function (data) {
                         limit = data.data.totalItems;
                         _instances[instance] = {
