@@ -23,18 +23,16 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
     //Functions
 
     $scope.getAgentStatusClass = function (agentStatus) {
-        if (agentStatus == "active")
+        if (agentStatus == "Active")
             return "green"
-        else if (agentStatus == "disconnected")
-            return "red";
         else
             return "red";
     };
 
     $scope.formatAgentStatus = function (agentStatus) {
-        if (agentStatus == "active")
+        if (agentStatus == "Active")
             return "Active"
-        else if (agentStatus == "disconnected")
+        else if (agentStatus == "Disconnected")
             return "Disconnected";
         else
             return "Never connected";
@@ -67,14 +65,6 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
             $scope.search = agent.name;
         }
     };
-
-    $scope.getDiscoverByAgent = function (agent) {
-        var _urlStr = '/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),filters:!((\'$state\':(store:appState),meta:(alias:!n,disabled:!f,index:\'ossec-*\',key:AgentName,negate:!f,value:\'';
-        var _urlStrSf = '\'),query:(match:(AgentName:(query:\'';
-        var _urlStrSSf = '\',type:phrase))))),index:\'ossec-*\',interval:auto,query:(query_string:(analyze_wildcard:!t,query:\'*\')),sort:!(\'@timestamp\',desc),vis:(aggs:!((params:(field:AgentName,orderBy:\'2\',size:20),schema:segment,type:terms),(id:\'2\',schema:metric,type:count)),type:histogram))&indexPattern=ossec-*&type=histogram';
-
-        return _urlStr + agent.name + _urlStrSf + agent.name + _urlStrSSf;
-    }
 	
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
@@ -85,7 +75,6 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
         $scope.state.setDiscoverState(template, filter);
 		$window.location.href = '#/discover/';
     }
-
 
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 256, 0)
@@ -119,8 +108,9 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 
 });
 
-app.controller('stateController', function ($scope, appState) {
+app.controller('stateController', function ($scope, appState, $route) {
     $scope.state = appState;
+    $scope.select = $route.current.params.select;
 });
 
 app.controller('stateLocationController', function ($scope, appState, $window) {

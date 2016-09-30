@@ -17,7 +17,7 @@
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
 	<div flex layout="row" ng-if="!load">
-		<md-content flex id="content" layout-padding>
+		<md-content flex id="content">
 			<md-toolbar style="height: 50px;">
 				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
 					<h2 ng-show="$parent._agent">{{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h2>
@@ -42,21 +42,41 @@
 				</div>
 			</md-toolbar>
 			<md-content layout="row" layout-align="center start" ng-show="_agent" layout-padding">
-				<md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+				<md-nav-bar flex="40" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 					<md-nav-item md-nav-click="submenuNavItem = 'overview'" name="overview">Overview</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File Integrity</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'policy_monitoring'" name="policy_monitoring">Policy Monitoring</md-nav-item>
 				</md-nav-bar>
-				<md-content flex="40" class="subNavLine" layout="row" layout-align="end start">
-				<md-button ng-if="_agent && submenuNavItem == 'overview'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('generic','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-				<md-button ng-if="_agent && submenuNavItem == 'fim'" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('fim','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-				<md-button style="margin-bottom: 0px !important;" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'overview'" ng-click="openDashboard('ossecalerts', 'AgentName:'+_agent.name)">
+				<md-content flex="60" style="margin-top: -6px" class="subNavLine secondLevelNavLine" layout="row" layout-align="end start">
+				
+				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-show="!show_timer" ng-click="show_timer = !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+					<i class="fa fa-clock-o" aria-hidden="true"></i> {{ (!timeFilter) ? '7d' : timeFilter}}
+				</md-button>
+				<md-content ng-show="show_timer" layout="row" layout-align="end start" ng-init="timeFilter = (timeFilter ? timeFilter : '7d')">
+					<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-click="show_timer = !show_timer; timeFilter='24h';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+						<i class="fa fa-clock-o" aria-hidden="true"></i> Last 24 hours
+					</md-button>
+					<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-click="show_timer = !show_timer;timeFilter='7d';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+						<i class="fa fa-clock-o" aria-hidden="true"></i> Last week
+					</md-button>
+					<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-click="show_timer = !show_timer;timeFilter='30d';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+						<i class="fa fa-clock-o" aria-hidden="true"></i> Last month
+					</md-button>
+				</md-content>
+			
+				<md-button ng-if="_agent && submenuNavItem == 'overview' && !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-click="openDiscover('generic','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  ng-if="_agent && submenuNavItem == 'fim' && !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('fim','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  ng-if="_agent && submenuNavItem == 'policy_monitoring' && !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('rootcheck','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'overview' && !show_timer" ng-click="openDashboard('OSSEC-Alerts', 'AgentName:'+_agent.name)">
 					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 				</md-button>
-				<md-button style="margin-bottom: 0px !important;" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'fim'" ng-click="openDashboard('fim', 'AgentName:'+_agent.name)">
+				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'fim' && !show_timer" ng-click="openDashboard('File-Integrity-Monitoring', 'AgentName:'+_agent.name)">
 					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 				</md-button>
-				<div ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'active' ? null : (_agent.status == 'neverConnected' ? 'extraLarge' : 'large')"
-					layout="row" layout-align="space-between center"><span>{{formatAgentStatus(_agent.status)}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
+				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'policy_monitoring' && !show_timer" ng-click="openDashboard('Policy-Monitoring', 'AgentName:'+_agent.name)">
+					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
+				</md-button>
+				<div style="margin-right: 23px; margin-top: 11px !important;margin-bottom: 0px !important;"  ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'Active' ? null : (_agent.status == 'Never Connected' ? 'extraLarge' : 'large')"
+					layout="row" layout-align="space-between center"><span style="padding-right: 5px;">{{formatAgentStatus(_agent.status)}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
 			</md-content>
 			</md-content>

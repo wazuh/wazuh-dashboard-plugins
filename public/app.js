@@ -21,9 +21,16 @@ require('plugins/wazuh/objects/tabProvider.js');
 require('plugins/wazuh/objects/testConnection.js');
 require('plugins/wazuh/objects/errlog.js');
 
+// Require directives
+require('plugins/wazuh/objects/autoSizeContainer.js');
+
 // Set up routes and views
 require('plugins/wazuh/objects/routes.js');
 
+// Require Kibana integrations
+require('plugins/wazuh/controllers/visLoader.js');
+require('plugins/wazuh/controllers/disLoader.js');
+require('plugins/wazuh/controllers/dashLoader.js');
 
 // Require controllers
 require('plugins/wazuh/controllers/general.js');
@@ -35,9 +42,6 @@ require('plugins/wazuh/controllers/fim.js');
 require('plugins/wazuh/controllers/policy-monitoring.js');
 require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
-require('plugins/wazuh/controllers/visLoader.js');
-require('plugins/wazuh/controllers/disLoader.js');
-require('plugins/wazuh/controllers/dashLoader.js');
 
 //Bootstrap and font awesome
 require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');

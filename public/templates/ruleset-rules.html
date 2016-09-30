@@ -4,7 +4,7 @@
 
 
 
-  <md-virtual-repeat-container layout-align="start start" ng-if="!load" flex layout="column" layout-padding style="min-height: 2000px;">
+  <md-virtual-repeat-container layout-align="start start" ng-if="!load" flex layout="column" layout-padding auto-size-container ng-style="autoSizeStyle">
 
     <div flex id="content" layout="row" layout-align="center stretch">
 
@@ -67,29 +67,36 @@
       </div>
     </md-toolbar>
     <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
-      <md-list>
-        <md-list-item ng-click=" showDetails[rule.id] = ! showDetails[rule.id]; ">
+      <md-list ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
+        <md-list-item ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''" ng-click=" showDetails[rule.id] = ! showDetails[rule.id]; ">
           <span flex="10">{{rule.id}}</span>
           <span flex="60">{{rule.description}}</span>
           <span flex="10">{{rule.level}}</span>
           <md-button md-no-ink class="invisibleButton" flex="20" ng-click="rulesApplyFilter({type: 'file', value: rule.file}); $event.stopPropagation();">{{rule.file}}</md-button>
         </md-list-item>
       </md-list>
-      <md-list ng-if="showDetails[rule.id]">
+      <md-list class="ruleset_rules_row_active" ng-if="showDetails[rule.id]">
         <md-list-item>
           <span style="font-weight: bold" flex="15">Groups</span>
-          <span flex="35" layout="column"><span ng-repeat="group in rule.groups" ng-click="rulesApplyFilter({type: 'group', value: group})"><i>{{ group }}</i></span></span>
-          <span style="font-weight: bold" flex="15" ng-if="rule.pci.length > 0">PCI Groups</span>
-          <span flex="35" layout="column" ng-if="rule.pci.length > 0"><span ng-repeat="pci in rule.pci" ng-click="rulesApplyFilter({type: 'pci', value: pci})"><i>{{ pci }}</i></span></span>
+          <span flex="35" layout="column">
+			<span><a ng-repeat="group in rule.groups" ng-click="rulesApplyFilter({type: 'group', value: group})">{{ group }}, </a></span>
+		  </span>
+          <span style="font-weight: bold" flex="15" ng-if="rule.pci.length > 0">PCI Requirements</span>
+          <span flex="35" layout="column" ng-if="rule.pci.length > 0">
+		  <span>
+		  <a ng-repeat="pci in rule.pci" ng-click="rulesApplyFilter({type: 'pci', value: pci})">{{ pci }}, </a>
+		  </span>
+		  </span>
         </md-list-item>
         <md-list-item ng-repeat="(detailk, detailv) in rule.details">
           <span style="font-weight: bold" flex="15">{{detailk}}</span>
           <span flex="40">{{detailv}}</span>
         </md-list-item>
-        <md-list-item>
+        <md-list-item layout-align="end end">
           <span style="font-weight: bold">
-            <md-button ng-href="/app/kibana#/discover?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))&_a=(columns:!(_source),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.sidid:{{rule.id}}')),sort:!('@timestamp',desc))" target="_blank">
-            Discover <i class="fa fa-external-link" aria-hidden="true"></i>
+		  
+            <md-button ng-click="openDiscover('generic','rule.sidid:'+rule.id)">
+            Discover alerts <i class="fa fa-external-link" aria-hidden="true"></i>
             </md-button>
             </span>
         </md-list-item>

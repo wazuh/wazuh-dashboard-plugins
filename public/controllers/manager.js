@@ -75,14 +75,34 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
     var load = function () {
         DataFactory.getAndClean('get', '/agents/summary', {})
             .then(function (data) {
-                $scope.agentsCountActive = data.data.active;
-                $scope.agentsCountDisconnected = data.data.disconnected;
-                $scope.agentsCountNeverConnected = data.data.neverConnected;
-                $scope.agentsCountTotal = data.data.total;
-                DataFactory.getAndClean('get', '/manager/status', {})
+                $scope.agentsCountActive = data.data.Active;
+                $scope.agentsCountDisconnected = data.data.Disconnected;
+                $scope.agentsCountNeverConnected = data.data['Never connected'];
+                $scope.agentsCountTotal = data.data.Total;
+                $scope.agentsCoverity = (data.data.Active / data.data.Total) * 100;
+            }, printError);
+        DataFactory.getAndClean('get', '/manager/status', {})
+            .then(function (data) {
+                $scope.daemons = data.data;
+            }, printError);
+        DataFactory.getAndClean('get', '/manager/info', {})
+            .then(function (data) {
+                $scope.managerInfo = data.data;
+                DataFactory.getAndClean('get', '/rules', { offset: 0, limit: 1 })
                     .then(function (data) {
-                        $scope.daemons = data.data;
-                        $scope.load = false;
+                        $scope.totalRules = data.data.totalItems;
+                        DataFactory.getAndClean('get', '/decoders', { offset: 0, limit: 1 })
+                            .then(function (data) {
+                                $scope.totalDecoders = data.data.totalItems;
+                                $scope.load = false;
+                            }, printError);
+                    }, printError);
+            }, printError);
+        DataFactory.getAndClean('get', '/agents', { offset: 0, limit: 1, sort: '-id' })
+            .then(function (data) {
+                DataFactory.getAndClean('get', '/agents/' + data.data.items[0].id, {})
+                    .then(function (data) {
+                        $scope.agentInfo = data.data;
                     }, printError);
             }, printError);
     };

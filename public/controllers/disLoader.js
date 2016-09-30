@@ -58,7 +58,8 @@ var app = require('ui/modules').get('app/wazuh', [])
         disG: '@disG',
         disFilter: '@disFilter',
         tableHeight: '@tableHeight',
-        infiniteScroll: '@infiniteScroll'
+        infiniteScroll: '@infiniteScroll',
+        indexSelector: '@indexSelector'
       },
       template: require('../templates/directives/dis-template.html')
     }
@@ -180,7 +181,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             index: $scope.indexPattern.id,
             timefield: $scope.indexPattern.timeFieldName,
             savedSearch: savedSearch,
-            indexPatternList: $scope._ip.list,
+            indexPatternList: $scope.indexSelector ? $scope._ip.list : [],
             timefilter: $scope.timefilter
           };
 

@@ -1,7 +1,7 @@
 <md-content ng-if="!_agent || submenuNavItem == 'preview'" class="md-padding">
     <div flex ng-controller="agentsPreviewController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-        <md-virtual-repeat-container style="min-height: 700px;" ng-if="!load">
+        <md-virtual-repeat-container auto-size-container ng-style="autoSizeStyle" ng-if="!load">
             <div flex layout="column" layout-align="space-between stretch">
                 <div layout="row" layout-align="space-between stretch">
 
@@ -11,7 +11,7 @@
                             flex>
                     </md-input-container>
                     <div flex="40"></div>
-                    <md-input-container flex="20" class="md-whiteframe-z1" style="margin-right: 10px; ">
+                    <md-input-container flex="20" class="md-whiteframe-z1" style="margin-right: 10px; background-color: rgb(207,216,220)">
                         <md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
                             <md-option value="all">All</md-option>
                             <md-option value="active">Active</md-option>
@@ -41,7 +41,7 @@
                         <span flex="10">{{agent.id}}</span>
                         <span flex="30">{{agent.name}}</span>
                         <span flex="30">{{agent.ip}}</span>
-                        <span flex="20">{{formatAgentStatus(agent.status)}}</span>
+                        <span flex="20">{{agent.status}}</span>
                         <span flex="10"> <span ng-class="getAgentStatusClass(agent.status)" class="round status"></span></span>
                     </md-list-item>
                 </md-list>

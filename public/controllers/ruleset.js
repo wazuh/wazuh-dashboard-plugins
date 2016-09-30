@@ -1,6 +1,6 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog) {
+app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
@@ -33,6 +33,11 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 
     //Functions
 
+	$scope.openDiscover = function (template, filter) {
+        $scope.state.setDiscoverState(template, filter);
+		$window.location.href = '#/discover/';
+    }
+	
     $scope.setSort = function (field) {
         if ($scope._sort === field) {
             if ($scope._sortOrder) {

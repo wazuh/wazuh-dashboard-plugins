@@ -1,36 +1,45 @@
 <md-content ng-if="!load && submenuNavItem =='logs'" ng-controller="osseclogController" layout="row" flex layout-padding>
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-    <md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding style="min-height: 500px;">
+    <md-virtual-repeat-container auto-size-container ng-if="!load" flex layout="column" layout-padding ng-style="autoSizeStyle">
         <div flex layout="row" layout-align="start start">
-            <md-input-container class="md-whiteframe-z1" style="margin-right: 15px; " flex="20">
-                <label for="categoryBox">Choose daemon</label>
+            <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 15px;margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);">
+                <label style="display: none" for="categoryBox">Choose daemon</label>
                 <md-select id="categoryBox" ng-model="$parent._category" ng-change="categoryFilter(_category)" aria-label="Logs category">
                     <md-option value="all">All</md-option>
                     <md-option ng-repeat="(key, value) in summary" value="{{key}}">{{key}}</md-option>
                 </md-select>
             </md-input-container>
-            <md-input-container class="md-whiteframe-z1" flex="20">
-                <label for="levelBox">Choose log level</label>
+            <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 0px;margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);">
+                <label style="display: none" for="levelBox">Choose log level</label>
                 <md-select id="levelBox" ng-model="$parent._level" ng-change="levelFilter(_level)" aria-label="Logs level">
                     <md-option value="all">All</md-option>
                     <md-option value="info">Info</md-option>
                     <md-option value="error">Error</md-option>
                 </md-select>
             </md-input-container>
-            <div flex layout="row" layout-align="end start">
-                <span><md-button ng-if="!realtime" class="md-primary md-whiteframe-z1" ng-click="playRealtime()" style="color: #000"><i class="fa fa-play" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i> Play realtime</md-button>
-                <md-button style="color: #000" ng-if="realtime" class="md-primary md-whiteframe-z1"
-                    ng-click="playRealtime()"><i class="fa fa-stop" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i> Stop realtime</md-button></span>
+			
+		
+            <div flex layout="row" layout-align="end end">
+                <span><md-button ng-if="!realtime" class="md-primary md-whiteframe-z1" ng-click="playRealtime()" style="margin-top: 20px; background-color: rgb(207,216,220); color: #000; width: 180px" >
+				<i class="fa fa-play" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i> 
+				Play realtime
+				</md-button>
+                <md-button style="margin-top: 20px; background-color: rgb(207,216,220); color: #000; width: 180px" ng-if="realtime" class="md-primary md-whiteframe-z1"
+                    ng-click="playRealtime()">
+					<i class="fa fa-stop" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i> 
+					Stop realtime</md-button></span>
             </div>
         </div>
 
+        <div md-virtual-repeat="line in textObj" md-on-demand>
         <table class="logTable" flex>
             <tbody>
-                <tr md-virtual-repeat="line in textObj" md-on-demand flex>
+                <tr flex>
                     <td class="logTableNumber">{{$index}}</td>
                     <td class="logTableCode" ng-class="{ logTableCodeOdd : ($index % 2) != 0}" ng-bind-html="colorLine(line)">{{colorLine(line)}}</td>
                 </tr>
             </tbody>
         </table>
+        </div>
     </md-virtual-repeat-container>
 </md-content>

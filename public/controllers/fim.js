@@ -24,6 +24,10 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
 
     //Functions
 
+	$scope.setTimer = function (time) {
+        $scope.timerFilterValue = time;
+    };
+	
     $scope.setSort = function (field) {
         if ($scope._sort === field) {
             if ($scope._sortOrder) {
@@ -90,18 +94,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
         },
     };
 
-    var isWindows = function () {
-        var defered = $q.defer();
-        var promise = defered.promise;
-
-        DataFactory.getAndClean('get', '/agents/' + $scope.$parent._agent.id, {})
-            .then(function (data) {
-                defered.resolve(data.data.os.toLowerCase().indexOf('windows') > -1);
-            }, printError);
-
-        return promise;
-    };
-
     $scope.changeType = function () {
         $scope.showFilesRegistry = !$scope.showFilesRegistry;
         fileTypeFilter();
@@ -131,9 +123,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
                             $scope.fileSearchFilter($scope._fileSearch);
                             $scope.fileEventFilter($scope._fimEvent);
                             fileTypeFilter();
-                            isWindows().then(function (value) {
-                                $scope.isWindows = value;
-                            });
                         }, printError);
                 }, printError);
         });
@@ -160,6 +149,7 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
     //Load
     try {
         load();
+		$scope.setTimer($scope.$parent.timeFilter);
     } catch (e) {
         $mdToast.show({
             template: '<md-toast> Unexpected exception loading controller </md-toast>',
@@ -169,6 +159,14 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
         errlog.log('Unexpected exception loading controller', e);
     }
 
+	
+    // Timer filter watch
+    var timerWatch = $scope.$watch(function () {
+        return $scope.$parent.timeFilter;
+    }, function () {
+        $scope.setTimer($scope.$parent.timeFilter);
+    });
+	
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
@@ -176,6 +174,7 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
         });
         $scope.files.length = 0;
         loadWatch();
+		timerWatch();
     });
 
 });

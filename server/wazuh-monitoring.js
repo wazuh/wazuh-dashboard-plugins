@@ -45,7 +45,7 @@ module.exports = function (server, options) {
         };
 
         needle.request('get', api_url + '/agents', payload, options, function (error, response) {
-            if (!error && response.body.data.totalItems) {
+            if (!error && response.body.data && response.body.data.totalItems) {
                 checkStatus(response.body.data.totalItems);
             } else {
                 server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
@@ -188,7 +188,7 @@ module.exports = function (server, options) {
             server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Skipping "wazuh-monitoring-*" index pattern configuration: Already configured.');
         }
     });
-    cron.schedule('0 */30 * * * *', function () {
+    cron.schedule('0 */10 * * * *', function () {
         agentsArray.length = 0;
         getConfig(loadCredentials);
     }, true);
