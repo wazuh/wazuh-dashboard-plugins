@@ -3,10 +3,7 @@ module.exports = function (server, options) {
     const MIN_VERSION = [1,3,0];
     const MAX_VERSION = [1,3,0];
 
-    const config = server.config();
-    var _elurl = config.get('elasticsearch.url');
-    var _eluser = config.get('elasticsearch.username');
-    var _elpass = config.get ('elasticsearch.password');
+    const client = server.plugins.elasticsearch.client;
 
     //Handlers - Generic
 
@@ -30,32 +27,16 @@ module.exports = function (server, options) {
     }
 
     var getConfig = function (callback) {
-        var needle = require('needle');
-
-        if (_eluser && _elpass) {
-            var options = {
-                username: _eluser,
-                password: _elpass,
-                rejectUnauthorized: false
-            };
-        } else {
-            var options = {
-                rejectUnauthorized: false
-            };
-        }
-
-        var elasticurl = _elurl+'/.kibana/wazuh-configuration/1';
-        needle.get(elasticurl, options, function (error, response) {
-            if (!error) {
-                if (response.body.found) {
-                    callback({ 'user': response.body._source.api_user, 'password': new Buffer(response.body._source.api_password, 'base64').toString("ascii"), 'url': response.body._source.api_url, 'insecure': response.body._source.insecure });
+        client.search({ index: '.kibana', type: 'wazuh-configuration', id: '1' })
+            .then(function (data) {
+                if (data.hits.total == 1) {
+                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.api_url, 'insecure': data.hits.hits[0]._source.insecure });
                 } else {
                     callback({ 'error': 'no credentials', 'error_code': 1 });
                 }
-            } else {
+            }, function () {
                 callback({ 'error': 'no elasticsearch', 'error_code': 2 });
-            }
-        });
+            });
     };
 
     //Handlers - Test API
@@ -186,37 +167,26 @@ module.exports = function (server, options) {
     //Handlers - Save config
 
     var saveApi = function (req, reply) {
-        var needle = require('needle');
-
-        if (_eluser && _elpass) {
-            var options = {
-                username: _eluser,
-                password: _elpass,
-                rejectUnauthorized: false,
-                json: true
-            };
-        } else {
-            var options = {
-                rejectUnauthorized: false,
-                json: true
-            };
-        }
-
-        var elasticurl = _elurl+'/.kibana/wazuh-configuration/1';
-
         if (!(req.payload.api_user && req.payload.api_password && req.payload.api_url && req.payload.insecure)) {
             reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
             return;
         }
 
-        needle.request('put', elasticurl, req.payload, options, function (error, response) {
-            if (error || response.body.error) {
-                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch'}).code(500);
-            } else {
-                reply({ 'statusCode': 200, 'message': 'ok'});
-            }
-        });
-
+        client.create({ index: '.kibana', type: 'wazuh-configuration', id: '1', body: req.payload, refresh: true })
+            .then(function (err) {
+                reply({ 'statusCode': 200, 'message': 'ok' });
+            }, function (error) {
+                if (error.statusCode == '409') {
+                    client.update({ index: '.kibana', type: 'wazuh-configuration', id: '1', body: { doc: req.payload } })
+                        .then(function () {
+                            reply({ 'statusCode': 200, 'message': 'ok' });
+                        }, function () {
+                            reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+                        });
+                } else {
+                    reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+                }
+            });
     };
 
     //Handlers - error loggin
