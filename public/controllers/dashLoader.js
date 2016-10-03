@@ -151,7 +151,7 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                 }
 
                 $scope.$watch("dashFilter", function () {
-                    $state.query = $scope.dashFilter;
+                    $state.query = { query_string: { query: $scope.dashFilter } };
                     $scope.filterResults();
                 });
 
@@ -207,13 +207,12 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                         .then(function (id) {
                             $scope.kbnTopNav.close('save');
                             if (id) {
-                                notify.info('Saved Dashboard as "' + dash.title + '"');
                                 if (dash.id !== $routeParams.id) {
                                     kbnUrl.change('/dashboard/{{id}}', { id: dash.id });
                                 }
                             }
                         })
-                        .catch(notify.fatal);
+                        .catch();
                 };
 
                 let pendingVis = _.size($state.panels);
