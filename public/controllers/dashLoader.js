@@ -151,7 +151,7 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                 }
 
                 $scope.$watch("dashFilter", function () {
-                    $state.query = { query_string: { query: $scope.dashFilter } };
+                    $state.query = $scope.dashFilter;
                     $scope.filterResults();
                 });
 
