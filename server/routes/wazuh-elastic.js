@@ -32,14 +32,16 @@ module.exports = function (server, options) {
             filtering = true;
 
         var payload = payloads.getFieldTop;
-
+		
+		
         if (filtering) {
             payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue;
         }
 
         payload.query.bool.must[1].range['@timestamp'].gte = timeAgo;
         payload.aggs['2'].terms.field = req.params.field;
-
+		
+		
         fetchElastic(payload).then(function (data) {
             if (data.hits.total == 0 || typeof data.aggregations['2'].buckets[0] === 'undefined')
                 reply({ 'statusCode': 200, 'data': '' });
@@ -52,23 +54,24 @@ module.exports = function (server, options) {
 
     var getLastField = function (req, reply) {
         var filtering = false;
-
+		var filterArray = {};
+		var termArray = {};
+		
         if (req.params.fieldValue && req.params.fieldFilter)
             filtering = true;
 
-        var payload = payloads.getLastField;
+		var payload = JSON.parse(JSON.stringify(payloads.getLastField));
 
         if (filtering) {
-            var filterArray;
-            var filterArray = {};
             filterArray[req.params.fieldFilter] = req.params.fieldValue;
-            var termArray = { "term": filterArray };
-            payload.query.bool.must.push(termArray);
+            termArray = { "term": filterArray };
+            payload.query.bool.must.push(termArray);	
         }
 
         payload.query.bool.must[0].exists.field = req.params.field;
 
         fetchElastic(payload).then(function (data) {
+			
             if (data.hits.total == 0 || typeof data.hits.hits[0] === 'undefined')
                 reply({ 'statusCode': 200, 'data': '' });
             else
