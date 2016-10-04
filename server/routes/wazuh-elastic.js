@@ -41,9 +41,9 @@ module.exports = function (server, options) {
         payload.query.bool.must[1].range['@timestamp'].gte = timeAgo;
         payload.aggs['2'].terms.field = req.params.field;
 		
-		console.log(payload.query.bool.must);
+
         fetchElastic(payload).then(function (data) {
-			console.log(data);
+
             if (data.hits.total == 0 || typeof data.aggregations['2'].buckets[0] === 'undefined')
                 reply({ 'statusCode': 200, 'data': '' });
             else
