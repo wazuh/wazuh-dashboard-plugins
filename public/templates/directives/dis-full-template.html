@@ -106,7 +106,7 @@
               </visualize>
             </div>
 
-            <div class="discover-table" fixed-scroll style="height: {{tableHeight}}">
+            <div class="discover-table" fixed-scroll ng-style="{ 'height': tableHeight }">
               <doc-table hits="rows" index-pattern="indexPattern" sorting="state.sort" columns="state.columns" infinite-scroll="infiniteScroll"
                 filter="filterQuery">
               </doc-table>

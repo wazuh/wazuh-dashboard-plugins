@@ -1,5 +1,5 @@
 <div ng-controller="VisEditorW">
-<div ng-if="_loadVisAsync" class="app-container vis-editor vis-type-{{ vis.type.name }}" style="height: {{visHeight}}">
+<div ng-if="_loadVisAsync" class="app-container vis-editor vis-type-{{ vis.type.name }}" ng-style="{height:visHeight}">
 
   <kbn-top-nav name="visualize" config="topNavMenu" ng-if="visSearchable">
     <div class="vis-editor-info">
