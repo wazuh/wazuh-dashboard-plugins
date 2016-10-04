@@ -75,7 +75,13 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
         $scope.state.setDiscoverState(template, filter);
 		$window.location.href = '#/discover/';
     }
-
+	$scope.resetDiscover = function () {
+        $scope.state.unsetDiscoverState();
+    }
+	$scope.resetDashboards = function () {
+        $scope.state.unsetDashboardsState();
+    }	
+	
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 256, 0)
             .then(function (data) {
@@ -111,6 +117,14 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 app.controller('stateController', function ($scope, appState, $route) {
     $scope.state = appState;
     $scope.select = $route.current.params.select;
+	
+	$scope.resetDiscover = function () {
+        $scope.state.unsetDiscoverState();
+    }
+	$scope.resetDashboards = function () {
+        $scope.state.unsetDashboardsState();
+    }
+	
 });
 
 app.controller('stateLocationController', function ($scope, appState, $window) {
@@ -121,11 +135,16 @@ app.controller('stateLocationController', function ($scope, appState, $window) {
 		$window.location.href = '#/dashboards/';
 		
     }
-	
 	$scope.openDiscover = function (template, filter) {
         $scope.state.setDiscoverState(template, filter);
 		$window.location.href = '#/discover/';
     }
+	$scope.resetDiscover = function () {
+        $scope.state.unsetDiscoverState();
+    }
+	$scope.resetDashboards = function () {
+        $scope.state.unsetDashboardsState();
+    }	
 	
 
 });

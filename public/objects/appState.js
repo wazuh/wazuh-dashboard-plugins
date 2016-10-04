@@ -12,6 +12,10 @@ require('ui/modules').get('app/wazuh', [])
                     $cookies.putObject('_dashboardsState_filter', filter);
                 }
             },
+			unsetDashboardsState: function () {
+                    $cookies.putObject('_dashboardsState_name', "");
+                    $cookies.putObject('_dashboardsState_filter', "");
+            },
 			getDiscoverState: function () {
                 return { name: $cookies.getObject('_discoverState_name'), filter: $cookies.getObject('_discoverState_filter') };
             },
@@ -22,6 +26,10 @@ require('ui/modules').get('app/wazuh', [])
                 if (filter) {
                     $cookies.putObject('_discoverState_filter', filter);
                 }
+            },
+			unsetDiscoverState: function () {
+                    $cookies.putObject('_discoverState_name', "");
+                    $cookies.putObject('_discoverState_filter', "");
             },
             getManagerState: function () {
                 return $cookies.getObject('_managerState');
