@@ -41,7 +41,7 @@
 					</span>
 				</div>
 			</md-toolbar>
-			<md-content layout="row" layout-align="center start" ng-show="_agent" layout-padding">
+			<md-content layout="row" layout-align="center start" ng-show="_agent" layout-padding" style="margin-right: 23px; ">
 				<md-nav-bar flex="40" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 					<md-nav-item md-nav-click="submenuNavItem = 'overview'" name="overview">Overview</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File Integrity</md-nav-item>
@@ -76,7 +76,11 @@
 				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'policy_monitoring'" ng-click="openDashboard('Policy-Monitoring', 'AgentName:'+_agent.name)">
 					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 				</md-button>
-				<div style="margin-right: 23px; margin-top: 11px !important;margin-bottom: 0px !important;"  ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'Active' ? null : (_agent.status == 'Never Connected' ? 'extraLarge' : 'large')"
+				<div style="margin-top: 11px !important;margin-bottom: 0px !important;"  ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'Active' ? null : (_agent.status == 'Never Connected' ? 'extraLarge' : 'large')"
 					layout="row" layout-align="space-between center"><span style="padding-right: 5px;">{{formatAgentStatus(_agent.status)}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
+					
+				<md-button ng-click="restartAgent()" style="margin-top: 11px !important;margin-bottom: 0px !important;"  class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-show="_agent.status == 'Active' && _agent.id != '000' ">
+					<i class="fa fa-refresh" aria-hidden="true"></i> Restart
+				</md-button>
 			</md-content>
 			</md-content>

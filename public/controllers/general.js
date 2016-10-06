@@ -82,6 +82,26 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
         $scope.state.unsetDashboardsState();
     }	
 	
+	$scope.restartAgent = function () {
+		var path = '/agents/' + $scope._agent.id + '/restart';
+
+		DataFactory.getAndClean('put', path, {})
+			.then(function (data) {
+				if(data.error != 0)
+					var alert = data.message;
+				else
+					var alert = data.data;
+				
+				$mdToast.show({
+					template: '<md-toast>' + alert + '</md-toast>',
+					position: 'bottom left',
+					hideDelay: 2000,
+				});
+				
+			}, printError);
+	};
+	
+	
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 256, 0)
             .then(function (data) {
