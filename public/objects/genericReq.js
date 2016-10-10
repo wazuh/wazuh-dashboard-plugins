@@ -1,42 +1,36 @@
 require('ui/modules').get('app/wazuh', [])
-    .service('genericReq', function ($q, $http) {
-        return {
-            request: function (method, url) {
-                var defered = $q.defer();
-                var promise = defered.promise;
-                if (!method || !url) {
-                    defered.reject({ 'error': -1, 'message': 'Missing parameters' });
-                    return promise;
-                }
-                var requestHeaders = {
-                    headers: {
-                        "Content-Type": 'application/json'
-                    }
-                }
-                if (method == "GET") {
-                    $http.get(url, requestHeaders)
-                        .success(function (data) {
-                            if (data.error) {
-                                defered.reject(data);
-                            } else {
-                                defered.resolve(data);
-                            }
-                        })
-                        .error(function (data) {
-                            if (data.error) {
-                                defered.reject(data);
-                            } else {
-                                defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
-                            }
-                        });
-                }
+    .service('genericReq', function ($q, $http, errlog) {
+        var _request = function (method, url) {
+            var defered = $q.defer();
+            var promise = defered.promise;
+            if (!method || !url) {
+                defered.reject({ 'error': -1, 'message': 'Missing parameters' });
                 return promise;
             }
+            var requestHeaders = {
+                headers: {
+                    "Content-Type": 'application/json'
+                }
+            }
+            if (method == "GET") {
+                $http.get(url, requestHeaders)
+                    .success(function (data) {
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.resolve(data);
+                        }
+                    })
+                    .error(function (data) {
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
+                        }
+                    });
+            }
+            return promise;
         };
-    });
-
-require('ui/modules').get('app/wazuh', [])
-    .service('genericRequest', function (genericReq, $q, errlog) {
 
         var prepError = function (err) {
             if (err.error < 0) {
@@ -78,12 +72,12 @@ require('ui/modules').get('app/wazuh', [])
             request: function (method, path) {
                 var defered = $q.defer();
                 var promise = defered.promise;
-                if (!method || !path || !body) {
+                if (!method || !path) {
                     defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
                     return promise;
                 }
 
-                genericReq.request(method, path)
+                _request(method, path)
                     .then(function (data) {
                         defered.resolve(data);
                     }, function (data) {
@@ -92,5 +86,4 @@ require('ui/modules').get('app/wazuh', [])
                 return promise;
             }
         };
-
     });
