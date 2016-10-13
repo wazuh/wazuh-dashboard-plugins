@@ -4,7 +4,7 @@
         <md-virtual-repeat-container auto-size-container ng-style="autoSizeStyle" ng-if="!load">
             <div flex layout="column" layout-align="space-between stretch">
 				<div layout="row" layout-align="space-between stretch">
-					<md-card flex layout="column">
+					<md-card flex layout="column" style="margin-left: 0px;">
 						<md-card-content style="text-align: center;">
 							<div class="metric-value ng-binding" style="font-size: 19pt;">{{lastAgent}}</div>
 							<div class="ng-binding">Last registered agent</div>
@@ -25,7 +25,7 @@
 						</md-card-content>
 					</md-card>
 					
-					<md-card flex layout="column">
+					<md-card flex layout="column"  style="margin-right: 0px;">
 						<md-card-content style="text-align: center;">
 							<div class="metric-value ng-binding" style="font-size: 19pt;">{{(agentsCoverity | number:2)}}%</div>
 							<div class="ng-binding">Agents coverage</div>
@@ -41,7 +41,7 @@
                             flex>
                     </div>
                     <div layout="row" class="sideNavBox" flex="20">
-						<md-input-container flex class="md-whiteframe-z1" style="margin-right: 10px; background-color: rgb(207,216,220)">
+						<md-input-container flex class="md-whiteframe-z1">
 							<md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
 								<md-option value="all">All</md-option>
 								<md-option value="active">Active</md-option>

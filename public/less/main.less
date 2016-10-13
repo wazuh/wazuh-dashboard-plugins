@@ -11,15 +11,11 @@
 	background: rgb(236, 239, 241) !important;
 	color: rgba(0,0,0,0.87)!important;
 }
-md-progress-linear.md-default-theme ._md-bar, md-progress-linear ._md-bar {
-	background-color: #3caed2;
-}
-md-select-menu.md-default-theme md-content, md-select-menu md-content {
-	background: rgb(207, 216, 220) !important;
-}
+
 md-input-container > md-select {
-	background: rgb(207, 216, 220);
+	background: #3caed2;
 	border-radius: 3px;
+	color: white; 
 	padding: 3px;
 }
 .md-headline{
@@ -362,7 +358,7 @@ button:hover, button:focus, button.focus{
 }
 
 md-content{
-	background-color: #f2f4f6;
+	background-color: #e4e8eb;
 }
 md-card{
 	box-shadow: none !important; 
@@ -380,3 +376,67 @@ md-card{
 	position: relative;
 }
 
+.headBar {
+	background-color: #f7f7f7;
+	padding-bottom: 0px;
+	padding-top: 4px; 
+}
+
+.horizontal-menu-right {
+	background-color: #f7f7f7
+}
+
+md-nav-bar.md-default-theme .md-button._md-nav-button.md-unselected, md-nav-bar .md-button._md-nav-button.md-unselected{
+	color: #141414;
+	border: none;
+}
+
+md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
+	background-color: #f7f7f7
+}
+.md-nav-bar{
+	border: none !important;
+}
+
+.md-toolbar-tools h1, .md-toolbar-tools h2, .md-toolbar-tools h3 {
+    font-size: inherit;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin: inherit;
+    color: #141414;
+    font-size: 16px;
+    }
+md-list{
+	background-color: white;
+}	
+md-input-container.md-whiteframe-z1.flex.md-input-has-value{
+
+	box-shadow: none; 
+	background-color: #3caed2;
+	
+}
+md-progress-linear.md-default-theme ._md-bar, md-progress-linear ._md-bar {
+	background-color: #3caed2;
+}
+md-select-menu.md-default-theme md-content, md-select-menu md-content {
+	background: #3caed2 !important;
+	color: white !important; 
+}
+
+md-select-menu.md-default-theme md-content md-option, md-select-menu md-content md-option{
+	color: white;
+}
+md-select-menu.md-default-theme md-content md-option:not([disabled]):focus, md-select-menu md-content md-option:not([disabled]):focus, md-select-menu.md-default-theme md-content md-option:not([disabled]):hover, md-select-menu md-content md-option:not([disabled]):hover{
+	background-color: rgba(255,255,255, 0.1);
+	color: white;
+}
+.md-input-focused{
+	color: white;
+}
+md-select.md-default-theme:not([disabled]):focus ._md-select-value, md-select:not([disabled]):focus ._md-select-value {
+	color: white;
+}
+
+input#searchBox {
+	box-shadow: none; 
+}
