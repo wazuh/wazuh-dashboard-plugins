@@ -3,14 +3,7 @@
     display: block !important; 
 	width: 0px; 
 }
-.button-active {
-	background: rgb(207,216,220) !important;
-	color: rgba(0,0,0,0.87)!important;
-}
-.button-disabled {
-	background: rgb(236, 239, 241) !important;
-	color: rgba(0,0,0,0.87)!important;
-}
+
 
 md-input-container > md-select {
 	background: #3caed2;
@@ -33,13 +26,13 @@ md-input-container > md-select {
 .status {
     width: 3%;
 }
-.status.green{
+.statusBox.green{
 	background-color: rgb(49, 196, 113);
 }
-.status.red{
-	background-color: red;
+.statusBox.red{
+	background-color: #da534f;
 }
-.status.orange {
+.statusBox.orange {
     background-color: orange;
 }
 .status.grey {
@@ -151,9 +144,14 @@ md-list-item.active._md-button-wrap.ng-scope._md.md-clickable{
     min-height: 36px;
     background: white;
     white-space: nowrap;
-    min-width: 75px;
+    min-width: 111px;
     text-align: center;
     font-size: 14px;
+	text-align: center;
+	margin-top: 11px !important; 
+	color: white;
+	text-transform: uppercase;
+	
 }
 .statusBox.large {
     min-width: 120px !important;
@@ -224,13 +222,7 @@ p {
  margin-top: 4px !important;
 }
 
-.subNavLine {
-    border-style: solid;
-    border-width: 0 0 1px;
-    border-bottom-color: rgba(0, 0, 0, 0.117647);
-    padding-bottom: 5px !important;
-    padding-left: 0px !important;
-}
+
 
 .subNavLine a {
     margin-bottom: 0px;
@@ -327,12 +319,12 @@ md-nav-bar {
 }
 
 md-select-menu:not(._md-overflow) md-content {
-padding-top: 0px !important; 
-padding-bottom: 0px !important; 
+	padding-top: 0px !important; 
+	padding-bottom: 0px !important; 
 }
 .ruleset_rules_row_active {
- background-color: #fafafa;
- padding-bottom: 0px; 
+	 background-color: #fafafa;
+	 padding-bottom: 0px; 
 }
 
 .ruleset_rules_row_active a{
@@ -418,6 +410,16 @@ md-input-container.md-whiteframe-z1.flex.md-input-has-value{
 md-progress-linear.md-default-theme ._md-bar, md-progress-linear ._md-bar {
 	background-color: #3caed2;
 }
+
+.button-active {
+	background: #3caed2 !important;
+	color: white!important;
+}
+.button-disabled {
+	background: rgba(60, 174, 210, 0.3) !important;
+	color: white !important;
+}
+
 md-select-menu.md-default-theme md-content, md-select-menu md-content {
 	background: #3caed2 !important;
 	color: white !important; 
@@ -440,3 +442,18 @@ md-select.md-default-theme:not([disabled]):focus ._md-select-value, md-select:no
 input#searchBox {
 	box-shadow: none; 
 }
+md-autocomplete-wrap.md-whiteframe-z1.layout-row {
+	box-shadow: none; 
+}
+md-input-container.md-whiteframe-z1.flex-20.md-input-has-value {
+	background: #3caed2;
+}
+
+md-input-container.md-whiteframe-z1.flex-20.md-input-has-value {
+    box-shadow: none;
+}
+
+button._md-no-style.md-button.md-ink-ripple {
+    background: none;
+}
+

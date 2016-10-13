@@ -6,10 +6,10 @@
 
   <md-virtual-repeat-container layout-align="start start" ng-if="!load" flex layout="column" layout-padding auto-size-container ng-style="autoSizeStyle">
 
-    <div flex id="content" layout="row" layout-align="center stretch">
+    <div flex id="content" layout="row" layout-align="center start">
 
-      <span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
-			<md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="$parent.search"
+      <span layout="row" style="padding-left: 0px;margin-top: 6px;margin-right: 5px; " flex layout-align="space-between center">
+		<md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="$parent.search"
 			md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
 			placeholder="Search for rule file, group or PCI requirement" md-search-text-change="fileSearchFilter(search)">
 				<md-item-template>
@@ -27,7 +27,16 @@
       </md-autocomplete>
       </span>
 
-      <md-input-container flex="15" style="margin-right: 0px !important; margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);"
+	  	<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="submenuNavItem2 = 'rules'"
+			class="md-primary">
+			Rules
+		</md-button>
+		<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" 
+			ng-class="button-disabled" ng-click="submenuNavItem2 = 'decoders'" class="md-primary">
+			Decoders
+		</md-button>
+		
+      <md-input-container flex="20" style="margin-top: 6px;margin-bottom: 0;border-radius: 3px;margin-left: 10px;"
         class="md-whiteframe-z1">
         <md-select style="border: none;" ng-model="statusFilter" ng-change="rulesStatusFilter(statusFilter)" aria-label="Filter by status">
           <md-option value="enabled">Enabled</md-option>
@@ -67,7 +76,7 @@
       </div>
     </md-toolbar>
     <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
-      <md-list ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
+      <md-list class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
         <md-list-item ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''" ng-click=" showDetails[rule.id] = ! showDetails[rule.id]; ">
           <span flex="10">{{rule.id}}</span>
           <span flex="60">{{rule.description}}</span>
