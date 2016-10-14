@@ -216,7 +216,7 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
 		var date = new Date();
         date.setDate(date.getDate() - 1);
         var timeAgo = date.getTime();
-        genericReq.request('GET', '/api/wazuh-elastic/top/AgentName/' + timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/AgentName')
             .then(function (data) {
                 $scope.mostActiveAgent = data.data;
             }, printError);	

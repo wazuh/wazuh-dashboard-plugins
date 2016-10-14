@@ -1,15 +1,15 @@
-<md-content ng-if="!load && submenuNavItem =='logs'" ng-controller="osseclogController" layout="row" flex layout-padding>
+<md-content ng-if="!load && submenuNavItem =='logs'" ng-controller="osseclogController" layout="row" flex>
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-    <md-virtual-repeat-container auto-size-container ng-if="!load" flex layout="column" layout-padding ng-style="autoSizeStyle">
-        <div flex layout="row" layout-align="start start">
-            <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 15px;margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);">
+    <md-virtual-repeat-container auto-size-container ng-if="!load" flex layout="column" layout-padding ng-style="autoSizeStyle" style="background: white;">
+        <div flex layout="row" layout-align="start start" class="horizontal-menu-right" style="background: #f7f7f7">
+            <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 15px;margin-left: 20px;padding: 3px;margin-right: 10px;">
                 <label style="display: none" for="categoryBox">Choose daemon</label>
                 <md-select id="categoryBox" ng-model="$parent._category" ng-change="categoryFilter(_category)" aria-label="Logs category">
                     <md-option value="all">All</md-option>
                     <md-option ng-repeat="(key, value) in summary" value="{{key}}">{{key}}</md-option>
                 </md-select>
             </md-input-container>
-            <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 0px;margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);">
+            <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 0px;margin-left: 20px;padding: 3px;margin-right: 10px;">
                 <label style="display: none" for="levelBox">Choose log level</label>
                 <md-select id="levelBox" ng-model="$parent._level" ng-change="levelFilter(_level)" aria-label="Logs level">
                     <md-option value="all">All</md-option>
@@ -20,11 +20,11 @@
 			
 		
             <div flex layout="row" layout-align="end end">
-                <span><md-button ng-if="!realtime" class="md-primary md-whiteframe-z1" ng-click="playRealtime()" style="margin-top: 20px; background-color: rgb(207,216,220); color: #000; width: 180px" >
+                <span><md-button ng-if="!realtime" class="md-primary md-whiteframe-z1 buttonMenu" ng-click="playRealtime()" style="margin-top: 20px; width: 180px" >
 				<i class="fa fa-play" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i> 
 				Play realtime
 				</md-button>
-                <md-button style="margin-top: 20px; background-color: rgb(207,216,220); color: #000; width: 180px" ng-if="realtime" class="md-primary md-whiteframe-z1"
+                <md-button style="margin-top: 20px; width: 180px" ng-if="realtime" class="md-primary md-whiteframe-z1 buttonMenu"
                     ng-click="playRealtime()">
 					<i class="fa fa-stop" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i> 
 					Stop realtime</md-button></span>

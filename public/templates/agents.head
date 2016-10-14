@@ -23,7 +23,7 @@
 					<h2 ng-show="$parent._agent">{{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h2>
 					<h2 ng-show="!_agent">Choose or search an agent</h2>
 					<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-					<md-autocomplete flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
+					<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
 						md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
 						placeholder="Search agent hostname, ID or IP address"> 
 						<md-item-template>
