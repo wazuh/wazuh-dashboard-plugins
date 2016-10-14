@@ -1,4 +1,4 @@
-<md-content layout="column" flex layout-padding ng-if="!load && submenuNavItem == 'ruleset' && submenuNavItem2 == 'rules'"
+<md-content layout="column" flex layout-padding ng-if="!load && submenuNavItem == 'ruleset' && $parent.submenuNavItem2 == 'rules'"
   ng-controller="rulesController" layout-align="start space-around">
   <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
@@ -27,12 +27,12 @@
       </md-autocomplete>
       </span>
 
-	  	<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="submenuNavItem2 = 'rules'"
+	  	<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('rules')"
 			class="md-primary">
 			Rules
 		</md-button>
 		<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" 
-			ng-class="button-disabled" ng-click="submenuNavItem2 = 'decoders'" class="md-primary">
+			ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
 			Decoders
 		</md-button>
 		

@@ -5,8 +5,10 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
     $scope.$parent.state.setManagerState('ruleset');
+	$scope.setRulesTab('rules');
+	
     $scope.search = undefined;
-
+	
     $scope.rules = [];
 
     $scope.statusFilter = 'enabled';
@@ -234,6 +236,8 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
         errlog.log('Unexpected exception loading controller', e);
     }
 
+	
+	
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
@@ -244,11 +248,11 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 });
 
 app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast, errlog) {
-
+	
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('decoders');
-
+	$scope.setRulesTab('decoders');
     $scope.decoders = [];
 
     $scope.typeFilter = 'all';
@@ -452,6 +456,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
         errlog.log('Unexpected exception loading controller', e);
     }
 
+	
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {

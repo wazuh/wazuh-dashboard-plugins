@@ -1,9 +1,9 @@
-<md-content layout="row" flex layout-padding ng-if="!load && submenuNavItem2 == 'decoders'" ng-controller="decodersController">
+<md-content layout="row" flex layout-padding ng-if="!load && $parent.submenuNavItem2 == 'decoders'" ng-controller="decodersController">
 	<md-virtual-repeat-container ng-if="!load" flex layout="column" layout-padding auto-size-container ng-style="autoSizeStyle">
 
-		<div flex id="content" layout="row" layout-align="space-between center">
+		<div flex id="content" layout="row" layout-align="center start">
 
-			<span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
+			<span layout="row" style="padding-left: 0px;margin-top: 6px;margin-right: 5px; " flex layout-align="space-between center">
 					<md-autocomplete ng-hide="$parent.typeFilter != 'all'" flex md-no-cache="true" md-selected-item="_filter" md-selected-item-change="decodersApplyFilter(_filter)" md-search-text="$parent.search"
 						md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-select-on-match="true" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
 						placeholder="Search file">
@@ -21,8 +21,19 @@
 			</md-autocomplete>
 			</span>
 
-			<md-input-container flex="15" style="margin-right: 0px;margin-left: 20px;padding: 3px;margin-right: 10px;"
-				class="md-whiteframe-z1">
+			
+			<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('rules')"
+			class="md-primary">
+			Rules
+		</md-button>
+		<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" 
+			ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
+			Decoders
+		</md-button>
+		
+		
+			<md-input-container flex="20" style="margin-top: 6px;margin-bottom: 0;border-radius: 3px;margin-left: 10px;"
+        class="md-whiteframe-z1">
 				<md-select ng-model="typeFilter" ng-change="decoderTypeFilter(typeFilter)" aria-label="Filter by type">
 					<md-option value="all">All</md-option>
 					<md-option value="parents">Parents only</md-option>

@@ -137,7 +137,7 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 app.controller('stateController', function ($scope, appState, $route) {
     $scope.state = appState;
     $scope.select = $route.current.params.select;
-	
+	$scope.submenuNavItem2 = "rules";
 	$scope.resetDiscover = function () {
         $scope.state.unsetDiscoverState();
     }
@@ -145,6 +145,10 @@ app.controller('stateController', function ($scope, appState, $route) {
         $scope.state.unsetDashboardsState();
     }
 	
+	$scope.setRulesTab = function(tab) {
+		$scope.submenuNavItem2 = tab;
+	};
+
 });
 
 app.controller('stateLocationController', function ($scope, appState, $window) {
