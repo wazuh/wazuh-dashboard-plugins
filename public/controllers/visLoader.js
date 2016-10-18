@@ -91,7 +91,6 @@ require('ui/modules').get('app/wazuh', [])
 
       const visTypes = Private(RegistryVisTypesProvider);
       const visType = _.find(visTypes, { name: $scope.visType });
-	  
       if (!visType) {
         throw new Error('You must provide a valid visualization type');
       }
@@ -105,7 +104,7 @@ require('ui/modules').get('app/wazuh', [])
           '*': '/'
         }));
     }
-
+	
     renderVis().then(function (_sVis) {
       $scope._loadVisAsync = true;
 		
@@ -152,12 +151,12 @@ require('ui/modules').get('app/wazuh', [])
         //This gets called when data changes.
         $route.current.params._g = $scope.visG;
         $route.updateParams({ '_g': $scope.visG });
+        $state.emit('fetch_with_changes');
       });
 
       function init() {
         // export some objects
         $scope.savedVis = savedVis;
-		
         $scope.searchSource = searchSource;
         $scope.vis = vis;
 
@@ -179,7 +178,7 @@ require('ui/modules').get('app/wazuh', [])
           timefilter.enabled = !!timeField;
 		  
         });
-
+		
         $scope.$listen($state, 'fetch_with_changes', function (keys) {
           let $state = $scope.$state = (function initState() {
             $route.current.params._a = $scope.visA;
@@ -226,10 +225,12 @@ require('ui/modules').get('app/wazuh', [])
         });
 
         $scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
-
+			
+	
         $scope.$on('$destroy', function () {
           savedVis.destroy();
         });
+		
       }
 
       $scope.fetch = function () {
@@ -255,7 +256,11 @@ require('ui/modules').get('app/wazuh', [])
         };
       }
       init();
-
+	
+	  
     });
+	
+
+		
 
   });
