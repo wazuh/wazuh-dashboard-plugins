@@ -1,4 +1,4 @@
-<md-content flex ng-controller="settingsController" layout="column">
+<md-content flex ng-controller="settingsController" layout="column" style="background-color: white">
 
   <md-content ng-init="menuNavItem = 'settings'" style="height: 75px;">
     <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
@@ -14,30 +14,46 @@
     </md-nav-bar>
   </md-content>
 
-  <div layout="column" layout-align="center center" ng-if="editConfiguration">
-    <h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Set Wazuh RESTful API settings</h1>
-    <form ng-submit="processForm()" layout="column" layout-align="center center">
-      <md-input-container>
-        <label>Username</label>
-        <input type="text" ng-model="$parent.formData.user" aria-label="username" required></input>
-      </md-input-container>
-      <md-input-container>
-        <label>Password</label>
-        <input type="password" ng-model="$parent.formData.password" aria-label="password" required></input>
-      </md-input-container>
-      <md-input-container>
-        <label>Full url</label>
-        <input ng-model="$parent.formData.url" type="url" aria-label="full url" required></input>
-      </md-input-container>
-      <md-switch ng-model="$parent.formData.insecure" aria-label="Accept selfsigned SSL" required>Accept selfsigned SSL</md-switch>
-      <md-button type="submit" class="md-raised md-primary"><span class="glyphicon glyphicon-flash"></span> Connect!</md-button>
-    </form>
+  <div layout="column" layout-align="center center">
+  
+	<md-card layout-padding>
+	
+		<h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Set Wazuh RESTful API settings</h1>
+		
+		<span layout="row" layout-align="space-between center">
+			<p>192.168.1.1</p>
+			<p>55555</p>
+			<p>foo</p>
+			<p>
+				<i class="fa fa-cog" aria-hidden="true" style="font-size: 18px;"></i>
+				<i class="fa fa-check" aria-hidden="true" style="font-size: 18px;"></i>
+			</p>
+		</span>
+		<md-divider></md-divider>
+		<md-button type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 18px;"></i> Add manager</md-button>
+		
+		<form ng-submit="processForm()" layout="column" layout-align="center center">
+		  <md-input-container>
+			<label>Username</label>
+			<input type="text" ng-model="$parent.formData.user" aria-label="username" required></input>
+		  </md-input-container>
+		  <md-input-container>
+			<label>Password</label>
+			<input type="password" ng-model="$parent.formData.password" aria-label="password" required></input>
+		  </md-input-container>
+		  <md-input-container>
+			<label>Full url</label>
+			<input ng-model="$parent.formData.url" type="url" aria-label="full url" required></input>
+		  </md-input-container>
+		  <md-button type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 13px; margin-right: 3px; "></i>Add</md-button>
+		</form>
+	
+	</md-card>
+	
   </div>
 
-  <div layout="column" layout-align="center center" ng-if="!editConfiguration">
-    <h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Wazuh RESTful API settings</h1>
+  <div layout="column" layout-align="center center">
     <p flex style="color: green;">Wazuh RESTful API settings are configured and working. The application is ready to be used.</p>
-    <md-button class="md-raised md-warn" ng-click="$parent.editConfiguration = !$parent.editConfiguration"><span class="glyphicon glyphicon-pencil"></span> Edit settings</md-button>
   </div>
 
   <div flex></div>

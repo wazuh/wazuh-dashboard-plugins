@@ -9,7 +9,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
     $scope.formData.user = "";
     $scope.formData.password = "";
     $scope.formData.url = "";
-    $scope.formData.insecure = true;
+    $scope.accept_ssl = true;
     $scope.editConfiguration = true;
     $scope.menuNavItem = 'settings';
 
@@ -24,7 +24,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
             'api_user': $scope.formData.user,
             'api_password': base64.encode($scope.formData.password),
             'api_url': $scope.formData.url,
-            'insecure': $scope.formData.insecure
+            'insecure': $scope.accept_ssl
         };
 
         $http.put("/api/wazuh-api/settings", data).success(function (data, status) {
