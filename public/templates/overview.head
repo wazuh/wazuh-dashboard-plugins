@@ -10,8 +10,14 @@
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/discover" name="discover" ng-click="resetDiscover();">Discover</md-nav-item>
 			<md-nav-item md-nav-href="#/dashboards" name="dashboards" ng-click="resetDashboards();">Dashboards</md-nav-item>
-			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+			<a href="#/settings"><button id="settingButtonTop" class="md-primary md-button ng-scope md-ink-ripple" type="button" ng-transclude="">
+				<i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i>
+			</button>
+			</a>
         </md-nav-bar>
+		
+		
+		
     </md-content>
 
 	<md-content class="headBar" layout="row" layout-align="center start" ng-init="submenuNavItem = (state.getOverviewState() ? state.getOverviewState() : 'general')">
