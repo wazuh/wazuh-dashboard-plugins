@@ -31,46 +31,45 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
 
     // Get settings function
     $scope.getSettings = function () {
-		
 			$http.get("/api/wazuh-api/apiEntries").success(function (data, status) {
 				$scope.apiEntries = data;
 				console.log(data);
 			}).error(function (data, status) {
-				console.log("10");
-				console.log(data);
-				console.log(status);
-				
 				$mdToast.show($mdToast.simple().textContent("Error getting API entries"));
 			})
     };
 
 	$scope.getSettings();
 	
-    testConnection.test()
-        .then(function (data) {
-            $scope.editConfiguration = false;
-        });
 
     // Save settings function
     $scope.saveSettings = function () {
+		var activeStatus = "false";
+		if($scope.apiEntries.length == 0)
+			activeStatus = "true";
 		
 		var tmpData = {
 			'user': $scope.formData.user,
 			'password': base64.encode($scope.formData.password),
 			'url': $scope.formData.url,
 			'port': $scope.formData.port,
-			'insecure': "true"
+			'insecure': "true",
+			'active': activeStatus
 		};
 
        // testConnection.test_tmp(tmpData).then(function (data) {
 			
-			console.log("1");
-			console.log(tmpData);
 			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
-				$mdToast.show($mdToast.simple().textContent('Successfully added'));
-			}).error(function (data, status) {
-				console.log("2");
 				console.log(data);
+				var newEntry = {'_id': data.response._id, _source: { active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } };
+				$scope.apiEntries.push(newEntry);
+				$mdToast.show($mdToast.simple().textContent('Successfully added'));
+				$scope.addManagerContainer = false;
+				$scope.formData.user = "";
+				$scope.formData.password = "";
+				$scope.formData.url = "";
+				$scope.formData.port = "";
+			}).error(function (data, status) {
 				if (status == '400') {
 					$mdToast.show($mdToast.simple().textContent("Please, fill all the fields in order to connect with Wazuh RESTful API."));
 				} else {

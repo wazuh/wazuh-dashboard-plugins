@@ -34,7 +34,7 @@
 		
 		<div ng-repeat="entry in apiEntries">
 			<span layout="row" layout-align="space-between center">
-				<p flex="40" ><i tooltip="Set as default Manager" class="fa fa-star" aria-hidden="true" style="color: #f39c12; font-size: 18px;"></i> {{entry._source.url}}</p>
+				<p flex="40" ><i ng-show="(entry._source.active == 'true')" tooltip="Set as default Manager" class="fa fa-star" aria-hidden="true" style="color: #f39c12; font-size: 18px;"></i> {{entry._source.url}}</p>
 				<p flex="20" >{{entry._source.api_port}}</p>
 				<p flex="20" >{{entry._source.api_user}}</p>
 				<p flex="20" >
@@ -72,10 +72,6 @@
 	
 	</md-card>
 	
-  </div>
-
-  <div layout="column" layout-align="center center">
-    <p flex style="color: green;">Wazuh RESTful API settings are configured and working. The application is ready to be used.</p>
   </div>
 
   <div flex></div>
