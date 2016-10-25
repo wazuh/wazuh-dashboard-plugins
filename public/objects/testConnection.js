@@ -18,6 +18,26 @@ require('ui/modules').get('app/wazuh', [])
                     })
 
                 return promise;
+            },
+			test_tmp: function (data) {
+                var defered = $q.defer();
+                var promise = defered.promise;
+
+                $http.post("/api/wazuh-api/test", data)
+                    .success(function (data) {
+						console.log("3");
+						console.log(data);
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.resolve(data);
+                        }
+                    })
+                    .error(function (data) {
+                        defered.reject(data);
+                    })
+
+                return promise;
             }
         };
     });

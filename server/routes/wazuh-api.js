@@ -30,7 +30,7 @@ module.exports = function (server, options) {
         client.search({ index: '.kibana', type: 'wazuh-configuration'})
             .then(function (data) {
                 if (data.hits.total == 1) {
-                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.api_url, 'insecure': data.hits.hits[0]._source.insecure });
+                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.api_url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure });
                 } else {
                     callback({ 'error': 'no credentials', 'error_code': 1 });
                 }
@@ -39,6 +39,28 @@ module.exports = function (server, options) {
             });
     };
 
+	
+	
+    var getAPI_entries = function (req,reply) {
+        client.search({ index: '.kibana', type: 'wazuh-configuration'}).then(
+			function (data) {
+				reply(data.hits.hits);
+            }, function (data, error) {
+				reply(data);
+            });
+    };
+
+    var deleteAPI_entries = function (req,reply) {
+        client.delete({ index: '.kibana', type: 'wazuh-configuration', id: req.params.id}).then(
+			function (data) {
+				reply(data);
+            }, function (data, error) {
+				reply(data);
+            });
+    };
+	
+	
+	
     //Handlers - Test API
 
     var testApiAux2 = function (error, response, insecure) {
@@ -65,7 +87,10 @@ module.exports = function (server, options) {
         } else if (!error && response && (!response.body.data || !checkVersion(response.body.data)) ) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'bad_url' });
         } else {
-            needle.request('get', wapi_config.url+'/version', {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
+            needle.request('get', wapi_config.url+":"+wapi_config.port+'/version', {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
+				console.log("5");
+				console.log(response);
+				console.log(error);
                 callback(testApiAux2(error, response, wapi_config.insecure));
             });
         }
@@ -93,7 +118,7 @@ module.exports = function (server, options) {
             if ((wapi_config.url.indexOf('https://') == -1) && (wapi_config.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
-                needle.request('get', wapi_config.url+'/version', {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
+                needle.request('get', wapi_config.url+":"+wapi_config.port+'/version', {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
                     testApiAux1(error, response, wapi_config, needle, function (test_result) {
                         reply(test_result);
                     });
@@ -102,6 +127,38 @@ module.exports = function (server, options) {
         });
     };
 
+	var testAPI_tmp = function (req, reply) {
+        var needle = require('needle');
+        needle.defaults({
+            open_timeout: 1000
+        });
+		console.log(req.payload);
+		if (!req.payload.user) {
+            reply({ 'statusCode': 400, 'error': 3, 'message': 'Missing param: API USER' }).code(400);
+        } else if (!req.payload.password) {
+            reply({ 'statusCode': 400, 'error': 4, 'message': 'Missing param: API PASSWORD' }).code(400);
+		} else if (!req.payload.url) {
+            reply({ 'statusCode': 400, 'error': 4, 'message': 'Missing param: API URL' }).code(400);
+		} else if (!req.payload.port) {
+            reply({ 'statusCode': 400, 'error': 4, 'message': 'Missing param: API PORT' }).code(400);			
+        } else {
+			req.payload.password = new Buffer(req.payload.password, 'base64').toString("ascii");
+            if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
+                reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
+            } else {
+                needle.request('get', req.payload.url+":"+req.payload.port+'/version', {}, { username: req.payload.user, password: req.payload.password }, function (error, response) {
+                    testApiAux1(error, response, req.payload, needle, function (test_result) {
+						console.log("4");
+						console.log(test_result);
+                        reply(test_result);
+                    });
+                });
+            }
+        }
+		
+
+    };
+	
     //Handlers - Route request
 
     var errorControl = function (error, response) {
@@ -141,7 +198,7 @@ module.exports = function (server, options) {
                 rejectUnauthorized: !wapi_config.insecure
             };
 
-            var fullUrl = wapi_config.url + path;
+            var fullUrl = wapi_config.url + ":" + wapi_config.port + path;
             
             needle.request(method, fullUrl, data, options, function (error, response) {
                 var errorData = errorControl(error, response);
@@ -167,20 +224,29 @@ module.exports = function (server, options) {
     //Handlers - Save config
 
     var saveApi = function (req, reply) {
-        if (!(req.payload.api_user && req.payload.api_password && req.payload.api_url && req.payload.insecure)) {
+		console.log(req.payload);
+        if (!(req.payload.user && req.payload.password && req.payload.url)) {
             reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
             return;
         }
-
-        client.create({ index: '.kibana', type: 'wazuh-configuration', id: '1', body: req.payload, refresh: true })
+		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API'};
+		console.log("Settings are: ");
+		console.log(settings);
+        client.index({ index: '.kibana', type: 'wazuh-configuration', body: settings, refresh: true })
             .then(function (err) {
                 reply({ 'statusCode': 200, 'message': 'ok' });
             }, function (error) {
+				console.log("error2 es: ");
+				console.log(error);
                 if (error.statusCode == '409') {
-                    client.update({ index: '.kibana', type: 'wazuh-configuration', id: '1', body: { doc: req.payload } })
+					console.log("Settings2 are: ");
+					console.log(settings);
+                    client.update({ index: '.kibana', type: 'wazuh-configuration', id: '1', body: {doc: settings} })
                         .then(function () {
                             reply({ 'statusCode': 200, 'message': 'ok' });
-                        }, function () {
+                        }, function (error) {
+							console.log("error es: ");
+							console.log(error);
                             reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
                         });
                 } else {
@@ -189,6 +255,27 @@ module.exports = function (server, options) {
             });
     };
 
+	//Handlers - Get API Settings
+
+    var getApiSettings = function (req, reply) {
+		getConfig(function (wapi_config) {
+
+			if (wapi_config.error_code > 1) {
+				//Can not connect to elasticsearch
+				reply({ 'statusCode': 200, 'error': '1', 'data': 'no_elasticsearch' });
+				return;
+			} else if (wapi_config.error_code > 0) {
+				//Credentials not found
+				reply({ 'statusCode': 200, 'error': '1', 'data': 'no_credentials' });
+				return;
+			}
+
+			console.log(wapi_config);
+			
+		});
+			
+    };
+	
     //Handlers - error loggin
 
     var postErrorLog = function (req, reply) {
@@ -221,6 +308,17 @@ module.exports = function (server, options) {
         handler: testApi
     });
 
+	/*
+    * POST /api/wazuh-api/test
+    * Returns if the wazuh-api configuration received in the POST body will work
+    *
+    **/
+    server.route({
+        method: 'POST',
+        path: '/api/wazuh-api/test',
+        handler: testAPI_tmp
+    });
+	
     /*
     * POST /api/wazuh-api/request
     * Returns the request result (With error control)
@@ -233,7 +331,7 @@ module.exports = function (server, options) {
     });
 
     /*
-    * POST /api/wazuh-api/settings
+    * PUT /api/wazuh-api/settings
     * Save the given settings into elasticsearch
     *
     **/
@@ -242,7 +340,40 @@ module.exports = function (server, options) {
         path: '/api/wazuh-api/settings',
         handler: saveApi
     });
-    
+ 
+    /*
+    * GET /api/wazuh-api/settings
+    * Get Wazuh-API settings from elasticsearch index
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-api/settings',
+        handler: getApiSettings
+    });
+	
+    /*
+    * GET /api/wazuh-api/settings
+    * Get Wazuh-API settings from elasticsearch index
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-api/apiEntries',
+        handler: getAPI_entries
+    });
+	
+    /*
+    * GET /api/wazuh-api/settings
+    * Get Wazuh-API settings from elasticsearch index
+    *
+    **/
+    server.route({
+        method: 'DELETE',
+        path: '/api/wazuh-api/apiEntries/{id}',
+        handler: deleteAPI_entries
+    });	
+	
     /*
     * POST /api/wazuh/debug
     * Write in debug log

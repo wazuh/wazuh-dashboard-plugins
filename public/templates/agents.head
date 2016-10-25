@@ -10,7 +10,7 @@
 			<md-nav-item md-nav-href="#/agents" name="agents" >Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/discover" name="discover" ng-click="resetDiscover();">Discover</md-nav-item>
 			<md-nav-item md-nav-href="#/dashboards" name="dashboards" ng-click="resetDashboards();">Dashboards</md-nav-item>
-			<a href="#/settings"><button id="settingButtonTop" class="md-primary md-button ng-scope md-ink-ripple" type="button" ng-transclude="">
+			<a href="#/settings"><button id="settingButtonTop" class="md-primary md-button ng-scope md-ink-ripple" type="button">
 				<i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i>
 			</button>
 			</a>

@@ -12,52 +12,81 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
     $scope.accept_ssl = true;
     $scope.editConfiguration = true;
     $scope.menuNavItem = 'settings';
+	$scope.load = true;
+	
+	// Remove API entry
+	
+	$scope.removeManager = function(item) {
+		var index = $scope.apiEntries.indexOf(item);
+		console.log($scope.apiEntries[index]);
+		
+		$http.delete("/api/wazuh-api/apiEntries/"+$scope.apiEntries[index]._id).success(function (data, status) {
+			$scope.apiEntries.splice(index, 1);   
+		}).error(function (data, status) {
+			$mdToast.show($mdToast.simple().textContent("Could not remove manager"));
+		})
+			
+	    
+	}
 
+    // Get settings function
+    $scope.getSettings = function () {
+		
+			$http.get("/api/wazuh-api/apiEntries").success(function (data, status) {
+				$scope.apiEntries = data;
+				console.log(data);
+			}).error(function (data, status) {
+				console.log("10");
+				console.log(data);
+				console.log(status);
+				
+				$mdToast.show($mdToast.simple().textContent("Error getting API entries"));
+			})
+    };
+
+	$scope.getSettings();
+	
     testConnection.test()
         .then(function (data) {
             $scope.editConfiguration = false;
         });
 
     // Save settings function
-    $scope.saveSettings = function (test) {
-        var data = {
-            'api_user': $scope.formData.user,
-            'api_password': base64.encode($scope.formData.password),
-            'api_url': $scope.formData.url,
-            'insecure': $scope.accept_ssl
-        };
+    $scope.saveSettings = function () {
+		
+		var tmpData = {
+			'user': $scope.formData.user,
+			'password': base64.encode($scope.formData.password),
+			'url': $scope.formData.url,
+			'port': $scope.formData.port,
+			'insecure': "true"
+		};
 
-        $http.put("/api/wazuh-api/settings", data).success(function (data, status) {
-            if (test) {
-                makeTest();
-            }
-        }).error(function (data, status) {
-            if (status == '400') {
-                $mdToast.show($mdToast.simple().textContent("Please, fill all the fields in order to connect with Wazuh RESTful API."));
-            } else {
-                $mdToast.show($mdToast.simple().textContent("Some error ocurred, could not save data in elasticsearch."));
-            }
-        })
+       // testConnection.test_tmp(tmpData).then(function (data) {
+			
+			console.log("1");
+			console.log(tmpData);
+			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
+				$mdToast.show($mdToast.simple().textContent('Successfully added'));
+			}).error(function (data, status) {
+				console.log("2");
+				console.log(data);
+				if (status == '400') {
+					$mdToast.show($mdToast.simple().textContent("Please, fill all the fields in order to connect with Wazuh RESTful API."));
+				} else {
+					$mdToast.show($mdToast.simple().textContent("Some error ocurred, could not save data in elasticsearch."));
+				}
+			})
+		//}, printTest);
     };
 
-    // Test connection function
-    function testSaveConnection() {
-        $scope.saveSettings(true);
-    };
 
     // Process form
     $scope.processForm = function () {
-        // Test and Save
-        testSaveConnection();
+        // Test and Save if OK
+		$scope.saveSettings();
     };
 
-    var makeTest = function () {
-        testConnection.test()
-            .then(function (data) {
-                $scope.editConfiguration = false;
-                $mdToast.show($mdToast.simple().textContent('Successfully connected!'));
-            }, printTest);
-    };
 
     var printTest = function (data) {
         var text;
