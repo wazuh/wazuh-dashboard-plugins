@@ -498,3 +498,23 @@ md-select.md-default-theme ._md-select-value._md-select-placeholder, md-select .
 .md-button.buttonBlueLight.md-default-theme:not([disabled]):hover, .md-button:not([disabled]):hover {
 	background-color: rgba(60,174,210,0.7)
 }
+input.ng-invalid.ng-dirty,
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-dirty,
+textarea.ng-invalid.ng-touched,
+select.ng-invalid.ng-dirty,
+select.ng-invalid.ng-touched {
+  border-color: #3caed2 !important;
+}
+
+md-input-container.md-default-theme.md-input-invalid label, md-input-container.md-input-invalid label {
+	color: rgba(0,0,0,0.38);
+	font-size: 16px; 
+}
+md-input-container.md-default-theme label.md-required:after, md-input-container label.md-required:after{
+  color: #3caed2 !important;
+}
+
+md-input-container.md-default-theme label, md-input-container label, md-input-container.md-default-theme ._md-placeholder, md-input-container ._md-placeholder {
+	font-size: 16px;
+}

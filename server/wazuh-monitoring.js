@@ -140,7 +140,7 @@ module.exports = function (server, options) {
     };
 
     var getConfig = function (callback) {
-        client.search({ index: '.kibana', type: 'wazuh-configuration', id: '1' })
+        client.search({ index: '.kibana', type: 'wazuh-configuration'})
             .then(function (data) {
                 if (data.hits.total == 1) {
                     callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.api_url, 'insecure': data.hits.hits[0]._source.insecure });
@@ -168,7 +168,7 @@ module.exports = function (server, options) {
             server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Skipping "wazuh-monitoring-*" index pattern configuration: Already configured.');
         }
     });
-    cron.schedule('0 */10 * * * *', function () {
+    cron.schedule('0 */01 * * * *', function () {
         agentsArray.length = 0;
         getConfig(loadCredentials);
     }, true);

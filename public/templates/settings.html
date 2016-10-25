@@ -10,42 +10,57 @@
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/discover" name="discover">Discover</md-nav-item>
 			<md-nav-item md-nav-href="#/dashboards" name="dashboards">Dashboards</md-nav-item>
-			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+			<a href="#/settings"><button id="settingButtonTop" class="md-primary md-button ng-scope md-ink-ripple" type="button" ng-transclude="">
+				<i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i>
+			</button>
+			</a>
     </md-nav-bar>
   </md-content>
 
-  <div layout="column" layout-align="center center">
+  <div layout="column" layout-align="start stretch" flex="50">
   
 	<md-card layout-padding>
 	
-		<h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Set Wazuh RESTful API settings</h1>
+		<h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Wazuh API settings</h1>
+
+		<span layout="row" layout-align="start start">
+			<p flex="40" style="font-weight: bold;">API IP Address</p>
+			<p flex="20" style="font-weight: bold;">API Port</p>
+			<p flex="20" style="font-weight: bold;">User</p>
+			<p flex="20" style="font-weight: bold;">Actions</p>
+			
+	
+		</span>
 		
 		<span layout="row" layout-align="space-between center">
-			<p>192.168.1.1</p>
-			<p>55555</p>
-			<p>foo</p>
-			<p>
-				<i class="fa fa-cog" aria-hidden="true" style="font-size: 18px;"></i>
-				<i class="fa fa-check" aria-hidden="true" style="font-size: 18px;"></i>
+			<p flex="40" >192.168.1.1</p>
+			<p flex="20" >55555</p>
+			<p flex="20" >foo</p>
+			<p flex="20" >
+				<i tooltip="Set as default Manager" class="fa fa-star" aria-hidden="true" style="font-size: 18px;"></i>
+				<i tooltip="Edit settings" class="fa fa-pencil" aria-hidden="true" style="margin-left: 7px; font-size: 18px;"></i>
+				<i tooltip="Remove manager" class="fa fa-trash" aria-hidden="true" style="margin-left: 7px;font-size: 18px;"></i>
 			</p>
+			
+	
 		</span>
 		<md-divider></md-divider>
-		<md-button type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 18px;"></i> Add manager</md-button>
+		<md-button ng-click="addManagerContainer = !addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new manager</md-button>
 		
-		<form ng-submit="processForm()" layout="column" layout-align="center center">
-		  <md-input-container>
-			<label>Username</label>
-			<input type="text" ng-model="$parent.formData.user" aria-label="username" required></input>
+		<form flex ng-submit="processForm()" layout="column" ng-show="addManagerContainer" style="margin-top: 30px; ">
+		  <md-input-container flex>
+			<label flex>API Username</label>
+			<input flex placeholder="foo" type="text" ng-model="$parent.formData.user" aria-label="username" required></input>
 		  </md-input-container>
 		  <md-input-container>
-			<label>Password</label>
-			<input type="password" ng-model="$parent.formData.password" aria-label="password" required></input>
+			<label>API Password</label>
+			<input placeholder="bar" type="password" ng-model="$parent.formData.password" aria-label="password" required></input>
 		  </md-input-container>
 		  <md-input-container>
-			<label>Full url</label>
-			<input ng-model="$parent.formData.url" type="url" aria-label="full url" required></input>
+			<label>API URL</label>
+			<input placeholder="https://10.0.0.3:55000" ng-model="$parent.formData.url" type="url" aria-label="full url" required></input>
 		  </md-input-container>
-		  <md-button type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 13px; margin-right: 3px; "></i>Add</md-button>
+		  <md-button type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 13px; margin-right: 5px; "></i>SAVE</md-button>
 		</form>
 	
 	</md-card>
