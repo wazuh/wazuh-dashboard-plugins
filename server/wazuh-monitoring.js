@@ -6,6 +6,7 @@ module.exports = function (server, options) {
     var api_pass;
     var api_url;
     var api_insecure;
+    var api_port;
 
     var colors = require('ansicolors');
     var blueWazuh = colors.blue('wazuh');
@@ -24,6 +25,7 @@ module.exports = function (server, options) {
         api_pass = json.password;
         api_url = json.url;
         api_insecure = json.insecure;
+        api_port = json.port;
         checkAndSaveStatus();
     }
 
@@ -40,7 +42,7 @@ module.exports = function (server, options) {
             rejectUnauthorized: !api_insecure
         };
 
-        needle.request('get', api_url + '/agents', payload, options, function (error, response) {
+        needle.request('get', api_url + ':' + api_port +'/agents', payload, options, function (error, response) {
             if (!error && response.body.data && response.body.data.totalItems) {
                 checkStatus(response.body.data.totalItems);
             } else {
@@ -67,7 +69,7 @@ module.exports = function (server, options) {
             rejectUnauthorized: !api_insecure
         };
 
-        needle.request('get', api_url + '/agents', payload, options, function (error, response) {
+        needle.request('get', api_url + ':' + api_port + '/agents', payload, options, function (error, response) {
             if (!error && response.body.data.items) {
                 agentsArray = agentsArray.concat(response.body.data.items);
                 if ((payload.limit + payload.offset) < maxSize) {
@@ -140,10 +142,10 @@ module.exports = function (server, options) {
     };
 
     var getConfig = function (callback) {
-        client.search({ index: '.kibana', type: 'wazuh-configuration'})
+        client.search({ index: '.kibana', type: 'wazuh-configuration', q: 'active:true'})
             .then(function (data) {
                 if (data.hits.total == 1) {
-                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.api_url, 'insecure': data.hits.hits[0]._source.insecure });
+                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure });
                 } else {
                     callback({ 'error': 'no credentials', 'error_code': 1 });
                 }
@@ -168,7 +170,7 @@ module.exports = function (server, options) {
             server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Skipping "wazuh-monitoring-*" index pattern configuration: Already configured.');
         }
     });
-    cron.schedule('0 */01 * * * *', function () {
+    cron.schedule('0 */10 * * * *', function () {
         agentsArray.length = 0;
         getConfig(loadCredentials);
     }, true);
