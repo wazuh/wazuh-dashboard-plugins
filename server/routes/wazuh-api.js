@@ -29,7 +29,6 @@ module.exports = function (server, options) {
     var getConfig = function (callback) {
         client.search({ index: '.kibana', type: 'wazuh-configuration', q: 'active:true'})
             .then(function (data) {
-				console.log(data);
                 if (data.hits.total == 1) {
                     callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure });
                 } else {
@@ -60,7 +59,38 @@ module.exports = function (server, options) {
             });
     };
 	
-	
+    var setAPI_entry_default = function (req,reply) {
+		// Searching for previous default
+		client.search({ index: '.kibana', type: 'wazuh-configuration', q: 'active:true'})
+            .then(function (data) {
+                if (data.hits.total == 1) {
+					// Setting off previous default
+                    var idPreviousActive = data.hits.hits[0]._id;
+					client.update({ index: '.kibana', type: 'wazuh-configuration', id: idPreviousActive, body: {doc: {"active": "false"}} }).then(
+					function () {
+						reply({ 'statusCode': 200, 'message': 'ok' });
+					}, function (error) {
+						reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+					});
+					// Set new default
+					client.update({ index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
+					function () {
+						reply({ 'statusCode': 200, 'message': 'ok' });
+					}, function (error) {
+						reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+					});						
+                }
+            }, function () {
+                callback({ 'error': 'no elasticsearch', 'error_code': 2 });
+         });
+			
+		client.update({ index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
+		function () {
+			reply({ 'statusCode': 200, 'message': 'ok' });
+		}, function (error) {
+			reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+		});
+    };	
 	
     //Handlers - Test API
 
@@ -344,8 +374,8 @@ module.exports = function (server, options) {
     });
 	
     /*
-    * GET /api/wazuh-api/settings
-    * Get Wazuh-API settings from elasticsearch index
+    * GET /api/wazuh-api/apiEntries
+    * Get Wazuh-API entries list (Multimanager) from elasticsearch index
     *
     **/
     server.route({
@@ -355,14 +385,25 @@ module.exports = function (server, options) {
     });
 	
     /*
-    * GET /api/wazuh-api/settings
-    * Get Wazuh-API settings from elasticsearch index
+    * DELETE /api/wazuh-api/settings
+    * Delete Wazuh-API entry (multimanager) from elasticsearch index
     *
     **/
     server.route({
         method: 'DELETE',
         path: '/api/wazuh-api/apiEntries/{id}',
         handler: deleteAPI_entries
+    });	
+
+    /*
+    * PUT /api/wazuh-api/settings
+    * Set Wazuh-API as default (multimanager) on elasticsearch index
+    *
+    **/
+    server.route({
+        method: 'PUT',
+        path: '/api/wazuh-api/apiEntries/{id}',
+        handler: setAPI_entry_default
     });	
 	
     /*

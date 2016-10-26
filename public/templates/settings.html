@@ -21,7 +21,7 @@
   
 	<md-card layout-padding>
 	
-		<h1 flex><span class="glyphicon glyphicon-floppy-save"></span> Wazuh API settings</h1>
+		<h1 flex><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh API: Managers list</h1>
 
 		<span layout="row" layout-align="start start">
 			<p flex="40" style="font-weight: bold;">API URL</p>
@@ -38,7 +38,7 @@
 				<p flex="20" >{{entry._source.api_port}}</p>
 				<p flex="20" >{{entry._source.api_user}}</p>
 				<p flex="20" >
-					<i tooltip="Set as default Manager" class="fa fa-star" aria-hidden="true" style="font-size: 18px;"></i>
+					<i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star" aria-hidden="true" style="font-size: 18px;"></i>
 					<i tooltip="Edit settings" class="fa fa-pencil" aria-hidden="true" style="margin-left: 7px; font-size: 18px;"></i>
 					<i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash" aria-hidden="true" style="margin-left: 7px;font-size: 18px;"></i>
 				</p>

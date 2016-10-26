@@ -13,27 +13,48 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
     $scope.editConfiguration = true;
     $scope.menuNavItem = 'settings';
 	$scope.load = true;
+	$scope.currentDefault = "";
 	
 	// Remove API entry
 	
 	$scope.removeManager = function(item) {
 		var index = $scope.apiEntries.indexOf(item);
-		console.log($scope.apiEntries[index]);
-		
+		if($scope.apiEntries[index]._source.active == "true"){
+			$mdToast.show($mdToast.simple().textContent("Please set another default manager before removing this one"));
+			return;
+		}
+			
 		$http.delete("/api/wazuh-api/apiEntries/"+$scope.apiEntries[index]._id).success(function (data, status) {
 			$scope.apiEntries.splice(index, 1);   
 		}).error(function (data, status) {
 			$mdToast.show($mdToast.simple().textContent("Could not remove manager"));
-		})
-			
-	    
+		})	 
 	}
 
+	// Set manager default
+	$scope.setDefault = function(item) {
+		var index = $scope.apiEntries.indexOf(item);
+		
+		$http.put("/api/wazuh-api/apiEntries/"+$scope.apiEntries[index]._id).success(function (data, status) {
+			$scope.apiEntries[$scope.currentDefault]._source.active	= "false";
+			$scope.apiEntries[index]._source.active	= "true";
+			$scope.currentDefault = index;
+			$mdToast.show($mdToast.simple().textContent("Manager "+$scope.apiEntries[index]._source.url+" set as default"));			
+		}).error(function (data, status) {
+			$mdToast.show($mdToast.simple().textContent("Could not set that manager as default"));
+		})	 
+	}
+	
     // Get settings function
     $scope.getSettings = function () {
 			$http.get("/api/wazuh-api/apiEntries").success(function (data, status) {
 				$scope.apiEntries = data;
-				console.log(data);
+				angular.forEach($scope.apiEntries, function (value, key) {
+					if(value._source.active == "true")
+						$scope.currentDefault = key;
+						
+				});
+
 			}).error(function (data, status) {
 				$mdToast.show($mdToast.simple().textContent("Error getting API entries"));
 			})
@@ -57,7 +78,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
 			'active': activeStatus
 		};
 
-       // testConnection.test_tmp(tmpData).then(function (data) {
+        testConnection.test_tmp(tmpData).then(function (data) {
 			
 			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
 				console.log(data);
@@ -76,7 +97,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
 					$mdToast.show($mdToast.simple().textContent("Some error ocurred, could not save data in elasticsearch."));
 				}
 			})
-		//}, printTest);
+		}, printTest);
     };
 
 
