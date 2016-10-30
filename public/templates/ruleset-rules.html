@@ -5,7 +5,46 @@
 
 
   <md-virtual-repeat-container layout-align="start start" ng-if="!load" flex layout="column" layout-padding auto-size-container ng-style="autoSizeStyle">
-
+	<div layout="row" layout-align="center start" style="height: 220px; min-height: 220px;;max-height: 220px; margin-bottom: 2px; ">
+	
+		<md-card flex="25" style="margin: 0">
+			<md-card-content>
+				<span class="md-headline">Rule ID</span>
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.sidid,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))" vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+	
+		<md-card flex="25" style="margin: 0">
+			<md-card-content>
+				<span class="md-headline">Groups</span>
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))" vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		
+		<md-card flex="25" style="margin: 0">
+			<md-card-content>
+				<span class="md-headline">PCI DSS requirements</span>
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.PCI_DSS,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))" vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		
+		<md-card flex="25" style="margin: 0">
+			<md-card-content>
+				<span class="md-headline">Level</span>
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.AlertLevel,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))" vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+	</div>
+	
+	
     <div flex id="content" layout="row" layout-align="center start">
 
       <span layout="row" style="padding-left: 0px;margin-top: 6px;margin-right: 5px; " flex layout-align="space-between center">
@@ -63,25 +102,32 @@
     </md-chips>
 
 
-    <md-toolbar layout="row">
+    <md-toolbar layout="row" style="margin-top: 8px;">
       <div class="md-toolbar-tools">
-        <span flex="10" ng-click="setSort('id')">ID
+        <span flex="5" ng-click="setSort('id')">ID
           <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
         </span>
-        <span flex="60">Description</span>
-        <span flex="10" ng-click="setSort('level')">Level
+		 <span flex="10">File</span>
+		 <span flex="40">Description</span>
+		 <span flex="25">Groups</span>
+		 <span flex="15">Requirement</span>
+        
+        <span flex="5" ng-click="setSort('level')">Level
           <i class="fa" ng-class="_sort === 'level' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
         </span>
-        <span flex="20">File</span>
+       
       </div>
     </md-toolbar>
     <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
-      <md-list class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
+      <md-list ng-class-odd="'odd'" ng-class-even="'even'" class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
         <md-list-item ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''" ng-click=" showDetails[rule.id] = ! showDetails[rule.id]; ">
-          <span flex="10">{{rule.id}}</span>
-          <span flex="60">{{rule.description}}</span>
-          <span flex="10">{{rule.level}}</span>
-          <md-button md-no-ink class="invisibleButton" flex="20" ng-click="rulesApplyFilter({type: 'file', value: rule.file}); $event.stopPropagation();">{{rule.file}}</md-button>
+          <span flex="5">{{rule.id}}</span>
+		  <span flex="10">{{rule.file}}</span>
+          <span flex="40">{{rule.description}}</span>
+		  <span flex="25"><span ng-repeat="group in rule.groups">{{ group }}<span ng-if="!$last">, </span> </span></span>
+		  <span flex="15"><span ng-repeat="pci in rule.pci">{{ pci }}<span ng-if="!$last">, </span> </span></span>
+          <span flex="5">{{rule.level}}</span>
+          
         </md-list-item>
       </md-list>
       <md-list class="ruleset_rules_row_active" ng-if="showDetails[rule.id]">
@@ -111,7 +157,7 @@
         </md-list-item>
 
       </md-list>
-      <md-divider></md-divider>
+      
     </div>
   </md-virtual-repeat-container>
 
