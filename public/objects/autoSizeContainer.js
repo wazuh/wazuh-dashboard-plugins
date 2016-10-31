@@ -12,7 +12,7 @@ require('ui/modules').get('app/wazuh', [])
                 var elTop = $element.offset().top;
                 var remaining = winBottom - elTop - 10;
 
-                $scope.autoSizeStyle = {'height': remaining+'px'};
+                $scope.autoSizeStyle = {'height': remaining-200+'px'};
             }
         }
     });
