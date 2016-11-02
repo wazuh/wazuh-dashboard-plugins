@@ -1,11 +1,13 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window) {
+app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window, $document) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
     $scope.$parent.state.setManagerState('ruleset');
 	$scope.setRulesTab('rules');
+	$scope.ruleActive = false;
+	$scope.extraInfo = false;
 	
     $scope.search = undefined;
 	
@@ -35,9 +37,16 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 
     //Functions
 
+
 	$scope.openDiscover = function (template, filter) {
         $scope.state.setDiscoverState(template, filter);
 		$window.location.href = '#/discover/';
+    }
+	
+	$scope.loadRule = function (rule) {
+        console.log("loadRule");
+		$scope.ruleActiveArray = rule;
+		$scope.ruleActive = true;
     }
 	
     $scope.setSort = function (field) {
@@ -177,6 +186,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
             if ($scope._rules_blocked) {
                 return null;
             }
+			
             var _pos = index - DataFactory.getOffset(objectsArray['/rules']);
             if (DataFactory.filters.flag(objectsArray['/rules'])) {
                 $scope._rules_blocked = true;

@@ -181,7 +181,6 @@ require('ui/modules').get('app/wazuh', [])
         });
 		
         $scope.$listen($state, 'fetch_with_changes', function (keys) {
-		console.log("hey");
           let $state = $scope.$state = (function initState() {
             $route.current.params._a = $scope.visA;
             $route.updateParams({ '_a': $scope.visA });
