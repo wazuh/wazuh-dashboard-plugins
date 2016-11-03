@@ -44,7 +44,6 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
     }
 	
 	$scope.loadRule = function (rule) {
-        console.log("loadRule");
 		$scope.ruleActiveArray = rule;
 		$scope.ruleActive = true;
     }
@@ -73,15 +72,19 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
         if (filterObj.type == 'file') {
             _file = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'file', filterObj.value);
+            $scope.ruleActive = false;
         } else if (filterObj.type == 'group') {
             _group = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'group', filterObj.value);
+            $scope.ruleActive = false;
         } else if (filterObj.type == 'pci') {
             _pci = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'pci', filterObj.value);
+            $scope.ruleActive = false;
         } else if (filterObj.type == 'search') {
             _search = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'search', filterObj.value);
+            $scope.ruleActive = false;
         }
     };
 
