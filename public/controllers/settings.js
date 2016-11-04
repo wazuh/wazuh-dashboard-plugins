@@ -14,6 +14,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
     $scope.menuNavItem = 'settings';
 	$scope.load = true;
 	$scope.currentDefault = "";
+	$scope.managerAPI = "";
 	
 	// Remove API entry
 	
@@ -74,14 +75,16 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
 			'password': base64.encode($scope.formData.password),
 			'url': $scope.formData.url,
 			'port': $scope.formData.port,
+			'manager': "",
 			'insecure': "true",
 			'active': activeStatus
 		};
 
         testConnection.test_tmp(tmpData).then(function (data) {
-			
+			// API Check correct, get Manager name
+			tmpData.manager = data;
+			// Insert new API entry
 			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
-				console.log(data);
 				var newEntry = {'_id': data.response._id, _source: { active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } };
 				$scope.apiEntries.push(newEntry);
 				$mdToast.show($mdToast.simple().textContent('Successfully added'));

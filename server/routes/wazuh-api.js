@@ -30,7 +30,7 @@ module.exports = function (server, options) {
         client.search({ index: '.kibana', type: 'wazuh-configuration', q: 'active:true'})
             .then(function (data) {
                 if (data.hits.total == 1) {
-                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure });
+                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'manager': data.hits.hits[0]._source.manager });
                 } else {
                     callback({ 'error': 'no credentials', 'error_code': 1 });
                 }
@@ -112,7 +112,7 @@ module.exports = function (server, options) {
 
     var testApiAux1 = function (error, response, wapi_config, needle, callback) {
         if (!error && response && response.body.data && checkVersion(response.body.data)) {
-            callback({ 'statusCode': 200, 'data': 'ok' });
+            callback({ 'statusCode': 200, 'data': 'ok', 'manager' : wapi_config.manager});
         } else if (response && response.statusCode == 401) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'unauthorized' });
         } else if (!error && response && (!response.body.data || !checkVersion(response.body.data)) ) {
@@ -175,7 +175,14 @@ module.exports = function (server, options) {
             } else {
                 needle.request('get', req.payload.url+":"+req.payload.port+'/version', {}, { username: req.payload.user, password: req.payload.password }, function (error, response) {
                     testApiAux1(error, response, req.payload, needle, function (test_result) {
-                        reply(test_result);
+						if(test_result.data == "ok"){
+							needle.request('get', req.payload.url+":"+req.payload.port+'/agents/000', {}, { username: req.payload.user, password: req.payload.password }, function (error, response) {
+								reply(response.body.data.name);
+								reply(test_result);
+							});
+						}else{
+							reply(test_result);
+						}
                     });
                 });
             }
@@ -184,6 +191,7 @@ module.exports = function (server, options) {
 
     };
 	
+
     //Handlers - Route request
 
     var errorControl = function (error, response) {
@@ -252,7 +260,7 @@ module.exports = function (server, options) {
             reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
             return;
         }
-		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active};
+		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'manager' : req.payload.manager};
         client.index({ index: '.kibana', type: 'wazuh-configuration', body: settings, refresh: true })
             .then(function (response) {
                 reply({ 'statusCode': 200, 'message': 'ok', 'response' : response });
@@ -268,7 +276,7 @@ module.exports = function (server, options) {
             reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
             return;
         }
-		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API'};
+		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'manager' : req.payload.manager};
                
 		client.update({ index: '.kibana', type: 'wazuh-configuration', id: '1', body: {doc: settings} })
 			.then(function () {

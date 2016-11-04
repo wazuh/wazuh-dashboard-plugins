@@ -25,8 +25,6 @@ require('ui/modules').get('app/wazuh', [])
 
                 $http.post("/api/wazuh-api/test", data)
                     .success(function (data) {
-						console.log("3");
-						console.log(data);
                         if (data.error) {
                             defered.reject(data);
                         } else {

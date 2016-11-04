@@ -2,9 +2,11 @@
 var routes = require('ui/routes');
 
 //Installation wizard
-var settingsWizard = function ($location, testConnection, $mdToast) {
+var settingsWizard = function ($location, testConnection, $mdToast, appState) {
     testConnection.test()
-        .then(function () { }, function (data) {
+        .then(function (data) {
+			appState.setDefaultManager(data.manager);
+		}, function (data) {
             $mdToast.show({
                 template: '<md-toast>Could not connect with Wazuh API. Please, configure it on settings tab.</md-toast>',
                 position: 'bottom left',

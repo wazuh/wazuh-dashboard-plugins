@@ -54,6 +54,14 @@ require('ui/modules').get('app/wazuh', [])
                 if (subtab) {
                     $cookies.putObject('_overviewState', subtab);
                 }
+            },
+			getDefaultManager: function () {
+                return { name: $cookies.getObject('_defaultManager')};
+            },
+            setDefaultManager: function (name) {
+                if (name) {
+                    $cookies.putObject('_defaultManager', name);
+                }
             }
         };
     });

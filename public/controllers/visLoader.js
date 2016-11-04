@@ -79,14 +79,15 @@ var app = require('ui/modules').get('app/wazuh', [])
   }]);
 
 require('ui/modules').get('app/wazuh', [])
-  .controller('VisEditorW', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
+  .controller('VisEditorW', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
     $scope.v = {};
-    $scope.v.filter = $scope.visFilter;
     $scope.chrome = {};
     $scope.chrome.getVisible = function () {
       return true;
     }
-
+	$scope.defaultManager = appState.getDefaultManager().name;
+	$scope.v.filter = $scope.visFilter + " AND host: " + $scope.defaultManager;
+	
     var renderVis = function () {
 
       const visTypes = Private(RegistryVisTypesProvider);
