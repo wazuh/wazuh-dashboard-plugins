@@ -39,6 +39,7 @@ import uiModules from 'ui/modules';
 import indexTemplate from 'plugins/wazuh/templates/directives/dis-template.html';
 import StateProvider from 'ui/state_management/state';
 
+
 import 'plugins/kibana/discover/saved_searches/saved_searches';
 import 'plugins/kibana/discover/directives/no_results';
 import 'plugins/kibana/discover/directives/timechart';
@@ -46,6 +47,7 @@ import 'ui/collapsible_sidebar';
 import 'plugins/kibana/discover/components/field_chooser/field_chooser';
 import 'plugins/kibana/discover/styles/main.less';
 import 'ui/doc_table/components/table_row';
+
 import savedObjectRegistry from 'ui/saved_objects/saved_object_registry';
 savedObjectRegistry.register(require('plugins/kibana/discover/saved_searches/saved_search_register'));
 
@@ -95,6 +97,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
     location: '*'
   });
 
+	
   $route.requireDefaultIndex = true;
   $route.template = $route.indexTemplate;
   $route.reloadOnSearch = false;
@@ -447,6 +450,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             });
 
             segmented.on('complete', function () {
+			  
               if ($scope.fetchStatus.hitCount === 0) {
                 flushResponseData();
               }
