@@ -56,7 +56,11 @@ require('ui/modules').get('app/wazuh', [])
                 }
             },
 			getDefaultManager: function () {
-                return { name: $cookies.getObject('_defaultManager')};
+				if($cookies.getObject('_defaultManager'))
+					return { name: $cookies.getObject('_defaultManager')};
+				else
+					return { name: "*"};
+				
             },
             setDefaultManager: function (name) {
                 if (name) {

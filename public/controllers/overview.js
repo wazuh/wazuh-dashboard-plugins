@@ -4,7 +4,6 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setOverviewState('general');
-
     $scope.stats = [];
 
     //Print Error

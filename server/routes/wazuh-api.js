@@ -178,7 +178,6 @@ module.exports = function (server, options) {
 						if(test_result.data == "ok"){
 							needle.request('get', req.payload.url+":"+req.payload.port+'/agents/000', {}, { username: req.payload.user, password: req.payload.password }, function (error, response) {
 								reply(response.body.data.name);
-								reply(test_result);
 							});
 						}else{
 							reply(test_result);

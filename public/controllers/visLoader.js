@@ -85,8 +85,8 @@ require('ui/modules').get('app/wazuh', [])
     $scope.chrome.getVisible = function () {
       return true;
     }
-	$scope.defaultManager = appState.getDefaultManager().name;
-	$scope.v.filter = $scope.visFilter + " AND host: " + $scope.defaultManager;
+	$scope.defaultManagerName = appState.getDefaultManager().name;
+	$scope.v.filter = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
 	
     var renderVis = function () {
 

@@ -3,7 +3,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 // Require utils
 var base64 = require('plugins/wazuh/utils/base64.js');
 
-app.controller('settingsController', function ($scope, $http, testConnection, $mdToast) {
+app.controller('settingsController', function ($scope, $http, testConnection, appState, $mdToast) {
 
     $scope.formData = {};
     $scope.formData.user = "";
@@ -35,8 +35,8 @@ app.controller('settingsController', function ($scope, $http, testConnection, $m
 	// Set manager default
 	$scope.setDefault = function(item) {
 		var index = $scope.apiEntries.indexOf(item);
-		
 		$http.put("/api/wazuh-api/apiEntries/"+$scope.apiEntries[index]._id).success(function (data, status) {
+			appState.setDefaultManager($scope.apiEntries[index]._source.manager);
 			$scope.apiEntries[$scope.currentDefault]._source.active	= "false";
 			$scope.apiEntries[index]._source.active	= "true";
 			$scope.currentDefault = index;
