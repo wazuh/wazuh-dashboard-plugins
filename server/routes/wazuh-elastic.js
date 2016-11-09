@@ -33,10 +33,11 @@ module.exports = function (server, options) {
 
 		var payload = JSON.parse(JSON.stringify(payloads.getFieldTop));
 		
-		
         if (filtering) {
-            payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue;
-        }
+            payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND host: " + req.params.manager;
+        }else{
+            payload.query.bool.must[0].query_string.query = "host: " + req.params.manager;
+		}
 
         payload.query.bool.must[1].range['@timestamp'].gte = timeAgo;
         payload.aggs['2'].terms.field = req.params.field;
@@ -62,15 +63,20 @@ module.exports = function (server, options) {
             filtering = true;
 
 		var payload = JSON.parse(JSON.stringify(payloads.getLastField));
-
+		payload.query.bool.must[0].exists.field = req.params.field;
+		
+		filterArray["host"] = req.params.manager;
+		termArray = { "term": filterArray };
+		payload.query.bool.must.push(termArray);
+		filterArray = {};
+		termArray = {};			
+			
         if (filtering) {
             filterArray[req.params.fieldFilter] = req.params.fieldValue;
             termArray = { "term": filterArray };
             payload.query.bool.must.push(termArray);	
         }
-
-        payload.query.bool.must[0].exists.field = req.params.field;
-
+		
         fetchElastic(payload).then(function (data) {
 			
             if (data.hits.total == 0 || typeof data.hits.hits[0] === 'undefined')
@@ -161,7 +167,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/top/{field}/{time?}',
+        path: '/api/wazuh-elastic/top/{manager}/{field}/{time?}',
         handler: getFieldTop
     });
 
@@ -172,7 +178,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/top/{field}/{time}/{fieldFilter}/{fieldValue}',
+        path: '/api/wazuh-elastic/top/{manager}/{field}/{time}/{fieldFilter}/{fieldValue}',
         handler: getFieldTop
     });
 
@@ -183,7 +189,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/last/{field}',
+        path: '/api/wazuh-elastic/last/{manager}/{field}',
         handler: getLastField
     });
     /*
@@ -195,7 +201,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/last/{field}/{fieldFilter}/{fieldValue}',
+        path: '/api/wazuh-elastic/last/{manager}/{field}/{fieldFilter}/{fieldValue}',
         handler: getLastField
     });
 };

@@ -4,6 +4,7 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setOverviewState('general');
+	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
     $scope.stats = [];
 
     //Print Error
@@ -36,19 +37,19 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
         var date = new Date();
         date.setDate(date.getDate() - daysAgo);
         var timeAgo = date.getTime();
-        genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/' + timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/srcuser/' + timeAgo)
             .then(function (data) {
                 $scope.topsrcuser = (data.data != "") ? data.data : "(no data)";
             }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/srcip/' + timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/srcip/' + timeAgo)
             .then(function (data) {
                 $scope.topsrcip = (data.data != "") ? data.data : "(no data)";
             }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/' + timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/' + timeAgo)
             .then(function (data) {
                 $scope.topgroup = (data.data != "") ? data.data : "(no data)";
             }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/' + timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.PCI_DSS/' + timeAgo)
             .then(function (data) {
                 $scope.toppci = (data.data != "") ? data.data : "(no data)";
             }, printError);
@@ -89,7 +90,7 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setOverviewState('fim');
-
+	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
     $scope.stats = [];
 
     //Print Error
@@ -125,36 +126,36 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
         var timeAgo = date.getTime();
         
         // Top fields
-        genericReq.request('GET', '/api/wazuh-elastic/top/AgentName/'+timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName/'+timeAgo)
             .then(function (data) {
                 $scope.topagent = (data.data != "") ? data.data : "(no data)";
             }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/SyscheckFile.perm_before/'+timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/SyscheckFile.perm_before/'+timeAgo)
             .then(function (data) {
                 $scope.toppermissions = (data.data != "") ? data.data : "(no data)";
             }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/' + timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.PCI_DSS/' + timeAgo)
             .then(function (data) {
                 $scope.toppci = (data.data != "") ? data.data : "(no data)";
             }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/SyscheckFile.path/' + timeAgo + '/location/syscheck')
+		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/SyscheckFile.path/' + timeAgo + '/location/syscheck')
             .then(function (data) {
                 $scope.topfile = (data.data != "") ? data.data : "(no data)";
             }, printError);	
             
         // Last fields
 
-        genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/modified')
+        genericReq.request('GET', '/api/wazuh-elastic/last/'+$scope.defaultManager+'/SyscheckFile/SyscheckFile.event/modified')
             .then(function (data) {
                 $scope.last_file_changed = (data.data != "") ? data.data.path : "(no data)";
         }, printError);
         
-        genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/added')
+        genericReq.request('GET', '/api/wazuh-elastic/last/'+$scope.defaultManager+'/SyscheckFile/SyscheckFile.event/added')
         .then(function (data) {
                 $scope.last_file_added = (data.data != "") ? data.data.path : "(no data)";
         }, printError);
         
-        genericReq.request('GET', '/api/wazuh-elastic/last/SyscheckFile/SyscheckFile.event/deleted')
+        genericReq.request('GET', '/api/wazuh-elastic/last/'+$scope.defaultManager+'/SyscheckFile/SyscheckFile.event/deleted')
         .then(function (data) {
                 $scope.last_file_deleted = (data.data != "") ? data.data.path : "(no data)";
         }, printError);
@@ -195,7 +196,7 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setOverviewState('pm');
-
+	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
     $scope.stats = [];
 
     //Print Error
@@ -231,7 +232,7 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
         var timeAgo = date.getTime();
         
         // Top fields
-        genericReq.request('GET', '/api/wazuh-elastic/top/AgentName/'+timeAgo)
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName/'+timeAgo)
             .then(function (data) {
                 $scope.topagent = data.data;
             }, printError);
@@ -239,22 +240,22 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
             
         // Last fields
 
-        genericReq.request('GET', '/api/wazuh-elastic/last/title/location/rootcheck')
+        genericReq.request('GET', '/api/wazuh-elastic/last/'+$scope.defaultManager+'/title/location/rootcheck')
             .then(function (data) {
                 $scope.lastEventTitle = (data.data != "") ? data.data : "(no data)";
         }, printError);
 		
-		genericReq.request('GET', '/api/wazuh-elastic/last/AgentName/location/rootcheck')
+		genericReq.request('GET', '/api/wazuh-elastic/last/'+$scope.defaultManager+'/AgentName/location/rootcheck')
             .then(function (data) {
                 $scope.lastEventAgentName = (data.data != "") ? data.data : "(no data)";
         }, printError);
 		
-		genericReq.request('GET', '/api/wazuh-elastic/last/AgentID/location/rootcheck')
+		genericReq.request('GET', '/api/wazuh-elastic/last/'+$scope.defaultManager+'/AgentID/location/rootcheck')
             .then(function (data) {
                 $scope.lastEventAgentID = (data.data != "") ? data.data : "";
         }, printError);
 		
-		genericReq.request('GET', '/api/wazuh-elastic/last/AgentIP/location/rootcheck')
+		genericReq.request('GET', '/api/wazuh-elastic/last/'+$scope.defaultManager+'/AgentIP/location/rootcheck')
             .then(function (data) {
                 $scope.lastEventAgentIP = (data.data != "") ? data.data : "";
         }, printError);
