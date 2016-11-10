@@ -4,30 +4,30 @@
         <md-virtual-repeat-container auto-size-container ng-style="autoSizeStyle" ng-if="!load">
             <div flex layout="column" layout-align="space-between stretch">
 				<div layout="row" layout-align="space-between stretch">
-					<md-card flex layout="column" style="margin-left: 0px;">
+					<md-card flex class="cardHover" layout="column" style="margin-left: 0px;" ng-click="applyAgent(lastAgent)">
 						<md-card-content style="text-align: center;">
-							<div class="metric-value ng-binding" style="font-size: 19pt;">{{lastAgent}}</div>
+							<div class="metric-value ng-binding" style="font-size: 16pt;">{{lastAgent.name}}</div>
 							<div class="ng-binding">Last registered agent</div>
 						</md-card-content>
 					</md-card>
 					
-					<md-card flex layout="column">
-						<md-card-content style="text-align: center;">
-							<div class="metric-value ng-binding" style="font-size: 19pt;">{{mostActiveAgent}}</div>
+					<md-card flex layout="column" class="cardHover">
+						<md-card-content style="text-align: center;" ng-click="applyAgent(mostActiveAgent)">
+							<div class="metric-value ng-binding" style="font-size: 16pt;">{{mostActiveAgent.name}}</div>
 							<div class="ng-binding">Most active agent</div>
 						</md-card-content>
 					</md-card>
 					
 					<md-card flex layout="column">
 						<md-card-content style="text-align: center;">
-							<div class="metric-value ng-binding" style="font-size: 19pt;">{{agentsCountActive}}</div>
+							<div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountActive}}</div>
 							<div class="ng-binding">Active agents</div>
 						</md-card-content>
 					</md-card>
 					
 					<md-card flex layout="column"  style="margin-right: 0px;">
 						<md-card-content style="text-align: center;">
-							<div class="metric-value ng-binding" style="font-size: 19pt;">{{(agentsCoverity | number:2)}}%</div>
+							<div class="metric-value ng-binding" style="font-size: 16pt;">{{(agentsCoverity | number:2)}}%</div>
 							<div class="ng-binding">Agents coverage</div>
 						</md-card-content>
 					</md-card>

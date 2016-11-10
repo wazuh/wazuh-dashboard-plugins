@@ -66,6 +66,7 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
         }
     };
 	
+	
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
 		$window.location.href = '#/dashboards/';

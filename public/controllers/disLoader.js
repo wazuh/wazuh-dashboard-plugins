@@ -86,7 +86,8 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches, appState) {
 
   $scope.defaultManagerName = appState.getDefaultManager().name;
-  $scope.stateQuery = $scope.disFilter + " AND host: " + $scope.defaultManagerName;
+  //$scope.stateQuery = $scope.disFilter + " AND host: " + $scope.defaultManagerName;
+  $scope.stateQuery = $scope.disFilter;
   
   $scope.chrome = {};
   $scope.chrome.getVisible = function () {

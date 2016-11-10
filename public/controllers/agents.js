@@ -102,7 +102,8 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';
-
+	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
+	$scope.mostActiveAgent = {"name" : "", "id" : ""};
     $scope.submenuNavItem = "preview";
 
     var objectsArray = [];
@@ -209,16 +210,26 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
             .then(function (data) {
                 DataFactory.getAndClean('get', '/agents/' + data.data.items[0].id, {})
                     .then(function (data) {
-                        $scope.lastAgent = data.data.name;
+                        $scope.lastAgent = data.data;
                     }, printError);
             }, printError);	
 			
+		// Tops
 		var date = new Date();
         date.setDate(date.getDate() - 1);
         var timeAgo = date.getTime();
-        genericReq.request('GET', '/api/wazuh-elastic/top/AgentName')
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName')
             .then(function (data) {
-                $scope.mostActiveAgent = data.data;
+				$scope.mostActiveAgent.name = data.data;
+				genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentID')
+				.then(function (data) {
+					if(data.data == "" && $scope.mostActiveAgent.name != ""){
+						$scope.mostActiveAgent.id = "000";
+					}else{
+						$scope.mostActiveAgent.id = data.data;
+					}
+								
+				}, printError);	
             }, printError);	
 			
 		DataFactory.getAndClean('get', '/agents/summary', {})
