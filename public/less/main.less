@@ -1,7 +1,6 @@
 body{
-   min-width:1024px; 
-   width: auto !important;  
-   width:1024px;
+   min-width:1024px;  
+   width:100%;
 }
 
 
@@ -291,39 +290,7 @@ md-nav-bar {
     padding-top: 0px !important;
 }
 
-/* noClickVis: Make visualizations not clickable*/
-.noClickVis visualize-legend .legend-value .legend-value-details {
-    visibility: hidden;
-    width: 0px;
-    height: 0px;
-    border: 0px;
-    padding: 0px;
-    display: none;
-}
-.noClickVis .legend-value-title {
-    cursor: default;
-}
-.noClickVis .legend-value {
-    opacity: 1 !important;
-}
-.noClickVis .legend-value:hover {
-    background-color: #fff !important;
-}
-.noClickVis .legend-value-full {
-    background-color: #fff !important;
-}
-.noClickVis .table-condensed .fa-search {
-    font-size: 0;
-}
-.noClickVis .table-condensed tbody td {
-    cursor: default;
-}
-.noClickVis .table-condensed tbody td:hover {
-    background-color: #fff !important;
-}
-.noClickVis .table-condensed tbody .cell-hover {
-    background-color: #fff !important;
-}
+
 
 md-select-menu:not(._md-overflow) md-content {
 	padding-top: 0px !important; 
@@ -590,7 +557,48 @@ a.pull-right {
 	visibility: hidden;
 }
 
+md-content._md.layout-row {
+	overflow-x: hidden;
+}
+md-content#agents-fim navbar {
+	background-color: white;
+}
 
 
 
 
+/* TMP 
+
+.noClickVis visualize-legend .legend-value .legend-value-details {
+    visibility: hidden;
+    width: 0px;
+    height: 0px;
+    border: 0px;
+    padding: 0px;
+    display: none;
+}
+.noClickVis .legend-value-title {
+    cursor: default;
+}
+.noClickVis .legend-value {
+    opacity: 1 !important;
+}
+.noClickVis .legend-value:hover {
+    background-color: #fff !important;
+}
+.noClickVis .legend-value-full {
+    background-color: #fff !important;
+}
+.noClickVis .table-condensed .fa-search {
+    font-size: 0;
+}
+.noClickVis .table-condensed tbody td {
+    cursor: default;
+}
+.noClickVis .table-condensed tbody td:hover {
+    background-color: #fff !important;
+}
+.noClickVis .table-condensed tbody .cell-hover {
+    background-color: #fff !important;
+}
+*/

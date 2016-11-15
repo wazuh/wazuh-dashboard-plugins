@@ -87,6 +87,8 @@ require('ui/modules').get('app/wazuh', [])
     }
 	$scope.defaultManagerName = appState.getDefaultManager().name;
 	$scope.v.filter = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
+
+	
 	
     var renderVis = function () {
 
@@ -108,7 +110,7 @@ require('ui/modules').get('app/wazuh', [])
 	
     renderVis().then(function (_sVis) {
       $scope._loadVisAsync = true;
-		
+	  const queryFilter = Private(FilterBarQueryFilterProvider);	
       const savedVis = _sVis;
 
       const vis = savedVis.vis;
@@ -128,35 +130,79 @@ require('ui/modules').get('app/wazuh', [])
       }];
 
 
+	  const matchQueryFilter = function (filter) {
+                    return filter.query && filter.query.query_string && !filter.meta;
+       };
+	   
+	   const extractQueryFromFilters = function (filters) {
+                    const filter = _.find(filters, matchQueryFilter);
+                    if (filter) return filter.query;
+                };
+				
       let $state = $scope.$state = (function initState() {
+		console.log("First state");
+		$scope.previousRoute = $route.current.params._a; 
+		
         $route.current.params._a = $scope.visA;
         $route.updateParams({ '_a': $scope.visA });
         $route.current.params._g = $scope.visG;
         $route.updateParams({ '_g': $scope.visG });
+		
         const stateDefaults = {
           uiState: {},
           linked: false,
           query: $scope.visFilter ? $scope.visFilter : { query_string: { analyze_wildcard: '!t', query: '*' } },
-          filters: [],
+          filters: _.reject(searchSource.getOwn('filter'), matchQueryFilter),
           vis: {}
         };
 
         $state = new AppState(stateDefaults);
-
+		$route.updateParams({ '_a': $scope.previousRoute });
+		$route.current.params._a = $scope.previousRoute
+		console.log($state);
         return $state;
       } ());
 
-      $scope.state = $state;
-
+      $scope.state = $state;	
+				
       $scope.$watch("visG", function () {	  
         //This gets called when data changes.
         $route.current.params._g = $scope.visG;
         $route.updateParams({ '_g': $scope.visG });
+		console.log("Watch VISG");
         $state.emit('fetch_with_changes');
 		//init();
       });
 
+	  
+		 function updateQueryOnRootSource() {
+			const filters = queryFilter.getFilters();
+			if ($state.query) {
+				searchSource.set('filter', _.union(filters, [{
+					query: $state.query
+				}]));
+			} else {
+				searchSource.set('filter', filters);
+			}
+		}
+
+
+		// update root source when filters update
+		$scope.$listen(queryFilter, 'update', function () {
+			//updateQueryOnRootSource();
+			//$state.save();
+			console.log("queryFilter changed!");
+			console.log(queryFilter);
+			
+		});
+
+		// update data when filters fire fetch event
+		$scope.$listen(queryFilter, 'fetch', $scope, function () {
+			console.log("queryFilter changed!");
+		});
+				
       function init() {
+		  console.log("Vis INIT 1");
         // export some objects
         $scope.savedVis = savedVis;
         $scope.searchSource = searchSource;
@@ -181,12 +227,24 @@ require('ui/modules').get('app/wazuh', [])
 		  
         });
 		
+		$scope.$on('searchFilterChanged', function (event, data) {
+		  console.log(data); // 'Data to send'
+		  //$scope.visFilter = data.stateQuery.query_string.query;
+		  
+		});
+		
+		
         $scope.$listen($state, 'fetch_with_changes', function (keys) {
+		console.log("Vis fetch_with_changes");
           let $state = $scope.$state = (function initState() {
+			$scope.previousRoute = $route.current.params._a;
+			
             $route.current.params._a = $scope.visA;
             $route.updateParams({ '_a': $scope.visA });
             $route.current.params._g = $scope.visG;
             $route.updateParams({ '_g': $scope.visG });
+			
+			
             const stateDefaults = {
               uiState: {},
               linked: false,
@@ -195,7 +253,12 @@ require('ui/modules').get('app/wazuh', [])
               vis: {}
             };
             $state = new AppState(stateDefaults);
+			
+			$route.updateParams({ '_a': $scope.previousRoute });
+			$route.current.params._a = $scope.previousRoute
 
+			
+			
             return $state;
           } ());
 
@@ -227,17 +290,24 @@ require('ui/modules').get('app/wazuh', [])
         });
 
         $scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
+		
+        //$scope.$listen(queryFilter.getFilters(), 'fetch', _.bindKey($scope, 'fetch'));
 			
+		
 	
         $scope.$on('$destroy', function () {
           savedVis.destroy();
         });
 		
+				
       }
 
       $scope.fetch = function () {
-        const queryFilter = Private(FilterBarQueryFilterProvider);
+		 console.log("Fetch VIS 1");
+		 console.log(timefilter);
+        
         if ($scope.visClickable) searchSource.set('filter', queryFilter.getFilters());
+		console.log(queryFilter.getFilters());
         if (!$state.linked) searchSource.set('query', $scope.v.filter);
         if ($scope.vis.type.requiresSearch) {
           courier.fetch();
@@ -253,7 +323,7 @@ require('ui/modules').get('app/wazuh', [])
           editableVis.dirty = false;
           $state.vis = full;
           $state.save();
-
+			console.log("Vis transferVisState");
           if (stage) $scope.fetch();
         };
       }

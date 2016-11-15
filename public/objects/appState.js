@@ -66,6 +66,18 @@ require('ui/modules').get('app/wazuh', [])
                 if (name) {
                     $cookies.putObject('_defaultManager', name);
                 }
+            },
+			getDisState: function (tab) {
+				if($cookies.getObject(tab))
+					return { value: $cookies.getObject(tab)};
+				else
+					return { value: "*"};
+				
+            },
+            setDisState: function (tab,value) {
+                if (tab && value) {
+                    $cookies.putObject(tab, value);
+                }
             }
         };
     });

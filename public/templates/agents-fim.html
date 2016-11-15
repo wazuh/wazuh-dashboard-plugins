@@ -1,46 +1,176 @@
-<md-content ng-if="submenuNavItem == 'fim'" ng-if="_agent" class="md-padding">
+<md-content ng-if="submenuNavItem == 'fim'" ng-if="_agent" id="agents-fim">
     <div flex ng-controller="fimController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-            <md-content layout="row">
-                <md-card flex="40">
+			<md-content layout="row">
+				<md-card flex>
+					
+					<kbn-top-nav name="discover" config="topNavMenu">
+						<div class="kibana-nav-info">
+							<span ng-show="opts.savedSearch.id" class="kibana-nav-info-title">
+								<span ng-bind="::opts.savedSearch.title"></span>
+								<i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>
+							</span>
+
+							<strong class="discover-info-hits">{{(hits || 0) | number:0}}</strong>
+							<ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
+						</div>
+					</kbn-top-nav>
+					<navbar name="discover-search">
+						<form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
+							<div class="typeahead" kbn-typeahead="discover">
+								<div class="input-group"
+								ng-class="discoverSearch.$invalid ? 'has-error' : ''">
+									<input
+									parse-query
+									input-focus
+									kbn-typeahead-input
+									ng-model="stateQuery"
+									placeholder="Search..."
+									aria-label="Search input"
+									type="text"
+									class="form-control">
+									<button type="submit" ng-disabled="discoverSearch.$invalid" aria-label="Search">
+									<span aria-hidden="true" class="fa fa-search"></span></button>
+								</div>
+								<kbn-typeahead-items></kbn-typeahead-items>
+							</div>
+						</form>
+						<div class="button-group" role="toolbar"></div>
+					</navbar>
+
+
+					<div class="container-fluid" role="main" style="width: 100%; ">
+						<div class="row">
+						<filter-bar state="state"></filter-bar>
+						</div>
+					</div>
+					
+					 <!-- result -->
+					<div class="discover-content">
+						<div class="results" ng-show="resultState === 'ready'">
+							<div class="discover-timechart" ng-if="opts.timefield" ng-show="true">
+								<header>
+									<center class="small">
+										<span tooltip="To change the time, click the clock icon in the navigation bar">{{timeRange.from | moment}} - {{timeRange.to | moment}}</span>                  &mdash;
+
+										<span class="results-interval" ng-hide="showInterval">
+											<a
+											ng-click="toggleInterval()">
+											{{ intervalName }}
+											</a>
+										</span>
+
+										<span ng-show="showInterval" class="results-interval form-inline">
+											<select
+											class="form-control"
+											ng-model="state.interval"
+											ng-options="interval.val as interval.display for interval in intervalOptions | filter: intervalEnabled"
+											>
+											</select>
+										</span>
+									</center>
+
+								</header>
+
+								<visualize ng-if="vis && rows.length != 0" vis="vis" ui-state="uiState" es-resp="mergedEsResp" search-source="searchSource">
+								</visualize>
+							</div>
+						</div>
+					</div>
+				</md-card>
+				 
+			</md-content>
+				
+				<md-content layout="row">
+				<md-card flex>
                     <md-card-title>
                         <md-card-title-text>
-                            <span class="md-headline">Events</span>
+                            <span class="md-headline">Files modified</span>
                         </md-card-title-text>
                     </md-card-title>
                     <md-card-content>
-                        <kbn-vis vis-height="100px" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20syscheck')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="location: syscheck AND {{'AgentName:'+_agent.name}}">
+                        <kbn-vis vis-searchable="true" vis-clickable="true"  vis-height="500px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+							vis-filter='*'>
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
-                <md-card flex="30">
+				</md-content>
+				
+            <md-content layout="row">
+                <md-card flex="20">
                     <md-card-title>
                         <md-card-title-text>
-                            <span class="md-headline">Top users</span>
+                            <span class="md-headline">Users</span>
                         </md-card-title-text>
                     </md-card-title>
                     <md-card-content>
-                        <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                        <kbn-vis vis-height="100px" vis-type="histogram" vis-index-pattern="ossec-*"
+						vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
+						
+                        vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+					    vis-filter="location: syscheck AND {{'AgentName:'+_agent.name}}">
+                        </kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="20">
+                    <md-card-title>
+                        <md-card-title-text>
+                            <span class="md-headline">Groups</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                    <md-card-content>
+                        <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" 
+							vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.gname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
                             vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="location: syscheck AND {{'AgentName:'+_agent.name}}">
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
 
-                <md-card flex="30">
+                <md-card flex="20">
                     <md-card-title>
                         <md-card-title-text>
-                            <span class="md-headline">Top files</span>
+                            <span class="md-headline">Files added</span>
                         </md-card-title-text>
                     </md-card-title>
                     <md-card-content>
                         <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="location: syscheck AND {{'AgentName:'+_agent.name}}">
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+							vis-filter='rule.sidid: 554 AND AgentName: {{_agent.name}} NOT location: syscheck-registry'>
+                        </kbn-vis>
+                    </md-card-content>
+                </md-card>
+				
+				<md-card flex="20">
+                    <md-card-title>
+                        <md-card-title-text>
+                            <span class="md-headline">Files modified</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                    <md-card-content>
+                        <kbn-vis vis-searchable="true" vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+							vis-filter='(rule.sidid: 550 OR rule.sidid: 551 OR rule.sidid: 552 OR rule.sidid: 555) AND AgentName: {{_agent.name}} NOT location: syscheck-registry'>
+                        </kbn-vis>
+                    </md-card-content>
+                </md-card>
+				
+				<md-card flex="20">
+                    <md-card-title>
+                        <md-card-title-text>
+                            <span class="md-headline">Files deleted</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                    <md-card-content> 
+                        <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
+							vis-filter='rule.sidid: 553 AND AgentName: {{_agent.name}} NOT location: syscheck-registry'>
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
             </md-content>
+			
             <div layout="row" layout-align="space-between stretch" ng-show="false">
                     <md-input-container layout="row" class="sideNavBox" flex="40">
                         <label for="searchBox">Search</label>
@@ -66,21 +196,44 @@
                     </md-input-container>
                </div>
 				
-                 <div layout="row" layout-align="space-between stretch">
-					<md-card flex="100">
-					<md-card-title>
-                        <md-card-title-text>
-                            <span class="md-headline">Last events</span>
-                        </md-card-title-text>
-                    </md-card-title>
-					<kbn-dis table-height="600px" dis-a="(columns:!(SyscheckFile.path,SyscheckFile.event,SyscheckFile.uname_after,SyscheckFile.gname_after,full_log),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'location:%20syscheck')),sort:!('@timestamp',desc))"
-					dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
-					dis-filter="location: syscheck AND {{'AgentName:'+_agent.name}}"
-					infinite-scroll="true">
-					</kbn-dis>
-					</md-card>
-				
-                </div>
+			<md-content layout="row">
+                <md-card flex>
+					<div class="discover-content">
+						<div ng-show="resultState === 'none'">
+							<div class="discover-overlay" style="position: relative !important; opacity: 1 !important;">
+								<h2 aria-hidden="true"><i aria-hidden="true" class="fa fa-meh-o"></i></h2>
+								<h4>No results found</h4>
+							</div>
+						</div>
+
+						<!-- loading -->
+						<div ng-show="resultState === 'loading'">
+							<div class="discover-overlay" style="position: relative !important; opacity: 1 !important;">
+								<h2>Searching</h2>
+								<div ng-show="fetchStatus">{{fetchStatus.complete}}/{{fetchStatus.total}}</div>
+							</div>
+						</div>
+
+						<!-- result -->
+						<div class="results" ng-show="resultState === 'ready'">
+
+							<div class="discover-table" fixed-scroll ng-style="{ 'height': tableHeight }">
+								<doc-table hits="rows" index-pattern="indexPattern" sorting="state.sort" columns="state.columns" infinite-scroll="infiniteScroll"
+								filter="filterQuery">
+								</doc-table>
+
+							<div ng-if="rows.length == opts.sampleSize" class="discover-table-footer">
+								<center>
+								These are the first {{opts.sampleSize}} documents matching the search.
+								</center>
+							</div>
+							</div>
+						</div>
+					</div>
+				</md-card>
+			</md-content>
+               
+			</div>
        
     </div>
 </md-content>
