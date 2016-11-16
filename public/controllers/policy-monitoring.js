@@ -1,12 +1,13 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog) {
-    //Initialisation
+app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog, appState) {    //Initialisation
     $scope.load = true;
     var objectsArray = [];
     var loadWatch;
-
+	$scope.defaultManagerName = appState.getDefaultManager().name;
+	console.log("pm");
+	console.log($scope._agent);
     $scope.events = [];
 
     //Print Error

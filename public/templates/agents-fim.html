@@ -81,23 +81,7 @@
 				</md-card>
 				 
 			</md-content>
-				
-				<md-content layout="row">
-				<md-card flex>
-                    <md-card-title>
-                        <md-card-title-text>
-                            <span class="md-headline">Files modified</span>
-                        </md-card-title-text>
-                    </md-card-title>
-                    <md-card-content>
-                        <kbn-vis vis-searchable="true" vis-clickable="true"  vis-height="500px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
-                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
-							vis-filter='*'>
-                        </kbn-vis>
-                    </md-card-content>
-                </md-card>
-				</md-content>
-				
+
             <md-content layout="row">
                 <md-card flex="20">
                     <md-card-title>
@@ -149,7 +133,7 @@
                         </md-card-title-text>
                     </md-card-title>
                     <md-card-content>
-                        <kbn-vis vis-searchable="true" vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
+                        <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
                             vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
 							vis-filter='(rule.sidid: 550 OR rule.sidid: 551 OR rule.sidid: 552 OR rule.sidid: 555) AND AgentName: {{_agent.name}} NOT location: syscheck-registry'>
                         </kbn-vis>
@@ -234,6 +218,5 @@
 			</md-content>
                
 			</div>
-       
-    </div>
-</md-content>
+			
+			</md-content>

@@ -200,8 +200,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
     };
 
 	
-	// TMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMP
-	
 	$scope.disA = "(columns:!(SyscheckFile.path,SyscheckFile.event,SyscheckFile.uname_after,SyscheckFile.gname_after,full_log),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'location:%20syscheck')),sort:!('@timestamp',desc))";
 	$scope.disG = "(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))";
 	$scope.disFilter = "location: syscheck AND AgentName: " + $scope.$parent._agent.name;
@@ -595,12 +593,7 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
 			
 			$route.current.params._a = $scope.disA;
             $route.updateParams({ '_a': $scope.disA })
-			console.log("Emitiendo desde fim.js");
-			
-			$scope.$broadcast('searchFilterChanged', {
-			  stateQuery: $scope.stateQuery // send whatever you want
-			});
-			
+
             $scope.searchSource
               .size($scope.opts.sampleSize)
               .sort(getSort($state.sort, $scope.indexPattern))
@@ -725,7 +718,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
 
     });
 	
-	// TMPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     //Load
     try {
         load();

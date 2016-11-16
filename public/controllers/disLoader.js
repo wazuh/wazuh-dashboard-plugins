@@ -82,41 +82,13 @@ var app = require('ui/modules').get('app/wazuh', [])
     }
   }]);
   
-  var app = require('ui/modules').get('app/wazuh', [])
-  .directive('kbnDisfim', [function () {
-    return {
-      restrict: 'E',
-      scope: {
-        disA: '@disA',
-        disG: '@disG',
-        disFilter: '@disFilter',
-        tableHeight: '@tableHeight',
-        infiniteScroll: '@infiniteScroll'
-      },
-      template: require('../templates/directives/dis-fim-template.html')
-    }
-  }]);
 
-  var app = require('ui/modules').get('app/wazuh', [])
-  .directive('kbnDissearch', [function () {
-    return {
-      restrict: 'E',
-      scope: {
-        disA: '@disA',
-        disG: '@disG',
-        disFilter: '@disFilter',
-        tableHeight: '@tableHeight',
-        infiniteScroll: '@infiniteScroll'
-      },
-      template: require('../templates/directives/dis-fim-searchbar.html')
-    }
-  }]);
   
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($scope, config, courier, $route, $window, Notifier,
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches, appState) {
 
   $scope.defaultManagerName = appState.getDefaultManager().name;
-  //$scope.stateQuery = $scope.disFilter + " AND host: " + $scope.defaultManagerName;
+
   $scope.stateQuery = $scope.disFilter;
   $scope.chrome = {};
   $scope.chrome.getVisible = function () {

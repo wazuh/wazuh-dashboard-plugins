@@ -1,5 +1,4 @@
 <div flex ng-controller="generalController" layout="column">
-
     <md-content ng-init="menuNavItem = 'agents'" style="height: 70px;">
         <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
             <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
@@ -15,7 +14,7 @@
 			</button>
 			</a>
         </md-nav-bar>
-    </md-content>
+    </md-content> 
 
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 

@@ -60,7 +60,8 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 
     $scope.applyAgent = function (agent) {
         if (agent) {
-            $scope.submenuNavItem = 'fim';
+            //$scope.submenuNavItem = 'fim';
+            $scope.submenuNavItem = 'overview';
             $scope._agent = agent;
             $scope.search = agent.name;
         }
@@ -108,17 +109,18 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				// tmp
+				/*
 				     DataFactory.get(objectsArray['/agents'])
 					.then(function (data) {
-						$scope.submenuNavItem = 'fim';
-						$scope._agent = data.data.items[0];
-						$scope.search = data.data.items[0].name;
+						//$scope.submenuNavItem = 'fim';
+						//$scope._agent = data.data.items[0];
+						//$scope.search = data.data.items[0].name;
 						 $scope.load = false;
 					}, function (data) {
 						printError(data);
 						//defered.reject();
 					});
-
+				*/
 				// tmp
                 DataFactory.get(data).then(function (data) {
                     DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
