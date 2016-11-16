@@ -1,5 +1,4 @@
 <div flex ng-controller="generalController" layout="column">
-
     <md-content ng-init="menuNavItem = 'agents'" style="height: 70px;">
         <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
             <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
@@ -8,11 +7,14 @@
 			<md-nav-item md-nav-href="#/overview" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
 			<md-nav-item md-nav-href="#/agents" name="agents" >Agents</md-nav-item>
-			<md-nav-item md-nav-href="#/discover" name="discover">Discover</md-nav-item>
-			<md-nav-item md-nav-href="#/dashboards" name="dashboards">Dashboards</md-nav-item>
-			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+			<md-nav-item md-nav-href="#/discover" name="discover" ng-click="resetDiscover();">Discover</md-nav-item>
+			<md-nav-item md-nav-href="#/dashboards" name="dashboards" ng-click="resetDashboards();">Dashboards</md-nav-item>
+			<a href="#/settings"><button id="settingButtonTop" class="md-primary md-button ng-scope md-ink-ripple" type="button">
+				<i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i>
+			</button>
+			</a>
         </md-nav-bar>
-    </md-content>
+    </md-content> 
 
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
@@ -20,12 +22,12 @@
 		<md-content flex id="content">
 			<md-toolbar style="height: 50px;">
 				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-					<h2 ng-show="$parent._agent">{{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h2>
-					<h2 ng-show="!_agent">Choose or search an agent</h2>
+					<h2 style="text-transform: none; font-size: 20px;" ng-show="$parent._agent"><i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> {{_agent.id}} - {{_agent.name}} <span ng-show="_agent.id == '000'">(Manager)</span></h2>
+					<h2 style="text-transform: none; font-size: 20px;" ng-show="!_agent"><i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents overview</h2>
 					<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-					<md-autocomplete flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
+					<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
 						md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
-						placeholder="Search agent hostname, ID or IP address"> 
+						placeholder="Search by name, ID or IP address"> 
 						<md-item-template>
 							<span class="item-title">
             <span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.name}} ({{item.id}}) </strong></span>
@@ -41,42 +43,46 @@
 					</span>
 				</div>
 			</md-toolbar>
-			<md-content layout="row" layout-align="center start" ng-show="_agent" layout-padding">
+			<md-content class="horizontal-menu-right" layout="row" layout-align="center start" ng-show="_agent" layout-padding">
 				<md-nav-bar flex="40" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 					<md-nav-item md-nav-click="submenuNavItem = 'overview'" name="overview">Overview</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File Integrity</md-nav-item>
 					<md-nav-item md-nav-click="submenuNavItem = 'policy_monitoring'" name="policy_monitoring">Policy Monitoring</md-nav-item>
 				</md-nav-bar>
-				<md-content flex="60" style="margin-top: -6px" class="subNavLine secondLevelNavLine" layout="row" layout-align="end start">
+				<md-content flex="60" style="margin-top: -6px" class="subNavLine secondLevelNavLine horizontal-menu-right" layout="row" layout-align="end start">
 				
-				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-show="!show_timer" ng-click="show_timer = !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+				<md-button style="" ng-show="!show_timer" ng-click="show_timer = !show_timer" class="md-primary buttonMenu"  target="_blank">
 					<i class="fa fa-clock-o" aria-hidden="true"></i> {{ (!timeFilter) ? '7d' : timeFilter}}
 				</md-button>
 				<md-content ng-show="show_timer" layout="row" layout-align="end start" ng-init="timeFilter = (timeFilter ? timeFilter : '7d')">
-					<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-click="show_timer = !show_timer; timeFilter='24h';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+					<md-button style="" ng-click="show_timer = !show_timer; timeFilter='24h';" class="md-primary buttonMenu"  target="_blank">
 						<i class="fa fa-clock-o" aria-hidden="true"></i> Last 24 hours
 					</md-button>
-					<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-click="show_timer = !show_timer;timeFilter='7d';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+					<md-button style="" ng-click="show_timer = !show_timer;timeFilter='7d';" class="md-primary buttonMenu"  target="_blank">
 						<i class="fa fa-clock-o" aria-hidden="true"></i> Last week
 					</md-button>
-					<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-click="show_timer = !show_timer;timeFilter='30d';" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" target="_blank">
+					<md-button style="" ng-click="show_timer = !show_timer;timeFilter='30d';" class="md-primary buttonMenu"  target="_blank">
 						<i class="fa fa-clock-o" aria-hidden="true"></i> Last month
 					</md-button>
 				</md-content>
 			
-				<md-button ng-if="_agent && submenuNavItem == 'overview' && !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" style="margin-top: 11px !important;margin-bottom: 0px !important;" ng-click="openDiscover('generic','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  ng-if="_agent && submenuNavItem == 'fim' && !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('fim','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  ng-if="_agent && submenuNavItem == 'policy_monitoring' && !show_timer" class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="openDiscover('rootcheck','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'overview' && !show_timer" ng-click="openDashboard('OSSEC-Alerts', 'AgentName:'+_agent.name)">
+				<md-button ng-if="_agent && submenuNavItem == 'overview'" class="md-primary buttonMenu"  style="" ng-click="openDiscover('generic','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button style=""  ng-if="_agent && submenuNavItem == 'fim'" class="md-primary buttonMenu"  ng-click="openDiscover('fim','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button style=""  ng-if="_agent && submenuNavItem == 'policy_monitoring'" class="md-primary buttonMenu"  ng-click="openDiscover('rootcheck','AgentName:'+_agent.name)"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
+				<md-button style=""  class="md-primary buttonMenu"  ng-if="submenuNavItem == 'overview'" ng-click="openDashboard('OSSEC-Alerts', 'AgentName:'+_agent.name)">
 					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 				</md-button>
-				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'fim' && !show_timer" ng-click="openDashboard('File-Integrity-Monitoring', 'AgentName:'+_agent.name)">
+				<md-button style=""  class="md-primary buttonMenu"  ng-if="submenuNavItem == 'fim'" ng-click="openDashboard('File-Integrity-Monitoring', 'AgentName:'+_agent.name)">
 					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 				</md-button>
-				<md-button style="margin-top: 11px !important;margin-bottom: 0px !important;"  class="md-primary" md-colors="::{background: 'primary-100', color: 'background-900'}" ng-if="submenuNavItem == 'policy_monitoring' && !show_timer" ng-click="openDashboard('Policy-Monitoring', 'AgentName:'+_agent.name)">
+				<md-button style=""  class="md-primary buttonMenu"  ng-if="submenuNavItem == 'policy_monitoring'" ng-click="openDashboard('Policy-Monitoring', 'AgentName:'+_agent.name)">
 					<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
 				</md-button>
-				<div style="margin-right: 23px; margin-top: 11px !important;margin-bottom: 0px !important;"  ng-if="_agent" class="statusBox" md-colors="::{background: 'primary-100'}" ng-class="_agent.status == 'Active' ? null : (_agent.status == 'Never Connected' ? 'extraLarge' : 'large')"
-					layout="row" layout-align="space-between center"><span style="padding-right: 5px;">{{formatAgentStatus(_agent.status)}}</span><span ng-class="getAgentStatusClass(_agent.status)" class="round status"></span></div>
+				<div style=""  ng-if="_agent" style="" class="statusBox" ng-class="getAgentStatusClass(_agent.status)" ng-class="_agent.status == 'Active' ? null : (_agent.status == 'Never Connected' ? 'extraLarge' : 'large')"
+					layout="row"><span style="width: 100%;">{{formatAgentStatus(_agent.status)}}</span></div>
+					
+				<md-button ng-click="restartAgent()" style=""  class="md-primary buttonMenu"  ng-show="_agent.status == 'Active' && _agent.id != '000' ">
+					<i class="fa fa-refresh" aria-hidden="true"></i> Restart
+				</md-button>
 			</md-content>
 			</md-content>

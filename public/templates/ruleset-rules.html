@@ -1,15 +1,52 @@
-<md-content layout="column" flex layout-padding ng-if="!load && submenuNavItem == 'ruleset' && submenuNavItem2 == 'rules'"
+<md-content layout="column" flex layout-padding ng-if="!load && submenuNavItem == 'ruleset' && $parent.submenuNavItem2 == 'rules'"
   ng-controller="rulesController" layout-align="start space-around">
   <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
+	
 
+	<div layout="row" layout-align="center start" style="padding: 0px;  height: 208px;  min-height: 208px; ">
+		
+		<md-card flex="25" style="margin: 0">
+			<md-card-content>
+				<span class="md-headline-small">Top 24h - Rule ID</span>
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.sidid,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+	
+		<md-card flex="25" style="margin: 0">
+			<md-card-content>
+				<span class="md-headline-small">Top 24h - Groups</span>
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		
+		<md-card flex="25" style="margin: 0">
+			<md-card-content>
+				<span class="md-headline-small">Top 24h - PCI DSS requirements</span>
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.PCI_DSS,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		
+		<md-card flex="25" style="margin: 0">
+			<md-card-content>
+				<span class="md-headline-small">Top 24h - Level</span>
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.AlertLevel,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+	</div>
+	
+	
+    <div id="content" layout="row" layout-align="start start" style="padding-left: 0px; padding-right: 0px; min-height: 53px; height: 53px;padding-top: 5px; padding-bottom: 0px;  ">
 
-
-  <md-virtual-repeat-container layout-align="start start" ng-if="!load" flex layout="column" layout-padding auto-size-container ng-style="autoSizeStyle">
-
-    <div flex id="content" layout="row" layout-align="center stretch">
-
-      <span layout="row" style="padding-left: 0px;" flex layout-align="space-between center">
-			<md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="$parent.search"
+      <span layout="row" style="padding-left: 0px;margin-top: 6px;margin-right: 5px; " flex layout-align="space-between center">
+		<md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="$parent.search"
 			md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
 			placeholder="Search for rule file, group or PCI requirement" md-search-text-change="fileSearchFilter(search)">
 				<md-item-template>
@@ -27,7 +64,16 @@
       </md-autocomplete>
       </span>
 
-      <md-input-container flex="15" style="margin-right: 0px !important; margin-left: 20px;padding: 3px;margin-right: 10px;background-color: rgb(207,216,220);"
+	  	<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('rules')"
+			class="md-primary">
+			Rules
+		</md-button>
+		<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" 
+			ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
+			Decoders
+		</md-button>
+		
+      <md-input-container flex="20" style="margin-top: 6px;margin-bottom: 0;border-radius: 3px;margin-left: 10px;"
         class="md-whiteframe-z1">
         <md-select style="border: none;" ng-model="statusFilter" ng-change="rulesStatusFilter(statusFilter)" aria-label="Filter by status">
           <md-option value="enabled">Enabled</md-option>
@@ -38,72 +84,173 @@
 
     </div>
 
-    <md-chips readonly="true" ng-show="rulesHasFilter('search') || rulesHasFilter('file') || rulesHasFilter('group') || rulesHasFilter('pci')">
-      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('search')" ng-if="rulesHasFilter('search')">
+    <md-chips style="background-color: #f7f7f7; margin-top: 16px; " readonly="true" ng-show="rulesHasFilter('search') || rulesHasFilter('file') || rulesHasFilter('group') || rulesHasFilter('pci')">
+      <md-chip ng-click="rulesUnset('search')" ng-if="rulesHasFilter('search')">
         <span class="bold">Search: {{rulesGetFilter('search')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
-      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('file')" ng-if="rulesHasFilter('file');">
+      <md-chip ng-click="rulesUnset('file')" ng-if="rulesHasFilter('file');">
         <span class="bold">File: {{rulesGetFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
-      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('group')" ng-if="rulesHasFilter('group');">
+      <md-chip ng-click="rulesUnset('group')" ng-if="rulesHasFilter('group');">
         <span class="bold">Group: {{rulesGetFilter('group')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
-      <md-chip md-colors="::{background: 'primary-100', color: 'background-900'}" ng-click="rulesUnset('pci')" ng-if="rulesHasFilter('pci');">
+      <md-chip ng-click="rulesUnset('pci')" ng-if="rulesHasFilter('pci');">
         <span>PCI control: {{rulesGetFilter('pci')}} <i class="fa fa-times" aria-hidden="true"></i></span>
       </md-chip>
     </md-chips>
 
 
-    <md-toolbar layout="row">
-      <div class="md-toolbar-tools">
-        <span flex="10" ng-click="setSort('id')">ID
+    <md-toolbar ng-show="!ruleActive" layout="row" style=" margin-top: 13px; min-height: 38px;height: 38px; padding: 8px; padding-top: 10px; ">
+      <div class="md-toolbar-tools" flex layout-align="start start">
+        <span flex="5" ng-click="setSort('id')">ID
           <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
         </span>
-        <span flex="60">Description</span>
-        <span flex="10" ng-click="setSort('level')">Level
+		 <span flex="10">File</span>
+		 <span flex="40">Description</span>
+		 <span flex="25">Groups</span>
+		 <span flex="15">Requirement</span>
+        
+        <span flex="5" ng-click="setSort('level')">Level
           <i class="fa" ng-class="_sort === 'level' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
         </span>
-        <span flex="20">File</span>
+       
       </div>
     </md-toolbar>
-    <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
-      <md-list ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
-        <md-list-item ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''" ng-click=" showDetails[rule.id] = ! showDetails[rule.id]; ">
-          <span flex="10">{{rule.id}}</span>
-          <span flex="60">{{rule.description}}</span>
-          <span flex="10">{{rule.level}}</span>
-          <md-button md-no-ink class="invisibleButton" flex="20" ng-click="rulesApplyFilter({type: 'file', value: rule.file}); $event.stopPropagation();">{{rule.file}}</md-button>
-        </md-list-item>
-      </md-list>
-      <md-list class="ruleset_rules_row_active" ng-if="showDetails[rule.id]">
-        <md-list-item>
-          <span style="font-weight: bold" flex="15">Groups</span>
-          <span flex="35" layout="column">
-			<span><a ng-repeat="group in rule.groups" ng-click="rulesApplyFilter({type: 'group', value: group})">{{ group }}, </a></span>
-		  </span>
-          <span style="font-weight: bold" flex="15" ng-if="rule.pci.length > 0">PCI Requirements</span>
-          <span flex="35" layout="column" ng-if="rule.pci.length > 0">
-		  <span>
-		  <a ng-repeat="pci in rule.pci" ng-click="rulesApplyFilter({type: 'pci', value: pci})">{{ pci }}, </a>
-		  </span>
-		  </span>
-        </md-list-item>
-        <md-list-item ng-repeat="(detailk, detailv) in rule.details">
-          <span style="font-weight: bold" flex="15">{{detailk}}</span>
-          <span flex="40">{{detailv}}</span>
-        </md-list-item>
-        <md-list-item layout-align="end end">
-          <span style="font-weight: bold">
-		  
-            <md-button ng-click="openDiscover('generic','rule.sidid:'+rule.id)">
-            Discover alerts <i class="fa fa-external-link" aria-hidden="true"></i>
-            </md-button>
-            </span>
-        </md-list-item>
 
-      </md-list>
-      <md-divider></md-divider>
+		
+  <md-virtual-repeat-container ng-show="!ruleActive" style="padding: 8px; padding-top: 0px;" layout-align="start start" ng-if="!load" flex layout="column" auto-size-container ng-style="autoSizeStyle">
+
+    <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
+      <md-list ng-class-odd="'odd'" ng-class-even="'even'" class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
+        <md-list-item ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''" ng-click="loadRule(rule)">
+          <span flex="5">{{rule.id}}</span>
+		  <span flex="10">{{rule.file}}</span>
+          <span flex="40">{{rule.description}}</span>
+		  <span flex="25"><span ng-repeat="group in rule.groups">{{ group }}<span ng-if="!$last">, </span> </span></span>
+		  <span flex="15"><span ng-repeat="pci in rule.pci">{{ pci }}<span ng-if="!$last">, </span> </span></span>
+          <span flex="5">{{rule.level}}</span>
+          
+        </md-list-item>
+      </md-list>      
     </div>
   </md-virtual-repeat-container>
+  
+	<div layout="column" flex layout-align="start stretch" ng-show="ruleActive" style="margin-top: 19px; height: 100%; background-color: #f7f7f7; padding: 0px; padding-top: 3px; margin-top: 15px;">
+		<md-content flex>	
+		<div layout="row" layout-align="end stretch" ng-show="ruleActive" style="background-color: #f7f7f7; padding-left: 0px; padding-right: 0px; padding-bottom: 0px; ">
+			<span ng-click="ruleActive = !ruleActive" class="">
+				<i style="font-size: 20px; margin-right: 15px; " class="fa fa-times" aria-hidden="true"></i>
+			</span>
+		</div>
+			
+		<div layout="row" flex layout-align="center start" ng-show="ruleActive" style=" background-color: #f7f7f7; padding-left: 0px; padding-right: 0px; padding-bottom: 0px;">
+		
+			<md-card flex="10" layout="column">
+				<md-card-content style="text-align: center;">
+				<div class="ng-binding" style="font-weight: bold">ID</div>
+					<div class="metric-value ng-binding" style="font-size: 12pt;">{{ruleActiveArray.id}}</div>
+					
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+				<div class="ng-binding" style="font-weight: bold">Description</div>
+					<div class="metric-value ng-binding" style="font-size: 12pt;">{{ruleActiveArray.description}}</div>
+					
+				</md-card-content>
+			</md-card>
+			<md-card flex="10" layout="column">
+				<md-card-content style="text-align: center;">
+				<div class="ng-binding" style="font-weight: bold">Level</div>
+					<div class="metric-value ng-binding" style="font-size: 12pt;">{{ruleActiveArray.level}}</div>
+					
+				</md-card-content>
+			</md-card>
+			<md-card class="cardHover" ng-click="rulesApplyFilter({type: 'file', value: ruleActiveArray.file}); $event.stopPropagation();" flex="20" layout="column">
+				<md-card-content style="text-align: center;">
+				<div class="ng-binding" style="font-weight: bold">File</div>
+					<div class="metric-value ng-binding" style="font-size: 12pt;">{{ruleActiveArray.file}}</div>
+				</md-card-content>
+			</md-card>
+		</div>
+
+		
+		
+		<div layout="row" flex layout-align="space-between start" ng-show="ruleActive" style="background-color: #f7f7f7; padding-left: 0px; padding-right: 0px; padding-bottom: 0px; ">
+		
+			<md-card flex layout="column" ng-if="ruleActiveArray.groups.length  > 0">
+				<md-card-content>
+					<h3>Groups</h3>
+					<span ng-repeat="group in ruleActiveArray.groups">
+						<span class="listHover" ng-click="rulesApplyFilter({type: 'group', value: group})" layout="row" layout-align="space-between center"><p>{{ group }}</p></span>
+						<md-divider ng-if="!$last"></md-divider>
+					</span>
+				</md-card-content>
+			</md-card>
+			
+			<md-card flex layout="column" ng-if="ruleActiveArray.pci.length  > 0">
+				<md-card-content>
+					<h3>PCI DSS </h3>
+					<span ng-repeat="pci in ruleActiveArray.pci">
+						<span class="listHover" ng-click="rulesApplyFilter({type: 'pci', value: pci})" layout="row" layout-align="space-between center"><p>{{ pci }}</p></span>
+						<md-divider ng-if="!$last"></md-divider>
+					</span>
+				</md-card-content>
+			</md-card>
+			
+			
+			<md-card flex layout="column">
+				<md-card-content>
+					<h3>Agents related</h3>
+					<span layout="row" layout-align="space-between center"><p>vpc-agent-centos</p></span>
+					<md-divider></md-divider>
+					<span layout="row" layout-align="space-between center"><p>vpc-debian</p></span>
+					<md-divider></md-divider>
+					<span layout="row" layout-align="space-between center"><p>vpc-ossec-manager</p></span>
+					<md-divider></md-divider>
+				</md-card-content>
+			</md-card>
+			
+			<md-card flex layout="column">
+				<md-card-content>
+					<h3>Statistics</h3>
+					<span layout="row" layout-align="space-between center">
+						<p>Last 24h alerts</p>
+						<p class="right-text">785</p>
+					</span>
+					<md-divider></md-divider>
+					<span layout="row" layout-align="space-between center">
+						<p>Top agent related</p>
+						<p class="right-text">vpc-agent-debian</p>
+					</span>
+					<md-divider></md-divider>
+				</md-card-content>
+			</md-card>
+			
+		</div>
+	
+		
+		<div layout="row" flex layout-align="center start" ng-show="ruleActive" style="background-color: #f7f7f7; padding-left: 0px; padding-right: 0px; padding-bottom: 0px; ">	
+				<md-card flex="100" layout="column">
+				<md-card-content>
+					<h3>Extra settings</h3>
+					<span ng-repeat="(detailk, detailv) in ruleActiveArray.details">
+						<span layout="row" layout-align="space-between center">
+							<p>{{detailk}}</p>
+							<p class="right-text">{{detailv}}</p>
+						</span>
+						<md-divider  ng-if="!$last"></md-divider>
+					</span>
+				</md-card-content>
+			</md-card>
+		</div>
+		
+		<div layout="row" flex layout-align="end stretch" ng-show="ruleActive" style="background-color: #f7f7f7; padding-left: 0px; padding-right: 0px; padding-bottom: 0px; padding-bottom: 30px; ">
+			<md-button ng-click="openDiscover('generic','rule.sidid:'+ruleActiveArray.id)" class="md-primary buttonMenu">
+				Discover alerts <i class="fa fa-external-link" aria-hidden="true"></i>
+			</md-button>
+		</div>
+	 </md-content>	
+	</div>
 
 </md-content>

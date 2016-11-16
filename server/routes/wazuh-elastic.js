@@ -31,16 +31,20 @@ module.exports = function (server, options) {
         if (req.params.fieldValue && req.params.fieldFilter)
             filtering = true;
 
-        var payload = payloads.getFieldTop;
-
+		var payload = JSON.parse(JSON.stringify(payloads.getFieldTop));
+		
         if (filtering) {
-            payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue;
-        }
+            payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND host: " + req.params.manager;
+        }else{
+            payload.query.bool.must[0].query_string.query = "host: " + req.params.manager;
+		}
 
         payload.query.bool.must[1].range['@timestamp'].gte = timeAgo;
         payload.aggs['2'].terms.field = req.params.field;
+		
 
         fetchElastic(payload).then(function (data) {
+
             if (data.hits.total == 0 || typeof data.aggregations['2'].buckets[0] === 'undefined')
                 reply({ 'statusCode': 200, 'data': '' });
             else
@@ -52,23 +56,29 @@ module.exports = function (server, options) {
 
     var getLastField = function (req, reply) {
         var filtering = false;
-
+		var filterArray = {};
+		var termArray = {};
+		
         if (req.params.fieldValue && req.params.fieldFilter)
             filtering = true;
 
-        var payload = payloads.getLastField;
-
+		var payload = JSON.parse(JSON.stringify(payloads.getLastField));
+		payload.query.bool.must[0].exists.field = req.params.field;
+		
+		filterArray["host"] = req.params.manager;
+		termArray = { "term": filterArray };
+		payload.query.bool.must.push(termArray);
+		filterArray = {};
+		termArray = {};			
+			
         if (filtering) {
-            var filterArray;
-            var filterArray = {};
             filterArray[req.params.fieldFilter] = req.params.fieldValue;
-            var termArray = { "term": filterArray };
-            payload.query.bool.must.push(termArray);
+            termArray = { "term": filterArray };
+            payload.query.bool.must.push(termArray);	
         }
-
-        payload.query.bool.must[0].exists.field = req.params.field;
-
+		
         fetchElastic(payload).then(function (data) {
+			
             if (data.hits.total == 0 || typeof data.hits.hits[0] === 'undefined')
                 reply({ 'statusCode': 200, 'data': '' });
             else
@@ -157,7 +167,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/top/{field}/{time?}',
+        path: '/api/wazuh-elastic/top/{manager}/{field}/{time?}',
         handler: getFieldTop
     });
 
@@ -168,7 +178,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/top/{field}/{time}/{fieldFilter}/{fieldValue}',
+        path: '/api/wazuh-elastic/top/{manager}/{field}/{time}/{fieldFilter}/{fieldValue}',
         handler: getFieldTop
     });
 
@@ -179,7 +189,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/last/{field}',
+        path: '/api/wazuh-elastic/last/{manager}/{field}',
         handler: getLastField
     });
     /*
@@ -191,7 +201,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/last/{field}/{fieldFilter}/{fieldValue}',
+        path: '/api/wazuh-elastic/last/{manager}/{field}/{fieldFilter}/{fieldValue}',
         handler: getLastField
     });
 };

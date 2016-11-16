@@ -3,22 +3,53 @@
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
         <md-virtual-repeat-container auto-size-container ng-style="autoSizeStyle" ng-if="!load">
             <div flex layout="column" layout-align="space-between stretch">
-                <div layout="row" layout-align="space-between stretch">
+				<div layout="row" layout-align="space-between stretch">
+					<md-card flex class="cardHover" layout="column" style="margin-left: 0px;" ng-click="applyAgent(lastAgent)">
+						<md-card-content style="text-align: center;">
+							<div class="metric-value ng-binding" style="font-size: 16pt;">{{lastAgent.name}}</div>
+							<div class="ng-binding">Last registered agent</div>
+						</md-card-content>
+					</md-card>
+					
+					<md-card flex layout="column" class="cardHover">
+						<md-card-content style="text-align: center;" ng-click="applyAgent(mostActiveAgent)">
+							<div class="metric-value ng-binding" style="font-size: 16pt;">{{mostActiveAgent.name}}</div>
+							<div class="ng-binding">Most active agent</div>
+						</md-card-content>
+					</md-card>
+					
+					<md-card flex layout="column">
+						<md-card-content style="text-align: center;">
+							<div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountActive}}</div>
+							<div class="ng-binding">Active agents</div>
+						</md-card-content>
+					</md-card>
+					
+					<md-card flex layout="column"  style="margin-right: 0px;">
+						<md-card-content style="text-align: center;">
+							<div class="metric-value ng-binding" style="font-size: 16pt;">{{(agentsCoverity | number:2)}}%</div>
+							<div class="ng-binding">Agents coverage</div>
+						</md-card-content>
+					</md-card>
+					
+				</div>
+                <div layout="row" layout-align="start stretch" flex>
 
-                    <md-input-container layout="row" class="sideNavBox" flex="40">
+                    <div layout="row" class="sideNavBox" flex="80">
 
-                        <input placeholder="Filter" type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)"
+                        <input placeholder="Filter" type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)" class="input-filter-box"
                             flex>
-                    </md-input-container>
-                    <div flex="40"></div>
-                    <md-input-container flex="20" class="md-whiteframe-z1" style="margin-right: 10px; background-color: rgb(207,216,220)">
-                        <md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
-                            <md-option value="all">All</md-option>
-                            <md-option value="active">Active</md-option>
-                            <md-option value="disconnected">Disconnected</md-option>
-                            <md-option value="neverConnected">Never connected</md-option>
-                        </md-select>
-                    </md-input-container>
+                    </div>
+                    <div layout="row" class="sideNavBox" flex="20">
+						<md-input-container flex class="md-whiteframe-z1">
+							<md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
+								<md-option value="all">All</md-option>
+								<md-option value="active">Active</md-option>
+								<md-option value="disconnected">Disconnected</md-option>
+								<md-option value="neverConnected">Never connected</md-option>
+							</md-select>
+						</md-input-container>
+					</div>
                 </div>
                 <div>
                     <md-toolbar layout="row">

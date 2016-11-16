@@ -1,12 +1,16 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window) {
+app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window, $document) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
     $scope.$parent.state.setManagerState('ruleset');
+	$scope.setRulesTab('rules');
+	$scope.ruleActive = false;
+	$scope.extraInfo = false;
+	
     $scope.search = undefined;
-
+	
     $scope.rules = [];
 
     $scope.statusFilter = 'enabled';
@@ -33,9 +37,15 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 
     //Functions
 
+
 	$scope.openDiscover = function (template, filter) {
         $scope.state.setDiscoverState(template, filter);
 		$window.location.href = '#/discover/';
+    }
+	
+	$scope.loadRule = function (rule) {
+		$scope.ruleActiveArray = rule;
+		$scope.ruleActive = true;
     }
 	
     $scope.setSort = function (field) {
@@ -62,15 +72,19 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
         if (filterObj.type == 'file') {
             _file = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'file', filterObj.value);
+            $scope.ruleActive = false;
         } else if (filterObj.type == 'group') {
             _group = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'group', filterObj.value);
+            $scope.ruleActive = false;
         } else if (filterObj.type == 'pci') {
             _pci = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'pci', filterObj.value);
+            $scope.ruleActive = false;
         } else if (filterObj.type == 'search') {
             _search = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'search', filterObj.value);
+            $scope.ruleActive = false;
         }
     };
 
@@ -175,6 +189,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
             if ($scope._rules_blocked) {
                 return null;
             }
+			
             var _pos = index - DataFactory.getOffset(objectsArray['/rules']);
             if (DataFactory.filters.flag(objectsArray['/rules'])) {
                 $scope._rules_blocked = true;
@@ -234,6 +249,8 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
         errlog.log('Unexpected exception loading controller', e);
     }
 
+	
+	
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
@@ -244,11 +261,11 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 });
 
 app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast, errlog) {
-
+	
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('decoders');
-
+	$scope.setRulesTab('decoders');
     $scope.decoders = [];
 
     $scope.typeFilter = 'all';
@@ -452,6 +469,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
         errlog.log('Unexpected exception loading controller', e);
     }
 
+	
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {

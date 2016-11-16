@@ -1,15 +1,12 @@
 module.exports = function (server, options) {
 
-    const config = server.config();
-    var _elurl = config.get('elasticsearch.url');
-    var _eluser = config.get('elasticsearch.username');
-    var _elpass = config.get('elasticsearch.password');
     const client = server.plugins.elasticsearch.client;
 
     var api_user;
     var api_pass;
     var api_url;
     var api_insecure;
+    var api_port;
 
     var colors = require('ansicolors');
     var blueWazuh = colors.blue('wazuh');
@@ -19,19 +16,31 @@ module.exports = function (server, options) {
 
     var agentsArray = [];
 
-    var loadCredentials = function (json) {
-        if (json.error) {
-            server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
-            return;
-        }
-        api_user = json.user;
-        api_pass = json.password;
-        api_url = json.url;
-        api_insecure = json.insecure;
-        checkAndSaveStatus();
+    var loadCredentials = function (apiEntries) {
+
+		apiEntries.hits.forEach(function (element) {
+			var apiEntry = { 'user': element._source.api_user, 'password': new Buffer(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
+			
+			if (apiEntry.error) {
+				server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
+				return;
+			}
+			
+			
+			checkAndSaveStatus(apiEntry);
+			
+        });
+
     }
 
-    var checkAndSaveStatus = function () {
+    var checkAndSaveStatus = function (apiEntry) {
+		
+		apiEntry.user;
+		apiEntry.password;
+		apiEntry.url;
+		apiEntry.insecure;
+		apiEntry.port;
+		
         var payload = {
             'offset': 0,
             'limit': 1,
@@ -39,14 +48,17 @@ module.exports = function (server, options) {
 
         var options = {
             headers: { 'api-version': 'v1.3.0' },
-            username: api_user,
-            password: api_pass,
-            rejectUnauthorized: !api_insecure
+            username: apiEntry.user,
+            password: apiEntry.password,
+            rejectUnauthorized: !apiEntry.insecure
         };
+		
 
-        needle.request('get', api_url + '/agents', payload, options, function (error, response) {
+        needle.request('get', apiEntry.url + ':' + apiEntry.port +'/agents', payload, options, function (error, response) {
+
             if (!error && response.body.data && response.body.data.totalItems) {
-                checkStatus(response.body.data.totalItems);
+                checkStatus(apiEntry, response.body.data.totalItems);
+
             } else {
                 server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
                 return;
@@ -54,7 +66,7 @@ module.exports = function (server, options) {
         });
     };
 
-    var checkStatus = function (maxSize, offset) {
+    var checkStatus = function (apiEntry, maxSize, offset) {
         if (!maxSize) {
             server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] You must provide a max size');
         }
@@ -66,16 +78,16 @@ module.exports = function (server, options) {
 
         var options = {
             headers: { 'api-version': 'v1.3.0' },
-            username: api_user,
-            password: api_pass,
-            rejectUnauthorized: !api_insecure
+            username: apiEntry.user,
+            password: apiEntry.password,
+            rejectUnauthorized: !apiEntry.insecure
         };
-
-        needle.request('get', api_url + '/agents', payload, options, function (error, response) {
+		
+        needle.request('get', apiEntry.url + ':' + apiEntry.port + '/agents', payload, options, function (error, response) {
             if (!error && response.body.data.items) {
                 agentsArray = agentsArray.concat(response.body.data.items);
                 if ((payload.limit + payload.offset) < maxSize) {
-                    checkStatus(response.body.data.totalItems, payload.limit + payload.offset);
+                    checkStatus(apiEntry, response.body.data.totalItems, payload.limit + payload.offset);
                 } else {
                     saveStatus();
                 }
@@ -107,7 +119,7 @@ module.exports = function (server, options) {
     var _elCreateIndex = function (todayIndex) {
         client.indices.create({ index: todayIndex }).then(
             function () {
-                client.indices.putMapping({ index: todayIndex, type: 'agent', body: { properties: { '@timestamp': { 'type': "date" }, 'status': { 'type': "keyword" }, 'ip': { 'type': "keyword" }, 'name': { 'type': "keyword" }, 'id': { 'type': "keyword" } } } }).then(
+                client.indices.putMapping({ index: todayIndex, type: 'agent', body: { properties: { '@timestamp': { 'type': "date" }, 'status': { 'type': "keyword" }, 'ip': { 'type': "keyword" }, 'host': { 'type': "keyword" } ,'name': { 'type': "keyword" }, 'id': { 'type': "keyword" } } } }).then(
                     function () {
                         _elInsertData(todayIndex);
                     }, function () {
@@ -121,55 +133,43 @@ module.exports = function (server, options) {
 
     var _elInsertData = function (todayIndex) {
         var body = '';
-        agentsArray.forEach(function (element) {
-            body += '{ "index":  { "_index": "' + todayIndex + '", "_type": "agent" } }\n';
-            element["@timestamp"] = Date.now();
-            body += JSON.stringify(element) + "\n";
-        });
-        if (body == '') {
-            return;
-        }
-        client.bulk({
-            index: todayIndex,
-            type: 'agent',
-            body: body
-        }).then(function () {
-            agentsArray.length = 0;
-            setTimeout(function () {
-                return;
-            }, 60000);
-        }, function (err) {
-            server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error inserting agent data into elasticsearch. Bulk request failed.');
-        });
+		if(agentsArray.length > 0) {
+			var managerName = agentsArray[0].name;
+			agentsArray.forEach(function (element) {
+				body += '{ "index":  { "_index": "' + todayIndex + '", "_type": "agent" } }\n';
+				element["@timestamp"] = Date.now();
+				element["host"] = managerName;
+				body += JSON.stringify(element) + "\n";
+			});
+			if (body == '') {
+				return;
+			}
+			client.bulk({
+				index: todayIndex,
+				type: 'agent',
+				body: body
+			}).then(function () {
+				agentsArray.length = 0;
+				setTimeout(function () {
+					return;
+				}, 60000);
+			}, function (err) {
+				server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error inserting agent data into elasticsearch. Bulk request failed.');
+			});
+		}
     };
 
     var getConfig = function (callback) {
-        var needle = require('needle');
-
-        if (_eluser && _elpass) {
-            var options = {
-                username: _eluser,
-                password: _elpass,
-                rejectUnauthorized: false
-            };
-        } else {
-            var options = {
-                rejectUnauthorized: false
-            };
-        }
-
-        var elasticurl = _elurl + '/.kibana/wazuh-configuration/1';
-        needle.get(elasticurl, options, function (error, response) {
-            if (!error) {
-                if (response.body.found) {
-                    callback({ 'user': response.body._source.api_user, 'password': new Buffer(response.body._source.api_password, 'base64').toString("ascii"), 'url': response.body._source.api_url, 'insecure': response.body._source.insecure });
+        client.search({ index: '.kibana', type: 'wazuh-configuration'})
+            .then(function (data) {
+                if (data.hits.total > 0) {
+                    callback(data.hits);
                 } else {
                     callback({ 'error': 'no credentials', 'error_code': 1 });
                 }
-            } else {
+            }, function () {
                 callback({ 'error': 'no elasticsearch', 'error_code': 2 });
-            }
-        });
+            });
     };
 
     var configureKibana = function () {
@@ -188,7 +188,7 @@ module.exports = function (server, options) {
             server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Skipping "wazuh-monitoring-*" index pattern configuration: Already configured.');
         }
     });
-    cron.schedule('0 */10 * * * *', function () {
+    cron.schedule('* */10 * * * *', function () {
         agentsArray.length = 0;
         getConfig(loadCredentials);
     }, true);

@@ -1,15 +1,5 @@
-<div ng-init="submenuNavItem2 = 'rules'" flex layout="column" ng-if="submenuNavItem == 'ruleset'" auto-size-container ng-style="autoSizeStyle">
+<div flex layout="column" ng-if="submenuNavItem == 'ruleset'" auto-size-container ng-style="autoSizeStyle">
 
-	<div layout="row" layout-align="center center" style="height: 50px; " ng-init="submenuNavItem2 = (state.getRulesetState() ? state.getRulesetState() : 'rules')">
-		<md-button style="width: 180px" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="submenuNavItem2 = 'rules'"
-			class="md-primary">
-			Rules
-		</md-button>
-		<md-button style="width: 180px" ng-class="(submenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" style="background-color: rgb(207,216,220); color: #000;"
-			ng-class="button-disabled" ng-click="submenuNavItem2 = 'decoders'" class="md-primary">
-			Decoders
-		</md-button>
-	</div>
 
 
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>

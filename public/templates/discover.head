@@ -1,6 +1,6 @@
 <div flex ng-controller="stateController" layout="column">
 
-    <md-content ng-init="menuNavItem = 'discover'; template = (state.getDiscoverState().name ? state.getDiscoverState().name : 'generic');  " style="height: 70px;">
+    <md-content  ng-init="menuNavItem = 'discover'; template = (state.getDiscoverState().name ? state.getDiscoverState().name : 'generic');  " style="height: 70px;">
         <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
             <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
                 <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
@@ -8,9 +8,12 @@
 			<md-nav-item md-nav-href="#/overview" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
-			<md-nav-item md-nav-href="#/discover" name="discover">Discover</md-nav-item>
-			<md-nav-item md-nav-href="#/dashboards" name="dashboards">Dashboards</md-nav-item>
-			<md-nav-item md-nav-href="#/settings" name="settings">Settings</md-nav-item>
+			<md-nav-item md-nav-href="#/discover" name="discover" ng-click="resetDiscover();">Discover</md-nav-item>
+			<md-nav-item md-nav-href="#/dashboards" name="dashboards" ng-click="resetDashboards();">Dashboards</md-nav-item>
+			<a href="#/settings"><button id="settingButtonTop" class="md-primary md-button ng-scope md-ink-ripple" type="button" ng-transclude="">
+				<i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i>
+			</button>
+			</a>
         </md-nav-bar>
     </md-content>
 

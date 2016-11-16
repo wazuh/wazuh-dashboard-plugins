@@ -96,13 +96,14 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
 
 });
 
-app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToast, errlog) {
+app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToast, errlog, genericReq) {
 
     //Initialisation
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';
-
+	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
+	$scope.mostActiveAgent = {"name" : "", "id" : ""};
     $scope.submenuNavItem = "preview";
 
     var objectsArray = [];
@@ -204,6 +205,41 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
                         $scope.load = false;
                     }, printError);
             }, printError);
+			
+		DataFactory.getAndClean('get', '/agents', { offset: 0, limit: 1, sort: '-id' })
+            .then(function (data) {
+                DataFactory.getAndClean('get', '/agents/' + data.data.items[0].id, {})
+                    .then(function (data) {
+                        $scope.lastAgent = data.data;
+                    }, printError);
+            }, printError);	
+			
+		// Tops
+		var date = new Date();
+        date.setDate(date.getDate() - 1);
+        var timeAgo = date.getTime();
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName')
+            .then(function (data) {
+				$scope.mostActiveAgent.name = data.data;
+				genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentID')
+				.then(function (data) {
+					if(data.data == "" && $scope.mostActiveAgent.name != ""){
+						$scope.mostActiveAgent.id = "000";
+					}else{
+						$scope.mostActiveAgent.id = data.data;
+					}
+								
+				}, printError);	
+            }, printError);	
+			
+		DataFactory.getAndClean('get', '/agents/summary', {})
+            .then(function (data) {
+                $scope.agentsCountActive = data.data.Active;
+                $scope.agentsCountDisconnected = data.data.Disconnected;
+                $scope.agentsCountNeverConnected = data.data['Never connected'];
+                $scope.agentsCountTotal = data.data.Total;
+                $scope.agentsCoverity = (data.data.Active / data.data.Total) * 100;
+            }, printError);	
     };
 
     //Load

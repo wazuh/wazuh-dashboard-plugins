@@ -79,19 +79,21 @@ var app = require('ui/modules').get('app/wazuh', [])
   }]);
 
 require('ui/modules').get('app/wazuh', [])
-  .controller('VisEditorW', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
+  .controller('VisEditorW', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
     $scope.v = {};
-    $scope.v.filter = $scope.visFilter;
     $scope.chrome = {};
     $scope.chrome.getVisible = function () {
       return true;
     }
+	$scope.defaultManagerName = appState.getDefaultManager().name;
+	$scope.v.filter = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
 
-    var _savedVis = function () {
+	
+	
+    var renderVis = function () {
 
       const visTypes = Private(RegistryVisTypesProvider);
       const visType = _.find(visTypes, { name: $scope.visType });
-
       if (!visType) {
         throw new Error('You must provide a valid visualization type');
       }
@@ -105,10 +107,10 @@ require('ui/modules').get('app/wazuh', [])
           '*': '/'
         }));
     }
-
-    _savedVis().then(function (_sVis) {
+	
+    renderVis().then(function (_sVis) {
       $scope._loadVisAsync = true;
-
+	  const queryFilter = Private(FilterBarQueryFilterProvider);	
       const savedVis = _sVis;
 
       const vis = savedVis.vis;
@@ -127,15 +129,25 @@ require('ui/modules').get('app/wazuh', [])
         run: function () { $scope.fetch(); }
       }];
 
-      if (savedVis.id) {
-        docTitle.change(savedVis.title);
-      }
 
+	  const matchQueryFilter = function (filter) {
+                    return filter.query && filter.query.query_string && !filter.meta;
+       };
+	   
+	   const extractQueryFromFilters = function (filters) {
+                    const filter = _.find(filters, matchQueryFilter);
+                    if (filter) return filter.query;
+                };
+				
       let $state = $scope.$state = (function initState() {
+
+		$scope.previousRoute = $route.current.params._a; 
+		
         $route.current.params._a = $scope.visA;
         $route.updateParams({ '_a': $scope.visA });
         $route.current.params._g = $scope.visG;
         $route.updateParams({ '_g': $scope.visG });
+		
         const stateDefaults = {
           uiState: {},
           linked: false,
@@ -145,22 +157,39 @@ require('ui/modules').get('app/wazuh', [])
         };
 
         $state = new AppState(stateDefaults);
+		$route.updateParams({ '_a': $scope.previousRoute });
+		$route.current.params._a = $scope.previousRoute
 
         return $state;
       } ());
 
-      $scope.state = $state;
-
-      $scope.$watch("visG", function () {
+      $scope.state = $state;	
+				
+      $scope.$watch("visG", function () {	  
         //This gets called when data changes.
         $route.current.params._g = $scope.visG;
         $route.updateParams({ '_g': $scope.visG });
+        $state.emit('fetch_with_changes');
+
       });
 
+	  
+		 function updateQueryOnRootSource() {
+			const filters = queryFilter.getFilters();
+			if ($state.query) {
+				searchSource.set('filter', _.union(filters, [{
+					query: $state.query
+				}]));
+			} else {
+				searchSource.set('filter', filters);
+			}
+		}
+
+
+				
       function init() {
         // export some objects
         $scope.savedVis = savedVis;
-
         $scope.searchSource = searchSource;
         $scope.vis = vis;
 
@@ -173,12 +202,6 @@ require('ui/modules').get('app/wazuh', [])
         vis.setUiState($scope.uiState);
 
         $scope.timefilter = timefilter;
-        $scope.opts = _.pick($scope, 'doSave', 'savedVis', 'shareData', 'timefilter');
-
-        const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
-        editableVis.listeners.click = vis.listeners.click = filterBarClickHandler($state);
-        const brushEvent = Private(UtilsBrushEventProvider);
-        editableVis.listeners.brush = vis.listeners.brush = brushEvent;
 
         // track state of editable vis vs. "actual" vis
         $scope.stageEditableVis = transferVisState(editableVis, vis, true);
@@ -186,28 +209,22 @@ require('ui/modules').get('app/wazuh', [])
 
         $scope.$watch('searchSource.get("index").timeFieldName', function (timeField) {
           timefilter.enabled = !!timeField;
+		  
         });
-
-        // update the searchSource when filters update
-        if ($scope.visClickable) {
-          const queryFilter = Private(FilterBarQueryFilterProvider);
-          $scope.$listen(queryFilter, 'update', function () {
-            searchSource.set('filter', queryFilter.getFilters());
-            $state.save();
-          });
-
-          // fetch data when filters fire fetch event
-          $scope.$listen(queryFilter, 'fetch', $scope.fetch);
-        }
-
-
+		
+	
+		
         $scope.$listen($state, 'fetch_with_changes', function (keys) {
 
           let $state = $scope.$state = (function initState() {
+			$scope.previousRoute = $route.current.params._a;
+			
             $route.current.params._a = $scope.visA;
             $route.updateParams({ '_a': $scope.visA });
             $route.current.params._g = $scope.visG;
             $route.updateParams({ '_g': $scope.visG });
+			
+			
             const stateDefaults = {
               uiState: {},
               linked: false,
@@ -216,7 +233,12 @@ require('ui/modules').get('app/wazuh', [])
               vis: {}
             };
             $state = new AppState(stateDefaults);
+			
+			$route.updateParams({ '_a': $scope.previousRoute });
+			$route.current.params._a = $scope.previousRoute
 
+			
+			
             return $state;
           } ());
 
@@ -243,32 +265,25 @@ require('ui/modules').get('app/wazuh', [])
             return;
           }
 
-          $scope.$watch("visFilter", function (newValue, oldValue) {
-            $scope.v.filter = newValue;
-            $scope.fetch();
-          });
-
-          $scope.$watch("visWidth", function (newValue, oldValue) {
-            $scope.fetch();
-          });
 
           $scope.fetch();
         });
 
-        $scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
-
-        $scope.$on('ready:vis', function () {
-          $state.emit('application.load');
-          $state.emit('fetch_with_changes');
-        });
-
+        //$scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
+		
+        //$scope.$listen(queryFilter.getFilters(), 'fetch', _.bindKey($scope, 'fetch'));
+			
+		
+	
         $scope.$on('$destroy', function () {
           savedVis.destroy();
         });
+		
+				
       }
 
       $scope.fetch = function () {
-        const queryFilter = Private(FilterBarQueryFilterProvider);
+
         if ($scope.visClickable) searchSource.set('filter', queryFilter.getFilters());
         if (!$state.linked) searchSource.set('query', $scope.v.filter);
         if ($scope.vis.type.requiresSearch) {
@@ -276,60 +291,6 @@ require('ui/modules').get('app/wazuh', [])
         }
       };
 
-      $scope.startOver = function () {
-        //Nothing
-      };
-
-      $scope.doSave = function () {
-        savedVis.id = savedVis.title;
-        // vis.title was not bound and it's needed to reflect title into visState
-        $state.vis.title = savedVis.title;
-        savedVis.visState = $state.vis;
-        savedVis.uiStateJSON = angular.toJson($scope.uiState.getChanges());
-
-        savedVis.save()
-          .then(function (id) {
-            $scope.kbnTopNav.close('save');
-
-            if (id) {
-              notify.info('Saved Visualization "' + savedVis.title + '"');
-              if (savedVis.id === $route.current.params.id) return;
-            }
-          }, notify.fatal);
-      };
-
-      $scope.unlink = function () {
-        if (!$state.linked) return;
-
-        $state.linked = false;
-        const parent = searchSource.getParent(true);
-        const parentsParent = parent.getParent(true);
-
-        // display unlinking for 2 seconds, unless it is double clicked
-        $scope.unlinking = $timeout($scope.clearUnlinking, 2000);
-
-        delete savedVis.savedSearchId;
-        parent.set('filter', _.union(searchSource.getOwn('filter'), parent.getOwn('filter')));
-
-        // copy over all state except "aggs" and filter, which is already copied
-        _(parent.toJSON())
-          .omit('aggs')
-          .forOwn(function (val, key) {
-            searchSource.set(key, val);
-          })
-          .commit();
-
-        $scope.query = searchSource.get('query');
-        $state.filters = searchSource.get('filter');
-        searchSource.inherits(parentsParent);
-      };
-
-      $scope.clearUnlinking = function () {
-        if ($scope.unlinking) {
-          $timeout.cancel($scope.unlinking);
-          $scope.unlinking = null;
-        }
-      };
 
       function transferVisState(fromVis, toVis, stage) {
         return function () {
@@ -339,12 +300,15 @@ require('ui/modules').get('app/wazuh', [])
           editableVis.dirty = false;
           $state.vis = full;
           $state.save();
-
           if (stage) $scope.fetch();
         };
       }
       init();
-
+	
+	  
     });
+	
+
+		
 
   });

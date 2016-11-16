@@ -60,11 +60,13 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 
     $scope.applyAgent = function (agent) {
         if (agent) {
+            //$scope.submenuNavItem = 'fim';
             $scope.submenuNavItem = 'overview';
             $scope._agent = agent;
             $scope.search = agent.name;
         }
     };
+	
 	
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
@@ -75,11 +77,51 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
         $scope.state.setDiscoverState(template, filter);
 		$window.location.href = '#/discover/';
     }
+	$scope.resetDiscover = function () {
+        $scope.state.unsetDiscoverState();
+    }
+	$scope.resetDashboards = function () {
+        $scope.state.unsetDashboardsState();
+    }	
+	
+	$scope.restartAgent = function () {
+		var path = '/agents/' + $scope._agent.id + '/restart';
 
+		DataFactory.getAndClean('put', path, {})
+			.then(function (data) {
+				if(data.error != 0)
+					var alert = data.message;
+				else
+					var alert = data.data;
+				
+				$mdToast.show({
+					template: '<md-toast>' + alert + '</md-toast>',
+					position: 'bottom left',
+					hideDelay: 2000,
+				});
+				
+			}, printError);
+	};
+	
+	
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 256, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
+				// tmp
+				/*
+				     DataFactory.get(objectsArray['/agents'])
+					.then(function (data) {
+						//$scope.submenuNavItem = 'fim';
+						//$scope._agent = data.data.items[0];
+						//$scope.search = data.data.items[0].name;
+						 $scope.load = false;
+					}, function (data) {
+						printError(data);
+						//defered.reject();
+					});
+				*/
+				// tmp
                 DataFactory.get(data).then(function (data) {
                     DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
                     $scope.load = false;
@@ -111,6 +153,18 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 app.controller('stateController', function ($scope, appState, $route) {
     $scope.state = appState;
     $scope.select = $route.current.params.select;
+	$scope.submenuNavItem2 = "rules";
+	$scope.resetDiscover = function () {
+        $scope.state.unsetDiscoverState();
+    }
+	$scope.resetDashboards = function () {
+        $scope.state.unsetDashboardsState();
+    }
+	
+	$scope.setRulesTab = function(tab) {
+		$scope.submenuNavItem2 = tab;
+	};
+
 });
 
 app.controller('stateLocationController', function ($scope, appState, $window) {
@@ -121,11 +175,16 @@ app.controller('stateLocationController', function ($scope, appState, $window) {
 		$window.location.href = '#/dashboards/';
 		
     }
-	
 	$scope.openDiscover = function (template, filter) {
         $scope.state.setDiscoverState(template, filter);
 		$window.location.href = '#/discover/';
     }
+	$scope.resetDiscover = function () {
+        $scope.state.unsetDiscoverState();
+    }
+	$scope.resetDashboards = function () {
+        $scope.state.unsetDashboardsState();
+    }	
 	
 
 });

@@ -12,6 +12,10 @@ require('ui/modules').get('app/wazuh', [])
                     $cookies.putObject('_dashboardsState_filter', filter);
                 }
             },
+			unsetDashboardsState: function () {
+                    $cookies.putObject('_dashboardsState_name', "");
+                    $cookies.putObject('_dashboardsState_filter', "");
+            },
 			getDiscoverState: function () {
                 return { name: $cookies.getObject('_discoverState_name'), filter: $cookies.getObject('_discoverState_filter') };
             },
@@ -22,6 +26,10 @@ require('ui/modules').get('app/wazuh', [])
                 if (filter) {
                     $cookies.putObject('_discoverState_filter', filter);
                 }
+            },
+			unsetDiscoverState: function () {
+                    $cookies.putObject('_discoverState_name', "");
+                    $cookies.putObject('_discoverState_filter', "");
             },
             getManagerState: function () {
                 return $cookies.getObject('_managerState');
@@ -45,6 +53,30 @@ require('ui/modules').get('app/wazuh', [])
             setOverviewState: function (subtab) {
                 if (subtab) {
                     $cookies.putObject('_overviewState', subtab);
+                }
+            },
+			getDefaultManager: function () {
+				if($cookies.getObject('_defaultManager'))
+					return { name: $cookies.getObject('_defaultManager')};
+				else
+					return { name: "*"};
+				
+            },
+            setDefaultManager: function (name) {
+                if (name) {
+                    $cookies.putObject('_defaultManager', name);
+                }
+            },
+			getDisState: function (tab) {
+				if($cookies.getObject(tab))
+					return { value: $cookies.getObject(tab)};
+				else
+					return { value: "*"};
+				
+            },
+            setDisState: function (tab,value) {
+                if (tab && value) {
+                    $cookies.putObject(tab, value);
                 }
             }
         };

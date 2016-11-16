@@ -45,10 +45,13 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
         dashSearchable: '@dashSearchable',
         dashTimepicker: '@dashTimepicker'
       },
-        controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState, savedDashboards) {
+        controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState, savedDashboards, appState) {
             $scope.chrome = {};
             $scope.chrome.getVisible = function () {return true};
-
+			
+			$scope.defaultManagerName = appState.getDefaultManager().name;
+			//$scope.dashFilter =  "* AND host: " + $scope.defaultManagerName;
+			
             $scope.topNavMenu = [{
                 key: 'open',
                 description: 'Load Saved Dashboard',
@@ -151,7 +154,7 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                 }
 
                 $scope.$watch("dashFilter", function () {
-                    $state.query = { query_string: { query: $scope.dashFilter } };
+                    $state.query = { query_string: { query: $scope.dashFilter ? $scope.dashFilter : '*' } };
                     $scope.filterResults();
                 });
 
@@ -207,13 +210,12 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                         .then(function (id) {
                             $scope.kbnTopNav.close('save');
                             if (id) {
-                                notify.info('Saved Dashboard as "' + dash.title + '"');
                                 if (dash.id !== $routeParams.id) {
                                     kbnUrl.change('/dashboard/{{id}}', { id: dash.id });
                                 }
                             }
                         })
-                        .catch(notify.fatal);
+                        .catch();
                 };
 
                 let pendingVis = _.size($state.panels);

@@ -1,32 +1,23 @@
-/* MATERIAL */
-::-webkit-scrollbar { 
-    display: block !important; 
-	width: 0px; 
+body{
+   min-width:1024px;  
+   width:100%;
 }
-.button-active {
-	background: rgb(207,216,220) !important;
-	color: rgba(0,0,0,0.87)!important;
-}
-.button-disabled {
-	background: rgb(236, 239, 241) !important;
-	color: rgba(0,0,0,0.87)!important;
-}
-md-progress-linear.md-default-theme ._md-bar, md-progress-linear ._md-bar {
-	background-color: #3caed2;
-}
-md-select-menu.md-default-theme md-content, md-select-menu md-content {
-	background: rgb(207, 216, 220) !important;
-}
+
+
 md-input-container > md-select {
-	background: rgb(207, 216, 220);
+	background: #3caed2;
 	border-radius: 3px;
+	color: white; 
 	padding: 3px;
 }
 .md-headline{
 	font-size: 22px !important;
 }
+.md-headline-small{
+	font-size: 18px;
+}
 .h3, h3 {
-	font-size: 22px !important;
+	font-size: 18px !important;
 	font-weight: 400 !important;
 }
 .vertical-repeater {
@@ -37,13 +28,19 @@ md-input-container > md-select {
 .status {
     width: 3%;
 }
-.status.green{
+.green{
 	background-color: rgb(49, 196, 113);
 }
-.status.red{
-	background-color: red;
+.red{
+	background-color: #da534f;
 }
-.status.orange {
+.statusBox.green{
+	background-color: rgb(49, 196, 113);
+}
+.statusBox.red{
+	background-color: #da534f;
+}
+.statusBox.orange {
     background-color: orange;
 }
 .status.grey {
@@ -155,9 +152,14 @@ md-list-item.active._md-button-wrap.ng-scope._md.md-clickable{
     min-height: 36px;
     background: white;
     white-space: nowrap;
-    min-width: 75px;
+    min-width: 111px;
     text-align: center;
     font-size: 14px;
+	text-align: center;
+	margin-top: 11px !important; 
+	color: white;
+	text-transform: uppercase;
+	
 }
 .statusBox.large {
     min-width: 120px !important;
@@ -228,13 +230,7 @@ p {
  margin-top: 4px !important;
 }
 
-.subNavLine {
-    border-style: solid;
-    border-width: 0 0 1px;
-    border-bottom-color: rgba(0, 0, 0, 0.117647);
-    padding-bottom: 5px !important;
-    padding-left: 0px !important;
-}
+
 
 .subNavLine a {
     margin-bottom: 0px;
@@ -264,13 +260,11 @@ p {
 	border: none !important;
 }
 .md-toolbar-tools {
-	font-size: 18px !important;
+	font-size: 15px !important;
+	font-weight: bold !important;
 }
 md-list.agents-preview-table:hover {
-	background-color: #f2f2f2;
-}
-a.pull-right {
-    visibility: hidden;
+	background-color: #c2e4ef;
 }
 
 .table-header-move {
@@ -296,7 +290,285 @@ md-nav-bar {
     padding-top: 0px !important;
 }
 
-/* noClickVis: Make visualizations not clickable*/
+
+
+md-select-menu:not(._md-overflow) md-content {
+	padding-top: 0px !important; 
+	padding-bottom: 0px !important; 
+}
+.ruleset_rules_row_active {
+	 background-color: #c2e4ef;
+	 padding-bottom: 0px; 
+}
+
+.ruleset_rules_row_active a{
+	color: rgba(0,0,0,0.87);
+	text-decoration: none;
+}
+.ruleset_rules_row_active a:hover{
+	color: #000;
+	text-decoration: none;
+}
+
+md-list-item.ruleset_rules_row_active {
+	 background-color: #3caed2;
+	 color: white;
+	 padding-bottom: 0px; 
+}
+
+button:hover, button:focus, button.focus{
+	color: #000;
+}
+
+.input-filter-box {
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
+	font-size: 14px;
+	padding: 0px 15px;
+	margin-top: 18px;border: none;
+	height: 40px;
+	margin-right: 20px;
+}
+
+md-content{
+	background-color: #e4e8eb;
+}
+md-card{
+	box-shadow: none !important; 
+}
+
+.horizontal-menu-right .buttonMenu{
+	background-color: #3caed2;
+	color: white;
+}
+.md-button.buttonMenu.md-default-theme:not([disabled]):hover, .md-button:not([disabled]):hover {
+	background-color: rgba(60,174,210,0.7)
+}
+
+.md-button.buttonMenu{
+	background-color: #3caed2;
+	color: white;
+}
+.app-container.vis-editor{
+	position: relative;
+}
+
+.headBar {
+	background-color: #f7f7f7;
+	padding-bottom: 0px;
+	padding-top: 4px; 
+}
+
+.horizontal-menu-right {
+	background-color: #f7f7f7
+}
+
+md-nav-bar.md-default-theme .md-button._md-nav-button.md-unselected, md-nav-bar .md-button._md-nav-button.md-unselected{
+	color: #141414;
+	border: none;
+}
+
+md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
+	background-color: #f7f7f7
+}
+.md-nav-bar{
+	border: none !important;
+}
+
+.md-toolbar-tools h1, .md-toolbar-tools h2, .md-toolbar-tools h3 {
+    font-size: inherit;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin: inherit;
+    color: #5a5a5a;
+    font-size: 16px;
+    }
+md-list{
+	background-color: white;
+}
+
+md-list.even{
+	background-color: #fafafa;
+}	
+
+md-list.odd{
+	background-color: white;
+}	
+
+	
+md-input-container.md-whiteframe-z1.flex.md-input-has-value{
+
+	box-shadow: none; 
+	background-color: #3caed2;
+	
+}
+md-progress-linear.md-default-theme ._md-bar, md-progress-linear ._md-bar {
+	background-color: #3caed2;
+}
+
+.button-active {
+	background: #3caed2 !important;
+	color: white!important;
+}
+.button-disabled {
+	background: rgba(60, 174, 210, 0.3) !important;
+	color: white !important;
+}
+
+md-select-menu.md-default-theme md-content, md-select-menu md-content {
+	background: #3caed2 !important;
+	color: white !important; 
+}
+
+md-select-menu.md-default-theme md-content md-option, md-select-menu md-content md-option{
+	color: white;
+}
+md-select-menu.md-default-theme md-content md-option:not([disabled]):focus, md-select-menu md-content md-option:not([disabled]):focus, md-select-menu.md-default-theme md-content md-option:not([disabled]):hover, md-select-menu md-content md-option:not([disabled]):hover{
+	background-color: rgba(255,255,255, 0.1);
+	color: white;
+}
+.md-input-focused{
+	color: white;
+}
+md-select.md-default-theme:not([disabled]):focus ._md-select-value, md-select:not([disabled]):focus ._md-select-value {
+	color: white;
+}
+
+input#searchBox {
+	box-shadow: none; 
+}
+md-autocomplete-wrap.md-whiteframe-z1.layout-row {
+	box-shadow: none; 
+}
+
+#agentsAutocomplete{
+	
+}
+md-input-container.md-whiteframe-z1.flex-20.md-input-has-value {
+	background: #3caed2;
+}
+
+md-input-container.md-whiteframe-z1.flex-20.md-input-has-value {
+    box-shadow: none;
+}
+
+button._md-no-style.md-button.md-ink-ripple {
+    background: none;
+}
+.horizontal-menu-right .md-whiteframe-1dp, .horizontal-menu-right .md-whiteframe-z1 {
+	box-shadow: none !important; 
+}
+
+md-input-container.md-whiteframe-z1.flex-20 {
+	background: #3caed2;
+}
+md-select.md-default-theme ._md-select-value._md-select-placeholder, md-select ._md-select-value._md-select-placeholder {
+	color: white;
+}
+#settingButtonTop{
+    float: right;
+    clear: both;
+    position: absolute;
+    color: white;
+    right: 0;
+}
+
+.buttonBlueLight{
+	background-color: #3caed2 !important;
+	color: white !important;
+	box-shadow: none !important;
+}
+.md-button.buttonBlueLight.md-default-theme:not([disabled]):hover, .md-button:not([disabled]):hover {
+	background-color: rgba(60,174,210,0.7)
+}
+input.ng-invalid.ng-dirty,
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-dirty,
+textarea.ng-invalid.ng-touched,
+select.ng-invalid.ng-dirty,
+select.ng-invalid.ng-touched {
+  border-color: #3caed2 !important;
+}
+
+md-input-container.md-default-theme.md-input-invalid label, md-input-container.md-input-invalid label {
+	color: rgba(0,0,0,0.38);
+	font-size: 16px; 
+}
+md-input-container.md-default-theme label.md-required:after, md-input-container label.md-required:after{
+  color: #3caed2 !important;
+}
+
+md-input-container.md-default-theme label, md-input-container label, md-input-container.md-default-theme ._md-placeholder, md-input-container ._md-placeholder {
+	font-size: 16px;
+}
+
+md-autocomplete input::-webkit-input-placeholder {
+    color: #5a5a5a;
+	font-weight: normal;
+}
+md-autocomplete input:-moz-placeholder { /* Firefox 18- */
+    color:#5a5a5a;
+	font-weight: normal;
+}
+
+md-autocomplete input::-moz-placeholder {  /* Firefox 19+ */
+    color:#5a5a5a;
+	font-weight: normal;
+}
+
+md-autocomplete input:-ms-input-placeholder { 
+    color:#5a5a5a;
+	font-weight: normal;
+}
+
+.h1, h1 {
+	font-size: 24px !important; 
+}
+md-chips.md-default-theme .md-chips, md-chips .md-chips {
+	box-shadow: none;
+}
+
+.md-chips md-chip {
+    cursor: default;
+    border-radius: 16px;
+    display: block;
+    background-color: #3caed2;
+    color: white;
+    height: 32px;
+    line-height: 32px;
+    margin: 8px 8px 0 0;
+    padding: 0 12px 0 12px;
+    float: left;
+    font-size: 14px;
+    box-sizing: border-box;
+    max-width: 100%;
+    position: relative;
+	cursor: pointer;
+}
+md-card.cardHover:hover{
+	background-color: #c2e4ef;
+}
+.listHover:hover{
+	background-color: #c2e4ef;
+}
+i.fa.fa-times{
+	cursor: pointer;
+}
+a.pull-right {
+	visibility: hidden;
+}
+
+md-content._md.layout-row {
+	overflow-x: hidden;
+}
+md-content#agents-fim navbar {
+	background-color: white;
+}
+
+
+
+
+/* TMP 
+
 .noClickVis visualize-legend .legend-value .legend-value-details {
     visibility: hidden;
     width: 0px;
@@ -329,25 +601,4 @@ md-nav-bar {
 .noClickVis .table-condensed tbody .cell-hover {
     background-color: #fff !important;
 }
-
-md-select-menu:not(._md-overflow) md-content {
-padding-top: 0px !important; 
-padding-bottom: 0px !important; 
-}
-.ruleset_rules_row_active {
- background-color: #fafafa;
- padding-bottom: 0px; 
-}
-
-.ruleset_rules_row_active a{
-	color: rgba(0,0,0,0.87);
-	text-decoration: none;
-}
-.ruleset_rules_row_active a:hover{
-	color: #000;
-	text-decoration: none;
-}
-
-button:hover, button:focus, button.focus{
-	color: #000;
-}
+*/

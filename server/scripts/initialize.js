@@ -70,7 +70,7 @@ module.exports = function (server, options) {
         client.create({ index: '.kibana', type: 'index-pattern', id: 'ossec-*', body: { title: 'ossec-*', timeFieldName: '@timestamp', fields: prepareMappingCache() } })
             .then(function () {
                 server.log([blueWazuh, 'initialize', 'info'], 'Successfully configured.');
-                setDefaultTime();
+                setDefaultIndex();
             }, function (response) {
                 if (response.statusCode != '409') {
                     server.log([blueWazuh, 'initialize', 'error'], 'Could not configure "ossec-*" index pattern.');
@@ -144,26 +144,26 @@ module.exports = function (server, options) {
         return JSON.stringify(cacheJson);
     };
 
-    var setDefaultTime = function () {
-        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default time to last 24h...');
-
-        uiSettings.set('timepicker:timeDefaults', '{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}')
-            .then(function () {
-                setDefaultIndex();
-            }).catch(function () {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not set default time.');
-            });
-    };
-
     var setDefaultIndex = function () {
         server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default index pattern to "ossec-*"...');
         
         uiSettings.set('defaultIndex', 'ossec-*')
             .then(function () {
-                importObjects();
-            }).catch(function (e) {
-                console.log(e);
+                setDefaultTime();
+            }).catch(function () {
                 server.log([blueWazuh, 'initialize', 'error'], 'Could not set default index.');
+            });
+    };
+
+    var setDefaultTime = function () {
+        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default time to last 24h...');
+
+        uiSettings.set('timepicker:timeDefaults', '{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}')
+            .then(function () {
+                importObjects();
+            }).catch(function (data) {
+                server.log([blueWazuh, 'initialize', 'warning'], 'Could not set default time. Please, configure it manually.');
+                importObjects();
             });
     };
 
