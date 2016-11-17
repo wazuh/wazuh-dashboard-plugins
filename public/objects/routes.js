@@ -58,6 +58,9 @@ routes
     .when('/settings/', {
         template: require('plugins/wazuh/templates/settings.html')
     })
+	.when('/test/', {
+        template: require('plugins/wazuh/templates/test.html')
+    })
     .when('/', {
         redirectTo: '/overview/',
     })

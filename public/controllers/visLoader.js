@@ -249,7 +249,7 @@ require('ui/modules').get('app/wazuh', [])
           }
 
           $state.vis.listeners = _.defaults($state.vis.listeners || {}, vis.listeners);
-
+		  
           vis.setState($state.vis);
           editableVis.setState($state.vis);
 
@@ -271,7 +271,7 @@ require('ui/modules').get('app/wazuh', [])
 
         //$scope.$listen(timefilter, 'fetch', _.bindKey($scope, 'fetch'));
 		
-        //$scope.$listen(queryFilter.getFilters(), 'fetch', _.bindKey($scope, 'fetch'));
+        $scope.$listen(queryFilter.getFilters(), 'fetch', _.bindKey($scope, 'fetch'));
 			
 		
 	
