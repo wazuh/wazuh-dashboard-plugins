@@ -1,6 +1,9 @@
 {
   "name": "wazuh",
-  "version": "5.0.0",
+  "version": "1.0.0",
+  "kibana" : {
+    "version" : "5.0.1"
+  },
   "description": "Wazuh App",
   "main": "index.js",
   "keywords": [

@@ -1,10 +1,10 @@
 <div ng-controller="VisController">
-<div ng-if="_loadVisAsync" class="app-container vis-editor vis-type-{{ vis.type.name }}" ng-style="{height:visHeight}">
+<div ng-if="loadBeforeShow" class="app-container vis-editor vis-type-{{ vis.type.name }}" ng-style="{height:visHeight}">
 
   <kbn-top-nav name="visualize" config="topNavMenu" ng-if="visSearchable">
     <div class="vis-editor-info">
-      <span ng-show="savedVis.id" class="vis-editor-info-title">
-        <span ng-bind="::savedVis.title"></span>
+      <span ng-show="newVis.id" class="vis-editor-info-title">
+        <span ng-bind="::newVis.title"></span>
       </span>
     </div>
   </kbn-top-nav>
@@ -27,7 +27,7 @@
       <form ng-if="vis.type.requiresSearch && !$state.linked" ng-submit="fetch()" class="inline-form fill" name="queryInput">
         <div class="typeahead" kbn-typeahead="visualize">
           <div class="input-group" ng-class="queryInput.$invalid ? 'has-error' : ''">
-            <input ng-model="v.filter" parse-query kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
+            <input ng-model="filter.vis" parse-query kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
 
             <button class="btn btn-default" type="submit" ng-disabled="queryInput.$invalid" aria-label="Search">
               <span aria-hidden="true" class="fa fa-search"></span>
@@ -45,7 +45,7 @@
   <div class="vis-editor-content">
 
     <div class="vis-editor-canvas">
-      <visualize vis="vis" ui-state="uiState" show-spy-panel="chrome.getVisible()" search-source="savedVis.searchSource" >
+      <visualize vis="vis" ui-state="uiState" search-source="newVis.searchSource" >
       </visualize>
     </div>
   </div>

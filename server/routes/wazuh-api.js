@@ -173,11 +173,14 @@ module.exports = function (server, options) {
             if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
-                needle.request('get', req.payload.url+":"+req.payload.port+'/version', {}, { username: req.payload.user, password: req.payload.password }, function (error, response) {
+                needle.request('get', req.payload.url+":"+req.payload.port+'/version', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
                     testApiAux1(error, response, req.payload, needle, function (test_result) {
 						if(test_result.data == "ok"){
-							needle.request('get', req.payload.url+":"+req.payload.port+'/agents/000', {}, { username: req.payload.user, password: req.payload.password }, function (error, response) {
-								reply(response.body.data.name);
+							needle.request('get', req.payload.url+":"+req.payload.port+'/agents/000', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
+								if(!error)
+									reply(response.body.data.name);
+								else
+									reply({ 'statusCode': 500, 'error': 5, 'message': 'Error occurred' }).code(500);	
 							});
 						}else{
 							reply(test_result);
