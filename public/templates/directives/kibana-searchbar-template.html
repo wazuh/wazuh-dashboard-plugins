@@ -1,0 +1,35 @@
+<div ng-controller="kibanaSearchBar"> 
+heey
+
+<kbn-top-nav name="discover" config="topNavMenu">
+    <div class="kibana-nav-info">
+
+    </div>
+  </kbn-top-nav>
+  <navbar name="discover-search">
+    <form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
+      <div class="typeahead" kbn-typeahead="discover">
+        <div class="input-group"
+          ng-class="discoverSearch.$invalid ? 'has-error' : ''">
+          <input
+            parse-query
+            input-focus
+            kbn-typeahead-input
+            ng-model="stateQuery"
+            placeholder="Search..."
+            aria-label="Search input"
+            type="text"
+            class="form-control">
+          <button type="submit"
+            ng-disabled="discoverSearch.$invalid"
+            aria-label="Search">
+            <span aria-hidden="true" class="fa fa-search"></span></button>
+        </div>
+        <kbn-typeahead-items></kbn-typeahead-items>
+      </div>
+    </form>
+    <div class="button-group" role="toolbar"></div>
+  </navbar>
+
+  <filter-bar state="$state"></filter-bar>
+</div>

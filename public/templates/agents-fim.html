@@ -90,8 +90,8 @@
                         </md-card-title-text>
                     </md-card-title>
                     <md-card-content>
-                        <kbn-vis vis-height="100px" vis-type="histogram" vis-index-pattern="ossec-*"
-						vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
+                        <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*"
+						vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:SyscheckFile.uname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users2',type:pie))"
 						
                         vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
 					    vis-filter="location: syscheck AND {{'AgentName:'+_agent.name}}">

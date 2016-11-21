@@ -60,7 +60,7 @@ import 'plugins/spy_modes/table_spy_mode';
 require('ui/courier');
 
 var app = require('ui/modules').get('app/wazuh', [])
-  .directive('kbnVis', [function () {
+  .directive('kbnVis2', [function () {
     return {
       restrict: 'E',
       scope: {
@@ -79,7 +79,7 @@ var app = require('ui/modules').get('app/wazuh', [])
   }]);
 
 require('ui/modules').get('app/wazuh', [])
-  .controller('VisEditorW', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
+  .controller('VisEditorW2', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations) {
     $scope.v = {};
     $scope.chrome = {};
     $scope.chrome.getVisible = function () {

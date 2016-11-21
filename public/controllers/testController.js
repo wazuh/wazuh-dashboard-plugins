@@ -2,7 +2,7 @@ import rison from 'rison-node';
 import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
 
 var app = require('ui/modules').get('app/wazuh', [])
-  .directive('kbnVisTest', [function () {
+  .directive('kbnVis', [function () {
     return {
 		restrict: 'E',
 		scope: {
@@ -20,7 +20,7 @@ var app = require('ui/modules').get('app/wazuh', [])
     }
   }]);
 
-require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState) {
+require('ui/modules').get('app/wazuh', []).controller('VisEditorW', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState,$rootScope) {
 		
 	$scope.filter = {};
 	
@@ -102,6 +102,15 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			$scope.fetch();
 
 		 });
+
+		$rootScope.$on('update', function (event, query) {
+			//$state.vis.listeners = _.defaults($state.vis.listeners || {}, $scope.vis.vis.listeners);
+			console.log("query filter update en vis");
+			console.log(query);
+			//$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
+			$scope.searchSource.set('query', query);
+			courier.fetch();
+		 });
 		$scope.$on('$destroy', function () {
 			$scope.newVis.destroy();
 		});
@@ -112,7 +121,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 			$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
 			$scope.searchSource.set('query', $scope.filter.vis);
-			console.log($state);
 			if ($scope.vis.type.requiresSearch) {
 				courier.fetch();
 			}

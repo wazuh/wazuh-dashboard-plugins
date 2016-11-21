@@ -1,4 +1,4 @@
-<div ng-controller="VisController">
+<div ng-controller="VisEditorW">
 <div ng-if="loadBeforeShow" class="app-container vis-editor vis-type-{{ vis.type.name }}" ng-style="{height:visHeight}">
 
   <kbn-top-nav name="visualize" config="topNavMenu" ng-if="visSearchable">
@@ -9,7 +9,9 @@
     </div>
   </kbn-top-nav>
 
-  <navbar name="visualize-search">
+
+
+  <navbar name="visualize-search" ng-show="visSearchable">
     <div class="fill bitty-modal-container">
 
       <form ng-if="vis.type.requiresSearch && $state.linked" class="inline-form fill" name="queryInput">
@@ -40,12 +42,12 @@
     <div class="button-group"></div>
   </navbar>
 
-  <filter-bar state="$state"></filter-bar>
+  <filter-bar state="$state" ng-show="visClickable"></filter-bar>
 
   <div class="vis-editor-content">
 
     <div class="vis-editor-canvas">
-      <visualize vis="vis" ui-state="uiState" search-source="newVis.searchSource" >
+      <visualize vis="vis" ui-state="uiState" search-source="searchSource" >
       </visualize>
     </div>
   </div>

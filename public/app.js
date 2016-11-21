@@ -31,6 +31,7 @@ require('plugins/wazuh/objects/routes.js');
 require('plugins/wazuh/controllers/visLoader.js');
 require('plugins/wazuh/controllers/disLoader.js');
 require('plugins/wazuh/controllers/dashLoader.js');
+require('plugins/wazuh/controllers/kibanaSearchbarDirective.js');
 
 // Require controllers
 require('plugins/wazuh/controllers/general.js');

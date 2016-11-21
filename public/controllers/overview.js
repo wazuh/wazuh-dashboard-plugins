@@ -231,6 +231,7 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
         date.setDate(date.getDate() - daysAgo);
         var timeAgo = date.getTime();
         
+
         // Top fields
         genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName/'+timeAgo)
             .then(function (data) {

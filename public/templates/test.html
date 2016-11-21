@@ -1,33 +1,42 @@
 <div ng-controller="testController">
 
-hey
+<kbn-searchbar></kbn-searchbar>
+
+
 <md-content flex layout="row">
 	<md-card flex = "50" > 
 
-	<kbn-vis-test
+	<kbn-vis
 		vis-height="300px"
 	    vis-type="pie"
         vis-index-pattern="ossec-*"
-        vis-searchable="true"
-	   vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'VISUA1',type:pie))"
+		vis-searchable="true"
+		vis-clickable="true"
+		vis-filter="AgentName: ubuntu5"
+		vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'VISUA1',type:pie))"
 						
          vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))"
 					    vis-filter="*">
 
-     </kbn-vis-test>
+     </kbn-vis>
 						
 						
 	
 	</md-card>
 	
 	<md-card flex = "50">
-
-	<kbn-vis-test vis-height="300px" vis-type="pie" vis-index-pattern="ossec-*" vis-searchable="true"
+	<kbn-vis 
+vis-height="300px"
+vis-type="pie"
+vis-index-pattern="ossec-*"
+vis-searchable="true"
+vis-clickable="true"
+vis-filter="Windows"
 						vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'VISUA2',type:pie))"
 						
                         vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-7d,mode:quick,to:now))"
 					    vis-filter="*">
-                        </kbn-vis-test>					
+                        </kbn-vis>					
 						
 	
 	</md-card>
