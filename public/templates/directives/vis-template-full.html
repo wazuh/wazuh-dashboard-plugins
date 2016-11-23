@@ -29,7 +29,7 @@
       <form ng-if="vis.type.requiresSearch && !$state.linked" ng-submit="fetch()" class="inline-form fill" name="queryInput">
         <div class="typeahead" kbn-typeahead="visualize">
           <div class="input-group" ng-class="queryInput.$invalid ? 'has-error' : ''">
-            <input ng-model="filter.vis" parse-query kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
+            <input ng-model="filter.current" parse-query kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
 
             <button class="btn btn-default" type="submit" ng-disabled="queryInput.$invalid" aria-label="Search">
               <span aria-hidden="true" class="fa fa-search"></span>

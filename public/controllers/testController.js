@@ -21,28 +21,26 @@ var app = require('ui/modules').get('app/wazuh', [])
   }]);
 
 require('ui/modules').get('app/wazuh', []).controller('VisEditorW', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState,$rootScope) {
-		
-	$scope.filter = {};
 	
+	// Set filters
+	$scope.filter = {};
 	$scope.defaultManagerName = appState.getDefaultManager().name;
-	$scope.filter.vis = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
+	$scope.filter.raw = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
+	$scope.filter.current = $scope.filter.raw;
 			
 	// Initialize Visualization
 
 	$scope.newVis = new SavedVis({ 'type': $scope.visType, 'indexPattern': $scope.visIndexPattern });
-
 	$scope.newVis.init().then(function () {
 		// Render visualization
 		renderVisualization();
 	});
 
-
-	
-	
 	
     function renderVisualization() {
 	
 		$scope.loadBeforeShow = false;
+		
 		// Get or create App State		
 		let $state = $scope.$state = (function initState() {
 		
@@ -53,33 +51,27 @@ require('ui/modules').get('app/wazuh', []).controller('VisEditorW', function ($s
 
 			return $state;
 		} ());
-	
-	
-		$scope.$watch("visG", function () {		
-		//This gets called when data changes.
-		//$route.current.params._g = $scope.visG;
-		//$route.updateParams({ '_g': $scope.visG });
-		});
-
-					
+		
 		// Initialize queryFilter and searchSorce
 
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);	
 		$scope.searchSource = $scope.newVis.searchSource;
 
-		// Initialize visualization params
+		// Initialize visualization initial state
 
 		$scope.vis = $scope.newVis.vis;
-
-        
-
 		$scope.indexPattern = $scope.vis.indexPattern;
 		$scope.state = $state;
 		$scope.uiState = $state.makeStateful('uiState');
-
 		$scope.vis.setUiState($scope.uiState);
-
+		
+		// Initialize time
 		$scope.timefilter = timefilter;
+		
+		// Set default time
+		if($route.current.params._g == "()")
+			$scope.timefilter.time.from = "now-24h";
+		
 
 		$timeout(
 		function() { 
@@ -96,36 +88,39 @@ require('ui/modules').get('app/wazuh', []).controller('VisEditorW', function ($s
 
 		}, 0);
 		
-		// Listen to filter changes
-		$scope.$listen($scope.queryFilter, 'update', function () {
-			//$state.vis.listeners = _.defaults($state.vis.listeners || {}, $scope.vis.vis.listeners);
-			$scope.fetch();
-
-		 });
-
-		$rootScope.$on('update', function (event, query) {
-			//$state.vis.listeners = _.defaults($state.vis.listeners || {}, $scope.vis.vis.listeners);
-			console.log("query filter update en vis");
-			console.log(query);
-			//$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
-			$scope.searchSource.set('query', query);
-			courier.fetch();
-		 });
-		$scope.$on('$destroy', function () {
-			$scope.newVis.destroy();
-		});
-			
-		// Fetch / reload visualization
+		// Fetch visualization
 		$scope.fetch = function () 
 		{
 
 			$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
-			$scope.searchSource.set('query', $scope.filter.vis);
+			$scope.searchSource.set('query', $scope.filter.current);
 			if ($scope.vis.type.requiresSearch) {
 				courier.fetch();
 			}
 
 		};
+		
+		// Listeners
+		
+		// Listen for timefilter changes
+		$scope.$listen(timefilter, 'fetch', function () {
+			courier.fetch();
+        });
+		// Listen for filter changes
+		$scope.$listen($scope.queryFilter, 'update', function () {
+			$scope.fetch();
+
+		 });
+		// Listen for query changes
+		$rootScope.$on('update', function (event, query) {
+			$scope.filter.current.query_string.query = $scope.filter.raw+" AND "+query.query_string.query
+			courier.fetch();
+		 });
+		// Listen for destroy 
+		$scope.$on('$destroy', function () {
+			$scope.newVis.destroy();
+		});
+		
 		$scope.loadBeforeShow = true;
     };
 
