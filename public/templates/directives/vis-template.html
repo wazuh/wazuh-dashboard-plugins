@@ -1,15 +1,17 @@
-<div ng-controller="VisEditorW">
-<div ng-if="_loadVisAsync" class="app-container vis-editor vis-type-{{ vis.type.name }}" ng-style="{height:visHeight}">
+<div ng-controller="VisController">
+<div ng-if="loadBeforeShow" class="app-container vis-editor vis-type-{{ vis.type.name }}" ng-style="{height:visHeight}">
 
   <kbn-top-nav name="visualize" config="topNavMenu" ng-if="visSearchable">
     <div class="vis-editor-info">
-      <span ng-show="savedVis.id" class="vis-editor-info-title">
-        <span ng-bind="::savedVis.title"></span>
+      <span ng-show="newVis.id" class="vis-editor-info-title">
+        <span ng-bind="::newVis.title"></span>
       </span>
     </div>
   </kbn-top-nav>
 
-  <navbar ng-if="chrome.getVisible() && visSearchable" name="visualize-search">
+
+
+  <navbar name="visualize-search" ng-show="visSearchable">
     <div class="fill bitty-modal-container">
 
       <form ng-if="vis.type.requiresSearch && $state.linked" class="inline-form fill" name="queryInput">
@@ -27,7 +29,7 @@
       <form ng-if="vis.type.requiresSearch && !$state.linked" ng-submit="fetch()" class="inline-form fill" name="queryInput">
         <div class="typeahead" kbn-typeahead="visualize">
           <div class="input-group" ng-class="queryInput.$invalid ? 'has-error' : ''">
-            <input ng-model="v.filter" parse-query kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
+            <input ng-model="filter.current" parse-query kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
 
             <button class="btn btn-default" type="submit" ng-disabled="queryInput.$invalid" aria-label="Search">
               <span aria-hidden="true" class="fa fa-search"></span>
@@ -40,12 +42,12 @@
     <div class="button-group"></div>
   </navbar>
 
-  <filter-bar state="$state" ng-if="visClickable"></filter-bar>
+  <filter-bar state="$state" ng-show="visClickable"></filter-bar>
 
   <div class="vis-editor-content">
 
-    <div class="vis-editor-canvas" ng-class="{ embedded: !chrome.getVisible() }">
-      <visualize vis="vis" ui-state="uiState" show-spy-panel="chrome.getVisible()" editable-vis="editableVis" search-source="savedVis.searchSource" ng-class="visClickable ? 'null' : 'noClickVis'">
+    <div class="vis-editor-canvas">
+      <visualize vis="vis" ui-state="uiState" search-source="searchSource" >
       </visualize>
     </div>
   </div>
