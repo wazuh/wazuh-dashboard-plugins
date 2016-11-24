@@ -50,9 +50,19 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
-		$rootScope.$broadcast('update',$scope.stateQuery);  
+		$rootScope.$broadcast('updateQuery',$scope.stateQuery);  
 	};
+	
+	// Watch visCounter, wait for finish and fetch.
+	$rootScope.$watch('visCounter', function (data) {
+		if($rootScope.visCounter == 0){
+			$timeout(
+			function() {  
+					$rootScope.$broadcast('fetchVisualization',$scope.stateQuery); 
+			}, 0);
+		}
 
+	});
 
 });
   

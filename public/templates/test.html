@@ -6,36 +6,47 @@
 <md-content flex layout="row">
 	<md-card flex = "50" > 
 
-	<kbn-vis-value
-		vis-height="90px"
-	    vis-type="table"
-        vis-index-pattern="ossec-*"
-		vis-filter="*"
-		vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-		vis-filter="*">
-
-     </kbn-vis-value>
-						
-						
-	
-	</md-card>
-	
-	<md-card flex = "50">
-	
 	<kbn-vis
 		vis-height="300px"
 	    vis-type="table"
         vis-index-pattern="ossec-*"
 		vis-searchable="true"
 		vis-clickable="true"
+		vis-id="Agents-total-alerts"
 		vis-filter="*"
-		vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+		vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'VISUA1',type:table))"
 
 					    vis-filter="*">
 
-     </kbn-vis>				
+     </kbn-vis>
+						
+						
+	
+	</md-card>
+	
+	<md-card flex = "50">
+	<kbn-vis 
+vis-height="300px"
+vis-type="pie"
+vis-id="Alert-level-evolution"
+vis-index-pattern="ossec-*"
+vis-searchable="true"
+vis-clickable="true"
+vis-filter="Windows"
+						vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'VISUA2',type:pie))"
+		
+					    vis-filter="*">
+                        </kbn-vis>					
 						
 	
 	</md-card>
 	</md-content>
+	
+	
+</div>
+
+
+
+	
+	
 </div>
