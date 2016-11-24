@@ -142,8 +142,14 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             $scope.showInterval = !$scope.showInterval;
           };
           $scope.topNavMenu = [];
-          $scope.timefilter = timefilter;
+		 
 
+		  $scope.timefilter = timefilter;
+		  
+		// Set default time
+		console.log($route.current.params._g);
+		if($route.current.params._g == "()")
+			$scope.timefilter.time.from = "now-24h";
 
           // the saved savedSearch
           const savedSearch = $scope._savedSearch;
@@ -166,8 +172,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             var _aJson = rison.decode($scope.disA);
             $route.current.params._a = $scope.disA;
             $route.updateParams({ '_a': $scope.disA });
-            $route.current.params._g = $scope.disG;
-            $route.updateParams({ '_g': $scope.disG });
             return {
               query: $scope.disFilter ? $scope.disFilter : { query_string: { analyze_wildcard: '!t', query: '*' } },
               sort: _aJson.sort.length > 0 ? _aJson.sort : getSort.array(savedSearch.sort, $scope.indexPattern),

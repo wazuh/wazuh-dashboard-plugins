@@ -30,7 +30,22 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	$route.reloadOnSearch = true;
 
 	timefilter.enabled = true;
+		
 	$scope.timefilter = timefilter;
+	
+	// Set default time
+	if($route.current.params._g == "()")
+		$scope.timefilter.time.from = "now-24h";
+	
+	let $state = $scope.$state = (function initState() {
+
+	if(getAppState())
+		$state = getAppState();
+	else
+		$state = new AppState();	
+
+	return $state;
+	} ());
 
 	// Fetch / reload visualization
 	$scope.fetch = function () 
