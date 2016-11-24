@@ -23,7 +23,7 @@ var app = require('ui/modules').get('app/wazuh', [])
   }]);
 
 require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, Notifier,$rootScope) {
-	console.log("load Kibana searchbar");
+
 
 	$scope.stateQuery = $scope.disFilter;
 

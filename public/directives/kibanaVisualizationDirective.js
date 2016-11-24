@@ -1,5 +1,6 @@
 import rison from 'rison-node';
 import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
+import UtilsBrushEventProvider from 'ui/utils/brush_event';
 
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnVis', [function () {
@@ -16,7 +17,23 @@ var app = require('ui/modules').get('app/wazuh', [])
 		  visSearchable: '@visSearchable',
 		  visClickable: '@visClickable'
 		},
-		template: require('../templates/directives/vis-template.html')
+		template: require('../templates/directives/kibana-visualization-template.html')
+    }
+  }]).directive('kbnVisValue', [function () {
+    return {
+		restrict: 'E',
+		scope: {
+		  visType: '@visType',
+		  visIndexPattern: '@visIndexPattern',
+		  visA: '@visA',
+		  visG: '@visG',
+		  visFilter: '@visFilter',
+		  visHeight: '@visHeight',
+		  visWidth: '@visWidth',
+		  visSearchable: '@visSearchable',
+		  visClickable: '@visClickable'
+		},
+		template: require('../templates/directives/kibana-visualization-value-template.html')
     }
   }]);
 
@@ -56,7 +73,8 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);	
 		$scope.searchSource = $scope.newVis.searchSource;
-
+		const brushEvent = Private(UtilsBrushEventProvider);
+		
 		// Initialize visualization initial state
 
 		$scope.vis = $scope.newVis.vis;
@@ -64,6 +82,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.state = $state;
 		$scope.uiState = $state.makeStateful('uiState');
 		$scope.vis.setUiState($scope.uiState);
+		$scope.vis.listeners = {brush: brushEvent};
 		
 		// Initialize time
 		$scope.timefilter = timefilter;

@@ -147,7 +147,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 		  $scope.timefilter = timefilter;
 		  
 		// Set default time
-		console.log($route.current.params._g);
 		if($route.current.params._g == "()")
 			$scope.timefilter.time.from = "now-24h";
 

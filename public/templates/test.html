@@ -6,54 +6,36 @@
 <md-content flex layout="row">
 	<md-card flex = "50" > 
 
-	<kbn-vis
-		vis-height="300px"
-	    vis-type="pie"
+	<kbn-vis-value
+		vis-height="90px"
+	    vis-type="table"
         vis-index-pattern="ossec-*"
-		vis-searchable="true"
-		vis-clickable="true"
 		vis-filter="*"
-		vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'VISUA1',type:pie))"
+		vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+		vis-filter="*">
 
-					    vis-filter="*">
-
-     </kbn-vis>
+     </kbn-vis-value>
 						
 						
 	
 	</md-card>
 	
 	<md-card flex = "50">
-	<kbn-vis 
-vis-height="300px"
-vis-type="pie"
-vis-index-pattern="ossec-*"
-vis-searchable="true"
-vis-clickable="true"
-vis-filter="Windows"
-						vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'VISUA2',type:pie))"
-		
+	
+	<kbn-vis
+		vis-height="300px"
+	    vis-type="table"
+        vis-index-pattern="ossec-*"
+		vis-searchable="true"
+		vis-clickable="true"
+		vis-filter="*"
+		vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+
 					    vis-filter="*">
-                        </kbn-vis>					
+
+     </kbn-vis>				
 						
 	
 	</md-card>
 	</md-content>
-	<md-content flex layout="row">
-
-					<md-card flex="100">
-					<md-card-title>
-                        <md-card-title-text>
-                            <span class="md-headline">Last events</span>
-                        </md-card-title-text>
-                    </md-card-title>
-					<kbn-dis table-height="600px" dis-a="(columns:!(SyscheckFile.path,SyscheckFile.event,SyscheckFile.uname_after,SyscheckFile.gname_after,full_log),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'location:%20syscheck')),sort:!('@timestamp',desc))"
-					dis-filter="*"
-					infinite-scroll="true">
-					</kbn-dis>
-					</md-card>
-				
-
-		   </md-content>
-
 </div>

@@ -21,44 +21,9 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
         $scope.timerFilterValue = time;
     };
 
-
-    var load_tops = function () {
-        var daysAgo = 1;
-        if ($scope.timerFilterValue == "24h") {
-            daysAgo = 1;
-        } else if ($scope.timerFilterValue == "7d") {
-            daysAgo = 7;
-		} else if ($scope.timerFilterValue == "30d") {
-            daysAgo = 30;	
-        } else {
-            daysAgo = 1;
-        }
-		
-        var date = new Date();
-        date.setDate(date.getDate() - daysAgo);
-        var timeAgo = date.getTime();
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/srcuser/' + timeAgo)
-            .then(function (data) {
-                $scope.topsrcuser = (data.data != "") ? data.data : "(no data)";
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/srcip/' + timeAgo)
-            .then(function (data) {
-                $scope.topsrcip = (data.data != "") ? data.data : "(no data)";
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/' + timeAgo)
-            .then(function (data) {
-                $scope.topgroup = (data.data != "") ? data.data : "(no data)";
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.PCI_DSS/' + timeAgo)
-            .then(function (data) {
-                $scope.toppci = (data.data != "") ? data.data : "(no data)";
-            }, printError);
-    };
-
     //Load
     try {
         $scope.setTimer($scope.$parent.timeFilter);
-        load_tops();
     } catch (e) {
         $mdToast.show({
             template: '<md-toast> Unexpected exception loading controller </md-toast>',
@@ -73,7 +38,6 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
         return $scope.$parent.timeFilter;
     }, function () {
         $scope.setTimer($scope.$parent.timeFilter);
-        load_tops();
     });
 
 
@@ -125,24 +89,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
         date.setDate(date.getDate() - daysAgo);
         var timeAgo = date.getTime();
         
-        // Top fields
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName/'+timeAgo)
-            .then(function (data) {
-                $scope.topagent = (data.data != "") ? data.data : "(no data)";
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/SyscheckFile.perm_before/'+timeAgo)
-            .then(function (data) {
-                $scope.toppermissions = (data.data != "") ? data.data : "(no data)";
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.PCI_DSS/' + timeAgo)
-            .then(function (data) {
-                $scope.toppci = (data.data != "") ? data.data : "(no data)";
-            }, printError);
-		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/SyscheckFile.path/' + timeAgo + '/location/syscheck')
-            .then(function (data) {
-                $scope.topfile = (data.data != "") ? data.data : "(no data)";
-            }, printError);	
-            
         // Last fields
 
         genericReq.request('GET', '/api/wazuh-elastic/last/'+$scope.defaultManager+'/SyscheckFile/SyscheckFile.event/modified')
