@@ -35,7 +35,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	
 	// Set default time
 	if($route.current.params._g == "()")
-		$scope.timefilter.time.from = "now-24h";
+		$scope.timefilter.time.from = "now-7d";
 	
 	let $state = $scope.$state = (function initState() {
 
@@ -50,6 +50,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
+		console.log("Boardcast updateQuery");
 		$rootScope.$broadcast('updateQuery',$scope.stateQuery);  
 	};
 	
@@ -58,7 +59,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 		if($rootScope.visCounter == 0){
 			$timeout(
 			function() {  
-					$rootScope.$broadcast('fetchVisualization',$scope.stateQuery); 
+					$rootScope.$broadcast('fetchVisualization'); 
 			}, 0);
 		}
 

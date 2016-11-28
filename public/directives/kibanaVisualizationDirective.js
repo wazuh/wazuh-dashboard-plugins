@@ -68,6 +68,11 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	
 		$scope.loadBeforeShow = false;
 		
+		
+		// Set default time
+		if($route.current.params._g == "()")
+			$scope.timefilter.time.from = "now-7d";
+		
 		// Get or create App State	
 		let $state = $scope.$state = (function initState() {
 		
@@ -91,10 +96,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		
 		// Initialize time
 		$scope.timefilter = timefilter;
-		 
-		// Set default time
-		if($route.current.params._g == "()")
-			$scope.timefilter.time.from = "now-24h";
+		
 		
 
 		$timeout(
@@ -119,8 +121,9 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			$scope.vis.getEnabledState();
 			$scope.vis.setState(visState);
 			
-			$scope.loadBeforeShow = true;
+			
 			$rootScope.visCounter--;
+			$scope.loadBeforeShow = true;
 			
 		}, 0);
 		
@@ -156,15 +159,18 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		 
 		// Listen for query changes
 		$rootScope.$on('updateQuery', function (event, query) {
+			console.log("Get updateQuery 1");
 			if(query !== "undefined"){
+				console.log("Get updateQuery 2");	
 				$scope.filter.current.query_string.query = $scope.filter.raw+" AND "+query.query_string.query;
-				courier.fetch();
+				$scope.fetch();
 			}
 		 });
 		 
 		// Listen for visualization queue prepared
 		$rootScope.$on('fetchVisualization', function (event) {
-				courier.fetch();
+				console.log($scope);
+				$scope.fetch();
 		 });		 
 		 
 		// Listen for destroy 

@@ -2,7 +2,43 @@
 
 <kbn-searchbar></kbn-searchbar>
 
+	<div layout="row" layout-align="center stretch">
+		<md-card flex layout="column">
+			<md-card-content>
+				<kbn-vis vis-height="70px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'totalEvents',type:metric))"
+				vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
 
+		<md-card flex layout="column">
+			<md-card-content>
+				<kbn-vis vis-height="70px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 10 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'EventsAbove10',type:metric))"
+				vis-filter="rule.AlertLevel:[10 TO *]"
+				>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+
+		<md-card flex layout="column">
+			<md-card-content>
+				<kbn-vis vis-height="70px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_failed')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failure'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'eventsAuthFailed',type:metric))"
+				vis-filter="rule.groups: authentication_failed"
+					>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+
+		<md-card flex layout="column">
+			<md-card-content>
+				<kbn-vis vis-height="70px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20authentication_success')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication success'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'eventsAuthSuccess',type:metric))"
+				vis-filter="rule.groups: authentication_success"
+				>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+	</div>
+	
 <md-content flex layout="row">
 	<md-card flex = "50" > 
 
