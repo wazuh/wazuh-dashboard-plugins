@@ -50,12 +50,12 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
-		console.log("Boardcast updateQuery");
+
 		$rootScope.$broadcast('updateQuery',$scope.stateQuery);  
 	};
 	
 	// Watch visCounter, wait for finish and fetch.
-	$rootScope.$watch('visCounter', function (data) {
+	var visCounterWatch = $rootScope.$watch('visCounter', function (data) {
 		if($rootScope.visCounter == 0){
 			$timeout(
 			function() {  
@@ -64,6 +64,9 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 		}
 
 	});
+	
+	// Listen for destroy 
+	$scope.$on('$destroy', visCounterWatch);
 
 });
   

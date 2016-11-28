@@ -158,18 +158,15 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		 });
 		 
 		// Listen for query changes
-		$rootScope.$on('updateQuery', function (event, query) {
-			console.log("Get updateQuery 1");
+		var updateQueryWatch = $rootScope.$on('updateQuery', function (event, query) {
 			if(query !== "undefined"){
-				console.log("Get updateQuery 2");	
 				$scope.filter.current.query_string.query = $scope.filter.raw+" AND "+query.query_string.query;
 				$scope.fetch();
 			}
 		 });
 		 
 		// Listen for visualization queue prepared
-		$rootScope.$on('fetchVisualization', function (event) {
-				console.log($scope);
+		var fetchVisualizationWatch = $rootScope.$on('fetchVisualization', function (event) {
 				$scope.fetch();
 		 });		 
 		 
@@ -177,6 +174,8 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.$on('$destroy', function () {
 			$scope.newVis.destroy();
 		});
+		$scope.$on('$destroy', updateQueryWatch);
+		$scope.$on('$destroy', fetchVisualizationWatch);
 		
 	
 		
