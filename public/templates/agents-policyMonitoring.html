@@ -1,4 +1,5 @@
 <md-content ng-if="submenuNavItem == 'policy_monitoring'" ng-if="_agent">
+<kbn-searchbar></kbn-searchbar>
     <div flex ng-controller="pmController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
             <md-content layout="row">
@@ -10,11 +11,11 @@
                     </md-card-title>
                     <md-card-content>
                         <kbn-vis vis-height="100px" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20rootcheck')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-                            vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+                            vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
-                <md-card flex="30">
+                <md-card flex="30"> 
                     <md-card-title>
                         <md-card-title-text>
                             <span class="md-headline">CIS Controls</span>
@@ -22,8 +23,8 @@
                     </md-card-title>
                     <md-card-content>
                         <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20rootcheck')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.CIS,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-                            vis-filter="{{'AgentName:'+_agent.name}}" vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
-                            vis-filter="{{'AgentName:'+_agent.name}}">
+                            vis-filter="{{'AgentName:'+_agent.name}}"
+							>
                         </kbn-vis>
                     </md-card-content>
                 </md-card>

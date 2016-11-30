@@ -58,6 +58,12 @@ routes
     .when('/settings/', {
         template: require('plugins/wazuh/templates/settings.html')
     })
+	.when('/test/', {
+        template: require('plugins/wazuh/templates/test.html'),
+		resolve: {
+            "check": settingsWizard
+        }
+    })
     .when('/', {
         redirectTo: '/overview/',
     })

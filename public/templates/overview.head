@@ -25,22 +25,8 @@
             <md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'pm'" name="pm">Policy monitoring</md-nav-item>
-        </md-nav-bar>
+        </md-nav-bar> 
 		<md-content class="horizontal-menu-right" style="margin-top: -2px" flex="70" class="subNavLine" layout="row" layout-align="end start">
-			<md-button ng-show="!show_timer" ng-click="show_timer = !show_timer" class="md-primary buttonMenu" target="_blank">
-				<i class="fa fa-clock-o" aria-hidden="true"></i> {{ (!timeFilter) ? '24h' : timeFilter}}
-			</md-button>
-			<md-content ng-show="show_timer" layout="row" layout-align="end start" ng-init="timeFilter = (timeFilter ? timeFilter : '24h')">
-				<md-button ng-click="show_timer = !show_timer; timeFilter='24h';" class="md-primary buttonMenu"  target="_blank">
-					<i class="fa fa-clock-o" aria-hidden="true"></i> Last 24 hours
-				</md-button>
-				<md-button ng-click="show_timer = !show_timer;timeFilter='7d';" class="md-primary buttonMenu"  target="_blank">
-					<i class="fa fa-clock-o" aria-hidden="true"></i> Last week
-				</md-button>
-				<md-button ng-click="show_timer = !show_timer;timeFilter='30d';" class="md-primary buttonMenu"  target="_blank">
-					<i class="fa fa-clock-o" aria-hidden="true"></i> Last month
-				</md-button>
-			</md-content>
 			<md-button ng-if="submenuNavItem == 'general'" class="md-primary buttonMenu"  ng-click="openDiscover('generic','*')">
 			<i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
 			<md-button ng-if="submenuNavItem == 'fim'" class="md-primary buttonMenu"  ng-click="openDiscover('fim','rule.groups: syscheck')"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>

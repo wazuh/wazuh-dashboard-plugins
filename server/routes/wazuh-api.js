@@ -94,15 +94,15 @@ module.exports = function (server, options) {
 	
     //Handlers - Test API
 
-    var testApiAux2 = function (error, response, insecure) {
+    var testApiAux2 = function (error, response, wapi_config) {
         if (!error && response && response.body.data && checkVersion(response.body.data)) {
-            return { 'statusCode': 200, 'data': 'ok' };
+            return { 'statusCode': 200, 'data': 'ok', 'manager' : wapi_config.manager };
         } else if (response && response.statusCode == 401) {
             return { 'statusCode': 200, 'error': '1', 'data': 'unauthorized' };
         } else if (!error && response && (!response.body.data || !checkVersion(response.body.data)) ) {
             return { 'statusCode': 200, 'error': '1', 'data': 'bad_url' };
         } else {
-            if (!insecure) {
+            if (!wapi_config.insecure) {
                 return { 'statusCode': 200, 'error': '1', 'data': 'self_signed' };
             } else {
                 return { 'statusCode': 200, 'error': '1', 'data': 'not_running' };
@@ -119,7 +119,7 @@ module.exports = function (server, options) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'bad_url' });
         } else {
             needle.request('get', wapi_config.url+":"+wapi_config.port+'/version', {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
-                callback(testApiAux2(error, response, wapi_config.insecure));
+                callback(testApiAux2(error, response, wapi_config));
             });
         }
     };
@@ -173,11 +173,14 @@ module.exports = function (server, options) {
             if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
-                needle.request('get', req.payload.url+":"+req.payload.port+'/version', {}, { username: req.payload.user, password: req.payload.password }, function (error, response) {
+                needle.request('get', req.payload.url+":"+req.payload.port+'/version', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
                     testApiAux1(error, response, req.payload, needle, function (test_result) {
 						if(test_result.data == "ok"){
-							needle.request('get', req.payload.url+":"+req.payload.port+'/agents/000', {}, { username: req.payload.user, password: req.payload.password }, function (error, response) {
-								reply(response.body.data.name);
+							needle.request('get', req.payload.url+":"+req.payload.port+'/agents/000', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
+								if(!error)
+									reply(response.body.data.name);
+								else
+									reply({ 'statusCode': 500, 'error': 5, 'message': 'Error occurred' }).code(500);	
 							});
 						}else{
 							reply(test_result);

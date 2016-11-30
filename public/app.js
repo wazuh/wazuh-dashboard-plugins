@@ -28,9 +28,11 @@ require('plugins/wazuh/objects/autoSizeContainer.js');
 require('plugins/wazuh/objects/routes.js');
 
 // Require Kibana integrations
-require('plugins/wazuh/controllers/visLoader.js');
-require('plugins/wazuh/controllers/disLoader.js');
-require('plugins/wazuh/controllers/dashLoader.js');
+require('plugins/wazuh/directives/kibanaImports.js');
+require('plugins/wazuh/directives/kibanaVisualizationDirective.js');
+require('plugins/wazuh/directives/kibanaDiscoverDirective.js');
+require('plugins/wazuh/directives/kibanaDashboardDirective.js');
+require('plugins/wazuh/directives/kibanaSearchbarDirective.js');
 
 // Require controllers
 require('plugins/wazuh/controllers/general.js');
@@ -42,6 +44,7 @@ require('plugins/wazuh/controllers/fim.js');
 require('plugins/wazuh/controllers/policy-monitoring.js');
 require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
+require('plugins/wazuh/controllers/testController.js');
 
 //Bootstrap and font awesome
 require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');

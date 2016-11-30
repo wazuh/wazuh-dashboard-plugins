@@ -1,0 +1,56 @@
+<div ng-controller="VisController">
+
+<div ng-if="loadBeforeShow" class="app-container vis-editor vis-type-{{ vis.type.name }}" ng-style="{height:visHeight}">
+  <kbn-top-nav name="visualize" config="topNavMenu" ng-if="visSearchable">
+    <div class="vis-editor-info">
+      <span ng-show="newVis.id" class="vis-editor-info-title">
+        <span ng-bind="::newVis.title"></span>
+      </span>
+    </div>
+  </kbn-top-nav>
+
+
+
+  <navbar name="visualize-search" ng-show="visSearchable">
+    <div class="fill bitty-modal-container">
+
+      <form ng-if="vis.type.requiresSearch && $state.linked" class="inline-form fill" name="queryInput">
+        <div class="typeahead">
+          <div class="input-group">
+            <input disabled type="text" class="form-control">
+
+            <button class="btn btn-default" type="submit" ng-disabled="true" aria-label="Search">
+              <span aria-hidden="true" class="fa fa-search"></span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <form ng-if="vis.type.requiresSearch && !$state.linked" ng-submit="fetch()" class="inline-form fill" name="queryInput">
+        <div class="typeahead" kbn-typeahead="visualize">
+          <div class="input-group" ng-class="queryInput.$invalid ? 'has-error' : ''">
+            <input ng-model="filter.current" parse-query kbn-typeahead-input placeholder="Search..." type="text" class="form-control">
+
+            <button class="btn btn-default" type="submit" ng-disabled="queryInput.$invalid" aria-label="Search">
+              <span aria-hidden="true" class="fa fa-search"></span>
+            </button>
+          </div>
+          <kbn-typeahead-items></kbn-typeahead-items>
+        </div>
+      </form>
+    </div>
+    <div class="button-group"></div>
+  </navbar>
+
+  <filter-bar state="$state" ng-show="visClickable"></filter-bar>
+
+  <div class="vis-editor-content">
+
+    <div class="vis-editor-canvas">
+      <visualize vis="vis" ui-state="uiState" search-source="searchSource" class="kibanaVisualizationValue">
+      </visualize>
+    </div>
+  </div>
+
+</div>
+</div>

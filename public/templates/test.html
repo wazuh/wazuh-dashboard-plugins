@@ -1,0 +1,37 @@
+<div ng-controller="testController">
+
+<kbn-searchbar></kbn-searchbar>
+
+	
+<md-content flex layout="row">
+
+		<md-card layout="column">
+			<md-card-content style="text-align: center;">
+								<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:bucket,type:date_histogram)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+				vis-filter="*">
+				</kbn-vis-value>
+				<div class="ng-binding">Most changed file</div>
+			</md-card-content>
+		</md-card>
+		
+		
+		
+
+	</md-content>
+	
+<md-content flex layout="row">
+
+		<md-card layout="column">
+			<md-card-content style="text-align: center;">
+								<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+				vis-filter="SyscheckFile.event: added AND location: syscheck">
+				</kbn-vis-value>
+				<div class="ng-binding">Most changed file</div>
+			</md-card-content>
+		</md-card>
+		
+
+	</md-content>
+	
+</div>
+

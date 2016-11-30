@@ -1,4 +1,5 @@
 <md-content ng-if="submenuNavItem == 'overview'" ng-if="_agent" class="md-padding">
+<kbn-searchbar></kbn-searchbar>
 	<div ng-controller="agentsController">
 
 	<md-content layout="row">
@@ -10,7 +11,7 @@
 				</md-card-title>
 				<md-card-content>
 					<kbn-vis vis-height="130px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 5',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+						vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
@@ -22,7 +23,7 @@
 				</md-card-title>
 				<md-card-content>
 					<kbn-vis vis-height="130px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+						vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
@@ -34,7 +35,7 @@
 				</md-card-title>
 				<md-card-content>
 					<kbn-vis vis-height="130px" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.PCI_DSS,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+						vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
@@ -49,7 +50,7 @@
 			</md-card-title>
 			<md-card-content>
 				<kbn-vis vis-height="200px" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',customLabel:'Agent alerts',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Agentbalerts last 24 days',type:histogram))"
-					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+					vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
 				</kbn-vis>
 			</md-card-content>
 		</md-card>
@@ -57,7 +58,7 @@
 		<md-content layout="row">
 			<md-card flex="40">
 				<md-card-content>
-					<div layout="column" flex>
+					<div layout="column" flex> 
 						<p><b style="margin-right: 5px;">Hostname:</b> {{_agent.name ? _agent.name : '-'}}</p>
 						<p ng-if="_agent.ip"><b style="margin-right: 5px;">IP address:</b> {{_agent.ip ? _agent.ip : '-'}}</p>
 						<p><b style="margin-right: 5px;">Agent version:</b> {{agentInfo.version ? agentInfo.version : '-'}}</p>
@@ -76,7 +77,7 @@
 				</md-card-title>
 				<md-card-content>
 					<kbn-vis vis-height="200px" vis-type="line" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.AlertLevel,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert level evolution',type:line))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))" vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+						vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
@@ -92,7 +93,6 @@
 			</md-card-title>
 			<md-card-content>
 				<kbn-vis vis-height="460px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.sidid,order:desc,orderBy:'1',size:20),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.AlertLevel,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Groups,field:rule.groups,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'PCI DSS',field:rule.PCI_DSS,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-				vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
 					vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
 				</kbn-vis>
 			</md-card-content>
