@@ -85,7 +85,7 @@ var app = require('ui/modules').get('app/wazuh', [])
 
   
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($scope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches, appState) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches, appState, $rootScope) {
 
   $scope.defaultManagerName = appState.getDefaultManager().name;
 
@@ -99,6 +99,10 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
     location: '*'
   });
 
+	if(typeof $rootScope.visCounter === "undefined")
+		$rootScope.visCounter = 0;
+	
+	$rootScope.visCounter++;
 	
   $route.requireDefaultIndex = true;
   $route.template = $route.indexTemplate;
@@ -208,7 +212,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             $scope.updateDataSource()
               .then(function () {
                 $scope.$listen(timefilter, 'fetch', function () {
-                  $scope.fetch();
+                  //$scope.fetch();
                 });
 
                 $scope.$watchCollection('state.sort', function (sort) {
@@ -229,7 +233,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 
                 // update data source when hitting forward/back and the query changes
                 $scope.$listen($state, 'fetch_with_changes', function (diff) {
-                  $scope.fetch();
+                  //$scope.fetch();
                 });
 
                 // fetch data when filters fire fetch event
@@ -243,7 +247,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                   if (interval !== oldInterval && interval === 'auto') {
                     $scope.showInterval = false;
                   }
-                  $scope.fetch();
+                  //$scope.fetch();
                 });
 
                 $scope.$watch('vis.aggs', function () {
@@ -316,7 +320,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                     init.complete = true;
                     //$state.replace();
                     $scope.$emit('application.load');
-                    $scope.fetch();
+                    //$scope.fetch();
                   });
               });
           });
@@ -557,6 +561,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 
             // stash this promise so that other calls to setupVisualization will have to wait
             loadingVis = new Promise(function (resolve) {
+				$rootScope.visCounter--;
               $scope.$on('ready:vis', function () {
                 resolve($scope.vis);
               });
@@ -565,10 +570,14 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                 // clear the loading flag
                 loadingVis = null;
               });
-
+			
             return loadingVis;
           }
-
+		// Listen for visualization queue prepared
+		var fetchVisualizationWatch = $rootScope.$on('fetchVisualization', function (event) {
+				//$scope.fetch();
+				courier.fetch()
+		 });
           function resolveIndexPatternLoading() {
             const props = $scope._ip;
             const loaded = props.loaded;

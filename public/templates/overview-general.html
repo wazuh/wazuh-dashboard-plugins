@@ -15,6 +15,7 @@
 				vis-filter="rule.AlertLevel:[10 TO *]"
 				>
 				</kbn-vis>
+				
 			</md-card-content>
 		</md-card>
 
@@ -38,17 +39,32 @@
 	</div>
 
 	<div layout="row" layout-align="center stretch">
-		<md-card flex="50">
+		<md-card flex="100">
 			<md-card-content>
 				<span class="md-headline">Events</span>
-				<kbn-vis vis-height="160px" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
+				<kbn-vis vis-height="120px" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
 					vis-filter="*"
 					>
 				</kbn-vis>
 			</md-card-content>
 		</md-card>
 
-		<md-card layout="column" flex="50">
+	</div>
+	
+	<div layout="row" layout-align="center stretch">
+		<md-card flex="65">
+			<md-card-content>
+				<span class="md-headline">Agents</span>
+				<kbn-vis vis-height="160px" vis-type="area" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'New%20Visualization',type:area))"
+					vis-filter="*"
+					>
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		
+
+
+		<md-card layout="column" flex="45">
 			<md-card-content>
 				<span class="md-headline">Agents status</span>
 				<kbn-vis vis-height="160px" vis-type="line" vis-index-pattern="wazuh-monitoring-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:id),schema:metric,type:cardinality),(enabled:!t,id:'4',params:(field:status,order:asc,orderBy:'3',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'New%20Visualization',type:line))"
@@ -63,25 +79,25 @@
 	<div layout="row" layout-align="center stretch">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-filter="*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcuser,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
+				<kbn-vis-value vis-height="37px" vis-type="table"  vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcuser,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
 				<div class="ng-binding">Top source user</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-filter="*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
+				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
 				<div class="ng-binding">Top source ip</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-filter="*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
+				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*"  vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
 				<div class="ng-binding">Top group</div>
 			</md-card-content> 
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-filter="*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.PCI_DSS,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
+				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*"  vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.PCI_DSS,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
 				<div class="ng-binding">Top PCI DSS requirement</div>
 			</md-card-content>
 		</md-card>

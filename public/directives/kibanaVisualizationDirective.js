@@ -76,9 +76,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Get or create App State	
 		let $state = $scope.$state = (function initState() {
 		
-			if(getAppState())
-				$state = getAppState();
-			else
 				$state = new AppState();	
 
 			return $state;
@@ -103,6 +100,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		function() {  
 			
 			// Bind visualization, index pattern and state
+			//$scope.newVis.vis.listeners = {brush: brushEvent};
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
 			$scope.state = $state;
@@ -113,14 +111,12 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
 			visState.params = visDecoded.vis.params;
+			visState.listeners = {brush: brushEvent};
 			
 			// Set Vis states
 			$scope.uiState = $state.makeStateful('uiState');
 			$scope.vis.setUiState($scope.uiState);
-			$scope.vis.listeners = {brush: brushEvent};
-			$scope.vis.getEnabledState();
 			$scope.vis.setState(visState);
-			
 			
 			$rootScope.visCounter--;
 			$scope.loadBeforeShow = true;
@@ -133,7 +129,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Fetch visualization
 		$scope.fetch = function () 
 		{
-			$state.save();	
+			$state.save();
 			if($scope.visIndexPattern == "ossec-*"){
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
 				$scope.searchSource.set('query', $scope.filter.current);
