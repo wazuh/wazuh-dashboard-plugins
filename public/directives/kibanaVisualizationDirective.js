@@ -81,7 +81,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			return $state;
 		} ());
 		
-		// Initialize queryFilter and searchSorce
+		// Initialize queryFilter and searchSource
 
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);	
 		$scope.searchSource = $scope.newVis.searchSource;
@@ -100,7 +100,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		function() {  
 			
 			// Bind visualization, index pattern and state
-			//$scope.newVis.vis.listeners = {brush: brushEvent};
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
 			$scope.state = $state; 
@@ -120,7 +119,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			
 			$rootScope.visCounter--;
 			$scope.loadBeforeShow = true;
-			
 		}, 0);
 		
 		
@@ -129,6 +127,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Fetch visualization
 		$scope.fetch = function () 
 		{
+			
 			$state.save();
 			if($scope.visIndexPattern == "ossec-*"){
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
