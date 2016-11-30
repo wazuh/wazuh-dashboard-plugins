@@ -103,13 +103,11 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			//$scope.newVis.vis.listeners = {brush: brushEvent};
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
-			$scope.state = $state;
-			$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
-			$scope.searchSource.set('query', $scope.filter.current);
+			$scope.state = $state; 
 				
 			// Build visualization
 			var visDecoded = rison.decode($scope.visA);
-			var visState = $scope.vis.getEnabledState();
+			var visState = {}; 
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
 			visState.params = visDecoded.vis.params;
