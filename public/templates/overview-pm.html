@@ -1,15 +1,5 @@
 <md-content flex layout="column" ng-if="!load && submenuNavItem == 'pm'" ng-controller="overviewPMController">
 	<kbn-searchbar></kbn-searchbar>
-	<md-content layout="row">
-
-		<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 19pt;">{{lastEventAgentID}} <span ng-show="lastEventAgentID != ''">-</span> {{lastEventAgentName}} <span ng-show="lastEventAgentIP != ''">-</span> {{lastEventAgentIP}}: {{lastEventTitle}}</div>
-					<div class="ng-binding">Last event</div>
-				</md-card-content>
-		</md-card>
-
-	</md-content>
 	
 	<div layout="row" layout-align="center stretch">
 		<md-card flex="50">

@@ -57,24 +57,24 @@
 	<md-content flex layout="row">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table)))"
-				vis-filter="location: syscheck AND SyscheckFile.event: modified">
+				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+				vis-filter="SyscheckFile.event: modified AND location: syscheck">
 				</kbn-vis-value>
 				<div class="ng-binding">Last file changed</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column"> 
 			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table)))"
-				vis-filter="location: syscheck AND SyscheckFile.event: added">
+				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+				vis-filter="SyscheckFile.event: added AND location: syscheck">
 				</kbn-vis-value>
 				<div class="ng-binding">Last file added</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table)))"
-				vis-filter="location: syscheck AND SyscheckFile.event: deleted">
+				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+				vis-filter="SyscheckFile.event: deleted AND location: syscheck">
 				</kbn-vis-value>
 				<div class="ng-binding">Last file deleted</div>
 			</md-card-content>

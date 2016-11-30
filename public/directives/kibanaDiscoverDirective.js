@@ -1,3 +1,4 @@
+
 require('plugins/kibana/discover/styles/main.less');
 require('ui/doc_table/doc_table.js');
 require('ui/styles/sidebar.less');
@@ -212,7 +213,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             $scope.updateDataSource()
               .then(function () {
                 $scope.$listen(timefilter, 'fetch', function () {
-                  //$scope.fetch();
+                  $scope.fetch();
                 });
 
                 $scope.$watchCollection('state.sort', function (sort) {
@@ -233,7 +234,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 
                 // update data source when hitting forward/back and the query changes
                 $scope.$listen($state, 'fetch_with_changes', function (diff) {
-                  //$scope.fetch();
+                  $scope.fetch();
                 });
 
                 // fetch data when filters fire fetch event
@@ -320,7 +321,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                     init.complete = true;
                     //$state.replace();
                     $scope.$emit('application.load');
-                    //$scope.fetch();
+                    $scope.fetch();
                   });
               });
           });
