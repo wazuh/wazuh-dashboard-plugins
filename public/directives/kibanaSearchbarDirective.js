@@ -35,7 +35,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	
 	// Set default time
 	if($route.current.params._g == "()")
-		$scope.timefilter.time.from = "now-7d";
+		$scope.timefilter.time.from = "now-24h";
 	
 	let $state = $scope.$state = (function initState() {
 
