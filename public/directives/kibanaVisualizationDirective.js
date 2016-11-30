@@ -104,7 +104,9 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
 			$scope.state = $state;
-			
+			$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
+			$scope.searchSource.set('query', $scope.filter.current);
+				
 			// Build visualization
 			var visDecoded = rison.decode($scope.visA);
 			var visState = $scope.vis.getEnabledState();
