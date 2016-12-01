@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
   "version": "1.0.0",
-  "kibana" : {
-    "version" : "5.0.1"
+  "kibana": {
+    "version" : "5.0.2"
   },
   "description": "Wazuh App",
   "main": "index.js",
@@ -11,16 +11,16 @@
     "wazuh",
     "ossec"
   ],
-  "author": "Wazuh",
+  "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wazuh/wazuh-kibana-ui.git"
+    "url": "https://github.com/wazuh/wazuh-kibana-app.git"
   },
   "bugs": {
-    "url": "https://github.com/wazuh/wazuh-kibana-ui/issues"
+    "url": "https://github.com/wazuh/wazuh-kibana-app/issues"
   },
-  "homepage": "http://www.wazuh.com/",
+  "homepage": "https://www.wazuh.com/",
   "dependencies": {
     "angular-animate": "1.4.7",
     "angular-aria": "1.4.7",
