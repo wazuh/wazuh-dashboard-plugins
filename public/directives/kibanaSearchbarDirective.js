@@ -38,12 +38,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 		$scope.timefilter.time.from = "now-24h";
 	
 	let $state = $scope.$state = (function initState() {
-
-	if(getAppState())
-		$state = getAppState();
-	else
-		$state = new AppState();	
-
+			$state = new AppState();	
 	return $state;
 	} ());
 
@@ -56,6 +51,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	
 	// Watch visCounter, wait for finish and fetch.
 	var visCounterWatch = $rootScope.$watch('visCounter', function (data) {
+
 		if($rootScope.visCounter == 0){
 			$timeout(
 			function() {  

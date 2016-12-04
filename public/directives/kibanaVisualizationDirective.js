@@ -38,6 +38,7 @@ var app = require('ui/modules').get('app/wazuh', [])
     }
   }]);
 
+
 require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
 	
 	
@@ -73,13 +74,9 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		if($route.current.params._g == "()")
 			$scope.timefilter.time.from = "now-24h";
 		
-		// Get or create App State	
-		let $state = $scope.$state = (function initState() {
-		
-				$state = new AppState();	
+		// Get App State	
+		let $state = getAppState();
 
-			return $state;
-		} ());
 		
 		// Initialize queryFilter and searchSource
 
@@ -87,15 +84,13 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.searchSource = $scope.newVis.searchSource;
 		const brushEvent = Private(UtilsBrushEventProvider);
 		
-		// Initialize visualization initial state
-
-
 		
 		// Initialize time
 		$scope.timefilter = timefilter;
 		
 		
-
+		
+			
 		$timeout(
 		function() {  
 			
@@ -118,16 +113,14 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			$scope.vis.setState(visState);
 			
 			$rootScope.visCounter--;
+			
 			$scope.loadBeforeShow = true;
 		}, 0);
 		
-		
-
 
 		// Fetch visualization
 		$scope.fetch = function () 
 		{
-			
 			$state.save();
 			if($scope.visIndexPattern == "ossec-*"){
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());

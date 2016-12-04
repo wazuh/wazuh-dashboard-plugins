@@ -2,6 +2,7 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
 
-app.controller('testController', function ($scope, $http, testConnection, appState, $mdToast) {
-	
+app.controller('testController', function ($scope, $http, testConnection, appState, $mdToast, $rootScope) {
+
+		
 });
