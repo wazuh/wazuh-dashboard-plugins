@@ -1,37 +1,86 @@
 <div ng-controller="testController">
 
-<kbn-searchbar></kbn-searchbar>
-
+	<md-content class="headBar" layout="row" layout-align="center start" ng-init="submenuNavItem = 'general'">
+        <md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+            <md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
+            <md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>
+        </md-nav-bar> 
 	
-<md-content flex layout="row">
-
-		<md-card layout="column">
-			<md-card-content style="text-align: center;">
-								<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:bucket,type:date_histogram)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-				vis-filter="*">
-				</kbn-vis-value>
-				<div class="ng-binding">Most changed file</div>
-			</md-card-content>
-		</md-card>
-		
-		
-		
-
-	</md-content>
+    </md-content>
 	
-<md-content flex layout="row">
+	<div ng-if="submenuNavItem == 'general'" >
+		<kbn-searchbar></kbn-searchbar>
 
-		<md-card layout="column">
-			<md-card-content style="text-align: center;">
-								<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:SyscheckFile.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-				vis-filter="SyscheckFile.event: added AND location: syscheck">
-				</kbn-vis-value>
-				<div class="ng-binding">Most changed file</div>
-			</md-card-content>
-		</md-card>
 		
+		<md-content flex layout="row">
 
-	</md-content>
+				<md-card flex="100">
+					<md-card-content>
+						<span class="md-headline">Agents</span>
+						<kbn-vis vis-height="160px" vis-type="area" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'New%20Visualization',type:area))"
+							vis-filter="*"
+							>
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				
+				
+				
+
+			</md-content>
+			
+		<md-content flex layout="row">
+
+				<md-card flex="100">
+					<md-card-content>
+						<span class="md-headline">Agents</span>
+						<kbn-vis vis-height="160px" vis-type="area" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'New%20Visualization',type:area))"
+							vis-filter="*"
+							>
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				
+
+			</md-content>
+	</div>
+
+	<div ng-if="submenuNavItem == 'fim'" >
+	
+		<kbn-searchbar></kbn-searchbar>
+		
+		<md-content flex layout="row">
+
+				<md-card flex="100">
+					<md-card-content>
+						<span class="md-headline">Agents</span>
+						<kbn-vis vis-height="160px" vis-type="area" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:AgentName,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'New%20Visualization',type:area))"
+							vis-filter="*"
+							>
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				
+				
+				
+
+			</md-content>
+			
+		<md-content flex layout="row">
+
+				<md-card flex="100">
+					<md-card-content>
+						<span class="md-headline">Agents</span>
+						<kbn-vis vis-height="160px" vis-type="area" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'New%20Visualization',type:area))"
+							vis-filter="*"
+							>
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				
+
+			</md-content>
+	</div>
 	
 </div>
 

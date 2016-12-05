@@ -44,7 +44,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	if(typeof $rootScope.visCounter === "undefined")
 		$rootScope.visCounter = 0;
 	
-	$rootScope.visCounter++;
+	
 	
 	// Set filters
 	$scope.filter = {};
@@ -53,12 +53,20 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	$scope.filter.current = $scope.filter.raw;
 			
 	// Initialize Visualization
-
 	$scope.newVis = new SavedVis({ 'type': $scope.visType, 'indexPattern': $scope.visIndexPattern });
+	
+	// Initialize and decode params
+	var visDecoded = rison.decode($scope.visA);
+	var visState = {};
+	
 	$scope.newVis.init().then(function () {
 		// Render visualization
+		$rootScope.visCounter++;
 		renderVisualization();
-	});
+	},function () {
+		console.log("Error: Could not load visualization: "+visDecoded.vis.title);
+		}
+	);
 	
 	
 	
@@ -105,8 +113,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			$scope.state = $state; 
 				
 			// Build visualization
-			var visDecoded = rison.decode($scope.visA);
-			var visState = {}; 
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
 			visState.params = visDecoded.vis.params;
