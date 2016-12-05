@@ -1,6 +1,7 @@
 import rison from 'rison-node';
 import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
 import UtilsBrushEventProvider from 'ui/utils/brush_event';
+import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_click_handler';
 
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnVis', [function () {
@@ -94,7 +95,8 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);	
 		$scope.searchSource = $scope.newVis.searchSource;
 		const brushEvent = Private(UtilsBrushEventProvider);
-
+		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
+		
 		$timeout(
 		function() {  
 			
@@ -107,7 +109,8 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
 			visState.params = visDecoded.vis.params;
-			visState.listeners = {brush: brushEvent};
+			visState.listeners = {brush: brushEvent, click: filterBarClickHandler($state)};
+			
 			
 			// Set Vis states
 			$scope.uiState = $state.makeStateful('uiState');
