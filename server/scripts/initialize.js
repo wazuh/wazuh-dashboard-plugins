@@ -19,8 +19,7 @@ module.exports = function (server, options) {
 	// Today
 	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
     var todayIndex = index_prefix + fDate;
-		
-		
+			
 	// Inserting sample data	
 	var insertSampleData = function (todayIndex) {
         var SAMPLE_DATA = {"full_log": "Sample alert created by Wazuh App. www.wazuh.com", "@timestamp": new Date().toISOString() };
@@ -37,7 +36,7 @@ module.exports = function (server, options) {
 	
 	// Save Wazuh App first set up for further updates
 	var saveSetupInfo = function () {
-        var setup_info = {"name" : "Wazuh App", "version": "1.0.0", "installationDate": new Date().toISOString() };
+        var setup_info = {"name" : "Wazuh App", "app-version": "1.0.0", "installationDate": new Date().toISOString() };
 
         client.create({ index: ".kibana", type: 'wazuh-setup', id: 1, body: setup_info }).then(
             function () {
@@ -70,8 +69,10 @@ module.exports = function (server, options) {
         client.create({ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp' } })
             .then(function () {
                 server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
-				// Once index pattern is created, set it as default
-				setDefaultIndex();
+				// Once index pattern is created, set it as default, wait few seconds for Kibana.
+				setTimeout(function () {
+					setDefaultIndex();
+				}, 2000)
             }, function (response) {
                 if (response.statusCode != '409') {
                     server.log([blueWazuh, 'initialize', 'error'], 'Could not configure index pattern:' + index_pattern);
@@ -104,12 +105,12 @@ module.exports = function (server, options) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document already exists. Skipping configuration...');
             }, function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document does not exist. Initializating configuration...');
-                createAndPutTemplate();
+                loadTemplate();
             }
         );
     };
 
-    var createAndPutTemplate = function () {
+    var loadTemplate = function () {
 		var map_jsondata = {};
 		try {
 			map_jsondata = JSON.parse(fs.readFileSync(TEMPLATE_FILE, 'utf8'));
