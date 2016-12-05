@@ -20,29 +20,24 @@
 		
     </md-content>
 
-	<md-content class="headBar" layout="row" layout-align="center start" ng-init="submenuNavItem = 'general'">
-        <md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-            <md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
-            <md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>
-            <md-nav-item md-nav-click="submenuNavItem = 'pm'" name="pm">Policy monitoring</md-nav-item>
-        </md-nav-bar> 
-		<md-content class="horizontal-menu-right" style="margin-top: -2px" flex="70" class="subNavLine" layout="row" layout-align="end start">
-			<md-button ng-if="submenuNavItem == 'general'" class="md-primary buttonMenu"  ng-click="openDiscover('generic','*')">
-			<i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-			<md-button ng-if="submenuNavItem == 'fim'" class="md-primary buttonMenu"  ng-click="openDiscover('fim','rule.groups: syscheck')"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>
-			<md-button ng-if="submenuNavItem == 'pm'" class="md-primary buttonMenu"  ng-click="openDiscover('rootcheck','rule.groups: rootcheck')"><i class="fa fa-external-link" aria-hidden="true"></i> Alerts</md-button>		
-			<md-button class="md-primary buttonMenu"  ng-if="submenuNavItem == 'general'" ng-click="openDashboard('OSSEC-Alerts','*')">
-				<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
-			</md-button>
-			<md-button class="md-primary buttonMenu"  ng-if="submenuNavItem == 'fim'" ng-click="openDashboard('File-Integrity-Monitoring','*')">
-				<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
-			</md-button>
-			<md-button class="md-primary buttonMenu"  ng-if="submenuNavItem == 'pm' " ng-click="openDashboard('Policy-Monitoring','*')">
-				<i class="fa fa-external-link" aria-hidden="true"></i> Dashboard
-			</md-button>
-		</md-content>
+	<md-content layout="row" layout-align="space-between start" style="background-color: #f7f7f7">
 	
-    </md-content>
+		<md-content class="headBar" layout="column" layout-align="center start" ng-init="tabView = 'panels'; submenuNavItem = 'general'">
+			<md-nav-bar flex="100" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+				<md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'pm'" name="pm">Policy monitoring</md-nav-item>
+			</md-nav-bar> 
+		</md-content>	
+		<md-content class="headBar" flex="20" layout="column" layout-align="end end">
+			<md-nav-bar layout-align="end end" flex="20" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+				<md-nav-item md-nav-click="tabView = 'panels'" name="panels">Panels</md-nav-item>
+				<md-nav-item md-nav-click="tabView = 'discover'" name="discover">Alerts</md-nav-item>
+				<md-nav-item md-nav-click="tabView = 'dashboard'" name="dashboard">Dashboards</md-nav-item>
+			</md-nav-bar> 
+		</md-content>
+		
 
+	</md-content>
 
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>

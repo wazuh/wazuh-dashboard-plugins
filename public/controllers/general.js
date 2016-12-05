@@ -184,6 +184,11 @@ app.controller('stateLocationController', function ($scope, appState, $window) {
     }
 	$scope.resetDashboards = function () {
         $scope.state.unsetDashboardsState();
+    }
+
+	$scope.changeTabView = function (view) {
+		console.log("En tab View");
+        $scope.tabView = view;
     }	
 	
 

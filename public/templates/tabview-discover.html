@@ -1,0 +1,9 @@
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
+
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
+	dis-filter="{{state.getDiscoverState().filter ? state.getDiscoverState().filter : '*'}}"
+	infinite-scroll="true">
+	</kbn-disfull>
+
+</md-content>
