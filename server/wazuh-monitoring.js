@@ -18,19 +18,21 @@ module.exports = function (server, options) {
 
     var loadCredentials = function (apiEntries) {
 
-		apiEntries.hits.forEach(function (element) {
-			var apiEntry = { 'user': element._source.api_user, 'password': new Buffer(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
-			
-			if (apiEntry.error) {
-				server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
-				return;
-			}
-			
-			
-			checkAndSaveStatus(apiEntry);
-			
-        });
-
+		if ( typeof apiEntries === 'undefined' || typeof apiEntries.hits === 'undefined')
+			return;
+		
+			apiEntries.hits.forEach(function (element) {
+				var apiEntry = { 'user': element._source.api_user, 'password': new Buffer(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
+				
+				if (apiEntry.error) {
+					server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
+					return;
+				}
+				
+				
+				checkAndSaveStatus(apiEntry);
+				
+			});
     }
 
     var checkAndSaveStatus = function (apiEntry) {

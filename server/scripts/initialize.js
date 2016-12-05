@@ -1,174 +1,147 @@
 module.exports = function (server, options) {
 
+	// External libraries
     const client = server.plugins.elasticsearch.client;
     const uiSettings = server.uiSettings();
-
+	const fs = require('fs');
+	
+	// Colors for console logging
     const colors = require('ansicolors');
     const blueWazuh = colors.blue('wazuh');
-
-    const fs = require('fs');
+	
+	// Initialize variables
+	var req = { path : "", headers : {}};
+	var index_pattern = "ossec-*";
+	var index_prefix = "ossec-";
     const OBJECTS_FILE = 'plugins/wazuh/server/scripts/integration_files/objects_file.json';
-    const MAPPING_FILE = 'plugins/wazuh/server/scripts/integration_files/template_file.json';
-    var map_jsondata = {};
+    const TEMPLATE_FILE = 'plugins/wazuh/server/scripts/integration_files/template_file.json';
+	
+	// Today
+	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
+    var todayIndex = index_prefix + fDate;
+		
+		
+	// Inserting sample data	
+	var insertSampleData = function (todayIndex) {
+        var SAMPLE_DATA = {"full_log": "Sample alert created by Wazuh App. www.wazuh.com", "@timestamp": new Date().toISOString() };
 
-    var setTemplate = function () {
-        client.indices.exists({ index: 'ossec-*' }).then(
-            function (result) {
-                if (result) {
-                    server.log([blueWazuh, 'initialize', 'info'], 'Index pattern "ossec-*" exists.');
-                    configureKibana();
-                } else {
-                    server.log([blueWazuh, 'initialize', 'info'], 'Index pattern "ossec-*" not exists. Creating...');
-                    createAndPutTemplate();
-                }
+        client.create({ index: todayIndex, type: 'ossec', id: Date.now(), body: SAMPLE_DATA }).then(
+            function (data) {
+                server.log([blueWazuh, 'initialize', 'info'], 'Sample alert was inserted successfully.');
+                configureKibana();
+            }, function (data) {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not insert sample alert.');
+                server.log([blueWazuh, 'initialize', 'error'], data);
+            });
+    };
+	
+	// Save Wazuh App first set up for further updates
+	var saveSetupInfo = function () {
+        var setup_info = {"name" : "Wazuh App", "version": "1.0.0", "installationDate": new Date().toISOString() };
+
+        client.create({ index: ".kibana", type: 'wazuh-setup', id: 1, body: setup_info }).then(
+            function () {
+                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh set up info inserted');
             }, function () {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not check if index pattern "ossec-*" exists.');
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh set up info');
+            });
+    };
+	
+	// Setting default index pattern
+	var setDefaultIndex = function () {
+        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default index pattern to "'+index_pattern+'"...');
+		
+        uiSettings.set(req,'defaultIndex', index_pattern)
+            .then(function (data) {
+                server.log([blueWazuh, 'initialize', 'info'], 'Default index pattern set to: ' + index_pattern);
+				// We have almost everything configure, setting up default time picker.
+				setDefaultTime();
+            }).catch(function (data) {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not set default index pattern: '+index_pattern);
+                server.log([blueWazuh, 'initialize', 'error'], data);
+            });
+			
+			
+    };
+
+	// Create index pattern
+	var createIndexPattern = function () {
+        server.log([blueWazuh, 'initialize', 'info'], 'Creating index pattern: ' + index_pattern);
+        client.create({ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp' } })
+            .then(function () {
+                server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
+				// Once index pattern is created, set it as default
+				setDefaultIndex();
+            }, function (response) {
+                if (response.statusCode != '409') {
+                    server.log([blueWazuh, 'initialize', 'error'], 'Could not configure index pattern:' + index_pattern);
+                } else {
+                    server.log([blueWazuh, 'initialize', 'info'], 'Skipping index pattern configuration: Already configured:' + index_pattern);
+                }
+            });
+    };
+	
+	// Configure Kibana status: Index pattern, default index pattern, default time, import dashboards.
+	var configureKibana = function () {
+        server.log([blueWazuh, 'initialize', 'info'], 'Configuring Kibana for working with "'+index_pattern+'" index pattern...');
+		
+		// Create Index Pattern > Set it as default > Set default time
+		createIndexPattern();
+		
+		// Import objects
+		importObjects();
+		
+		// Save Setup Info
+		saveSetupInfo();
+		
+    };
+	
+	
+	// Init function. Check for "wazuh-setup" document existance.
+    var init = function () {
+        client.get({ index: ".kibana", type: "wazuh-setup", id: "1" }).then(
+            function (data) {
+                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document already exists. Skipping configuration...');
+            }, function (data) {
+                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document does not exist. Initializating configuration...');
+                createAndPutTemplate();
             }
         );
     };
 
     var createAndPutTemplate = function () {
-        var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
-        var todayIndex = 'ossec-' + fDate;
-
-        client.indices.create({ index: todayIndex }).then(
-            function () {
-                try {
-                    map_jsondata = JSON.parse(fs.readFileSync(MAPPING_FILE, 'utf8'));
-                } catch (e) {
-                    server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-                    server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + MAPPING_FILE);
-                    server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-                };
-                client.indices.putMapping({ index: 'ossec-*', type: 'ossec', body: map_jsondata}).then(
-                    function () {
-                        server.log([blueWazuh, 'initialize', 'info'], 'Index pattern "ossec-*" was initialized successfully.');
-                        insertSampleData(todayIndex);
-                    }, function () {
-                        server.log([blueWazuh, 'initialize', 'error'], 'Could not put mapping for "ossec-*" on elasticsearch.');
-                    });
-            }, function () {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not create ' + todayIndex + ' index on elasticsearch.');
-            }
-        );
-    };
-
-    var insertSampleData = function (todayIndex) {
-        var SAMPLE_DATA = {"rule": { "sidid": 0, "firedtimes": 1, "groups": [ ], "PCI_DSS": [ ], "description": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash server to start shipping alerts.", "AlertLevel": 0 }, "full_log": "This is the first alert on your ELK Cluster, please start OSSEC Manager and Logstash server to start shipping alerts.", "decoder": { }, "@timestamp": new Date().toISOString() };
-
-        client.create({ index: todayIndex, type: 'ossec', id: 'sample', body: SAMPLE_DATA }).then(
-            function () {
-                server.log([blueWazuh, 'initialize', 'info'], 'Sample data was inserted successfully.');
-                configureKibana();
-            }, function () {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not insert sample data.');
-            });
-    };
-
-    var configureKibana = function () {
-        server.log([blueWazuh, 'initialize', 'info'], 'Configuring Kibana for working with "ossec-*" index pattern...');
-        client.create({ index: '.kibana', type: 'index-pattern', id: 'ossec-*', body: { title: 'ossec-*', timeFieldName: '@timestamp', fields: prepareMappingCache() } })
-            .then(function () {
-                server.log([blueWazuh, 'initialize', 'info'], 'Successfully configured.');
-                setDefaultIndex();
-            }, function (response) {
-                if (response.statusCode != '409') {
-                    server.log([blueWazuh, 'initialize', 'error'], 'Could not configure "ossec-*" index pattern.');
-                } else {
-                    server.log([blueWazuh, 'initialize', 'info'], 'Skipping "ossec-*" index pattern configuration: Already configured.');
-                }
-            });
-    };
-
-    var prepareMappingCache = function () {
-        if (!map_jsondata.ossec) {
-            try {
-                map_jsondata = JSON.parse(fs.readFileSync(MAPPING_FILE, 'utf8'));
-            } catch (e) {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-                server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + MAPPING_FILE);
-                server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-            };
-        }
-        var cacheJson = [];
-        for (var key in map_jsondata.ossec.properties) {
-            if (!Object.prototype.hasOwnProperty.call(map_jsondata.ossec.properties, key)) continue;
-            var element = map_jsondata.ossec.properties[key];
-            var tmpObj = {};
-            if (element.properties) {
-                for (var _subKey in element.properties) {
-                    tmpObj = {};
-                    if (!Object.prototype.hasOwnProperty.call(element.properties, _subKey)) continue;
-                    var _subEle = element.properties[_subKey];
-                    if (_subEle.type == 'long') tmpObj.type = 'number';
-                    else if (_subEle.type == 'date') tmpObj.type = 'date';
-                    else if (_subEle.type == 'geo_point') tmpObj.type = 'geo_point';
-                    else tmpObj.type = 'string';
-                    if (_subEle.index == 'analyzed') tmpObj.analyzed = true;
-                    else if (_subEle.type == 'text') tmpObj.analyzed = true;
-                    else tmpObj.analyzed = false;
-                    if (_subEle.index != 'no') tmpObj.indexed = true;
-                    else tmpObj.index = false;
-                    if (_subEle.doc_values) tmpObj.doc_values = _subEle.doc_values;
-                    else tmpObj.doc_values = false;
-                    tmpObj.count = 0;
-                    tmpObj.scripted = false;
-                    tmpObj.name = key + '.' + _subKey;
-                    cacheJson.push(tmpObj);
-                };
-            } else {
-                var tmpObj = {};
-                if (element.type == 'long') tmpObj.type = 'number';
-                else if (element.type == 'date') tmpObj.type = 'date';
-                else if (element.type == 'geo_point') tmpObj.type = 'geo_point';
-                else tmpObj.type = 'string';
-                if (element.index == 'analyzed') tmpObj.analyzed = true;
-                else if (element.type == 'text') tmpObj.analyzed = true;
-                else tmpObj.analyzed = false;
-                if (element.index != 'no') tmpObj.indexed = true;
-                else tmpObj.index = false;
-                if (element.doc_values) tmpObj.doc_values = element.doc_values;
-                else tmpObj.doc_values = false;
-                tmpObj.count = 0;
-                tmpObj.scripted = false;
-                tmpObj.name = key;
-                cacheJson.push(tmpObj);
-            }
-        };
-        cacheJson.push({ name: '_score', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'number' });
-        cacheJson.push({ name: '_index', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'string' });
-        cacheJson.push({ name: '_type', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'string' });
-        cacheJson.push({ name: '_id', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'string' });
-        cacheJson.push({ name: '@version', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: 'string' });
-        cacheJson.push({ name: '_source', scripted: false, count: 0, doc_values: false, index: false, analyzed: false, type: '_source' });
-        return JSON.stringify(cacheJson);
-    };
-
-    var setDefaultIndex = function () {
-        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default index pattern to "ossec-*"...');
-        
-        uiSettings.set('defaultIndex', 'ossec-*')
-            .then(function () {
-                setDefaultTime();
-            }).catch(function () {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not set default index.');
-            });
+		var map_jsondata = {};
+		try {
+			map_jsondata = JSON.parse(fs.readFileSync(TEMPLATE_FILE, 'utf8'));
+		} catch (e) {
+			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
+			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + TEMPLATE_FILE);
+			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+		};
+		
+		client.indices.putTemplate( {name: "ossec", order: 0, body: map_jsondata}).then(
+			function () {
+				server.log([blueWazuh, 'initialize', 'info'], 'Template installed and loaded: ' +  index_pattern);
+				insertSampleData(todayIndex);
+			}, function () {
+				server.log([blueWazuh, 'initialize', 'error'], 'Could not install template' +  index_pattern);
+			});
     };
 
     var setDefaultTime = function () {
+		
         server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default time to last 24h...');
-
-        uiSettings.set('timepicker:timeDefaults', '{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}')
+        uiSettings.set(req,'timepicker:timeDefaults', '{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}')
             .then(function () {
-                importObjects();
+				server.log([blueWazuh, 'initialize', 'info'], 'Kibana default time set to Last 24h.');
             }).catch(function (data) {
                 server.log([blueWazuh, 'initialize', 'warning'], 'Could not set default time. Please, configure it manually.');
-                importObjects();
+                server.log([blueWazuh, 'initialize', 'warning'], data);
             });
     };
 
     var importObjects = function () {
-        server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searchs, visualizations and dashboards) into Elasticsearch...');
+        server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...');
         try {
             var objects = JSON.parse(fs.readFileSync(OBJECTS_FILE, 'utf8'));
         } catch (e) {
@@ -194,6 +167,6 @@ module.exports = function (server, options) {
         });
     };
 
-    setTemplate();
+    init();
 
 };
