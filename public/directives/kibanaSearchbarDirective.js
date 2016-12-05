@@ -31,11 +31,15 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 
 	timefilter.enabled = true;
 		
-	$scope.timefilter = timefilter;
+	
 	
 	// Set default time
-	if($route.current.params._g == "()")
-		$scope.timefilter.time.from = "now-24h";
+	if($route.current.params._g == "()"){
+		timefilter.time.from = "now-24h";
+		timefilter.time.to = "now";
+	}
+	
+	$scope.timefilter = timefilter;
 	
 	let $state = $scope.$state = (function initState() {
 			$state = new AppState();	

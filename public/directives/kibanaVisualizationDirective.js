@@ -77,28 +77,24 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	
 		$scope.loadBeforeShow = false;
 		
-		
 		// Set default time
-		if($route.current.params._g == "()")
-			$scope.timefilter.time.from = "now-24h";
+		if($route.current.params._g == "()"){
+			timefilter.time.from = "now-24h";
+			timefilter.time.to = "now";
+		}
+		
+		// Initialize time
+		$scope.timefilter = timefilter;
 		
 		// Get App State	
 		let $state = getAppState();
 
 		
 		// Initialize queryFilter and searchSource
-
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);	
 		$scope.searchSource = $scope.newVis.searchSource;
 		const brushEvent = Private(UtilsBrushEventProvider);
-		
-		
-		// Initialize time
-		$scope.timefilter = timefilter;
-		
-		
-		
-			
+
 		$timeout(
 		function() {  
 			
@@ -170,8 +166,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		});
 		$scope.$on('$destroy', updateQueryWatch);
 		$scope.$on('$destroy', fetchVisualizationWatch);
-		
-	
 		
     };
 
