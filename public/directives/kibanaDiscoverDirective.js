@@ -86,7 +86,7 @@ var app = require('ui/modules').get('app/wazuh', [])
 
   
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($scope, config, courier, $route, $window, Notifier,
-  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches, appState, $rootScope) {
+  AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches, appState, $rootScope, getAppState) {
 
   $scope.defaultManagerName = appState.getDefaultManager().name;
 
@@ -151,6 +151,8 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 
 		  $scope.timefilter = timefilter;
 		  
+		  // Decode discover settings from directive
+		  var disDecoded = rison.decode($scope.disA);
 		// Set default time
 		if($route.current.params._g == "()")
 			$scope.timefilter.time.from = "now-24h";
@@ -168,24 +170,34 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             docTitle.change(savedSearch.title);
           }
 
-          const $state = $scope.state = new AppState(getStateDefaults());
+		  // Configure AppState. Get App State, if there is no App State create new one
+		  let currentAppState = getAppState();
+		  if(!currentAppState){
+			  $scope.state = new AppState(getStateDefaults());
+		  }else{
+			   $scope.state = currentAppState;
+			   $scope.state.columns = disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns');
+			   
+		  }
+		  
+		  const $state = $scope.state;
           $scope.uiState = $state.makeStateful('uiState');
           $state.query = ($scope.stateQuery ? $scope.stateQuery : '*');
 
           function getStateDefaults() {
-            var _aJson = rison.decode($scope.disA);
+            
             $route.current.params._a = $scope.disA;
             $route.updateParams({ '_a': $scope.disA });
             return {
               query: $scope.disFilter ? $scope.disFilter : { query_string: { analyze_wildcard: '!t', query: '*' } },
-              sort: _aJson.sort.length > 0 ? _aJson.sort : getSort.array(savedSearch.sort, $scope.indexPattern),
-              columns: _aJson.columns.length > 0 ? _aJson.columns : (savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns')),
-              index: _aJson.index ? _aJson.index : $scope.indexPattern.id,
+              sort: disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern),
+              columns: disDecoded.columns.length > 0 ? disDecoded.columns : (savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns')),
+              index: disDecoded.index ? disDecoded.index : $scope.indexPattern.id,
               interval: 'auto',
               filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
             };
           }
-
+		  console.log($state);
           $state.index = $scope.indexPattern.id;
           $state.sort = getSort.array($state.sort, $scope.indexPattern);
 

@@ -63,8 +63,8 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                 $scope.dash = _dash;
                 const dash = _dash;
 
-                $route.current.params._a = rison.encode([]);
-                $route.updateParams({ '_a': rison.encode([]) });
+                //	$route.current.params._a = rison.encode([]);
+                //$route.updateParams({ '_a': rison.encode([]) });
 
                 const queryFilter = Private(FilterBarQueryFilterProvider);
 
@@ -96,6 +96,7 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                     if (filter) return filter.query;
                 };
 
+		  
                 const stateDefaults = {
                     title: dash.title,
                     panels: dash.panelsJSON ? JSON.parse(dash.panelsJSON) : [],
@@ -105,7 +106,22 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                     filters: _.reject(dash.searchSource.getOwn('filter'), matchQueryFilter),
                 };
 
-                const $state = $scope.state = new AppState(stateDefaults);
+				// Configure AppState. Get App State, if there is no App State create new one
+				let currentAppState = getAppState();
+
+				if(!currentAppState)
+					$scope.state = new AppState(stateDefaults);
+				else{
+					$scope.state = currentAppState;
+                    $scope.state.title = dash.title;
+                    $scope.state.panels = dash.panelsJSON ? JSON.parse(dash.panelsJSON) : [];
+                    $scope.state.options = dash.optionsJSON ? JSON.parse(dash.optionsJSON) : {};
+                    $scope.state.uiState = dash.uiStateJSON ? JSON.parse(dash.uiStateJSON) : {};
+                    $scope.state.query = extractQueryFromFilters(dash.searchSource.getOwn('filter')) || { query_string: { query: '*' } };					
+				}
+
+				const $state = $scope.state;
+				
                 const $uiState = $scope.uiState = $state.makeStateful('uiState');
 
                 $scope.$watchCollection('state.options', function (newVal, oldVal) {

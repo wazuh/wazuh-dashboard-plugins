@@ -1,9 +1,21 @@
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
-
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
-	dis-filter="{{state.getDiscoverState().filter ? state.getDiscoverState().filter : '*'}}"
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="submenuNavItem == 'general' && tabView == 'discover'">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(AgentName,AgentIP,rule.AlertLevel,rule.description,rule.groups,rule.PCI_DSS,full_log),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter="*"
 	infinite-scroll="true">
 	</kbn-disfull>
+</md-content>
 
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="submenuNavItem == 'fim' && tabView == 'discover'">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(AgentName,AgentIP,SyscheckFile.event,SyscheckFile.path,SyscheckFile.owner_after,SyscheckFile.gowner_after,SyscheckFile.perm_after),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter="rule.groups:syscheck"
+	infinite-scroll="true">
+	</kbn-disfull>
+</md-content>
+
+
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="submenuNavItem == 'pm' && tabView == 'discover'">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(AgentName,AgentIP,rule.description,title,rule.AlertLevel,file),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter="rule.groups:rootcheck"
+	infinite-scroll="true">
+	</kbn-disfull>
 </md-content>

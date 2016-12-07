@@ -4,19 +4,19 @@
 		<div flex="10" layout="column">
 			<md-card>
 				<md-card-content>
-					<kbn-vis vis-height="72px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Events),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.groups:"syscheck"'>
+					<kbn-vis vis-height="72px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Added),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.sidid: 554'>
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
 			<md-card>
 				<md-card-content>
-					<kbn-vis vis-height="72px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Changed'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry'>
+					<kbn-vis vis-height="72px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Changed'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='(rule.sidid: 550 OR rule.sidid: 551 OR rule.sidid: 552 OR rule.sidid: 555)'>
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
 			<md-card>
 				<md-card-content>
-					<kbn-vis vis-height="72px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22was%20deleted%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Deleted),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.groups:"syscheck" AND full_log:"was deleted" NOT location: syscheck-registry'>
+					<kbn-vis vis-height="72px" vis-type="metric" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22was%20deleted%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Deleted),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.sidid: 553'>
 					</kbn-vis>
 				</md-card-content>
 			</md-card>

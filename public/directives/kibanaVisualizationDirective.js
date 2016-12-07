@@ -88,8 +88,8 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.timefilter = timefilter;
 		
 		// Get App State	
-		let $state = getAppState();
-
+		const $state = getAppState();
+		//let $state = new AppState();
 		
 		// Initialize queryFilter and searchSource
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);	
@@ -109,6 +109,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
 			visState.params = visDecoded.vis.params;
+
 			visState.listeners = {brush: brushEvent, click: filterBarClickHandler($state)};
 			
 			
@@ -118,7 +119,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			$scope.vis.setState(visState);
 			
 			$rootScope.visCounter--;
-			
 			$scope.loadBeforeShow = true;
 		}, 0);
 		
@@ -126,12 +126,13 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Fetch visualization
 		$scope.fetch = function () 
 		{
-			$state.save();
+			//$state.save();
 			if($scope.visIndexPattern == "ossec-*"){
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
 				$scope.searchSource.set('query', $scope.filter.current);
 			}
 			if ($scope.vis.type.requiresSearch) {
+				$state.save();
 				courier.fetch();
 			}
 
