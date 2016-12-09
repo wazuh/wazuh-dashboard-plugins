@@ -1,5 +1,11 @@
-<md-content style="background-color: white" flex layout="column" ng-if="tabView == 'dashboard'" layout-align="start space-around">
-
+<md-content style="background-color: white" flex layout="column" ng-if="submenuNavItem == 'general' && tabView == 'dashboard'" layout-align="start space-around">
     <kbn-dash dash-id="OSSEC-Alerts" dash-searchable="true" dash-timepicker="true"></kbn-dash>
-	
+</md-content>
+
+<md-content style="background-color: white" flex layout="column" ng-if="submenuNavItem == 'fim' && tabView == 'dashboard'" layout-align="start space-around">
+    <kbn-dash dash-id="File-Integrity-Monitoring" dash-searchable="true" dash-timepicker="true"></kbn-dash>
+</md-content>
+
+<md-content style="background-color: white" flex layout="column" ng-if="submenuNavItem == 'pm' && tabView == 'dashboard'" layout-align="start space-around">
+    <kbn-dash dash-id="CIS-Compliance" dash-searchable="true" dash-timepicker="true"></kbn-dash>
 </md-content>
