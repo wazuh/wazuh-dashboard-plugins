@@ -1,4 +1,4 @@
-<md-content ng-if="submenuNavItem == 'fim'" ng-if="_agent" id="agents-fim">
+<md-content ng-if="submenuNavItem == 'fim' && tabView == 'panels'" ng-if="_agent" id="agents-fim">
 <kbn-searchbar></kbn-searchbar>
     <div flex ng-controller="fimController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>

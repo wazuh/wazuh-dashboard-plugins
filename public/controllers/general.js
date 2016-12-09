@@ -109,19 +109,18 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				// tmp
-				
+				/*
 				     DataFactory.get(objectsArray['/agents'])
 					.then(function (data) {
 						$scope.submenuNavItem = 'overview';
 						$scope._agent = data.data.items[14];
 						$scope.search = data.data.items[14].name;
-						console.log(data.data.items);
 						$scope.load = false;
 					}, function (data) {
 						printError(data);
 						//defered.reject();
 					});
-				
+				*/
 				// tmp
                 DataFactory.get(data).then(function (data) {
                     DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');

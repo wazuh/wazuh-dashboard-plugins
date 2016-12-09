@@ -1,4 +1,4 @@
-<md-content ng-if="submenuNavItem == 'policy_monitoring'" ng-if="_agent">
+<md-content ng-if="submenuNavItem == 'policy_monitoring' && tabView == 'panels'" ng-if="_agent">
 <kbn-searchbar></kbn-searchbar>
     <div flex ng-controller="pmController" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
