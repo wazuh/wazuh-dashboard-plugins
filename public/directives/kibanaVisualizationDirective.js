@@ -94,6 +94,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Initialize queryFilter and searchSource
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);	
 		$scope.searchSource = $scope.newVis.searchSource;
+		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
 		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
 		

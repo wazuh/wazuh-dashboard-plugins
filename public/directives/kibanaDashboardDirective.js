@@ -103,7 +103,7 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                     options: dash.optionsJSON ? JSON.parse(dash.optionsJSON) : {},
                     uiState: dash.uiStateJSON ? JSON.parse(dash.uiStateJSON) : {},
                     query: extractQueryFromFilters(dash.searchSource.getOwn('filter')) || { query_string: { query: '*' } },
-                    filters: _.reject(dash.searchSource.getOwn('filter'), matchQueryFilter),
+                    filters: _.reject(dash.searchSource.getOwn('filter'), matchQueryFilter)
                 };
 
 				// Configure AppState. Get App State, if there is no App State create new one
