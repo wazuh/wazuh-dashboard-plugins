@@ -33,6 +33,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
         DataFactory.getAndClean('get', '/agents/' + agent.id, {})
             .then(function (data) {
                 $scope.agentInfo = data.data;
+				$scope.$parent._agent.status = data.data.status;
                 if (agent.id != '000') {
                     DataFactory.getAndClean('get', '/agents/' + agent.id + '/key', {})
                         .then(function (data) {
