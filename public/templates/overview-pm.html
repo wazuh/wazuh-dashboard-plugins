@@ -14,7 +14,7 @@
 		<md-card flex="25">
 			<md-card-content>
 				<span class="md-headline">Top 10 CIS Requirements</span>
-				<kbn-vis vis-height="220px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.CIS,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20CIS%20Requirements',type:pie))"
+				<kbn-vis vis-height="220px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.cis,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20CIS%20Requirements',type:pie))"
 				vis-filter='rule.groups:"rootcheck"'>
 				</kbn-vis>
 			</md-card-content>
@@ -24,7 +24,7 @@
 		<md-card flex="25">
 			<md-card-content>
 				<span class="md-headline">Top 10 PCI DSS Requirements</span>
-				<kbn-vis vis-height="220px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.PCI_DSS,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20PCI%20DSS%20Requirements',type:pie))"
+				<kbn-vis vis-height="220px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20PCI%20DSS%20Requirements',type:pie))"
 				vis-filter='rule.groups:"rootcheck"'>
 				</kbn-vis>
 			</md-card-content>
@@ -36,7 +36,7 @@
 		<md-card flex>
 			<md-card-content>
 				<span class="md-headline">Events per agent evolution</span>
-				<kbn-vis vis-height="220px" vis-type="line" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:AgentName,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'New%20Visualization',type:line))"
+				<kbn-vis vis-height="220px" vis-type="line" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'New%20Visualization',type:line))"
 				vis-filter='rule.groups:"rootcheck"'>
 				</kbn-vis>
 			</md-card-content>
@@ -52,7 +52,7 @@
 				</md-card-title-text>
 			</md-card-title>
 			<md-card-content>
-				<kbn-vis vis-height="460px" vis-type="table" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'location:%20rootcheck')),uiState:(vis:(params:(sort:(columnIndex:3,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:5000),schema:bucket,type:terms),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'4',params:(field:title,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+				<kbn-vis vis-height="460px" vis-type="table" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'location:%20rootcheck')),uiState:(vis:(params:(sort:(columnIndex:3,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:5000),schema:bucket,type:terms),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'4',params:(field:title,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
 					vis-filter='location: rootcheck'>
 				</kbn-vis>
 			</md-card-content>
