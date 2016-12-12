@@ -10,10 +10,8 @@
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/discover" name="discover" ng-click="resetDiscover();">Discover</md-nav-item>
 			<md-nav-item md-nav-href="#/dashboards" name="dashboards" ng-click="resetDashboards();">Dashboards</md-nav-item>
-			<a href="#/settings"><button id="settingButtonTop" class="md-primary md-button ng-scope md-ink-ripple" type="button">
-				<i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i>
-			</button>
-			</a>
+			<md-nav-item md-nav-href="#/settings" name="dashboards"><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i></md-nav-item>
+			
         </md-nav-bar>
 		
 		
@@ -22,15 +20,16 @@
 
 	<md-content layout="row" layout-align="space-between start" style="background-color: #f7f7f7">
 	
-		<md-content class="headBar" layout="column" layout-align="center start" ng-init="tabView = 'panels'; submenuNavItem = 'general'">
-			<md-nav-bar flex="100" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+		<md-content class="headBar" flex="50" layout="column" layout-align="center start" ng-init="tabView = 'panels'; submenuNavItem = 'general'">
+			<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>
 				<md-nav-item md-nav-click="submenuNavItem = 'pm'" name="pm">Policy monitoring</md-nav-item>
 			</md-nav-bar> 
 		</md-content>	
-		<md-content class="headBar tabView" flex="20" layout="column" layout-align="end end">
-			<md-nav-bar layout-align="end end" flex="20" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+		
+		<md-content class="headBar tabView" flex="50" layout="column" layout-align="end end">
+			<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="tabView = 'panels'" name="panels">Panels</md-nav-item>
 				<md-nav-item md-nav-click="tabView = 'discover'" name="discover">Alerts</md-nav-item>
 				<md-nav-item md-nav-click="tabView = 'dashboard'" name="dashboard">Dashboards</md-nav-item>
