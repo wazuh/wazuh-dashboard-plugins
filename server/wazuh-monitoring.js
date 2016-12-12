@@ -139,7 +139,8 @@ module.exports = function (server, options) {
 			var managerName = agentsArray[0].name;
 			agentsArray.forEach(function (element) {
 				body += '{ "index":  { "_index": "' + todayIndex + '", "_type": "agent" } }\n';
-				element["@timestamp"] = Date.now();
+				var date = new Date(Date.now()).toISOString();
+				element["@timestamp"] = date;
 				element["host"] = managerName;
 				body += JSON.stringify(element) + "\n";
 			});
