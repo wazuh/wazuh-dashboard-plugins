@@ -1,6 +1,6 @@
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="template == 'generic'">
 
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
 	dis-filter="{{state.getDiscoverState().filter ? state.getDiscoverState().filter : '*'}}"
 	infinite-scroll="true">
@@ -11,7 +11,7 @@
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="template == 'fim'">
 
 	<kbn-disfull table-height="1000px;"
-	dis-a="(columns:!(AgentName,AgentIP,SyscheckFile.path,SyscheckFile.event,SyscheckFile.uname_after,SyscheckFile.gname_after,SyscheckFile.perm_after),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:syscheck')),sort:!('@timestamp',desc),vis:(aggs:!((params:(field:AgentIP,orderBy:'2',size:20),schema:segment,type:terms),(id:'2',schema:metric,type:count)),type:histogram))"
+	dis-a="(columns:!(AgentName,AgentIP,SyscheckFile.path,SyscheckFile.event,SyscheckFile.uname_after,SyscheckFile.gname_after,SyscheckFile.perm_after),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:syscheck')),sort:!('@timestamp',desc),vis:(aggs:!((params:(field:AgentIP,orderBy:'2',size:20),schema:segment,type:terms),(id:'2',schema:metric,type:count)),type:histogram))"
 	dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
 	dis-filter="{{state.getDiscoverState().filter ? state.getDiscoverState().filter : '*'}}"
 	infinite-scroll="true">
@@ -22,7 +22,7 @@
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="template == 'rootcheck'">
 
 	<kbn-disfull table-height="1000px;"
-	dis-a="(columns:!(AgentName,rule.description,title,AlertsFile,rule.AlertLevel,rule.CIS,rule.PCI_DSS),filters:!(),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-a="(columns:!(AgentName,rule.description,title,AlertsFile,rule.AlertLevel,rule.CIS,rule.PCI_DSS),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))"
 	dis-filter="rule.groups:rootcheck AND {{state.getDiscoverState().filter ? state.getDiscoverState().filter : '*'}}"
 	infinite-scroll="true">

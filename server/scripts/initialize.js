@@ -11,8 +11,8 @@ module.exports = function (server, options) {
 	
 	// Initialize variables
 	var req = { path : "", headers : {}};
-	var index_pattern = "ossec-*";
-	var index_prefix = "ossec-";
+	var index_pattern = "wazuh-alerts-*";
+	var index_prefix = "wazuh-";
     const OBJECTS_FILE = 'plugins/wazuh/server/scripts/integration_files/objects_file.json';
     const TEMPLATE_FILE = 'plugins/wazuh/server/scripts/integration_files/template_file.json';
 	
@@ -24,7 +24,7 @@ module.exports = function (server, options) {
 	var insertSampleData = function (todayIndex) {
         var SAMPLE_DATA = {"full_log": "Sample alert created by Wazuh App. www.wazuh.com", "@timestamp": new Date().toISOString() };
 
-        client.create({ index: todayIndex, type: 'ossec', id: Date.now(), body: SAMPLE_DATA }).then(
+        client.create({ index: todayIndex, type: 'wazuh', id: Date.now(), body: SAMPLE_DATA }).then(
             function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Sample alert was inserted successfully.');
                 configureKibana();
@@ -120,7 +120,7 @@ module.exports = function (server, options) {
 			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
 		};
 		
-		client.indices.putTemplate( {name: "ossec", order: 0, body: map_jsondata}).then(
+		client.indices.putTemplate( {name: "wazuh", order: 0, body: map_jsondata}).then(
 			function () {
 				server.log([blueWazuh, 'initialize', 'info'], 'Template installed and loaded: ' +  index_pattern);
 				insertSampleData(todayIndex);
@@ -161,7 +161,7 @@ module.exports = function (server, options) {
             index: '.kibana',
             body: body
         }).then(function () {
-            client.indices.refresh({ index: ['.kibana', 'ossec-*'] });
+            client.indices.refresh({ index: ['.kibana', index_pattern] });
             server.log([blueWazuh, 'initialize', 'info'], 'Templates, mappings, index patterns, visualizations, searches and dashboards were successfully installed. App ready to be used.');
         }, function (err) {
             server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch. Bulk request failed.');

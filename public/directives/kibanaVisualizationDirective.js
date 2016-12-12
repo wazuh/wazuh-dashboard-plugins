@@ -128,7 +128,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.fetch = function () 
 		{
 			//$state.save();
-			if($scope.visIndexPattern == "ossec-*"){
+			if($scope.visIndexPattern == "wazuh-alerts-*"){
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
 				$scope.searchSource.set('query', $scope.filter.current);
 			}
