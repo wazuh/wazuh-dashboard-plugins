@@ -12,7 +12,7 @@ module.exports = function (server, options) {
 	// Initialize variables
 	var req = { path : "", headers : {}};
 	var index_pattern = "wazuh-alerts-*";
-	var index_prefix = "wazuh-";
+	var index_prefix = "wazuh-alerts-";
     const OBJECTS_FILE = 'plugins/wazuh/server/scripts/integration_files/objects_file.json';
     const TEMPLATE_FILE = 'plugins/wazuh/server/scripts/integration_files/template_file.json';
 	
@@ -124,8 +124,9 @@ module.exports = function (server, options) {
 			function () {
 				server.log([blueWazuh, 'initialize', 'info'], 'Template installed and loaded: ' +  index_pattern);
 				insertSampleData(todayIndex);
-			}, function () {
-				server.log([blueWazuh, 'initialize', 'error'], 'Could not install template' +  index_pattern);
+			}, function (data) {
+				console.log(data);
+				server.log([blueWazuh, 'initialize', 'error'], 'Could not install template ' +  index_pattern);
 			});
     };
 

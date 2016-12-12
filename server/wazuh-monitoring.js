@@ -152,9 +152,6 @@ module.exports = function (server, options) {
 				body: body
 			}).then(function () {
 				agentsArray.length = 0;
-				setTimeout(function () {
-					return;
-				}, 60000);
 			}, function (err) {
 				server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error inserting agent data into elasticsearch. Bulk request failed.');
 			});
