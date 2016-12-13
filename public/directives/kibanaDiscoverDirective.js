@@ -82,9 +82,9 @@ var app = require('ui/modules').get('app/wazuh', [])
       template: require('../templates/directives/dis-full-template.html')
     }
   }]);
-  
 
-  
+
+
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($scope, config, courier, $route, $window, Notifier,
   AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches, appState, $rootScope, getAppState) {
 
@@ -102,9 +102,9 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 
 	if(typeof $rootScope.visCounter === "undefined")
 		$rootScope.visCounter = 0;
-	
+
 	$rootScope.visCounter++;
-	
+
   $route.requireDefaultIndex = true;
   $route.template = $route.indexTemplate;
   $route.reloadOnSearch = false;
@@ -147,10 +147,10 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             $scope.showInterval = !$scope.showInterval;
           };
           $scope.topNavMenu = [];
-		 
+
 
 		  $scope.timefilter = timefilter;
-		  
+
 		  // Decode discover settings from directive
 		  var disDecoded = rison.decode($scope.disA);
 		// Set default time
@@ -177,15 +177,16 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
 		  }else{
 			   $scope.state = currentAppState;
 			   $scope.state.columns = disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns');
-			   
+
 		  }
-		  
+
 		  const $state = $scope.state;
           $scope.uiState = $state.makeStateful('uiState');
+          $scope.uiState.set('vis.legendOpen', false);
           $state.query = ($scope.stateQuery ? $scope.stateQuery : '*');
 
           function getStateDefaults() {
-            
+
             $route.current.params._a = $scope.disA;
             $route.updateParams({ '_a': $scope.disA });
             return {
@@ -363,7 +364,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
           };
 
           $scope.opts.fetch = $scope.fetch = function () {
-			  
+
             // ignore requests to fetch before the app inits
             if (!init.complete) return;
 
@@ -473,7 +474,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             });
 
             segmented.on('complete', function () {
-			  
+
               if ($scope.fetchStatus.hitCount === 0) {
                 flushResponseData();
               }
@@ -583,7 +584,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                 // clear the loading flag
                 loadingVis = null;
               });
-			
+
             return loadingVis;
           }
 		// Listen for visualization queue prepared
