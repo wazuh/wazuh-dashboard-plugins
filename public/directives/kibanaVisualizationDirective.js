@@ -41,26 +41,26 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 
 require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
-	
-	
+
+
 	if(typeof $rootScope.visCounter === "undefined")
 		$rootScope.visCounter = 0;
-	
-	
-	
+
+
+
 	// Set filters
 	$scope.filter = {};
 	$scope.defaultManagerName = appState.getDefaultManager().name;
 	$scope.filter.raw = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
 	$scope.filter.current = $scope.filter.raw;
-			
+
 	// Initialize Visualization
 	$scope.newVis = new SavedVis({ 'type': $scope.visType, 'indexPattern': $scope.visIndexPattern });
-	
+
 	// Initialize and decode params
 	var visDecoded = rison.decode($scope.visA);
 	var visState = {};
-	
+
 	$scope.newVis.init().then(function () {
 		// Render visualization
 		$rootScope.visCounter++;
@@ -69,63 +69,71 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		console.log("Error: Could not load visualization: "+visDecoded.vis.title);
 		}
 	);
-	
-	
-	
 
-	
+
+
+
+
     function renderVisualization() {
-	
+
 		$scope.loadBeforeShow = false;
-		
+
 		// Set default time
 		if($route.current.params._g == "()"){
 			timefilter.time.from = "now-24h";
 			timefilter.time.to = "now";
 		}
-		
+
 		// Initialize time
 		$scope.timefilter = timefilter;
-		
-		// Get App State	
+
+		// Get App State
 		const $state = getAppState();
 		//let $state = new AppState();
-		
+
 		// Initialize queryFilter and searchSource
-		$scope.queryFilter = Private(FilterBarQueryFilterProvider);	
+		$scope.queryFilter = Private(FilterBarQueryFilterProvider);
 		$scope.searchSource = $scope.newVis.searchSource;
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
 		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
-		
+
 		$timeout(
-		function() {  
-			
+		function() {
+
 			// Bind visualization, index pattern and state
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
-			$scope.state = $state; 
-				
+			$scope.state = $state;
+
 			// Build visualization
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
 			visState.params = visDecoded.vis.params;
-
+      //console.log(visDecoded.vis.title);
 			visState.listeners = {brush: brushEvent, click: filterBarClickHandler($state)};
-			
-			
+
+
 			// Set Vis states
 			$scope.uiState = $state.makeStateful('uiState');
+
+      // Hide legend if needed
+      if(typeof visDecoded.uiState.vis !== "undefined" && typeof visDecoded.uiState.vis.legendOpen !== "undefined" && !visDecoded.uiState.vis.legendOpen)
+        $scope.uiState.set('vis.legendOpen', false);
+      else {
+        $scope.uiState.set('vis.legendOpen', true);
+      }
 			$scope.vis.setUiState($scope.uiState);
 			$scope.vis.setState(visState);
-			
 			$rootScope.visCounter--;
 			$scope.loadBeforeShow = true;
+
+
 		}, 0);
-		
+
 
 		// Fetch visualization
-		$scope.fetch = function () 
+		$scope.fetch = function ()
 		{
 			//$state.save();
 			if($scope.visIndexPattern == "wazuh-alerts-*"){
@@ -138,20 +146,20 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			}
 
 		};
-		
-		 
+
+
 		// Listeners
-		
+
 		// Listen for timefilter changes
 		$scope.$listen(timefilter, 'fetch', function () {
-			$scope.fetch(); 
+			$scope.fetch();
         });
-		
+
 		// Listen for filter changes
 		$scope.$listen($scope.queryFilter, 'update', function () {
 			$scope.fetch();
 		 });
-		 
+
 		// Listen for query changes
 		var updateQueryWatch = $rootScope.$on('updateQuery', function (event, query) {
 			if(query !== "undefined"){
@@ -159,19 +167,19 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 				$scope.fetch();
 			}
 		 });
-		 
+
 		// Listen for visualization queue prepared
 		var fetchVisualizationWatch = $rootScope.$on('fetchVisualization', function (event) {
 				$scope.fetch();
-		 });		 
-		 
-		// Listen for destroy 
+		 });
+
+		// Listen for destroy
 		$scope.$on('$destroy', function () {
 			$scope.newVis.destroy();
 		});
 		$scope.$on('$destroy', updateQueryWatch);
 		$scope.$on('$destroy', fetchVisualizationWatch);
-		
+
     };
 
   });
