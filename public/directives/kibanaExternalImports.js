@@ -1,6 +1,6 @@
 require('ui/styles/base.less');
 require('ui/styles/mixins.less');
-require('ui/share/styles/index.less');
+
 require('ui/styles/control_group.less');
 require('ui/styles/navbar.less');
 require('plugins/kibana/visualize/styles/main.less');

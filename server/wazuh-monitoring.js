@@ -1,7 +1,8 @@
 module.exports = function (server, options) {
 
     const client = server.plugins.elasticsearch.client;
-
+    const fs = require('fs');
+	
     var api_user;
     var api_pass;
     var api_url;
@@ -13,7 +14,8 @@ module.exports = function (server, options) {
 
     var cron = require('node-cron');
     var needle = require('needle');
-
+	const KIBANA_FIELDS_FILE = 'plugins/wazuh/server/scripts/integration_files/kibana_fields_file.json';
+	
     var agentsArray = [];
 
     var loadCredentials = function (apiEntries) {
@@ -173,7 +175,17 @@ module.exports = function (server, options) {
     };
 
     var configureKibana = function () {
-        return client.create({ index: '.kibana', type: 'index-pattern', id: 'wazuh-monitoring-*', body: { title: 'wazuh-monitoring-*', timeFieldName: '@timestamp'} });
+		
+		var kibana_fields_data = {};
+        try {
+          kibana_fields_data = JSON.parse(fs.readFileSync(KIBANA_FIELDS_FILE, 'utf8'));
+        } catch (e) {
+          server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
+          server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
+          server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+        };
+		
+        return client.create({ index: '.kibana', type: 'index-pattern', id: 'wazuh-monitoring-*', body: { title: 'wazuh-monitoring-*', timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_monitoring} });
     };
 
     server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Creating today index...');
