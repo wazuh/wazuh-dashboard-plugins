@@ -198,7 +198,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
               filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
             };
           }
-		  console.log($state);
           $state.index = $scope.indexPattern.id;
           $state.sort = getSort.array($state.sort, $scope.indexPattern);
 

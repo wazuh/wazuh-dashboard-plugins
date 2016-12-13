@@ -1,16 +1,57 @@
 <div ng-controller="discoverW" class="app-container">
 
-<kbn-top-nav name="discover" config="topNavMenu">
-    <div class="kibana-nav-info">
-      <span ng-show="opts.savedSearch.id" class="kibana-nav-info-title">
-        <span ng-bind="::opts.savedSearch.title"></span>
-        <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>
-      </span>
+  <kbn-top-nav name="discover" config="topNavMenu">
+    <!-- Transcluded elements. -->
 
-      <strong class="discover-info-hits">{{(hits || 0) | number:0}}</strong>
-      <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
+    <div data-transclude-slots>
+      <!-- Breadcrumbs. -->
+      <div data-transclude-slot="topLeftCorner" class="localBreadcrumbs">
+        <div class="localBreadcrumb">
+          <span ng-show="opts.savedSearch.id" class="localBreadcrumb__emphasis">
+            <span data-test-subj="discoverCurrentQuery" ng-bind="::opts.savedSearch.title"></span>
+            <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
+          </span>
+          <span data-test-subj="discoverQueryHits" class="localBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
+          <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
+        </div>
+      </div>
+
+      <!-- Search. -->
+      <form
+        data-transclude-slot="bottomRow"
+        class="fullWidth"
+        role="form"
+        name="discoverSearch"
+        ng-submit="fetch()"
+      >
+        <div class="typeahead" kbn-typeahead="discover">
+          <div class="localSearch">
+            <input
+              parse-query
+              input-focus
+              kbn-typeahead-input
+              ng-model="state.query"
+              placeholder="Search..."
+              aria-label="Search input"
+              type="text"
+              class="localSearchInput"
+              ng-class="{'localSearchInput-isInvalid': discoverSearch.$invalid}"
+            >
+            <button
+              type="submit"
+              aria-label="Search"
+              class="localSearchButton"
+              ng-disabled="discoverSearch.$invalid"
+            >
+              <span class="fa fa-search" aria-hidden="true"></span>
+            </button>
+          </div>
+          <kbn-typeahead-items></kbn-typeahead-items>
+        </div>
+      </form>
     </div>
   </kbn-top-nav>
+
   <navbar name="discover-search">
     <form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
       <div class="typeahead" kbn-typeahead="discover">
@@ -36,15 +77,15 @@
     <div class="button-group" role="toolbar"></div>
   </navbar>
 
-  
+
   <div class="container-fluid" role="main">
   <div class="row">
       <filter-bar state="state"></filter-bar>
     </div>
 
-	
+
     <div class="row">
-	
+
 	<div class="col-md-2 sidebar-container collapsible-sidebar">
         <disc-field-chooser
           columns="state.columns"

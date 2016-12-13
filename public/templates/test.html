@@ -1,26 +1,11 @@
 <div ng-controller="testController">
 <kbn-searchbar></kbn-searchbar>
-  <div layout="row" layout-align="center stretch">
-		<md-card flex="100">
-			<md-card-content>
-				<span class="md-headline">Events</span>
-				<kbn-vis vis-height="120px" vis-type="histogram" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-					vis-filter="*"
-					>
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
-</div>
-<div layout="row" layout-align="center stretch">
-    <md-card flex layout="column">
-			<md-card-content>
-				<kbn-vis vis-height="70px" vis-type="metric" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))"
-				vis-filter="*">
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
 
 
-	</div>
-
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,agent.ip,rule.level,rule.description,rule.groups,rule.pci_dss,full_log),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter="*"
+	infinite-scroll="true">
+	</kbn-disfull>
+</md-content>
 </div>
