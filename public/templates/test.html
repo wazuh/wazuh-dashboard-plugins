@@ -1,43 +1,11 @@
 <div ng-controller="testController">
-
-	<md-content class="headBar" layout="row" layout-align="center start" ng-init="submenuNavItem = 'general'">
-        <md-nav-bar flex="60" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-            <md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
-            <md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>
-        </md-nav-bar> 
-	
-    </md-content>
-	
-	<div ng-if="submenuNavItem == 'general'" >
-		<kbn-searchbar></kbn-searchbar>
+<kbn-searchbar></kbn-searchbar>
 
 
-		
-		<md-content flex layout="row">
-
-				<md-card flex="100">
-					<md-card-content>
-						<span class="md-headline">Agents</span>
-						<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:AgentName,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
-					</kbn-vis>
-					</md-card-content>
-				</md-card>
-				
-				
-				
-
-			</md-content>
-	</div>
-
-	<div ng-if="submenuNavItem == 'fim'" >
-	
-
-
-		
-		<kbn-dash dash-id="OSSEC-Alerts" dash-searchable="true" dash-timepicker="true"></kbn-dash>
-			
-	</div>
-
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,agent.ip,rule.level,rule.description,rule.groups,rule.pci_dss,full_log),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter="*"
+	infinite-scroll="true">
+	</kbn-disfull>
+</md-content>
 </div>
-

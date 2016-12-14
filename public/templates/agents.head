@@ -9,10 +9,7 @@
 			<md-nav-item md-nav-href="#/agents" name="agents" >Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/discover" name="discover" ng-click="resetDiscover();">Discover</md-nav-item>
 			<md-nav-item md-nav-href="#/dashboards" name="dashboards" ng-click="resetDashboards();">Dashboards</md-nav-item>
-			<a href="#/settings"><button id="settingButtonTop" class="md-primary md-button ng-scope md-ink-ripple" type="button">
-				<i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i>
-			</button>
-			</a>
+			<md-nav-item md-nav-href="#/settings" name="dashboards"><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 18px;"></i></md-nav-item>
         </md-nav-bar>
     </md-content> 
 
@@ -20,65 +17,66 @@
 
 	<div flex layout="row" ng-if="!load">
 		<md-content flex id="content">
-			<md-toolbar style="height: 50px;">
-				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-					<div style="text-transform: none; font-size: 20px;" ng-show="$parent._agent">
-					
-						<div style="float: left;margin-top: 3px;margin-right: 11px;">
-							<span> <i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i>
-							{{_agent.id}} - {{_agent.name}}</span><span ng-show="_agent.id == '000'">(Manager)</span>
-						</div>
+			<md-content layout="row" layout-align="space-between start" style="background-color: #f7f7f7"> 
+				<md-toolbar style="height: 50px;">
+					<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+						<div style="text-transform: none; font-size: 20px;" ng-show="$parent._agent">
+						
+							<div style="float: left;margin-top: 3px;margin-right: 11px;">
+								<span> <i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i>
+								{{_agent.id}} - {{_agent.name}}</span><span ng-show="_agent.id == '000'">(Manager)</span>
+							</div>
 
-						<div style="float: left;margin-right: 11px;">
-							<span ng-class="getAgentStatusClass(_agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(_agent.status)}}</span>
-						</div>
+							<div style="float: left;margin-right: 11px;">
+								<span ng-class="getAgentStatusClass(_agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(_agent.status)}}</span>
+							</div>
+							
+							<div ng-click="restartAgent()" style="float: left;" ng-show="_agent.status == 'Active' && _agent.id != '000' ">
+								<span style="width: 100%;background-color: #3caed2;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">Restart</span>
+							</div>
+							
 						
-						<div ng-click="restartAgent()" style="float: left;" ng-show="_agent.status == 'Active' && _agent.id != '000' ">
-							<span style="width: 100%;background-color: #3caed2;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">Restart</span>
 						</div>
 						
 					
+						<h2 style="text-transform: none; font-size: 20px;" ng-show="!_agent"><i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents overview</h2>
+						<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
+						<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
+							md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
+							placeholder="Search by name, ID or IP address"> 
+							<md-item-template>
+								<span class="item-title">
+				<span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.name}} ({{item.id}}) </strong></span>
+						</span>
+						<span class="item-metadata">
+									<span class="item-metastat" md-highlight-text="search" md-highlight-flags="i"> {{item.ip}} ({{item.status}}) </span>
+						</span>
+						</md-item-template>
+						<md-not-found>
+							No agents matching "{{search}}" were found.
+						</md-not-found>
+						</md-autocomplete>
+						</span>
 					</div>
-					
-				
-					<h2 style="text-transform: none; font-size: 20px;" ng-show="!_agent"><i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents overview</h2>
-					<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-					<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
-						md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
-						placeholder="Search by name, ID or IP address"> 
-						<md-item-template>
-							<span class="item-title">
-            <span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.name}} ({{item.id}}) </strong></span>
-					</span>
-					<span class="item-metadata">
-								<span class="item-metastat" md-highlight-text="search" md-highlight-flags="i"> {{item.ip}} ({{item.status}}) </span>
-					</span>
-					</md-item-template>
-					<md-not-found>
-						No agents matching "{{search}}" were found.
-					</md-not-found>
-					</md-autocomplete>
-					</span>
-				</div>
-			</md-toolbar>
-			
-			
+				</md-toolbar>
+			</md-content>
 			
 			<md-content layout="row" layout-align="space-between start" style="background-color: #f7f7f7">
-				<md-content ng-show="_agent" class="headBar" layout="column" layout-align="center start" ng-init="tabView = 'panels';">
-					<md-nav-bar flex="40" style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+			
+				<md-content flex="50" ng-show="_agent" class="headBar" layout="column" layout-align="center start" ng-init="tabView = 'panels';">
+					<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 						<md-nav-item md-nav-click="submenuNavItem = 'overview'" name="overview">Overview</md-nav-item>
 						<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File Integrity</md-nav-item>
 						<md-nav-item md-nav-click="submenuNavItem = 'policy_monitoring'" name="policy_monitoring">Policy Monitoring</md-nav-item>
 					</md-nav-bar>
 				</md-content>
 				
-				<md-content ng-show="_agent" class="headBar tabView" flex="20" layout="column" layout-align="end end">
-					<md-nav-bar layout-align="end end" flex="20" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+				<md-content ng-show="_agent" class="headBar tabView" flex="50" layout="column" layout-align="end end">
+					<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 						<md-nav-item md-nav-click="tabView = 'panels'" name="panels">Panels</md-nav-item>
 						<md-nav-item md-nav-click="tabView = 'discover'" name="discover">Alerts</md-nav-item>
 						<md-nav-item md-nav-click="tabView = 'dashboard'" name="dashboard">Dashboards</md-nav-item>
 					</md-nav-bar> 
 				</md-content>
-				
+
 			</md-content>

@@ -28,7 +28,7 @@ require('plugins/wazuh/objects/autoSizeContainer.js');
 require('plugins/wazuh/objects/routes.js');
 
 // Require Kibana integrations
-require('plugins/wazuh/directives/kibanaImports.js');
+require('plugins/wazuh/directives/kibanaExternalImports.js');
 require('plugins/wazuh/directives/kibanaVisualizationDirective.js');
 require('plugins/wazuh/directives/kibanaDiscoverDirective.js');
 require('plugins/wazuh/directives/kibanaDashboardDirective.js');

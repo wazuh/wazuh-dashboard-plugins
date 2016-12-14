@@ -15,7 +15,7 @@ module.exports = function (server, options) {
     //Handlers - stats
 
     var fetchElastic = function (payload) {
-        return client.search({ index: 'ossec-*', type: 'ossec', body: payload });
+        return client.search({ index: 'wazuh-alerts-*', type: 'wazuh', body: payload });
     };
 
     var getFieldTop = function (req, reply) {

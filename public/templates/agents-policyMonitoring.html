@@ -10,8 +10,8 @@
                         </md-card-title-text>
                     </md-card-title>
                     <md-card-content>
-                        <kbn-vis vis-height="100px" vis-type="histogram" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20rootcheck')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-                            vis-filter="{{_agent.name ? 'AgentName:'+_agent.name : '*'}}">
+                        <kbn-vis vis-height="100px" vis-type="histogram" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
+                            vis-filter="rule.groups: rootcheck AND {{_agent.name ? 'agent.name:'+_agent.name : '*'}}">
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
@@ -22,8 +22,8 @@
                         </md-card-title-text>
                     </md-card-title>
                     <md-card-content>
-                        <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="ossec-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20rootcheck')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.CIS,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-                            vis-filter="{{'AgentName:'+_agent.name}}"
+                        <kbn-vis vis-height="100px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.cis,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                            vis-filter="rule.groups: rootcheck AND {{'agent.name:'+_agent.name}}"
 							>
                         </kbn-vis>
                     </md-card-content>
@@ -47,11 +47,11 @@
                             <span class="md-headline">Last events</span>
                         </md-card-title-text>
                     </md-card-title>
-					<kbn-dis table-height="600px" dis-a="(columns:!(rule.description,title,rule.CIS,rule.PCI_DSS,AlertsFile),index:'ossec-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'location:rootcheck')),sort:!('@timestamp',desc))"
-					dis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-{{timerFilterValue}},mode:quick,to:now))"
-					dis-filter="location: rootcheck AND {{'AgentName:'+_agent.name}}"
-					infinite-scroll="true">
-					</kbn-dis>
+					
+					<kbn-vis vis-height="600px" vis-type="table" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'location:%20rootcheck')),uiState:(vis:(params:(sort:(columnIndex:3,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:5000),schema:bucket,type:terms),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'4',params:(field:title,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+					vis-filter="rule.groups: rootcheck AND {{'agent.name:'+_agent.name}}">
+					</kbn-vis>
+					
 					</md-card>
 				
            </div>
