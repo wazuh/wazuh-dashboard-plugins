@@ -1,50 +1,55 @@
 module.exports = function (server, options) {
 
+	  // External libraries
     const client = server.plugins.elasticsearch.client;
     const fs = require('fs');
-	
+    const path = require('path');
+    var colors = require('ansicolors');
+    var cron = require('node-cron');
+    var needle = require('needle');
+
+    // Declare variables
     var api_user;
     var api_pass;
     var api_url;
     var api_insecure;
     var api_port;
 
-    var colors = require('ansicolors');
+    // Initialize
     var blueWazuh = colors.blue('wazuh');
-
-    var cron = require('node-cron');
-    var needle = require('needle');
-	const KIBANA_FIELDS_FILE = 'plugins/wazuh/server/scripts/integration_files/kibana_fields_file.json';
-	
     var agentsArray = [];
+    const KIBANA_FIELDS_FILE = 'scripts/integration_files/kibana_fields_file.json';
+    var kibana_fields_data = {};
+
+
 
     var loadCredentials = function (apiEntries) {
 
 		if ( typeof apiEntries === 'undefined' || typeof apiEntries.hits === 'undefined')
 			return;
-		
+
 			apiEntries.hits.forEach(function (element) {
 				var apiEntry = { 'user': element._source.api_user, 'password': new Buffer(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
-				
+
 				if (apiEntry.error) {
 					server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
 					return;
 				}
-				
-				
+
+
 				checkAndSaveStatus(apiEntry);
-				
+
 			});
     }
 
     var checkAndSaveStatus = function (apiEntry) {
-		
+
 		apiEntry.user;
 		apiEntry.password;
 		apiEntry.url;
 		apiEntry.insecure;
 		apiEntry.port;
-		
+
         var payload = {
             'offset': 0,
             'limit': 1,
@@ -56,7 +61,7 @@ module.exports = function (server, options) {
             password: apiEntry.password,
             rejectUnauthorized: !apiEntry.insecure
         };
-		
+
 
         needle.request('get', apiEntry.url + ':' + apiEntry.port +'/agents', payload, options, function (error, response) {
 
@@ -86,7 +91,7 @@ module.exports = function (server, options) {
             password: apiEntry.password,
             rejectUnauthorized: !apiEntry.insecure
         };
-		
+
         needle.request('get', apiEntry.url + ':' + apiEntry.port + '/agents', payload, options, function (error, response) {
             if (!error && response.body.data.items) {
                 agentsArray = agentsArray.concat(response.body.data.items);
@@ -175,16 +180,15 @@ module.exports = function (server, options) {
     };
 
     var configureKibana = function () {
-		
-		var kibana_fields_data = {};
+
         try {
-          kibana_fields_data = JSON.parse(fs.readFileSync(KIBANA_FIELDS_FILE, 'utf8'));
+          kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
         } catch (e) {
           server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
           server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
           server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
         };
-		
+
         return client.create({ index: '.kibana', type: 'index-pattern', id: 'wazuh-monitoring-*', body: { title: 'wazuh-monitoring-*', timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_monitoring} });
     };
 
