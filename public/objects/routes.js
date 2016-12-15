@@ -2,18 +2,22 @@
 var routes = require('ui/routes');
 
 //Installation wizard
-var settingsWizard = function ($location, testConnection, $mdToast, appState) {
-    testConnection.test()
-        .then(function (data) {
+var settingsWizard = function ($location, testConnection, $mdToast, appState, $q) {
+    var deferred = $q.defer();
+    testConnection.test().then(function (data)
+    {
 			appState.setDefaultManager(data.manager);
+      deferred.resolve();
 		}, function (data) {
             $mdToast.show({
                 template: '<md-toast>Could not connect with Wazuh API. Please, configure it on settings tab.</md-toast>',
                 position: 'bottom left',
                 hideDelay: 5000,
             });
+            deferred.reject();
             $location.path('/settings');
-        });
+    });
+    return deferred.promise;
 }
 
 //Routes

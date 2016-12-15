@@ -4,6 +4,7 @@ module.exports = function (server, options) {
     const client = server.plugins.elasticsearch.client;
     const uiSettings = server.uiSettings();
     const fs = require('fs');
+    const path = require('path');
 
 	// Colors for console logging
     const colors = require('ansicolors');
@@ -13,9 +14,17 @@ module.exports = function (server, options) {
 	var req = { path : "", headers : {}};
 	var index_pattern = "wazuh-alerts-*";
 	var index_prefix = "wazuh-alerts-";
-	const OBJECTS_FILE = 'plugins/wazuh/server/scripts/integration_files/objects_file.json';
-	const TEMPLATE_FILE = 'plugins/wazuh/server/scripts/integration_files/template_file.json';
-	const KIBANA_FIELDS_FILE = 'plugins/wazuh/server/scripts/integration_files/kibana_fields_file.json';
+
+  // External files template or objects
+  const OBJECTS_FILE = 'integration_files/objects_file.json';
+  const TEMPLATE_FILE = 'integration_files/template_file.json';
+  const KIBANA_FIELDS_FILE = 'integration_files/kibana_fields_file.json';
+
+  // Initialize objects
+  var kibana_fields_data = {};
+  var map_jsondata = {};
+  var objects = {};
+
 
 	// Today
 	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
@@ -67,15 +76,14 @@ module.exports = function (server, options) {
 	// Create index pattern
 	var createIndexPattern = function () {
 
-        var kibana_fields_data = {};
         try {
-          kibana_fields_data = JSON.parse(fs.readFileSync(KIBANA_FIELDS_FILE, 'utf8'));
+          kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
         } catch (e) {
           server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
           server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
           server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
         };
-		
+
         server.log([blueWazuh, 'initialize', 'info'], 'Creating index pattern: ' + index_pattern);
         client.create({ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_alerts } })
             .then(function () {
@@ -122,9 +130,8 @@ module.exports = function (server, options) {
     };
 
     var loadTemplate = function () {
-		var map_jsondata = {};
 		try {
-			map_jsondata = JSON.parse(fs.readFileSync(TEMPLATE_FILE, 'utf8'));
+      map_jsondata = JSON.parse(fs.readFileSync(path.resolve(__dirname, TEMPLATE_FILE), 'utf8'));
 		} catch (e) {
 			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
 			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + TEMPLATE_FILE);
@@ -156,7 +163,7 @@ module.exports = function (server, options) {
     var importObjects = function () {
         server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...');
         try {
-            var objects = JSON.parse(fs.readFileSync(OBJECTS_FILE, 'utf8'));
+            objects = JSON.parse(fs.readFileSync(path.resolve(__dirname, OBJECTS_FILE), 'utf8'));
         } catch (e) {
             server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
             server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + OBJECTS_FILE);
