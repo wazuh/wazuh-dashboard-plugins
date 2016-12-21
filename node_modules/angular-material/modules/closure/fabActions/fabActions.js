@@ -2,10 +2,10 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
-goog.provide('ng.material.components.fabActions');
-goog.require('ng.material.core');
+goog.provide('ngmaterial.components.fabActions');
+goog.require('ngmaterial.core');
 (function() {
   'use strict';
 
@@ -13,6 +13,7 @@ goog.require('ng.material.core');
    * @ngdoc module
    * @name material.components.fabActions
    */
+  MdFabActionsDirective.$inject = ["$mdUtil"];
   angular
     .module('material.components.fabActions', ['material.core'])
     .directive('mdFabActions', MdFabActionsDirective);
@@ -53,8 +54,7 @@ goog.require('ng.material.core');
       }
     }
   }
-  MdFabActionsDirective.$inject = ["$mdUtil"];
 
 })();
 
-ng.material.components.fabActions = angular.module("material.components.fabActions");
+ngmaterial.components.fabActions = angular.module("material.components.fabActions");

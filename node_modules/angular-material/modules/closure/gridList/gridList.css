@@ -2,13 +2,8 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
-/*  Only used with Theme processes */
-html.md-THEME_NAME-theme, body.md-THEME_NAME-theme {
-  color: '{{foreground-1}}';
-  background-color: '{{background-color}}'; }
-
 md-grid-list {
   box-sizing: border-box;
   display: block;
@@ -22,14 +17,14 @@ md-grid-list {
     display: block;
     position: absolute; }
     md-grid-list md-grid-tile figure {
+      display: -webkit-box;
       display: -webkit-flex;
-      display: -ms-flexbox;
       display: flex;
+      -webkit-box-align: center;
       -webkit-align-items: center;
-          -ms-flex-align: center;
               align-items: center;
+      -webkit-box-pack: center;
       -webkit-justify-content: center;
-          -ms-flex-pack: center;
               justify-content: center;
       height: 100%;
       position: absolute;
@@ -41,14 +36,15 @@ md-grid-list {
       margin: 0; }
     md-grid-list md-grid-tile md-grid-tile-header,
     md-grid-list md-grid-tile md-grid-tile-footer {
+      display: -webkit-box;
       display: -webkit-flex;
-      display: -ms-flexbox;
       display: flex;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
       -webkit-flex-direction: row;
-          -ms-flex-direction: row;
               flex-direction: row;
+      -webkit-box-align: center;
       -webkit-align-items: center;
-          -ms-flex-align: center;
               align-items: center;
       height: 48px;
       color: #fff;

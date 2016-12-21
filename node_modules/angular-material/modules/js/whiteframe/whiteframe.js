@@ -2,7 +2,7 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
 (function( window, angular, undefined ){
 "use strict";
@@ -11,6 +11,7 @@
  * @ngdoc module
  * @name material.components.whiteframe
  */
+MdWhiteframeDirective.$inject = ["$log"];
 angular
   .module('material.components.whiteframe', ['material.core'])
   .directive('mdWhiteframe', MdWhiteframeDirective);
@@ -76,7 +77,6 @@ function MdWhiteframeDirective($log) {
     });
   }
 }
-MdWhiteframeDirective.$inject = ["$log"];
 
 
 })(window, window.angular);
