@@ -50,8 +50,8 @@ If you want to contribute to our project please don't hesitate to send a pull re
 
 * API from Elastic and Kibana (elastic.co).
 * Angular Material (material.angularjs.org).
-* Bootstrap (getbootstrap.com/).
-* AngularJS
+* Bootstrap (getbootstrap.com).
+* AngularJS.
 * Node.js (Ryan Dahl).
 * NPM packages Angular animate, aria, cookies, md5, needle and cron.
 
