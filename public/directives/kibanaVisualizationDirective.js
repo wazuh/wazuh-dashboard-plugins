@@ -121,9 +121,9 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			// Hide legend if needed
 			if(typeof visDecoded.uiState.vis !== "undefined" && typeof visDecoded.uiState.vis.legendOpen !== "undefined" && !visDecoded.uiState.vis.legendOpen)
 				$scope.uiState.set('vis.legendOpen', false);
-			}else{
+			else
 				$scope.uiState.set('vis.legendOpen', true);
-			}
+			
 			$scope.vis.setUiState($scope.uiState);
 			$scope.vis.setState(visState);
 			$rootScope.visCounter--;

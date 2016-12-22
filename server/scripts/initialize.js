@@ -131,7 +131,7 @@ module.exports = function (server, options) {
 
     var loadTemplate = function () {
 		try {
-      map_jsondata = JSON.parse(fs.readFileSync(path.resolve(__dirname, TEMPLATE_FILE), 'utf8'));
+			map_jsondata = JSON.parse(fs.readFileSync(path.resolve(__dirname, TEMPLATE_FILE), 'utf8'));
 		} catch (e) {
 			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
 			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + TEMPLATE_FILE);
