@@ -146,16 +146,14 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
           $scope.toggleInterval = function () {
             $scope.showInterval = !$scope.showInterval;
           };
-          $scope.topNavMenu = [];
-
-
+  
 		  $scope.timefilter = timefilter;
 
 		  // Decode discover settings from directive
 		  var disDecoded = rison.decode($scope.disA);
 		// Set default time
-		if($route.current.params._g == "()")
-			$scope.timefilter.time.from = "now-24h";
+		  if($route.current.params._g == "()")
+			  $scope.timefilter.time.from = "now-24h";
 
           // the saved savedSearch
           const savedSearch = $scope._savedSearch;
@@ -260,7 +258,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                   if (interval !== oldInterval && interval === 'auto') {
                     $scope.showInterval = false;
                   }
-                  //$scope.fetch();
+
                 });
 
                 $scope.$watch('vis.aggs', function () {
@@ -331,7 +329,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
                 return Promise.resolve($scope.opts.timefield && initForTime())
                   .then(function () {
                     init.complete = true;
-                    //$state.replace();
                     $scope.$emit('application.load');
                     $scope.fetch();
                   });
@@ -441,7 +438,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function ($sc
             segmented.on('mergedSegment', function (merged) {
               $scope.mergedEsResp = merged;
               $scope.hits = merged.hits.total;
-
               const indexPattern = $scope.searchSource.get('index');
 
               // the merge rows, use a new array to help watchers

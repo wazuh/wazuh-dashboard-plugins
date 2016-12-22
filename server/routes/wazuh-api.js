@@ -32,7 +32,7 @@ module.exports = function (server, options) {
                 if (data.hits.total == 1) {
                     callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'manager': data.hits.hits[0]._source.manager });
                 } else {
-                    callback({ 'error': 'no credentials', 'error_code': 1 });
+                    callback({ 'error': 'no credentials', 'error_code': 1 }); 
                 }
             }, function () {
                 callback({ 'error': 'no elasticsearch', 'error_code': 2 });
@@ -177,10 +177,12 @@ module.exports = function (server, options) {
                     testApiAux1(error, response, req.payload, needle, function (test_result) {
 						if(test_result.data == "ok"){
 							needle.request('get', req.payload.url+":"+req.payload.port+'/agents/000', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
-								if(!error)
+								if(!error && !response.body.error)
 									reply(response.body.data.name);
+								else if(response.body.error)
+									reply({ 'statusCode': 500, 'error': 5, 'message': response.body.message }).code(500);
 								else
-									reply({ 'statusCode': 500, 'error': 5, 'message': 'Error occurred' }).code(500);	
+									reply({ 'statusCode': 500, 'error': 5, 'message': 'Error occurred' }).code(500);
 							});
 						}else{
 							reply(test_result);

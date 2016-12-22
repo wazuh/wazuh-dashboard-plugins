@@ -100,7 +100,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 					$mdToast.show($mdToast.simple().textContent("Some error ocurred, could not save data in elasticsearch."));
 				}
 			})
-		}, printTest);
+		}, printError);
     };
 
 
@@ -111,7 +111,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     };
 
 
-    var printTest = function (data) {
+    var printError = function (data) {
         var text;
         switch (data.data) {
             case 'no_elasticsearch':
@@ -136,7 +136,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
                 text = 'There are not services running in the given URL.';
                 break;
             default:
-                text = 'Unexpected error. Please, report this to the Wazuh Team.';
+                text = 'Unexpected error. '+data.message;
         }
         $mdToast.show($mdToast.simple().textContent(text));
     };

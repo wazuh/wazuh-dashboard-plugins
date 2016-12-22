@@ -2,10 +2,10 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
-goog.provide('ng.material.components.card');
-goog.require('ng.material.core');
+goog.provide('ngmaterial.components.card');
+goog.require('ngmaterial.core');
 /**
  * @ngdoc module
  * @name material.components.card
@@ -13,6 +13,7 @@ goog.require('ng.material.core');
  * @description
  * Card components.
  */
+mdCardDirective.$inject = ["$mdTheming"];
 angular.module('material.components.card', [
     'material.core'
   ])
@@ -29,7 +30,8 @@ angular.module('material.components.card', [
  * @description
  * The `<md-card>` directive is a container element used within `<md-content>` containers.
  *
- * An image included as a direct descendant will fill the card's width, while the `<md-card-content>`
+ * An image included as a direct descendant will fill the card's width. If you want to avoid this,
+ * you can add the `md-image-no-fill` class to the parent element. The `<md-card-content>`
  * container will wrap text content and provide padding. An `<md-card-footer>` element can be
  * optionally included to put content flush against the bottom edge of the card.
  *
@@ -136,6 +138,5 @@ function mdCardDirective($mdTheming) {
     }
   };
 }
-mdCardDirective.$inject = ["$mdTheming"];
 
-ng.material.components.card = angular.module("material.components.card");
+ngmaterial.components.card = angular.module("material.components.card");

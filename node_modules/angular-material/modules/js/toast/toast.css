@@ -2,13 +2,8 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
-/*  Only used with Theme processes */
-html.md-THEME_NAME-theme, body.md-THEME_NAME-theme {
-  color: '{{foreground-1}}';
-  background-color: '{{background-color}}'; }
-
 .md-toast-text {
   padding: 0 6px; }
 
@@ -20,6 +15,7 @@ md-toast {
   overflow: hidden;
   padding: 8px;
   opacity: 1;
+  -webkit-transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   /* Transition differently when swiping */
   /*
@@ -27,11 +23,12 @@ md-toast {
    * make it rotate when the user swipes it away
    */ }
   md-toast .md-toast-content {
+    display: -webkit-box;
     display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
+    direction: row;
+    -webkit-box-align: center;
     -webkit-align-items: center;
-        -ms-flex-align: center;
             align-items: center;
     max-height: 168px;
     max-width: 100%;
@@ -43,9 +40,10 @@ md-toast {
     overflow: hidden;
     -webkit-transform: translate3d(0, 0, 0) rotateZ(0deg);
             transform: translate3d(0, 0, 0) rotateZ(0deg);
+    -webkit-transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    -webkit-box-pack: start;
     -webkit-justify-content: flex-start;
-        -ms-flex-pack: start;
             justify-content: flex-start; }
     md-toast .md-toast-content::before {
       content: '';
@@ -53,23 +51,31 @@ md-toast {
       visibility: hidden;
       display: inline-block; }
     [dir=rtl] md-toast .md-toast-content {
+      -webkit-box-pack: end;
       -webkit-justify-content: flex-end;
-          -ms-flex-pack: end;
               justify-content: flex-end; }
+    md-toast .md-toast-content span {
+      -webkit-box-flex: 1;
+      -webkit-flex: 1 1 0%;
+              flex: 1 1 0%;
+      box-sizing: border-box;
+      min-width: 0; }
   md-toast.md-capsule {
     border-radius: 24px; }
     md-toast.md-capsule .md-toast-content {
       border-radius: 24px; }
   md-toast.ng-leave-active .md-toast-content {
+    -webkit-transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
     transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2); }
-  md-toast._md-swipeleft .md-toast-content, md-toast._md-swiperight .md-toast-content, md-toast._md-swipeup .md-toast-content, md-toast._md-swipedown .md-toast-content {
+  md-toast.md-swipeleft .md-toast-content, md-toast.md-swiperight .md-toast-content, md-toast.md-swipeup .md-toast-content, md-toast.md-swipedown .md-toast-content {
+    -webkit-transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
   md-toast.ng-enter {
     opacity: 0; }
     md-toast.ng-enter .md-toast-content {
       -webkit-transform: translate3d(0, 100%, 0);
               transform: translate3d(0, 100%, 0); }
-    md-toast.ng-enter._md-top .md-toast-content {
+    md-toast.ng-enter.md-top .md-toast-content {
       -webkit-transform: translate3d(0, -100%, 0);
               transform: translate3d(0, -100%, 0); }
     md-toast.ng-enter.ng-enter-active {
@@ -81,13 +87,13 @@ md-toast {
     opacity: 0;
     -webkit-transform: translate3d(0, 100%, 0);
             transform: translate3d(0, 100%, 0); }
-  md-toast.ng-leave.ng-leave-active._md-swipeup .md-toast-content {
+  md-toast.ng-leave.ng-leave-active.md-swipeup .md-toast-content {
     -webkit-transform: translate3d(0, -50%, 0);
             transform: translate3d(0, -50%, 0); }
-  md-toast.ng-leave.ng-leave-active._md-swipedown .md-toast-content {
+  md-toast.ng-leave.ng-leave-active.md-swipedown .md-toast-content {
     -webkit-transform: translate3d(0, 50%, 0);
             transform: translate3d(0, 50%, 0); }
-  md-toast.ng-leave.ng-leave-active._md-top .md-toast-content {
+  md-toast.ng-leave.ng-leave-active.md-top .md-toast-content {
     -webkit-transform: translate3d(0, -100%, 0);
             transform: translate3d(0, -100%, 0); }
   md-toast .md-action {
@@ -116,10 +122,10 @@ md-toast {
     border-radius: 0;
     bottom: 0;
     padding: 0; }
-    md-toast.ng-leave.ng-leave-active._md-swipeup .md-toast-content {
+    md-toast.ng-leave.ng-leave-active.md-swipeup .md-toast-content {
       -webkit-transform: translate3d(0, -50%, 0);
               transform: translate3d(0, -50%, 0); }
-    md-toast.ng-leave.ng-leave-active._md-swipedown .md-toast-content {
+    md-toast.ng-leave.ng-leave-active.md-swipedown .md-toast-content {
       -webkit-transform: translate3d(0, 50%, 0);
               transform: translate3d(0, 50%, 0); } }
 
@@ -130,32 +136,28 @@ md-toast {
    * When the toast doesn't take up the whole screen,
    * make it rotate when the user swipes it away
    */ }
-    md-toast._md-bottom {
+    md-toast.md-bottom {
       bottom: 0; }
-    md-toast._md-left {
+    md-toast.md-left {
       left: 0; }
-    md-toast._md-right {
+    md-toast.md-right {
       right: 0; }
-    md-toast._md-top {
+    md-toast.md-top {
       top: 0; }
     md-toast._md-start {
       left: 0; }
       [dir=rtl] md-toast._md-start {
-        left: 0;
         left: auto;
-        left: initial;
         right: 0; }
     md-toast._md-end {
       right: 0; }
       [dir=rtl] md-toast._md-end {
-        right: 0;
         right: auto;
-        right: initial;
         left: 0; }
-    md-toast.ng-leave.ng-leave-active._md-swipeleft .md-toast-content {
+    md-toast.ng-leave.ng-leave-active.md-swipeleft .md-toast-content {
       -webkit-transform: translate3d(-50%, 0, 0);
               transform: translate3d(-50%, 0, 0); }
-    md-toast.ng-leave.ng-leave-active._md-swiperight .md-toast-content {
+    md-toast.ng-leave.ng-leave-active.md-swiperight .md-toast-content {
       -webkit-transform: translate3d(50%, 0, 0);
               transform: translate3d(50%, 0, 0); } }
 
@@ -167,5 +169,5 @@ md-toast {
   md-toast {
     border: 1px solid #fff; } }
 
-._md-toast-animating {
+.md-toast-animating {
   overflow: hidden !important; }

@@ -5,7 +5,7 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
     //Initialisation
     $scope.load = true;
     $scope.search = '';
-    $scope.menuNavItem = 'agents';
+    //$scope.menuNavItem = 'agents';
     $scope.submenuNavItem = '';
     $scope.state = appState;
 
@@ -187,9 +187,7 @@ app.controller('stateLocationController', function ($scope, appState, $window) {
     }
 
 	$scope.changeTabView = function (view) {
-		console.log("En tab View");
         $scope.tabView = view;
     }
-
 
 });

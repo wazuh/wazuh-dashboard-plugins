@@ -3,7 +3,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
-    $scope.$parent.state.setOverviewState('general');
+
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
     $scope.stats = [];
 

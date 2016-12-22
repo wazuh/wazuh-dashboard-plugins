@@ -2,44 +2,37 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
-/*  Only used with Theme processes */
-html.md-THEME_NAME-theme, body.md-THEME_NAME-theme {
-  color: '{{foreground-1}}';
-  background-color: '{{background-color}}'; }
-
 md-card {
   box-sizing: border-box;
+  display: -webkit-box;
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
   -webkit-flex-direction: column;
-      -ms-flex-direction: column;
           flex-direction: column;
   margin: 8px;
   box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12); }
   md-card md-card-header {
     padding: 16px;
+    display: -webkit-box;
     display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
     -webkit-flex-direction: row;
-        -ms-flex-direction: row;
             flex-direction: row; }
     md-card md-card-header:first-child md-card-avatar {
       margin-right: 12px; }
       [dir=rtl] md-card md-card-header:first-child md-card-avatar {
-        margin-right: 0;
         margin-right: auto;
-        margin-right: initial;
         margin-left: 12px; }
     md-card md-card-header:last-child md-card-avatar {
       margin-left: 12px; }
       [dir=rtl] md-card md-card-header:last-child md-card-avatar {
-        margin-left: 0;
         margin-left: auto;
-        margin-left: initial;
         margin-right: 12px; }
     md-card md-card-header md-card-avatar {
       width: 40px;
@@ -54,50 +47,54 @@ md-card {
         md-card md-card-header md-card-avatar + md-card-header-text .md-title {
           font-size: 14px; }
     md-card md-card-header md-card-header-text {
+      display: -webkit-box;
       display: -webkit-flex;
-      display: -ms-flexbox;
       display: flex;
+      -webkit-box-flex: 1;
       -webkit-flex: 1;
-          -ms-flex: 1;
               flex: 1;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
       -webkit-flex-direction: column;
-          -ms-flex-direction: column;
               flex-direction: column; }
       md-card md-card-header md-card-header-text .md-subhead {
         font-size: 14px; }
   md-card > img,
-  md-card > :not(md-card-content) img {
+  md-card > md-card-header img,
+  md-card md-card-title-media img {
     box-sizing: border-box;
+    display: -webkit-box;
     display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
+    -webkit-box-flex: 0;
     -webkit-flex: 0 0 auto;
-        -ms-flex: 0 0 auto;
             flex: 0 0 auto;
     width: 100%;
-    height: 100% !important; }
+    height: auto; }
   md-card md-card-title {
     padding: 24px 16px 16px;
+    display: -webkit-box;
     display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
+    -webkit-box-flex: 1;
     -webkit-flex: 1 1 auto;
-        -ms-flex: 1 1 auto;
             flex: 1 1 auto;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
     -webkit-flex-direction: row;
-        -ms-flex-direction: row;
             flex-direction: row; }
     md-card md-card-title + md-card-content {
       padding-top: 0; }
     md-card md-card-title md-card-title-text {
+      -webkit-box-flex: 1;
       -webkit-flex: 1;
-          -ms-flex: 1;
               flex: 1;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
       -webkit-flex-direction: column;
-          -ms-flex-direction: column;
               flex-direction: column;
+      display: -webkit-box;
       display: -webkit-flex;
-      display: -ms-flexbox;
       display: flex; }
       md-card md-card-title md-card-title-text .md-subhead {
         padding-top: 0;
@@ -137,33 +134,30 @@ md-card {
       margin-top: 6px;
       margin-bottom: 6px; }
     md-card .md-actions md-card-icon-actions, md-card md-card-actions md-card-icon-actions {
+      -webkit-box-flex: 1;
       -webkit-flex: 1;
-          -ms-flex: 1;
               flex: 1;
+      -webkit-box-pack: start;
       -webkit-justify-content: flex-start;
-          -ms-flex-pack: start;
               justify-content: flex-start;
+      display: -webkit-box;
       display: -webkit-flex;
-      display: -ms-flexbox;
       display: flex;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
       -webkit-flex-direction: row;
-          -ms-flex-direction: row;
               flex-direction: row; }
     md-card .md-actions:not(.layout-column) .md-button:not(.md-icon-button), md-card md-card-actions:not(.layout-column) .md-button:not(.md-icon-button) {
       margin: 0 4px; }
       md-card .md-actions:not(.layout-column) .md-button:not(.md-icon-button):first-of-type, md-card md-card-actions:not(.layout-column) .md-button:not(.md-icon-button):first-of-type {
         margin-left: 0; }
         [dir=rtl] md-card .md-actions:not(.layout-column) .md-button:not(.md-icon-button):first-of-type, [dir=rtl] md-card md-card-actions:not(.layout-column) .md-button:not(.md-icon-button):first-of-type {
-          margin-left: 0;
           margin-left: auto;
-          margin-left: initial;
           margin-right: 0; }
       md-card .md-actions:not(.layout-column) .md-button:not(.md-icon-button):last-of-type, md-card md-card-actions:not(.layout-column) .md-button:not(.md-icon-button):last-of-type {
         margin-right: 0; }
         [dir=rtl] md-card .md-actions:not(.layout-column) .md-button:not(.md-icon-button):last-of-type, [dir=rtl] md-card md-card-actions:not(.layout-column) .md-button:not(.md-icon-button):last-of-type {
-          margin-right: 0;
           margin-right: auto;
-          margin-right: initial;
           margin-left: 0; }
     md-card .md-actions:not(.layout-column) .md-button.md-icon-button, md-card md-card-actions:not(.layout-column) .md-button.md-icon-button {
       margin-left: 6px;
@@ -171,29 +165,26 @@ md-card {
       md-card .md-actions:not(.layout-column) .md-button.md-icon-button:first-of-type, md-card md-card-actions:not(.layout-column) .md-button.md-icon-button:first-of-type {
         margin-left: 12px; }
         [dir=rtl] md-card .md-actions:not(.layout-column) .md-button.md-icon-button:first-of-type, [dir=rtl] md-card md-card-actions:not(.layout-column) .md-button.md-icon-button:first-of-type {
-          margin-left: 0;
           margin-left: auto;
-          margin-left: initial;
           margin-right: 12px; }
       md-card .md-actions:not(.layout-column) .md-button.md-icon-button:last-of-type, md-card md-card-actions:not(.layout-column) .md-button.md-icon-button:last-of-type {
         margin-right: 12px; }
         [dir=rtl] md-card .md-actions:not(.layout-column) .md-button.md-icon-button:last-of-type, [dir=rtl] md-card md-card-actions:not(.layout-column) .md-button.md-icon-button:last-of-type {
-          margin-right: 0;
           margin-right: auto;
-          margin-right: initial;
           margin-left: 12px; }
     md-card .md-actions:not(.layout-column) .md-button + md-card-icon-actions, md-card md-card-actions:not(.layout-column) .md-button + md-card-icon-actions {
+      -webkit-box-flex: 1;
       -webkit-flex: 1;
-          -ms-flex: 1;
               flex: 1;
+      -webkit-box-pack: end;
       -webkit-justify-content: flex-end;
-          -ms-flex-pack: end;
               justify-content: flex-end;
+      display: -webkit-box;
       display: -webkit-flex;
-      display: -ms-flexbox;
       display: flex;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
       -webkit-flex-direction: row;
-          -ms-flex-direction: row;
               flex-direction: row; }
   md-card md-card-footer {
     margin-top: auto;
@@ -202,3 +193,7 @@ md-card {
 @media screen and (-ms-high-contrast: active) {
   md-card {
     border: 1px solid #fff; } }
+
+.md-image-no-fill > img {
+  width: auto;
+  height: auto; }

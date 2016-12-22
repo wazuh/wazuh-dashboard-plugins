@@ -2,14 +2,10 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
-/*  Only used with Theme processes */
-html.md-THEME_NAME-theme, body.md-THEME_NAME-theme {
-  color: '{{foreground-1}}';
-  background-color: '{{background-color}}'; }
-
 md-backdrop {
+  -webkit-transition: opacity 450ms;
   transition: opacity 450ms;
   position: absolute;
   top: 0;
@@ -17,19 +13,20 @@ md-backdrop {
   left: 0;
   right: 0;
   z-index: 50; }
-  md-backdrop._md-menu-backdrop {
+  md-backdrop.md-menu-backdrop {
     position: fixed !important;
     z-index: 99; }
-  md-backdrop._md-select-backdrop {
+  md-backdrop.md-select-backdrop {
     z-index: 81;
-    transition-duration: 0; }
-  md-backdrop._md-dialog-backdrop {
+    -webkit-transition-duration: 0;
+            transition-duration: 0; }
+  md-backdrop.md-dialog-backdrop {
     z-index: 79; }
-  md-backdrop._md-bottom-sheet-backdrop {
+  md-backdrop.md-bottom-sheet-backdrop {
     z-index: 69; }
-  md-backdrop._md-sidenav-backdrop {
+  md-backdrop.md-sidenav-backdrop {
     z-index: 59; }
-  md-backdrop._md-click-catcher {
+  md-backdrop.md-click-catcher {
     position: absolute; }
   md-backdrop.md-opaque {
     opacity: .48; }
@@ -39,6 +36,7 @@ md-backdrop {
       opacity: .48; }
     md-backdrop.md-opaque.ng-leave {
       opacity: .48;
+      -webkit-transition: opacity 400ms;
       transition: opacity 400ms; }
     md-backdrop.md-opaque.ng-leave.md-opaque.ng-leave-active {
       opacity: 0; }

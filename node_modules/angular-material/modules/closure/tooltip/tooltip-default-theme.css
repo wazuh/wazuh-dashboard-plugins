@@ -2,14 +2,9 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
-/*  Only used with Theme processes */
-html.md-THEME_NAME-theme, body.md-THEME_NAME-theme {
-  color: '{{foreground-1}}';
-  background-color: '{{background-color}}'; }
-
 md-tooltip.md-THEME_NAME-theme {
-  color: '{{background-A100}}'; }
-  md-tooltip.md-THEME_NAME-theme ._md-content {
-    background-color: '{{foreground-2}}'; }
+  color: '{{background-700-contrast}}'; }
+  md-tooltip.md-THEME_NAME-theme .md-content {
+    background-color: '{{background-700}}'; }

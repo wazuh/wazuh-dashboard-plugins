@@ -2,51 +2,54 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.1.0-rc.5
+ * v1.1.1
  */
-/*  Only used with Theme processes */
-html.md-THEME_NAME-theme, body.md-THEME_NAME-theme {
-  color: '{{foreground-1}}';
-  background-color: '{{background-color}}'; }
-
-._md-open-menu-container {
+.md-open-menu-container {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 100;
   opacity: 0;
   border-radius: 2px; }
-  ._md-open-menu-container md-menu-divider {
+  .md-open-menu-container md-menu-divider {
     margin-top: 4px;
     margin-bottom: 4px;
     height: 1px;
     min-height: 1px;
     max-height: 1px;
     width: 100%; }
-  ._md-open-menu-container md-menu-content > * {
+  .md-open-menu-container md-menu-content > * {
     opacity: 0; }
-  ._md-open-menu-container:not(._md-clickable) {
+  .md-open-menu-container:not(.md-clickable) {
     pointer-events: none; }
-  ._md-open-menu-container._md-active {
+  .md-open-menu-container.md-active {
     opacity: 1;
+    -webkit-transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    transition-duration: 200ms; }
-    ._md-open-menu-container._md-active > md-menu-content > * {
+    -webkit-transition-duration: 200ms;
+            transition-duration: 200ms; }
+    .md-open-menu-container.md-active > md-menu-content > * {
       opacity: 1;
+      -webkit-transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
       transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
-      transition-duration: 200ms;
-      transition-delay: 100ms; }
-  ._md-open-menu-container._md-leave {
+      -webkit-transition-duration: 200ms;
+              transition-duration: 200ms;
+      -webkit-transition-delay: 100ms;
+              transition-delay: 100ms; }
+  .md-open-menu-container.md-leave {
     opacity: 0;
+    -webkit-transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
     transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
-    transition-duration: 250ms; }
+    -webkit-transition-duration: 250ms;
+            transition-duration: 250ms; }
 
 md-menu-content {
+  display: -webkit-box;
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
   -webkit-flex-direction: column;
-      -ms-flex-direction: column;
           flex-direction: column;
   padding: 8px 0;
   max-height: 304px;
@@ -58,26 +61,35 @@ md-menu-content {
       min-height: 0px; }
 
 md-menu-item {
+  display: -webkit-box;
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
   -webkit-flex-direction: row;
-      -ms-flex-direction: row;
           flex-direction: row;
   min-height: 48px;
   height: 48px;
   -webkit-align-content: center;
-      -ms-flex-line-pack: center;
           align-content: center;
+  -webkit-box-pack: start;
   -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start; }
+          justify-content: flex-start;
+  /*
+   * We cannot use flex on <button> elements due to a bug in Firefox, so we also can't use it on
+   * <a> elements. Add some top padding to fix alignment since buttons automatically align their
+   * text vertically.
+   */ }
   md-menu-item > * {
     width: 100%;
     margin: auto 0;
     padding-left: 16px;
     padding-right: 16px; }
+  md-menu-item > a.md-button {
+    padding-top: 5px; }
   md-menu-item > .md-button {
+    text-align: left;
+    display: inline-block;
     border-radius: 0;
     margin: auto 0;
     font-size: 15px;
@@ -86,17 +98,10 @@ md-menu-item {
     height: 100%;
     padding-left: 16px;
     padding-right: 16px;
-    text-align: left;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-align-items: baseline;
-        -ms-flex-align: baseline;
-            align-items: baseline;
-    -webkit-align-content: flex-start;
-        -ms-flex-line-pack: start;
-            align-content: flex-start;
     width: 100%; }
+    md-menu-item > .md-button::-moz-focus-inner {
+      padding: 0;
+      border: 0; }
     [dir=rtl] md-menu-item > .md-button {
       text-align: right; }
     md-menu-item > .md-button md-icon {
@@ -111,9 +116,6 @@ md-menu-item {
       margin-bottom: auto; }
     md-menu-item > .md-button .md-ripple-container {
       border-radius: inherit; }
-
-.md-menu {
-  padding: 8px 0; }
 
 md-toolbar .md-menu {
   height: auto;

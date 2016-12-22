@@ -1,6 +1,6 @@
 <div ng-controller="discoverW" class="app-container">
 
-  <kbn-top-nav name="discover" config="topNavMenu">
+  <kbn-top-nav name="discover-search" config="topNavMenu">
     <!-- Transcluded elements. -->
 
     <div data-transclude-slots>
@@ -15,40 +15,6 @@
           <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
         </div>
       </div>
-
-      <!-- Search. -->
-      <form
-        data-transclude-slot="bottomRow"
-        class="fullWidth"
-        role="form"
-        name="discoverSearch"
-        ng-submit="fetch()"
-      >
-        <div class="typeahead" kbn-typeahead="discover">
-          <div class="localSearch">
-            <input
-              parse-query
-              input-focus
-              kbn-typeahead-input
-              ng-model="state.query"
-              placeholder="Search..."
-              aria-label="Search input"
-              type="text"
-              class="localSearchInput"
-              ng-class="{'localSearchInput-isInvalid': discoverSearch.$invalid}"
-            >
-            <button
-              type="submit"
-              aria-label="Search"
-              class="localSearchButton"
-              ng-disabled="discoverSearch.$invalid"
-            >
-              <span class="fa fa-search" aria-hidden="true"></span>
-            </button>
-          </div>
-          <kbn-typeahead-items></kbn-typeahead-items>
-        </div>
-      </form>
     </div>
   </kbn-top-nav>
 
