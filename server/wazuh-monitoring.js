@@ -115,9 +115,9 @@ module.exports = function (server, options) {
         client.indices.exists({ index: todayIndex }).then(
             function (result) {
                 if (result) {
-                    _elInsertData(todayIndex);
+                    insertDocument(todayIndex);
                 } else {
-                    _elCreateIndex(todayIndex);
+                    createIndex(todayIndex);
                 }
             }, function () {
                 server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Could not check if the index ' + todayIndex + ' exists.');
@@ -125,22 +125,17 @@ module.exports = function (server, options) {
         );
     };
 
-    var _elCreateIndex = function (todayIndex) {
+    var createIndex = function (todayIndex) {
         client.indices.create({ index: todayIndex }).then(
             function () {
-                client.indices.putMapping({ index: todayIndex, type: 'agent', body: { properties: { '@timestamp': { 'type': "date" }, 'status': { 'type': "keyword" }, 'ip': { 'type': "keyword" }, 'host': { 'type': "keyword" } ,'name': { 'type': "keyword" }, 'id': { 'type': "keyword" } } } }).then(
-                    function () {
-                        _elInsertData(todayIndex);
-                    }, function () {
-                        server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error setting mapping while creating ' + todayIndex + ' index on elasticsearch.');
-                    });
+                insertDocument(todayIndex);
             }, function () {
                 server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Could not create ' + todayIndex + ' index on elasticsearch.');
             }
         );
     };
 
-    var _elInsertData = function (todayIndex) {
+    var insertDocument = function (todayIndex) {
         var body = '';
 		if(agentsArray.length > 0) {
 			var managerName = agentsArray[0].name;
