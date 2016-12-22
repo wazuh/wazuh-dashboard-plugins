@@ -7,7 +7,8 @@ module.exports = function (kibana) {
       app: {
         id: 'wazuh',
         title: 'Wazuh',
-        description: 'Wazuh UI and Kibana integrations for OSSEC',
+        description: 'Wazuh App for Kibana',
+		icon: 'plugins/wazuh/img/icon.png',
         main: 'plugins/wazuh/app',
         injectVars: function (server, options) {
           var config = server.config();
