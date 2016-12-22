@@ -1,6 +1,6 @@
 <md-content flex ng-controller="settingsController" layout="column" style="background-color: white">
 
-  <md-content ng-init="menuNavItem = 'settings'" style="height: 75px;">
+  <md-content ng-init="menuNavItem = 'settings'" style="height: 70px;">
     <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
       <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
         <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
@@ -18,10 +18,11 @@
   
 	<md-card layout-padding>
 	
-		<h1 flex><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh API: Managers list</h1>
+		<h1 flex><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh API configuration</h1>
 
 		<span layout="row" layout-align="start start">
-			<p flex="40" style="font-weight: bold;">API URL</p>
+			<p flex="20" style="font-weight: bold;">Manager</p>
+			<p flex="20" style="font-weight: bold;">API URL</p>
 			<p flex="20" style="font-weight: bold;">API Port</p>
 			<p flex="20" style="font-weight: bold;">User</p>
 			<p flex="20" style="font-weight: bold;">Actions</p>
@@ -31,7 +32,8 @@
 		
 		<div ng-repeat="entry in apiEntries">
 			<span layout="row" layout-align="space-between center">
-				<p flex="40" ><i ng-show="(entry._source.active == 'true')" tooltip="Set as default Manager" class="fa fa-star" aria-hidden="true" style="color: #f39c12; font-size: 18px;"></i> {{entry._source.url}}</p>
+				<p flex="20" ><i ng-show="(entry._source.active == 'true')" tooltip="Set as default Manager" class="fa fa-star" aria-hidden="true" style="color: #f39c12; font-size: 18px;"></i> {{entry._source.manager}}</p>
+				<p flex="20" >{{entry._source.url}}</p>
 				<p flex="20" >{{entry._source.api_port}}</p>
 				<p flex="20" >{{entry._source.api_user}}</p>
 				<p flex="20" >
@@ -43,23 +45,23 @@
 			<md-divider></md-divider>
 		</div>
 		
-		<md-button ng-click="addManagerContainer = !addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new manager</md-button>
+		<md-button ng-click="addManagerContainer = !addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new API</md-button>
 		
 		<form flex ng-submit="processForm()" layout="column" ng-show="addManagerContainer" style="margin-top: 30px; ">
 		  <md-input-container flex>
-			<label flex>API Username</label>
+			<label flex>Username</label>
 			<input flex placeholder="foo" type="text" ng-model="formData.user" aria-label="username" required></input>
 		  </md-input-container>
 		  <md-input-container>
-			<label>API Password</label>
+			<label>Password</label>
 			<input placeholder="bar" type="password" ng-model="formData.password" aria-label="password" required></input>
 		  </md-input-container>
 		  <md-input-container>
-			<label>API URL</label>
+			<label>URL</label>
 			<input placeholder="https://10.0.0.3" ng-model="formData.url" type="url" aria-label="full url" required></input>
 		  </md-input-container>
 		  <md-input-container>
-			<label>API Port</label>
+			<label>Port</label>
 			<input placeholder="55000" ng-model="formData.port" type="text" aria-label="port" required></input>
 		  </md-input-container>
 		  <md-button type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 13px; margin-right: 5px; "></i>SAVE</md-button>

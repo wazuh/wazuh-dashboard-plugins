@@ -73,9 +73,15 @@
 				
 				<md-content ng-show="_agent" class="headBar tabView" flex="50" layout="column" layout-align="end end">
 					<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
-						<md-nav-item md-nav-click="tabView = 'panels'" name="panels">Panels</md-nav-item>
-						<md-nav-item md-nav-click="tabView = 'discover'" name="discover">Alerts</md-nav-item>
-						<md-nav-item md-nav-click="tabView = 'dashboard'" name="dashboard">Dashboards</md-nav-item>
+						<md-nav-item md-nav-click="tabView = 'panels'" name="panels">
+							<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
+						</md-nav-item>
+						<md-nav-item md-nav-click="tabView = 'discover'" name="discover">
+							<img style="width: 16px; margin-right: 6px;" src="/plugins/wazuh/img/discover.svg">Discover
+						</md-nav-item>
+						<md-nav-item md-nav-click="tabView = 'dashboard'" name="dashboard">
+							<img style="width: 16px; margin-right: 6px;" src="/plugins/wazuh/img/dashboard.svg">Dashboards
+						</md-nav-item>
 					</md-nav-bar> 
 				</md-content>
 
