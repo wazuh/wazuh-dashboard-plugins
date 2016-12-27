@@ -2,13 +2,14 @@
   ng-controller="rulesController" layout-align="start space-around">
   <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 	
+<md-virtual-repeat-container ng-show="!ruleActive" style="padding: 8px; padding-top: 0px;" layout-align="start start" ng-if="!load" flex layout="column" auto-size-container ng-style="autoSizeStyle">
 
 	<div layout="row" layout-align="center start" style="padding: 0px;  height: 208px;  min-height: 208px;" class="visFilterDisabled">
 		
 		<md-card flex="25" style="margin: 0">
 			<md-card-content>
 				<span class="md-headline-small">Top 24h - Rule ID</span>
-				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.id,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.id,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
 					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
 				</kbn-vis>
 			</md-card-content>
@@ -17,7 +18,7 @@
 		<md-card flex="25" style="margin: 0">
 			<md-card-content>
 				<span class="md-headline-small">Top 24h - Groups</span>
-				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
 					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
 				</kbn-vis>
 			</md-card-content>
@@ -26,7 +27,7 @@
 		<md-card flex="25" style="margin: 0">
 			<md-card-content>
 				<span class="md-headline-small">Top 24h - PCI DSS requirements</span>
-				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
 					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
 				</kbn-vis>
 			</md-card-content>
@@ -35,7 +36,7 @@
 		<md-card flex="25" style="margin: 0">
 			<md-card-content>
 				<span class="md-headline-small">Top 24h - Level</span>
-				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.level,order:desc,orderBy:'1',size:7),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+				<kbn-vis vis-height="150px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.level,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
 					vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*">
 				</kbn-vis>
 			</md-card-content>
@@ -118,11 +119,11 @@
     </md-toolbar>
 
 		
-  <md-virtual-repeat-container ng-show="!ruleActive" style="padding: 8px; padding-top: 0px;" layout-align="start start" ng-if="!load" flex layout="column" auto-size-container ng-style="autoSizeStyle">
-
+ 
+	 
     <div md-virtual-repeat="rule in rulesObj" md-on-demand flex layout="column" layout-align="start stretch">
-      <md-list ng-class-odd="'odd'" ng-class-even="'even'" class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
-        <md-list-item ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''" ng-click="loadRule(rule)">
+      <md-list ng-click="loadRule(rule)" ng-class-odd="'odd'" ng-class-even="'even'" class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
+        <md-list-item ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
           <span flex="5">{{rule.id}}</span>
 		  <span flex="10">{{rule.file}}</span>
           <span flex="40">{{rule.description}}</span>
@@ -133,7 +134,7 @@
         </md-list-item>
       </md-list>      
     </div>
-  </md-virtual-repeat-container>
+
   
 	<div layout="column" flex layout-align="start stretch" ng-show="ruleActive" style="margin-top: 19px; height: 100%; background-color: #f7f7f7; padding: 0px; padding-top: 3px; margin-top: 15px;">
 		<md-content flex>	
@@ -252,5 +253,5 @@
 		</div>
 	 </md-content>	
 	</div>
-
+  </md-virtual-repeat-container>
 </md-content>

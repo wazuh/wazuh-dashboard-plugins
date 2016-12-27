@@ -1,6 +1,6 @@
 <md-content flex ng-controller="settingsController" layout="column" style="background-color: white">
 
-  <md-content ng-init="menuNavItem = 'settings'" style="height: 70px;">
+  <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'settings'" style="height: 70px;">
     <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
       <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
         <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
@@ -14,11 +14,11 @@
     </md-nav-bar>
   </md-content>
 
-  <div layout="column" layout-align="start stretch" flex="100">
+  <div layout="column" layout-align="start stretch">
   
-	<md-card layout-padding>
+	<md-card layout-padding layout-align="start stretch">
 	
-		<h1 flex><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh API configuration</h1>
+		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh API configuration</h1>
 
 		<span layout="row" layout-align="start start">
 			<p flex="20" style="font-weight: bold;">Manager</p>
@@ -47,10 +47,10 @@
 		
 		<md-button ng-click="addManagerContainer = !addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new API</md-button>
 		
-		<form flex ng-submit="processForm()" layout="column" ng-show="addManagerContainer" style="margin-top: 30px; ">
-		  <md-input-container flex>
-			<label flex>Username</label>
-			<input flex placeholder="foo" type="text" ng-model="formData.user" aria-label="username" required></input>
+		<form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="addManagerContainer" style="margin-top: 30px; ">
+		  <md-input-container>
+			<label>Username</label>
+			<input placeholder="foo" type="text" ng-model="formData.user" aria-label="username" required></input>
 		  </md-input-container>
 		  <md-input-container>
 			<label>Password</label>
