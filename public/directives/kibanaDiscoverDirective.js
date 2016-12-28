@@ -1,4 +1,3 @@
-
 require('plugins/kibana/discover/styles/main.less');
 require('ui/doc_table/doc_table.js');
 require('ui/styles/sidebar.less');

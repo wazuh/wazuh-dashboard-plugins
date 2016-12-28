@@ -2,7 +2,7 @@
 require('plugins/wazuh/less/main.less');
 
 // Set up Wazuh app
-var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial'])
+var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial', 'infinite-scroll'])
   .config(['$compileProvider', function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
   }])
@@ -50,6 +50,7 @@ require('plugins/wazuh/controllers/testController.js');
 require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');
 require('plugins/wazuh/../node_modules/bootstrap/dist/js/bootstrap.min.js');
 require('plugins/wazuh/utils/fontawesome/css/font-awesome.min.css');
+require('plugins/wazuh/utils/infinite_scroll/infinite-scroll.js');
 
 //Material
 require('plugins/wazuh/../node_modules/angular-material/angular-material.css');

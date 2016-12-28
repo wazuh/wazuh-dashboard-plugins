@@ -306,24 +306,35 @@ md-select-menu:not(._md-overflow) md-content {
 	padding-bottom: 0px !important;
 }
 .ruleset_rules_row_active {
-	 background-color: #c2e4ef;
-	 padding-bottom: 0px;
+	background-color: #c2e4ef;
 }
-
+md-list.agents-preview-table.even.ruleset_rules_row_active {
+	background-color: #c2e4ef;
+}
+md-list.agents-preview-table.odd.ruleset_rules_row_active {
+	background-color: #c2e4ef;
+}
 .ruleset_rules_row_active a{
-	color: rgba(0,0,0,0.87);
-	text-decoration: none;
+
 }
 .ruleset_rules_row_active a:hover{
-	color: #000;
-	text-decoration: none;
+
+}
+.ruleset_card_info {
+	background-color: #dbf0f7
 }
 
 md-list-item.ruleset_rules_row_active {
-	 background-color: #3caed2;
-	 color: white;
-	 padding-bottom: 0px;
+	background-color: #c2e4ef;
 }
+md-list.agents-preview-table.ruleset_rules_row_active:hover {
+	background-color: #c2e4ef;
+}
+md-list.agents-preview-table:focus{
+	border: none;
+	outline: none;
+}
+
 
 button:hover, button:focus, button.focus{
 	color: #000;
@@ -488,6 +499,9 @@ md-select.md-default-theme ._md-select-value._md-select-placeholder, md-select .
 .md-button.buttonBlueLight.md-default-theme:not([disabled]):hover, .md-button:not([disabled]):hover {
 	background-color: rgba(60,174,210,0.7)
 }
+
+
+
 input.ng-invalid.ng-dirty,
 input.ng-invalid.ng-touched,
 textarea.ng-invalid.ng-dirty,
@@ -556,7 +570,7 @@ md-card.cardHover:hover{
 	background-color: #c2e4ef;
 }
 .listHover:hover{
-	background-color: #c2e4ef;
+	font-weight: bold; 
 }
 i.fa.fa-times{
 	cursor: pointer;
@@ -620,7 +634,7 @@ md-content._md.layout-row {
     display: none;
 }
 .visFilterDisabled .legend-value-title {
-    cursor: pointer;
+    cursor: default;
 }
 .visFilterDisabled .legend-value {
     opacity: 1 !important;
@@ -673,3 +687,16 @@ kbn-searchbar {
 	background-color: rgba(34, 34, 34, 0.93) !important;
 }
 .flex { flex : 1 1 0% !important;}
+
+.md-button.agents-preview-table.buttonBlueLight.md-default-theme:not([disabled]):hover, .md-button:not([disabled]):hover {
+	background-color: #c2e4ef;
+}
+.md-button.agents-preview-table.buttonMenu.md-default-theme:not([disabled]):hover, .md-button:not([disabled]):hover{
+	background-color: #c2e4ef;
+}
+
+.md-button.agents-preview-table.buttonBlueLight.md-default-theme:not([disabled]):hover, .md-button:not([disabled]):hover{
+	background-color: #c2e4ef;
+}
+
+.rules-item-list button.md-no-style.md-button.md-ink-ripple {opacity: 0;}

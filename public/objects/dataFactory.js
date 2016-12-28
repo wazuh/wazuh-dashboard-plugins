@@ -395,7 +395,9 @@ require('ui/modules').get('app/wazuh', [])
         dataObj.getOffset = function (instanceId) {
             return _instances[instanceId]['offset'];
         };
-
+		dataObj.setOffset = function (instanceId, offset) {
+            _instances[instanceId]['offset'] = offset;
+        };
         dataObj.getTotalItems = function (instanceId) {
             if (_instances[instanceId]['limit']) {
                 return _instances[instanceId]['limit'];

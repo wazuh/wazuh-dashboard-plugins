@@ -1,6 +1,53 @@
-var app = require('ui/modules').get('app/wazuh', []);
+require('plugins/wazuh/utils/infinite_scroll/infinite-scroll.js');
+var app = require('ui/modules').get('app/wazuh'); 
 
-app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window, $document) {
+app.factory('Rules', function($http, DataFactory) {
+  var Rules = function(objectsArray, items) {
+    this.items = items;
+	this.objectsArray = objectsArray;
+    this.busy = false;
+  };
+
+  Rules.prototype.nextPage = function() {
+
+    if (this.busy) return;
+    this.busy = true;
+	DataFactory.next(this.objectsArray['/rules']).then(function (data) {
+			var items = data.data.items;
+			for (var i = 0; i < items.length; i++) {
+				this.items.push(items[i]);
+			}
+			this.busy = false;
+        }.bind(this));
+		
+	};
+  return Rules;
+});
+
+app.factory('Decoders', function($http, DataFactory) {
+  var Decoders = function(objectsArray, items) {
+    this.items = items;
+	this.objectsArray = objectsArray;
+    this.busy = false;
+  };
+
+  Decoders.prototype.nextPage = function() {
+
+    if (this.busy) return;
+    this.busy = true;
+	DataFactory.next(this.objectsArray['/decoders']).then(function (data) {
+			var items = data.data.items;
+			for (var i = 0; i < items.length; i++) {
+				this.items.push(items[i]);
+			}
+			this.busy = false;
+        }.bind(this));
+		
+	};
+  return Decoders;
+});
+
+app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window, $document, Rules) {
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
@@ -9,9 +56,8 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 	$scope.ruleActive = false;
 	$scope.extraInfo = false;
 	
-    $scope.search = undefined;
 	
-    $scope.rules = [];
+    $scope.search = undefined;
 
     $scope.statusFilter = 'enabled';
 
@@ -43,32 +89,31 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 		$window.location.href = '#/discover/';
     }
 	
-	$scope.loadRule = function (rule) {
+	$scope.loadRule = function (id) {
 		$scope.ruleActiveArray = rule;
 		$scope.ruleActive = true;
     }
 	
     $scope.setSort = function (field) {
-        if ($scope._sort === field) {
-            if ($scope._sortOrder) {
-                $scope._sortOrder = false;
-                $scope._sort = '';
-                DataFactory.filters.unset(objectsArray['/rules'], 'filter-sort');
-            } else {
-                $scope._sortOrder = true;
-                DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', field);
-            }
-        } else {
-            $scope._sortOrder = false;
-            $scope._sort = field;
-            DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-' + field);
-        }
+		$scope._sort = field;
+		$scope._sortOrder = !$scope._sortOrder;
+        if ($scope._sortOrder) {
+			DataFactory.filters.set(objectsArray['/rules'], 'filter-sort',field);
+		} else {
+			DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-' + field);
+		}
+		
+		DataFactory.setOffset(objectsArray['/rules'],0);
+		DataFactory.get(objectsArray['/rules']).then(function (data) { 
+			$scope.rules.items = data.data.items;
+		});
     }
 
     $scope.rulesApplyFilter = function (filterObj) {
         if (!filterObj) {
             return null;
         }
+		$scope.load = true;
         if (filterObj.type == 'file') {
             _file = filterObj.value;
             DataFactory.filters.set(objectsArray['/rules'], 'file', filterObj.value);
@@ -86,6 +131,12 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
             DataFactory.filters.set(objectsArray['/rules'], 'search', filterObj.value);
             $scope.ruleActive = false;
         }
+		
+		DataFactory.setOffset(objectsArray['/rules'],0);
+		DataFactory.get(objectsArray['/rules']).then(function (data) { 
+			$scope.rules.items = data.data.items;
+			$scope.load = false;
+		});
     };
 
     $scope.rulesHasFilter = function (type) {
@@ -101,6 +152,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
     };
 
     $scope.rulesUnset = function (type) {
+		$scope.load = true;
         if (type == 'file') {
             _file = null;
             DataFactory.filters.unset(objectsArray['/rules'], 'file');
@@ -122,6 +174,12 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
             $scope.search = undefined;
             DataFactory.filters.unset(objectsArray['/rules'], 'search');
         }
+		
+		DataFactory.setOffset(objectsArray['/rules'],0);
+		DataFactory.get(objectsArray['/rules']).then(function (data) { 
+			$scope.rules.items = data.data.items;
+			$scope.load = false;
+		});
     };
 
     $scope.rulesGetFilter = function (type) {
@@ -140,7 +198,6 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
         var defered = $q.defer();
         var promise = defered.promise;
         var result = [];
-
         if (!search) {
             search = undefined;
         } else {
@@ -149,8 +206,9 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 
         DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 5, 'search': search })
             .then(function (data) {
+				
                 angular.forEach(data.data.items, function (value) {
-                    result.push({ 'type': 'file', 'value': value.name });
+                    result.push({ 'type': 'file', 'value': value.file });
                 });
                 DataFactory.getAndClean('get', '/rules/groups', { 'offset': 0, 'limit': 5, 'search': search })
                     .then(function (data) {
@@ -183,54 +241,20 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
         DataFactory.filters.set(objectsArray['/rules'], 'status', status);
     };
 
-    $scope.rulesObj = {
-        //Obj with methods for virtual scrolling
-        getItemAtIndex: function (index) {
-            if ($scope._rules_blocked) {
-                return null;
-            }
-			
-            var _pos = index - DataFactory.getOffset(objectsArray['/rules']);
-            if (DataFactory.filters.flag(objectsArray['/rules'])) {
-                $scope._rules_blocked = true;
-                DataFactory.scrollTo(objectsArray['/rules'], 50)
-                    .then(function (data) {
-                        $scope.rules.length = 0;
-                        $scope.rules = data.data.items;
-                        DataFactory.filters.unflag(objectsArray['/rules']);
-                        $scope._rules_blocked = false;
-                    }, printError);
-            } else if ((_pos > 70) || (_pos < 0)) {
-                $scope._rules_blocked = true;
-                DataFactory.scrollTo(objectsArray['/rules'], index)
-                    .then(function (data) {
-                        $scope.rules.length = 0;
-                        $scope.rules = data.data.items;
-                        $scope._rules_blocked = false;
-                    }, printError);
-            } else {
-                return $scope.rules[_pos];
-            }
-        },
-        getLength: function () {
-            return DataFactory.getTotalItems(objectsArray['/rules']);
-        },
-    };
 
     var load = function () {
-        DataFactory.initialize('get', '/rules', {}, 100, 0)
+        DataFactory.initialize('get', '/rules', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/rules'] = data;
-                DataFactory.get(objectsArray['/rules'])
-                    .then(function (data) {
-                        $scope.rules = data.data.items;
-                        DataFactory.filters.register(objectsArray['/rules'], 'search', 'string');
-                        DataFactory.filters.register(objectsArray['/rules'], 'file', 'string');
-                        DataFactory.filters.register(objectsArray['/rules'], 'group', 'string');
-                        DataFactory.filters.register(objectsArray['/rules'], 'pci', 'string');
-                        DataFactory.filters.register(objectsArray['/rules'], 'status', 'string');
-                        DataFactory.filters.register(objectsArray['/rules'], 'filter-sort', 'string');
-                        DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-level');
+				DataFactory.filters.register(objectsArray['/rules'], 'search', 'string');
+				DataFactory.filters.register(objectsArray['/rules'], 'file', 'string');
+				DataFactory.filters.register(objectsArray['/rules'], 'group', 'string');
+				DataFactory.filters.register(objectsArray['/rules'], 'pci', 'string');
+				DataFactory.filters.register(objectsArray['/rules'], 'status', 'string');
+				DataFactory.filters.register(objectsArray['/rules'], 'filter-sort', 'string');
+				DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-level');
+                DataFactory.get(objectsArray['/rules']).then(function (data) {
+						$scope.rules = new Rules(objectsArray, data.data.items);
                         $scope._sort = 'level';
                         $scope.load = false;
                     }, printError);
@@ -260,13 +284,12 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 
 });
 
-app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast, errlog) {
+app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast, errlog, Decoders) {
 	
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setRulesetState('decoders');
 	$scope.setRulesTab('decoders');
-    $scope.decoders = [];
 
     $scope.typeFilter = 'all';
     var _file;
@@ -326,21 +349,39 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 
     $scope.decoderTypeFilter = function (type) {
         $scope.typeFilter = type;
-        $scope.decodersUnset('file');
-        $scope.decodersUnset('search');
         DataFactory.clean(objectsArray['/decoders']);
-        DataFactory.initialize('get', (type == 'parents') ? '/decoders/parents' : '/decoders', {}, 100, 0)
+        DataFactory.initialize('get', (type == 'parents') ? '/decoders/parents' : '/decoders', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/decoders'] = data;
+				DataFactory.filters.register(objectsArray['/decoders'], 'search', 'string');
+				DataFactory.filters.register(objectsArray['/decoders'], 'file', 'string');
+				DataFactory.filters.register(objectsArray['/decoders'], 'name', 'string');
+				DataFactory.filters.register(objectsArray['/decoders'], 'filter-sort', 'string');
+				DataFactory.filters.set(objectsArray['/decoders'], 'filter-sort', 'name');
+				DataFactory.setOffset(objectsArray['/decoders'],0);
                 DataFactory.get(objectsArray['/decoders'])
                     .then(function (data) {
-                        $scope.decoders = data.data.items;
-                        DataFactory.filters.register(objectsArray['/decoders'], 'search', 'string');
-                        (type != 'parents') ? DataFactory.filters.register(objectsArray['/decoders'], 'file', 'string') : null;
+						$scope.decoders = new Decoders(objectsArray, data.data.items);
+                        $scope.load = false;                        
                     }, printError);
             }, printError);
     };
 
+	$scope.setSort = function (field) {
+		$scope._sort = field;
+		$scope._sortOrder = !$scope._sortOrder;
+        if ($scope._sortOrder) {
+			DataFactory.filters.set(objectsArray['/decoders'], 'filter-sort',field);
+		} else {
+			DataFactory.filters.set(objectsArray['/decoders'], 'filter-sort', '-' + field);
+		}
+		
+		DataFactory.setOffset(objectsArray['/decoders'],0);
+		DataFactory.get(objectsArray['/decoders']).then(function (data) { 
+			$scope.decoders.items = data.data.items;
+		});
+    }
+	
     $scope.decodersApplyFilter = function (filterObj) {
         if (!filterObj) {
             return null;
@@ -352,6 +393,11 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
             _search = filterObj.value;
             DataFactory.filters.set(objectsArray['/decoders'], 'search', filterObj.value);
         }
+		DataFactory.setOffset(objectsArray['/decoders'],0);
+		DataFactory.get(objectsArray['/decoders']).then(function (data) { 
+			$scope.decoders.items = data.data.items;
+			$scope.load = false;
+		});
     };
 
     $scope.decodersHasFilter = function (type) {
@@ -375,6 +421,11 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
             $scope._filter = undefined;
             $scope.search = undefined;
         }
+		DataFactory.setOffset(objectsArray['/decoders'],0);
+		DataFactory.get(objectsArray['/decoders']).then(function (data) { 
+			$scope.decoders.items = data.data.items;
+			$scope.load = false;
+		});
     };
 
     $scope.decodersGetFilter = function (type) {
@@ -399,7 +450,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
         DataFactory.getAndClean('get', '/decoders/files', { 'offset': 0, 'limit': 14, 'search': search })
             .then(function (data) {
                 angular.forEach(data.data.items, function (value) {
-                    result.push({ 'type': 'file', 'value': value });
+                    result.push({ 'type': 'file', 'value': value.file });
                 });
                 defered.resolve(result);
             }, function (data) {
@@ -410,48 +461,20 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
         return promise;
     };
 
-    $scope.decodersObj = {
-        //Obj with methods for virtual scrolling
-        getItemAtIndex: function (index) {
-            if ($scope._decoders_blocked) {
-                return null;
-            }
-            var _pos = index - DataFactory.getOffset(objectsArray['/decoders']);
-            if (DataFactory.filters.flag(objectsArray['/decoders'])) {
-                $scope._decoders_blocked = true;
-                DataFactory.scrollTo(objectsArray['/decoders'], 50)
-                    .then(function (data) {
-                        $scope.decoders.length = 0;
-                        $scope.decoders = data.data.items;
-                        DataFactory.filters.unflag(objectsArray['/decoders']);
-                        $scope._decoders_blocked = false;
-                    }, printError);
-            } else if ((_pos > 70) || (_pos < 0)) {
-                $scope._decoders_blocked = true;
-                DataFactory.scrollTo(objectsArray['/decoders'], index)
-                    .then(function (data) {
-                        $scope.decoders.length = 0;
-                        $scope.decoders = data.data.items;
-                        $scope._decoders_blocked = false;
-                    }, printError);
-            } else {
-                return $scope.decoders[_pos];
-            }
-        },
-        getLength: function () {
-            return DataFactory.getTotalItems(objectsArray['/decoders']);
-        },
-    };
 
     var load = function () {
-        DataFactory.initialize('get', '/decoders', {}, 100, 0)
+        DataFactory.initialize('get', '/decoders', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/decoders'] = data;
+				DataFactory.filters.register(objectsArray['/decoders'], 'search', 'string');
+				DataFactory.filters.register(objectsArray['/decoders'], 'file', 'string');
+				DataFactory.filters.register(objectsArray['/decoders'], 'name', 'string');
+				DataFactory.filters.register(objectsArray['/decoders'], 'filter-sort', 'string');
+				DataFactory.filters.set(objectsArray['/decoders'], 'filter-sort', 'name');
                 DataFactory.get(objectsArray['/decoders'])
                     .then(function (data) {
-                        $scope.decoders = data.data.items;
-                        DataFactory.filters.register(objectsArray['/decoders'], 'search', 'string');
-                        DataFactory.filters.register(objectsArray['/decoders'], 'file', 'string');
+						$scope._sort = 'name';
+						$scope.decoders = new Decoders(objectsArray, data.data.items);
                         $scope.load = false;
                     }, printError);
             }, printError);
