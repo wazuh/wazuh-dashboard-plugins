@@ -2,21 +2,14 @@
 <kbn-searchbar></kbn-searchbar>
 
 
-
-
-<div infinite-scroll-module='reddit.nextPage()' infinite-scroll-disabled='reddit.busy' infinite-scroll-distance='1'>
-    <div ng-repeat='item in reddit.items'>
-      <span class='score'>{{item.score}}</span>
-      <span class='title'>
-        <a ng-href='{{item.url}}' target='_blank'>{{item.title}}</a>
-      </span>
-      <small>by {{item.author}} -
-        <a ng-href='http://reddit.com{{item.permalink}}' target='_blank'>{{item.num_comments}} comments</a>
-      </small>
-      <div style='clear: both;'></div>
-    </div>
-    <div ng-show='reddit.busy'>Loading data...</div>
-  </div>
+		<md-card flex="100">
+			<md-card-content>
+				<span class="md-headline">Groups</span>
+				<kbn-vis vis-height="193px" vis-type="histogram" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.cis,order:desc,orderBy:'1',size:8),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!f,times:!(),yAxis:()),title:'Signature:%20Area%20Chart',type:area))"
+				vis-filter="*"
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
 
 
 

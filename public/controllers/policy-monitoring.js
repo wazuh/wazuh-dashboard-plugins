@@ -6,8 +6,6 @@ app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog, 
     var objectsArray = [];
     var loadWatch;
 	$scope.defaultManagerName = appState.getDefaultManager().name;
-	console.log("pm");
-	console.log($scope._agent);
     $scope.events = [];
 
     //Print Error

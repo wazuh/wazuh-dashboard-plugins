@@ -62,6 +62,10 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	var visState = {};
 
 	$scope.newVis.init().then(function () {
+		// For the first vis, we reload index pattern
+		if($rootScope.visCounter == 0)
+			$scope.newVis.vis.indexPattern.refreshFields();
+		
 		// Render visualization
 		$rootScope.visCounter++;
 		renderVisualization();
@@ -97,7 +101,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
 		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
-
+		var agg_fields = [];
 		$timeout(
 		function() {
 
@@ -105,8 +109,23 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			// Bind visualization, index pattern and state
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
+			angular.forEach($scope.indexPattern.fields, function(value, key) {
+				if(value.aggregatable)
+					agg_fields.push(value.displayName);
+			});
+
 			$scope.state = $state;
 
+			// Check if needed fields are agreggable
+			$scope.not_aggregable = false;
+			angular.forEach(visDecoded.vis.aggs, function(value, key) {
+				if(value.type == "terms" && (agg_fields.indexOf(value.params.field) === -1)){
+					$scope.not_aggregable = true;
+					return;
+				}
+			});
+
+			
 			// Build visualization
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
@@ -123,6 +142,11 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 				$scope.uiState.set('vis.legendOpen', false);
 			else
 				$scope.uiState.set('vis.legendOpen', true);
+
+			if($scope.not_aggregable){
+				$rootScope.visCounter--;
+				return;
+			}
 			
 			$scope.vis.setUiState($scope.uiState);
 			$scope.vis.setState(visState);
@@ -163,7 +187,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		// Listen for query changes
 		var updateQueryWatch = $rootScope.$on('updateQuery', function (event, query) {
-			if(query !== "undefined"){
+			if(query !== "undefined" && !$scope.not_aggregable){
 				$scope.filter.current.query_string.query = $scope.filter.raw+" AND "+query.query_string.query;
 				$scope.fetch();
 			}
