@@ -1,4 +1,5 @@
 // Require config
+require('plugins/wazuh/utils/infinite_scroll/infinite-scroll.js');
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
@@ -97,7 +98,33 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
 
 });
 
-app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToast, errlog, genericReq) {
+app.factory('Agents', function($http, DataFactory) {
+  var Agents = function(objectsArray, items) {
+    this.items = items;
+	this.objectsArray = objectsArray;
+    this.busy = false;
+  };
+
+  Agents.prototype.nextPage = function() {
+	
+    if (this.busy) return;
+    this.busy = true;
+	DataFactory.next(this.objectsArray['/agents']).then(function (data) {
+			var items = data.data.items;
+			for (var i = 0; i < items.length; i++) {
+				this.items.push(items[i]);
+			}
+			this.busy = false;
+        }.bind(this), 
+		function (data) {
+			this.busy = false;
+		}.bind(this));
+		
+	};
+  return Agents;
+});
+
+app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToast, errlog, genericReq, Agents) {
 
     //Initialisation
     $scope.load = true;
@@ -124,20 +151,18 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
 
     //Functions
     $scope.setSort = function (field) {
-        if ($scope._sort === field) {
-            if ($scope._sortOrder) {
-                $scope._sortOrder = false;
-                $scope._sort = '';
-                DataFactory.filters.unset(objectsArray['/agents'], 'filter-sort');
-            } else {
-                $scope._sortOrder = true;
-                DataFactory.filters.set(objectsArray['/agents'], 'filter-sort', field);
-            }
-        } else {
-            $scope._sortOrder = false;
-            $scope._sort = field;
-            DataFactory.filters.set(objectsArray['/agents'], 'filter-sort', '-' + field);
-        }
+       $scope._sort = field;
+		$scope._sortOrder = !$scope._sortOrder;
+        if ($scope._sortOrder) {
+			DataFactory.filters.set(objectsArray['/agents'], 'filter-sort',field);
+		} else {
+			DataFactory.filters.set(objectsArray['/agents'], 'filter-sort', '-' + field);
+		}
+		
+		DataFactory.setOffset(objectsArray['/agents'],0);
+		DataFactory.get(objectsArray['/agents']).then(function (data) { 
+			$scope.agents.items = data.data.items;
+		});
     };
 
     $scope.agentSearchFilter = function (search) {
@@ -156,53 +181,16 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
         }
     };
 
-
-
-    $scope.agentsObj = {
-        //Obj with methods for virtual scrolling
-        getItemAtIndex: function (index) {
-            if ($scope.blocked) {
-                return null;
-            }
-            var _pos = index - DataFactory.getOffset(objectsArray['/agents']);
-            if (DataFactory.filters.flag(objectsArray['/agents'])) {
-                $scope.blocked = true;
-                DataFactory.scrollTo(objectsArray['/agents'], 50)
-                    .then(function (data) {
-                        $scope.agents.length = 0;
-                        $scope.agents = data.data.items;
-                        DataFactory.filters.unflag(objectsArray['/agents']);
-                        $scope.blocked = false;
-                    }, printError);
-            } else if ((_pos > 70) || (_pos < 0)) {
-                $scope.blocked = true;
-                DataFactory.scrollTo(objectsArray['/agents'], index)
-                    .then(function (data) {
-                        $scope.agents.length = 0;
-                        $scope.agents = data.data.items;
-                        $scope.blocked = false;
-                    }, printError);
-            } else {
-                return $scope.agents[_pos];
-            }
-        },
-        getLength: function () {
-            return DataFactory.getTotalItems(objectsArray['/agents']);
-        },
-    };
-
-
-
     var load = function () {
-        DataFactory.initialize('get', '/agents', {}, 100, 0)
+        DataFactory.initialize('get', '/agents', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
+				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
+				DataFactory.filters.register(objectsArray['/agents'], 'status', 'string');
+				DataFactory.filters.register(objectsArray['/agents'], 'filter-sort', 'string');
                 DataFactory.get(objectsArray['/agents'])
                     .then(function (data) {
-                        $scope.agents = data.data.items;
-                        DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
-                        DataFactory.filters.register(objectsArray['/agents'], 'status', 'string');
-                        DataFactory.filters.register(objectsArray['/agents'], 'filter-sort', 'string');
+						$scope.agents = new Agents(objectsArray, data.data.items);
                         $scope.load = false;
                     }, printError);
             }, printError);

@@ -18,7 +18,10 @@ app.factory('Rules', function($http, DataFactory) {
 				this.items.push(items[i]);
 			}
 			this.busy = false;
-        }.bind(this));
+        }.bind(this), 
+		function (data) {
+			this.busy = false;
+		}.bind(this));
 		
 	};
   return Rules;
@@ -41,7 +44,10 @@ app.factory('Decoders', function($http, DataFactory) {
 				this.items.push(items[i]);
 			}
 			this.busy = false;
-        }.bind(this));
+        }.bind(this), 
+		function (data) {
+			this.busy = false;
+		}.bind(this));
 		
 	};
   return Decoders;

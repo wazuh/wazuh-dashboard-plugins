@@ -105,27 +105,11 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 
 
     var load = function () {
-        DataFactory.initialize('get', '/agents', {}, 256, 0)
+        DataFactory.initialize('get', '/agents', {}, 5, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
-				// tmp
-        /*
-				     DataFactory.get(objectsArray['/agents'])
-					.then(function (data) {
-						$scope.submenuNavItem = 'overview';
-						$scope._agent = data.data.items[0];
-						$scope.search = data.data.items[0].name;
-						$scope.load = false;
-					}, function (data) {
-						printError(data);
-						//defered.reject();
-					});
-        */ 
-				// tmp
-                DataFactory.get(data).then(function (data) {
-                    DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
-                    $scope.load = false;
-                }, printError);
+				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
+                $scope.load = false;
             }, printError);
     };
 

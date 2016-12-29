@@ -66,7 +66,7 @@ require('ui/modules').get('app/wazuh', [])
             if ((_instances[instanceId]['offset'] < 0) ||
                 (_instances[instanceId]['offset'] >= _instances[instanceId]['limit'])) {
                 _instances[instanceId]['offset'] -= _instances[instanceId]['pageSize']
-                defered.reject(prepError({ 'error': -11, 'message': 'Pagination out of bounds' }));
+                defered.reject("");
                 return promise;
             }
 
@@ -79,6 +79,7 @@ require('ui/modules').get('app/wazuh', [])
 
             return promise;
         };
+
 
         dataObj.scrollTo = function (instanceId, index) {
             var defered = $q.defer();
