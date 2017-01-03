@@ -5,10 +5,10 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
     //Initialisation
     $scope.load = true;
     $scope.search = '';
-    //$scope.menuNavItem = 'agents';
     $scope.submenuNavItem = '';
     $scope.state = appState;
-
+	$scope._status = 'all';
+	
     var objectsArray = [];
 
     //Print Error

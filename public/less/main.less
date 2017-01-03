@@ -432,7 +432,7 @@ md-list.odd{
 md-input-container.md-whiteframe-z1.flex.md-input-has-value{
 
 	box-shadow: none;
-	background-color: #3caed2;
+	background-color: white;
 
 }
 md-progress-linear.md-default-theme ._md-bar, md-progress-linear ._md-bar {
@@ -453,13 +453,8 @@ md-select-menu.md-default-theme md-content, md-select-menu md-content {
 	color: white !important;
 }
 
-md-select-menu.md-default-theme md-content md-option, md-select-menu md-content md-option{
-	color: white;
-}
-md-select-menu.md-default-theme md-content md-option:not([disabled]):focus, md-select-menu md-content md-option:not([disabled]):focus, md-select-menu.md-default-theme md-content md-option:not([disabled]):hover, md-select-menu md-content md-option:not([disabled]):hover{
-	background-color: rgba(255,255,255, 0.1);
-	color: white;
-}
+
+
 .md-input-focused{
 	color: white;
 }
@@ -478,7 +473,7 @@ md-autocomplete-wrap.md-whiteframe-z1.layout-row {
 
 }
 md-input-container.md-whiteframe-z1.flex-20.md-input-has-value {
-	background: #3caed2;
+	background: white;
 }
 
 md-input-container.md-whiteframe-z1.flex-20.md-input-has-value {
@@ -493,7 +488,7 @@ button._md-no-style.md-button.md-ink-ripple {
 }
 
 md-input-container.md-whiteframe-z1.flex-20 {
-	background: #3caed2;
+	background: white;
 }
 md-select.md-default-theme ._md-select-value._md-select-placeholder, md-select ._md-select-value._md-select-placeholder {
 	color: white;
@@ -714,3 +709,50 @@ kbn-searchbar {
 }
 
 .rules-item-list button.md-no-style.md-button.md-ink-ripple {opacity: 0;}
+
+.agentsPreview {
+    margin: 10px;
+}
+
+.md-whiteframe-1dp, .agentsPreview .md-whiteframe-z1 {
+	box-shadow: none; 
+}
+
+md-input-container {
+  margin: 0 0;
+  margin-top: 18px;
+  padding: 0;
+}
+
+.agentsPreview md-input-container {
+  height: 41px;
+  margin-top: 17px;
+  padding: 2px;
+}
+
+md-input-container > md-select {
+  background: white;
+  color: black;
+  padding: 4px;
+  padding-bottom: 6px;
+  border-radius: 0px;
+}
+
+
+md-select:not([disabled]):focus .md-select-value, md-select.md-default-theme .md-select-value, md-select .md-select-value  {
+	border-bottom-width: 0;
+	border-bottom-color: white;
+}
+.md-select-menu-container.md-active md-select-menu > *{
+	background-color: white !important;
+}
+md-select-menu.md-default-theme md-content md-option[selected], md-select-menu md-content md-option[selected] {
+	color: black;
+}
+md-select-menu.md-default-theme md-content md-option, md-select-menu md-content md-option{
+	color: black;
+}
+md-select-menu.md-default-theme md-content md-option:not([disabled]):focus, md-select-menu md-content md-option:not([disabled]):focus, md-select-menu.md-default-theme md-content md-option:not([disabled]):hover, md-select-menu md-content md-option:not([disabled]):hover{
+	background-color: rgba(255,255,255, 0.1);
+	color: #555;
+}

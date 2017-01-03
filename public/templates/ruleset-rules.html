@@ -91,8 +91,8 @@
 
 		<md-toolbar layout="row" class="md-toolbar-tools" style=" margin-top: 13px; min-height: 38px;height: 38px; padding: 8px; padding-top: 10px; ">
 			<span flex="5" ng-click="setSort('id')">ID <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-			<span flex="10" ng-click="setSort('file')">File <i class="fa" ng-class="_sort === 'file' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-			<span flex="40" ng-click="setSort('description')">Description <i class="fa" ng-class="_sort === 'description' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+			<span flex="15" ng-click="setSort('file')">File <i class="fa" ng-class="_sort === 'file' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+			<span flex="35" ng-click="setSort('description')">Description <i class="fa" ng-class="_sort === 'description' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 			<span flex="25">Groups</span>
 			<span flex="15">Requirement</span>
 			<span flex="5" ng-click="setSort('level')">Level <i class="fa" ng-class="_sort === 'level' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
@@ -104,8 +104,8 @@
 		
 			<md-list-item class="rules-item-list" ng-click="showDetails[rule.id] = !showDetails[rule.id]" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
 			  <span flex="5">{{rule.id}}</span>
-			  <span flex="10">{{rule.file}}</span>
-			  <span flex="40">{{rule.description}}</span>
+			  <span flex="15">{{rule.file}}</span>
+			  <span flex="35">{{rule.description}}</span>
 			  <span flex="25"><span ng-repeat="group in rule.groups">{{ group }}<span ng-if="!$last">, </span> </span></span>
 			  <span flex="15"><span ng-repeat="pci in rule.pci">{{ pci }}<span ng-if="!$last">, </span> </span></span>
 			  <span flex="5">{{rule.level}}</span>
