@@ -25,10 +25,6 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
 
     //Functions
 	
-    $scope.setTimer = function (time) {
-        $scope.timerFilterValue = time;
-    };
-	
 	
     $scope.fetchAgent = function (agent) {
         DataFactory.getAndClean('get', '/agents/' + agent.id, {})
@@ -40,6 +36,7 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
                         .then(function (data) {
                             $scope.agentInfo.key = data.data;
                             $scope.load = false;
+                            $scope.$parent.load = false;
                         }, printError);
                 }
             }, printError);
@@ -67,33 +64,13 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
     }, function () {
         $scope.fetchAgent($scope.$parent._agent);
     });
-
-	//Load
-    try {
-		$scope.setTimer($scope.$parent.timeFilter);
-    } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
-        errlog.log('Unexpected exception loading controller', e);
-    }
-	
-    // Timer filter watch
-    var loadWatch2 = $scope.$watch(function () {
-        return $scope.$parent.timeFilter;
-    }, function () {
-        $scope.setTimer($scope.$parent.timeFilter);
-    });
 	
     //Destroy
     $scope.$on("$destroy", function () {
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)
         });
-        loadWatch();
-		loadWatch2();
+        //loadWatch();
     });
 
 });

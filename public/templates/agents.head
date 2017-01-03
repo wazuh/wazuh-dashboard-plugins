@@ -20,7 +20,7 @@
 			<md-content layout="row" layout-align="space-between start" style="background-color: #f7f7f7"> 
 				<md-toolbar style="height: 50px;">
 					<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-						<div style="text-transform: none; font-size: 20px;" ng-show="$parent._agent">
+						<div style="text-transform: none; font-size: 20px;" ng-if="_agent">
 						
 							<div style="float: left;margin-top: 3px;margin-right: 11px;">
 								<span> <i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i>
@@ -38,24 +38,27 @@
 						
 						</div>
 						
-					
-						<h2 style="text-transform: none; font-size: 20px;" ng-show="!_agent"><i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents overview</h2>
+						<div ng-if="!_agent">
+							<h2 style="text-transform: none; font-size: 20px;">
+								<i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents overview
+							</h2>
+						</div>
 						<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-						<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
-							md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
-							placeholder="Search by name, ID or IP address"> 
-							<md-item-template>
-								<span class="item-title">
-				<span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.name}} ({{item.id}}) </strong></span>
-						</span>
-						<span class="item-metadata">
-									<span class="item-metastat" md-highlight-text="search" md-highlight-flags="i"> {{item.ip}} ({{item.status}}) </span>
-						</span>
-						</md-item-template>
-						<md-not-found>
-							No agents matching "{{search}}" were found.
-						</md-not-found>
-						</md-autocomplete>
+							<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="search"
+								md-items="item in agentsSearch(search)" md-item-text="item.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
+								placeholder="Search by name, ID or IP address"> 
+								<md-item-template>
+									<span class="item-title">
+										<span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.name}} ({{item.id}}) </strong></span>
+									</span>
+									<span class="item-metadata">
+												<span class="item-metastat" md-highlight-text="search" md-highlight-flags="i"> {{item.ip}} ({{item.status}}) </span>
+									</span>
+								</md-item-template>
+								<md-not-found>
+									No agents matching "{{search}}" were found.
+								</md-not-found>
+							</md-autocomplete>
 						</span>
 					</div>
 				</md-toolbar>

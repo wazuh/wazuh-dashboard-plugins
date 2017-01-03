@@ -60,10 +60,12 @@ app.controller('generalController', function ($scope, $q, DataFactory, $mdToast,
 
     $scope.applyAgent = function (agent) {
         if (agent) {
+			$scope.load = true;
             //$scope.submenuNavItem = 'fim';
             $scope.submenuNavItem = 'overview';
             $scope._agent = agent;
             $scope.search = agent.name;
+			$scope.load = false;
         }
     };
 
