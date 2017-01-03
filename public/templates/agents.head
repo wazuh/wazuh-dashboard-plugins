@@ -28,7 +28,7 @@
 							</div>
 
 							<div style="float: left;margin-right: 11px;">
-								<span ng-class="getAgentStatusClass(_agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(_agent.status)}}</span>
+								<span ng-show="_agent.status" ng-class="getAgentStatusClass(_agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(_agent.status)}}</span>
 							</div>
 							
 							<div ng-click="restartAgent()" style="float: left;" ng-show="_agent.status == 'Active' && _agent.id != '000' ">
