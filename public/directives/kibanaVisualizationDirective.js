@@ -63,8 +63,8 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 	$scope.newVis.init().then(function () {
 		// For the first vis, we reload index pattern
-		if($rootScope.visCounter == 0)
-			$scope.newVis.vis.indexPattern.refreshFields();
+		//if($rootScope.visCounter == 0)
+			//$scope.newVis.vis.indexPattern.refreshFields();
 		
 		// Render visualization
 		$rootScope.visCounter++;

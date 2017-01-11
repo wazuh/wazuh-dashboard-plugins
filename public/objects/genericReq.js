@@ -29,6 +29,23 @@ require('ui/modules').get('app/wazuh', [])
                         }
                     });
             }
+			if (method == "PUT") {
+                $http.put(url, requestHeaders)
+                    .success(function (data) {
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.resolve(data);
+                        }
+                    })
+                    .error(function (data) {
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
+                        }
+                    });
+            }
             return promise;
         };
 

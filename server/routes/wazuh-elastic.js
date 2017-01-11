@@ -1,6 +1,17 @@
 module.exports = function (server, options) {
 
+	// Colors for console logging
+    const colors = require('ansicolors');
+    const blueWazuh = colors.blue('wazuh');
+	
     const client = server.plugins.elasticsearch.client;
+	var index_pattern = "wazuh-alerts-*";
+	var index_prefix = "wazuh-alerts-";
+	const fs = require('fs');
+	const path = require('path');
+	const KIBANA_FIELDS_FILE = '../scripts/integration_files/kibana_fields_file.json';
+	var kibana_fields_data = {};
+		
     const payloads = {
         getFieldTop: { "size": 1, "query": { "bool": { "must": [{ "query_string": { "query": "*", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": { "2": { "terms": { "field": '', "size": 1, "order": { "_count": "desc" } } } } },
         getLastField: { "size": 1, "query": { "bool": { "must": [{ "exists": { "field": '' } }, { "query_string": { "query": "*" } }], "must_not": [{}] } }, "sort": [{ "@timestamp": { "order": "desc", "unmapped_type": "boolean" } }] },
@@ -12,7 +23,7 @@ module.exports = function (server, options) {
             { "size": 0, "query": { "bool": { "must": [{ "query_string": { "query": "*", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": { "2": { "terms": { "field": "SyscheckFile.path", "size": 1, "order": { "_count": "desc" } } } } }]
     };
 
-    //Handlers - stats
+    //Handlers
 
     var fetchElastic = function (payload) {
         return client.search({ index: 'wazuh-alerts-*', type: 'wazuh', body: payload });
@@ -158,10 +169,36 @@ module.exports = function (server, options) {
         });
     };
 
+	var putWazuhPattern = function (req, reply) {
+	
+		try {
+			  kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
+			} catch (e) {
+			  server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
+			  server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
+			  server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+		};
+			
+		client.update({
+		  index: '.kibana',
+		  type: 'index-pattern',
+		  id: index_pattern,
+		  body: {
+			doc: {
+			  fields: kibana_fields_data.wazuh_alerts
+			}
+		  }
+		}, function (error, response) {
+		  reply({ 'response': response, 'error': error  }).code(200);
+		  server.log([blueWazuh, 'initialize', 'error'], 'Error when putWazuhPattern: wazuh-elastic.js:192');
+		})
+	
+    };
+	
     //Server routes 
 
     /*
-    * GET /api/wazuh-stats/top/agent
+    * GET /api/wazuh-elastic/top/{manager}/{field}/{time?}
     * Returns the agent with most alerts
     *
     **/
@@ -172,7 +209,7 @@ module.exports = function (server, options) {
     });
 
 	/*
-    * GET /api/wazuh-stats/top/agent
+    * GET /api/wazuh-elastic/top/{manager}/{field}/{time}/{fieldFilter}/{fieldValue}
     * Returns the agent with most alerts
     *
     **/
@@ -183,7 +220,7 @@ module.exports = function (server, options) {
     });
 
     /*
-    * GET /api/wazuh-stats/last/AgentName
+    * GET /api/wazuh-elastic/last/{manager}/{field}
     * Return last field value
     *
     **/
@@ -195,7 +232,7 @@ module.exports = function (server, options) {
     /*
 	
 	/*
-    * GET /api/wazuh-stats/last/AgentName/ID/005
+    * GET /api/wazuh-elastic/last/{manager}/{field}/{fieldFilter}/{fieldValue}
     * Return last field value
     *
     **/
@@ -203,5 +240,15 @@ module.exports = function (server, options) {
         method: 'GET',
         path: '/api/wazuh-elastic/last/{manager}/{field}/{fieldFilter}/{fieldValue}',
         handler: getLastField
+    });
+	/*
+    * PUT /api/wazuh-elastic/wazuh-pattern
+    * Return last field value
+    *
+    **/
+    server.route({
+        method: 'PUT',
+        path: '/api/wazuh-elastic/wazuh-pattern',
+        handler: putWazuhPattern
     });
 };
