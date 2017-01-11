@@ -9,13 +9,13 @@
 
 ## Installation
 
-```/usr/share/kibana/bin/kibana-plugin install  http://wazuh.com/resources/wazuh-app.zip ```
+```/usr/share/kibana/bin/kibana-plugin install  https://wazuh.com/resources/wazuh-app.zip ```
 
 ## Upgrading
 
 ```/usr/share/kibana/bin/kibana-plugin remove wazuh ```
 
-```/usr/share/kibana/bin/kibana-plugin install  http://wazuh.com/resources/wazuh-app.zip ```
+```/usr/share/kibana/bin/kibana-plugin install  https://wazuh.com/resources/wazuh-app.zip ```
 
 ## Wazuh Open Source modules and contributions
 
@@ -61,6 +61,6 @@ Wazuh App Copyright (C) 2016 Wazuh Inc. (License GPLv2)
 
 ## References
 
-* [Wazuh website](http://wazuh.com)
+* [Wazuh website](https://wazuh.com)
 * [Wazuh documentation](http://documentation.wazuh.com)
-* [Elastic stack](http://elastic.co)
+* [Elastic stack](https://elastic.co)
