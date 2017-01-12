@@ -45,7 +45,7 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
         dashSearchable: '@dashSearchable',
         dashTimepicker: '@dashTimepicker'
       },
-        controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState, savedDashboards, appState) {
+        controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState, savedDashboards, appState, genericReq, SavedVis) {
             $scope.chrome = {};
             $scope.chrome.getVisible = function () {return true};
 			$scope.defaultManagerName = appState.getDefaultManager().name;
@@ -56,218 +56,221 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
                 description: 'Load Saved Dashboard',
                 template: require('plugins/kibana/dashboard/partials/load_dashboard.html')
             }];
-
+			
+	
             $route.requireDefaultIndex = true;
-            savedDashboards.get($scope.dashId).then(function (_dash) {
-                $scope.dash = _dash;
-                const dash = _dash;
+			genericReq.request('PUT', '/api/wazuh-elastic/wazuh-pattern').then(function (data) { 
+				savedDashboards.get($scope.dashId).then(function (_dash) {
+					$scope.dash = _dash;
+					const dash = _dash;
 
-                const queryFilter = Private(FilterBarQueryFilterProvider);
+					const queryFilter = Private(FilterBarQueryFilterProvider);
 
-                const notify = new Notifier({
-                    location: '*'
-                });
+					const notify = new Notifier({
+						location: '*'
+					});
 
-                if (dash.timeRestore && dash.timeTo && dash.timeFrom && !getAppState.previouslyStored()) {
-                    timefilter.time.to = dash.timeTo;
-                    timefilter.time.from = dash.timeFrom;
-                    if (dash.refreshInterval) {
-                        timefilter.refreshInterval = dash.refreshInterval;
-                    }
-                }
+					if (dash.timeRestore && dash.timeTo && dash.timeFrom && !getAppState.previouslyStored()) {
+						timefilter.time.to = dash.timeTo;
+						timefilter.time.from = dash.timeFrom;
+						if (dash.refreshInterval) {
+							timefilter.refreshInterval = dash.refreshInterval;
+						}
+					}
 
-                if ($scope.dashTimeTo && $scope.dashTimeFrom) {
-                    timefilter.time.to = $scope.dashTimeTo;
-                    timefilter.time.from = $scope.dashTimeFrom;
-                }
+					if ($scope.dashTimeTo && $scope.dashTimeFrom) {
+						timefilter.time.to = $scope.dashTimeTo;
+						timefilter.time.from = $scope.dashTimeFrom;
+					}
 
-                $scope.$on('$destroy', dash.destroy);
+					$scope.$on('$destroy', dash.destroy);
 
-                const matchQueryFilter = function (filter) {
-                    return filter.query && filter.query.query_string && !filter.meta;
-                };
+					const matchQueryFilter = function (filter) {
+						return filter.query && filter.query.query_string && !filter.meta;
+					};
 
-                const extractQueryFromFilters = function (filters) {
-                    const filter = _.find(filters, matchQueryFilter);
-                    if (filter) return filter.query;
-                };
+					const extractQueryFromFilters = function (filters) {
+						const filter = _.find(filters, matchQueryFilter);
+						if (filter) return filter.query;
+					};
 
-		  
-                const stateDefaults = {
-                    title: dash.title,
-                    panels: dash.panelsJSON ? JSON.parse(dash.panelsJSON) : [],
-                    options: dash.optionsJSON ? JSON.parse(dash.optionsJSON) : {},
-                    uiState: dash.uiStateJSON ? JSON.parse(dash.uiStateJSON) : {},
-                    query: extractQueryFromFilters(dash.searchSource.getOwn('filter')) || { query_string: { query: '*' } },
-                    filters: _.reject(dash.searchSource.getOwn('filter'), matchQueryFilter)
-                };
+			  
+					const stateDefaults = {
+						title: dash.title,
+						panels: dash.panelsJSON ? JSON.parse(dash.panelsJSON) : [],
+						options: dash.optionsJSON ? JSON.parse(dash.optionsJSON) : {},
+						uiState: dash.uiStateJSON ? JSON.parse(dash.uiStateJSON) : {},
+						query: extractQueryFromFilters(dash.searchSource.getOwn('filter')) || { query_string: { query: '*' } },
+						filters: _.reject(dash.searchSource.getOwn('filter'), matchQueryFilter)
+					};
 
-				// Configure AppState. Get App State, if there is no App State create new one
-				let currentAppState = getAppState();
+					// Configure AppState. Get App State, if there is no App State create new one
+					let currentAppState = getAppState();
 
-				if(!currentAppState)
-					$scope.state = new AppState(stateDefaults);
-				else{
-					$scope.state = currentAppState;
-                    $scope.state.title = dash.title;
-                    $scope.state.panels = dash.panelsJSON ? JSON.parse(dash.panelsJSON) : [];
-                    $scope.state.options = dash.optionsJSON ? JSON.parse(dash.optionsJSON) : {};
-                    $scope.state.uiState = dash.uiStateJSON ? JSON.parse(dash.uiStateJSON) : {};
-                    $scope.state.query = extractQueryFromFilters(dash.searchSource.getOwn('filter')) || { query_string: { query: '*' } };					
-				}
+					if(!currentAppState)
+						$scope.state = new AppState(stateDefaults);
+					else{
+						$scope.state = currentAppState;
+						$scope.state.title = dash.title;
+						$scope.state.panels = dash.panelsJSON ? JSON.parse(dash.panelsJSON) : [];
+						$scope.state.options = dash.optionsJSON ? JSON.parse(dash.optionsJSON) : {};
+						$scope.state.uiState = dash.uiStateJSON ? JSON.parse(dash.uiStateJSON) : {};
+						$scope.state.query = extractQueryFromFilters(dash.searchSource.getOwn('filter')) || { query_string: { query: '*' } };					
+					}
 
-				const $state = $scope.state;
-				
-                const $uiState = $scope.uiState = $state.makeStateful('uiState');
+					const $state = $scope.state;
+					
+					const $uiState = $scope.uiState = $state.makeStateful('uiState');
 
-                $scope.$watchCollection('state.options', function (newVal, oldVal) {
-                    if (!angular.equals(newVal, oldVal)) $state.save();
-                });
-                $scope.$watch('state.options.darkTheme', setDarkTheme);
+					$scope.$watchCollection('state.options', function (newVal, oldVal) {
+						if (!angular.equals(newVal, oldVal)) $state.save();
+					});
+					$scope.$watch('state.options.darkTheme', setDarkTheme);
 
-                $scope.refresh = _.bindKey(courier, 'fetch');
+					$scope.refresh = _.bindKey(courier, 'fetch');
 
-                timefilter.enabled = true;
-                $scope.timefilter = timefilter;
-                $scope.$listen(timefilter, 'fetch', $scope.refresh);
+					timefilter.enabled = true;
+					$scope.timefilter = timefilter;
+					$scope.$listen(timefilter, 'fetch', $scope.refresh);
 
-                courier.setRootSearchSource(dash.searchSource);
+					courier.setRootSearchSource(dash.searchSource);
 
-                function init() {
-                    updateQueryOnRootSource();
+					function init() {
+						updateQueryOnRootSource();
 
-                    const docTitle = Private(DocTitleProvider);
-                    if (dash.id) {
-                        docTitle.change(dash.title);
-                    }
+						const docTitle = Private(DocTitleProvider);
+						if (dash.id) {
+							docTitle.change(dash.title);
+						}
 
-                    initPanelIndices();
-                    $scope.$emit('application.load');
-                }
+						initPanelIndices();
+						$scope.$emit('application.load');
+					}
 
-                function initPanelIndices() {
-                    // find the largest panelIndex in all the panels
-                    let maxIndex = getMaxPanelIndex();
+					function initPanelIndices() {
+						// find the largest panelIndex in all the panels
+						let maxIndex = getMaxPanelIndex();
+						// ensure that all panels have a panelIndex
+						$scope.state.panels.forEach(function (panel) {
+							if (!panel.panelIndex) {
+								panel.panelIndex = maxIndex++;
+							}
+						});
+					}
 
-                    // ensure that all panels have a panelIndex
-                    $scope.state.panels.forEach(function (panel) {
-                        if (!panel.panelIndex) {
-                            panel.panelIndex = maxIndex++;
-                        }
-                    });
-                }
+					function getMaxPanelIndex() {
+						
+						let index = $scope.state.panels.reduce(function (idx, panel) {
+							// if panel is missing an index, add one and increment the index
+							return Math.max(idx, panel.panelIndex || idx);
+						}, 0);
+						return ++index;
+					}
 
-                function getMaxPanelIndex() {
-                    let index = $scope.state.panels.reduce(function (idx, panel) {
-                        // if panel is missing an index, add one and increment the index
-                        return Math.max(idx, panel.panelIndex || idx);
-                    }, 0);
-                    return ++index;
-                }
+					$scope.$watch("dashFilter", function () {
+						$state.query = { query_string: { query: $scope.dashFilter ? $scope.dashFilter : '*' } };
+						$scope.filterResults();
+					});
 
-                $scope.$watch("dashFilter", function () {
-                    $state.query = { query_string: { query: $scope.dashFilter ? $scope.dashFilter : '*' } };
-                    $scope.filterResults();
-                });
+					function updateQueryOnRootSource() {
+						const filters = queryFilter.getFilters();
+						if ($state.query) {
+							dash.searchSource.set('filter', _.union(filters, [{
+								query: $state.query
+							}]));
+						} else {
+							dash.searchSource.set('filter', filters);
+						}
+					}
 
-                function updateQueryOnRootSource() {
-                    const filters = queryFilter.getFilters();
-                    if ($state.query) {
-                        dash.searchSource.set('filter', _.union(filters, [{
-                            query: $state.query
-                        }]));
-                    } else {
-                        dash.searchSource.set('filter', filters);
-                    }
-                }
+					function setDarkTheme(enabled) {
+						const theme = Boolean(enabled) ? 'theme-dark' : 'theme-light';
+						chrome.removeApplicationClass(['theme-dark', 'theme-light']);
+						chrome.addApplicationClass(theme);
+					}
 
-                function setDarkTheme(enabled) {
-                    const theme = Boolean(enabled) ? 'theme-dark' : 'theme-light';
-                    chrome.removeApplicationClass(['theme-dark', 'theme-light']);
-                    chrome.addApplicationClass(theme);
-                }
+					// update root source when filters update
+					$scope.$listen(queryFilter, 'update', function () {
+						updateQueryOnRootSource();
+						$state.save();
+					});
 
-                // update root source when filters update
-                $scope.$listen(queryFilter, 'update', function () {
-                    updateQueryOnRootSource();
-                    $state.save();
-                });
+					// update data when filters fire fetch event
+					$scope.$listen(queryFilter, 'fetch', $scope.refresh);
 
-                // update data when filters fire fetch event
-                $scope.$listen(queryFilter, 'fetch', $scope.refresh);
+					$scope.newDashboard = function () {
+						kbnUrl.change('/dashboard', {});
+					};
 
-                $scope.newDashboard = function () {
-                    kbnUrl.change('/dashboard', {});
-                };
+					$scope.filterResults = function () {
+						updateQueryOnRootSource();
+					    $state.save();
+					    $scope.refresh();
+					};
 
-                $scope.filterResults = function () {
-                    updateQueryOnRootSource();
-                    $state.save();
-                    $scope.refresh();
-                };
+					$scope.save = function () {
+						$state.title = dash.id = dash.title;
+						$state.save();
 
-                $scope.save = function () {
-                    $state.title = dash.id = dash.title;
-                    $state.save();
+						const timeRestoreObj = _.pick(timefilter.refreshInterval, ['display', 'pause', 'section', 'value']);
+						dash.panelsJSON = angular.toJson($state.panels);
+						dash.uiStateJSON = angular.toJson($uiState.getChanges());
+						dash.timeFrom = dash.timeRestore ? timefilter.time.from : undefined;
+						dash.timeTo = dash.timeRestore ? timefilter.time.to : undefined;
+						dash.refreshInterval = dash.timeRestore ? timeRestoreObj : undefined;
+						dash.optionsJSON = angular.toJson($state.options);
 
-                    const timeRestoreObj = _.pick(timefilter.refreshInterval, ['display', 'pause', 'section', 'value']);
-                    dash.panelsJSON = angular.toJson($state.panels);
-                    dash.uiStateJSON = angular.toJson($uiState.getChanges());
-                    dash.timeFrom = dash.timeRestore ? timefilter.time.from : undefined;
-                    dash.timeTo = dash.timeRestore ? timefilter.time.to : undefined;
-                    dash.refreshInterval = dash.timeRestore ? timeRestoreObj : undefined;
-                    dash.optionsJSON = angular.toJson($state.options);
+						dash.save()
+							.then(function (id) {
+								$scope.kbnTopNav.close('save');
+								if (id) {
+									if (dash.id !== $routeParams.id) {
+										kbnUrl.change('/dashboard/{{id}}', { id: dash.id });
+									}
+								}
+							})
+							.catch();
+					};
 
-                    dash.save()
-                        .then(function (id) {
-                            $scope.kbnTopNav.close('save');
-                            if (id) {
-                                if (dash.id !== $routeParams.id) {
-                                    kbnUrl.change('/dashboard/{{id}}', { id: dash.id });
-                                }
-                            }
-                        })
-                        .catch();
-                };
+					let pendingVis = _.size($state.panels);
+					$scope.$on('ready:vis', function () {
+						if (pendingVis) pendingVis--;
+						if (pendingVis === 0) {
+							$state.save();
+							$scope.refresh();
+						}
+					});
 
-                let pendingVis = _.size($state.panels);
-                $scope.$on('ready:vis', function () {
-                    if (pendingVis) pendingVis--;
-                    if (pendingVis === 0) {
-                        $state.save();
-                        $scope.refresh();
-                    }
-                });
+					// listen for notifications from the grid component that changes have
+					// been made, rather than watching the panels deeply
+					$scope.$on('change:vis', function () {
+						$state.save();
+					});
 
-                // listen for notifications from the grid component that changes have
-                // been made, rather than watching the panels deeply
-                $scope.$on('change:vis', function () {
-                    $state.save();
-                });
+					// called by the saved-object-finder when a user clicks a vis
+					$scope.addVis = function (hit) {
+						pendingVis++;
+						$state.panels.push({ id: hit.id, type: 'visualization', panelIndex: getMaxPanelIndex() });
+					};
 
-                // called by the saved-object-finder when a user clicks a vis
-                $scope.addVis = function (hit) {
-                    pendingVis++;
-                    $state.panels.push({ id: hit.id, type: 'visualization', panelIndex: getMaxPanelIndex() });
-                };
+					$scope.addSearch = function (hit) {
+						pendingVis++;
+						$state.panels.push({ id: hit.id, type: 'search', panelIndex: getMaxPanelIndex() });
+					};
 
-                $scope.addSearch = function (hit) {
-                    pendingVis++;
-                    $state.panels.push({ id: hit.id, type: 'search', panelIndex: getMaxPanelIndex() });
-                };
+					// Setup configurable values for config directive, after objects are initialized
+					$scope.opts = {
+						dashboard: dash,
+						ui: $state.options,
+						save: $scope.save,
+						addVis: $scope.addVis,
+						addSearch: $scope.addSearch,
+						timefilter: $scope.timefilter
+					};
 
-                // Setup configurable values for config directive, after objects are initialized
-                $scope.opts = {
-                    dashboard: dash,
-                    ui: $state.options,
-                    save: $scope.save,
-                    addVis: $scope.addVis,
-                    addSearch: $scope.addSearch,
-                    timefilter: $scope.timefilter
-                };
-
-                init();
-            }).catch(console.log('Dashboard not found!'));
+					init();
+				}).catch(console.log('Dashboard not found!'));
+			});
         },
         template: indexTemplate
     }

@@ -49,7 +49,6 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
-
 		$rootScope.$broadcast('updateQuery',$scope.stateQuery);  
 	};
 	

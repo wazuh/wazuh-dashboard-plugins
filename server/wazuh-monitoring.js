@@ -23,7 +23,7 @@ module.exports = function (server, options) {
 	const TEMPLATE_FILE = 'scripts/integration_files/template_file.json';
     var kibana_fields_data = {};
 	var map_jsondata = {};	
-	api_version = "v1.3.0";
+	api_version = "v2.0.0";
 	var index_pattern = "wazuh-monitoring-*";
 	var index_prefix = "wazuh-monitoring-";
 	

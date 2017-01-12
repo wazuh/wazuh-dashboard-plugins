@@ -1,8 +1,9 @@
 module.exports = function (server, options) {
 
-    const MIN_VERSION = [1,3,0];
-    const MAX_VERSION = [1,3,0];
-
+    const MIN_VERSION = [2,0,0];
+    const MAX_VERSION = [3,0,0];
+	const wazuh_api_version = 'v2.0.0';
+	
     const client = server.plugins.elasticsearch.client;
 
     //Handlers - Generic
@@ -229,7 +230,7 @@ module.exports = function (server, options) {
             }
 
             var options = {
-                headers: { 'api-version': 'v1.3.0' },
+                headers: { 'api-version': wazuh_api_version },
                 username: wapi_config.user,
                 password: wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
