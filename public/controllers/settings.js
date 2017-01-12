@@ -20,7 +20,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	
 	$scope.removeManager = function(item) {
 		var index = $scope.apiEntries.indexOf(item);
-		if($scope.apiEntries[index]._source.active == "true"){
+		if($scope.apiEntries[index]._source.active == "true" && $scope.apiEntries.length != 1){
 			$mdToast.show($mdToast.simple().textContent("Please set another default manager before removing this one"));
 			return;
 		}
@@ -85,7 +85,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			tmpData.manager = data;
 			// Insert new API entry
 			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
-				var newEntry = {'_id': data.response._id, _source: { active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } };
+				var newEntry = {'_id': data.response._id, _source: { manager: tmpData.manager, active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } };
 				$scope.apiEntries.push(newEntry);
 				$mdToast.show($mdToast.simple().textContent('Successfully added'));
 				$scope.addManagerContainer = false;

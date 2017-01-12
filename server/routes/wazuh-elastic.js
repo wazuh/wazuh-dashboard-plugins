@@ -190,7 +190,6 @@ module.exports = function (server, options) {
 		  }
 		}, function (error, response) {
 		  reply({ 'response': response, 'error': error  }).code(200);
-		  server.log([blueWazuh, 'initialize', 'error'], 'Error when putWazuhPattern: wazuh-elastic.js:192');
 		})
 	
     };
