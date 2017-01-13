@@ -8,7 +8,6 @@ var app = require('ui/modules').get('app/wazuh', [])
     return {
 		restrict: 'E',
 		scope: {
-		  visType: '@visType',
 		  visIndexPattern: '@visIndexPattern',
 		  visA: '@visA',
 		  visG: '@visG',
@@ -25,7 +24,6 @@ var app = require('ui/modules').get('app/wazuh', [])
     return {
 		restrict: 'E',
 		scope: {
-		  visType: '@visType',
 		  visIndexPattern: '@visIndexPattern',
 		  visA: '@visA',
 		  visG: '@visG',
@@ -54,22 +52,20 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	$scope.filter.raw = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
 	$scope.filter.current = $scope.filter.raw;
 
-	// Initialize Visualization
-	$scope.newVis = new SavedVis({ 'type': $scope.visType, 'indexPattern': $scope.visIndexPattern });
-
 	// Initialize and decode params
-	var visDecoded = rison.decode($scope.visA);
 	var visState = {};
+	var visDecoded = rison.decode($scope.visA);
+	
+	// Initialize Visualization
+	$scope.newVis = new SavedVis({ 'type': visDecoded.vis.type, 'indexPattern': $scope.visIndexPattern });
 
 	$scope.newVis.init().then(function () {
-	
 		// Render visualization
 		$rootScope.visCounter++;
 		renderVisualization();
 	},function () {
 		console.log("Error: Could not load visualization: "+visDecoded.vis.title);
-		}
-	);
+	});
 
     function renderVisualization() {
 
@@ -158,7 +154,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
 				$scope.searchSource.set('query', $scope.filter.current);
 			}
-			if ($scope.vis.type.requiresSearch) {
+			if ($scope.vis && $scope.vis.type.requiresSearch) {
 				$state.save();
 				courier.fetch();
 			}

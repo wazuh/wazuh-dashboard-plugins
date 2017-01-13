@@ -1,30 +1,89 @@
 <div ng-controller="testController">
-<button ng-click="AgentName = 'localCentos'">localCentos</button>
-<button ng-click="AgentName = 'snaowPC'">localPC</button>
-<kbn-searchbar></kbn-searchbar>
-			<md-card flex="100">
+	<button ng-click="AgentName = 'localCentos'">localCentos</button>
+	<button ng-click="AgentName = 'snaowPC'">localPC</button>
+	
+	<kbn-searchbar></kbn-searchbar>
+	<md-content>
+			<md-card flex="50">
 				<md-card-title>
 					<md-card-title-text>
-						<span class="md-headline">Top 5 signatures</span>
+						<span class="md-headline">SCAP Agents</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 5',type:pie))"
-						vis-filter="agent.name: {{AgentName}}">
+					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Agents',type:pie))"
+						vis-filter="*">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="100">
+			<md-card flex="50">
 				<md-card-title>
 					<md-card-title-text>
-						<span class="md-headline">Top 5 signatures</span>
+						<span class="md-headline">SCAP Profiles</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 5',type:pie))"
-						vis-filter="agent.name: {{AgentName}}">
+					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:oscap.scan.profile.title,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Profiles',type:pie))"
+						vis-filter="*">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
+	</md-content>
 
+	<md-content>
+			<md-card flex="50">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">SCAP Content</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:oscap.scan.content,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Content',type:pie))"
+						vis-filter="*">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="50">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">SCAP Severity</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20rule.groups:%22oscap-result%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:oscap.check.severity,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'OSCAP%20Checks:%20Severity',type:histogram))"
+						vis-filter="*">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+	</md-content>
+	
+	<md-content>
+		<md-card flex="50">
+			<md-card-title>
+				<md-card-title-text>
+					<span class="md-headline">SCAP Score average</span>
+				</md-card-title-text>
+			</md-card-title>
+			<md-card-content>
+				<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20rule.groups:%22oscap-report%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:avg),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,legendPosition:right,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'OSCAP%20Scans:%20Score%20average',type:line))"
+					vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<kbn-vis-value vis-height="37px" vis-type="table"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcuser,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="*"></kbn-vis-value>
+					<div class="ng-binding">Last scan</div>
+				</md-card-content>
+		</md-card>
+	</md-content>
+	
+	<md-content>
+		<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="ng-binding">Last checks</div>
+				</md-card-content>
+			</md-card>
+	</md-content>
+	
 </div>
