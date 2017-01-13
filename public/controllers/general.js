@@ -153,7 +153,7 @@ app.controller('stateController', function ($scope, appState, $route) {
 
 });
 
-app.controller('stateLocationController', function ($scope, appState, $window) {
+app.controller('generalController', function ($scope, appState, $window) {
     $scope.state = appState;
 
     $scope.openDashboard = function (dashboard, filter) {
