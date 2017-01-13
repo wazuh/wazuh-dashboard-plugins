@@ -3,87 +3,125 @@
 	<button ng-click="AgentName = 'snaowPC'">localPC</button>
 	
 	<kbn-searchbar></kbn-searchbar>
-	<md-content>
-			<md-card flex="50">
+	<md-content layout="row">
+		<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<kbn-vis-value vis-height="37px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:oscap.scan.score,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
+					<div class="ng-binding">Last score</div>
+				</md-card-content>
+		</md-card>
+		<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<kbn-vis-value vis-height="37px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
+					<div class="ng-binding">Last agent scanned</div>
+				</md-card-content>
+		</md-card>
+		<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<kbn-vis-value vis-height="37px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:oscap.scan.profile.title,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
+					<div class="ng-binding">Last scan profile</div>
+				</md-card-content>
+		</md-card>
+	</md-content>
+	
+	<md-content layout="row">
+			<md-card flex="33">
 				<md-card-title>
 					<md-card-title-text>
-						<span class="md-headline">SCAP Agents</span>
+						<span class="md-headline">Agents</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Agents',type:pie))"
+					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Agents',type:pie))"
 						vis-filter="*">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="50">
+			<md-card flex="33">
 				<md-card-title>
 					<md-card-title-text>
-						<span class="md-headline">SCAP Profiles</span>
+						<span class="md-headline">Profiles</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:oscap.scan.profile.title,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Profiles',type:pie))"
+					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:oscap.scan.profile.title,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Profiles',type:pie))"
+						vis-filter="*">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="33">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Content</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:oscap.scan.content,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Content',type:pie))"
 						vis-filter="*">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
 	</md-content>
 
-	<md-content>
-			<md-card flex="50">
+	<md-content layout="row">
+	
+		<md-content layout="column" flex="60">
+			<md-card flex="100">
 				<md-card-title>
 					<md-card-title-text>
-						<span class="md-headline">SCAP Content</span>
+						<span class="md-headline">Top 15 - Checks</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20NOT%20rule.groups:%22syslog%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:oscap.scan.content,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Content',type:pie))"
+					<kbn-vis id="vis-oscap-checks" vis-height="347px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20rule.groups:%22oscap-result%22%20AND%20oscap.check.result:%22fail%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:oscap.check.title,order:desc,orderBy:'1',size:15),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Top%2020%20failed%20checks',type:pie))"
 						vis-filter="*">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
+		</md-content>	
+		<md-content layout="column" flex="40">
 			<md-card flex="50">
 				<md-card-title>
 					<md-card-title-text>
-						<span class="md-headline">SCAP Severity</span>
+						<span class="md-headline">Severity</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20rule.groups:%22oscap-result%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:oscap.check.severity,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'OSCAP%20Checks:%20Severity',type:histogram))"
+					<kbn-vis vis-height="130px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20rule.groups:%22oscap-result%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:oscap.check.severity,order:desc,orderBy:'1',size:10000),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'OSCAP%20Checks:%20Severity',type:histogram))"
 						vis-filter="*">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
+			
+			<md-card flex="50">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Score average</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="130px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20rule.groups:%22oscap-report%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:avg),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,legendPosition:right,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'OSCAP%20Scans:%20Score%20average',type:line))"
+						vis-filter="*">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>	
+		
+		</md-content>	
 	</md-content>
 	
 	<md-content>
-		<md-card flex="50">
+		<md-card flex>
 			<md-card-title>
 				<md-card-title-text>
-					<span class="md-headline">SCAP Score average</span>
+					<span class="md-headline">Last checks</span>
 				</md-card-title-text>
 			</md-card-title>
 			<md-card-content>
-				<kbn-vis vis-height="154px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22oscap%22%20AND%20rule.groups:%22oscap-report%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:avg),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,legendPosition:right,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'OSCAP%20Scans:%20Score%20average',type:line))"
-					vis-filter="*">
+				<kbn-vis vis-height="460px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%20oscap')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Agent name',field:agent.name,order:desc,orderBy:'1',size:99999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Title,field:oscap.check.title,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Result,field:oscap.check.result,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:'Scan ID',field:oscap.scan.id,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:Content,field:oscap.scan.content,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+					vis-filter='*'>
 				</kbn-vis>
 			</md-card-content>
 		</md-card>
-		<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-type="table"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcuser,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="*"></kbn-vis-value>
-					<div class="ng-binding">Last scan</div>
-				</md-card-content>
-		</md-card>
-	</md-content>
-	
-	<md-content>
-		<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="ng-binding">Last checks</div>
-				</md-card-content>
-			</md-card>
 	</md-content>
 	
 </div>
