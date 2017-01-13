@@ -5,11 +5,9 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
 
     //Initialisation
     $scope.load = true;
-    $scope.agentInfo = [];
-
-    var objectsArray = [];
-    var loadWatch;
-
+    $scope.agentInfo = $scope.$parent._agent;
+	
+	var loadWatch;
     //Print Error
     var printError = function (error) {
         $mdToast.show({
@@ -17,14 +15,9 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
             position: 'bottom left',
             hideDelay: 5000,
         });
-        if ($scope.blocked) {
-            $scope.blocked = false;
-        }
     };
 
     //Functions
-	
-	
     $scope.fetchAgent = function (agent) {
         DataFactory.getAndClean('get', '/agents/' + agent.id, {})
             .then(function (data) {
@@ -39,37 +32,18 @@ app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
                         }, printError);
                 }
             }, printError);
-        $scope.fetchFim(agent);
-        $scope.fetchRootcheck(agent);
     };
-
-    $scope.fetchFim = function (agent) {
-        DataFactory.getAndClean('get', '/syscheck/' + agent.id, { 'offset': 0, 'limit': 5 })
-            .then(function (data) {
-                $scope.agentInfo.syscheckEvents = data.data.items;
-            }, printError);
-    };
-
-    $scope.fetchRootcheck = function (agent) {
-        DataFactory.getAndClean('get', '/rootcheck/' + agent.id, { 'offset': 0, 'limit': 5 })
-            .then(function (data) {
-                $scope.agentInfo.rootcheckEvents = data.data.items;
-            }, printError);
-    };
-
-    //Load
-    loadWatch = $scope.$watch(function () {
+	
+	loadWatch = $scope.$watch(function () {
         return $scope.$parent._agent;
     }, function () {
+		console.log($scope.$parent._agent);
         $scope.fetchAgent($scope.$parent._agent);
     });
 	
-    //Destroy
+	//Destroy
     $scope.$on("$destroy", function () {
-        angular.forEach(objectsArray, function (value) {
-            DataFactory.clean(value)
-        });
-        //loadWatch();
+        loadWatch();
     });
 
 });

@@ -62,10 +62,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	var visState = {};
 
 	$scope.newVis.init().then(function () {
-		// For the first vis, we reload index pattern
-		//if($rootScope.visCounter == 0)
-			//$scope.newVis.vis.indexPattern.refreshFields();
-		
+	
 		// Render visualization
 		$rootScope.visCounter++;
 		renderVisualization();
@@ -73,10 +70,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		console.log("Error: Could not load visualization: "+visDecoded.vis.title);
 		}
 	);
-
-
-
-
 
     function renderVisualization() {
 
@@ -198,10 +191,15 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 				$scope.fetch();
 		 });
 
-		// Listen for destroy
+		// Watcher
+
+	
+		 
+		// Destroy
 		$scope.$on('$destroy', function () {
 			$scope.newVis.destroy();
 		});
+		
 		$scope.$on('$destroy', updateQueryWatch);
 		$scope.$on('$destroy', fetchVisualizationWatch);
 

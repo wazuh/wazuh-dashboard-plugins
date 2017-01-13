@@ -108,9 +108,6 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
             }, printError);	
 			
 		// Tops
-		var date = new Date();
-        date.setDate(date.getDate() - 1);
-        var timeAgo = date.getTime();
         genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName')
             .then(function (data) {
 				if(data.data == ""){
