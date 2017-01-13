@@ -23,10 +23,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
     };
 
     //Functions
-
-	$scope.setTimer = function (time) {
-        $scope.timerFilterValue = time;
-    };
 	
     $scope.setSort = function (field) {
         if ($scope._sort === field) {
@@ -149,7 +145,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
     //Load
     try {
         load();
-		$scope.setTimer($scope.$parent.timeFilter);
     } catch (e) {
         $mdToast.show({
             template: '<md-toast> Unexpected exception loading controller </md-toast>',
@@ -159,13 +154,7 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
         errlog.log('Unexpected exception loading controller', e);
     }
 
-	
-    // Timer filter watch
-    var timerWatch = $scope.$watch(function () {
-        return $scope.$parent.timeFilter;
-    }, function () {
-        $scope.setTimer($scope.$parent.timeFilter);
-    });
+
 	
     //Destroy
     $scope.$on("$destroy", function () {
@@ -174,7 +163,6 @@ app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, err
         });
         $scope.files.length = 0;
         loadWatch();
-		timerWatch();
     });
 
 }); 

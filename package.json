@@ -2,7 +2,7 @@
   "name": "wazuh",
   "version": "2.0.0-beta1",
   "kibana": {
-    "version" : "5.1.1"
+    "version" : "5.1.2"
   },
   "description": "Wazuh App",
   "main": "index.js",

@@ -35,15 +35,25 @@ require('plugins/wazuh/directives/kibanaDashboardDirective.js');
 require('plugins/wazuh/directives/kibanaSearchbarDirective.js');
 
 // Require controllers
+// Global
 require('plugins/wazuh/controllers/general.js');
+
+// Overview
 require('plugins/wazuh/controllers/overview.js');
-require('plugins/wazuh/controllers/agents.js');
-require('plugins/wazuh/controllers/settings.js');
+
+// Manager
 require('plugins/wazuh/controllers/manager.js');
-require('plugins/wazuh/controllers/fim.js');
-require('plugins/wazuh/controllers/policy-monitoring.js');
 require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
+
+// Agents
+require('plugins/wazuh/controllers/agentsOverview.js');
+require('plugins/wazuh/controllers/agentsPreview.js');
+require('plugins/wazuh/controllers/agentsFim.js');
+require('plugins/wazuh/controllers/agentsPm.js');
+
+// Settings
+require('plugins/wazuh/controllers/settings.js');
 require('plugins/wazuh/controllers/testController.js');
 
 //Bootstrap and font awesome

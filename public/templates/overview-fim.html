@@ -10,7 +10,7 @@
 			</md-card>
 			<md-card>
 				<md-card-content>
-					<kbn-vis vis-height="72px" vis-type="metric" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Changed'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555)'>
+					<kbn-vis vis-height="72px" vis-type="metric" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Modified'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555)'>
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
@@ -60,7 +60,7 @@
 				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
 				vis-filter="syscheck.event: modified AND location: syscheck">
 				</kbn-vis-value>
-				<div class="ng-binding">Last file changed</div>
+				<div class="ng-binding">Last file modified</div>
 			</md-card-content>
 		</md-card>
 		<md-card flex layout="column"> 
@@ -86,7 +86,7 @@
 
 		<md-card flex="33">
 			<md-card-content>
-				<div class="md-headline">Top changed</div>
+				<div class="md-headline">Top file changes</div>
 				<kbn-vis vis-height="193px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:8),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
 					vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry'>
 			</md-card-content>
@@ -94,7 +94,7 @@
 
 		<md-card flex="33">
 			<md-card-content>
-				<div class="md-headline">Top root related changes</div>
+				<div class="md-headline">Root user file changes</div>
 				<kbn-vis vis-height="193px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:8),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
 					vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry AND root'>
 			</md-card-content>
@@ -102,7 +102,7 @@
 
 		<md-card flex="33">
 			<md-card-content>
-				<div class="md-headline">Top world writable</div>
+				<div class="md-headline">World writable modified files</div>
 				<kbn-vis vis-height="193px" vis-type="pie" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20_exists_:syscheck.perm_after%20AND%20%20(syscheck.perm_after:%2F%5B0-7%5D%7B5%7D(%5B2367%5D).*%2F)')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:8),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Files',type:pie))"
 					vis-filter='rule.groups:"syscheck" AND _exists_:syscheck.perm_after AND (syscheck.perm_after:/[0-7]{5}([2367]).*/) '>
 			</md-card-content>
@@ -133,7 +133,7 @@
 		<md-card flex="40" layout="column">
 			<md-card-content style="text-align: center;">
 				<kbn-vis-value vis-height="37px" vis-type="table" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>	
-				<div class="ng-binding">Most changed file</div>
+				<div class="ng-binding">Most modified file</div>
 			</md-card-content>
 		</md-card>
 

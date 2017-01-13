@@ -5,47 +5,7 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
     $scope.load = true;
 
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-    $scope.stats = [];
 
-    //Print Error
-    var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
-    };
-
-    //Functions
-    $scope.setTimer = function (time) {
-        $scope.timerFilterValue = time;
-    };
-
-    //Load
-    try {
-        $scope.setTimer($scope.$parent.timeFilter);
-    } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
-        errlog.log('Unexpected exception loading controller', e);
-    }
-
-    // Timer filter watch
-    var loadWatch = $scope.$watch(function () {
-        return $scope.$parent.timeFilter;
-    }, function () {
-        $scope.setTimer($scope.$parent.timeFilter);
-    });
-
-
-    //Destroy
-    $scope.$on("$destroy", function () {
-        $scope.stats.length = 0;
-        loadWatch();
-    });
 
 });
 
@@ -53,9 +13,7 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
 app.controller('overviewFimController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
     //Initialisation
     $scope.load = true;
-    $scope.$parent.state.setOverviewState('fim');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-    $scope.stats = [];
 
     //Print Error
     var printError = function (error) {
@@ -67,27 +25,8 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
     };
 
     //Functions
-    $scope.setTimer = function (time) {
-		$scope.timerFilterValue = time;
-    };
-
 
     var load_tops = function () {
-		
-        var daysAgo = 1;
-        if ($scope.timerFilterValue == "24h") {
-            daysAgo = 1;
-        } else if ($scope.timerFilterValue == "7d") {
-            daysAgo = 7;
-		} else if ($scope.timerFilterValue == "30d") {
-            daysAgo = 30;	
-        } else {
-            daysAgo = 1;
-        }
-		
-        var date = new Date();
-        date.setDate(date.getDate() - daysAgo);
-        var timeAgo = date.getTime();
         
         // Last fields
 
@@ -110,7 +49,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
 
     //Load
     try {
-        $scope.setTimer($scope.$parent.timeFilter);
         load_tops();
     } catch (e) {
         $mdToast.show({
@@ -121,20 +59,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
         errlog.log('Unexpected exception loading controller', e);
     }
 
-    // Timer filter watch
-    var loadWatch = $scope.$watch(function () {
-        return $scope.$parent.timeFilter;
-    }, function () {
-        $scope.setTimer($scope.$parent.timeFilter);
-        load_tops();
-    });
-
-    //Destroy
-    $scope.$on("$destroy", function () {
-        $scope.stats.length = 0;
-        loadWatch();
-    });
-
 });
 
 
@@ -143,7 +67,6 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
     $scope.load = true;
     $scope.$parent.state.setOverviewState('pm');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-    $scope.stats = [];
 
     //Print Error
     var printError = function (error) {
@@ -154,36 +77,9 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
         });
     };
 
-    //Functions
-    $scope.setTimer = function (time) {
-		$scope.timerFilterValue = time;
-    };
 
 
     var load_tops = function () {
-		
-        var daysAgo = 1;
-        if ($scope.timerFilterValue == "24h") {
-            daysAgo = 1;
-        } else if ($scope.timerFilterValue == "7d") {
-            daysAgo = 7;
-		} else if ($scope.timerFilterValue == "30d") {
-            daysAgo = 30;	
-        } else {
-            daysAgo = 1;
-        }
-		
-        var date = new Date();
-        date.setDate(date.getDate() - daysAgo);
-        var timeAgo = date.getTime();
-        
-
-        // Top fields
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName/'+timeAgo)
-            .then(function (data) {
-                $scope.topagent = data.data;
-            }, printError);
-
             
         // Last fields
 
@@ -206,14 +102,11 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
             .then(function (data) {
                 $scope.lastEventAgentIP = (data.data != "") ? data.data : "";
         }, printError);
-        
-
 
     };
 
     //Load
     try {
-	    $scope.setTimer($scope.$parent.timeFilter);
         load_tops();
     } catch (e) {
         $mdToast.show({
@@ -224,18 +117,5 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
         errlog.log('Unexpected exception loading controller', e);
     }
 
-    // Timer filter watch
-    var loadWatch = $scope.$watch(function () {
-        return $scope.$parent.timeFilter;
-    }, function () {
-        $scope.setTimer($scope.$parent.timeFilter);
-        load_tops();
-    });
-
-    //Destroy
-    $scope.$on("$destroy", function () {
-        $scope.stats.length = 0;
-        loadWatch();
-    });
 
 });
