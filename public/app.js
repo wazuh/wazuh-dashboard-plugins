@@ -47,6 +47,7 @@ require('plugins/wazuh/controllers/ruleset.js');
 require('plugins/wazuh/controllers/osseclog.js');
 
 // Agents
+require('plugins/wazuh/controllers/agents.js');
 require('plugins/wazuh/controllers/agentsOverview.js');
 require('plugins/wazuh/controllers/agentsPreview.js');
 require('plugins/wazuh/controllers/agentsFim.js');

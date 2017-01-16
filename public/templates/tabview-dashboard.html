@@ -1,25 +1,44 @@
+<!-- Overview dashbards -->
+
+<!-- OSSEC Alerts -->
 <md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'overview' && submenuNavItem == 'general' && tabView == 'dashboard'" layout-align="start space-around">
     <kbn-dash dash-id="OSSEC-Alerts" dash-searchable="true" dash-timepicker="true"></kbn-dash>
 </md-content>
 
+<!-- File integrity monitoring-->
 <md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'overview' && submenuNavItem == 'fim' && tabView == 'dashboard'" layout-align="start space-around">
     <kbn-dash dash-id="File-Integrity-Monitoring" dash-searchable="true" dash-timepicker="true"></kbn-dash>
 </md-content>
 
+<!-- Policy monitoring -->
 <md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'overview' && submenuNavItem == 'pm' && tabView == 'dashboard'" layout-align="start space-around">
     <kbn-dash dash-id="CIS-Compliance" dash-searchable="true" dash-timepicker="true"></kbn-dash>
 </md-content>
 
+<!-- OSCAP -->
+<md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'overview' && submenuNavItem == 'oscap' && tabView == 'dashboard'" layout-align="start space-around">
+    <kbn-dash dash-id="OpenSCAP" dash-searchable="true" dash-timepicker="true"></kbn-dash>
+</md-content>
 
 
+<!-- Agents dashboards -->
+
+<!-- OSSEC Alerts -->
 <md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'agents' && submenuNavItem == 'overview' && tabView == 'dashboard'" layout-align="start space-around">
     <kbn-dash dash-id="OSSEC-Alerts" dash-searchable="true" dash-timepicker="true" dash-filter="agent.name: {{_agent.name}}"></kbn-dash>
 </md-content> 
 
+<!-- File integrity monitoring-->
 <md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'agents' && submenuNavItem == 'fim' && tabView == 'dashboard'" layout-align="start space-around">
     <kbn-dash dash-id="File-Integrity-Monitoring" dash-searchable="true" dash-timepicker="true" dash-filter="agent.name: {{_agent.name}}"></kbn-dash>
 </md-content>
 
+<!-- Policy monitoring -->
 <md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'agents' && submenuNavItem == 'policy_monitoring' && tabView == 'dashboard'" layout-align="start space-around">
     <kbn-dash dash-id="CIS-Compliance" dash-searchable="true" dash-timepicker="true" dash-filter="agent.name: {{_agent.name}}"></kbn-dash>
+</md-content>
+
+<!-- OSCAP -->
+<md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'agents' && submenuNavItem == 'oscap' && tabView == 'dashboard'" layout-align="start space-around">
+    <kbn-dash dash-id="OpenSCAP" dash-searchable="true" dash-timepicker="true" dash-filter="agent.name: {{_agent.name}}"></kbn-dash>
 </md-content>

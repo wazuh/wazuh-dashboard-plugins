@@ -5,6 +5,7 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
     //Initialisation
     $scope.load = true;
     $scope.$parent.state.setManagerState('status');
+    $scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
     $scope.timeFilter = "24h";
 
     $scope.stats = [];
@@ -31,46 +32,6 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
             return "status red";
     };
 
-    $scope.setTimer = function (time) {
-        if (time == "24h") {
-            $scope.timerFilterValue = "24h";
-        } else if (time == "48h") {
-            $scope.timerFilterValue = "48h";
-        } else {
-            $scope.timerFilterValue = "7d";
-        }
-    };
-
-    var load_tops = function () {
-        var daysAgo = 1;
-        if ($scope.timerFilterValue == "7d") {
-            var daysAgo = 7;
-        } else if ($scope.timerFilterValue == "48h") {
-            var daysAgo = 2;
-        } else {
-            var daysAgo = 1;
-        }
-        var date = new Date();
-        date.setDate(date.getDate() - daysAgo);
-        var timeAgo = date.getTime();
-        //timeAgo = "";
-        genericReq.request('GET', '/api/wazuh-elastic/top/srcuser/' + timeAgo)
-            .then(function (data) {
-                $scope.topsrcuser = data.data;
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/srcip/' + timeAgo)
-            .then(function (data) {
-                $scope.topsrcip = data.data;
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/rule.groups/' + timeAgo)
-            .then(function (data) {
-                $scope.topgroup = data.data;
-            }, printError);
-        genericReq.request('GET', '/api/wazuh-elastic/top/rule.PCI_DSS/' + timeAgo)
-            .then(function (data) {
-                $scope.toppci = data.data;
-            }, printError);
-    };
 
     var load = function () {
         DataFactory.getAndClean('get', '/agents/summary', {})
@@ -110,7 +71,6 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
     //Load
     try {
         load();
-        load_tops();
     } catch (e) {
         $mdToast.show({
             template: '<md-toast> Unexpected exception loading controller </md-toast>',

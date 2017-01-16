@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, DataFactory, $mdToast) {
+app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToast) {
 
     //Initialisation
     $scope.load = true;

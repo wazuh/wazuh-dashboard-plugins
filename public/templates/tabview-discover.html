@@ -1,3 +1,6 @@
+<!-- Overview discover -->
+
+<!-- General -->
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'general' && tabView == 'discover'">
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,agent.ip,rule.level,rule.description,rule.groups,rule.pci_dss,full_log),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-filter="*"
@@ -5,6 +8,7 @@
 	</kbn-disfull>
 </md-content>
 
+<!-- FIM -->
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'fim' && tabView == 'discover'">
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,agent.ip,syscheck.event,syscheck.path,syscheck.owner_after,syscheck.gowner_after,syscheck.perm_after),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-filter="rule.groups:syscheck"
@@ -12,7 +16,7 @@
 	</kbn-disfull>
 </md-content>
 
-
+<!-- PM -->
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'pm' && tabView == 'discover'">
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,agent.ip,rule.description,title,rule.level,file),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-filter="rule.groups:rootcheck"
@@ -20,8 +24,18 @@
 	</kbn-disfull>
 </md-content>
 
+<!-- SCAP -->
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'oscap' && tabView == 'discover'">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,oscap.check.title,oscap.check.result,oscap.check.severity,oscap.scan.id,oscap.scan.content,oscap.scan.profile.title),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter='rule.groups:"oscap" AND rule.groups:"oscap-result"'
+	infinite-scroll="true">
+	</kbn-disfull>
+</md-content>
 
 
+<!-- Agents discover -->
+
+<!-- General -->
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'overview' && tabView == 'discover'">
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,agent.ip,rule.level,rule.description,rule.groups,rule.pci_dss,full_log),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-filter="{{'agent.name:'+_agent.name}}"
@@ -29,6 +43,7 @@
 	</kbn-disfull>
 </md-content>
 
+<!-- FIM -->
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'fim' && tabView == 'discover'">
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,agent.ip,syscheck.event,syscheck.path,syscheck.owner_after,syscheck.gowner_after,syscheck.perm_after),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-filter="rule.groups:syscheck AND {{'agent.name:'+_agent.name}}"
@@ -36,10 +51,18 @@
 	</kbn-disfull>
 </md-content>
 
-
+<!-- PM -->
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'policy_monitoring' && tabView == 'discover'">
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,agent.ip,rule.description,title,rule.level,file),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-filter="rule.groups:rootcheck AND {{'agent.name:'+_agent.name}}"
+	infinite-scroll="true">
+	</kbn-disfull>
+</md-content>
+
+<!-- SCAP -->
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'oscap' && tabView == 'discover'">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(agent.name,oscap.check.title,oscap.check.result,oscap.check.severity,oscap.scan.id,oscap.scan.content,oscap.scan.profile.title),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter='rule.groups:"oscap" AND rule.groups:"oscap-result" AND {{'agent.name:'+_agent.name}}'
 	infinite-scroll="true">
 	</kbn-disfull>
 </md-content>

@@ -208,13 +208,13 @@ module.exports = function (server, options) {
     });
 
 	/*
-    * GET /api/wazuh-elastic/top/{manager}/{field}/{time}/{fieldFilter}/{fieldValue}
+    * GET /api/wazuh-elastic/top/{manager}/{field}/{fieldFilter}/{fieldValue}/{time?}
     * Returns the agent with most alerts
     *
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/top/{manager}/{field}/{time}/{fieldFilter}/{fieldValue}',
+        path: '/api/wazuh-elastic/top/{manager}/{field}/{fieldFilter}/{fieldValue}/{time?}',
         handler: getFieldTop
     });
 
@@ -242,7 +242,7 @@ module.exports = function (server, options) {
     });
 	/*
     * PUT /api/wazuh-elastic/wazuh-pattern
-    * Return last field value
+    * Set wazuh index pattern
     *
     **/
     server.route({
