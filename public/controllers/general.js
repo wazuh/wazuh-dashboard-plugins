@@ -39,7 +39,7 @@ app.controller('generalController', function ($scope, appState, $window, generic
 	
 	// Function: Check if rule group exists on Elastic cluster latest alerts.
 	$scope.dynamicTab_exists = function (group) {
-		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/rule.groups/'+group)
+		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/rule.groups/'+group+'/'+timeAgo)
 			.then(function (data) {
 				console.log(data);
 				if(data.data != ""){

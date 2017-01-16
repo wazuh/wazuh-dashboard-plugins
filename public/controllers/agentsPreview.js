@@ -74,6 +74,10 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
         } else {
             DataFactory.filters.unset(objectsArray['/agents'], 'search');
         }
+		DataFactory.setOffset(objectsArray['/agents'],0);
+		DataFactory.get(objectsArray['/agents']).then(function (data) { 
+			$scope.agents.items = data.data.items;
+		});
     };
 
     $scope.agentStatusFilter = function (status) {
@@ -82,6 +86,10 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
         } else {
             DataFactory.filters.set(objectsArray['/agents'], 'status', status);
         }
+		DataFactory.setOffset(objectsArray['/agents'],0);
+		DataFactory.get(objectsArray['/agents']).then(function (data) { 
+			$scope.agents.items = data.data.items;
+		});
     };
 
     var load = function () {
