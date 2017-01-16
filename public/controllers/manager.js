@@ -2,7 +2,7 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('managerController', function ($scope, DataFactory, genericReq, $mdDialog, $mdToast, errlog) {
-    //Initialisation
+    //Initialization
     $scope.load = true;
     $scope.$parent.state.setManagerState('status');
     $scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
@@ -98,7 +98,7 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
 });
 
 app.controller('managerConfigurationController', function ($scope, DataFactory, errlog) {
-    //Initialisation
+    //Initialization
     $scope.load = true;
     $scope.$parent.state.setManagerState('configuration');
 

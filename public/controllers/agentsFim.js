@@ -2,7 +2,6 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('fimController', function ($scope, $q, DataFactory, $mdToast, errlog) {
-    //Initialisation
     $scope._fimEvent = 'all'
 
     //Print error

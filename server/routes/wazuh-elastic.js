@@ -44,12 +44,16 @@ module.exports = function (server, options) {
 
 		var payload = JSON.parse(JSON.stringify(payloads.getFieldTop));
 		
-        if (filtering) {
-            payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND host: " + req.params.manager;
+        if (req.params.fieldFilter && req.params.fieldFilter2) {
+			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND " + req.params.fieldFilter2 + ":" + req.params.fieldValue2 + " AND host: " + req.params.manager;
+		}else if(req.params.fieldFilter){
+			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND host: " + req.params.manager;
         }else{
             payload.query.bool.must[0].query_string.query = "host: " + req.params.manager;
 		}
-
+		
+		console.log(payload.query.bool.must[0].query_string.query);
+		console.log(req.params);
         payload.query.bool.must[1].range['@timestamp'].gte = timeAgo;
         payload.aggs['2'].terms.field = req.params.field;
 		
@@ -217,7 +221,18 @@ module.exports = function (server, options) {
         path: '/api/wazuh-elastic/top/{manager}/{field}/{fieldFilter}/{fieldValue}/{time?}',
         handler: getFieldTop
     });
-
+	
+	/*
+    * GET /api/wazuh-elastic/top/{manager}/{field}/{fieldFilter}/{fieldValue}/{fieldFilter}/{fieldValue}/{time?}
+    * Returns the agent with most alerts
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/top/{manager}/{field}/{fieldFilter}/{fieldValue}/{fieldFilter2}/{fieldValue2}/{time?}',
+        handler: getFieldTop
+    });
+	
     /*
     * GET /api/wazuh-elastic/last/{manager}/{field}
     * Return last field value

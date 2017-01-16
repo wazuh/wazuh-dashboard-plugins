@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('pmController', function ($scope, DataFactory, $mdToast, errlog, appState) {
+app.controller('oscapController', function ($scope, DataFactory, $mdToast, errlog, appState) {
 	$scope.defaultManagerName = appState.getDefaultManager().name;
 
     //Print Error

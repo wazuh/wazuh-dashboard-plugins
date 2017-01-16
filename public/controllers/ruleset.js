@@ -54,7 +54,7 @@ app.factory('Decoders', function($http, DataFactory) {
 });
 
 app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window, $document, Rules) {
-    //Initialisation
+    //Initialization
     $scope.load = true;
     $scope.$parent.state.setRulesetState('rules');
     $scope.$parent.state.setManagerState('ruleset');
@@ -292,7 +292,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 
 app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast, errlog, Decoders) {
 	
-    //Initialisation
+    //Initialization
     $scope.load = true;
     $scope.$parent.state.setRulesetState('decoders');
 	$scope.setRulesTab('decoders');
@@ -510,7 +510,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 
 
 app.controller('updateRulesetController', function ($scope, $q, DataFactory, $mdDialog, $mdToast, errlog) {
-    //Initialisation
+    //Initialization
     $scope.load = true;
     $scope.$parent.state.setRulesetState('update');
 

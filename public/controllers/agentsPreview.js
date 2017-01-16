@@ -30,7 +30,6 @@ app.factory('Agents', function($http, DataFactory) {
 
 app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToast, errlog, genericReq, Agents) {
 
-    //Initialisation
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';

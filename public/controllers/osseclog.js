@@ -2,7 +2,7 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, $mdToast, errlog) {
-    //Initialisation
+    //Initialization
     $scope.load = true;
     $scope.text = [];
     $scope.realtime = false;

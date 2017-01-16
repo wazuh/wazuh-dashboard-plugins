@@ -3,7 +3,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToast) {
 
-    //Initialisation
+    //Initialization 
     $scope.load = true;
     $scope.agentInfo = $scope.$parent._agent;
 	

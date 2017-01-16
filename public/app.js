@@ -52,6 +52,7 @@ require('plugins/wazuh/controllers/agentsOverview.js');
 require('plugins/wazuh/controllers/agentsPreview.js');
 require('plugins/wazuh/controllers/agentsFim.js');
 require('plugins/wazuh/controllers/agentsPm.js');
+require('plugins/wazuh/controllers/agentsOscap.js');
 
 // Settings
 require('plugins/wazuh/controllers/settings.js');

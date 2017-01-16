@@ -1,16 +1,19 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window) {
-    //Initialisation
+app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window, genericReq) {
+    //Initialization
+	$scope.state = appState;
     $scope.load = true;
     $scope.search = '';
     $scope.submenuNavItem = '';
     $scope.state = appState;
 	$scope._status = 'all';
 	
+	$scope.dynamicTab_fields = {};
     var objectsArray = [];
-
+	$scope.defaultManager = $scope.state.getDefaultManager().name;
+	
     //Print Error
     var printError = function (error) {
         $mdToast.show({
@@ -58,6 +61,24 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
         return promise;
     };
 
+	var daysAgo = 7;
+	var date = new Date();
+	date.setDate(date.getDate() - daysAgo);
+	var timeAgo = date.getTime();
+	
+	// Function: Check if rule group exists on Elastic cluster latest alerts.
+	$scope.dynamicTab_exists = function (group, agentName) {
+		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/rule.groups/'+group+'/agent.name/'+agentName+'/'+timeAgo)
+			.then(function (data) {
+				console.log(data);
+				if(data.data != ""){
+					$scope.dynamicTab_fields[group] = true;
+				}else{
+					$scope.dynamicTab_fields[group] = false
+				}
+        });	
+    };
+	
     $scope.applyAgent = function (agent) {
         if (agent) {
 			$scope.load = true;
@@ -65,6 +86,10 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
             $scope.submenuNavItem = 'overview';
             $scope._agent = agent;
             $scope.search = agent.name;
+			
+			// Checking dynamic panels
+			$scope.dynamicTab_exists("oscap", $scope._agent.name);
+			
 			$scope.load = false;
         }
     };
@@ -105,19 +130,21 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 			}, printError);
 	};
 
-
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 5, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
 				/* tmp for debugging. Forcing a tab/agent selected.*/
-					$scope.submenuNavItem = 'policy_monitoring';
-					DataFactory.getAndClean('get', '/agents/' + "000", {})
+				/*	
+					$scope.submenuNavItem = 'oscap';
+					DataFactory.getAndClean('get', '/agents/' + "002", {})
 					.then(function (data) {
 						$scope.agentInfo = data.data;
 						$scope._agent = data.data;
+						$scope.dynamicTab_exists("oscap", $scope._agent.name);
 					}, printError);
+				*/
 				// close tmp
                 $scope.load = false;
             }, printError);
