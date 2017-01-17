@@ -13,18 +13,32 @@
 						<md-card flex layout="column" class="cardHover">
 							<md-card-content style="text-align: center;" ng-click="applyAgent(mostActiveAgent)">
 								<div class="metric-value ng-binding" style="font-size: 16pt;">{{mostActiveAgent.name}}</div>
-								<div class="ng-binding">Most active agent</div>
+								<div class="ng-binding">Higher activity</div>
 							</md-card-content>
 						</md-card>
 						
-						<md-card flex layout="column">
+						<md-card flex="10" layout="column">
 							<md-card-content style="text-align: center;">
 								<div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountActive}}</div>
-								<div class="ng-binding">Active agents</div>
+								<div class="ng-binding">Active</div>
 							</md-card-content>
 						</md-card>
 						
-						<md-card flex layout="column"  style="margin-right: 0px;">
+						<md-card flex="10" layout="column">
+							<md-card-content style="text-align: center;">
+								<div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountDisconnected}}</div>
+								<div class="ng-binding">Disconnected</div>
+							</md-card-content>
+						</md-card>
+						
+						<md-card flex="10" layout="column">
+							<md-card-content style="text-align: center;">
+								<div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountNeverConnected}}</div>
+								<div class="ng-binding">Never connected</div>
+							</md-card-content>
+						</md-card>
+						
+						<md-card flex="10" layout="column"  style="margin-right: 0px;">
 							<md-card-content style="text-align: center;">
 								<div class="metric-value ng-binding" style="font-size: 16pt;">{{(agentsCoverity | number:2)}}%</div>
 								<div class="ng-binding">Agents coverage</div>
