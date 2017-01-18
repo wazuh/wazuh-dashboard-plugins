@@ -2,20 +2,20 @@
 
 ## Requisites
 
-- Wazuh HIDS 1.2 or superior
-- Wazuh RESTful API 1.3 or superior
+- Wazuh HIDS 2.0 or superior
+- Wazuh RESTful API 2.0 or superior
 - Kibana 5 or superior
 - Elasticsearch 5 or superior
 
 ## Installation
 
-```/usr/share/kibana/bin/kibana-plugin install  https://wazuh.com/resources/wazuh-app.zip ```
+```/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp.zip ```
 
 ## Upgrading
 
 ```/usr/share/kibana/bin/kibana-plugin remove wazuh ```
 
-```/usr/share/kibana/bin/kibana-plugin install  https://wazuh.com/resources/wazuh-app.zip ```
+```/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp.zip ```
 
 ## Wazuh Open Source modules and contributions
 
