@@ -7,7 +7,7 @@
             <md-card>
 				<md-card-title ng-click="setting.global = !setting.global">
 					<md-card-title-text>
-						<span class="md-headline">Global <i class="fa fa-arrow-down managerConfigurationArrow" aria-hidden="true"></i></span>
+						<span class="md-headline">Global <i ng-class="(setting.global) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
 					</md-card-title-text>
 				</md-card-title>
                 <md-card-content ng-show="!setting.global">
@@ -166,7 +166,7 @@
             <md-card>
                 <md-card-title ng-click="setting.activeResponse = !setting.activeResponse">
 					<md-card-title-text>
-						<span class="md-headline">Active response<i class="fa fa-arrow-down managerConfigurationArrow" aria-hidden="true"></i></span>
+						<span class="md-headline">Active response<i ng-class="(!setting.activeResponse) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
 					</md-card-title-text>
 				</md-card-title>
                 <md-card-content ng-show="setting.activeResponse">
@@ -230,7 +230,7 @@
             <md-card>
                 <md-card-title ng-click="setting.commands = !setting.commands">
 					<md-card-title-text>
-						<span class="md-headline">Commands<i class="fa fa-arrow-down managerConfigurationArrow" aria-hidden="true"></i></span>
+						<span class="md-headline">Commands<i ng-class="(!setting.commands) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
 					</md-card-title-text>
 				</md-card-title>
                 <md-card-content ng-show="setting.commands">
@@ -274,7 +274,7 @@
 		<md-card>
 			    <md-card-title ng-click="setting.syscheck = !setting.syscheck">
 					<md-card-title-text>
-						<span class="md-headline">Syscheck<i class="fa fa-arrow-down managerConfigurationArrow" aria-hidden="true"></i></span>
+						<span class="md-headline">Syscheck<i ng-class="(!setting.syscheck) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
 					</md-card-title-text>
 				</md-card-title>
                 <md-card-content ng-show="setting.syscheck">
@@ -353,7 +353,7 @@
             <md-card>
                 <md-card-title ng-click="setting.rootcheck = !setting.rootcheck">
 					<md-card-title-text>
-						<span class="md-headline">Rootcheck<i class="fa fa-arrow-down managerConfigurationArrow" aria-hidden="true"></i></span>
+						<span class="md-headline">Rootcheck<i ng-class="(!setting.rootcheck) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
 					</md-card-title-text>
 				</md-card-title>
                 <md-card-content ng-show="setting.rootcheck">
@@ -423,7 +423,7 @@
             <md-card>
                 <md-card-title ng-click="setting.logcollector = !setting.logcollector">
 					<md-card-title-text>
-						<span class="md-headline">Logcollector<i class="fa fa-arrow-down managerConfigurationArrow" aria-hidden="true"></i></span>
+						<span class="md-headline">Logcollector<i ng-class="(!setting.logcollector) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
 					</md-card-title-text>
 				</md-card-title>
                 <md-card-content ng-show="setting.logcollector">
@@ -460,85 +460,98 @@
 		</md-card>
 		
 		</div>
-        <div flex layout="column" ng-if="managerConfiguration.rules">
+        <div flex layout="column" ng-if="managerConfiguration.ruleset">
             <md-card>
-                <md-card-title ng-click="setting.decoders = !setting.decoders">
+                <md-card-title ng-click="setting.ruleset = !setting.ruleset">
 					<md-card-title-text>
-						<span class="md-headline">Decoders<i class="fa fa-arrow-down managerConfigurationArrow" aria-hidden="true"></i></span>
+						<span class="md-headline">Ruleset<i ng-class="(!setting.ruleset) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
 					</md-card-title-text>
 				</md-card-title>
-                <md-card-content ng-show="setting.decoders">
-                    <span ng-if="managerConfiguration.rules.decoder_dir">
-              <span layout="row" layout-align="space-between center">
-              <p style="font-weight: bold"> Decoder directories</p>
-              <p class="right-text">
-                  
-                  
-                </p>
-              </span>
-                    <span ng-repeat="item in managerConfiguration.rules.decoder_dir|orderBy">
-              <p> {{ item }} </p>
-            </span>
-                    <md-divider></md-divider>
-                    </span>
+                <md-card-content ng-show="setting.ruleset">
+					<span ng-if="managerConfiguration.ruleset.decoder_dir">
+						<span layout="row" layout-align="space-between center">
+							<p style="font-weight: bold"> Decoder directories</p>
+							<p class="right-text"></p>
+						</span>
+						<span ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
+							<p> {{ item }} </p>
+						</span>
+						<md-divider></md-divider>
+					</span>
 
-                    <span ng-if="managerConfiguration.rules.decoder">
-              <span layout="row" layout-align="space-between center">
-              <p style="font-weight: bold"> Decoder files</p>
-              <p class="right-text">
-                  
-                  
-                </p>
-              </span>
-                    <span ng-repeat="item in managerConfiguration.rules.decoder|orderBy">
-              <p> {{ item }} </p>
-            </span>
-                    <md-divider></md-divider>
-                    </span>
+					<span ng-if="managerConfiguration.ruleset.decoder_exclude">
+						<span layout="row" layout-align="space-between center">
+							<p style="font-weight: bold">Decoder excludes</p>
+							<p class="right-text"></p>
+						</span>
+						<span ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
+							<p> {{ item }} </p>
+						</span>
+						<md-divider></md-divider>
+					</span>
+					
+					<span ng-if="managerConfiguration.ruleset.decoder">
+						<span layout="row" layout-align="space-between center">
+							<p style="font-weight: bold">Decoders files</p>
+						</span>
+						<span ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
+							<p> {{ item }} </p>
+						</span>
+					</span>
+					
+					<span ng-if="managerConfiguration.ruleset.rule_dir">
+						<span layout="row" layout-align="space-between center">
+							<p style="font-weight: bold">Rules directories</p>
+						</span>
+						<span ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
+							<p> {{ item }} </p>
+						</span>
+						<md-divider></md-divider>
+					</span>
+
+					<span ng-if="managerConfiguration.ruleset.include">
+						<span layout="row" layout-align="space-between center">
+							<p style="font-weight: bold">Rules files</p>
+						</span>
+						<span ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
+							<p> {{ item }} </p>
+						</span>
+					</span>
+					
+					<span ng-if="managerConfiguration.ruleset.rule_exclude">
+						<span layout="row" layout-align="space-between center">
+							<p style="font-weight: bold">Rule excludes</p>
+							<p class="right-text"></p>
+						</span>
+
+						<span ng-if="isArray(managerConfiguration.ruleset.rule_exclude)">
+							<p ng-repeat="item in managerConfiguration.ruleset.list|orderBy"> {{ item }} </p>
+						</span>
+
+						<span ng-if="!isArray(managerConfiguration.ruleset.rule_exclude)">
+							<p> {{ managerConfiguration.ruleset.rule_exclude }} </p>
+						</span>
+						
+						<md-divider></md-divider>
+					</span>
+					
+			  		<span ng-if="managerConfiguration.ruleset.list">
+						<span layout="row" layout-align="space-between center">
+							<p style="font-weight: bold">CDB lists</p>
+							<p class="right-text"></p>
+						</span>
+
+						<span ng-if="isArray(managerConfiguration.ruleset.list)">
+							<p ng-repeat="item in managerConfiguration.ruleset.list|orderBy"> {{ item }} </p>
+						</span>
+
+						<span ng-if="!isArray(managerConfiguration.ruleset.list)">
+							<p> {{ managerConfiguration.ruleset.list }} </p>
+						</span>
+						<md-divider></md-divider>
+					</span>
+					
 				</md-card-content>
-            </md-card>
-            <md-card>
-                <md-card-title ng-click="setting.rules = !setting.rules">
-					<md-card-title-text>
-						<span class="md-headline">Rules<i class="fa fa-arrow-down managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
-                <md-card-content ng-show="setting.rules">
-                    <span ng-if="managerConfiguration.rules.rule_dir">
-              <span layout="row" layout-align="space-between center">
-              <p style="font-weight: bold"> Rules directories</p>
-              </span>
-                    <span ng-repeat="item in managerConfiguration.rules.rule_dir|orderBy">
-              <p> {{ item }} </p>
-            </span>
-                    <md-divider></md-divider>
-                    </span>
-
-                    <span ng-if="managerConfiguration.rules.include">
-              <span layout="row" layout-align="space-between center">
-              <p style="font-weight: bold"> Rules files</p>
-              </span>
-                    <div ng-repeat="item in managerConfiguration.rules.include" class="repeated-item" flex>
-                        <p> {{ item }} </p>
-                    </div>
-                    <md-divider></md-divider>
-                    </span>
-
-                    <span ng-if="managerConfiguration.rules.list">
-              <span layout="row" layout-align="space-between center">
-              <p style="font-weight: bold">CDB lists</p>
-              <p class="right-text">
-                  
-                  
-                </p>
-              </span>
-                    <span ng-repeat="item in managerConfiguration.rules.list|orderBy">
-              <p> {{ item }} </p>
-            </span>
-                    <md-divider></md-divider>
-                    </span>
-
-                </md-card-content>
             </md-card>
         </div>
 

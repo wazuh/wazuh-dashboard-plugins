@@ -101,7 +101,8 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
     //Initialization
     $scope.load = true;
     $scope.$parent.state.setManagerState('configuration');
-
+	$scope.isArray = angular.isArray;
+	
     //Print Error
     var printError = function (error) {
         $mdToast.show({
