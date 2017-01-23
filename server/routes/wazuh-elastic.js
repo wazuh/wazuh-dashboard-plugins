@@ -52,8 +52,6 @@ module.exports = function (server, options) {
             payload.query.bool.must[0].query_string.query = "host: " + req.params.manager;
 		}
 		
-		console.log(payload.query.bool.must[0].query_string.query);
-		console.log(req.params);
         payload.query.bool.must[1].range['@timestamp'].gte = timeAgo;
         payload.aggs['2'].terms.field = req.params.field;
 		

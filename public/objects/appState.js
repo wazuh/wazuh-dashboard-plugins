@@ -12,6 +12,14 @@ require('ui/modules').get('app/wazuh', [])
                     $cookies.putObject('_dashboardsState_filter', filter);
                 }
             },
+			getExtensions: function () {
+                return { extensions: $cookies.getObject('extensions') };
+            },
+            setExtensions: function (extensions) {
+                if (extensions) {
+                    $cookies.putObject('extensions', extensions);
+                }
+            },
 			unsetDashboardsState: function () {
                     $cookies.putObject('_dashboardsState_name', "");
                     $cookies.putObject('_dashboardsState_filter', "");

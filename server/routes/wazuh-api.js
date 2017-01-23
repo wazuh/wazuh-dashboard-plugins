@@ -31,7 +31,7 @@ module.exports = function (server, options) {
         client.search({ index: '.kibana', type: 'wazuh-configuration', q: 'active:true'})
             .then(function (data) {
                 if (data.hits.total == 1) {
-                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'manager': data.hits.hits[0]._source.manager });
+                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'manager': data.hits.hits[0]._source.manager, 'extensions': data.hits.hits[0]._source.extensions });
                 } else {
                     callback({ 'error': 'no credentials', 'error_code': 1 }); 
                 }
@@ -92,12 +92,34 @@ module.exports = function (server, options) {
 			reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
 		});
     };	
+
+	var getExtensions = function (req,reply) {
+        client.search({ index: '.kibana', type: 'wazuh-configuration'}).then(
+			function (data) {
+				reply(data.hits.hits);
+            }, function (data, error) {
+				reply(data);
+            });
+    };
+	
+    var toggleExtension = function (req,reply) {
+		// Toggle extenion state
+		var extension = {};
+		extension[req.params.extensionName] = (req.params.extensionValue == "true") ? true : false;
+		
+		client.update({ index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"extensions" : extension}} }).then(
+		function () {
+			reply({ 'statusCode': 200, 'message': 'ok' });
+		}, function (error) {
+			reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+		});
+    };	
 	
     //Handlers - Test API
 
     var testApiAux2 = function (error, response, wapi_config) {
         if (!error && response && response.body.data && checkVersion(response.body.data)) {
-            return { 'statusCode': 200, 'data': 'ok', 'manager' : wapi_config.manager };
+            return { 'statusCode': 200, 'data': 'ok', 'manager' : wapi_config.manager, 'extensions' : wapi_config.extensions };
         } else if (response && response.statusCode == 401) {
             return { 'statusCode': 200, 'error': '1', 'data': 'unauthorized' };
         } else if (!error && response && (!response.body.data || !checkVersion(response.body.data)) ) {
@@ -113,7 +135,7 @@ module.exports = function (server, options) {
 
     var testApiAux1 = function (error, response, wapi_config, needle, callback) {
         if (!error && response && response.body.data && checkVersion(response.body.data)) {
-            callback({ 'statusCode': 200, 'data': 'ok', 'manager' : wapi_config.manager});
+            callback({ 'statusCode': 200, 'data': 'ok', 'manager' : wapi_config.manager, 'extensions' : wapi_config.extensions});
         } else if (response && response.statusCode == 401) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'unauthorized' });
         } else if (!error && response && (!response.body.data || !checkVersion(response.body.data)) ) {
@@ -265,30 +287,13 @@ module.exports = function (server, options) {
             reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
             return;
         }
-		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'manager' : req.payload.manager};
-        client.index({ index: '.kibana', type: 'wazuh-configuration', body: settings, refresh: true })
+		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'manager' : req.payload.manager, 'extensions' : req.payload.extensions};
+        client.index({ index: '.kibana', type: 'wazuh-configuration', body: settings, refresh: true }) 
             .then(function (response) {
                 reply({ 'statusCode': 200, 'message': 'ok', 'response' : response });
             }, function (error) {
                 reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
             });
-    };
-	
-	// Handlers - Update API Entry
-	
-	var updateAPI_entry = function (req, reply) {
-        if (!(req.payload.user && req.payload.password && req.payload.url)) {
-            reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
-            return;
-        }
-		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'manager' : req.payload.manager};
-               
-		client.update({ index: '.kibana', type: 'wazuh-configuration', id: '1', body: {doc: settings} })
-			.then(function () {
-				reply({ 'statusCode': 200, 'message': 'ok' });
-			}, function (error) {
-				reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-			});
     };
 	
 	//Handlers - Get API Settings
@@ -419,7 +424,30 @@ module.exports = function (server, options) {
         handler: setAPI_entry_default
     });	
 	
-    /*
+	
+    /* 
+    * PUT /api/wazuh-api/extension/toggle/documentId/extensionName/trueorfalse
+    * Toggle extension state: Enable / Disable
+    *
+    **/
+    server.route({
+        method: 'PUT',
+        path: '/api/wazuh-api/extension/toggle/{id}/{extensionName}/{extensionValue}',
+        handler: toggleExtension
+    });	
+
+    /* 
+    * GET /api/wazuh-api/extension
+    * Return extension state list
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-api/extension',
+        handler: getExtensions
+    });	
+	
+	/*
     * POST /api/wazuh/debug
     * Write in debug log
     *

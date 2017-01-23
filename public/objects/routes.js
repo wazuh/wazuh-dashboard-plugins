@@ -7,6 +7,7 @@ var settingsWizard = function ($location, testConnection, $mdToast, appState, $q
     testConnection.test().then(function (data)
     {
 		appState.setDefaultManager(data.manager);
+		appState.setExtensions(data.extensions);
 		deferred.resolve();
 	}, function (data) {
 		$mdToast.show({

@@ -87,7 +87,7 @@
 				OVAL (Open Vulnerability Assessment Language) interpreter used to check system configuration and detect vulnerable applications. It is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.
 			</span>
 			<span>
-				<md-switch flex ng-model="extensions.oscap" aria-label="extensionsOscap" ng-change="onChange(extensions.oscap)"></md-switch>
+				<md-switch flex ng-model="extensions.oscap" aria-label="extensionsOscap" ng-change="toggleExtension('oscap',extensions.oscap)"></md-switch>
 			</span>
 			<md-divider></md-divider>
 		</div>
@@ -100,7 +100,7 @@
 				The Linux Audit system provides a way to track security-relevant information on your system. Based on pre-configured rules, Audit generates log entries to record as much information about the events that are happening on your system as possible.
 			</span>
 			<span layout="row" layout-align="space-between center">
-				<md-switch flex ng-model="extensions.audit" aria-label="extensionsAudit" ng-change="onChange(extensions.audit)"></md-switch>
+				<md-switch flex ng-model="extensions.audit" aria-label="extensionsAudit" ng-change="toggleExtension('audit',extensions.audit)"></md-switch>
 			</span>
 		</div>		
   

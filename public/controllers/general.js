@@ -15,8 +15,7 @@ app.controller('stateController', function ($scope, appState, $route) {
 app.controller('generalController', function ($scope, appState, $window, genericReq, $q) {
     $scope.state = appState;
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
-	$scope.dynamicTab_fields = {};
-	
+	$scope.extensions = $scope.state.getExtensions().extensions;
 	
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
@@ -37,19 +36,8 @@ app.controller('generalController', function ($scope, appState, $window, generic
 	date.setDate(date.getDate() - daysAgo);
 	var timeAgo = date.getTime();
 	
-	// Function: Check if rule group exists on Elastic cluster latest alerts.
-	$scope.dynamicTab_exists = function (group) {
-		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/rule.groups/'+group+'/'+timeAgo)
-			.then(function (data) {
-				console.log(data);
-				if(data.data != ""){
-					$scope.dynamicTab_fields[group] = true;
-				}else{
-					$scope.dynamicTab_fields[group] = false
-				}
-        });	
+	$scope.extensionStatus = function (extension) {
+		return $scope.extensions[extension];
     };
-	// Checking dynamic panels
-	$scope.dynamicTab_exists("oscap");
 
 });

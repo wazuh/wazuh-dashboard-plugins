@@ -10,9 +10,9 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
     $scope.state = appState;
 	$scope._status = 'all';
 	
-	$scope.dynamicTab_fields = {};
     var objectsArray = [];
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
+	$scope.extensions = $scope.state.getExtensions().extensions;
 	
     //Print Error
     var printError = function (error) {
@@ -60,23 +60,9 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
             });
         return promise;
     };
-
-	var daysAgo = 7;
-	var date = new Date();
-	date.setDate(date.getDate() - daysAgo);
-	var timeAgo = date.getTime();
 	
-	// Function: Check if rule group exists on Elastic cluster latest alerts.
-	$scope.dynamicTab_exists = function (group, agentName) {
-		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/rule.groups/'+group+'/agent.name/'+agentName+'/'+timeAgo)
-			.then(function (data) {
-				console.log(data);
-				if(data.data != ""){
-					$scope.dynamicTab_fields[group] = true;
-				}else{
-					$scope.dynamicTab_fields[group] = false
-				}
-        });	
+	$scope.extensionStatus = function (extension) {
+		return $scope.extensions[extension];
     };
 	
     $scope.applyAgent = function (agent) {
@@ -85,11 +71,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
             //$scope.submenuNavItem = 'fim';
             $scope.submenuNavItem = 'overview';
             $scope._agent = agent;
-            $scope.search = agent.name;
-			
-			// Checking dynamic panels
-			$scope.dynamicTab_exists("oscap", $scope._agent.name);
-			
+            $scope.search = agent.name;	
 			$scope.load = false;
         }
     };

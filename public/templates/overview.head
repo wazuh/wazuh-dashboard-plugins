@@ -25,8 +25,8 @@
 				<md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>
 				<md-nav-item md-nav-click="submenuNavItem = 'pm'" name="pm">Policy monitoring</md-nav-item>
-				<md-nav-item md-nav-click="submenuNavItem = 'oscap'" name="oscap" ng-show="dynamicTab_fields['oscap']">SCAP</md-nav-item>
-				<md-nav-item md-nav-click="submenuNavItem = 'audit'" name="audit">Audit</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'oscap'" name="oscap" ng-show="extensions.oscap">SCAP</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'audit'" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
 			</md-nav-bar> 
 		</md-content>	
 		

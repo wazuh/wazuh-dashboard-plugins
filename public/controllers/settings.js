@@ -13,7 +13,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     $scope.editConfiguration = true;
     $scope.menuNavItem = 'settings';
 	$scope.load = true;
-	$scope.currentDefault = "";
+	$scope.currentDefault = 0;
 	$scope.managerAPI = "";
 	$scope.extensions = {};
 	$scope.extensions.oscap = true;
@@ -43,7 +43,8 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			$scope.apiEntries[$scope.currentDefault]._source.active	= "false";
 			$scope.apiEntries[index]._source.active	= "true";
 			$scope.currentDefault = index;
-			$mdToast.show($mdToast.simple().textContent("Manager "+$scope.apiEntries[index]._source.url+" set as default"));			
+			$scope.extensions = $scope.apiEntries[$scope.currentDefault]._source.extensions;
+			$mdToast.show($mdToast.simple().textContent("Manager "+$scope.apiEntries[index]._source.manager+" set as default"));			
 		}).error(function (data, status) {
 			$mdToast.show($mdToast.simple().textContent("Could not set that manager as default"));
 		})	 
@@ -54,8 +55,15 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			$http.get("/api/wazuh-api/apiEntries").success(function (data, status) {
 				$scope.apiEntries = data;
 				angular.forEach($scope.apiEntries, function (value, key) {
-					if(value._source.active == "true")
+					if(value._source.active == "true"){
 						$scope.currentDefault = key;
+						if(value._source.extensions){
+							$scope.extensions = value._source.extensions;
+						}else{
+							$scope.extensions.oscap = true;
+							$scope.extensions.audit = true;
+						}
+					}
 						
 				});
 
@@ -86,9 +94,10 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.test_tmp(tmpData).then(function (data) {
 			// API Check correct, get Manager name
 			tmpData.manager = data;
+			tmpData.extensions = {"oscap": true, "audit": true};
 			// Insert new API entry
 			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
-				var newEntry = {'_id': data.response._id, _source: { manager: tmpData.manager, active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } };
+				var newEntry = {'_id': data.response._id, _source: { manager: tmpData.manager, active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } }; 
 				$scope.apiEntries.push(newEntry);
 				$mdToast.show($mdToast.simple().textContent('Successfully added'));
 				$scope.addManagerContainer = false;
@@ -113,12 +122,14 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 		$scope.saveSettings();
     };
 
-	// Extensions
-	$scope.onChange = function(state) {
-		$scope.message = state;
-		//console.log(state);
-		console.log("Audit: " + $scope.extensions.audit);
-		console.log("Oscap: " + $scope.extensions.oscap);
+	// Toggle extension
+	$scope.toggleExtension = function(extension,state) {
+		if(extension == "oscap" || extension == "audit"){
+			$http.put("/api/wazuh-api/extension/toggle/"+$scope.apiEntries[$scope.currentDefault]._id+"/"+extension+"/"+state).success(function (data, status) {	
+			}).error(function (data, status) {
+				$mdToast.show($mdToast.simple().textContent("Invalid request when toggle extension state."));
+			})
+		}
 	};
 	
     var printError = function (data) {
