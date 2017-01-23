@@ -20,6 +20,10 @@
     <kbn-dash dash-id="OpenSCAP" dash-searchable="true" dash-timepicker="true"></kbn-dash>
 </md-content>
 
+<!-- Audit -->
+<md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'overview' && submenuNavItem == 'audit' && tabView == 'dashboard'" layout-align="start space-around">
+    <kbn-dash dash-id="Audit" dash-searchable="true" dash-timepicker="true"></kbn-dash>
+</md-content>
 
 <!-- Agents dashboards -->
 
@@ -41,4 +45,9 @@
 <!-- OSCAP -->
 <md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'agents' && submenuNavItem == 'oscap' && tabView == 'dashboard'" layout-align="start space-around">
     <kbn-dash dash-id="OpenSCAP" dash-searchable="true" dash-timepicker="true" dash-filter="agent.name: {{_agent.name}}"></kbn-dash>
+</md-content>
+
+<!-- Audit -->
+<md-content style="background-color: white" flex layout="column" ng-if="menuNavItem == 'agents' && submenuNavItem == 'audit' && tabView == 'dashboard'" layout-align="start space-around">
+    <kbn-dash dash-id="Audit" dash-searchable="true" dash-timepicker="true" dash-filter="agent.name: {{_agent.name}}"></kbn-dash>
 </md-content>

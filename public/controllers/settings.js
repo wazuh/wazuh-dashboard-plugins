@@ -15,6 +15,9 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	$scope.load = true;
 	$scope.currentDefault = "";
 	$scope.managerAPI = "";
+	$scope.extensions = {};
+	$scope.extensions.oscap = true;
+	$scope.extensions.audit = true;
 	
 	// Remove API entry
 	
@@ -110,7 +113,14 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 		$scope.saveSettings();
     };
 
-
+	// Extensions
+	$scope.onChange = function(state) {
+		$scope.message = state;
+		//console.log(state);
+		console.log("Audit: " + $scope.extensions.audit);
+		console.log("Oscap: " + $scope.extensions.oscap);
+	};
+	
     var printError = function (data) {
         var text;
         switch (data.data) {

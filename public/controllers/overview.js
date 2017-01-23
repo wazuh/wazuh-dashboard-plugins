@@ -29,3 +29,11 @@ app.controller('overviewOSCAPController', function ($scope, DataFactory, generic
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
 
 });
+
+app.controller('overviewAuditController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
+
+    $scope.load = true;
+    $scope.$parent.state.setOverviewState('audit');
+	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
+
+});

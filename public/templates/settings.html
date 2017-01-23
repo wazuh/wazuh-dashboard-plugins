@@ -1,4 +1,4 @@
-<md-content flex ng-controller="settingsController" layout="column" style="background-color: white">
+<md-content flex ng-controller="settingsController" layout="column">
 
   <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'settings'" style="height: 70px;">
     <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
@@ -45,29 +45,65 @@
 			<md-divider></md-divider>
 		</div>
 		
-		<md-button ng-click="addManagerContainer = !addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new API</md-button>
+		<div layout="row" layout-align="center center">
+			<md-button flex="15" ng-click="addManagerContainer = !addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new API</md-button>
+		</div>
 		
 		<form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="addManagerContainer" style="margin-top: 30px; ">
 		  <md-input-container>
 			<label>Username</label>
-			<input placeholder="foo" type="text" ng-model="formData.user" aria-label="username" required></input>
+			<input placeholder="" type="text" ng-model="formData.user" aria-label="username" required></input>
 		  </md-input-container>
 		  <md-input-container>
 			<label>Password</label>
-			<input placeholder="bar" type="password" ng-model="formData.password" aria-label="password" required></input>
+			<input placeholder="" type="password" ng-model="formData.password" aria-label="password" required></input>
 		  </md-input-container>
 		  <md-input-container>
 			<label>URL</label>
-			<input placeholder="https://10.0.0.3" ng-model="formData.url" type="url" aria-label="full url" required></input>
+			<input placeholder="https://" ng-model="formData.url" type="url" aria-label="full url" required></input>
 		  </md-input-container>
 		  <md-input-container>
 			<label>Port</label>
-			<input placeholder="55000" ng-model="formData.port" type="text" aria-label="port" required></input>
+			<input placeholder="" ng-model="formData.port" type="text" aria-label="port" required></input>
 		  </md-input-container>
-		  <md-button type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 13px; margin-right: 5px; "></i>SAVE</md-button>
-		  
+		  <div layout="row" layout-align="center center">
+			<md-button flex="15" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 13px; margin-right: 5px; "></i>SAVE</md-button>
+		  </div>
 		</form>
 	
+	</md-card>
+
+	<md-card flex layout-padding layout-align="start stretch">
+	
+		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh App: Extensions</h1>
+		
+		<p flex>Enable or disable extensions according to your needs. The extension includes: Panels, discover and dashboards, for agents / overview.</p>
+		
+		<div>
+			<span layout="row" layout-align="space-between center" style="font-weight: bold">
+				OpenSCAP
+			</span>
+			<span>
+				OVAL (Open Vulnerability Assessment Language) interpreter used to check system configuration and detect vulnerable applications. It is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.
+			</span>
+			<span>
+				<md-switch flex ng-model="extensions.oscap" aria-label="extensionsOscap" ng-change="onChange(extensions.oscap)"></md-switch>
+			</span>
+			<md-divider></md-divider>
+		</div>
+		
+		<div>
+			<span layout="row" layout-align="space-between center" style="font-weight: bold">
+				Audit
+			</span>
+			<span>
+				The Linux Audit system provides a way to track security-relevant information on your system. Based on pre-configured rules, Audit generates log entries to record as much information about the events that are happening on your system as possible.
+			</span>
+			<span layout="row" layout-align="space-between center">
+				<md-switch flex ng-model="extensions.audit" aria-label="extensionsAudit" ng-change="onChange(extensions.audit)"></md-switch>
+			</span>
+		</div>		
+  
 	</md-card>
 	
   </div>
