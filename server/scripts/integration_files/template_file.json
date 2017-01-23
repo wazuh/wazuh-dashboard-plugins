@@ -25,6 +25,18 @@
         "@version": {
           "type": "text"
         },
+		"source": {
+          "type": "keyword",
+          "doc_values": "true"
+        },
+		"tags": {
+          "type": "keyword",
+          "doc_values": "true"
+        },
+		"log": {
+          "type": "keyword",
+          "doc_values": "true"
+        },
         "agent": {
           "properties": {
             "ip": {
@@ -112,6 +124,10 @@
               "doc_values": "true"
             },
             "region_name": {
+              "type": "keyword",
+              "doc_values": "true"
+            },
+			"region_code": {
               "type": "keyword",
               "doc_values": "true"
             },
@@ -301,6 +317,10 @@
           }
         },
         "srcip": {
+          "type": "keyword",
+          "doc_values": "true"
+        },
+		"srcport": {
           "type": "keyword",
           "doc_values": "true"
         },
