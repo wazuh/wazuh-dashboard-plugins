@@ -15,17 +15,21 @@ module.exports = function (server, options) {
 	var index_pattern = "wazuh-alerts-*";
 	var index_prefix = "wazuh-alerts-";
 
-  // External files template or objects
-  const OBJECTS_FILE = 'integration_files/objects_file.json';
-  const TEMPLATE_FILE = 'integration_files/template_file.json';
-  const KIBANA_FIELDS_FILE = 'integration_files/kibana_fields_file.json';
+	// External files template or objects
+	const OBJECTS_FILE = 'integration_files/objects_file.json';
+	const TEMPLATE_FILE = 'integration_files/template_file.json';
+	const KIBANA_FIELDS_FILE = 'integration_files/kibana_fields_file.json';
 
-  // Initialize objects
-  var kibana_fields_data = {};
-  var map_jsondata = {};
-  var objects = {};
+	// Initialize objects
+	var kibana_fields_data = {};
+	var map_jsondata = {};
+	var objects = {};
 
+	var packageJSON = {};
 
+	// Read config from package JSON
+	packageJSON = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
+	
 	// Today
 	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
     var todayIndex = index_prefix + fDate;
@@ -46,7 +50,7 @@ module.exports = function (server, options) {
 
 	// Save Wazuh App first set up for further updates
 	var saveSetupInfo = function () {
-        var setup_info = {"name" : "Wazuh App", "app-version": "1.0.0", "installationDate": new Date().toISOString() };
+        var setup_info = {"name" : "Wazuh App", "app-version": packageJSON.version, "installationDate": new Date().toISOString() };
 
         client.create({ index: ".kibana", type: 'wazuh-setup', id: 1, body: setup_info }).then(
             function () {

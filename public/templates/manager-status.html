@@ -1,6 +1,16 @@
-<md-content flex layout="row" ng-if="!load && submenuNavItem == 'status'" ng-controller="managerController" layout-align="start stretch">
-	<div flex="80" layout="column" layout-align="start stretch">
-		<div layout="row" layout-align="center stretch">
+<md-content flex layout="column" ng-if="!load && submenuNavItem == 'status'" ng-controller="managerController">
+<div flex layout="column" layout-align="start stretch">
+	<md-content layout="row" layout-align="start start">
+		<md-card flex layout-align="start stretch" ng-repeat="(k,v) in daemons">
+			<md-card-content layout="column" flex layout-align="start center">
+				<p layout="row" style="" ng-class="getDaemonStatusClass(v)" class="round"></p>
+				<p layout="row" style="text-align: center">{{k}}</p>
+			</md-card-content>
+		</md-card>
+	</md-content>		
+	
+	
+		<div layout="row" layout-align="start start">
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 19pt;">{{agentsCountTotal}}</div>
@@ -38,15 +48,39 @@
 		<md-card layout="column" flex="50">
 			<md-card-content>
 				<h3>Manager information</h3>
-				<div layout="column" flex>
-				<p><b style="margin-right: 5px;">Version:</b> {{managerInfo.version ? managerInfo.version : '-'}}</p>
-					<p><b style="margin-right: 5px;">Installation date:</b> {{managerInfo.installation_date ? managerInfo.installation_date : '-'}}</p>
-					<p><b style="margin-right: 5px;">Installation path:</b> {{managerInfo.path ? managerInfo.path : '-'}}</p>
-					<p><b style="margin-right: 5px;">Installation type:</b> {{managerInfo.type ? managerInfo.type : '-'}}</p>
-					<p><b style="margin-right: 5px;">Max agents:</b> {{managerInfo.max_agents ? managerInfo.max_agents : '-'}}</p>
-					<p><b style="margin-right: 5px;">OpenSSL Support:</b> {{managerInfo.openssl_support ? managerInfo.openssl_support : '-'}}</p>
-					<p><b style="margin-right: 5px;">Total rules:</b> {{totalRules ? totalRules : '-'}}</p>
-					<p><b style="margin-right: 5px;">Total decoders:</b> {{totalDecoders ? totalDecoders : '-'}}</p>
+				<div layout="column">
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Version</p>
+						<p class="right-text">{{managerInfo.version ? managerInfo.version : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Installation date</p>
+						<p class="right-text">{{managerInfo.installation_date ? managerInfo.installation_date : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Installation path</p>
+						<p class="right-text">{{managerInfo.path ? managerInfo.path : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Installation type</p>
+						<p class="right-text">{{managerInfo.type ? managerInfo.type : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Agents limit</p>
+						<p class="right-text">{{managerInfo.max_agents ? managerInfo.max_agents : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >OpenSSL Support</p>
+						<p class="right-text">{{managerInfo.openssl_support ? managerInfo.openssl_support : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Total rules</p>
+						<p class="right-text">{{totalRules ? totalRules : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Total decoders</p>
+						<p class="right-text">{{totalDecoders ? totalDecoders : '-'}}</p>
+					</span>
 				</div>
 			</md-card-content>
 		</md-card>
@@ -55,37 +89,43 @@
 			<md-card-content>
 				<h3>Last registered agent</h3>
 				<div layout="column" flex>
-					<p><b style="margin-right: 5px;">Name:</b> {{agentInfo.name ? agentInfo.name : '-'}}</p>
-					<p><b style="margin-right: 5px;">ID:</b> {{agentInfo.id ? agentInfo.id : '-'}}</p>
-					<p><b style="margin-right: 5px;">Status:</b> {{agentInfo.status ? agentInfo.status : '-'}}</p>
-					<p><b style="margin-right: 5px;">IP Address:</b> {{agentInfo.ip ? agentInfo.ip : '-'}}</p>
-					<p><b style="margin-right: 5px;">Date add:</b> {{agentInfo.dateAdd ? agentInfo.dateAdd : '-'}}</p>
-					<p ng-show="agentInfo.version"><b style="margin-right: 5px;">Version:</b> {{agentInfo.version ? agentInfo.version : '-'}}</p>
-					<p ng-show="agentInfo.lastKeepAlive"><b style="margin-right: 5px;">Last keep alive:</b> {{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</p>
-					<p ng-show="agentInfo.os" ><b style="margin-right: 5px;">Operative system:</b> {{agentInfo.os ? agentInfo.os : '-'}}</p>
-					
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Name</p>
+						<p class="right-text">{{agentInfo.name ? agentInfo.name : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >ID</p>
+						<p class="right-text">{{agentInfo.id ? agentInfo.id : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Status</p>
+						<p class="right-text">{{agentInfo.status ? agentInfo.status : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >IP Address</p>
+						<p class="right-text">{{agentInfo.ip ? agentInfo.ip : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Date add</p>
+						<p class="right-text">{{agentInfo.dateAdd ? agentInfo.dateAdd : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Version</p>
+						<p class="right-text">{{agentInfo.version ? agentInfo.version : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Last keep alive</p>
+						<p class="right-text">{{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</p>
+					</span>
+					<span layout="row">
+						<p style="font-weight: bold; min-width: 150px" >Operative system</p>
+						<p class="right-text">{{agentInfo.os ? agentInfo.os : '-'}}</p>
+					</span>	
 				</div>
 			</md-card-content>
 		</md-card>
 	  </div>
 	  
-	</div>
-	
-	<div flex="20" layout="column" layout-align="start stretch">
-		<md-card layout="column">
-			<md-card-content>
-			  <span layout="row" layout-align="space-between center">
-						  <h3>Daemon status</h3>
-						</span>
-			  <span layout="column" ng-repeat="(k,v) in daemons">
-							<span layout="row" layout-align="space-between center">
-							  <p>{{k}}</p>
-							  <p class="right-text"><span ng-class="getDaemonStatusClass(v)" class="round" style="float: right"></span></p>
-			  </span>
-			  <md-divider></md-divider>
-			  </span>
-			</md-card-content>
-		</md-card>
 	</div>
 
 </md-content>

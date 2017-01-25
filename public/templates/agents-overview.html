@@ -1,105 +1,134 @@
 <md-content ng-if="submenuNavItem == 'overview' && tabView == 'panels'" ng-if="agentInfo">
 <kbn-searchbar></kbn-searchbar>
-	<div ng-controller="agentsOverviewController">
-
-	<md-content layout="row">
-			<md-card flex="33">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 5 signatures</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 5',type:pie))"
-						vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
-					</kbn-vis>
+	<div ng-controller="agentsOverviewController">					
+		<md-content layout="row">
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
+					<div class="ng-binding">Name</div>
 				</md-card-content>
 			</md-card>
-			<md-card flex="33">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 5 groups</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top',type:pie))"
-						vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
-					</kbn-vis>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.ip}}</div>
+					<div class="ng-binding">IP Address</div>
 				</md-card-content>
 			</md-card>
-			<md-card flex="33">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 5 PCI Controls</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top',type:pie))"
-						vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
-					</kbn-vis>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.version}}</div>
+					<div class="ng-binding">Version</div>
 				</md-card-content>
 			</md-card>
-
+		
+		
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding"  class="legend-value-title ng-binding legend-value-truncate" tooltip="{{agentInfo.os}}" style="font-size: 14pt;">{{ agentInfo.os | limitTo: 20 }}{{agentInfo.os.length > 20 ? '...' : ''}}</div>
+					<div class="ng-binding">Operating system</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.lastKeepAlive}}</div>
+					<div class="ng-binding">Last keep alive</div>
+				</md-card-content>
+			</md-card>
 		</md-content>
+		<md-content layout="row">
+				<md-card flex="33">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Top 5 alerts</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 5',type:pie))"
+							vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				<md-card flex="33">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Top 5 groups</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top groups',type:pie))"
+							vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				<md-card flex="33">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Top 5 PCI Controls</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top pci',type:pie))"
+							vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
 
-		<md-card>
-			<md-card-title>
-				<md-card-title-text>
-					<span class="md-headline">Alerts</span>
-				</md-card-title-text>
-			</md-card-title>
-			<md-card-content>
-				<kbn-vis vis-height="200px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',customLabel:'Agent alerts',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Agentbalerts last 24 days',type:histogram))"
-					vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
+			</md-content>
+
+			<md-card>
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Alerts</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="200px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',customLabel:'Agent alerts',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Agentbalerts last 24 days',type:histogram))"
+						vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+
+			<md-content layout="row">
+				<md-card flex="40">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Alerts by level</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="200px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.level,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'Top 5',type:pie))"
+							vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				<md-card flex="60">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Alert level evolution</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="200px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.level,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert level evolution',type:line))"
+							vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+			</md-content>
+
 
 		<md-content layout="row">
-			<md-card flex="40">
-				<md-card-content>
-					<div layout="column" flex>
-						<p><b style="margin-right: 5px;">Hostname:</b> {{agentInfo.name ? agentInfo.name : '-'}}</p>
-						<p ng-if="agentInfo.ip"><b style="margin-right: 5px;">IP address:</b> {{agentInfo.ip ? agentInfo.ip : '-'}}</p>
-						<p><b style="margin-right: 5px;">Agent version:</b> {{agentInfo.version ? agentInfo.version : '-'}}</p>
-						<p><b style="margin-right: 5px;">Operating system:</b> {{agentInfo.os ? agentInfo.os : '-'}}</p>
-						<p ng-show="agentInfo.id != '000'"><b style="margin-right: 5px;">Last keep alive:</b> {{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</p>
-						<p ng-show="agentInfo.id != '000'" ng-click="showKey = !showKey"><b style="margin-right: 5px;">Agent key <i ng-show="!showKey" class="fa fa-caret-down" aria-hidden="true"></i><i ng-show="showKey" class="fa fa-caret-up" aria-hidden="true"></i></b></p>
-						<pre ng-if="showKey && agentInfo.id != '000'" flex="80">{{agentInfo.key}}</pre>
-					</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex="60">
+			<md-card flex>
 				<md-card-title>
 					<md-card-title-text>
-						<span class="md-headline">Alert level evolution</span>
+						<span class="md-headline">Alerts summary</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="200px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.level,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert level evolution',type:line))"
+					<kbn-vis vis-height="460px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.id,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.level,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Groups,field:rule.groups,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'PCI DSS',field:rule.pci_dss,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
 						vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
 		</md-content>
-
-
-	<md-content layout="row">
-		<md-card flex>
-			<md-card-title>
-				<md-card-title-text>
-					<span class="md-headline">Alerts summary</span>
-				</md-card-title-text>
-			</md-card-title>
-			<md-card-content>
-				<kbn-vis vis-height="460px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.id,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.level,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Groups,field:rule.groups,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'PCI DSS',field:rule.pci_dss,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-					vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
-	</md-content>
-
-
-
 	</div>
 </md-content>

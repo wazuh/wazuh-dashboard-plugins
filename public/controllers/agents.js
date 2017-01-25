@@ -119,12 +119,11 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
 				/* tmp for debugging. Forcing a tab/agent selected.*/
 				/*	
-					$scope.submenuNavItem = 'oscap';
+					$scope.submenuNavItem = 'overview';
 					DataFactory.getAndClean('get', '/agents/' + "002", {})
 					.then(function (data) {
 						$scope.agentInfo = data.data;
 						$scope._agent = data.data;
-						$scope.dynamicTab_exists("oscap", $scope._agent.name);
 					}, printError);
 				*/
 				// close tmp
