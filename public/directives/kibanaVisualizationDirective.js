@@ -120,7 +120,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			visState.title = visDecoded.vis.title;
 			visState.params = visDecoded.vis.params;
 			if($scope.visClickable != "false")
-				visState.listeners = {brush: brushEvent, click: filterBarClickHandler($state)};
+				visState.listeners = {brush: brushEvent($state), click: filterBarClickHandler($state)};
 
 
 			// Set Vis states

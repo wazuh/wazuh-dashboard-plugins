@@ -37,7 +37,6 @@ app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToa
 	loadWatch = $scope.$watch(function () {
         return $scope.$parent._agent;
     }, function () {
-		console.log($scope.$parent._agent);
         $scope.fetchAgent($scope.$parent._agent);
     });
 	

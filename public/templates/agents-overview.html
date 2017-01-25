@@ -28,7 +28,7 @@
 					<div class="ng-binding">Operating system</div>
 				</md-card-content>
 			</md-card>
-			<md-card flex layout="column">
+			<md-card flex layout="column" ng-show="agentInfo.id != '000'">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.lastKeepAlive}}</div>
 					<div class="ng-binding">Last keep alive</div>
