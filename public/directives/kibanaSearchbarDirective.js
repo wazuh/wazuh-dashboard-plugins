@@ -46,22 +46,21 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	function injectPciIcon(){
 		// Get all filters on filter bar
 		var filters = document.querySelectorAll(".filter-bar .filter");
-		console.log(filters);
 		// Analyze each filter
 		filters.forEach(function(item) {
 			if(angular.element(item).data('pci') != "1"){
-				var filterLabel = item.querySelectorAll(".filter-description .ng-scope");
-				filterLabel.forEach(function(item) {	
-					if(item.innerText == "rule.pci_dss:"){
+				var filterLabel = item.querySelectorAll(".filter-description");
+				filterLabel.forEach(function(item) {
+					if(item.children[0].innerText == "rule.pci_dss:"){
 						// Preparing and adding new element to filter actions icons
-						var pciLink = angular.element('<a class="action" ng-click=\'displayPCI('+item.nextElementSibling.innerText+')\'><img src="/plugins/wazuh/img/icon_pci.png"></a>');
+						var pciLink = angular.element('<a class="action" ng-click=\'displayPCI('+item.children[1].innerText+')\'><img src="/plugins/wazuh/img/icon_pci.png"></a>');
 						// Append the new element
-						angular.element(pciLink).appendTo(item.parentNode.nextElementSibling);
+						angular.element(pciLink).appendTo(item.nextElementSibling);
 						// Compile element to enable ng click
-						$compile(angular.element(item.parentNode.nextElementSibling).contents())($scope);
+						$compile(angular.element(item.nextElementSibling).contents())($scope);
 						// Setup min width when adding new icon
-						angular.element(item.parentNode.parentNode).css("min-width","calc(6*(1.414em + 13px))");
-						angular.element(item.parentNode.parentNode).attr('data-pci','1');
+						angular.element(item.parentNode).css("min-width","calc(6*(1.414em + 13px))");
+						angular.element(item.parentNode).attr('data-pci','1');
 					}
 				});
 			}
