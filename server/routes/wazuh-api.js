@@ -2,6 +2,8 @@ module.exports = function (server, options) {
 	// Require some libraries
 	const fs = require('fs');
 	const path = require('path');
+	var colors = require('ansicolors');
+	var blueWazuh = colors.blue('wazuh');
 
 	// Consts values, versions.
     const MIN_VERSION = [2,0,0];
@@ -342,8 +344,6 @@ module.exports = function (server, options) {
     //Handlers - error loggin
 
     var postErrorLog = function (req, reply) {
-        var colors = require('ansicolors');
-        var blueWazuh = colors.blue('wazuh');
 
         if (!req.payload.message) {
             server.log([blueWazuh, 'server', 'error'], 'Error logging failed:');

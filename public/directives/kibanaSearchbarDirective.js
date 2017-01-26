@@ -61,6 +61,9 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 						// Setup min width when adding new icon
 						angular.element(item.parentNode).css("min-width","calc(6*(1.414em + 13px))");
 						angular.element(item.parentNode).attr('data-pci','1');
+						var cleanRequirement = item.children[1].innerText.replace(/^"(.*)"$/, '$1');
+						//console.log(cleanRequirement);
+						$scope.displayPCI(cleanRequirement);
 					}
 				});
 			}
@@ -87,6 +90,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 		$rootScope.$broadcast('updateQuery',$scope.stateQuery);
 	};
 	$scope.queryFilter = Private(FilterBarQueryFilterProvider);
+
 	// Listen for filter changes
 	$scope.$listen($scope.queryFilter, 'update', function () {
 		$timeout(
