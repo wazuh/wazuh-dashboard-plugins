@@ -22,8 +22,7 @@ var app = require('ui/modules').get('app/wazuh', [])
     }
   }]);
 
-require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, Notifier,$rootScope) {
-
+require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', function (genericReq, $compile, $scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, Notifier, $rootScope) {
 
 	$scope.stateQuery = $scope.disFilter;
 
@@ -32,7 +31,56 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	timefilter.enabled = true;
 		
 	
+	$scope.displayPCI = function (requirement){
+		var pciRequirementBox = document.querySelector("#pciRequirementBox");
+		var pciRequirementBox_ReqTitle = document.querySelector("#pciRequirementBox_ReqTitle");
+
+		genericReq.request('GET', '/api/wazuh-api/pci/'+requirement).then(function (data) {
+			pciRequirementBox_ReqTitle.innerText = requirement;
+			pciRequirementBox_ReqContent.innerHTML = data.pci.description;
+			angular.element(pciRequirementBox).show();
+		});
+
+	}
+
+	function injectPciIcon(){
+		// Get all filters on filter bar
+		var filters = document.querySelectorAll(".filter-bar .filter");
+		// Analyze each filter
+		filters.forEach(function(item) {
+			if(angular.element(item).data('pci') != "1"){
+				var filterLabel = item.querySelectorAll(".filter-description .ng-scope");
+				filterLabel.forEach(function(item) {	
+					if(item.innerText == "rule.pci_dss:"){
+						// Preparing and adding new element to filter actions icons
+						var pciLink = angular.element('<a class="action" ng-click=\'displayPCI('+item.nextElementSibling.innerText+')\'><img src="/plugins/wazuh/img/icon_pci.png"></a>');
+						// Append the new element
+						angular.element(pciLink).appendTo(item.parentNode.nextElementSibling);
+						// Compile element to enable ng click
+						$compile(angular.element(item.parentNode.nextElementSibling).contents())($scope);
+						// Setup min width when adding new icon
+						angular.element(item.parentNode.parentNode).css("min-width","calc(6*(1.414em + 13px))");
+						angular.element(item.parentNode.parentNode).attr('data-pci','1');
+					}
+				});
+			}
+		});
+		return;
+	}
+
+
 	
+	// create an observer instance
+	var observer = new MutationObserver(function(mutations) {
+	  mutations.forEach(function(mutation) {
+			console.log("watching!");
+			injectPciIcon();
+	  });    
+	});
+
+	var config = { childList: true };
+
+
 	// Set default time
 	if($route.current.params._g == "()"){
 		timefilter.time.from = "now-24h";
@@ -58,12 +106,14 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 		if($rootScope.visCounter == 0){
 			$timeout(
 			function() {  
-					$rootScope.$broadcast('fetchVisualization'); 
+				var watchFilterBar = document.querySelectorAll(".filter-bar")[0];
+				observer.observe(watchFilterBar, config);
+				$rootScope.$broadcast('fetchVisualization'); 
 			}, 0);
 		}
 
 	});
-	
+
 	// Listen for destroy 
 	$scope.$on('$destroy', visCounterWatch);
 

@@ -39,7 +39,19 @@
 	</div>
 
 	<div layout="row" layout-align="center stretch">
-		<md-card flex="100">
+		<md-card flex="45">
+			<md-card-title>
+				<md-card-title-text>
+					<span class="md-headline">Top 5 PCI Controls</span>
+				</md-card-title-text>
+			</md-card-title>
+			<md-card-content>
+				<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top pci',type:pie))"
+					vis-filter="*">
+				</kbn-vis>
+			</md-card-content>
+		</md-card>
+		<md-card flex="65">
 			<md-card-content>
 				<span class="md-headline">Events</span>
 				<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!f,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Events',type:histogram))"

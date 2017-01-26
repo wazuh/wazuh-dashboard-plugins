@@ -1,9 +1,14 @@
 module.exports = function (server, options) {
+	// Require some libraries
+	const fs = require('fs');
+	const path = require('path');
 
+	// Consts values, versions.
     const MIN_VERSION = [2,0,0];
     const MAX_VERSION = [3,0,0];
 	const wazuh_api_version = 'v2.0.0';
 	
+	// Elastic JS Client
     const client = server.plugins.elasticsearch.client;
 
     //Handlers - Generic
@@ -92,6 +97,25 @@ module.exports = function (server, options) {
 			reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
 		});
     };	
+
+	var getPciRequirement = function (req,reply) {
+
+		const pciRequirementsFile = '../scripts/integration_files/pci_requirements.json';
+		var pciRequirements = {};
+
+		try {
+			pciRequirements = JSON.parse(fs.readFileSync(path.resolve(__dirname, pciRequirementsFile), 'utf8'));
+			console.log(pciRequirements);
+		} catch (e) {
+			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
+			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + pciRequirementsFile);
+			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+		};
+		var pci_description = "";
+		if(pciRequirements[req.params.requirement])
+			pci_description = pciRequirements[req.params.requirement];
+		reply({pci: {requirement: req.params.requirement, description: pci_description}});
+    };
 
 	var getExtensions = function (req,reply) {
         client.search({ index: '.kibana', type: 'wazuh-configuration'}).then(
@@ -445,6 +469,17 @@ module.exports = function (server, options) {
         method: 'GET',
         path: '/api/wazuh-api/extension',
         handler: getExtensions
+    });	
+
+    /* 
+    * GET /api/wazuh-api/pci/requirement
+    * Return a PCI requirement description
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-api/pci/{requirement}',
+        handler: getPciRequirement
     });	
 	
 	/*
