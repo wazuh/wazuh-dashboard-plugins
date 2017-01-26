@@ -46,6 +46,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	function injectPciIcon(){
 		// Get all filters on filter bar
 		var filters = document.querySelectorAll(".filter-bar .filter");
+		console.log(filters);
 		// Analyze each filter
 		filters.forEach(function(item) {
 			if(angular.element(item).data('pci') != "1"){
@@ -68,19 +69,6 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 		return;
 	}
 
-
-	
-	// create an observer instance
-	var observer = new MutationObserver(function(mutations) {
-	  mutations.forEach(function(mutation) {
-			console.log("watching!");
-			injectPciIcon();
-	  });    
-	});
-
-	var config = { childList: true };
-
-
 	// Set default time
 	if($route.current.params._g == "()"){
 		timefilter.time.from = "now-24h";
@@ -90,25 +78,32 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	$scope.timefilter = timefilter;
 	
 	let $state = $scope.$state = (function initState() {
-			$state = new AppState();	
-	return $state;
+		$state = new AppState();	
+		return $state;
 	} ());
 
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
-		$rootScope.$broadcast('updateQuery',$scope.stateQuery);  
+		$rootScope.$broadcast('updateQuery',$scope.stateQuery);
 	};
-	
+	$scope.queryFilter = Private(FilterBarQueryFilterProvider);
+	// Listen for filter changes
+	$scope.$listen($scope.queryFilter, 'update', function () {
+		$timeout(
+		function() {  
+			injectPciIcon();
+		}, 0);
+	 });
+
 	// Watch visCounter, wait for finish and fetch.
 	var visCounterWatch = $rootScope.$watch('visCounter', function (data) {
 
 		if($rootScope.visCounter == 0){
 			$timeout(
 			function() {  
-				var watchFilterBar = document.querySelectorAll(".filter-bar")[0];
-				observer.observe(watchFilterBar, config);
-				$rootScope.$broadcast('fetchVisualization'); 
+				$rootScope.$broadcast('fetchVisualization');
+				injectPciIcon();
 			}, 0);
 		}
 
