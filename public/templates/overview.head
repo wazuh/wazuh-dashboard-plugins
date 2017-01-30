@@ -20,7 +20,7 @@
 
 	<md-content layout="row" layout-align="space-between start" class="horizontalTabsBar">
 	
-		<md-content class="horizontalTabsBar" layout="column" layout-align="center start" ng-init="tabView = 'panels'; submenuNavItem = 'pci'">
+		<md-content class="horizontalTabsBar" layout="column" layout-align="center start" ng-init="tabView = 'panels'; submenuNavItem = 'general'">
 			<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>

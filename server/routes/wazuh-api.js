@@ -114,6 +114,12 @@ module.exports = function (server, options) {
 			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
 		};
 		var pci_description = "";
+		
+		if(req.params.requirement == "all"){
+			reply(pciRequirements);
+			return;
+		}
+		
 		if(pciRequirements[req.params.requirement])
 			pci_description = pciRequirements[req.params.requirement];
 		reply({pci: {requirement: req.params.requirement, description: pci_description}});
