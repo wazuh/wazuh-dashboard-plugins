@@ -18,6 +18,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	$scope.extensions = {};
 	$scope.extensions.oscap = true;
 	$scope.extensions.audit = true;
+	$scope.extensions.pci = true;
 	
 	// Remove API entry
 	
@@ -62,6 +63,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 						}else{
 							$scope.extensions.oscap = true;
 							$scope.extensions.audit = true;
+							$scope.extensions.pci = true;
 						}
 					}
 						
@@ -94,7 +96,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.test_tmp(tmpData).then(function (data) {
 			// API Check correct, get Manager name
 			tmpData.manager = data;
-			tmpData.extensions = {"oscap": true, "audit": true};
+			tmpData.extensions = {"oscap": true, "audit": true, "pci": true};
 			// Insert new API entry
 			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
 				var newEntry = {'_id': data.response._id, _source: { manager: tmpData.manager, active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } }; 
@@ -124,7 +126,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 
 	// Toggle extension
 	$scope.toggleExtension = function(extension,state) {
-		if(extension == "oscap" || extension == "audit"){
+		if(extension == "oscap" || extension == "audit" || extension == "pci"){
 			$http.put("/api/wazuh-api/extension/toggle/"+$scope.apiEntries[$scope.currentDefault]._id+"/"+extension+"/"+state).success(function (data, status) {	
 			}).error(function (data, status) {
 				$mdToast.show($mdToast.simple().textContent("Invalid request when toggle extension state."));

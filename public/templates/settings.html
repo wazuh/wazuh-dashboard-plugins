@@ -78,6 +78,19 @@
 		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh App: Extensions</h1>
 		
 		<p flex>Enable or disable extensions according to your needs. The extension includes: Panels, discover and dashboards, for agents / overview.</p>
+
+		<div>
+			<span layout="row" layout-align="space-between center" style="font-weight: bold">
+				PCI DSS
+			</span>
+			<span>
+				The Payment Card Industry Data Security Standard (PCI DSS) is a proprietary information security standard for organizations that handle branded credit cards from the major card schemes including Visa, MasterCard, American Express, Discover, and JCB. The PCI Standard is mandated by the card brands and administered by the Payment Card Industry Security Standards Council. The standard was created to increase controls around cardholder data to reduce credit card fraud.
+			</span>
+			<span>
+				<md-switch flex ng-model="extensions.pci" aria-label="extensionsPci" ng-change="toggleExtension('pci',extensions.pci)"></md-switch>
+			</span>
+			<md-divider></md-divider>
+		</div>
 		
 		<div>
 			<span layout="row" layout-align="space-between center" style="font-weight: bold">

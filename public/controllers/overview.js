@@ -37,3 +37,11 @@ app.controller('overviewAuditController', function ($scope, DataFactory, generic
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
 
 });
+
+app.controller('overviewPCIController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
+
+    $scope.load = true;
+    $scope.$parent.state.setOverviewState('pci');
+	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
+
+});

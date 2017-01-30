@@ -52,7 +52,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 				var filter = item.querySelector(".filter-description");
 				if(filter.children[0].innerText == "rule.pci_dss:"){
 					// Preparing and adding new element to filter actions icons
-					var pciLink = angular.element('<a class="action" ng-click=\'displayPCI('+filter.children[1].innerText+')\'><img src="/plugins/wazuh/img/icon_pci.png"></a>');
+					var pciLink = angular.element('<a class="action" ng-click=\'displayPCI('+filter.children[1].innerText+')\'>PCI</a>');
 					// Append the new element
 					angular.element(pciLink).appendTo(filter.nextElementSibling);
 					// Compile element to enable ng click
@@ -61,13 +61,31 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 					angular.element(filter.parentNode).css("min-width","calc(6*(1.414em + 13px))");
 					angular.element(filter.parentNode).attr('data-pci','1');
 					var cleanRequirement = filter.children[1].innerText.replace(/^"(.*)"$/, '$1');
-					$scope.displayPCI(cleanRequirement);
 				}
 			}
 		});
 		return;
 	}
-
+	
+	function injectTipLeyend(){
+		// Get all leyends from vis
+		var visBox = document.querySelectorAll('.visBox');
+		var topPos = 7;
+		// Analyze each leyend title
+		visBox.forEach(function(box) {
+			var leyendLabel = box.querySelectorAll('.legend-value-container');
+			topPos = 7;
+			leyendLabel.forEach(function(item) {
+				var tip = angular.element('<i class="fa fa-question-circle" style="color: rgb(111, 135, 216);clear: both;float: right;position: absolute;right: 0px;top: '+topPos+'px;"></i>');
+				angular.element(tip).appendTo(item);
+				topPos = topPos + 19;
+			});
+		});
+		return;
+	}
+	
+	
+	
 	// Set default time
 	if($route.current.params._g == "()"){
 		timefilter.time.from = "now-24h";
@@ -104,22 +122,17 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 			$timeout(
 			function() {
 				injectPciIcon();
-				var watchFilterBar = document.querySelectorAll(".filter-bar")[0];
 				$rootScope.$broadcast('fetchVisualization');
 			}, 0);
 		}
 
 	});
 
-	// create an observer instance
-	var observer = new MutationObserver(function(mutations) {
-	  mutations.forEach(function(mutation) {
-			injectPciIcon();
-	  });    
-	});
-
-	var config = { childList: true };
-
+	$timeout(
+	function() {
+		injectTipLeyend();
+	}, 3000);
+	
 	// Listen for destroy 
 	$scope.$on('$destroy', visCounterWatch);
 
