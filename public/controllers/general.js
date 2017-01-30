@@ -31,11 +31,6 @@ app.controller('generalController', function ($scope, appState, $window, generic
         $scope.tabView = view;
     }
 	
-	var daysAgo = 7;
-	var date = new Date();
-	date.setDate(date.getDate() - daysAgo);
-	var timeAgo = date.getTime();
-	
 	$scope.extensionStatus = function (extension) {
 		return $scope.extensions[extension];
     };

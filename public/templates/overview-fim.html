@@ -86,7 +86,11 @@
 
 		<md-card flex="33">
 			<md-card-content>
-				<div class="md-headline">Top file changes</div>
+				<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Top file changes</span>
+						</md-card-title-text>
+				</md-card-title>
 				<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:8),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
 					vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry'>
 			</md-card-content>
@@ -94,7 +98,11 @@
 
 		<md-card flex="33">
 			<md-card-content>
-				<div class="md-headline">Root user file changes</div>
+				<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Root user file changes</span>
+						</md-card-title-text>
+				</md-card-title>
 				<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:8),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
 					vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry AND root'>
 			</md-card-content>
@@ -102,7 +110,11 @@
 
 		<md-card flex="33">
 			<md-card-content>
-				<div class="md-headline">World writable modified files</div>
+				<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">World writable modified files</span>
+						</md-card-title-text>
+				</md-card-title>
 				<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20_exists_:syscheck.perm_after%20AND%20%20(syscheck.perm_after:%2F%5B0-7%5D%7B5%7D(%5B2367%5D).*%2F)')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:8),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Files',type:pie))"
 					vis-filter='rule.groups:"syscheck" AND _exists_:syscheck.perm_after AND (syscheck.perm_after:/[0-7]{5}([2367]).*/) '>
 			</md-card-content>
