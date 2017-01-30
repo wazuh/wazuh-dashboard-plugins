@@ -40,6 +40,14 @@
 	</kbn-disfull>
 </md-content>
 
+<!-- PCI -->
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'pci' && tabView == 'discover'">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter="_exists_:rule.pci_dss"
+	infinite-scroll="true">
+	</kbn-disfull>
+</md-content>
+
 <!-- Agents discover -->
 
 <!-- General -->
@@ -78,6 +86,14 @@
 <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'audit' && tabView == 'discover'">
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 	dis-filter="rule.groups:audit AND agent.name: {{_agent.name}}"
+	infinite-scroll="true">
+	</kbn-disfull>
+</md-content>
+
+<!-- PCI -->
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'pci' && tabView == 'discover'">
+	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	dis-filter="_exists_:rule.pci_dss AND agent.name: {{_agent.name}}"
 	infinite-scroll="true">
 	</kbn-disfull>
 </md-content>
