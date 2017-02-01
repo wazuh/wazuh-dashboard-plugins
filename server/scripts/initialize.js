@@ -1,12 +1,21 @@
 module.exports = function (server, options) {
 
+
+	// Elastic JS Client
+	const serverConfig = server.config();
+	const elasticsearchURL = serverConfig.get('elasticsearch.url');
+	const elasticsearch = require('elasticsearch');
+	const client = new elasticsearch.Client({
+	  host: elasticsearchURL,
+	  apiVersion: '5.0'
+	});
+	
 	// External libraries
-    const client = server.plugins.elasticsearch.client;
     const uiSettings = server.uiSettings();
     const fs = require('fs');
     const path = require('path');
 
-	// Colors for console logging
+	// Colors for console logging 
     const colors = require('ansicolors');
     const blueWazuh = colors.blue('wazuh');
 

@@ -12,11 +12,15 @@ app.controller('stateController', function ($scope, appState, $route) {
 
 });
 
-app.controller('generalController', function ($scope, appState, $window, genericReq, $q) {
+app.controller('generalController', function ($scope, appState, $window, genericReq, $q, $routeParams) {
     $scope.state = appState;
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	
+	$scope.submenuNavItem = "general";
+	var tab = "";
+    if($routeParams.tab)
+		$scope.submenuNavItem  = $routeParams.tab;
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
 		$window.location.href = '#/dashboards/';

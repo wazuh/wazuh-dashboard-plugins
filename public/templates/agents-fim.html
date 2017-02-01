@@ -13,7 +13,7 @@
                     <kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*"
         vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.uname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users2',type:pie))"
 
-          vis-filter="rule.groups: syscheck AND {{'agent.name:'+_agent.name}}">
+          vis-filter="rule.groups: syscheck AND agent.name: {{_agent.name ? _agent.name : '*'}}">
                     </kbn-vis>
                 </md-card-content>
             </md-card>
@@ -26,7 +26,7 @@
                 <md-card-content>
                     <kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*"
           vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.gname_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
-                        vis-filter="rule.groups: syscheck AND {{'agent.name:'+_agent.name}}">
+                        vis-filter="rule.groups: syscheck AND agent.name: {{_agent.name ? _agent.name : '*'}}">
                     </kbn-vis>
                 </md-card-content>
             </md-card>
@@ -39,7 +39,7 @@
                 <md-card-content>
                     <kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*"
           vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.perm_after,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%20permissions',type:pie))"
-                        vis-filter="rule.groups: syscheck AND {{'agent.name:'+_agent.name}}"> 
+                        vis-filter="rule.groups: syscheck AND agent.name: {{_agent.name ? _agent.name : '*'}}"> 
                     </kbn-vis>
                 </md-card-content>
             </md-card>
@@ -53,7 +53,7 @@
                         </md-card-title-text>
                     </md-card-title>
 				<kbn-vis vis-height="160px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-					vis-filter="rule.groups: syscheck AND {{'agent.name:'+_agent.name}}"
+					vis-filter="rule.groups: syscheck AND agent.name: {{_agent.name ? _agent.name : '*'}}"
 					>
 				</kbn-vis>
 				</md-card>
@@ -67,7 +67,7 @@
                     </md-card-title>
                     <md-card-content>
                         <kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-							vis-filter='rule.id: 554 AND agent.name: {{_agent.name}} NOT location: syscheck-registry'>
+							vis-filter="rule.id: 554 AND agent.name: {{_agent.name ? _agent.name : '*'}} NOT location: syscheck-registry">
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
@@ -80,7 +80,7 @@
                     </md-card-title>
                     <md-card-content>
                         <kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
-							vis-filter='(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555) AND agent.name: {{_agent.name}} NOT location: syscheck-registry'>
+							vis-filter="(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555) AND agent.name: {{_agent.name ? _agent.name : '*'}} NOT location: syscheck-registry">
                         </kbn-vis>
                     </md-card-content>
                 </md-card>
@@ -93,7 +93,7 @@
                             </md-card-title>
                             <md-card-content>
                                 <kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-        							vis-filter='rule.id: 553 AND agent.name: {{_agent.name}} NOT location: syscheck-registry'>
+        							vis-filter="rule.id: 553 AND agent.name: {{_agent.name ? _agent.name : '*'}} NOT location: syscheck-registry">
                                 </kbn-vis>
                             </md-card-content>
                         </md-card>
@@ -107,7 +107,7 @@
                         </md-card-title-text>
                     </md-card-title>
 					<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:Agent,field:agent.name,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:File,field:syscheck.path,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Event,field:syscheck.event,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-					vis-filter="rule.groups: syscheck AND {{'agent.name:'+_agent.name}}">
+					vis-filter="rule.groups: syscheck AND agent.name: {{_agent.name ? _agent.name : '*'}}">
 				</kbn-vis>
 
 					</md-card>

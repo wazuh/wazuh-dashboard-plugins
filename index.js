@@ -11,12 +11,21 @@ module.exports = function (kibana) {
 		icon: 'plugins/wazuh/img/icon.png',
         main: 'plugins/wazuh/app',
         injectVars: function (server, options) {
-          var config = server.config();
+		  const serverConfig = server.config();
+		  const configuredUrl = server.config().get('tilemap.url');
+          const isOverridden = typeof configuredUrl === 'string' && configuredUrl !== '';
+          const tilemapConfig = serverConfig.get('tilemap');
           return {
-            kbnIndex: config.get('kibana.index'),
-            esApiVersion: config.get('elasticsearch.apiVersion'),
-            esShardTimeout: config.get('elasticsearch.shardTimeout'),
-            tilemap: config.get('tilemap')
+            kbnIndex: serverConfig.get('kibana.index'),
+            esApiVersion: serverConfig.get('elasticsearch.apiVersion'),
+            esShardTimeout: serverConfig.get('elasticsearch.shardTimeout'),
+			tilemapsConfig: {
+              deprecated: {
+                isOverridden: isOverridden,
+                config: tilemapConfig,
+              },
+              manifestServiceUrl: serverConfig.get('tilemap.manifestServiceUrl')
+            }
           };
         }
       }

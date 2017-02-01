@@ -1,20 +1,21 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
+app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
 
     $scope.load = true;
+	$scope.$parent.state.setOverviewState('general');
+	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
+});
+
+app.controller('overviewFimController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
+
+    $scope.load = true;
+	$scope.$parent.state.setOverviewState('fim');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
 
 });
 
-app.controller('overviewFimController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
-
-    $scope.load = true;
-	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-
-});
-
-app.controller('overviewPMController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
+app.controller('overviewPMController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
 
     $scope.load = true;
     $scope.$parent.state.setOverviewState('pm');
@@ -22,7 +23,7 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
 
 });
 
-app.controller('overviewOSCAPController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
+app.controller('overviewOSCAPController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
 
     $scope.load = true;
     $scope.$parent.state.setOverviewState('oscap');
@@ -30,19 +31,19 @@ app.controller('overviewOSCAPController', function ($scope, DataFactory, generic
 
 });
 
-app.controller('overviewAuditController', function ($scope, DataFactory, genericReq, $mdToast, errlog) {
+app.controller('overviewAuditController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
 
     $scope.load = true;
     $scope.$parent.state.setOverviewState('audit');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-
 });
 
-app.controller('overviewPCIController', function ($scope, $compile, DataFactory, genericReq, $mdToast, errlog) {
+app.controller('overviewPCIController', function ($scope, $compile, DataFactory, genericReq, $mdToast, errlog, $route) {
 
     $scope.load = true;
     $scope.$parent.state.setOverviewState('pci');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
+	
 	var tabs = [];
 	genericReq.request('GET', '/api/wazuh-api/pci/all').then(function (data) {
 		angular.forEach(data, function(value, key) {

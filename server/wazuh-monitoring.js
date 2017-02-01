@@ -1,7 +1,16 @@
 module.exports = function (server, options) {
 
-	  // External libraries
-    const client = server.plugins.elasticsearch.client;
+	
+	// Elastic JS Client
+	const serverConfig = server.config();
+	const elasticsearchURL = serverConfig.get('elasticsearch.url');
+	const elasticsearch = require('elasticsearch');
+	const client = new elasticsearch.Client({
+	  host: elasticsearchURL,
+	  apiVersion: '5.0'
+	});
+	
+	// External libraries
     const fs = require('fs');
     const path = require('path');
     var colors = require('ansicolors');

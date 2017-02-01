@@ -11,8 +11,14 @@ module.exports = function (server, options) {
 	const wazuh_api_version = 'v2.0.0';
 	
 	// Elastic JS Client
-    const client = server.plugins.elasticsearch.client;
-
+	const serverConfig = server.config();
+	const elasticsearchURL = serverConfig.get('elasticsearch.url');
+	const elasticsearch = require('elasticsearch');
+	const client = new elasticsearch.Client({
+	  host: elasticsearchURL,
+	  apiVersion: '5.0'
+	});
+	
     //Handlers - Generic
 
     var checkVersion = function (version) {

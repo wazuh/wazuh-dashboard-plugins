@@ -4,7 +4,15 @@ module.exports = function (server, options) {
     const colors = require('ansicolors');
     const blueWazuh = colors.blue('wazuh');
 	
-    const client = server.plugins.elasticsearch.client;
+	// Elastic JS Client
+	const serverConfig = server.config();
+	const elasticsearchURL = serverConfig.get('elasticsearch.url');
+	const elasticsearch = require('elasticsearch');
+	const client = new elasticsearch.Client({
+	  host: elasticsearchURL,
+	  apiVersion: '5.0'
+	});
+	
 	var index_pattern = "wazuh-alerts-*";
 	var index_prefix = "wazuh-alerts-";
 	const fs = require('fs');

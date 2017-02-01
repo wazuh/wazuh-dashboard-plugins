@@ -1,4 +1,4 @@
-<md-content flex class="agentsPreview" ng-controller="agentsPreviewController" layout="column" style="height: 100%;" ng-if="!_agent || submenuNavItem == 'preview'" class="md-padding" layout-align="start space-around">
+<md-content flex class="agentsPreview" ng-controller="agentsPreviewController" layout="column" style="height: 100%;" ng-if="!_agent && submenuNavItem == 'preview'" class="md-padding" layout-align="start space-around">
 		<div infinite-scroll-module='agents.nextPage()' infinite-scroll-disabled='agents.busy' infinite-scroll-distance='0' style="padding: 0">
 			<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 				<div flex layout="column" layout-align="space-between stretch">

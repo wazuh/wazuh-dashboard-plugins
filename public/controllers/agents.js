@@ -1,16 +1,23 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window, genericReq) {
+app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window, genericReq, $routeParams, $route, $location) {
     //Initialization
 	$scope.state = appState;
     $scope.load = true;
     $scope.search = '';
-    $scope.submenuNavItem = '';
+    $scope.submenuNavItem = 'preview';
     $scope.state = appState;
 	$scope._status = 'all';
 	
-    var objectsArray = [];
+	var agentId = "";
+	var tab = "";
+	if($routeParams.id)
+		agentId = $routeParams.id;
+    if($routeParams.tab)
+		tab = $routeParams.tab;
+	
+	var objectsArray = [];
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	
@@ -24,6 +31,15 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
     };
 
     //Functions
+
+	// Listen for route change, reset to agents preview
+	$scope.$on('$routeUpdate', function(){
+		if(!$routeParams.id && !$routeParams.tab){
+			delete $scope._agent;
+			delete $scope.agentInfo;
+			 $scope.submenuNavItem = 'preview';
+		}
+	});
 
     $scope.getAgentStatusClass = function (agentStatus) {
         if (agentStatus == "Active")
@@ -67,31 +83,15 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	
     $scope.applyAgent = function (agent) {
         if (agent) {
-			$scope.load = true;
-            //$scope.submenuNavItem = 'fim';
             $scope.submenuNavItem = 'overview';
             $scope._agent = agent;
             $scope.search = agent.name;	
+			$location.search('id', agent.id);
+			$location.search('tab', "overview");
 			$scope.load = false;
         }
     };
 
-
-    $scope.openDashboard = function (dashboard, filter) {
-        $scope.state.setDashboardsState(dashboard, filter);
-		$window.location.href = '#/dashboards/';
-    }
-
-	$scope.openDiscover = function (template, filter) {
-        $scope.state.setDiscoverState(template, filter);
-		$window.location.href = '#/discover/';
-    }
-	$scope.resetDiscover = function () {
-        $scope.state.unsetDiscoverState();
-    }
-	$scope.resetDashboards = function () {
-        $scope.state.unsetDashboardsState();
-    }
 
 	$scope.restartAgent = function () {
 		var path = '/agents/' + $scope._agent.id + '/restart';
@@ -117,17 +117,18 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
-				/* tmp for debugging. Forcing a tab/agent selected.*/
-				/*	
-					$scope.submenuNavItem = 'overview';
-					DataFactory.getAndClean('get', '/agents/' + "002", {})
+				if(agentId != ""){
+					DataFactory.getAndClean('get', '/agents/' + agentId, {})
 					.then(function (data) {
+						$scope.submenuNavItem = 'overview';
+						if(tab != "")
+							$scope.submenuNavItem = tab;
 						$scope.agentInfo = data.data;
 						$scope._agent = data.data;
+						$scope.load = false;
 					}, printError);
-				*/
-				// close tmp
-                $scope.load = false;
+				}else
+					$scope.load = false;
             }, printError);
     };
 
