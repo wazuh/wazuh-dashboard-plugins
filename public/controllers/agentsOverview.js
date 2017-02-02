@@ -3,11 +3,13 @@ var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToast) {
 
+
     //Initialization 
     $scope.load = true;
-    $scope.agentInfo = $scope.$parent._agent;
+    //$scope.agentInfo = $scope.$parent._agent;
 	
 	var loadWatch;
+
     //Print Error
     var printError = function (error) {
         $mdToast.show({
@@ -44,5 +46,7 @@ app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToa
     $scope.$on("$destroy", function () {
         loadWatch();
     });
+	
+	
 
 });

@@ -1,5 +1,6 @@
 // Require CSS
 require('plugins/wazuh/less/main.less');
+require('plugins/wazuh/less/ui_framework.less');
 
 // Set up Wazuh app
 var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial', 'infinite-scroll'])

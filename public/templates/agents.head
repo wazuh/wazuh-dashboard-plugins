@@ -15,7 +15,7 @@
 
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-	<div flex layout="row" ng-if="!load" style="height: 100%;">
+	<div flex layout="row" style="height: 100%;">
 		<md-content flex id="content" style="height: 100%;">
 			<md-content layout="row" layout-align="space-between start" style="background-color: #f7f7f7"> 
 				<md-toolbar style="height: 50px;">
@@ -38,7 +38,7 @@
 						
 						</div>
 						
-						<div ng-if="!_agent">
+						<div ng-if="!_agent"> 
 							<h2 style="text-transform: none; font-size: 20px;">
 								<i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents overview
 							</h2>
@@ -66,8 +66,8 @@
 			
 			<md-content layout="row" layout-align="space-between start" class="horizontalTabsBar">
 			
-				<md-content ng-show="_agent" class="horizontalTabsBar" layout="column" layout-align="center start" ng-init="tabView = 'panels';">
-					<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+				<md-content ng-if="_agent" class="horizontalTabsBar" layout="column" layout-align="center start" ng-init="$parent.tabView = 'panels';">
+					<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="$parent.submenuNavItem" nav-bar-aria-label="navigation submenu">
 						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=overview" name="overview">Overview</md-nav-item>
 						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=fim" name="fim">File Integrity</md-nav-item>
 						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=policy_monitoring" name="policy_monitoring">Policy Monitoring</md-nav-item>
@@ -77,7 +77,7 @@
 					</md-nav-bar>
 				</md-content>
 				
-				<md-content ng-show="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
+				<md-content ng-if="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
 					<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 						<md-nav-item md-nav-click="tabView = 'panels'" name="panels">
 							<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels

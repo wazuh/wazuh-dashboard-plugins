@@ -35,7 +35,6 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
     $scope._status = 'all';
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
-    $scope.submenuNavItem = "preview";
 
     var objectsArray = [];
 

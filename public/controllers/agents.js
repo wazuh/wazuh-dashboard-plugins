@@ -34,10 +34,14 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 
 	// Listen for route change, reset to agents preview
 	$scope.$on('$routeUpdate', function(){
+		console.log("hey");
 		if(!$routeParams.id && !$routeParams.tab){
+			$scope.submenuNavItem = 'preview';
 			delete $scope._agent;
 			delete $scope.agentInfo;
-			 $scope.submenuNavItem = 'preview';
+			
+			console.log("hey2");
+			console.log($scope.submenuNavItem);
 		}
 	});
 
@@ -83,12 +87,16 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	
     $scope.applyAgent = function (agent) {
         if (agent) {
-            $scope.submenuNavItem = 'overview';
-            $scope._agent = agent;
-            $scope.search = agent.name;	
-			$location.search('id', agent.id);
-			$location.search('tab', "overview");
-			$scope.load = false;
+            $scope.submenuNavItem = 'overview';			
+			DataFactory.getAndClean('get', '/agents/' + agent.id, {})
+			.then(function (data) {
+				$scope.agentInfo = data.data;
+				$scope._agent = data.data;
+				$scope.search = agent.name;	
+				$location.search('id', agent.id);
+				$location.search('tab', "overview");
+				$scope.load = false;
+			}, printError);
         }
     };
 
@@ -117,18 +125,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
-				if(agentId != ""){
-					DataFactory.getAndClean('get', '/agents/' + agentId, {})
-					.then(function (data) {
-						$scope.submenuNavItem = 'overview';
-						if(tab != "")
-							$scope.submenuNavItem = tab;
-						$scope.agentInfo = data.data;
-						$scope._agent = data.data;
-						$scope.load = false;
-					}, printError);
-				}else
-					$scope.load = false;
+				$scope.load = false;
             }, printError);
     };
 
