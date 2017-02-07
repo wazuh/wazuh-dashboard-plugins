@@ -35,7 +35,8 @@
 		
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding"  class="legend-value-title ng-binding legend-value-truncate" tooltip="{{agentInfo.os}}" style="font-size: 14pt;">{{ agentInfo.os | limitTo: 20 }}{{agentInfo.os.length > 20 ? '...' : ''}}</div>
+					<div class="metric-value ng-binding"  class="legend-value-title ng-binding legend-value-truncate" style="font-size: 14pt;">{{ agentInfo.os | limitTo: 20 }}{{agentInfo.os.length > 20 ? '...' : ''}}</div>
+					<md-tooltip md-direction="bottom">{{ agentInfo.os }}</md-tooltip>
 					<div class="ng-binding">Operating system</div>
 				</md-card-content>
 			</md-card>
