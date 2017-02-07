@@ -1,135 +1,146 @@
-<md-content flex layout="column" ng-if="!load && submenuNavItem == 'general' && tabView == 'panels'" ng-controller="overviewGeneralController" layout-align="space-around">
-	<kbn-searchbar></kbn-searchbar>
-	<div layout="row" layout-align="center stretch">
-		<md-card flex layout="column">
-			<md-card-content>
-				<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Alerts',type:metric))"
-				vis-filter="*">
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
+<md-content flex layout="column" ng-if="submenuNavItem == 'general'" ng-controller="overviewGeneralController" layout-align="space-around">
 
-		<md-card flex layout="column">
-			<md-card-content>
-				<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 10 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Level 10 or above',type:metric))"
-				vis-filter="rule.level:[10 TO *]"
-				>
-				</kbn-vis>
+	<!-- View: Discover -->
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
+		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+		dis-filter="*"
+		infinite-scroll="true">
+		</kbn-disfull>
+	</md-content>
 
-			</md-card-content>
-		</md-card>
-
-		<md-card flex layout="column">
-			<md-card-content>
-				<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failure'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth failed',type:metric))"
-				vis-filter="rule.groups: authentication_failed"
-					>
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
-
-		<md-card flex layout="column">
-			<md-card-content>
-				<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication success'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth success',type:metric))"
-				vis-filter="rule.groups: authentication_success"
-				>
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
-	</div>
-
-	<div layout="row" layout-align="center stretch" style="margin-left: 16px; margin-right: 16px; ">
-		<md-card layout="column" flex="40" class="visBox-alert-level-evolution">
-			<md-card-content>
-				<span class="md-headline">Alert level evolution</span>
-				<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.level,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert level evolution',type:line))"
-				vis-filter="*"
-					</kbn-vis>
-			</md-card-content>
-		</md-card>
-		<md-card flex="60">
-			<md-card-content>
-				<span class="md-headline">Alerts</span>
-				<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!f,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Alerts',type:histogram))"
-					vis-filter="*"
-					>
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
-	</div>
-
-	<div layout="row" layout-align="center stretch">
-		<md-card flex="20">
-			<md-card-content>
-				<span class="md-headline">Groups</span>
-					<kbn-vis vis-height="170px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top groups',type:pie))"
+	<!-- View: Panels -->
+	<div ng-if="tabView == 'panels'">
+		<kbn-searchbar></kbn-searchbar>
+		<div layout="row" layout-align="center stretch">
+			<md-card flex layout="column">
+				<md-card-content>
+					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Alerts',type:metric))"
 					vis-filter="*">
 					</kbn-vis>
-			</md-card-content>
-		</md-card>
-		<md-card flex="40">
-			<md-card-content>
-				<span class="md-headline">Alerts evolution - Top 5 agents</span> 
-				<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'Agents',type:area))"
-					vis-filter="*"
+				</md-card-content>
+			</md-card>
+
+			<md-card flex layout="column">
+				<md-card-content>
+					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 10 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Level 10 or above',type:metric))"
+					vis-filter="rule.level:[10 TO *]"
 					>
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
-		<md-card layout="column" flex="40">
-			<md-card-content>
-				<span class="md-headline">Agents status</span>
-				<kbn-vis vis-height="193px" vis-index-pattern="wazuh-monitoring-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:id),schema:metric,type:cardinality),(enabled:!t,id:'4',params:(field:status,order:asc,orderBy:'3',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Agents Status',type:line))"
-					vis-filter="*">
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
+					</kbn-vis>
+
+				</md-card-content>
+			</md-card>
+
+			<md-card flex layout="column">
+				<md-card-content>
+					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failure'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth failed',type:metric))"
+					vis-filter="rule.groups: authentication_failed"
+						>
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+
+			<md-card flex layout="column">
+				<md-card-content>
+					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication success'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth success',type:metric))"
+					vis-filter="rule.groups: authentication_success"
+					>
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+		</div>
+
+		<div layout="row" layout-align="center stretch" style="margin-left: 16px; margin-right: 16px;">
+			<md-card layout="column" flex="40" class="visBox-alert-level-evolution">
+				<md-card-content>
+					<span class="md-headline">Alert level evolution</span>
+					<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.level,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert level evolution',type:line))"
+					vis-filter="*"
+						</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="60">
+				<md-card-content>
+					<span class="md-headline">Alerts</span>
+					<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!f,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Alerts',type:histogram))"
+						vis-filter="*"
+						>
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+		</div>
+
+		<div layout="row" layout-align="center stretch" style="margin-left: 16px; margin-right: 16px;">
+			<md-card flex="20">
+				<md-card-content>
+					<span class="md-headline">Groups</span>
+						<kbn-vis vis-height="170px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top groups',type:pie))"
+						vis-filter="*">
+						</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="40">
+				<md-card-content>
+					<span class="md-headline">Alerts evolution - Top 5 agents</span> 
+					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'Agents',type:area))"
+						vis-filter="*"
+						>
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card layout="column" flex="40">
+				<md-card-content>
+					<span class="md-headline">Agents status</span>
+					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-monitoring-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:id),schema:metric,type:cardinality),(enabled:!t,id:'4',params:(field:status,order:asc,orderBy:'3',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Agents Status',type:line))"
+						vis-filter="*">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
 
 
+		</div>
+
+		<div layout="row" layout-align="center stretch">
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<kbn-vis-value vis-height="29px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcuser,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="*"></kbn-vis-value>
+					<div class="ng-binding">Top source user</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<kbn-vis-value vis-height="29px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source ip',type:table))" vis-filter="*"></kbn-vis-value>
+					<div class="ng-binding">Top source ip</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<kbn-vis-value vis-height="29px" vis-index-pattern="wazuh-alerts-*"  vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top group',type:table))" vis-filter="*"></kbn-vis-value>
+					<div class="ng-binding">Top group</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<kbn-vis-value vis-height="29px" vis-index-pattern="wazuh-alerts-*"  vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top PCI DSS',type:table))" vis-filter="*"></kbn-vis-value>
+					<div class="ng-binding">Top PCI DSS requirement</div>
+				</md-card-content>
+			</md-card>
+		</div>
+		
+		<div layout="row" layout-align="center stretch">
+			<md-card flex>
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Alerts summary</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:5,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.id,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.level,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Groups,field:rule.groups,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'PCI DSS',field:rule.pci_dss,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:5,direction:desc),totalFunc:sum),title:'Alerts summary',type:table))"
+						vis-filter="*">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+		</div>
+
+		<div flex></div>
 	</div>
-
-	<div layout="row" layout-align="center stretch">
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="29px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcuser,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="*"></kbn-vis-value>
-				<div class="ng-binding">Top source user</div>
-			</md-card-content>
-		</md-card>
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="29px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcip,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source ip',type:table))" vis-filter="*"></kbn-vis-value>
-				<div class="ng-binding">Top source ip</div>
-			</md-card-content>
-		</md-card>
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="29px" vis-index-pattern="wazuh-alerts-*"  vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top group',type:table))" vis-filter="*"></kbn-vis-value>
-				<div class="ng-binding">Top group</div>
-			</md-card-content>
-		</md-card>
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				<kbn-vis-value vis-height="29px" vis-index-pattern="wazuh-alerts-*"  vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top PCI DSS',type:table))" vis-filter="*"></kbn-vis-value>
-				<div class="ng-binding">Top PCI DSS requirement</div>
-			</md-card-content>
-		</md-card>
-	</div>
-	
-	<div layout="row" layout-align="center stretch">
-		<md-card flex>
-			<md-card-title>
-				<md-card-title-text>
-					<span class="md-headline">Alerts summary</span>
-				</md-card-title-text>
-			</md-card-title>
-			<md-card-content>
-				<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:5,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.id,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.level,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Groups,field:rule.groups,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'PCI DSS',field:rule.pci_dss,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:5,direction:desc),totalFunc:sum),title:'Alerts summary',type:table))"
-					vis-filter="*">
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
-	</div>
-
-	<div flex></div>
-
 </md-content>

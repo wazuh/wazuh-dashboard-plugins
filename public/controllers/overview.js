@@ -1,10 +1,11 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
-
+	
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('general');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
+	
 });
 
 app.controller('overviewFimController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {

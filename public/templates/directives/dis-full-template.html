@@ -109,11 +109,11 @@
 
               </header>
 
-              <visualize ng-if="vis && rows.length != 0" vis="vis" ui-state="uiState" es-resp="mergedEsResp" search-source="searchSource">
+              <visualize ng-if="vis && rows.length != 0 && state.sort" vis="vis" ui-state="uiState" es-resp="mergedEsResp" search-source="searchSource">
               </visualize>
             </div>
 
-            <div class="discover-table" fixed-scroll ng-style="{ 'height': tableHeight }">
+            <div class="discover-table" fixed-scroll ng-style="{ 'height': tableHeight }" ng-if="state.sort && state.columns">
               <doc-table hits="rows" index-pattern="indexPattern" sorting="state.sort" columns="state.columns" infinite-scroll="infiniteScroll"
                 filter="filterQuery">
               </doc-table>

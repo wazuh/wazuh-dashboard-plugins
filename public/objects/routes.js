@@ -24,7 +24,7 @@ var settingsWizard = function ($location, testConnection, $mdToast, appState, $q
 //Routes
 routes.enable();
 routes
-    .when('/agents/:id?/:tab?', {
+    .when('/agents/:id?/:tab?/:view?', {
         template: require('plugins/wazuh/templates/agents.jade'),
         resolve: {
             "check": settingsWizard
@@ -36,7 +36,7 @@ routes
             "check": settingsWizard
         }
     })
-	.when('/overview/:tab?', {
+	.when('/overview/:tab?/:view?', {
         template: require('plugins/wazuh/templates/overview.jade'),
         resolve: {
             "check": settingsWizard

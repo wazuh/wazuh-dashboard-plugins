@@ -20,14 +20,14 @@
 
 	<md-content layout="row" layout-align="space-between start" class="horizontalTabsBar">
 	
-		<md-content class="horizontalTabsBar" layout="column" layout-align="center start" ng-init="tabView = 'panels'">
+		<md-content class="horizontalTabsBar" layout="column" layout-align="center start">
 			<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
-				<md-nav-item md-nav-href="#/overview?tab=general" name="general">General</md-nav-item>
-				<md-nav-item md-nav-href="#/overview?tab=fim" name="fim">File integrity</md-nav-item>
-				<md-nav-item md-nav-href="#/overview?tab=pm" name="pm">Policy monitoring</md-nav-item>
-				<md-nav-item md-nav-href="#/overview?tab=oscap" name="oscap" ng-show="extensions.oscap">SCAP</md-nav-item>
-				<md-nav-item md-nav-href="#/overview?tab=audit" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
-				<md-nav-item md-nav-href="#/overview?tab=pci" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'general'" name="general">General</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File integrity</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'pm'" name="pm">Policy monitoring</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'oscap'" name="oscap" ng-show="extensions.oscap">SCAP</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'audit'" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
+				<md-nav-item md-nav-click="submenuNavItem = 'pci'" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
 			</md-nav-bar> 
 		</md-content>	
 		

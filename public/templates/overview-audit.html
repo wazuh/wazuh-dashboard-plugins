@@ -1,194 +1,203 @@
-<md-content flex layout="column" ng-if="!load && submenuNavItem == 'audit' && tabView == 'panels'" ng-controller="overviewAuditController" layout-align="space-around">
+<md-content flex layout="column" ng-if="submenuNavItem == 'audit'" ng-controller="overviewAuditController" layout-align="space-around">
 
-	<kbn-searchbar></kbn-searchbar>
-	
-	<md-content layout="row" layout-align="center stretch">
-		<md-card flex="10" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'New files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80790"></kbn-vis>
-				</md-card-content>
-		</md-card>
-		<md-card flex="10" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Read files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80784"></kbn-vis>
-				</md-card-content>
-		</md-card>
-		<md-card flex="10" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Modified files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80781"></kbn-vis>
-				</md-card-content>
-		</md-card>
-		<md-card flex="10" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Removed files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80791"></kbn-vis>
-				</md-card-content>
-		</md-card>
-		<md-card  flex="60" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="44px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="rule.groups: audit"></kbn-vis-value>
-					<div class="ng-binding">Latest alert</div>
-				</md-card-content>
-		</md-card>
+	<!-- View: Discover -->
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
+		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+		dis-filter="*"
+		infinite-scroll="true">
+		</kbn-disfull>
 	</md-content>
 	
-
-	<md-content layout="row" layout-align="center stretch">
-			<md-card flex="25">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Groups</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="180px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'Audit:%20Rule%20groups',type:pie))"
-						vis-filter="rule.groups: audit">
-					</kbn-vis>
-				</md-card-content>
+	<!-- View: Panels -->
+	<div ng-if="tabView == 'panels'">
+		<kbn-searchbar></kbn-searchbar>		
+		<md-content layout="row" layout-align="center stretch">
+			<md-card flex="10" layout="column">
+					<md-card-content style="text-align: center;">
+						<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'New files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80790"></kbn-vis>
+					</md-card-content>
 			</md-card>
-			<md-card flex="25">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Agents</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="180px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'Audit:%20Agents',type:pie))"
-						vis-filter="rule.groups: audit">
-					</kbn-vis>
-				</md-card-content>
+			<md-card flex="10" layout="column">
+					<md-card-content style="text-align: center;">
+						<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Read files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80784"></kbn-vis>
+					</md-card-content>
 			</md-card>
-			<md-card flex="25">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Directories</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="180px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.directory.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'Audit:%20Directories',type:pie))"
-						vis-filter="rule.groups: audit">
-					</kbn-vis>
-				</md-card-content>
+			<md-card flex="10" layout="column">
+					<md-card-content style="text-align: center;">
+						<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Modified files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80781"></kbn-vis>
+					</md-card-content>
 			</md-card>
-			
-			<md-card flex="25">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Files</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="180px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'Audit:%20Files',type:pie))"
-						vis-filter="rule.groups: audit">
-					</kbn-vis>
-				</md-card-content>
+			<md-card flex="10" layout="column">
+					<md-card-content style="text-align: center;">
+						<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Removed files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80791"></kbn-vis>
+					</md-card-content>
 			</md-card>
-	</md-content>
-
-	<md-content layout="row" layout-align="center stretch">
-		<md-card flex="100">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Alerts over time</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis class="vis-expand-leyend" vis-height="290px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'Audit:%20Alerts%20over%20time',type:area))"
-						vis-filter="rule.groups: audit">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-	</md-content>
-	
-	
-	<md-content layout="row" layout-align="center stretch">
-		<md-content flex="20" layout="column" layout-align="center stretch">
-		
-			<md-card flex="50">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">File read access</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
-						vis-filter="rule.groups: audit AND rule.id: 80784">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			
-			<md-card flex="50">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">File write access</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
-						vis-filter="rule.groups: audit AND rule.id: 80781">
-					</kbn-vis>
-				</md-card-content>
+			<md-card  flex="60" layout="column">
+					<md-card-content style="text-align: center;">
+						<kbn-vis-value vis-height="44px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="rule.groups: audit"></kbn-vis-value>
+						<div class="ng-binding">Latest alert</div>
+					</md-card-content>
 			</md-card>
 		</md-content>
 		
-		<md-content flex="60" layout="column" layout-align="center stretch">
+
+		<md-content layout="row" layout-align="center stretch">
+				<md-card flex="25">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Groups</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="180px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'Audit:%20Rule%20groups',type:pie))"
+							vis-filter="rule.groups: audit">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				<md-card flex="25">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Agents</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="180px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'Audit:%20Agents',type:pie))"
+							vis-filter="rule.groups: audit">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				<md-card flex="25">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Directories</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="180px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.directory.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'Audit:%20Directories',type:pie))"
+							vis-filter="rule.groups: audit">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				
+				<md-card flex="25">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Files</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="180px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'Audit:%20Files',type:pie))"
+							vis-filter="rule.groups: audit">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+		</md-content>
+
+		<md-content layout="row" layout-align="center stretch">
 			<md-card flex="100">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Alerts over time</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis class="vis-expand-leyend" vis-height="290px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:rule.description,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:overlap,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'Audit:%20Alerts%20over%20time',type:area))"
+							vis-filter="rule.groups: audit">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+		</md-content>
+		
+		
+		<md-content layout="row" layout-align="center stretch">
+			<md-content flex="20" layout="column" layout-align="center stretch">
+			
+				<md-card flex="50">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">File read access</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
+							vis-filter="rule.groups: audit AND rule.id: 80784">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				
+				<md-card flex="50">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">File write access</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
+							vis-filter="rule.groups: audit AND rule.id: 80781">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+			</md-content>
+			
+			<md-content flex="60" layout="column" layout-align="center stretch">
+				<md-card flex="100">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Commands</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="340px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.command,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
+							vis-filter="rule.groups: audit">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+			</md-content>
+			
+			<md-content flex="20" layout="column" layout-align="center stretch">
+			
+				<md-card flex="50">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Created files</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
+							vis-filter="rule.groups: audit AND rule.id: 80790">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+				
+				<md-card flex="50">
+					<md-card-title>
+						<md-card-title-text>
+							<span class="md-headline">Removed files</span>
+						</md-card-title-text>
+					</md-card-title>
+					<md-card-content>
+						<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
+							vis-filter="rule.groups: audit AND rule.id: 80791">
+						</kbn-vis>
+					</md-card-content>
+				</md-card>
+			</md-content>
+			
+		</md-content>
+		
+		<md-content layout-align="center stretch">
+			<md-card flex>
 				<md-card-title>
 					<md-card-title-text>
-						<span class="md-headline">Commands</span>
+						<span class="md-headline">Last alerts</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="340px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.command,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
+					<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Agent name',field:agent.name,order:desc,orderBy:'1',size:99999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Event,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Command,field:audit.exe,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:'Effective user ID',field:audit.euid,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'Effective group ID',field:audit.egid,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
 						vis-filter="rule.groups: audit">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
 		</md-content>
-		
-		<md-content flex="20" layout="column" layout-align="center stretch">
-		
-			<md-card flex="50">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Created files</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
-						vis-filter="rule.groups: audit AND rule.id: 80790">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			
-			<md-card flex="50">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Removed files</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="120px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'',field:audit.file.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Audit:%20File%20read%20access',type:pie))"
-						vis-filter="rule.groups: audit AND rule.id: 80791">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-		</md-content>
-		
-	</md-content>
-	
-	<md-content layout-align="center stretch">
-		<md-card flex>
-			<md-card-title>
-				<md-card-title-text>
-					<span class="md-headline">Last alerts</span>
-				</md-card-title-text>
-			</md-card-title>
-			<md-card-content>
-				<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Agent name',field:agent.name,order:desc,orderBy:'1',size:99999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Event,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Command,field:audit.exe,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:'Effective user ID',field:audit.euid,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'Effective group ID',field:audit.egid,order:desc,orderBy:'1',size:5),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-					vis-filter="rule.groups: audit">
-				</kbn-vis>
-			</md-card-content>
-		</md-card>
-	</md-content>
-
+	</div>
 </md-content>

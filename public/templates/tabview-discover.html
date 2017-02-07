@@ -1,99 +1,42 @@
-<!-- Overview discover -->
-
-<!-- General -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'general' && tabView == 'discover'">
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="*"
-	infinite-scroll="true">
-	</kbn-disfull>
-</md-content>
-
-<!-- FIM -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'fim' && tabView == 'discover'">
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="rule.groups:syscheck"
-	infinite-scroll="true">
-	</kbn-disfull>
-</md-content>
-
-<!-- PM -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'pm' && tabView == 'discover'">
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="rule.groups:rootcheck"
-	infinite-scroll="true">
-	</kbn-disfull>
-</md-content>
-
-<!-- SCAP -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'oscap' && tabView == 'discover'">
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter='rule.groups:"oscap" AND rule.groups:"oscap-result"'
-	infinite-scroll="true">
-	</kbn-disfull>
-</md-content>
-
-<!-- Audit -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'audit' && tabView == 'discover'">
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter='rule.groups:"audit"'
-	infinite-scroll="true">
-	</kbn-disfull>
-</md-content>
-
-<!-- PCI -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'overview' && submenuNavItem == 'pci' && tabView == 'discover'">
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="_exists_:rule.pci_dss"
-	infinite-scroll="true">
-	</kbn-disfull>
-</md-content>
-
 <!-- Agents discover -->
 
-<!-- General -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'overview' && tabView == 'discover'">
-	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="{{'agent.name:'+_agent.name}}"
-	infinite-scroll="true">
-	</kbn-disfull>
-</md-content>
 
 <!-- FIM -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'fim' && tabView == 'discover'">
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'fim' && tabView == 'discover'" >
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="rule.groups:syscheck AND {{'agent.name:'+_agent.name}}"
+	dis-filter="rule.groups:syscheck AND agent.name: {{_agent.name ? _agent.name : '*'}}"
 	infinite-scroll="true">
 	</kbn-disfull>
 </md-content>
 
 <!-- PM -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'policy_monitoring' && tabView == 'discover'">
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'policy_monitoring' && tabView == 'discover'" >
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="rule.groups:rootcheck AND {{'agent.name:'+_agent.name}}"
+	dis-filter="rule.groups:rootcheck AND agent.name: {{_agent.name ? _agent.name : '*'}}"
 	infinite-scroll="true">
 	</kbn-disfull>
 </md-content>
 
 <!-- SCAP -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'oscap' && tabView == 'discover'">
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'oscap' && tabView == 'discover'" >
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="rule.groups:oscap AND rule.groups:oscap-result AND agent.name: {{_agent.name}}"
+	dis-filter="rule.groups:oscap AND rule.groups:oscap-result AND agent.name: {{_agent.name ? _agent.name : '*'}}"
 	infinite-scroll="true">
 	</kbn-disfull>
 </md-content>
 
 <!-- Audit -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'audit' && tabView == 'discover'">
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'audit' && tabView == 'discover'" >
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="rule.groups:audit AND agent.name: {{_agent.name}}"
+	dis-filter="rule.groups:audit AND agent.name: {{_agent.name ? _agent.name : '*'}}"
 	infinite-scroll="true">
 	</kbn-disfull>
 </md-content>
 
 <!-- PCI -->
-<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'pci' && tabView == 'discover'">
+<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="menuNavItem == 'agents' && submenuNavItem == 'pci' && tabView == 'discover'" >
 	<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-	dis-filter="_exists_:rule.pci_dss AND agent.name: {{_agent.name}}"
+	dis-filter="_exists_:rule.pci_dss AND agent.name: {{_agent.name ? _agent.name : '*'}}"
 	infinite-scroll="true">
 	</kbn-disfull>
 </md-content>

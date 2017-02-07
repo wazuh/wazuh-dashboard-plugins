@@ -1,6 +1,16 @@
-<md-content ng-if="submenuNavItem == 'fim' && tabView == 'panels'" ng-if="_agent" id="agents-fim">
-	<kbn-searchbar></kbn-searchbar>
-    <div flex ng-controller="fimController" layout="column">
+<md-content ng-if="!load && submenuNavItem == 'fim'" ng-if="_agent" id="agents-fim" ng-controller="fimController">
+
+	<!-- View: Discover -->
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="$parent.tabView == 'discover'" >
+		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+		dis-filter="agent.name: {{_agent.name ? _agent.name : '*'}}"
+		infinite-scroll="true">
+		</kbn-disfull>
+	</md-content>
+
+	<!-- View: Panels -->	
+    <div flex layout="column"  ng-if="$parent.tabView == 'panels'">
+		<kbn-searchbar></kbn-searchbar>
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
         <md-content layout="row">
             <md-card flex="33">

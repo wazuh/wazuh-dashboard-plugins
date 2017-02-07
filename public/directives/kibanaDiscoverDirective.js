@@ -38,8 +38,9 @@ import uiRoutes from 'ui/routes';
 import uiModules from 'ui/modules';
 import indexTemplate from 'plugins/wazuh/templates/directives/dis-template.html';
 import StateProvider from 'ui/state_management/state';
+import stateMonitorFactory  from 'ui/state_management/state_monitor_factory';
 
-
+import 'ui/debounce';
 import 'plugins/kibana/discover/saved_searches/saved_searches';
 import 'plugins/kibana/discover/directives/no_results';
 import 'plugins/kibana/discover/directives/timechart';
@@ -104,9 +105,9 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
     $rootScope.visCounter++;
 
-    $route.requireDefaultIndex = true;
-    $route.template = $route.indexTemplate;
-    $route.reloadOnSearch = false;
+   // $route.requireDefaultIndex = true;
+    //$route.template = $route.indexTemplate;
+    //$route.reloadOnSearch = false;
 
     const State = Private(StateProvider);
     courier.indexPatterns.getIds()
@@ -167,6 +168,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         docTitle.change(savedSearch.title);
                     }
 
+					
                     // Configure AppState. Get App State, if there is no App State create new one
                     let currentAppState = getAppState();
                     if (!currentAppState) {
@@ -174,37 +176,30 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     } else {
                         $scope.state = currentAppState;
                         $scope.state.columns = disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns');
-
+                        $scope.state.sort = disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern);
                     }
-
+					
+                    const $appStatus = $scope.appStatus = {};
+                    let stateMonitor;
                     const $state = $scope.state;
                     $scope.uiState = $state.makeStateful('uiState');
                     $scope.uiState.set('vis.legendOpen', false);
                     $state.query = ($scope.stateQuery ? $scope.stateQuery : '*');
 
                     function getStateDefaults() {
-
-                        $route.current.params._a = $scope.disA;
-                        $route.updateParams({
-                            '_a': $scope.disA
-                        });
                         return {
-                            query: $scope.disFilter ? $scope.disFilter : {
-                                query_string: {
-                                    analyze_wildcard: '!t',
-                                    query: '*'
-                                }
-                            },
+                            query: $scope.disFilter ? $scope.disFilter : '',
                             sort: disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern),
-                            columns: disDecoded.columns.length > 0 ? disDecoded.columns : (savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns')),
+                            columns: disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns'),
                             index: disDecoded.index ? disDecoded.index : $scope.indexPattern.id,
                             interval: 'auto',
                             filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
                         };
                     }
+					
                     $state.index = $scope.indexPattern.id;
                     $state.sort = getSort.array($state.sort, $scope.indexPattern);
-
+					
                     $scope.opts = {
                         // number of records to fetch, then paginate through
                         sampleSize: config.get('discover:sampleSize'),
@@ -226,6 +221,12 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                             $scope.failuresShown = showTotal;
                         };
 
+						stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
+						stateMonitor.onChange((status) => {
+							$appStatus.dirty = status.dirty;
+						});
+						$scope.$on('$destroy', () => stateMonitor.destroy());
+						
                         $scope.updateDataSource()
                             .then(function() {
                                 $scope.$listen(timefilter, 'fetch', function() {
@@ -377,7 +378,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                             })
                             .catch(notify.error);
                     };
-
                     $scope.searchSource.onBeginSegmentedFetch(function(segmented) {
 
                         function flushResponseData() {
@@ -388,7 +388,9 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         }
 
                         if (!$scope.rows) flushResponseData();
-
+						
+						if(!$state.sort)
+							$state.sort = ["@timestamp","desc"];
                         const sort = $state.sort;
                         const timeField = $scope.indexPattern.timeFieldName;
                         const totalSize = $scope.size || $scope.opts.sampleSize;
@@ -489,7 +491,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         };
                     };
 
-                    $scope.updateDataSource = Promise.method(function() {
+                    $scope.updateDataSource = Promise.method(function updateDataSource() {
 
                         $scope.searchSource
                             .size($scope.opts.sampleSize)
@@ -497,17 +499,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                             .query(!$scope.stateQuery ? null : $scope.stateQuery)
                             .set('filter', queryFilter.getFilters());
 
-                        if (config.get('doc_table:highlight')) {
-                            $scope.searchSource.highlight({
-                                pre_tags: [highlightTags.pre],
-                                post_tags: [highlightTags.post],
-                                fields: {
-                                    '*': {}
-                                },
-                                require_field_match: false,
-                                fragment_size: 2147483647 // Limit of an integer.
-                            });
-                        }
                     });
 
                     // TODO: On array fields, negating does not negate the combination, rather all terms

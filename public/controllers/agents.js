@@ -7,15 +7,20 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
     $scope.load = true;
     $scope.search = '';
     $scope.submenuNavItem = 'preview';
+	$scope.tabView = "panels";	
     $scope.state = appState;
 	$scope._status = 'all';
-	
+	console.log("loading AgentsController");
 	var agentId = "";
-	var tab = "";
+	
+	$route.reloadOnSearch = false;
+	
 	if($routeParams.id)
 		agentId = $routeParams.id;
     if($routeParams.tab)
-		tab = $routeParams.tab;
+		$scope.submenuNavItem = $routeParams.tab;
+	if($routeParams.view && $routeParams.view != "")
+		$scope.tabView  = $routeParams.view;
 	
 	var objectsArray = [];
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
@@ -34,14 +39,11 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 
 	// Listen for route change, reset to agents preview
 	$scope.$on('$routeUpdate', function(){
-		console.log("hey");
 		if(!$routeParams.id && !$routeParams.tab){
 			$scope.submenuNavItem = 'preview';
+			$scope.tabView = 'panels';
 			delete $scope._agent;
 			delete $scope.agentInfo;
-			
-			console.log("hey2");
-			console.log($scope.submenuNavItem);
 		}
 	});
 
@@ -87,14 +89,18 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	
     $scope.applyAgent = function (agent) {
         if (agent) {
-            $scope.submenuNavItem = 'overview';			
+			console.log("aply agent");
+			if($scope.submenuNavItem == 'preview')
+				$scope.submenuNavItem = 'overview';		
+			
 			DataFactory.getAndClean('get', '/agents/' + agent.id, {})
 			.then(function (data) {
 				$scope.agentInfo = data.data;
 				$scope._agent = data.data;
-				$scope.search = agent.name;	
-				$location.search('id', agent.id);
-				$location.search('tab', "overview");
+				$scope.search = data.data.name;	
+				$location.search('id', data.data.id);
+				$location.search('tab', $scope.submenuNavItem);
+				$location.search('view', $scope.tabView);
 				$scope.load = false;
 			}, printError);
         }
@@ -125,7 +131,10 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
-				$scope.load = false;
+				if(agentId != "")
+					$scope.applyAgent({"id": agentId});
+				else
+					$scope.load = false;
             }, printError);
     };
 
@@ -143,6 +152,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 
     //Destroy
     $scope.$on("$destroy", function () {
+		console.log("destroying");
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)
         });
