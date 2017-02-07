@@ -1,4 +1,4 @@
-<div flex ng-controller="generalController" layout="column">
+<div flex ng-controller="overviewController" layout="column">
 
     <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'overview'" style="height: 70px;">
         <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">

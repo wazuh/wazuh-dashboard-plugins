@@ -30,7 +30,7 @@ routes
             "check": settingsWizard
         }
     })
-    .when('/manager/', {
+    .when('/manager/:tab?/', {
         template: require('plugins/wazuh/templates/manager.jade'),
         resolve: {
             "check": settingsWizard

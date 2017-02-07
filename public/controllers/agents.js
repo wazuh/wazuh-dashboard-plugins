@@ -10,16 +10,15 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	$scope.tabView = "panels";	
     $scope.state = appState;
 	$scope._status = 'all';
-	console.log("loading AgentsController");
+
 	var agentId = "";
 	
-	$route.reloadOnSearch = false;
 	
 	if($routeParams.id)
 		agentId = $routeParams.id;
     if($routeParams.tab)
 		$scope.submenuNavItem = $routeParams.tab;
-	if($routeParams.view && $routeParams.view != "")
+	if($routeParams.view)
 		$scope.tabView  = $routeParams.view;
 	
 	var objectsArray = [];
@@ -35,17 +34,21 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
         });
     };
 
-    //Functions
-
-	// Listen for route change, reset to agents preview
-	$scope.$on('$routeUpdate', function(){
-		if(!$routeParams.id && !$routeParams.tab){
-			$scope.submenuNavItem = 'preview';
-			$scope.tabView = 'panels';
-			delete $scope._agent;
-			delete $scope.agentInfo;
-		}
+	// Watchers
+	$scope.$watch('_agent', function() {
+		$location.search('id', $scope._agent.id);		
 	});
+	
+	$scope.$watch('tabView', function() {
+		$location.search('view', $scope.tabView);		
+	});
+	
+	$scope.$watch('submenuNavItem', function() {
+		$location.search('tab', $scope.submenuNavItem);
+	});	
+	
+	
+    //Functions
 
     $scope.getAgentStatusClass = function (agentStatus) {
         if (agentStatus == "Active")
@@ -89,7 +92,6 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	
     $scope.applyAgent = function (agent) {
         if (agent) {
-			console.log("aply agent");
 			if($scope.submenuNavItem == 'preview')
 				$scope.submenuNavItem = 'overview';		
 			
@@ -98,9 +100,6 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 				$scope.agentInfo = data.data;
 				$scope._agent = data.data;
 				$scope.search = data.data.name;	
-				$location.search('id', data.data.id);
-				$location.search('tab', $scope.submenuNavItem);
-				$location.search('view', $scope.tabView);
 				$scope.load = false;
 			}, printError);
         }

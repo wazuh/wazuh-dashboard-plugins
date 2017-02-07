@@ -1,11 +1,29 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, DataFactory, genericReq, $mdDialog, $mdToast, errlog) {
+app.controller('managerController', function ($scope, $route, $routeParams, $location) {
+
+	$scope.submenuNavItem = "status";
+	$scope.submenuNavItem2 = "rules";
+
+	if($routeParams.tab)
+		$scope.submenuNavItem = $routeParams.tab;
+	
+	// Watchers
+	$scope.$watch('submenuNavItem', function() {
+		$location.search('tab', $scope.submenuNavItem);		
+	});
+	
+	$scope.setRulesTab = function(tab) {
+		$scope.submenuNavItem2 = tab;
+	};
+
+});
+
+
+app.controller('managerStatusController', function ($scope, DataFactory, genericReq, $mdDialog, $mdToast, errlog) {
     //Initialization
     $scope.load = true;
-    $scope.$parent.state.setManagerState('status');
-    $scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
     $scope.timeFilter = "24h";
 
     $scope.stats = [];
@@ -80,19 +98,9 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
         errlog.log('Unexpected exception loading controller', e);
     }
 
-    // Timer filter watch
-    var loadWatch = $scope.$watch(function () {
-        return $scope.$parent.timeFilter;
-    }, function () {
-        $scope.setTimer($scope.$parent.timeFilter);
-        load_tops();
-    });
-
-
     //Destroy
     $scope.$on("$destroy", function () {
         $scope.stats.length = 0;
-        loadWatch();
     });
 
 });
@@ -100,7 +108,6 @@ app.controller('managerController', function ($scope, DataFactory, genericReq, $
 app.controller('managerConfigurationController', function ($scope, DataFactory, errlog) {
     //Initialization
     $scope.load = true;
-    $scope.$parent.state.setManagerState('configuration');
 	$scope.isArray = angular.isArray;
 	
     //Print Error

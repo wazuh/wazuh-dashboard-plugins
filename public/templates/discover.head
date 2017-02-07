@@ -1,6 +1,6 @@
-<div flex ng-controller="stateController" layout="column">
+<div flex layout="column">
 
-    <md-content  class="wazuhMenuNavBar" ng-init="menuNavItem = 'discover'; template = (state.getDiscoverState().name ? state.getDiscoverState().name : 'generic');  " style="height: 70px;">
+    <md-content  class="wazuhMenuNavBar" ng-init="menuNavItem = 'discover'" style="height: 70px;">
         <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
             <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
                 <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
@@ -13,7 +13,4 @@
 			<md-nav-item class="wazuhMenuNavBar_gear" md-nav-href="#/settings" name="settings"><i class="fa fa-cog ng-scope" aria-hidden="true" ></i></md-nav-item>
         </md-nav-bar>
     </md-content>
-
-
-
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>

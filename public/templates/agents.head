@@ -66,23 +66,23 @@
 			
 			<md-content layout="row" layout-align="space-between start" class="horizontalTabsBar">
 			
-				<md-content ng-if="_agent" class="horizontalTabsBar" layout="column" layout-align="center start">
-					<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="$parent.submenuNavItem" nav-bar-aria-label="navigation submenu">
-						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=overview&view={{tabView}}" name="overview">Overview</md-nav-item>
-						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=fim&view={{tabView}}" name="fim">File Integrity</md-nav-item>
-						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=policy_monitoring&view={{tabView}}" name="policy_monitoring">Policy Monitoring</md-nav-item>
-						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=oscap&view={{tabView}}" name="oscap"  ng-show="extensions.oscap">SCAP</md-nav-item>
-						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=audit&view={{tabView}}" name="audit" ng-show="extensions.audit">Audit</md-nav-item> 
-						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab=pci&view={{tabView}}" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item> 
+				<md-content ng-show="_agent" class="horizontalTabsBar" layout="column" layout-align="center start">
+					<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+						<md-nav-item md-nav-click="submenuNavItem = 'overview'" name="overview">Overview</md-nav-item>
+						<md-nav-item md-nav-click="submenuNavItem = 'fim'" name="fim">File Integrity</md-nav-item>
+						<md-nav-item md-nav-click="submenuNavItem = 'policy_monitoring'" name="policy_monitoring">Policy Monitoring</md-nav-item>
+						<md-nav-item md-nav-click="submenuNavItem = 'oscap'" name="oscap"  ng-show="extensions.oscap">SCAP</md-nav-item>
+						<md-nav-item md-nav-click="submenuNavItem = 'audit'" name="audit" ng-show="extensions.audit">Audit</md-nav-item> 
+						<md-nav-item md-nav-click="submenuNavItem = 'pci'" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item> 
 					</md-nav-bar>
 				</md-content>
 				
-				<md-content ng-if="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
-					<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="$parent.tabView" nav-bar-aria-label="navigation submenu">
-						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab={{submenuNavItem}}&view=panels" name="panels">
+				<md-content ng-show="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
+					<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+						<md-nav-item md-nav-click="tabView = 'panels'" name="panels">
 							<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
 						</md-nav-item>
-						<md-nav-item md-nav-href="#/agents?id={{_agent.id}}&tab={{submenuNavItem}}&view=discover" name="discover">
+						<md-nav-item md-nav-click="tabView = 'discover'" name="discover">
 							<img style="width: 16px; margin-right: 6px;" src="/plugins/wazuh/img/discover.svg">Discover
 						</md-nav-item>
 					</md-nav-bar> 

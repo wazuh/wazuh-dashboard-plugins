@@ -36,8 +36,6 @@ require('plugins/wazuh/directives/kibanaDashboardDirective.js');
 require('plugins/wazuh/directives/kibanaSearchbarDirective.js');
 
 // Require controllers
-// Global
-require('plugins/wazuh/controllers/general.js');
 
 // Overview
 require('plugins/wazuh/controllers/overview.js');

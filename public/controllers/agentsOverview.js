@@ -6,7 +6,6 @@ app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToa
 
     //Initialization 
     $scope.load = true;
-    //$scope.agentInfo = $scope.$parent._agent;
 	
 	var loadWatch;
 

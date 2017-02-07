@@ -1,8 +1,8 @@
-<md-content ng-if="!load && submenuNavItem == 'overview' && agentInfo" ng-controller="agentsOverviewController">
+<md-content ng-if="submenuNavItem == 'overview' && agentInfo" ng-controller="agentsOverviewController">
 
 	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="$parent.tabView == 'discover'" >
-		<kbn-disfull ng-if="tabView == 'discover'" table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'" >
+		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="agent.name: {{_agent.name ? _agent.name : '*'}}"
 		infinite-scroll="true">
 		</kbn-disfull>

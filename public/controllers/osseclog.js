@@ -7,8 +7,6 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
     $scope.text = [];
     $scope.realtime = false;
 
-    $scope.$parent.state.setManagerState('logs');
-
     var objectsArray = [];
 
     var _category = 'all';
