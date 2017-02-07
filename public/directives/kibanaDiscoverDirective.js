@@ -555,7 +555,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                                     timefilter.time.to = moment(e.point.x + e.data.ordered.interval);
                                     timefilter.time.mode = 'absolute';
                                 },
-                                brush: brushEvent
+                                brush: brushEvent($state)
                             },
                             aggs: visStateAggs
                         });

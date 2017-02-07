@@ -99,7 +99,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 			.then(function (data) {
 				$scope.agentInfo = data.data;
 				$scope._agent = data.data;
-				$scope.search = data.data.name;	
+				$scope.search = data.data.name;
 				$scope.load = false;
 			}, printError);
         }

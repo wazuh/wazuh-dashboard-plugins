@@ -120,21 +120,6 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
     };
 
     //Functions
-    var parseConfiguration = function () {
-        if ($scope.managerConfiguration.rules.decoder) {
-            if (angular.isString($scope.managerConfiguration.rules.decoder)) { $scope.managerConfiguration.rules.decoder = [$scope.managerConfiguration.rules.decoder] }
-        }
-        if ($scope.managerConfiguration.rules.rule_dir) {
-            if (angular.isString($scope.managerConfiguration.rules.rule_dir)) { $scope.managerConfiguration.rules.rule_dir = [$scope.managerConfiguration.rules.rule_dir] }
-        }
-        if ($scope.managerConfiguration.rules.list) {
-            if (angular.isString($scope.managerConfiguration.rules.list)) { $scope.managerConfiguration.rules.list = [$scope.managerConfiguration.rules.list] }
-        }
-        if ($scope.managerConfiguration.rootcheck.system_audit) {
-            if (angular.isString($scope.managerConfiguration.rootcheck.system_audit)) { $scope.managerConfiguration.rootcheck.system_audit = [$scope.managerConfiguration.rootcheck.system_audit] }
-        }
-    };
-
     var load = function () {
         DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {
@@ -142,7 +127,6 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
                 DataFactory.getAndClean('get', '/manager/configuration', {})
                     .then(function (data) {
                         $scope.managerConfiguration = data.data;
-                        parseConfiguration();
                         $scope.load = false;
                     }, printError);
             }, printError);

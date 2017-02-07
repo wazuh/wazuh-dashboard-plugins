@@ -16,7 +16,8 @@ var app = require('ui/modules').get('app/wazuh', [])
 		  visHeight: '@visHeight',
 		  visWidth: '@visWidth',
 		  visSearchable: '@visSearchable',
-		  visClickable: '@visClickable'
+		  visClickable: '@visClickable',
+		  visTimefilter: '@visTimefilter'
 		},
 		template: require('../templates/directives/kibana-visualization-template.html')
     }
@@ -76,7 +77,12 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			timefilter.time.from = "now-24h";
 			timefilter.time.to = "now";
 		}
-
+		// Set time filter if needed
+		if($scope.visTimefilter){
+			timefilter.time.from = "now-"+$scope.visTimefilter;
+			timefilter.time.to = "now";
+		}
+		
 		// Initialize time
 		$scope.timefilter = timefilter;
 
