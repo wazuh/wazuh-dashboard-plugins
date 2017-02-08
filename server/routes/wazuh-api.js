@@ -113,7 +113,6 @@ module.exports = function (server, options) {
 
 		try {
 			pciRequirements = JSON.parse(fs.readFileSync(path.resolve(__dirname, pciRequirementsFile), 'utf8'));
-			console.log(pciRequirements);
 		} catch (e) {
 			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
 			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + pciRequirementsFile);

@@ -156,7 +156,6 @@ module.exports = function (server, options) {
 				server.log([blueWazuh, 'initialize', 'info'], 'Template installed and loaded: ' +  index_pattern);
 				insertSampleData(todayIndex);
 			}, function (data) {
-				console.log(data);
 				server.log([blueWazuh, 'initialize', 'error'], 'Could not install template ' +  index_pattern);
 			});
     };

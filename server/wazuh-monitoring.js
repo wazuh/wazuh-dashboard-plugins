@@ -208,7 +208,6 @@ module.exports = function (server, options) {
 			function () {
 				server.log([blueWazuh, 'initialize', 'info'], '[Wazuh agents monitoring] Template installed and loaded: ' +  index_pattern);
 			}, function (data) {
-				console.log(data);
 				server.log([blueWazuh, 'initialize', 'error'], '[Wazuh agents monitoring] Could not install template ' +  index_pattern);
 			});
     };
