@@ -40,6 +40,9 @@ require('plugins/wazuh/directives/kibanaSearchbarDirective.js');
 // Overview
 require('plugins/wazuh/controllers/overview.js');
 
+// Dashboard
+require('plugins/wazuh/controllers/dashboard.js');
+
 // Manager
 require('plugins/wazuh/controllers/manager.js');
 require('plugins/wazuh/controllers/ruleset.js');

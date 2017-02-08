@@ -1,5 +1,8 @@
-<md-content style="background-color: white" flex layout="column" ng-if="submenuNavItem == 'dashboards'" layout-align="start space-around">
+<script>
+$('iframe').load( function() {
+    $('iframe').contents().find("head")
+      .append($('<style type="text/css">.kuiLocalNav.ng-hide { display: block !important; }</style>'));
+});
+</script>
 
-    <kbn-dash dash-id="{{select}}" dash-time-from="now-24h" dash-time-to="now" dash-searchable="true" dash-timepicker="true" ng-init="state.setDashboardsState(select);"></kbn-dash>
-	
-</md-content>
+<iframe ng-controller="dashboardController" src="{{dashboardURL}}" iframe-set-dimensions-onload></iframe>
