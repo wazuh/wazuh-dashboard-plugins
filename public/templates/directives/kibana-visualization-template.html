@@ -1,14 +1,5 @@
 <div ng-controller="VisController">
 
-	<div ng-if="not_aggregable" class="text-center visualize-error visualize-chart ng-scope">
-		<div class="item top"></div>
-		<div class="item">
-			<h2 aria-hidden="true"><i aria-hidden="true" class="fa fa-meh-o"></i></h2>
-			<h4>No results found</h4>
-		</div>
-		<div class="item bottom"></div>
-	</div>
-	
 	<div ng-if="loadBeforeShow" class="app-container vis-editor vis-type-{{ vis.type.name }}" ng-style="{height:visHeight}">
 
 	  <kbn-top-nav name="visualize" config="topNavMenu" ng-if="visSearchable">

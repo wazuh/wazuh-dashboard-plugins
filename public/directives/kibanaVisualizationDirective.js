@@ -104,22 +104,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			// Bind visualization, index pattern and state
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
-			angular.forEach($scope.indexPattern.fields, function(value, key) {
-				if(value.aggregatable)
-					agg_fields.push(value.displayName);
-			});
-
 			$scope.state = $state;
-
-			// Check if needed fields are agreggable
-			$scope.not_aggregable = false;
-			angular.forEach(visDecoded.vis.aggs, function(value, key) {
-				if(value.type == "terms" && (agg_fields.indexOf(value.params.field) === -1)){
-					$scope.not_aggregable = true;
-					return;
-				}
-			});
-
 			
 			// Build visualization
 			visState.aggs = visDecoded.vis.aggs;
