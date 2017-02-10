@@ -28,8 +28,8 @@ module.exports = function (server, options) {
     // Initialize
     var blueWazuh = colors.blue('wazuh');
     var agentsArray = [];
-    const KIBANA_FIELDS_FILE = 'scripts/integration_files/kibana_fields_file.json';
-	const TEMPLATE_FILE = 'scripts/integration_files/template_file.json';
+    const KIBANA_FIELDS_FILE = 'startup/integration_files/kibana_fields_file.json';
+	const TEMPLATE_FILE = 'startup/integration_files/template_file.json';
     var kibana_fields_data = {};
 	var map_jsondata = {};	
 	api_version = "v2.0.0";
@@ -49,10 +49,7 @@ module.exports = function (server, options) {
 					server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
 					return;
 				}
-
-
 				checkAndSaveStatus(apiEntry);
-
 			});
     }
 

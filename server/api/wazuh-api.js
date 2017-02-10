@@ -108,7 +108,7 @@ module.exports = function (server, options) {
 
 	var getPciRequirement = function (req,reply) {
 
-		const pciRequirementsFile = '../scripts/integration_files/pci_requirements.json';
+		const pciRequirementsFile = '../startup/integration_files/pci_requirements.json';
 		var pciRequirements = {};
 
 		try {

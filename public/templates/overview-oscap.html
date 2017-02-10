@@ -1,5 +1,14 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'oscap'" ng-controller="overviewOSCAPController" layout-align="space-around">
 
+	<!-- No results message -->
+	<md-content flex layout="row" layout-align="start start" ng-if="!results">
+		<md-card flex layout="column">
+			<md-card-content style="text-align: center;">
+				No results for selected time interval
+			</md-card-content>
+		</md-card>		
+	</md-content> 
+	
 	<!-- View: Discover -->
 	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
 		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
@@ -9,7 +18,7 @@
 	</md-content> 
 	
 	<!-- View: Panels -->
-	<div ng-if="tabView == 'panels'">
+	<div ng-if="tabView == 'panels' && results">
 		<kbn-searchbar></kbn-searchbar>		
 		<md-content layout="row" layout-align="center stretch">
 			<md-card flex="20" layout="column">
@@ -89,11 +98,11 @@
 			<md-card flex="100">
 					<md-card-title>
 						<md-card-title-text>
-							<span class="md-headline">Top 5 Agents - Alerts severity high</span>
+							<span class="md-headline">Top 5 Agents - Severity high</span>
 						</md-card-title-text>
 					</md-card-title>
 					<md-card-content>
-						<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
+						<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:grouped,scale:linear,setYExtents:!f,times:!()),title:'New%20Visualization',type:histogram))"
 							vis-filter="rule.groups: oscap AND oscap.check.severity: high">
 						</kbn-vis>
 					</md-card-content>

@@ -1,3 +1,4 @@
+import rison from 'rison-node';
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location) {
@@ -37,6 +38,19 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.$watch('submenuNavItem', function() {
 		$location.search('tab', $scope.submenuNavItem);
 	});	
+	
+	// Check if there are any alert.
+	$scope.presentData = function (group, timeAgo) {
+		var deferred = $q.defer();
+		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/rule.groups/'+group+'/'+timeAgo)
+		.then(function (data) {
+			if(data.data != "")
+				deferred.resolve(true);
+			else
+				deferred.resolve(false);
+		});	
+		return deferred.promise;
+	};
 
 });
 
@@ -66,10 +80,16 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
 
 app.controller('overviewOSCAPController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
 
-    $scope.load = true;
+    $scope.load = false;
     $scope.$parent.state.setOverviewState('oscap');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-
+	var daysAgo = 1;
+	var date = new Date();
+	date.setDate(date.getDate() - daysAgo);
+	var timeAgo = date.getTime();
+	console.log(rison.decode($route.current.params._g));
+	$scope.presentData("oscap",timeAgo).then(function (data) {$scope.results = data;});
+	
 });
 
 app.controller('overviewAuditController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {

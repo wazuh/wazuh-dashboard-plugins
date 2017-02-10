@@ -17,7 +17,7 @@ module.exports = function (server, options) {
 	var index_prefix = "wazuh-alerts-";
 	const fs = require('fs');
 	const path = require('path');
-	const KIBANA_FIELDS_FILE = '../scripts/integration_files/kibana_fields_file.json';
+	const KIBANA_FIELDS_FILE = '../startup/integration_files/kibana_fields_file.json';
 	var kibana_fields_data = {};
 		
     const payloads = {
