@@ -106,6 +106,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 		// Check if tab is empty, then reset to preview
 		if(angular.isUndefined($location.search().tab) && angular.isUndefined($location.search().id)){
 			$scope.submenuNavItem = "preview";
+			delete $scope._agent;
 		}
 	});
 	
