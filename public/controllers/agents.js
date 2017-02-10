@@ -1,7 +1,8 @@
+import rison from 'rison-node';
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window, genericReq, $routeParams, $route, $location) {
+app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window, genericReq, $routeParams, $route, $location, $http) {
     //Initialization
 	$scope.state = appState;
     $scope.load = true;
@@ -10,7 +11,17 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	$scope.tabView = "panels";	
     $scope.state = appState;
 	$scope._status = 'all';
-
+	
+	// Object for matching nav items and Wazuh groups
+	var tabGroups = {
+		"overview": {"group": "*"},
+		"fim": {"group": "syscheck"},
+		"policy_monitoring": {"group": "rootcheck"},
+		"oscap": {"group": "oscap"},
+		"audit": {"group": "audit"},
+		"pci": {"group": "*"}
+	};
+	
 	var agentId = "";
 	
 	
@@ -36,17 +47,67 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 
 	// Watchers
 	$scope.$watch('_agent', function() {
-		$location.search('id', $scope._agent.id);		
+		$location.search('id', $scope._agent.id);
+		$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;});	
 	});
 	
 	$scope.$watch('tabView', function() {
 		$location.search('view', $scope.tabView);		
 	});
 	
+	$scope.results = false;
 	$scope.$watch('submenuNavItem', function() {
 		$location.search('tab', $scope.submenuNavItem);
+		if($scope.submenuNavItem != "preview")
+			$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;});		
 	});	
 	
+	// Checking for alerts count
+	
+	// Get current time filter or default
+	$scope.timeGTE = ($route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
+	$scope.timeLT = ($route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
+
+	// Check if there are any alert. 
+	$scope.presentData = function (agentID) {
+		var group = tabGroups[$scope.submenuNavItem].group;
+		var payload = {};
+		var fields = {"fields" : [{"field": "rule.groups", "value": group},{"field": "agent.id", "value": agentID}]};
+		// No filter needed for general/pci
+		if(group == "*")
+			fields = {"fields" : []};
+		var managerName = {"manager" : $scope.defaultManager};
+		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
+		angular.extend(payload, fields, managerName, timeInterval);
+		
+		var deferred = $q.defer();
+		$http.post('/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
+			if(data.data.data != 0)
+				deferred.resolve(true);
+			else
+				deferred.resolve(false);
+		});
+		return deferred.promise;
+	};
+	
+	// Watch for timefilter changes
+	$scope.$on('$routeUpdate', function(){
+		var currentTimeFilter = rison.decode($location.search()._g);
+		
+		// Check if timefilter has changed and update values
+		if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+			$scope.timeGTE = currentTimeFilter.time.from;
+			$scope.timeLT = currentTimeFilter.time.to;
+			
+			//Check for present data for the selected tab
+			if($scope.submenuNavItem != "preview")
+				$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;});
+		}
+		// Check if tab is empty, then reset to preview
+		if(angular.isUndefined($location.search().tab) && angular.isUndefined($location.search().id)){
+			$scope.submenuNavItem = "preview";
+		}
+	});
 	
     //Functions
 
@@ -130,8 +191,12 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
-				if(agentId != "")
-					$scope.applyAgent({"id": agentId});
+				if(agentId != ""){
+					$scope.presentData(agentId).then(function (data) {
+						$scope.results = data;
+						$scope.applyAgent({"id": agentId});
+					});	
+				}
 				else
 					$scope.load = false;
             }, printError);
@@ -151,7 +216,6 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 
     //Destroy
     $scope.$on("$destroy", function () {
-		console.log("destroying");
         angular.forEach(objectsArray, function (value) {
             DataFactory.clean(value)
         });

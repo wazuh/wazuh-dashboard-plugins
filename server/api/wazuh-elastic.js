@@ -36,10 +36,38 @@ module.exports = function (server, options) {
     var fetchElastic = function (payload) {
         return client.search({ index: 'wazuh-alerts-*', type: 'wazuh', body: payload });
     };
+	
+	// Returns alerts count for fields/value array between timeGTE and timeLT
+    var alertsCount = function (req, reply) {
+		
+		var payload = {"size": 1,"query": {"bool": {"must": [], "filter": {"range": {"@timestamp": {"gte": "","lt": ""}}}}}};
 
+		// Set up time interval, default to Last 24h
+        const timeGTE = req.payload.timeinterval.gte ? req.payload.timeinterval.gte : "now-1d";
+        const timeLT = req.payload.timeinterval.lt ? req.payload.timeinterval.lt : "now";
+		payload.query.bool.filter.range['@timestamp'].gte = timeGTE;
+		payload.query.bool.filter.range['@timestamp'].lt = timeLT;
+		
+		// Set up match for default manager name
+		payload.query.bool.must.push({"match": {"manager.name": req.payload.manager}});
+
+		// Set up match for different pairs field/value
+		req.payload.fields.forEach(function(item) {
+			var obj = {};
+			obj[item.field] = item.value;
+			payload.query.bool.must.push({"match": obj});
+		})
+		
+
+        fetchElastic(payload).then(function (data) {
+            reply({ 'statusCode': 200, 'data': data.hits.total });
+        }, function () {
+            reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
+        });
+    };
+	
     var getFieldTop = function (req, reply) {
-        var filtering = false;
-
+ 
         // is date defined? or must use 24h ?
         var date = new Date();
         date.setDate(date.getDate() - 1);
@@ -47,8 +75,7 @@ module.exports = function (server, options) {
 
         const timeAgo = req.params.time ? encodeURIComponent(req.params.time) : date;
 
-        if (req.params.fieldValue && req.params.fieldFilter)
-            filtering = true;
+
 
 		var payload = JSON.parse(JSON.stringify(payloads.getFieldTop));
 		
@@ -271,6 +298,16 @@ module.exports = function (server, options) {
         handler: getFieldTop
     });
 	
+	/*
+    * /api/wazuh-elastic/alerts-count
+    * Returns alerts count for fields/value array between timeGTE and timeLT
+    * @params: fields[{field,value}], manager, timeinterval{gte,lte}
+    **/
+    server.route({
+        method: 'POST',
+        path: '/api/wazuh-elastic/alerts-count/',
+        handler: alertsCount
+    });		
     /*
     * GET /api/wazuh-elastic/last/{manager}/{field}
     * Return last field value

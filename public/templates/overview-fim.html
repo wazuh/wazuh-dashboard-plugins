@@ -1,5 +1,16 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'fim'" ng-controller="overviewFimController">
 
+	<!-- No results message -->
+	<kbn-searchbar ng-if="!results"></kbn-searchbar>
+	<md-content flex layout="row" layout-align="start start" ng-if="!results">
+		<md-card flex layout="column">
+			<md-card-content style="text-align: center;">
+				No results for selected time interval
+			</md-card-content>
+		</md-card>		
+	</md-content> 
+	
+	
 	<!-- View: Discover -->
 	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
 		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
@@ -9,7 +20,7 @@
 	</md-content>
 	
 	<!-- View: Panels -->
-	<div ng-if="tabView == 'panels'">
+	<div ng-if="tabView == 'panels' && results">
 		<kbn-searchbar></kbn-searchbar>
 		<md-content layout="row">
 			<div flex="10" layout="column">

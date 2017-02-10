@@ -1,32 +1,4 @@
 <div ng-controller="testController">
 
 
-<md-content flex layout="column"  layout-align="space-around">
-
-	<kbn-searchbar></kbn-searchbar>
-	
-		<md-card flex layout="column">
-			<md-card-content>
-				<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top pci',type:pie))"
-							vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
-						</kbn-vis>
-
-			</md-card-content>
-		</md-card>
-
-		<md-card flex layout="column">
-			<md-card-content>
-<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.groups,order:desc,orderBy:'1',size:8),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!f,times:!(),yAxis:()),title:'Signature:%20Area%20Chart',type:area))"
-				vis-filter="*"
-				</kbn-vis>
-
-			</md-card-content>
-		</md-card>
-
-
-
-</md-content>
-
-
-
 </div>

@@ -1,6 +1,7 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'oscap'" ng-controller="overviewOSCAPController" layout-align="space-around">
 
 	<!-- No results message -->
+	<kbn-searchbar ng-if="!results"></kbn-searchbar>
 	<md-content flex layout="row" layout-align="start start" ng-if="!results">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">

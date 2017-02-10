@@ -1,7 +1,7 @@
 import rison from 'rison-node';
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location) {
+app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location, $http) {
 	
     $scope.state = appState;
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
@@ -9,6 +9,16 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
 	
+	// Object for matching nav items and Wazuh groups
+	var tabGroups = {
+		"general": {"group": "*"},
+		"fim": {"group": "syscheck"},
+		"pm": {"group": "rootcheck"},
+		"oscap": {"group": "oscap"},
+		"audit": {"group": "audit"},
+		"pci": {"group": "*"}
+	};
+
 	var tab = "";
 	var view = "";
     if($routeParams.tab)
@@ -35,22 +45,50 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		$location.search('view', $scope.tabView);		
 	});
 	
+	$scope.results = false;
 	$scope.$watch('submenuNavItem', function() {
 		$location.search('tab', $scope.submenuNavItem);
+		$scope.presentData().then(function (data) {$scope.results = data;});
 	});	
 	
-	// Check if there are any alert.
-	$scope.presentData = function (group, timeAgo) {
+	// Get current time filter or default
+	$scope.timeGTE = ($route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
+	$scope.timeLT = ($route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
+
+	// Check if there are any alert. 
+	$scope.presentData = function () {
+		var group = tabGroups[$scope.submenuNavItem].group;
+		var payload = {};
+		var fields = {"fields" : [{"field": "rule.groups", "value": group}]};
+		// No filter needed for general/pci
+		if(group == "*")
+			fields = {"fields" : []};
+		var managerName = {"manager" : $scope.defaultManager};
+		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
+		angular.extend(payload, fields, managerName, timeInterval);
+		
 		var deferred = $q.defer();
-		genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/rule.groups/rule.groups/'+group+'/'+timeAgo)
-		.then(function (data) {
-			if(data.data != "")
+		$http.post('/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
+			if(data.data.data != 0)
 				deferred.resolve(true);
 			else
 				deferred.resolve(false);
-		});	
+		});
 		return deferred.promise;
 	};
+	
+	// Watch for timefilter changes
+	$scope.$on('$routeUpdate', function(){
+		var currentTimeFilter = rison.decode($location.search()._g);
+		// Check if timefilter has changed and update values
+		if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+			$scope.timeGTE = currentTimeFilter.time.from;
+			$scope.timeLT = currentTimeFilter.time.to;
+			
+			//Check for present data for the selected tab
+			$scope.presentData().then(function (data) {$scope.results = data;});
+		}
+	});
 
 });
 
@@ -83,12 +121,6 @@ app.controller('overviewOSCAPController', function ($scope, DataFactory, generic
     $scope.load = false;
     $scope.$parent.state.setOverviewState('oscap');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-	var daysAgo = 1;
-	var date = new Date();
-	date.setDate(date.getDate() - daysAgo);
-	var timeAgo = date.getTime();
-	console.log(rison.decode($route.current.params._g));
-	$scope.presentData("oscap",timeAgo).then(function (data) {$scope.results = data;});
 	
 });
 
