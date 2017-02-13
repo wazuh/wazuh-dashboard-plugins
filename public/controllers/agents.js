@@ -65,8 +65,8 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	// Checking for alerts count
 	
 	// Get current time filter or default
-	$scope.timeGTE = ($route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
-	$scope.timeLT = ($route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
+	$scope.timeGTE = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
+	$scope.timeLT = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
 
 	// Check if there are any alert. 
 	$scope.presentData = function (agentID) {
@@ -92,16 +92,18 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	
 	// Watch for timefilter changes
 	$scope.$on('$routeUpdate', function(){
-		var currentTimeFilter = rison.decode($location.search()._g);
-		
-		// Check if timefilter has changed and update values
-		if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
-			$scope.timeGTE = currentTimeFilter.time.from;
-			$scope.timeLT = currentTimeFilter.time.to;
+		if($location.search()._g){
+			var currentTimeFilter = rison.decode($location.search()._g);
 			
-			//Check for present data for the selected tab
-			if($scope.submenuNavItem != "preview")
-				$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;});
+			// Check if timefilter has changed and update values
+			if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+				$scope.timeGTE = currentTimeFilter.time.from;
+				$scope.timeLT = currentTimeFilter.time.to;
+				
+				//Check for present data for the selected tab
+				if($scope.submenuNavItem != "preview")
+					$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;});
+			}
 		}
 		// Check if tab is empty, then reset to preview
 		if(angular.isUndefined($location.search().tab) && angular.isUndefined($location.search().id)){

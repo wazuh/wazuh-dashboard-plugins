@@ -93,7 +93,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			'active': activeStatus
 		};
 
-        testConnection.test_tmp(tmpData).then(function (data) {
+        testConnection.check(tmpData).then(function (data) {
 			// API Check correct, get Manager name
 			tmpData.manager = data;
 			tmpData.extensions = {"oscap": true, "audit": true, "pci": true};

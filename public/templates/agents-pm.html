@@ -1,7 +1,9 @@
 <md-content ng-if="submenuNavItem == 'policy_monitoring' && _agent" id="agents-pm" ng-controller="pmController">
 
+	<!-- Kibana search bar -->
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	
 	<!-- No results message -->
-	<kbn-searchbar ng-if="!results"></kbn-searchbar>
 	<md-content flex layout="row" layout-align="start start" ng-if="!results">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
@@ -20,7 +22,6 @@
 	</md-content>
 	
     <div flex ng-if="tabView == 'panels' && results" layout="column">
-		<kbn-searchbar></kbn-searchbar>
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
             <md-content layout="row">
                 <md-card flex="50">

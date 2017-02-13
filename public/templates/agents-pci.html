@@ -1,7 +1,9 @@
 <md-content ng-if="submenuNavItem == 'pci' && _agent" id="agents-pci" ng-controller="PCIController">
 
+	<!-- Kibana search bar -->
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	
 	<!-- No results message -->
-	<kbn-searchbar ng-if="!results"></kbn-searchbar>
 	<md-content flex layout="row" layout-align="start start" ng-if="!results">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
@@ -21,7 +23,6 @@
 	
     <div flex ng-if="tabView == 'panels' && results" layout="column"> 
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-		<kbn-searchbar></kbn-searchbar>	
 		<md-content layout="row" layout-align="center stretch">
 		<md-card flex>
 			<md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">

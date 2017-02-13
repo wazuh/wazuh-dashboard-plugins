@@ -1,7 +1,9 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'audit'" ng-controller="overviewAuditController" layout-align="space-around">
 
+	<!-- Kibana search bar -->
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	
 	<!-- No results message -->
-	<kbn-searchbar ng-if="!results"></kbn-searchbar>
 	<md-content flex layout="row" layout-align="start start" ng-if="!results">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
@@ -21,7 +23,6 @@
 	
 	<!-- View: Panels -->
 	<div ng-if="tabView == 'panels' && results">
-		<kbn-searchbar></kbn-searchbar>		
 		<md-content layout="row" layout-align="center stretch">
 			<md-card flex="10" layout="column">
 					<md-card-content style="text-align: center;">

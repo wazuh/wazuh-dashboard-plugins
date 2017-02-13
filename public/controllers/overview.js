@@ -52,8 +52,8 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	});	
 	
 	// Get current time filter or default
-	$scope.timeGTE = ($route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
-	$scope.timeLT = ($route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
+	$scope.timeGTE = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
+	$scope.timeLT = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
 
 	// Check if there are any alert. 
 	$scope.presentData = function () {
@@ -79,14 +79,16 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	
 	// Watch for timefilter changes
 	$scope.$on('$routeUpdate', function(){
-		var currentTimeFilter = rison.decode($location.search()._g);
-		// Check if timefilter has changed and update values
-		if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
-			$scope.timeGTE = currentTimeFilter.time.from;
-			$scope.timeLT = currentTimeFilter.time.to;
-			
-			//Check for present data for the selected tab
-			$scope.presentData().then(function (data) {$scope.results = data;});
+		if($location.search()._g){
+			var currentTimeFilter = rison.decode($location.search()._g);
+			// Check if timefilter has changed and update values
+			if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+				$scope.timeGTE = currentTimeFilter.time.from;
+				$scope.timeLT = currentTimeFilter.time.to;
+				
+				//Check for present data for the selected tab
+				$scope.presentData().then(function (data) {$scope.results = data;});
+			}
 		}
 	});
 

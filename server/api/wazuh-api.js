@@ -184,7 +184,7 @@ module.exports = function (server, options) {
         }
     };
 
-    var testApi = function (req, reply) {
+    var checkStoredAPI = function (req, reply) {
         var needle = require('needle');
         needle.defaults({
             open_timeout: 5000
@@ -215,7 +215,7 @@ module.exports = function (server, options) {
         });
     };
 
-	var testAPI_tmp = function (req, reply) {
+	var checkAPI = function (req, reply) {
         var needle = require('needle');
         needle.defaults({
             open_timeout: 1000
@@ -378,19 +378,20 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-api/test',
-        handler: testApi
+        path: '/api/wazuh-api/check',
+        handler: checkStoredAPI
     });
 
 	/*
     * POST /api/wazuh-api/test
+	* Check if credentials on POST connect to Wazuh API. Not storing them!
     * Returns if the wazuh-api configuration received in the POST body will work
     *
     **/
     server.route({
         method: 'POST',
-        path: '/api/wazuh-api/test',
-        handler: testAPI_tmp
+        path: '/api/wazuh-api/check',
+        handler: checkAPI
     });
 	
     /*

@@ -1,11 +1,11 @@
 require('ui/modules').get('app/wazuh', [])
     .service('testConnection', function ($q, $http) {
         return {
-            test: function () {
+            check_stored: function () {
                 var defered = $q.defer();
                 var promise = defered.promise;
 
-                $http.get("/api/wazuh-api/test")
+                $http.get("/api/wazuh-api/check")
                     .success(function (data) {
                         if (data.error) {
                             defered.reject(data);
@@ -19,11 +19,11 @@ require('ui/modules').get('app/wazuh', [])
 
                 return promise;
             },
-			test_tmp: function (data) {
+			check: function (data) {
                 var defered = $q.defer();
                 var promise = defered.promise;
 
-                $http.post("/api/wazuh-api/test", data)
+                $http.post("/api/wazuh-api/check", data)
                     .success(function (data) {
                         if (data.error) {
                             defered.reject(data);

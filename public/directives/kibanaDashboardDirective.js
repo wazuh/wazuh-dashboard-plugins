@@ -48,8 +48,6 @@ app.directive('kbnDash', function (Notifier, courier, AppState, timefilter, kbnU
         controller: function ($scope, $rootScope, $route, $routeParams, $location, Private, getAppState, savedDashboards, appState, genericReq, SavedVis) {
             $scope.chrome = {};
             $scope.chrome.getVisible = function () {return true};
-			$scope.defaultManagerName = appState.getDefaultManager().name;
-			//$scope.dashFilter =  "* AND host: " + $scope.defaultManagerName;
 			
             $scope.topNavMenu = [{
                 key: 'open',

@@ -1,7 +1,9 @@
 <md-content ng-if="submenuNavItem == 'overview' && agentInfo" ng-controller="agentsOverviewController">
 
+	<!-- Kibana search bar -->
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	
 	<!-- No results message -->
-	<kbn-searchbar ng-if="!results"></kbn-searchbar>
 	<md-content flex layout="row" layout-align="start start" ng-if="!results">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
@@ -21,7 +23,6 @@
 
 	<!-- View: Panels -->
 	<div ng-if="tabView == 'panels' && results">
-		<kbn-searchbar></kbn-searchbar>
 		<md-content layout="row">
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
@@ -96,8 +97,8 @@
 				</md-card>
 
 			</md-content>
-		<md-content layout="row">
-			<md-card flex="40" class="visBox-alert-level-evolution">
+		<md-content layout="row" layout-align="start stretch">
+			<md-card flex class="visBox-alert-level-evolution">
 					<md-card-title>
 						<md-card-title-text>
 							<span class="md-headline">Alert level evolution</span>

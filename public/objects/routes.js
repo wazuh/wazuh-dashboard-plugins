@@ -4,7 +4,7 @@ var routes = require('ui/routes');
 //Installation wizard
 var settingsWizard = function ($location, testConnection, $mdToast, appState, $q, genericReq) {
     var deferred = $q.defer();
-    testConnection.test().then(function (data)
+    testConnection.check_stored().then(function (data)
     {
 		appState.setDefaultManager(data.manager);
 		appState.setExtensions(data.extensions);

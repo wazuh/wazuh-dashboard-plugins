@@ -50,7 +50,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	// Set filters
 	$scope.filter = {};
 	$scope.defaultManagerName = appState.getDefaultManager().name;
-	$scope.filter.raw = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
+	$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
 	$scope.filter.current = $scope.filter.raw;
 
 	// Initialize and decode params
@@ -118,6 +118,8 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			$scope.uiState = $state.makeStateful('uiState');
 
 			// Hide legend if needed
+			if(typeof visDecoded.uiState.vis !== "undefined" && typeof visDecoded.uiState.vis.legendOpen !== "undefined")
+				console.log(visDecoded.uiState.vis.legendOpen);
 			if(typeof visDecoded.uiState.vis !== "undefined" && typeof visDecoded.uiState.vis.legendOpen !== "undefined" && !visDecoded.uiState.vis.legendOpen)
 				$scope.uiState.set('vis.legendOpen', false);
 			else
