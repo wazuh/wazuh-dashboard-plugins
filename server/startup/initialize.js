@@ -43,20 +43,6 @@ module.exports = function (server, options) {
 	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
     var todayIndex = index_prefix + fDate;
 
-	// Inserting sample data
-	var insertSampleData = function (todayIndex) {
-        var SAMPLE_DATA = {"full_log": "Sample alert created by Wazuh App. www.wazuh.com", "@timestamp": new Date().toISOString() };
-
-        client.create({ index: todayIndex, type: 'wazuh', id: Date.now(), body: SAMPLE_DATA }).then(
-            function (data) {
-                server.log([blueWazuh, 'initialize', 'info'], 'Sample alert was inserted successfully.');
-                configureKibana();
-            }, function (data) {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not insert sample alert.');
-                server.log([blueWazuh, 'initialize', 'error'], data);
-            });
-    };
-
 	// Save Wazuh App first set up for further updates
 	var saveSetupInfo = function () {
         var setup_info = {"name" : "Wazuh App", "app-version": packageJSON.version, "installationDate": new Date().toISOString() };
@@ -154,7 +140,7 @@ module.exports = function (server, options) {
 		client.indices.putTemplate( {name: "wazuh", order: 0, body: map_jsondata}).then(
 			function () {
 				server.log([blueWazuh, 'initialize', 'info'], 'Template installed and loaded: ' +  index_pattern);
-				insertSampleData(todayIndex);
+				configureKibana();
 			}, function (data) {
 				server.log([blueWazuh, 'initialize', 'error'], 'Could not install template ' +  index_pattern);
 			});
