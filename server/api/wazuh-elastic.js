@@ -62,7 +62,6 @@ module.exports = function (server, options) {
 			payload.query.bool.must.push({"match": obj});
 		})
 		
-		//console.log(JSON.stringify(payload));
         fetchElastic(payload).then(function (data) {
             reply({ 'statusCode': 200, 'data': data.hits.total });
         }, function () {

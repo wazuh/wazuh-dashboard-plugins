@@ -180,7 +180,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		// Watcher
 		var visFilterWatch = $scope.$watch("visFilter", function () {
-			$scope.filter.raw = $scope.visFilter + " AND host: " + $scope.defaultManagerName;
+			$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
 			$scope.filter.current = $scope.filter.raw;
 			$scope.fetch();
 		});		

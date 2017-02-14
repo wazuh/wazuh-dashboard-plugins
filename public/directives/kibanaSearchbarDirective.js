@@ -127,13 +127,6 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 		}
 
 	});
-
-	/* Disabled
-	$timeout(
-	function() {
-		injectTipLeyend();
-	}, 3000);
-	*/
 	
 	// Listen for destroy 
 	$scope.$on('$destroy', visCounterWatch);
