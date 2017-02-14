@@ -41,13 +41,16 @@ module.exports = function (server, options) {
 	// Returns alerts count for fields/value array between timeGTE and timeLT
     var alertsCount = function (req, reply) {
 		
-		var payload = {"size": 1,"query": {"bool": {"must": [], "filter": {"range": {"@timestamp": {"gte": "","lt": ""}}}}}};
+		var payload = {"size": 1,"query": {"bool": {"must": [], "filter": {"range": {"@timestamp": {}}}}}};
 
 		// Set up time interval, default to Last 24h
         const timeGTE = req.payload.timeinterval.gte ? req.payload.timeinterval.gte : "now-1d";
         const timeLT = req.payload.timeinterval.lt ? req.payload.timeinterval.lt : "now";
-		payload.query.bool.filter.range['@timestamp'].gte = timeGTE;
-		payload.query.bool.filter.range['@timestamp'].lt = timeLT;
+		payload.query.bool.filter.range['@timestamp']["gte"] = timeGTE;
+		if(timeLT != "now")
+			payload.query.bool.filter.range['@timestamp']["lte"] = timeLT;
+		else
+			payload.query.bool.filter.range['@timestamp']["lt"] = timeLT;
 		
 		// Set up match for default manager name
 		payload.query.bool.must.push({"match": {"manager.name": req.payload.manager}});

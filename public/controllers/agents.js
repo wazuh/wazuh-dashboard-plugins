@@ -75,7 +75,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 		var fields = {"fields" : [{"field": "rule.groups", "value": group},{"field": "agent.id", "value": agentID}]};
 		// No filter needed for general/pci
 		if(group == "*")
-			fields = {"fields" : []};
+			fields = {"fields" : [{"field": "agent.id", "value": agentID}]};
 		var managerName = {"manager" : $scope.defaultManager};
 		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
 		angular.extend(payload, fields, managerName, timeInterval);
