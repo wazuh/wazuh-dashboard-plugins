@@ -62,7 +62,7 @@ module.exports = function (server, options) {
 			payload.query.bool.must.push({"match": obj});
 		})
 		
-
+		//console.log(JSON.stringify(payload));
         fetchElastic(payload).then(function (data) {
             reply({ 'statusCode': 200, 'data': data.hits.total });
         }, function () {
@@ -84,11 +84,11 @@ module.exports = function (server, options) {
 		var payload = JSON.parse(JSON.stringify(payloads.getFieldTop));
 		
         if (req.params.fieldFilter && req.params.fieldFilter2) {
-			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND " + req.params.fieldFilter2 + ":" + req.params.fieldValue2 + " AND host: " + req.params.manager;
+			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND " + req.params.fieldFilter2 + ":" + req.params.fieldValue2 + " AND manager.name: " + req.params.manager;
 		}else if(req.params.fieldFilter){
-			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND host: " + req.params.manager;
+			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND manager.name: " + req.params.manager;
         }else{
-            payload.query.bool.must[0].query_string.query = "host: " + req.params.manager;
+            payload.query.bool.must[0].query_string.query = "manager.name: " + req.params.manager;
 		}
 		
         payload.query.bool.must[1].range['@timestamp'].gte = timeAgo;
@@ -117,7 +117,7 @@ module.exports = function (server, options) {
 		var payload = JSON.parse(JSON.stringify(payloads.getLastField));
 		payload.query.bool.must[0].exists.field = req.params.field;
 		
-		filterArray["host"] = req.params.manager;
+		filterArray["host"]["manager.name"] = req.params.manager;
 		termArray = { "term": filterArray };
 		payload.query.bool.must.push(termArray);
 		filterArray = {};
@@ -216,7 +216,8 @@ module.exports = function (server, options) {
 			kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
 			// Get fields index pattern template  (wazuh-alerts-*)
 			var wazuhAlerts_indexPattern_template = JSON.parse(kibana_fields_data.wazuh_alerts)
-			var wazuhAlerts_indexPattern_current = {};	
+			var wazuhAlerts_indexPattern_current = {};
+			var responseBack = {};
 			var fields = [];
 			for (var i = 0, len = wazuhAlerts_indexPattern_template.length; i < len; i++) {
 				fields.push(wazuhAlerts_indexPattern_template[i].name);
@@ -247,7 +248,7 @@ module.exports = function (server, options) {
 						}
 					}
 				}, function (error, response) {
-					reply({ 'response': response, 'error': error  }).code(200);
+					responseBack["wazuh-alerts"] = response;
 				})
 			})
 
@@ -270,7 +271,8 @@ module.exports = function (server, options) {
 					}
 				}
 			}, function (error, response) {
-				reply({ 'response': response, 'error': error  }).code(200);
+				responseBack["wazuh-monitoring"] = response;
+				reply({ 'response': responseBack, 'error': error  }).code(200);				
 			})
 
 			} catch (e) {
