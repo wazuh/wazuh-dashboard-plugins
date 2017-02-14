@@ -1,22 +1,30 @@
 <md-content flex ng-controller="settingsController" layout="column">
 
-  <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'settings'" style="height: 70px;">
-    <md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-      <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
-        <img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
-      </md-nav-item>
+	<md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'settings'" style="height: 70px;">
+	<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+	  <md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
+		<img aria-hidden="true" src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>
+	  </md-nav-item>
 			<md-nav-item md-nav-href="#/overview" name="overview">Overview</md-nav-item>
 			<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>
 			<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>
 			<md-nav-item md-nav-href="#/discover" name="discover">Discover</md-nav-item>
 			<md-nav-item md-nav-href="#/dashboards" name="dashboards">Dashboards</md-nav-item>
 			<md-nav-item class="wazuhMenuNavBar_gear" md-nav-href="#/settings" name="settings"><i class="fa fa-cog ng-scope" aria-hidden="true"></i></md-nav-item>
-    </md-nav-bar>
-  </md-content>
+	</md-nav-bar>
+	</md-content>
 
+	<md-content class="headBar" layout="row"  layout-align="center start">
+		<md-nav-bar flex style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+			<md-nav-item md-nav-click="submenuNavItem = 'api'" name="api">API</md-nav-item>
+			<md-nav-item md-nav-click="submenuNavItem = 'extensions'" name="extensions">Extensions</md-nav-item>
+			<md-nav-item md-nav-click="submenuNavItem = 'about'" name="about">About</md-nav-item>
+		</md-nav-bar>
+	</md-content>
+	
   <div layout="column" layout-align="start stretch">
   
-	<md-card layout-padding layout-align="start stretch">
+	<md-card layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api'">
 	
 		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh API configuration</h1>
 
@@ -46,10 +54,10 @@
 		</div>
 		
 		<div layout="row" layout-align="center center">
-			<md-button flex="15" ng-click="addManagerContainer = !addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new API</md-button>
+			<md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new API</md-button>
 		</div>
 		
-		<form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="addManagerContainer" style="margin-top: 30px; ">
+		<form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="$parent.addManagerContainer" style="margin-top: 30px; ">
 		  <md-input-container>
 			<label>Username</label>
 			<input placeholder="" type="text" ng-model="formData.user" aria-label="username" required></input>
@@ -73,7 +81,7 @@
 	
 	</md-card>
 
-	<md-card flex layout-padding layout-align="start stretch">
+	<md-card flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'extensions'">
 	
 		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh App: Extensions</h1>
 		
@@ -119,6 +127,27 @@
   
 	</md-card>
 	
+	<md-card layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'about'">
+		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> About Wazuh Kibana app</h1>
+		<md-card-content style="width: 500px;">
+			<span layout="row" layout-align="space-between center">
+				<p>App version</p>
+				<p>{{appInfo["app-version"]}}</p>
+			</span>
+			<md-divider></md-divider>
+			<span layout="row" layout-align="space-between center">
+				<p>Install date</p>
+				<p>{{appInfo["installationDate"]}}</p>
+			</span>
+			<md-divider></md-divider>
+			<span layout="row" layout-align="space-between center">
+				<p>Revision</p>
+				<p>{{appInfo["revision"]}}</p>
+			</span>
+			
+		</md-card-content>
+		
+	</md-card>	
   </div>
 
 </md-content>

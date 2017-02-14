@@ -46,7 +46,7 @@ module.exports = function (server, options) {
 				var apiEntry = { 'user': element._source.api_user, 'password': new Buffer(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
 
 				if (apiEntry.error) {
-					server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error getting wazuh-api data: ' + json.error);
+					server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Error getting wazuh-api data: ' + json.error);
 					return;
 				}
 				checkAndSaveStatus(apiEntry);
@@ -81,7 +81,7 @@ module.exports = function (server, options) {
                 checkStatus(apiEntry, response.body.data.totalItems);
 
             } else {
-                server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
+                server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
                 return;
             }
         });
@@ -90,7 +90,7 @@ module.exports = function (server, options) {
 	// Check status and get agent status array	
     var checkStatus = function (apiEntry, maxSize, offset) {
         if (!maxSize) {
-            server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] You must provide a max size');
+            server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'You must provide a max size');
         }
 
         var payload = {
@@ -114,7 +114,7 @@ module.exports = function (server, options) {
                     saveStatus();
                 }
             } else {
-                server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
+                server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
                 return;
             }
         });
@@ -134,7 +134,7 @@ module.exports = function (server, options) {
                     createIndex(todayIndex);
                 }
             }, function () {
-                server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Could not check if the index ' + todayIndex + ' exists.');
+                server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not check if the index ' + todayIndex + ' exists.');
             }
         );
     };
@@ -145,7 +145,7 @@ module.exports = function (server, options) {
             function () {
                 insertDocument(todayIndex);
             }, function () {
-                server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Could not create ' + todayIndex + ' index on elasticsearch.');
+                server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not create ' + todayIndex + ' index on elasticsearch.');
             }
         );
     };
@@ -172,7 +172,7 @@ module.exports = function (server, options) {
 			}).then(function () {
 				agentsArray.length = 0;
 			}, function (err) {
-				server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Error inserting agent data into elasticsearch. Bulk request failed.');
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Error inserting agent data into elasticsearch. Bulk request failed.');
 			});
 		}
     };
@@ -196,16 +196,16 @@ module.exports = function (server, options) {
 		try {
 			map_jsondata = JSON.parse(fs.readFileSync(path.resolve(__dirname, TEMPLATE_FILE), 'utf8'));
 		} catch (e) {
-			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + TEMPLATE_FILE);
-			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not read the mapping file.');
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Path: ' + TEMPLATE_FILE);
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Exception: ' + e);
 		};
 
 		client.indices.putTemplate( {name: "wazuh", order: 0, body: map_jsondata}).then(
 			function () {
-				server.log([blueWazuh, 'initialize', 'info'], '[Wazuh agents monitoring] Template installed and loaded: ' +  index_pattern);
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Template installed and loaded: ' +  index_pattern);
 			}, function (data) {
-				server.log([blueWazuh, 'initialize', 'error'], '[Wazuh agents monitoring] Could not install template ' +  index_pattern);
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not install template ' +  index_pattern);
 			});
     };
 	
@@ -215,25 +215,25 @@ module.exports = function (server, options) {
         try {
           kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
         } catch (e) {
-          server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-          server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
-          server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+          server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not read the mapping file.');
+          server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
+          server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Exception: ' + e);
         };
 		
         return client.create({ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_monitoring} });
     };
 
 	// Main. First execution when installing / loading App.
-    server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Creating today index...');
+    server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating today index...');
     saveStatus();
-    server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Configuring Kibana for working with "'+index_pattern+'" index pattern...');
+    server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Configuring Kibana for working with "'+index_pattern+'" index pattern...');
     configureKibana().then(function () {
-        server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Successfully initialized!');
+        server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Successfully initialized!');
     }, function (response) {
         if (response.statusCode != '409') {
-            server.log([blueWazuh, 'server', 'error'], '[Wazuh agents monitoring] Could not configure "'+index_pattern+'" index pattern. Please, configure it manually on Kibana.');
+            server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not configure "'+index_pattern+'" index pattern. Please, configure it manually on Kibana.');
         } else {
-            server.log([blueWazuh, 'server', 'info'], '[Wazuh agents monitoring] Skipping "'+index_pattern+'" index pattern configuration: Already configured.');
+            server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Skipping "'+index_pattern+'" index pattern configuration: Already configured.');
         }
     });
 	

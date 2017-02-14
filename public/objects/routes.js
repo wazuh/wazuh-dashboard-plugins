@@ -62,7 +62,7 @@ routes
             "check": settingsWizard
         }
     })
-    .when('/settings/', {
+    .when('/settings/:tab?/', {
         template: require('plugins/wazuh/templates/settings.html')
     })
 	.when('/test/', {

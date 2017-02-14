@@ -3,8 +3,11 @@ var app = require('ui/modules').get('app/wazuh', []);
 // Require utils
 var base64 = require('plugins/wazuh/utils/base64.js');
 
-app.controller('settingsController', function ($scope, $http, testConnection, appState, $mdToast) {
+app.controller('settingsController', function ($scope, $http, testConnection, appState, $mdToast, $routeParams, $location) {
 
+
+
+	// Initialize
     $scope.formData = {};
     $scope.formData.user = "";
     $scope.formData.password = "";
@@ -19,9 +22,25 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	$scope.extensions.oscap = true;
 	$scope.extensions.audit = true;
 	$scope.extensions.pci = true;
+	$scope.addManagerContainer = false;
+	
+	// Tabs
+	
+	// Default tab
+	$scope.submenuNavItem = "api";
+	
+	// URL Tab
+	var tab = "";
+	var view = "";
+    if($routeParams.tab)
+		$scope.submenuNavItem  = $routeParams.tab;
+	
+	// Watch tab change
+	$scope.$watch('submenuNavItem', function() {
+		$location.search('tab', $scope.submenuNavItem);
+	});	
 	
 	// Remove API entry
-	
 	$scope.removeManager = function(item) {
 		var index = $scope.apiEntries.indexOf(item);
 		if($scope.apiEntries[index]._source.active == "true" && $scope.apiEntries.length != 1){
@@ -73,9 +92,6 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 				$mdToast.show($mdToast.simple().textContent("Error getting API entries"));
 			})
     };
-
-	$scope.getSettings();
-	
 
     // Save settings function
     $scope.saveSettings = function () {
@@ -163,6 +179,22 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         }
         $mdToast.show($mdToast.simple().textContent(text));
     };
+	
+	$scope.getAppInfo = function () {
+		$http.get("/elasticsearch/.kibana/wazuh-setup/1").success(function (data, status) {
+			$scope.appInfo = {};
+			$scope.appInfo["app-version"] = data._source["app-version"];
+			$scope.appInfo["installationDate"] = data._source["installationDate"];
+			$scope.appInfo["revision"] = data._source["revision"];
+		}).error(function (data, status) {
+			$mdToast.show($mdToast.simple().textContent("Error when loading Wazuh setup info"));
+		})
+		
+	}
+	
+	// Loading data
+	$scope.getSettings();
+	$scope.getAppInfo();
 
 });
 

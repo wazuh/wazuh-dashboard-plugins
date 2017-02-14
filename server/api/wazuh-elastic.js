@@ -14,6 +14,7 @@ module.exports = function (server, options) {
 	});
 	
 	var index_pattern = "wazuh-alerts-*";
+	var index_pattern_wazuh_monitoring = "wazuh-monitoring-*";
 	var index_prefix = "wazuh-alerts-";
 	const fs = require('fs');
 	const path = require('path');
@@ -207,19 +208,10 @@ module.exports = function (server, options) {
     };
 
 	var putWazuhPattern = function (req, reply) {
-		function extend(target) {
-    var sources = [].slice.call(arguments, 1);
-    sources.forEach(function (source) {
-        for (var prop in source) {
-            target[prop] = source[prop];
-        }
-    });
-    return target;
-}
 
 		try {
 			kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
-			// Get fields index pattern template
+			// Get fields index pattern template  (wazuh-alerts-*)
 			var wazuhAlerts_indexPattern_template = JSON.parse(kibana_fields_data.wazuh_alerts)
 			var wazuhAlerts_indexPattern_current = {};	
 			var fields = [];
@@ -227,7 +219,7 @@ module.exports = function (server, options) {
 				fields.push(wazuhAlerts_indexPattern_template[i].name);
 			}
 
-			// Get current fields index pattern
+			// Get current fields index pattern (wazuh-alerts-*)
 			client.get({
 				index: '.kibana',
 				type: 'index-pattern',
@@ -241,7 +233,7 @@ module.exports = function (server, options) {
 						wazuhAlerts_indexPattern_current[i].aggregatable = true;
 					}
 				}
-				// Update index pattern
+				// Update index pattern  (wazuh-alerts-*)
 				client.update({
 					index: '.kibana',
 					type: 'index-pattern',
@@ -261,6 +253,29 @@ module.exports = function (server, options) {
 			  server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
 			  server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
 		};
+		
+		try {
+			kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
+			// Update index pattern  (wazuh-monitoring-*)
+			client.update({
+				index: '.kibana',
+				type: 'index-pattern',
+				id: index_pattern_wazuh_monitoring,
+				body: {
+					doc: {
+						fields: kibana_fields_data.wazuh_monitoring
+					}
+				}
+			}, function (error, response) {
+				reply({ 'response': response, 'error': error  }).code(200);
+			})
+
+			} catch (e) {
+			  server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
+			  server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
+			  server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+		};		
+		
     };
 	
     //Server routes 
