@@ -2,7 +2,7 @@ import rison from 'rison-node';
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window, genericReq, $routeParams, $route, $location, $http) {
+app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window, genericReq, $routeParams, $route, $location, $http, $rootScope) {
     //Initialization
 	$scope.state = appState;
     $scope.load = true;
@@ -46,8 +46,10 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 			if($scope.submenuNavItem != "preview"){
 				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
 			}
-		}else
+		}else{
 			$rootScope.$broadcast('fetchVisualization');
+			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+		}
 	};
 	
     //Print Error

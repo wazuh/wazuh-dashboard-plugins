@@ -52,8 +52,10 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
 			$scope.presentData().then(function (data) {$scope.results = data;});
-		}else
+		}else{
+			$scope.presentData().then(function (data) {$scope.results = data;});
 			$rootScope.$broadcast('fetchVisualization');
+		}
 	};
 	
 	// Get current time filter or default

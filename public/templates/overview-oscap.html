@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="submenuNavItem == 'oscap'" ng-controller="overviewOSCAPController" layout-align="space-around">
+<md-content flex layout="column" ng-if="submenuNavItem == 'oscap'" ng-controller="overviewOSCAPController" layout-align="start">
 
 	<!-- Kibana search bar -->
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
@@ -96,8 +96,8 @@
 				</md-card>
 		</md-content>
 
-		<md-content layout="row" layout-align="center stretch">
-			<md-card flex="100">
+		<md-content layout="row" layout-align="start stretch">
+			<md-card flex>
 					<md-card-title>
 						<md-card-title-text>
 							<span class="md-headline">Top 5 Agents - Severity high</span>

@@ -1,13 +1,8 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToast) {
-
-
-    //Initialization 
-    $scope.load = true;
-	
-	var loadWatch;
+app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToast, appState) {
+	$scope.defaultManagerName = appState.getDefaultManager().name;
 
     //Print Error
     var printError = function (error) {
@@ -17,35 +12,4 @@ app.controller('agentsOverviewController', function ($scope, DataFactory, $mdToa
             hideDelay: 5000,
         });
     };
-
-    //Functions
-    $scope.fetchAgent = function (agent) {
-        DataFactory.getAndClean('get', '/agents/' + agent.id, {})
-            .then(function (data) {
-                $scope.agentInfo = data.data;
-				$scope.$parent._agent.status = data.data.status;
-                if (agent.id != '000') {
-                    DataFactory.getAndClean('get', '/agents/' + agent.id + '/key', {})
-                        .then(function (data) {
-                            $scope.agentInfo.key = data.data;
-                            $scope.load = false;
-                            $scope.$parent.load = false;
-                        }, printError);
-                }
-            }, printError);
-    };
-	
-	loadWatch = $scope.$watch(function () {
-        return $scope.$parent._agent;
-    }, function () {
-        $scope.fetchAgent($scope.$parent._agent);
-    });
-	
-	//Destroy
-    $scope.$on("$destroy", function () {
-        loadWatch();
-    });
-	
-	
-
 });
