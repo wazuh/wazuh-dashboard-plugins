@@ -11,7 +11,12 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	$scope.tabView = "panels";	
     $scope.state = appState;
 	$scope._status = 'all';
+	$scope.defaultManager = $scope.state.getDefaultManager().name;
+	$scope.extensions = $scope.state.getExtensions().extensions;
+	$scope.results = false;
+	var objectsArray = [];
 	
+	var agentId = "";	
 	// Object for matching nav items and Wazuh groups
 	var tabGroups = {
 		"overview": {"group": "*"},
@@ -22,9 +27,6 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 		"pci": {"group": "*"}
 	};
 	
-	var agentId = "";
-	
-	
 	if($routeParams.id)
 		agentId = $routeParams.id;
     if($routeParams.tab)
@@ -32,9 +34,21 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	if($routeParams.view)
 		$scope.tabView  = $routeParams.view;
 	
-	var objectsArray = [];
-	$scope.defaultManager = $scope.state.getDefaultManager().name;
-	$scope.extensions = $scope.state.getExtensions().extensions;
+	
+	//Functions
+	
+	// Switch tab: Refresh or change location and check for present data
+	$scope.switchTab = function (tab) {
+		// Detecting refresh or location
+		if($scope.submenuNavItem != tab){
+			$scope.submenuNavItem = tab;
+			$location.search('tab', $scope.submenuNavItem);
+			if($scope.submenuNavItem != "preview"){
+				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+			}
+		}else
+			$rootScope.$broadcast('fetchVisualization');
+	};
 	
     //Print Error
     var printError = function (error) {
@@ -45,23 +59,6 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
         });
     };
 
-	// Watchers
-	$scope.$watch('_agent', function() {
-		$location.search('id', $scope._agent.id);
-		$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;});	
-	});
-	
-	$scope.$watch('tabView', function() {
-		$location.search('view', $scope.tabView);		
-	});
-	
-	$scope.results = false;
-	$scope.$watch('submenuNavItem', function() {
-		$location.search('tab', $scope.submenuNavItem);
-		if($scope.submenuNavItem != "preview")
-			$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;});		
-	});	
-	
 	// Checking for alerts count
 	
 	// Get current time filter or default
@@ -69,13 +66,13 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	$scope.timeLT = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
 
 	// Check if there are any alert. 
-	$scope.presentData = function (agentID) {
+	$scope.presentData = function (agentName) {
 		var group = tabGroups[$scope.submenuNavItem].group;
 		var payload = {};
-		var fields = {"fields" : [{"field": "rule.groups", "value": group},{"field": "agent.id", "value": agentID}]};
+		var fields = {"fields" : [{"field": "rule.groups", "value": group},{"field": "agent.name", "value": agentName}]};
 		// No filter needed for general/pci
 		if(group == "*")
-			fields = {"fields" : [{"field": "agent.id", "value": agentID}]};
+			fields = {"fields" : [{"field": "agent.name", "value": agentName}]};
 		var managerName = {"manager" : $scope.defaultManager};
 		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
 		angular.extend(payload, fields, managerName, timeInterval);
@@ -89,30 +86,6 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 		});
 		return deferred.promise;
 	};
-	
-	// Watch for timefilter changes
-	$scope.$on('$routeUpdate', function(){
-		if($location.search()._g){
-			var currentTimeFilter = rison.decode($location.search()._g);
-			
-			// Check if timefilter has changed and update values
-			if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
-				$scope.timeGTE = currentTimeFilter.time.from;
-				$scope.timeLT = currentTimeFilter.time.to;
-				
-				//Check for present data for the selected tab
-				if($scope.submenuNavItem != "preview")
-					$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;});
-			}
-		}
-		// Check if tab is empty, then reset to preview
-		if(angular.isUndefined($location.search().tab) && angular.isUndefined($location.search().id)){
-			$scope.submenuNavItem = "preview";
-			delete $scope._agent;
-		}
-	});
-	
-    //Functions
 
     $scope.getAgentStatusClass = function (agentStatus) {
         if (agentStatus == "Active")
@@ -156,15 +129,21 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	
     $scope.applyAgent = function (agent) {
         if (agent) {
-			if($scope.submenuNavItem == 'preview')
+			if($scope.submenuNavItem == 'preview'){
 				$scope.submenuNavItem = 'overview';		
+				$location.search('tab', $scope.submenuNavItem);
+			}
 			
 			DataFactory.getAndClean('get', '/agents/' + agent.id, {})
 			.then(function (data) {
 				$scope.agentInfo = data.data;
 				$scope._agent = data.data;
 				$scope.search = data.data.name;
-				$scope.load = false;
+				$location.search('id', $scope._agent.id);
+				$scope.presentData($scope._agent.name).then(function (data) {
+					$scope.results = data;
+					$scope.load = false;
+				});
 			}, printError);
         }
     };
@@ -189,16 +168,40 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 			}, printError);
 	};
 
+	// Watchers
+	$scope.$watch('tabView', function() {
+		$location.search('view', $scope.tabView);		
+	});
+	
+	// Watch for timefilter changes
+	$scope.$on('$routeUpdate', function(){
+		if($location.search()._g && $location.search()._g != "()"){
+			var currentTimeFilter = rison.decode($location.search()._g);
+			// Check if timefilter has changed and update values
+			if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+				$scope.timeGTE = currentTimeFilter.time.from;
+				$scope.timeLT = currentTimeFilter.time.to;
+				
+				//Check for present data for the selected tab
+				if($scope.submenuNavItem != "preview"){
+					$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+				}
+			}
+		}
+		// Check if tab is empty, then reset to preview
+		if(angular.isUndefined($location.search().tab) && angular.isUndefined($location.search().id)){
+			$scope.submenuNavItem = "preview";
+			delete $scope._agent;
+		}
+	});
+	
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 5, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
 				if(agentId != ""){
-					$scope.presentData(agentId).then(function (data) {
-						$scope.results = data;
-						$scope.applyAgent({"id": agentId});
-					});	
+					$scope.applyAgent({"id": agentId});
 				}
 				else
 					$scope.load = false;

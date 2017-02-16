@@ -1,13 +1,16 @@
 import rison from 'rison-node';
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location, $http) {
+app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location, $http, $rootScope) {
 	
     $scope.state = appState;
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
+	$scope.results = false;
+	var tab = "";
+	var view = ""; 
 	
 	// Object for matching nav items and Wazuh groups
 	var tabGroups = {
@@ -18,14 +21,14 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		"audit": {"group": "audit"},
 		"pci": {"group": "*"}
 	};
-
-	var tab = "";
-	var view = "";
+	
     if($routeParams.tab)
 		$scope.submenuNavItem  = $routeParams.tab;
 	
 	if($routeParams.view)
 		$scope.tabView  = $routeParams.view;
+	
+	// Functions 
 	
     $scope.openDashboard = function (dashboard, filter) {
         $scope.state.setDashboardsState(dashboard, filter);
@@ -41,15 +44,17 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		return $scope.extensions[extension];
     };
 	
-	$scope.$watch('tabView', function() {
-		$location.search('view', $scope.tabView);		
-	});
 	
-	$scope.results = false;
-	$scope.$watch('submenuNavItem', function() {
-		$location.search('tab', $scope.submenuNavItem);
-		$scope.presentData().then(function (data) {$scope.results = data;});
-	});	
+	// Switch tab: Refresh or change location and check for present data
+	$scope.switchTab = function (tab) {
+		// Detecting refresh or location
+		if($scope.submenuNavItem != tab){
+			$scope.submenuNavItem = tab;
+			$location.search('tab', $scope.submenuNavItem);
+			$scope.presentData().then(function (data) {$scope.results = data;});
+		}else
+			$rootScope.$broadcast('fetchVisualization');
+	};
 	
 	// Get current time filter or default
 	$scope.timeGTE = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
@@ -77,9 +82,14 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		return deferred.promise;
 	};
 	
+	// Watchers
+	$scope.$watch('tabView', function() {
+		$location.search('view', $scope.tabView);		
+	});
+	
 	// Watch for timefilter changes
 	$scope.$on('$routeUpdate', function(){
-		if($location.search()._g){
+		if($location.search()._g && $location.search()._g != "()"){
 			var currentTimeFilter = rison.decode($location.search()._g);
 			// Check if timefilter has changed and update values
 			if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
@@ -91,6 +101,9 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 			}
 		}
 	});
+	
+	// Load
+	$scope.presentData().then(function (data) {$scope.results = data;});
 
 });
 
