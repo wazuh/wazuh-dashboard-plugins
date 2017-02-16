@@ -194,6 +194,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 		if(angular.isUndefined($location.search().tab) && angular.isUndefined($location.search().id)){
 			$scope.submenuNavItem = "preview";
 			delete $scope._agent;
+			$scope.search = "";
 		}
 	});
 	
