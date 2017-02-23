@@ -1,6 +1,7 @@
 <md-content flex layout="column" ng-if="!load && submenuNavItem == 'status'" ng-controller="managerStatusController"> 
 <div flex layout="column" layout-align="start stretch">
-	<md-content layout="row" layout-align="start start">
+
+	<md-content class="joinCardsRow" layout="row" layout-align="start start">
 		<md-card flex layout-align="start stretch" ng-repeat="(k,v) in daemons">
 			<md-card-content layout="column" flex layout-align="start center">
 				<p layout="row" style="" ng-class="getDaemonStatusClass(v)" class="round"></p>
@@ -10,7 +11,7 @@
 	</md-content>		
 	
 	
-		<div layout="row" layout-align="start start">
+		<div class="joinCardsRow" layout="row" layout-align="start start">
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 19pt;">{{agentsCountTotal}}</div>

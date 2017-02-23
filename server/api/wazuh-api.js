@@ -1,7 +1,9 @@
 module.exports = function (server, options) {
 	// Require some libraries
+	const pciRequirementsFile = '';
 	const fs = require('fs');
 	const path = require('path');
+	var fetchAgentsExternal = require(path.resolve(__dirname, "../wazuh-monitoring.js"));
 	var colors = require('ansicolors');
 	var blueWazuh = colors.blue('wazuh');
 
@@ -351,6 +353,13 @@ module.exports = function (server, options) {
 		});
 			
     };
+	// Fetch agent status and insert it directly on demand
+	var fetchAgents = function (req, reply){
+		fetchAgentsExternal();
+		reply({ 'statusCode': 200, 'error': '0', 'data': '' });
+	}
+	
+	
 	
     //Handlers - error loggin
 
@@ -504,4 +513,16 @@ module.exports = function (server, options) {
         path: '/api/wazuh/errlog',
         handler: postErrorLog
     });
+	
+    /* 
+    * GET /api/wazuh-api/pci/requirement
+    * Return a PCI requirement description
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-api/fetchAgents',
+        handler: fetchAgents
+    });	
+	
 };

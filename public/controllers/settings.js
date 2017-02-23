@@ -123,6 +123,11 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 				$scope.formData.password = "";
 				$scope.formData.url = "";
 				$scope.formData.port = "";
+				// Fetch agents on demand
+				$http.get("/api/wazuh-api/fetchAgents").error(function (data, status) {
+					$mdToast.show($mdToast.simple().textContent("Error fetching agents"));
+				});
+			
 			}).error(function (data, status) {
 				if (status == '400') {
 					$mdToast.show($mdToast.simple().textContent("Please, fill all the fields in order to connect with Wazuh RESTful API."));

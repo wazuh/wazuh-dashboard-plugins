@@ -223,6 +223,12 @@ module.exports = function (server, options) {
         return client.create({ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_monitoring} });
     };
 
+	// fetchAgents on demand
+   var fetchAgents = function () { 
+		getConfig(loadCredentials);
+		return;
+    };
+	
 	// Main. First execution when installing / loading App.
     server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating today index...');
     saveStatus();
@@ -242,5 +248,6 @@ module.exports = function (server, options) {
         agentsArray.length = 0;
         getConfig(loadCredentials);
     }, true);
-
+	
+	module.exports = fetchAgents;
 }

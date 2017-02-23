@@ -49,9 +49,14 @@
 						</div>
 						<div layout="row" layout-align="start stretch" flex>
 							<md-card flex layout="column" style="margin: 8px 0 0 0">
+								<md-card-title>
+									<md-card-title-text>
+										<span class="md-headline">Top 5 Agents</span>
+									</md-card-title-text>
+								</md-card-title>							
 								<md-card-content style="text-align: center;">
 									<kbn-searchbar style="display: none"></kbn-searchbar>
-									<kbn-vis vis-timefilter="24h" vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Alerts),schema:metric,type:count),(enabled:!t,id:'3',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:cardinal,legendPosition:right,mode:overlap,scale:linear,setYExtents:!f,times:!()),title:'New%20Visualization',type:area))"
+									<kbn-vis vis-timefilter="24h" vis-height="200px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:20),schema:group,type:terms),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:top,mode:stacked,orderBucketsBySum:!f,scale:linear,setYExtents:!f,times:!()),title:'New%20Visualization',type:histogram))"
 									vis-filter="*">
 								</kbn-vis>
 								</md-card-content>

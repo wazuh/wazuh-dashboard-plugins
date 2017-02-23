@@ -8,8 +8,8 @@
     "wazuh": {
       "dynamic_templates": [
         {
-          "notanalyzed": {
-            "match": "*",
+          "string_as_keyword": {
+            "match_mapping_type": "string",
             "mapping": {
               "type": "keyword",
               "doc_values": "true"
@@ -24,18 +24,6 @@
         },
         "@version": {
           "type": "text"
-        },
-		"source": {
-          "type": "keyword",
-          "doc_values": "true"
-        },
-		"tags": {
-          "type": "keyword",
-          "doc_values": "true"
-        },
-		"log": {
-          "type": "keyword",
-          "doc_values": "true"
         },
         "agent": {
           "properties": {
@@ -124,10 +112,6 @@
               "doc_values": "true"
             },
             "region_name": {
-              "type": "keyword",
-              "doc_values": "true"
-            },
-			"region_code": {
               "type": "keyword",
               "doc_values": "true"
             },
@@ -263,8 +247,7 @@
               "doc_values": "true"
             },
             "id": {
-              "type": "string",
-              "index": "not_analyzed",
+              "type": "keyword",
               "doc_values": "true"
             },
             "cve": {
@@ -318,10 +301,6 @@
           }
         },
         "srcip": {
-          "type": "keyword",
-          "doc_values": "true"
-        },
-		"srcport": {
           "type": "keyword",
           "doc_values": "true"
         },
