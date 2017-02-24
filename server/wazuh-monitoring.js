@@ -229,19 +229,36 @@ module.exports = function (server, options) {
 		return;
     };
 	
+	// Wait until Elasticsearch is ready
+	var checkElasticStatus = function () {
+		client.info().then(
+			function (data) {
+				init();
+			}, function (data) {
+				server.log([blueWazuh, 'initialize', 'info'], 'Waiting Elasticsearch to be up...');
+				setTimeout(function () {checkElasticStatus()}, 3000)
+			}
+		);
+	}
+	
 	// Main. First execution when installing / loading App.
-    server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating today index...');
-    saveStatus();
-    server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Configuring Kibana for working with "'+index_pattern+'" index pattern...');
-    configureKibana().then(function () {
-        server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Successfully initialized!');
-    }, function (response) {
-        if (response.statusCode != '409') {
-            server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not configure "'+index_pattern+'" index pattern. Please, configure it manually on Kibana.');
-        } else {
-            server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Skipping "'+index_pattern+'" index pattern configuration: Already configured.');
-        }
-    });
+	var init = function (){
+		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating today index...');
+		saveStatus();
+		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Configuring Kibana for working with "'+index_pattern+'" index pattern...');
+		configureKibana().then(function () {
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Successfully initialized!');
+		}, function (response) {
+			if (response.statusCode != '409') {
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not configure "'+index_pattern+'" index pattern. Please, configure it manually on Kibana.');
+			} else {
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Skipping "'+index_pattern+'" index pattern configuration: Already configured.');
+			}
+		});
+	}
+	
+	// Starting
+	checkElasticStatus();
 	
 	// Cron tab for getting agent status.
     cron.schedule('0 */10 * * * *', function () {

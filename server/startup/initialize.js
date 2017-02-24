@@ -11,13 +11,13 @@ module.exports = function (server, options) {
 	});
 	
 	// External libraries
-    const uiSettings = server.uiSettings();
-    const fs = require('fs');
-    const path = require('path');
+	const uiSettings = server.uiSettings();
+	const fs = require('fs');
+	const path = require('path');
 
 	// Colors for console logging 
-    const colors = require('ansicolors');
-    const blueWazuh = colors.blue('wazuh');
+	const colors = require('ansicolors');
+	const blueWazuh = colors.blue('wazuh');
 
 	// Initialize variables
 	var req = { path : "", headers : {}};
@@ -41,7 +41,7 @@ module.exports = function (server, options) {
 	
 	// Today
 	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
-    var todayIndex = index_prefix + fDate;
+	var todayIndex = index_prefix + fDate;
 
 	// Save Wazuh App first set up for further updates
 	var saveSetupInfo = function (type) {
@@ -66,23 +66,6 @@ module.exports = function (server, options) {
 		}
     };
 
-	// Setting default index pattern
-	var setDefaultIndex = function () {
-        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default index pattern to "'+index_pattern+'"...');
-
-        uiSettings.set(req,'defaultIndex', index_pattern)
-            .then(function (data) {
-                server.log([blueWazuh, 'initialize', 'info'], 'Default index pattern set to: ' + index_pattern);
-				// We have almost everything configure, setting up default time picker.
-				setDefaultTime();
-            }).catch(function (data) {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not set default index pattern: '+index_pattern);
-                server.log([blueWazuh, 'initialize', 'error'], data);
-            });
-
-
-    };
-
 	// Create index pattern
 	var createIndexPattern = function (type) {
 		
@@ -102,8 +85,8 @@ module.exports = function (server, options) {
 					server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
 					// Once index pattern is created, set it as default, wait few seconds for Kibana.
 					setTimeout(function () {
-						setDefaultIndex();
-					}, 2000)
+						setDefaultIndex(type);
+					}, 2000)					
 				}, function (response) {
 					if (response.statusCode != '409') {
 						server.log([blueWazuh, 'initialize', 'error'], 'Could not configure index pattern:' + index_pattern);
@@ -113,7 +96,50 @@ module.exports = function (server, options) {
 				});
 		}
     };
+	
+	// Setting default index pattern
+	var setDefaultIndex = function (type) {
+        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default index pattern to "'+index_pattern+'"...');
 
+        uiSettings.set(req,'defaultIndex', index_pattern)
+            .then(function (data) {
+                server.log([blueWazuh, 'initialize', 'info'], 'Default index pattern set to: ' + index_pattern);
+				// We have almost everything configure, setting up default time picker.
+				setDefaultTime(type);
+            }).catch(function (data) {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not set default index pattern: '+index_pattern);
+                server.log([blueWazuh, 'initialize', 'error'], data);
+            });
+
+
+    };
+	
+	var setDefaultTime = function (type) {
+
+        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default time to last 24h...');
+        uiSettings.set(req,'timepicker:timeDefaults', '{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}')
+            .then(function () {
+				server.log([blueWazuh, 'initialize', 'info'], 'Kibana default time set to Last 24h.');
+				setMetafields(type); 
+            }).catch(function (data) {
+                server.log([blueWazuh, 'initialize', 'warning'], 'Could not set default time. Please, configure it manually.');
+                server.log([blueWazuh, 'initialize', 'warning'], data);
+            });
+    };
+
+	var setMetafields = function (type) {
+		if(type == "install"){
+			server.log([blueWazuh, 'initialize', 'info'], 'Hide Kibana metafields...');
+			uiSettings.set(req,'metaFields', '{}')
+				.then(function () {
+					server.log([blueWazuh, 'initialize', 'info'], 'Kibana metafield set to empty');
+				}).catch(function (data) {
+					server.log([blueWazuh, 'initialize', 'warning'], 'Could not set default metafields. Please, configure it manually.');
+					server.log([blueWazuh, 'initialize', 'warning'], data);
+				});
+		}
+    };
+	
 	// Configure Kibana status: Index pattern, default index pattern, default time, import dashboards.
 	var configureKibana = function (type) {
         server.log([blueWazuh, 'initialize', 'info'], 'Configuring Kibana for working with "'+index_pattern+'" index pattern...');
@@ -165,19 +191,7 @@ module.exports = function (server, options) {
 				server.log([blueWazuh, 'initialize', 'error'], 'Could not install template ' +  index_pattern);
 			});
     };
-
-    var setDefaultTime = function () {
-
-        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default time to last 24h...');
-        uiSettings.set(req,'timepicker:timeDefaults', '{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}')
-            .then(function () {
-				server.log([blueWazuh, 'initialize', 'info'], 'Kibana default time set to Last 24h.');
-            }).catch(function (data) {
-                server.log([blueWazuh, 'initialize', 'warning'], 'Could not set default time. Please, configure it manually.');
-                server.log([blueWazuh, 'initialize', 'warning'], data);
-            });
-    };
-
+	
     var importObjects = function (type) {
 		
 		if(type == "install"){
@@ -208,6 +222,19 @@ module.exports = function (server, options) {
 		};
 	}
 
-    init();
+    // Wait until Kibana index is created / loaded and initialize Wazuh App
+	var checkKibanaIndex = function () {
+		client.exists({ index: ".kibana", id: packageJSON.kibana.version, type: "config" }).then(
+			function (data) {
+				init();
+			}, function (data) {
+				server.log([blueWazuh, 'initialize', 'info'], 'Waiting index ".kibana" to be created and prepared....');
+				setTimeout(function () {checkKibanaIndex()}, 3000)
+			}
+		);
+	}
+	
+	// Check Kibana index and if it is prepared, start the initialization of wazuh App.
+	checkKibanaIndex();
 
 };
