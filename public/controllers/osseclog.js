@@ -1,11 +1,12 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, $mdToast, errlog) {
+app.controller('osseclogController', function ($scope, DataFactory, $sce, $interval, Notifier, errlog) {
     //Initialization
     $scope.load = true;
     $scope.text = [];
     $scope.realtime = false;
+	const notify = new Notifier({location: 'Manager - Logs'});
 
     var objectsArray = [];
 
@@ -15,11 +16,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
 
     //Print Error
     var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error(error.message);
         if ($scope.blocked) {
             $scope.blocked = false;
         }
@@ -143,11 +140,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
     try {
         load();
     } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error('Unexpected exception loading controller');
         errlog.log('Unexpected exception loading controller', e);
     }
 

@@ -53,13 +53,13 @@ app.factory('Decoders', function($http, DataFactory) {
   return Decoders;
 });
 
-app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, errlog, $window, $document, Rules) {
+app.controller('rulesController', function ($scope, $q, DataFactory, Notifier, errlog, $window, $document, Rules) {
     //Initialization
     $scope.load = true;
 	$scope.setRulesTab('rules');
 	$scope.ruleActive = false;
 	$scope.extraInfo = false;
-	
+	const notify = new Notifier({location: 'Manager - Rules'});
 	
     $scope.search = undefined;
 
@@ -75,11 +75,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 
     //Print Error
     var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error(error.message);
         if ($scope._rules_blocked) {
             $scope._rules_blocked = false;
         }
@@ -269,11 +265,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
     try {
         load();
     } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error("Unexpected exception loading controller");
         errlog.log('Unexpected exception loading controller', e);
     }
 
@@ -288,12 +280,13 @@ app.controller('rulesController', function ($scope, $q, DataFactory, $mdToast, e
 
 });
 
-app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $mdToast, errlog, Decoders) {
+app.controller('decodersController', function ($scope, $q, $sce, DataFactory, Notifier, errlog, Decoders) {
 	
     //Initialization
     $scope.load = true;
 	$scope.setRulesTab('decoders');
-
+	const notify = new Notifier({location: 'Manager - Decoders'});
+	
     $scope.typeFilter = 'all';
     var _file;
     var _search;
@@ -302,11 +295,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
 
     //Print Error
     var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error(error.message);
         if ($scope._decoders_blocked) {
             $scope._decoders_blocked = false;
         }
@@ -487,11 +476,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
     try {
         load();
     } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error("Unexpected exception loading controller");
         errlog.log('Unexpected exception loading controller', e);
     }
 
@@ -503,160 +488,4 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, $m
         });
         $scope.decoders.length = 0;
     });
-});
-
-
-app.controller('updateRulesetController', function ($scope, $q, DataFactory, $mdDialog, $mdToast, errlog) {
-    //Initialization
-    $scope.load = true;
-    $scope.$parent.state.setRulesetState('update');
-
-    $scope.backups = [];
-
-    $scope.updateType = 'b';
-    $scope.updateForce = false;
-
-    //Print Error
-    var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
-    }
-
-    //Functions
-
-    $scope.updateRuleset = function (ev) {
-        if (!$scope.updateType) {
-            $mdToast.show({
-                template: '<md-toast>Select an update type</md-toast>',
-                position: 'bottom left',
-                hideDelay: 5000,
-            });
-        }
-        if ($scope.updateForce) {
-            var template = 'Are you sure you want to update the ruleset? The ruleset will be overwritten, except local_rules and local_decoders file. OSSEC manager is going to be restarted. Before the update, backup of the ruleset will be done.';
-        }
-        else {
-            var template = 'Are you sure you want to update the ruleset? The ruleset will be overwritten, except local_rules and local_decoders file. If any rule included in ossec.conf is updated, OSSEC manager will be restarted. Before the update, backup of the ruleset will be done.';
-        }
-        var confirm = $mdDialog.confirm()
-            .title('Update ruleset')
-            .textContent(template)
-            .targetEvent(ev)
-            .ok('Update')
-            .cancel('Cancel');
-
-        $mdDialog.show(confirm).then(function () {
-            if ($scope.updateForce) {
-                if ($scope.updateType == 'r') {
-                    var path = '/manager/update-ruleset?force=yes&type=rules';
-                } else if ($scope.updateType == 'c') {
-                    var path = '/manager/update-ruleset?force=yes&type=rootchecks';
-                } else {
-                    var path = '/manager/update-ruleset?force=yes';
-                }
-            } else {
-                if ($scope.updateType == 'r') {
-                    var path = '/manager/update-ruleset?type=rules';
-                } else if ($scope.updateType == 'c') {
-                    var path = '/manager/update-ruleset?type=rootchecks';
-                } else {
-                    var path = '/manager/update-ruleset';
-                }
-            }
-            DataFactory.getAndClean('put', path, {})
-                .then(function (data) {
-                    var alert = data.data.msg + '. ';
-                    if (data.data.need_restart === 'yes' && (data.data.restarted === 'no' || data.data.restart_status === 'fail')) {
-                        alert += "The manager needs to be manually restarted.";
-                    } else if (data.data.restarted === 'yes') {
-                        alert += "The manager has been restarted. ";
-                    }
-                    if (data.data.manual_steps !== 'no') {
-                        alert += "The following manual steps are required: " + data.data.manual_steps_detail;
-                    }
-                    $mdToast.show({
-                        template: '<md-toast>' + alert + '</md-toast>',
-                        position: 'bottom left',
-                        hideDelay: 5000,
-                    });
-                    $scope.load_backups();
-                }, printError);
-        });
-    };
-
-    $scope.restoreBackup = function (ev) {
-        var template = 'Are you sure you want to restore this backup? This action can not be undone.';
-        var confirm = $mdDialog.confirm()
-            .title('Restore backup')
-            .textContent(template)
-            .targetEvent(ev)
-            .ok('Restore')
-            .cancel('Cancel');
-
-        $mdDialog.show(confirm).then(function () {
-            DataFactory.getAndClean('put', '/manager/update-ruleset/backups/' + $scope.selectedBackup, {})
-                .then(function (data) {
-                    var alert;
-                    if (data.data.msg === 'Backup successfully') {
-                        alert = 'Backup successfuly restored. ';
-                    }
-                    if (data.data.need_restart === 'yes' && (data.data.restarted === 'no' || data.data.restart_status === 'fail')) {
-                        alert += "The manager needs to be manually restarted.";
-                    } else if (data.data.restarted === 'yes') {
-                        alert += "The manager has been restarted";
-                    }
-                    if (data.data.manual_steps !== 'no') {
-                        alert += "The following manual steps are required: " + data.data.manual_steps_detail;
-                    }
-                    $mdToast.show({
-                        template: '<md-toast>' + alert + '</md-toast>',
-                        position: 'bottom left',
-                        hideDelay: 5000,
-                    });
-                }, printError);
-        });
-    };
-
-    //Load functions
-    $scope.load_backups = function () {
-        var defered = $q.defer();
-        var promise = defered.promise;
-
-        DataFactory.getAndClean('get', '/manager/update-ruleset/backups', {})
-            .then(function (data) {
-                defered.resolve();
-                $scope.backups.length = 0;
-                $scope.backups = data.data;
-            }, function (error) {
-                printError(error);
-                defered.reject();
-            });
-
-        return promise;
-    };
-
-    var load = function () {
-        $scope.load = false;
-    };
-
-    //Load
-    try {
-        load();
-    } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
-        errlog.log('Unexpected exception loading controller', e);
-    }
-
-    //Destroy
-    $scope.$on("$destroy", function () {
-        $scope.backups.length = 0;
-    });
-
 });

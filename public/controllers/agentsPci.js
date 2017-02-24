@@ -1,7 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('PCIController', function ($scope, DataFactory, $mdToast, errlog, appState, genericReq) {
+app.controller('PCIController', function ($scope, DataFactory, errlog, appState, genericReq) {
 	$scope.defaultManagerName = appState.getDefaultManager().name;
 	
 	var tabs = [];
@@ -24,14 +24,5 @@ app.controller('PCIController', function ($scope, DataFactory, $mdToast, errlog,
       var index = tabs.indexOf(tab);
       tabs.splice(index, 1);
     };
-	
-    //Print Error
-    var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
-    }
 
 });

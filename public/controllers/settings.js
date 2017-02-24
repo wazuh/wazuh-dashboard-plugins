@@ -3,11 +3,12 @@ var app = require('ui/modules').get('app/wazuh', []);
 // Require utils
 var base64 = require('plugins/wazuh/utils/base64.js');
 
-app.controller('settingsController', function ($scope, $http, testConnection, appState, $mdToast, $routeParams, $location) {
+app.controller('settingsController', function ($scope, $http, testConnection, appState, Notifier, $routeParams, $location) {
 
 
 
 	// Initialize
+	const notify = new Notifier({location: 'Settings'});
     $scope.formData = {};
     $scope.formData.user = "";
     $scope.formData.password = "";
@@ -44,14 +45,14 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	$scope.removeManager = function(item) {
 		var index = $scope.apiEntries.indexOf(item);
 		if($scope.apiEntries[index]._source.active == "true" && $scope.apiEntries.length != 1){
-			$mdToast.show($mdToast.simple().textContent("Please set another default manager before removing this one"));
+			notify.error("Please set another default manager before removing this one");
 			return;
 		}
 			
 		$http.delete("/api/wazuh-api/apiEntries/"+$scope.apiEntries[index]._id).success(function (data, status) {
 			$scope.apiEntries.splice(index, 1);   
 		}).error(function (data, status) {
-			$mdToast.show($mdToast.simple().textContent("Could not remove manager"));
+			notify.error("Could not remove manager");
 		})	 
 	}
 
@@ -64,9 +65,9 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			$scope.apiEntries[index]._source.active	= "true";
 			$scope.currentDefault = index;
 			$scope.extensions = $scope.apiEntries[$scope.currentDefault]._source.extensions;
-			$mdToast.show($mdToast.simple().textContent("Manager "+$scope.apiEntries[index]._source.manager+" set as default"));			
+			notify.info("Manager "+$scope.apiEntries[index]._source.manager+" set as default");			
 		}).error(function (data, status) {
-			$mdToast.show($mdToast.simple().textContent("Could not set that manager as default"));
+			notify.error("Could not set that manager as default");
 		})	 
 	}
 	
@@ -89,7 +90,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 				});
 
 			}).error(function (data, status) {
-				$mdToast.show($mdToast.simple().textContent("Error getting API entries"));
+				notify.error("Error getting API entries");
 			})
     };
 
@@ -117,7 +118,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
 				var newEntry = {'_id': data.response._id, _source: { manager: tmpData.manager, active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } }; 
 				$scope.apiEntries.push(newEntry);
-				$mdToast.show($mdToast.simple().textContent('Successfully added'));
+				notify.info('Wazuh API successfully added');
 				$scope.addManagerContainer = false;
 				$scope.formData.user = "";
 				$scope.formData.password = "";
@@ -125,19 +126,35 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 				$scope.formData.port = "";
 				// Fetch agents on demand
 				$http.get("/api/wazuh-api/fetchAgents").error(function (data, status) {
-					$mdToast.show($mdToast.simple().textContent("Error fetching agents"));
+					notify.error("Error fetching agents");
 				});
 			
 			}).error(function (data, status) {
 				if (status == '400') {
-					$mdToast.show($mdToast.simple().textContent("Please, fill all the fields in order to connect with Wazuh RESTful API."));
+					notify.error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
 				} else {
-					$mdToast.show($mdToast.simple().textContent("Some error ocurred, could not save data in elasticsearch."));
+					notify.error("Some error ocurred, could not save data in elasticsearch.");
 				}
 			})
 		}, printError);
     };
 
+	// Check manager connectivity
+    $scope.checkManager = function (item) {
+		
+		var index = $scope.apiEntries.indexOf(item);
+		var tmpData = {
+			'user': $scope.apiEntries[$scope.currentDefault]._source.api_user,
+			'password': $scope.apiEntries[$scope.currentDefault]._source.api_password,
+			'url': $scope.apiEntries[$scope.currentDefault]._source.url,
+			'port': $scope.apiEntries[$scope.currentDefault]._source.api_port,
+			'insecure': "true"
+		};
+
+        testConnection.check(tmpData).then(function (data) {
+			notify.info("Connection success");
+		}, printError);
+    };
 
     // Process form
     $scope.processForm = function () {
@@ -150,7 +167,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 		if(extension == "oscap" || extension == "audit" || extension == "pci"){
 			$http.put("/api/wazuh-api/extension/toggle/"+$scope.apiEntries[$scope.currentDefault]._id+"/"+extension+"/"+state).success(function (data, status) {	
 			}).error(function (data, status) {
-				$mdToast.show($mdToast.simple().textContent("Invalid request when toggle extension state."));
+				notify.error("Invalid request when toggle extension state.");
 			})
 		}
 	};
@@ -182,7 +199,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
             default:
                 text = 'Unexpected error. '+data.message;
         }
-        $mdToast.show($mdToast.simple().textContent(text));
+        notify.error(text);
     };
 	
 	$scope.getAppInfo = function () {
@@ -192,7 +209,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			$scope.appInfo["installationDate"] = data._source["installationDate"];
 			$scope.appInfo["revision"] = data._source["revision"];
 		}).error(function (data, status) {
-			$mdToast.show($mdToast.simple().textContent("Error when loading Wazuh setup info"));
+			notify.error("Error when loading Wazuh setup info");
 		})
 		
 	}

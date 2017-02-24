@@ -2,7 +2,8 @@
 var routes = require('ui/routes');
 
 //Installation wizard
-var settingsWizard = function ($location, testConnection, $mdToast, appState, $q, genericReq) {
+var settingsWizard = function ($location, testConnection, appState, $q, genericReq, Notifier) {
+	const notify = new Notifier();
     var deferred = $q.defer();
     testConnection.check_stored().then(function (data)
     {
@@ -12,11 +13,7 @@ var settingsWizard = function ($location, testConnection, $mdToast, appState, $q
 			deferred.resolve();
 		});
 	}, function (data) {
-		$mdToast.show({
-			template: '<md-toast>Could not connect with Wazuh API. Please, configure it on settings tab.</md-toast>',
-			position: 'bottom left',
-			hideDelay: 5000,
-		});
+		notify.error("Could not connect with Wazuh RESTful API.");
 		deferred.reject();
 		$location.path('/settings');
     });
@@ -66,10 +63,7 @@ routes
         template: require('plugins/wazuh/templates/settings.html')
     })
 	.when('/test/', {
-        template: require('plugins/wazuh/templates/test.html'),
-		resolve: {
-            "check": settingsWizard
-        }
+        template: require('plugins/wazuh/templates/test.html')
     })
     .when('/', {
         redirectTo: '/overview/',

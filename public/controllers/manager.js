@@ -21,11 +21,11 @@ app.controller('managerController', function ($scope, $route, $routeParams, $loc
 });
 
 
-app.controller('managerStatusController', function ($scope, DataFactory, genericReq, $mdDialog, $mdToast, errlog) {
+app.controller('managerStatusController', function ($scope, DataFactory, genericReq, errlog, Notifier) {
     //Initialization
     $scope.load = true;
     $scope.timeFilter = "24h";
-
+	const notify = new Notifier({location: 'Manager - Status'});
     $scope.stats = [];
     $scope.stats['/top/agent'] = '-';
     $scope.stats['/overview/alerts'] = { "alerts": 0, "ip": "-", "group": "-" };
@@ -33,11 +33,7 @@ app.controller('managerStatusController', function ($scope, DataFactory, generic
 
     //Print Error
     var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+		notify.error(error.message);
     };
 
     //Functions
@@ -90,11 +86,7 @@ app.controller('managerStatusController', function ($scope, DataFactory, generic
     try {
         load();
     } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error("Unexpected exception loading controller");
         errlog.log('Unexpected exception loading controller', e);
     }
 
@@ -105,18 +97,15 @@ app.controller('managerStatusController', function ($scope, DataFactory, generic
 
 });
 
-app.controller('managerConfigurationController', function ($scope, DataFactory, errlog) {
+app.controller('managerConfigurationController', function ($scope, DataFactory, errlog, Notifier) {
     //Initialization
     $scope.load = true;
 	$scope.isArray = angular.isArray;
+	const notify = new Notifier({location: 'Manager - Configuration'});
 	
     //Print Error
     var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error(error.message);
     };
 
     //Functions
@@ -136,11 +125,7 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
     try {
         load();
     } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+		notify.error("Unexpected exception loading controller");
         errlog.log('Unexpected exception loading controller', e);
     }
 

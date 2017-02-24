@@ -2,7 +2,7 @@ import rison from 'rison-node';
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, appState, errlog, $window, genericReq, $routeParams, $route, $location, $http, $rootScope) {
+app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, appState, errlog, $window, genericReq, $routeParams, $route, $location, $http, $rootScope) {
     //Initialization
 	$scope.state = appState;
     $scope.load = true;
@@ -15,6 +15,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.results = false;
 	var objectsArray = [];
+	const notify = new Notifier({location: 'Agents'});
 	
 	var agentId = "";	
 	// Object for matching nav items and Wazuh groups
@@ -54,11 +55,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 	
     //Print Error
     var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error(error.message);
     };
 
 	// Checking for alerts count
@@ -161,11 +158,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
 				else
 					var alert = data.data;
 
-				$mdToast.show({
-					template: '<md-toast>' + alert + '</md-toast>',
-					position: 'bottom left',
-					hideDelay: 2000,
-				});
+				notify.error(alert);
 
 			}, printError);
 	};
@@ -215,11 +208,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, $mdToast, 
     try {
         load();
     } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+        notify.error('Unexpected exception loading controller');
         errlog.log('Unexpected exception loading controller', e);
     }
 

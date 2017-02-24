@@ -28,24 +28,20 @@ app.factory('Agents', function($http, DataFactory) {
   return Agents;
 });
 
-app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToast, errlog, genericReq, Agents) {
+app.controller('agentsPreviewController', function ($scope, DataFactory, Notifier, errlog, genericReq, Agents) {
 
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
-
+	const notify = new Notifier({location: 'Agents - Preview'});
+	
     var objectsArray = [];
 
     //Print Error
     var printError = function (error) {
-        $mdToast.show({
-            template: '<md-toast>' + error.html + '</md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-
-        });
+        notify.error(error.message);
         if ($scope.blocked) {
             $scope.blocked = false;
         }
@@ -147,11 +143,7 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, $mdToas
     try {
         load();
     } catch (e) {
-        $mdToast.show({
-            template: '<md-toast> Unexpected exception loading controller </md-toast>',
-            position: 'bottom left',
-            hideDelay: 5000,
-        });
+		notify.error("Unexpected exception loading controller");
         errlog.log('Unexpected exception loading controller', e);
     }
 

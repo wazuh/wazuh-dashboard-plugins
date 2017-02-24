@@ -58,9 +58,20 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		}
 	};
 	
-	// Get current time filter or default
-	$scope.timeGTE = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
-	$scope.timeLT = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
+	// Decode and set time filter
+	if($route.current.params._g){
+		var decodedTimeFilter = rison.decode($route.current.params._g);
+		if(decodedTimeFilter.time){
+			$scope.timeGTE = decodedTimeFilter.time.from;
+			$scope.timeLT = decodedTimeFilter.time.to;
+		}else{
+			$scope.timeGTE = "now-1d";
+			$scope.timeLT = "now";
+		}
+	}else{
+		$scope.timeGTE = "now-1d";
+		$scope.timeLT = "now";
+	}
 
 	// Check if there are any alert. 
 	$scope.presentData = function () {
@@ -109,7 +120,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 
 });
 
-app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
+app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, errlog, $route) {
 	
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('general');
@@ -117,7 +128,7 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
 	
 });
 
-app.controller('overviewFimController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
+app.controller('overviewFimController', function ($scope, DataFactory, genericReq, errlog, $route) {
 
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('fim');
@@ -125,7 +136,7 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
 
 });
 
-app.controller('overviewPMController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
+app.controller('overviewPMController', function ($scope, DataFactory, genericReq, errlog, $route) {
 
     $scope.load = true;
     $scope.$parent.state.setOverviewState('pm');
@@ -133,7 +144,7 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
 
 });
 
-app.controller('overviewOSCAPController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
+app.controller('overviewOSCAPController', function ($scope, DataFactory, genericReq, errlog, $route) {
 
     $scope.load = false;
     $scope.$parent.state.setOverviewState('oscap');
@@ -141,14 +152,14 @@ app.controller('overviewOSCAPController', function ($scope, DataFactory, generic
 	
 });
 
-app.controller('overviewAuditController', function ($scope, DataFactory, genericReq, $mdToast, errlog, $route) {
+app.controller('overviewAuditController', function ($scope, DataFactory, genericReq, errlog, $route) {
 
     $scope.load = true;
     $scope.$parent.state.setOverviewState('audit');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
 });
 
-app.controller('overviewPCIController', function ($scope, $compile, DataFactory, genericReq, $mdToast, errlog, $route) {
+app.controller('overviewPCIController', function ($scope, $compile, DataFactory, genericReq, errlog, $route) {
 
     $scope.load = true;
     $scope.$parent.state.setOverviewState('pci');

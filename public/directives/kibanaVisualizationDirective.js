@@ -72,11 +72,21 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		$scope.loadBeforeShow = false;
 
-		// Set default time
-		if($route.current.params._g == "()"){
-			timefilter.time.from = "now-24h";
+		// Decode and set time filter
+		if($route.current.params._g){
+			var decodedTimeFilter = rison.decode($route.current.params._g);
+			if(decodedTimeFilter.time){
+				timefilter.time.from  = decodedTimeFilter.time.from;
+				timefilter.time.to = decodedTimeFilter.time.to;
+			}else{
+				timefilter.time.from = "now-1d";
+				timefilter.time.to = "now";
+			}
+		}else{
+			timefilter.time.from = "now-1d";
 			timefilter.time.to = "now";
 		}
+	
 		// Set time filter if needed
 		if($scope.visTimefilter){
 			timefilter.time.from = "now-"+$scope.visTimefilter;
