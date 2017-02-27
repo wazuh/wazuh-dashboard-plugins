@@ -24,9 +24,28 @@
 	
   <div layout="column" layout-align="start stretch">
   
+  	<md-card layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api' && apiEntries.length == 0">
+	
+		<h1>Welcome to Wazuh App for Kibana 5</h1>
+		<div>
+			<p>Wazuh App brings together a new and useful web interface to manage and monitor your infrastructure. Check agents status, alerts evolution, most recents events, popular alerts, top groups, manager configuration and logs, etc.</p>
+			<p>Configure according to your needs the three available extensions:</p>
+			<ul>
+				<li>Linux Audit file system integration.
+				<li>PCI DSS Compliance
+				<li>OpenSCAP security compliance and vulnerability assessments.
+			</ul>
+			<p>The interface will put together funcionalities included in Wazuh as: <strong>Log management and analysis</strong>, <strong>file integrity monitoring</strong>, <strong>intrusion and anomaly detection</strong> and <strong>policy and compliance monitoring.</strong></p>	
+			<p>Help us to improve the App, we will be happy to have your feedback, collaborate with us in the <a href="https://groups.google.com/forum/#!forum/wazuh">Mailing Lists</a> and/or Wazuh App <a href="https://github.com/wazuh/wazuh-kibana-app">Github repository</a></p>	
+			<br>
+			<p>Please fill up your Wazuh RESTful API credentials at the form below to begin.</p>	
+		</div>
+
+	</md-card>
+	
 	<md-card layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api'">
 	
-		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh API configuration</h1>
+		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh App: API configuration</h1>
 
 		<span layout="row" layout-align="start start">
 			<p flex="20" style="font-weight: bold;">Manager</p>
@@ -58,7 +77,7 @@
 			<md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="buttonBlueLight md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new API</md-button>
 		</div>
 		
-		<form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="$parent.addManagerContainer" style="margin-top: 30px; ">
+		<form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="$parent.addManagerContainer || apiEntries.length == 0" style="margin-top: 30px; ">
 		  <md-input-container>
 			<label>Username</label>
 			<input placeholder="" type="text" ng-model="formData.user" aria-label="username" required></input>
@@ -129,7 +148,7 @@
 	</md-card>
 	
 	<md-card layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'about'">
-		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> About Wazuh Kibana app</h1>
+		<h1><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i>  Wazuh App: About</h1>
 		<md-card-content style="width: 500px;">
 			<span layout="row" layout-align="space-between center">
 				<p>App version</p>

@@ -105,7 +105,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		if($location.search()._g && $location.search()._g != "()"){
 			var currentTimeFilter = rison.decode($location.search()._g);
 			// Check if timefilter has changed and update values
-			if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+			if($route.current.params._g != "()" && currentTimeFilter.time && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
 				$scope.timeGTE = currentTimeFilter.time.from;
 				$scope.timeLT = currentTimeFilter.time.to;
 				

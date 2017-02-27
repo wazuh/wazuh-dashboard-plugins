@@ -13,7 +13,10 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
 			deferred.resolve();
 		});
 	}, function (data) {
-		notify.error("Could not connect with Wazuh RESTful API.");
+		if(data.error == 2)
+			notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+		else
+			notify.error("Could not connect with Wazuh RESTful API.");
 		deferred.reject();
 		$location.path('/settings');
     });

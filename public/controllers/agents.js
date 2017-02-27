@@ -60,10 +60,21 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 
 	// Checking for alerts count
 	
-	// Get current time filter or default
-	$scope.timeGTE = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.from : "now-1d";
-	$scope.timeLT = ($route.current.params._g && $route.current.params._g != "()") ? rison.decode($route.current.params._g).time.to : "now";
-
+	// Decode and set time filter
+	if($route.current.params._g){
+		var decodedTimeFilter = rison.decode($route.current.params._g);
+		if(decodedTimeFilter.time){
+			$scope.timeGTE = decodedTimeFilter.time.from;
+			$scope.timeLT = decodedTimeFilter.time.to;
+		}else{
+			$scope.timeGTE = "now-1d";
+			$scope.timeLT = "now";
+		}
+	}else{
+		$scope.timeGTE = "now-1d";
+		$scope.timeLT = "now";
+	}
+	
 	// Check if there are any alert. 
 	$scope.presentData = function (agentName) {
 		var group = tabGroups[$scope.submenuNavItem].group;
@@ -158,7 +169,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				else
 					var alert = data.data;
 
-				notify.error(alert);
+				notify.info(alert);
 
 			}, printError);
 	};
@@ -173,7 +184,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 		if($location.search()._g && $location.search()._g != "()"){
 			var currentTimeFilter = rison.decode($location.search()._g);
 			// Check if timefilter has changed and update values
-			if($route.current.params._g != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+			if($route.current.params._g != "()" && currentTimeFilter.time && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
 				$scope.timeGTE = currentTimeFilter.time.from;
 				$scope.timeLT = currentTimeFilter.time.to;
 				

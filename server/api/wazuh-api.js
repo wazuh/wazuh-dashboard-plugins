@@ -201,7 +201,7 @@ module.exports = function (server, options) {
                 return;
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
-                reply({ 'statusCode': 200, 'error': '1', 'data': 'no_credentials' });
+                reply({ 'statusCode': 200, 'error': '2', 'data': 'no_credentials' });
                 return;
             }
 
