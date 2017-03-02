@@ -158,6 +158,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 
     // Process form
     $scope.processForm = function () {
+		$scope.messageError = "";
         // Test and Save if OK
 		$scope.saveSettings();
     };
@@ -200,6 +201,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
                 text = 'Unexpected error. '+data.message;
         }
         notify.error(text);
+		$scope.messageError = text;
     };
 	
 	$scope.getAppInfo = function () {

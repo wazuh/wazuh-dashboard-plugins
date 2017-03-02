@@ -16,7 +16,7 @@
 	<!-- View: Discover -->
 	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'" >
 		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-		dis-filter="rule.groups:oscap AND rule.groups:oscap-result AND agent.name: {{_agent.name ? _agent.name : '*'}} AND manager.name: {{defaultManager ? defaultManager : '*'}}"
+		dis-filter="rule.groups:oscap AND agent.name: {{_agent.name ? _agent.name : '*'}} AND manager.name: {{defaultManager ? defaultManager : '*'}}"
 		infinite-scroll="true">
 		</kbn-disfull>
 	</md-content>
