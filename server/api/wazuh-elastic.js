@@ -209,6 +209,7 @@ module.exports = function (server, options) {
         });
     };
 
+	
 	var putWazuhPattern = function (req, reply) {
 
 		try {
@@ -228,30 +229,50 @@ module.exports = function (server, options) {
 				type: 'index-pattern',
 				id: index_pattern
 			}, function (error, response) {
-				wazuhAlerts_indexPattern_current = JSON.parse(response._source.fields);
-				// Compare and update fields properties
-				for (var i = 0, len = wazuhAlerts_indexPattern_current.length; i < len; i++) {
-					if (fields.indexOf(wazuhAlerts_indexPattern_current[i].name) >= 0) {
-						wazuhAlerts_indexPattern_current[i].searchable = true;
-						wazuhAlerts_indexPattern_current[i].aggregatable = true;
-					}
-				}
-				// Update index pattern  (wazuh-alerts-*)
-				client.update({
-					index: '.kibana',
-					type: 'index-pattern',
-					id: index_pattern,
-					body: {
-						doc: {
-							fields: JSON.stringify((wazuhAlerts_indexPattern_current))
+				if(response.found){
+					wazuhAlerts_indexPattern_current = JSON.parse(response._source.fields);
+					// Compare and update fields properties
+					for (var i = 0, len = wazuhAlerts_indexPattern_current.length; i < len; i++) {
+						if (fields.indexOf(wazuhAlerts_indexPattern_current[i].name) >= 0) {
+							wazuhAlerts_indexPattern_current[i].searchable = true;
+							wazuhAlerts_indexPattern_current[i].aggregatable = true;
 						}
 					}
-				}, function (error, response) {
-					responseBack["wazuh-alerts"] = response;
-				})
-			})
+					// Update index pattern  (wazuh-alerts-*)
+					client.update({
+						index: '.kibana',
+						type: 'index-pattern',
+						id: index_pattern,
+						body: {
+							doc: {
+								fields: JSON.stringify((wazuhAlerts_indexPattern_current))
+							}
+						}
+					}, function (error, response) {
+						responseBack["wazuh-alerts"] = response;
+					});
+				}else{
+					// Create index pattern
+					client.create({ 
+						index: '.kibana', 
+						type: 'index-pattern', 
+						id: index_pattern, 
+						body: { 
+							title: index_pattern, 
+							timeFieldName: '@timestamp', 
+							fields: kibana_fields_data.wazuh_alerts 
+						} 
+					}).then(function () {
+							responseBack["wazuh-alerts"] = response;			
+					}, function (response) {
+						if (response.statusCode != '409') {
+							responseBack["wazuh-alerts"] = "Index pattern not found and could not be created";
+						}
+					});
+				}
+			});
 
-			} catch (e) {
+		} catch (e) {
 			  server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
 			  server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
 			  server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
@@ -274,7 +295,7 @@ module.exports = function (server, options) {
 				reply({ 'response': responseBack, 'error': error  }).code(200);				
 			})
 
-			} catch (e) {
+		} catch (e) {
 			  server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
 			  server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
 			  server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
