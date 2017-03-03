@@ -13,9 +13,7 @@
 | :---:         |     :---      |
 | 5.2.2  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.2.2.zip  |
 
-```/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp.zip ```
-
-## Upgrading
+## Upgrade
 
 Remove the App using kibana-plugin tool
 
@@ -27,9 +25,9 @@ Install the App
 
 ## Wazuh Open Source modules and contributions
 
-* [OSSEC Wazuh Ruleset](http://documentation.wazuh.com/en/latest/ossec_ruleset.html): Includes compliance mapping with PCI DSS v3.1, CIS and additional decoders and rules. Users can contribute to this rule set by submitting pull requests to our [Github repository](https://github.com/wazuh/wazuh-ruleset). Our team will continue to maintain and update it periodically.
+* [Wazuh Ruleset](http://documentation.wazuh.com/en/latest/ossec_ruleset.html): Includes compliance mapping with PCI DSS v3.1, CIS and additional decoders and rules. Users can contribute to this rule set by submitting pull requests to our [Github repository](https://github.com/wazuh/wazuh-ruleset). Our team will continue to maintain and update it periodically.
 
-* [Wazuh fork](http://documentation.wazuh.com/en/latest/ossec_wazuh.html) with extended JSON logging capabilities, for easy [integration with ELK Stack](http://documentation.wazuh.com/en/latest/ossec_elk.html) and third party log management tools. The manager also include modifications in OSSEC binaries needed by the [OSSEC Wazuh RESTful API](http://documentation.wazuh.com/en/latest/ossec_api.html).
+* [Wazuh](http://documentation.wazuh.com/en/latest/ossec_wazuh.html) with extended JSON logging capabilities, for easy [integration with ELK Stack](http://documentation.wazuh.com/en/latest/ossec_elk.html) and third party log management tools. The manager also include modifications in OSSEC binaries needed by the [OSSEC Wazuh RESTful API](http://documentation.wazuh.com/en/latest/ossec_api.html).
 
 * [Wazuh RESTful API](http://documentation.wazuh.com/en/latest/ossec_api.html): Used to monitor and control your OSSEC installation, providing an interface to interact with the manager from anything that can send an HTTP request.
 
