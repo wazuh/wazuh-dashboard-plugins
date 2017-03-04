@@ -45,10 +45,10 @@
 			<md-card flex layout="column">
 				<md-card-content>
 					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failure'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth failed',type:metric))"
-					vis-filter="rule.groups: authentication_failed"
+					vis-filter="(rule.groups: authentication_failed OR rule.groups: authentication_failures)"
 						>
 					</kbn-vis>
-				</md-card-content>
+				</md-card-content> 
 			</md-card>
 
 			<md-card flex layout="column">
