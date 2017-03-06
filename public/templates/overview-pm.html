@@ -35,8 +35,8 @@
 			
 			<md-card flex="25">
 				<md-card-content>
-					<span class="md-headline">Top 10 CIS Requirements</span>
-					<kbn-vis vis-height="220px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.cis,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20CIS%20Requirements',type:pie))"
+					<span class="md-headline">Top 5 CIS Requirements</span>
+					<kbn-vis vis-height="220px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.cis,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20CIS%20Requirements',type:pie))"
 					vis-filter='rule.groups:"rootcheck"'>
 					</kbn-vis>
 				</md-card-content>
@@ -45,8 +45,8 @@
 			
 			<md-card flex="25">
 				<md-card-content>
-					<span class="md-headline">Top 10 PCI DSS Requirements</span>
-					<kbn-vis vis-height="220px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20PCI%20DSS%20Requirements',type:pie))"
+					<span class="md-headline">Top 5 PCI DSS Requirements</span>
+					<kbn-vis vis-height="220px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22rootcheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'PM%20Top%2010%20PCI%20DSS%20Requirements',type:pie))"
 					vis-filter='rule.groups:"rootcheck"'>
 					</kbn-vis>
 				</md-card-content>
