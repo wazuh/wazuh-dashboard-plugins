@@ -130,7 +130,7 @@ module.exports = function (server, options) {
 	var setMetafields = function (type) {
 		if(type == "install"){
 			server.log([blueWazuh, 'initialize', 'info'], 'Hide Kibana metafields...');
-			uiSettings.set(req,'metaFields', '{}')
+			uiSettings.set(req,'metaFields', '')
 				.then(function () {
 					server.log([blueWazuh, 'initialize', 'info'], 'Kibana metafield set to empty');
 				}).catch(function (data) {
