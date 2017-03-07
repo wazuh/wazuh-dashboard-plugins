@@ -126,14 +126,26 @@
 
 		</md-content>
 		<md-content layout="row">
-			<md-card flex>
+			<md-card  flex="60">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Alerts summary</span>
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="460px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.id,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.level,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Groups,field:rule.groups,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'PCI DSS',field:rule.pci_dss,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+					<kbn-vis vis-height="460px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.id,order:desc,orderBy:'1',size:99999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.level,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+						vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="40">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Groups summary</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:1,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:Group,field:rule.groups,order:desc,orderBy:'1',size:99999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:5,direction:desc),totalFunc:sum),title:'Groups',type:table))"
 						vis-filter="{{agentInfo.name ? 'agent.name:'+agentInfo.name : '*'}}">
 					</kbn-vis>
 				</md-card-content>
