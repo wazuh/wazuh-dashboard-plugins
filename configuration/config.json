@@ -1,0 +1,7 @@
+{
+	"wazuhapi" : {
+		"requests": {
+			"timeout" : 5000
+		}
+	}
+}

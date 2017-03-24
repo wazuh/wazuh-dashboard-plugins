@@ -4,13 +4,25 @@ module.exports = function (server, options) {
 	const fs = require('fs');
 	const path = require('path');
 	var fetchAgentsExternal = require(path.resolve(__dirname, "../wazuh-monitoring.js"));
+	const wazuh_config_file = '../../configuration/config.json';
 	var colors = require('ansicolors');
 	var blueWazuh = colors.blue('wazuh');
-
+	var wazuh_config = {};
+	
 	// Consts values, versions.
     const MIN_VERSION = [2,0,0];
     const MAX_VERSION = [3,0,0];
 	const wazuh_api_version = 'v2.0.0';
+	
+	// Read Wazuh App configuration file
+	try {
+		wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
+	} catch (e) {
+		server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file file.');
+		server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
+		server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+	};	
+	
 	
 	// Elastic JS Client
 	const serverConfig = server.config();
@@ -189,7 +201,7 @@ module.exports = function (server, options) {
     var checkStoredAPI = function (req, reply) {
         var needle = require('needle');
         needle.defaults({
-            open_timeout: 5000
+            open_timeout: wazuh_config.wazuhapi.requests.timeout
         });
 
         //Get config from elasticsearch
@@ -220,7 +232,7 @@ module.exports = function (server, options) {
 	var checkAPI = function (req, reply) {
         var needle = require('needle');
         needle.defaults({
-            open_timeout: 1000
+            open_timeout: 1500
         });
 		if (!req.payload.user) {
             reply({ 'statusCode': 400, 'error': 3, 'message': 'Missing param: API USER' }).code(400);
@@ -280,10 +292,9 @@ module.exports = function (server, options) {
                 reply({ 'statusCode': 404, 'error': 1, 'message': 'Credentials does not exists' }).code(404);
                 return;
             }
-
             var needle = require('needle');
             needle.defaults({
-                open_timeout: 5000
+                open_timeout: wazuh_config.wazuhapi.requests.timeout
             });
 
             if (!data) {
