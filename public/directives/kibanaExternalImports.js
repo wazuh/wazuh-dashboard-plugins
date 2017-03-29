@@ -8,6 +8,8 @@ require('ui/styles/config.less');
 require('ui/styles/spinner.less');
 
 import _ from 'lodash';
+import 'ui/modals';
+
 import 'plugins/kibana/visualize/saved_visualizations/saved_visualizations';
 import 'plugins/kibana/visualize/editor/sidebar';
 import 'plugins/kibana/visualize/editor/agg_filter';
@@ -58,5 +60,6 @@ import 'ui/typeahead';
 
 import 'plugins/spy_modes/req_resp_stats_spy_mode';
 import 'plugins/spy_modes/table_spy_mode';
+
 
 require('ui/courier');

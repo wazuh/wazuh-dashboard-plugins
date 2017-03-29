@@ -32,7 +32,6 @@ require('plugins/wazuh/objects/routes.js');
 require('plugins/wazuh/directives/kibanaExternalImports.js');
 require('plugins/wazuh/directives/kibanaVisualizationDirective.js');
 require('plugins/wazuh/directives/kibanaDiscoverDirective.js');
-require('plugins/wazuh/directives/kibanaDashboardDirective.js');
 require('plugins/wazuh/directives/kibanaSearchbarDirective.js');
 
 // Require controllers

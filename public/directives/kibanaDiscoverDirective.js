@@ -86,7 +86,7 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
-    AppState, timefilter, Promise, Private, kbnUrl, highlightTags, $location, savedSearches, appState, $rootScope, getAppState) {
+    AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
 
     $scope.defaultManagerName = appState.getDefaultManager().name;
 
@@ -104,10 +104,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
         $rootScope.visCounter = 0;
 
     $rootScope.visCounter++;
-
-   // $route.requireDefaultIndex = true;
-    //$route.template = $route.indexTemplate;
-    //$route.reloadOnSearch = false;
 
     const State = Private(StateProvider);
     courier.indexPatterns.getIds()
@@ -497,7 +493,8 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                             .size($scope.opts.sampleSize)
                             .sort(getSort($state.sort, $scope.indexPattern))
                             .query(!$scope.stateQuery ? null : $scope.stateQuery)
-                            .set('filter', queryFilter.getFilters());
+                            .set('filter', queryFilter.getFilters())
+                            .highlightAll(true);
 
                     });
 
