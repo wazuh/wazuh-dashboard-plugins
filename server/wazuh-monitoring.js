@@ -160,7 +160,7 @@ module.exports = function (server, options) {
 			if (body == '') {
 				return;
 			}
-			elasticRequest.callWithInternalUser('indices.bulk',
+			elasticRequest.callWithInternalUser('bulk',
 			{
 				index: todayIndex,
 				type: 'agent',

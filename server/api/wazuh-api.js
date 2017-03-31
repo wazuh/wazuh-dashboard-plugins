@@ -27,7 +27,7 @@ module.exports = function (server, options) {
 	// Elastic JS Client
 	const serverConfig = server.config();
 	const elasticsearch = require('elasticsearch');
-	const { elasticRequest } = server.plugins.elasticsearch.getCluster('data');
+	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 	
     //Handlers - Generic
 
@@ -51,7 +51,7 @@ module.exports = function (server, options) {
     }
 
     var getConfig = function (callback) {
-		elasticRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration', q: 'active:true'}).then(
+		elasticRequest.callWithInternalUser('search', { index: '.kibana', type: 'wazuh-configuration', q: 'active:true'}).then(
 			function (data) {
 					if (data.hits.total == 1) {
 						callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'manager': data.hits.hits[0]._source.manager, 'extensions': data.hits.hits[0]._source.extensions });
@@ -66,7 +66,7 @@ module.exports = function (server, options) {
 	
 	
     var getAPI_entries = function (req,reply) {
-		elasticRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration'}).then(
+		elasticRequest.callWithRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration'}).then(
 			function (data) {
 				reply(data.hits.hits);
             }, function (data, error) {
@@ -75,7 +75,7 @@ module.exports = function (server, options) {
     };
 
     var deleteAPI_entries = function (req,reply) {
-		elasticRequest(req, 'delete', { index: '.kibana', type: 'wazuh-configuration', id: req.params.id}).then(
+		elasticRequest.callWithRequest(req, 'delete', { index: '.kibana', type: 'wazuh-configuration', id: req.params.id}).then(
 			function (data) {
 				reply(data);
             }, function (data, error) {
@@ -85,15 +85,15 @@ module.exports = function (server, options) {
 	
     var setAPI_entry_default = function (req,reply) {
 		// Searching for previous default
-		elasticRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration', q: 'active:true'}).then(
+		elasticRequest.callWithRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration', q: 'active:true'}).then(
             function (data) {
                 if (data.hits.total == 1) {
 					// Setting off previous default
                     var idPreviousActive = data.hits.hits[0]._id;
-					elasticRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id: idPreviousActive, body: {doc: {"active": "false"}} }).then(
+					elasticRequest.callWithRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id: idPreviousActive, body: {doc: {"active": "false"}} }).then(
 					function () {
 						// Set new default
-						elasticRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
+						elasticRequest.callWithRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
 						function () {
 							reply({ 'statusCode': 200, 'message': 'ok' });
 						}, function (error) {
@@ -104,7 +104,7 @@ module.exports = function (server, options) {
 					});					
                 }else{
 					// Set new default
-					elasticRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
+					elasticRequest.callWithRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
 					function () {
 						reply({ 'statusCode': 200, 'message': 'ok' });
 					}, function (error) {
@@ -143,7 +143,7 @@ module.exports = function (server, options) {
     };
 
 	var getExtensions = function (req,reply) {
-        elasticRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration'}).then(
+        elasticRequest.callWithRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration'}).then(
 			function (data) {
 				reply(data.hits.hits);
             }, function (data, error) {
@@ -156,7 +156,7 @@ module.exports = function (server, options) {
 		var extension = {};
 		extension[req.params.extensionName] = (req.params.extensionValue == "true") ? true : false;
 		
-		elasticRequest(req, 'update',{ index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"extensions" : extension}} }).then(
+		elasticRequest.callWithRequest(req, 'update',{ index: '.kibana', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"extensions" : extension}} }).then(
 		function () {
 			reply({ 'statusCode': 200, 'message': 'ok' });
 		}, function (error) {
@@ -337,7 +337,7 @@ module.exports = function (server, options) {
         }
 		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'manager' : req.payload.manager, 'extensions' : req.payload.extensions};
 		
-        elasticRequest(req, 'index', { index: '.kibana', type: 'wazuh-configuration', body: settings, refresh: true }) 
+        elasticRequest.callWithRequest(req, 'index', { index: '.kibana', type: 'wazuh-configuration', body: settings, refresh: true }) 
             .then(function (response) {
                 reply({ 'statusCode': 200, 'message': 'ok', 'response' : response });
             }, function (error) {
