@@ -3,12 +3,9 @@ module.exports = function (server, options) {
 
 	// Elastic JS Client
 	const serverConfig = server.config();
-	const elasticsearchURL = serverConfig.get('elasticsearch.url');
 	const elasticsearch = require('elasticsearch');
-	const client = new elasticsearch.Client({
-	  host: elasticsearchURL,
-	  apiVersion: '5.0'
-	});
+	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
+	//callWithInternalUser
 	
 	// External libraries
 	const uiSettings = server.uiSettings();
@@ -48,7 +45,7 @@ module.exports = function (server, options) {
         var setup_info = {"name" : "Wazuh App", "app-version": packageJSON.version, "revision": packageJSON.revision, "installationDate": new Date().toISOString() };
 		
 		if(type == "install"){
-			client.create({ index: ".kibana", type: 'wazuh-setup', id: 1, body: setup_info }).then(
+			elasticRequest.callWithInternalUser('create', { index: ".kibana", type: 'wazuh-setup', id: 1, body: setup_info }).then(
 				function () {
 					server.log([blueWazuh, 'initialize', 'info'], 'Wazuh set up info inserted');
 				}, function () {
@@ -57,7 +54,7 @@ module.exports = function (server, options) {
 		}
 		
 		if(type == "upgrade"){
-			client.update({ index: ".kibana", type: 'wazuh-setup', id: 1, body: {doc: setup_info}}).then(
+			elasticRequest.callWithInternalUser('update', { index: ".kibana", type: 'wazuh-setup', id: 1, body: {doc: setup_info}}).then(
 				function () {
 					server.log([blueWazuh, 'initialize', 'info'], 'Wazuh set up info updated');
 				}, function () {
@@ -80,7 +77,7 @@ module.exports = function (server, options) {
 			};
 
 			server.log([blueWazuh, 'initialize', 'info'], 'Creating index pattern: ' + index_pattern);
-			client.create({ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_alerts } })
+			elasticRequest.callWithInternalUser('create', { index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_alerts } })
 				.then(function () {
 					server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
 					// Once index pattern is created, set it as default, wait few seconds for Kibana.
@@ -158,7 +155,7 @@ module.exports = function (server, options) {
 
 	// Init function. Check for "wazuh-setup" document existance.
     var init = function () {
-        client.get({ index: ".kibana", type: "wazuh-setup", id: "1" }).then(
+        elasticRequest.callWithInternalUser('get', { index: ".kibana", type: "wazuh-setup", id: "1" }).then(
             function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document already exists. Proceed to upgrade.');
 				install("upgrade");
@@ -182,8 +179,7 @@ module.exports = function (server, options) {
 			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + TEMPLATE_FILE);
 			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
 		};
-
-		client.indices.putTemplate( {name: "wazuh", order: 0, body: map_jsondata}).then(
+		elasticRequest.callWithInternalUser('indices.putTemplate', {name: "wazuh", order: 0, body: map_jsondata}).then(
 			function () {
 				server.log([blueWazuh, 'initialize', 'info'], 'Template installed and loaded: ' +  index_pattern);
 				configureKibana(type);
@@ -209,12 +205,11 @@ module.exports = function (server, options) {
 				body += '{ "index":  { "_index": ".kibana", "_type": "'+element._type+'", "_id": "'+element._id+'" } }\n';
 				body += JSON.stringify(element._source) + "\n";
 			});
-
-			client.bulk({
+			elasticRequest.callWithInternalUser('bulk',{
 				index: '.kibana',
 				body: body
 			}).then(function () {
-				client.indices.refresh({ index: ['.kibana', index_pattern] });
+				elasticRequest.callWithInternalUser('indices.refresh',{ index: ['.kibana', index_pattern] });
 				server.log([blueWazuh, 'initialize', 'info'], 'Templates, mappings, index patterns, visualizations, searches and dashboards were successfully installed. App ready to be used.');
 			}, function (err) {
 				server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch. Bulk request failed.');
@@ -224,7 +219,7 @@ module.exports = function (server, options) {
 
     // Wait until Kibana index is created / loaded and initialize Wazuh App
 	var checkKibanaIndex = function () {
-		client.exists({ index: ".kibana", id: packageJSON.kibana.version, type: "config" }).then(
+		elasticRequest.callWithInternalUser('exists',{ index: ".kibana", id: packageJSON.kibana.version, type: "config" }).then(
 			function (data) {
 				init();
 			}, function (data) {

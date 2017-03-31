@@ -110,7 +110,7 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
             }, printError);	
 			
 		// Tops
-        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentName')
+        genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/agent.name')
             .then(function (data) {
 				if(data.data == ""){
 						$scope.mostActiveAgent.name = $scope.defaultManager;
@@ -118,7 +118,7 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 						return;
 				}
 				$scope.mostActiveAgent.name = data.data;
-				genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/AgentID')
+				genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.defaultManager+'/agent.id')
 				.then(function (data) {
 					if(data.data == "" && $scope.mostActiveAgent.name != ""){
 						$scope.mostActiveAgent.id = "000";

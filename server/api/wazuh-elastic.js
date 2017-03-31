@@ -6,12 +6,8 @@ module.exports = function (server, options) {
 	
 	// Elastic JS Client
 	const serverConfig = server.config();
-	const elasticsearchURL = serverConfig.get('elasticsearch.url');
 	const elasticsearch = require('elasticsearch');
-	const client = new elasticsearch.Client({
-	  host: elasticsearchURL,
-	  apiVersion: '5.0'
-	});
+	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 	
 	var index_pattern = "wazuh-alerts-*";
 	var index_pattern_wazuh_monitoring = "wazuh-monitoring-*";
@@ -23,26 +19,20 @@ module.exports = function (server, options) {
 		
     const payloads = {
         getFieldTop: { "size": 1, "query": { "bool": { "must": [{ "query_string": { "query": "*", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": { "2": { "terms": { "field": '', "size": 1, "order": { "_count": "desc" } } } } },
-        getLastField: { "size": 1, "query": { "bool": { "must": [{ "exists": { "field": '' } }, { "query_string": { "query": "*" } }], "must_not": [{}] } }, "sort": [{ "@timestamp": { "order": "desc", "unmapped_type": "boolean" } }] },
-        statsOverviewAlerts: [{ "size": 0, "query": { "bool": { "must": [{ "query_string": { "query": "*", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": {} },
-            { "size": 0, "query": { "bool": { "must": [{ "query_string": { "query": "*", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": { "2": { "terms": { "field": "srcip", "size": 1, "order": { "_count": "desc" } } } } },
-            { "size": 0, "query": { "bool": { "must": [{ "query_string": { "query": "*", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": { "2": { "terms": { "field": "rule.groups", "size": 1, "order": { "_count": "desc" } } } } }],
-        statsOverviewSyscheck: [{ "size": 0, "query": { "bool": { "must": [{ "query_string": { "query": "rule.groups:syscheck", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": {} },
-            { "size": 0, "query": { "bool": { "must": [{ "query_string": { "query": "rule.groups:syscheck", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": { "2": { "terms": { "field": "AgentName", "size": 1, "order": { "_count": "desc" } } } } },
-            { "size": 0, "query": { "bool": { "must": [{ "query_string": { "query": "*", "analyze_wildcard": true } }, { "range": { "@timestamp": { "gte": '', "format": "epoch_millis" } } }], "must_not": [] } }, "aggs": { "2": { "terms": { "field": "SyscheckFile.path", "size": 1, "order": { "_count": "desc" } } } } }]
+        getLastField: { "size": 1, "query": { "bool": { "must": [{ "exists": { "field": '' } }, { "query_string": { "query": "*" } }], "must_not": [{}] } }, "sort": [{ "@timestamp": { "order": "desc", "unmapped_type": "boolean" } }] }
     };
 
     //Handlers
 
-    var fetchElastic = function (payload) {
-        return client.search({ index: 'wazuh-alerts-*', type: 'wazuh', body: payload });
+    var fetchElastic = function (req, payload) {
+		return elasticRequest.callWithRequest(req, 'search', { index: 'wazuh-alerts-*', type: 'wazuh', body: payload });
     };
 	
 	// Returns alerts count for fields/value array between timeGTE and timeLT
     var alertsCount = function (req, reply) {
 		
 		var payload = {"size": 1,"query": {"bool": {"must": [], "filter": {"range": {"@timestamp": {}}}}}};
-
+		
 		// Set up time interval, default to Last 24h
         const timeGTE = req.payload.timeinterval.gte ? req.payload.timeinterval.gte : "now-1d";
         const timeLT = req.payload.timeinterval.lt ? req.payload.timeinterval.lt : "now";
@@ -62,7 +52,8 @@ module.exports = function (server, options) {
 			payload.query.bool.must.push({"match": obj});
 		})
 		
-        fetchElastic(payload).then(function (data) {
+		
+        fetchElastic(req, payload).then(function (data) {
             reply({ 'statusCode': 200, 'data': data.hits.total });
         }, function () {
             reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
@@ -70,31 +61,21 @@ module.exports = function (server, options) {
     };
 	
     var getFieldTop = function (req, reply) {
- 
-        // is date defined? or must use 24h ?
-        var date = new Date();
-        date.setDate(date.getDate() - 1);
-        date = date.getTime();
 
-        const timeAgo = req.params.time ? encodeURIComponent(req.params.time) : date;
-
-
-
-		var payload = JSON.parse(JSON.stringify(payloads.getFieldTop));
+		// Top field payload
+		var payload = {"size":1,"query":{"bool":{"must":[],"filter":{"range":{"@timestamp":{}}}}},"aggs":{"2":{"terms":{"field":"","size":1,"order":{"_count":"desc"}}}}}
 		
-        if (req.params.fieldFilter && req.params.fieldFilter2) {
-			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND " + req.params.fieldFilter2 + ":" + req.params.fieldValue2 + " AND manager.name: " + req.params.manager;
-		}else if(req.params.fieldFilter){
-			payload.query.bool.must[0].query_string.query = req.params.fieldFilter + ":" + req.params.fieldValue + " AND manager.name: " + req.params.manager;
-        }else{
-            payload.query.bool.must[0].query_string.query = "manager.name: " + req.params.manager;
-		}
-		
-        payload.query.bool.must[1].range['@timestamp'].gte = timeAgo;
+        // Set up time interval, default to Last 24h
+        const timeGTE = "now-1d";
+        const timeLT = "now";
+		payload.query.bool.filter.range['@timestamp']["gte"] = timeGTE;
+		payload.query.bool.filter.range['@timestamp']["lt"] = timeLT;
+
+		// Set up match for default manager name
+		payload.query.bool.must.push({"match": {"manager.name": req.params.manager}});
         payload.aggs['2'].terms.field = req.params.field;
-		
 
-        fetchElastic(payload).then(function (data) {
+        fetchElastic(req, payload).then(function (data) {
 
             if (data.hits.total == 0 || typeof data.aggregations['2'].buckets[0] === 'undefined')
                 reply({ 'statusCode': 200, 'data': '' });
@@ -128,7 +109,7 @@ module.exports = function (server, options) {
             payload.query.bool.must.push(termArray);	
         }
 		
-        fetchElastic(payload).then(function (data) {
+        fetchElastic(req, payload).then(function (data) {
 			
             if (data.hits.total == 0 || typeof data.hits.hits[0] === 'undefined')
                 reply({ 'statusCode': 200, 'data': '' });
@@ -139,78 +120,7 @@ module.exports = function (server, options) {
         });
     };
 
-    var statsOverviewAlerts = function (req, reply) {
-        var gte = new Date() - (24 * 3600);
-
-        var _payloads = payloads.statsOverviewAlerts;
-
-        var _data = [];
-
-        _payloads[0].query.bool.must[1].range['@timestamp'].gte = gte;
-        _payloads[1].query.bool.must[1].range['@timestamp'].gte = gte;
-        _payloads[2].query.bool.must[1].range['@timestamp'].gte = gte;
-
-        fetchElastic(_payloads[0]).then(function (data) {
-            _data['alerts'] = data.hits.total;
-            fetchElastic(_payloads[1]).then(function (data) {
-                if (data.hits.total == 0)
-                    _data['ip'] = '-';
-                else
-                    _data['ip'] = data.aggregations['2'].buckets[0].key;
-                fetchElastic(_payloads[2]).then(function (data) {
-                    if (data.hits.total == 0)
-                        _data['group'] = '-';
-                    else
-                        _data['group'] = data.aggregations['2'].buckets[0].key;
-                    reply({ 'statusCode': 200, 'data': { 'alerts': _data['alerts'], 'ip': _data['ip'], 'group': _data['group'] } });
-                }, function () {
-                    reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
-                });
-            }, function () {
-                reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
-            });
-        }, function () {
-            reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
-        });
-    };
-
-    var statsOverviewSyscheck = function (req, reply) {
-        var gte = new Date() - (24 * 3600);
-
-        var _payloads = payloads.statsOverviewSyscheck;
-
-        var _data = [];
-
-        _payloads[0].query.bool.must[1].range['@timestamp'].gte = gte;
-        _payloads[1].query.bool.must[1].range['@timestamp'].gte = gte;
-        _payloads[2].query.bool.must[1].range['@timestamp'].gte = gte;
-
-        fetchElastic(_payloads[0]).then(function (data) {
-            data['alerts'] = data.hits.total;
-            fetchElastic(_payloads[1]).then(function (data) {
-                if (data.hits.total == 0)
-                    _data['agent'] = '-';
-                else
-                    _data['agent'] = data.aggregations['2'].buckets[0].key;
-                fetchElastic(_payloads[2]).then(function (data) {
-                    if (data.hits.total == 0)
-                        _data['file'] = '-';
-                    else
-                        _data['file'] = data.aggregations['2'].buckets[0].key;
-                    reply({ 'statusCode': 200, 'data': { 'alerts': _data['alerts'], 'agent': _data['agent'], 'file': _data['file'] } });
-                }, function () {
-                    reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
-                });
-            }, function () {
-                reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
-            });
-        }, function () {
-            reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
-        });
-    };
-
-	
-	var putWazuhPattern = function (req, reply) {
+	var putWazuhAlertsPattern = function (req, reply) {
 
 		try {
 			kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
@@ -224,12 +134,12 @@ module.exports = function (server, options) {
 			}
 
 			// Get current fields index pattern (wazuh-alerts-*)
-			client.get({
+			elasticRequest.callWithInternalUser('get', { 
 				index: '.kibana',
 				type: 'index-pattern',
-				id: index_pattern
-			}, function (error, response) {
-				if(response.found){
+				id: index_pattern 
+			}).then(
+				function (response) {
 					wazuhAlerts_indexPattern_current = JSON.parse(response._source.fields);
 					// Compare and update fields properties
 					for (var i = 0, len = wazuhAlerts_indexPattern_current.length; i < len; i++) {
@@ -239,7 +149,7 @@ module.exports = function (server, options) {
 						}
 					}
 					// Update index pattern  (wazuh-alerts-*)
-					client.update({
+					elasticRequest.callWithInternalUser('update', { 
 						index: '.kibana',
 						type: 'index-pattern',
 						id: index_pattern,
@@ -248,12 +158,16 @@ module.exports = function (server, options) {
 								fields: JSON.stringify((wazuhAlerts_indexPattern_current))
 							}
 						}
-					}, function (error, response) {
-						responseBack["wazuh-alerts"] = response;
-					});
-				}else{
+					}).then(
+						function (response) {
+							reply({ 'response': response}).code(200);
+						}, function (error) {
+							reply({ 'response': error, 'error' : '1'}).code(error.statusCode);
+						}
+					);
+				}, function (error) {
 					// Create index pattern
-					client.create({ 
+					elasticRequest.callWithInternalUser('create', {
 						index: '.kibana', 
 						type: 'index-pattern', 
 						id: index_pattern, 
@@ -262,46 +176,74 @@ module.exports = function (server, options) {
 							timeFieldName: '@timestamp', 
 							fields: kibana_fields_data.wazuh_alerts 
 						} 
-					}).then(function () {
-							responseBack["wazuh-alerts"] = response;			
-					}, function (response) {
-						if (response.statusCode != '409') {
-							responseBack["wazuh-alerts"] = "Index pattern not found and could not be created";
-						}
+					}).then(
+					function (response) {
+							reply({ 'response': response}).code(200);
+					}, function (error) {
+							reply({ 'response': error, 'error' : '2'}).code(error.statusCode);
 					});
 				}
-			});
+			);
 
 		} catch (e) {
 			  server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
 			  server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
 			  server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
 		};
+    };
+	var putWazuhMonitoringPattern = function (req, reply) {
 		
 		try {
 			kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
-			// Update index pattern  (wazuh-monitoring-*)
-			client.update({
+			// Check if wazuh-monitoring-* exists
+			elasticRequest.callWithInternalUser('get', { 
 				index: '.kibana',
 				type: 'index-pattern',
-				id: index_pattern_wazuh_monitoring,
-				body: {
-					doc: {
-						fields: kibana_fields_data.wazuh_monitoring
-					}
+				id: index_pattern_wazuh_monitoring 
+			}).then(
+				function (response) {
+					// Update index pattern  (wazuh-monitoring-*)
+					elasticRequest.callWithInternalUser('update', { 
+						index: '.kibana',
+						type: 'index-pattern',
+						id: index_pattern_wazuh_monitoring,
+						body: {
+							doc: {
+								fields: kibana_fields_data.wazuh_monitoring
+							}
+						}
+					}).then(
+						function (response) {
+							reply({ 'response': response}).code(200);
+						}, function (error) {
+							reply({ 'response': error }).code(error.statusCode);
+						}
+					);
+				}, function (error) {
+					// Create index pattern
+					elasticRequest.callWithInternalUser('create', {
+						index: '.kibana', 
+						type: 'index-pattern', 
+						id: index_pattern_wazuh_monitoring, 
+						body: { 
+							title: index_pattern_wazuh_monitoring, 
+							timeFieldName: '@timestamp', 
+							fields: kibana_fields_data.wazuh_monitoring 
+						} 
+					}).then(
+					function (response) {
+							reply({ 'response': response}).code(200);
+					}, function (error) {
+							reply({ 'response': error, 'error' : '2'}).code(error.statusCode);
+					});			
 				}
-			}, function (error, response) {
-				responseBack["wazuh-monitoring"] = response;
-				reply({ 'response': responseBack, 'error': error  }).code(200);				
-			})
-
+			);
 		} catch (e) {
 			  server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
 			  server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_FIELDS_FILE);
 			  server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-		};		
-		
-    };
+		};	
+	}
 	
     //Server routes 
 
@@ -370,6 +312,7 @@ module.exports = function (server, options) {
         path: '/api/wazuh-elastic/last/{manager}/{field}/{fieldFilter}/{fieldValue}',
         handler: getLastField
     });
+	
 	/*
     * PUT /api/wazuh-elastic/wazuh-pattern
     * Set wazuh index pattern
@@ -377,7 +320,18 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'PUT',
-        path: '/api/wazuh-elastic/wazuh-pattern',
-        handler: putWazuhPattern
+        path: '/api/wazuh-elastic/wazuh-alerts-pattern',
+        handler: putWazuhAlertsPattern
     });
+	
+	/*
+    * PUT /api/wazuh-elastic/wazuh-pattern
+    * Set wazuh index pattern
+    *
+    **/
+    server.route({
+        method: 'PUT',
+        path: '/api/wazuh-elastic/wazuh-monitoring-pattern',
+        handler: putWazuhMonitoringPattern
+    });	
 };

@@ -9,8 +9,10 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
     {
 		appState.setDefaultManager(data.manager);
 		appState.setExtensions(data.extensions);
-		genericReq.request('PUT', '/api/wazuh-elastic/wazuh-pattern').then(function (data) { 
-			deferred.resolve();
+		genericReq.request('PUT', '/api/wazuh-elastic/wazuh-alerts-pattern').then(function (data) { 
+			genericReq.request('PUT', '/api/wazuh-elastic/wazuh-monitoring-pattern').then(function (data) { 
+				deferred.resolve();
+			});
 		});
 	}, function (data) {
 		if(data.error == 2)

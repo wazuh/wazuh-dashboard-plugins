@@ -3,12 +3,8 @@ module.exports = function (server, options) {
 	
 	// Elastic JS Client
 	const serverConfig = server.config();
-	const elasticsearchURL = serverConfig.get('elasticsearch.url');
 	const elasticsearch = require('elasticsearch');
-	const client = new elasticsearch.Client({
-		host: elasticsearchURL,
-		apiVersion: '5.0'
-	});
+	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 	
 	// External libraries
 	const fs = require('fs');
@@ -125,8 +121,7 @@ module.exports = function (server, options) {
 		var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
 
 		var todayIndex = index_prefix + fDate;
-
-		client.indices.exists({ index: todayIndex }).then(
+		elasticRequest.callWithInternalUser('indices.exists',{ index: todayIndex }).then(
 			function (result) {
 				if (result) {
 					insertDocument(todayIndex);
@@ -141,7 +136,7 @@ module.exports = function (server, options) {
 	
 	// Creating wazuh-monitoring index
 	var createIndex = function (todayIndex) {
-		client.indices.create({ index: todayIndex }).then(
+		elasticRequest.callWithInternalUser('indices.create',{ index: todayIndex }).then(
 			function () {
 				insertDocument(todayIndex);
 			}, function () {
@@ -165,7 +160,8 @@ module.exports = function (server, options) {
 			if (body == '') {
 				return;
 			}
-			client.bulk({
+			elasticRequest.callWithInternalUser('indices.bulk',
+			{
 				index: todayIndex,
 				type: 'agent',
 				body: body
@@ -179,7 +175,7 @@ module.exports = function (server, options) {
 
 	// Get API configuration from elastic and callback to loadCredentials
 	var getConfig = function (callback) {
-		client.search({ index: '.kibana', type: 'wazuh-configuration'})
+		elasticRequest.callWithInternalUser('search',{ index: '.kibana', type: 'wazuh-configuration'})
 			.then(function (data) {
 				if (data.hits.total > 0) {
 					callback(data.hits);
@@ -200,8 +196,7 @@ module.exports = function (server, options) {
 			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Path: ' + TEMPLATE_FILE);
 			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Exception: ' + e);
 		};
-
-		client.indices.putTemplate( {name: "wazuh", order: 0, body: map_jsondata}).then(
+		elasticRequest.callWithInternalUser('indices.putTemplate',{name: "wazuh", order: 0, body: map_jsondata}).then(
 			function () {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Template installed and loaded: ' +  index_pattern);
 			}, function (data) {
@@ -220,7 +215,7 @@ module.exports = function (server, options) {
 		  server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Exception: ' + e);
 		};
 		
-		return client.create({ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_monitoring} });
+		return elasticRequest.callWithInternalUser('create',{ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_monitoring} });
 	};
 
 	// fetchAgents on demand
@@ -231,7 +226,7 @@ module.exports = function (server, options) {
 	
 	// Wait until Elasticsearch is ready
 	var checkElasticStatus = function () {
-		client.info().then(
+		elasticRequest.callWithInternalUser('info').then(
 			function (data) {
 				init();
 			}, function (data) {
