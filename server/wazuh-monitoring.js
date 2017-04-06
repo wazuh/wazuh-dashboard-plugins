@@ -4,7 +4,7 @@ module.exports = function (server, options) {
 	// Elastic JS Client
 	const serverConfig = server.config();
 	const elasticsearch = require('elasticsearch');
-	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
+	const elasticRequest = server.plugins.elasticsearch.getCluster('admin');
 	
 	// External libraries
 	const fs = require('fs');
