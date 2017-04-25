@@ -161,39 +161,42 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 					$scope.results = data;
 					$scope.load = false;
 				});
+				
+				// Get syscheck info
+				DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
+					$scope.agentInfo.syscheck = data.data;
+					$scope.agentInfo.syscheck.duration = "Unknown";
+					if($scope.agentInfo.syscheck.syscheckEndTime != null && $scope.agentInfo.syscheck.syscheckTime != null){
+						var syscheckTime = new Date($scope.agentInfo.syscheck.syscheckTime);
+						var syscheckEndTime = new Date($scope.agentInfo.syscheck.syscheckEndTime);
+						var minutes = ((syscheckEndTime-syscheckTime)/1000)/60;
+						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);			
+					}else if($scope.agentInfo.syscheck.syscheckEndTime == null){
+						$scope.agentInfo.syscheck.syscheckEndTime = "Unknown";
+					}else{
+						$scope.agentInfo.syscheck.syscheckTime = "Unknown";
+					}
+				}, printError);
+				
+				// Get rootcheck info
+				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
+					$scope.agentInfo.rootcheck = data.data;
+					$scope.agentInfo.rootcheck.duration = "Unknown";
+					if($scope.agentInfo.rootcheck.rootcheckEndTime != null && $scope.agentInfo.rootcheck.rootcheckTime != null){
+						var rootcheckTime = new Date($scope.agentInfo.rootcheck.rootcheckTime);
+						var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.rootcheckEndTime);
+						var minutes = ((rootcheckEndTime-rootcheckTime)/1000)/60;
+						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);			
+					}else if($scope.agentInfo.rootcheck.rootcheckEndTime == null){
+						$scope.agentInfo.rootcheck.rootcheckEndTime = "Unknown";
+					}else{
+						$scope.agentInfo.rootcheck.rootcheckTime = "Unknown";
+					}						
+				}, printError);				
+				
 			}, printError);	
 			
-			// Get syscheck info
-			DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
-				$scope.agentInfo.syscheck = data.data;
-				$scope.agentInfo.syscheck.duration = "Unknown";
-				if($scope.agentInfo.syscheck.syscheckEndTime != null && $scope.agentInfo.syscheck.syscheckTime != null){
-					var syscheckTime = new Date($scope.agentInfo.syscheck.syscheckTime);
-					var syscheckEndTime = new Date($scope.agentInfo.syscheck.syscheckEndTime);
-					var minutes = ((syscheckEndTime-syscheckTime)/1000)/60;
-					$scope.agentInfo.syscheck.duration = window.Math.round(minutes);			
-				}else if($scope.agentInfo.syscheck.syscheckEndTime == null){
-					$scope.agentInfo.syscheck.syscheckEndTime = "Unknown";
-				}else{
-					$scope.agentInfo.syscheck.syscheckTime = "Unknown";
-				}
-			}, printError);
-			
-			// Get rootcheck info
-			DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
-				$scope.agentInfo.rootcheck = data.data;
-				$scope.agentInfo.rootcheck.duration = "Unknown";
-				if($scope.agentInfo.rootcheck.rootcheckEndTime != null && $scope.agentInfo.rootcheck.rootcheckTime != null){
-					var rootcheckTime = new Date($scope.agentInfo.rootcheck.rootcheckTime);
-					var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.rootcheckEndTime);
-					var minutes = ((rootcheckEndTime-rootcheckTime)/1000)/60;
-					$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);			
-				}else if($scope.agentInfo.rootcheck.rootcheckEndTime == null){
-					$scope.agentInfo.rootcheck.rootcheckEndTime = "Unknown";
-				}else{
-					$scope.agentInfo.rootcheck.rootcheckTime = "Unknown";
-				}						
-			}, printError);
+
         }
     };
 
