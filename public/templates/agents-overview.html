@@ -3,6 +3,72 @@
 	<!-- Kibana search bar -->
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	
+	<div ng-if="tabView == 'panels'">
+		<md-content layout="row">
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
+					<div class="ng-binding">Name</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex="10" layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.ip}}</div>
+					<div class="ng-binding">IP Address</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex="10" layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.version}}</div>
+					<div class="ng-binding">Version</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding"  class="legend-value-title ng-binding legend-value-truncate" style="font-size: 14pt;">{{ agentInfo.os | limitTo: 70 }}{{agentInfo.os.length > 70 ? '...' : ''}}</div>
+					<md-tooltip md-direction="bottom">{{ agentInfo.os }}</md-tooltip>
+					<div class="ng-binding">OS</div>
+				</md-card-content>
+			</md-card>
+		</md-content>	
+		<md-content layout="row">
+			<md-card flex layout="column" ng-show="agentInfo.id != '000'">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.lastKeepAlive}}</div>
+					<div class="ng-binding">Last keep alive</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.dateAdd}}</div>
+					<div class="ng-binding">Registration date</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.syscheck.syscheckEndTime}}</div>
+					<md-tooltip md-direction="bottom">
+						Start time: {{ agentInfo.syscheck.syscheckTime }} <br>
+						End time: {{ agentInfo.syscheck.syscheckEndTime }} <br>
+						Duration time: {{ agentInfo.syscheck.duration }} minutes
+					</md-tooltip>
+					<div class="ng-binding">Last syscheck scan</div>
+				</md-card-content>
+			</md-card>
+			<md-card flex layout="column">
+				<md-card-content style="text-align: center;">
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.rootcheck.rootcheckEndTime}}</div>
+					<md-tooltip md-direction="bottom">
+						Start time: {{ agentInfo.rootcheck.rootcheckTime }} <br>
+						End time: {{ agentInfo.rootcheck.rootcheckEndTime }} <br>
+						Duration time: {{ agentInfo.rootcheck.duration }} minutes
+					</md-tooltip>
+					<div class="ng-binding">Last rootcheck scan</div>
+				</md-card-content>
+			</md-card>
+		</md-content>
+	</div>
+	
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels'">
 		<md-card flex layout="column">
@@ -23,41 +89,6 @@
 
 	<!-- View: Panels -->
 	<div ng-if="tabView == 'panels' && results">
-		<md-content layout="row">
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
-					<div class="ng-binding">Name</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.ip}}</div>
-					<div class="ng-binding">IP Address</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.version}}</div>
-					<div class="ng-binding">Version</div>
-				</md-card-content>
-			</md-card>
-		
-		
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding"  class="legend-value-title ng-binding legend-value-truncate" style="font-size: 14pt;">{{ agentInfo.os | limitTo: 20 }}{{agentInfo.os.length > 20 ? '...' : ''}}</div>
-					<md-tooltip md-direction="bottom">{{ agentInfo.os }}</md-tooltip>
-					<div class="ng-binding">Operating system</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column" ng-show="agentInfo.id != '000'">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.lastKeepAlive}}</div>
-					<div class="ng-binding">Last keep alive</div>
-				</md-card-content>
-			</md-card>
-		</md-content>	
 		<md-content layout="row">
 				<md-card flex="33">
 					<md-card-title>

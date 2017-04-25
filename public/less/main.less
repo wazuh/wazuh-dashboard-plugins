@@ -783,10 +783,18 @@ svg:not(:root) {
 
 md-tooltip.md-default-theme, md-tooltip {
 	color: white;
+	height: auto;
 }
 md-tooltip.md-default-theme .md-content, md-tooltip .md-content {
 	background-color: black;
+	height: auto;
 }
+@media (min-width: 960px) {
+	md-tooltip .md-content {
+		height: auto !important;
+	} 
+}
+
 md-card md-card-content {
 	padding: 5px; 
 }
