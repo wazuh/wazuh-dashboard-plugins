@@ -23,24 +23,12 @@ Install the App
 
 ```/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.x.x.zip ```
 
-## Wazuh Open Source modules and contributions
-
-* [Wazuh Ruleset](http://documentation.wazuh.com/en/latest/ossec_ruleset.html): Includes compliance mapping with PCI DSS v3.1, CIS and additional decoders and rules. Users can contribute to this rule set by submitting pull requests to our [Github repository](https://github.com/wazuh/wazuh-ruleset). Our team will continue to maintain and update it periodically.
-
-* [Wazuh](http://documentation.wazuh.com/en/latest/ossec_wazuh.html) with extended JSON logging capabilities, for easy [integration with ELK Stack](http://documentation.wazuh.com/en/latest/ossec_elk.html) and third party log management tools. The manager also include modifications in OSSEC binaries needed by the [OSSEC Wazuh RESTful API](http://documentation.wazuh.com/en/latest/ossec_api.html).
-
-* [Wazuh RESTful API](http://documentation.wazuh.com/en/latest/ossec_api.html): Used to monitor and control your OSSEC installation, providing an interface to interact with the manager from anything that can send an HTTP request.
-
-* [Pre-compiled installation packages](http://documentation.wazuh.com/en/latest/ossec_installation.html), both for OSSEC agent and manager: Include repositories for RedHat, CentOS, Fedora, Debian, Ubuntu and Windows.
-
-* [Puppet scripts](http://documentation.wazuh.com/en/latest/ossec_puppet.html) for automatic OSSEC deployment and configuration.
-
-* [Docker containers](http://documentation.wazuh.com/en/latest/ossec_docker.html) to virtualize and run your OSSEC manager and an all-in-one integration with ELK Stack.
 
 ## Documentation
 
-* [Full documentation](http://documentation.wazuh.com)
-* [Wazuh installation guide](http://documentation.wazuh.com/en/latest/wazuh_installation.html)
+* [Full documentation](https://documentation.wazuh.com)
+* [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html)
+* [Screenshots](https://documentation.wazuh.com/current/index.html#example-screenshots)
 
 ## Branches
 
@@ -68,5 +56,5 @@ Wazuh App Copyright (C) 2016 Wazuh Inc. (License GPLv2)
 ## References
 
 * [Wazuh website](https://wazuh.com)
-* [Wazuh documentation](http://documentation.wazuh.com)
+* [Wazuh documentation](https://documentation.wazuh.com)
 * [Elastic stack](https://elastic.co)
