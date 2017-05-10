@@ -26,12 +26,10 @@ module.exports = function (server, options) {
 	const TEMPLATE_FILE = 'integration_files/template_file.json';
 	const KIBANA_FIELDS_FILE = 'integration_files/kibana_fields_file.json';
 	const ALERT_SAMPLE_FILE = 'integration_files/alert_sample.json';
-	const MONITORING_SAMPLE_FILE = 'integration_files/monitoring_sample.json';
 
 	// Initialize objects
 	var kibana_fields_data = {};
 	var alert_sample = {};
-	var monitoring_sample = {};
 	var map_jsondata = {};
 	var objects = {};
 
@@ -75,15 +73,7 @@ module.exports = function (server, options) {
 			alert_sample = JSON.parse(fs.readFileSync(path.resolve(__dirname, ALERT_SAMPLE_FILE), 'utf8'));
 		} catch (e) {
 			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + ALERT_SAMPLE);
-			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-		};
-			
-		try {
-			monitoring_sample = JSON.parse(fs.readFileSync(path.resolve(__dirname, MONITORING_SAMPLE_FILE), 'utf8'));
-		} catch (e) {
-			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + MONITORING_SAMPLE);
+			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + ALERT_SAMPLE_FILE);
 			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
 		};
 			
@@ -98,7 +88,6 @@ module.exports = function (server, options) {
 					server.log([blueWazuh, 'initialize', 'info'], 'Skipping alert insertion. Already inserted.');
 				}
 			});
-		
 	}
 	
 	// Create index pattern

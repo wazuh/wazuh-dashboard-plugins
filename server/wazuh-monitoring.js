@@ -26,11 +26,17 @@ module.exports = function (server, options) {
 	var agentsArray = [];
 	const KIBANA_FIELDS_FILE = 'startup/integration_files/kibana_fields_file.json';
 	const TEMPLATE_FILE = 'startup/integration_files/template_file.json';
+	const MONITORING_SAMPLE_FILE = 'startup/integration_files/monitoring_sample.json';
+	
+	var monitoring_sample = {};
 	var kibana_fields_data = {};
 	var map_jsondata = {};	
 	api_version = "v2.0.0";
 	var index_pattern = "wazuh-monitoring-*";
 	var index_prefix = "wazuh-monitoring-";
+	
+	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
+	var todayIndex = index_prefix + fDate;
 	
 	// Load Wazuh API credentials from Elasticsearch document
 	var loadCredentials = function (apiEntries) {
@@ -118,9 +124,6 @@ module.exports = function (server, options) {
 
 	// Save agent status into elasticsearch, create index and/or insert document
 	var saveStatus = function () {
-		var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
-
-		var todayIndex = index_prefix + fDate;
 		elasticRequest.callWithInternalUser('indices.exists',{ index: todayIndex }).then(
 			function (result) {
 				if (result) {
@@ -199,6 +202,29 @@ module.exports = function (server, options) {
 		elasticRequest.callWithInternalUser('indices.putTemplate',{name: "wazuh", order: 0, body: map_jsondata}).then(
 			function () {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Template installed and loaded: ' +  index_pattern);
+				
+				
+				try {
+					monitoring_sample = JSON.parse(fs.readFileSync(path.resolve(__dirname, MONITORING_SAMPLE_FILE), 'utf8'));
+				} catch (e) {
+					server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not read the mapping file.');
+					server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Path: ' + MONITORING_SAMPLE_FILE);
+					server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Exception: ' + e);
+				};
+				
+				// Insert sample alert	
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Inserting sample alert...');
+				elasticRequest.callWithInternalUser('create', { index: todayIndex, type: 'agent', id: 'alert_monitoring_sample', body: monitoring_sample })
+					.then(function () {
+						server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Sample alert inserted');				
+					}, function (response) {
+						if (response.statusCode != '409') {
+							server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not insert the sample alert');
+						} else {
+							server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Skipping alert insertion. Already inserted.');
+						}
+					});
+			
 			}, function (data) {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not install template ' +  index_pattern);
 			});

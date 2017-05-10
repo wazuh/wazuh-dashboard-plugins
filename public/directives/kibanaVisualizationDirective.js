@@ -56,7 +56,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	// Initialize and decode params
 	var visState = {};
 	var visDecoded = rison.decode($scope.visA);
-	
+
 	// Initialize Visualization
 	$scope.newVis = new SavedVis({ 'type': visDecoded.vis.type, 'indexPattern': $scope.visIndexPattern });
 
@@ -106,7 +106,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
 		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
-		var agg_fields = [];
 		$timeout(
 		function() {
 

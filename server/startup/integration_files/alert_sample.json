@@ -1,8 +1,11 @@
 {
-  "@timestamp": "2017-05-10T11:13:21.000Z",
+  "@timestamp": "2015-03-18T15:55:55.000Z",
   "AlertsFile": "sample",
   "title": "sample",
   "full_log": "sample",
+  "id": "sample",
+  "srcuser": "sample",
+  "srcip": "sample",
   "location": "sample",
   "GeoLocation": {
     "country_name": "sample",
@@ -13,6 +16,7 @@
   },
   "audit": {
     "command": "sample",
+    "type": "sample",
     "egid": "sample",
     "euid": "sample",
     "exe": "sample",
@@ -33,6 +37,7 @@
       "title": "sample"
     },
     "scan": {
+	  "id": "sample",
       "content": "sample",
       "score": 1.55,
       "profile": {
@@ -61,6 +66,7 @@
     "uid_after": "sample",
     "uid_before": "sample",
     "uname_after": "sample",
-    "uname_before": "sample"
+    "uname_before": "sample",
+    "event": "sample"
   }
 }
