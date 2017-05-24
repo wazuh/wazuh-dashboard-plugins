@@ -349,12 +349,12 @@ module.exports = function (server, options) {
 
     var updateApiHostname = function (req,reply) {
         elasticRequest.callWithRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id:req.params.id, body: {doc: {"manager": req.payload.manager}} }).then(
-					function () {
-						reply({ 'statusCode': 200, 'message': 'ok' });
-					}, function (error) {
-						reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-					});		
-    };	
+            function () {
+                reply({ 'statusCode': 200, 'message': 'ok' });
+            }, function (error) {
+                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+            });		
+    };
 	
 	//Handlers - Get API Settings
 
@@ -555,6 +555,5 @@ module.exports = function (server, options) {
         method: 'PUT',
         path: '/api/wazuh-api/updateApiHostname/{id}',
         handler: updateApiHostname
-    });	
-
+    });
 };
