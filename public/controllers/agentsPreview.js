@@ -3,10 +3,11 @@ require('plugins/wazuh/utils/infinite_scroll/infinite-scroll.js');
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.factory('Agents', function($http, DataFactory) {
-  var Agents = function(objectsArray, items) {
+  var Agents = function(objectsArray, items, os_list) {
     this.items = items;
 	this.objectsArray = objectsArray;
     this.busy = false;
+    this.os_list = os_list;
   };
 
   Agents.prototype.nextPage = function() {
@@ -33,6 +34,7 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';
+    $scope._os = 'all';
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
 	const notify = new Notifier({location: 'Agents - Preview'});
@@ -86,6 +88,18 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 			$scope.agents.items = data.data.items;
 		});
     };
+    
+    $scope.agentOSFilter = function (os) {
+        if (os == 'all') {
+            DataFactory.filters.unset(objectsArray['/agents'], 'os');
+        } else {
+            DataFactory.filters.set(objectsArray['/agents'], 'os', os);
+        }
+		DataFactory.setOffset(objectsArray['/agents'],0);
+		DataFactory.get(objectsArray['/agents']).then(function (data) { 
+			$scope.agents.items = data.data.items;
+		});
+    };
 
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 30, 0)
@@ -93,10 +107,11 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
 				DataFactory.filters.register(objectsArray['/agents'], 'status', 'string');
+                DataFactory.filters.register(objectsArray['/agents'], 'os', 'string');
 				DataFactory.filters.register(objectsArray['/agents'], 'filter-sort', 'string');
                 DataFactory.get(objectsArray['/agents'])
                     .then(function (data) {
-						$scope.agents = new Agents(objectsArray, data.data.items);
+						$scope.agents = new Agents(objectsArray, data.data.items, data.data.os_list);
                         $scope.load = false;
                     }, printError);
             }, printError);

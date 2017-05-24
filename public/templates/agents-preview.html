@@ -65,17 +65,32 @@
 								</md-input-container>
 							</div>
 						</div>
+						<div layout="row" layout-align="start stretch" flex>
+							<div layout="row" class="sideNavBox" flex="20">
+								<md-input-container flex class="md-whiteframe-z1">
+									<md-select id="eventBox" ng-model="$parent._os" ng-change="agentOSFilter($parent._os)" aria-label="Filter by operative system">
+										<md-option value="all">All</md-option>
+                                        <md-option ng-repeat='os in agents.os_list' value="{{os.os_family}}-{{os.os_distribution}}-{{os.os_version}}-{{os.os_architecture}}">
+                                            {{os.os_family}} {{os.os_distribution}} {{os.os_version}} {{os.os_architecture}}
+                                        </md-option>
+									</md-select>
+								</md-input-container>
+							</div>
+						</div>
+						
 						<div>
 							<md-toolbar layout="row">
 								<div class="md-toolbar-tools">
 									<span flex="10" ng-click="setSort('id')">ID
 										<i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-									<span flex="30" ng-click="setSort('name')">Name
+									<span flex="25" ng-click="setSort('name')">Name
 										<i class="fa" ng-class="_sort === 'name' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-									<span flex="30" ng-click="setSort('ip')">IP
+									<span flex="25" ng-click="setSort('ip')">IP
 										<i class="fa" ng-class="_sort === 'ip' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-									<span flex="30" ng-click="setSort('status')">Status
+									<span flex="25" ng-click="setSort('status')">Status
 										<i class="fa" ng-class="_sort === 'status' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+									<span flex="15" ng-click="setSort('os_family')">OS
+										<i class="fa" ng-class="_sort === 'os' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 								</div>
 							</md-toolbar>
 						</div>
@@ -83,10 +98,11 @@
 					<md-list ng-repeat='agent in agents.items' class="agents-preview-table" ng-click="applyAgent(agent)">
 						<md-list-item>
 							<span flex="10">{{agent.id}}</span>
-							<span flex="30">{{agent.name}}</span>
-							<span flex="30">{{agent.ip}}</span>
-							<span flex="20">{{agent.status}}</span>
+							<span flex="25">{{agent.name}}</span>
+							<span flex="25">{{agent.ip}}</span>
+							<span flex="15">{{agent.status}}</span>
 							<span flex="10"> <span ng-class="getAgentStatusClass(agent.status)" class="round status"></span></span>
+							<span flex="15">{{agent.os_family}} {{agent.os_distribution}} {{agent.os_version}} {{agent.os_architecture}}</span>
 						</md-list-item>
 					</md-list>
 					<md-divider></md-divider>
