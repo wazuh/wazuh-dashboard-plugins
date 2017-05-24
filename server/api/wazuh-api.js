@@ -344,6 +344,17 @@ module.exports = function (server, options) {
                 reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
             });
     };
+    
+   	//Handlers - Update API Hostname
+
+    var updateApiHostname = function (req,reply) {
+        elasticRequest.callWithRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id:req.params.id, body: {doc: {"manager": req.payload.manager}} }).then(
+					function () {
+						reply({ 'statusCode': 200, 'message': 'ok' });
+					}, function (error) {
+						reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+					});		
+    };	
 	
 	//Handlers - Get API Settings
 
@@ -535,4 +546,15 @@ module.exports = function (server, options) {
         handler: fetchAgents
     });	
 	
+    /* 
+    * PUT /api/wazuh-api/updateApiHostname/apiId
+    * Update the API hostname
+    *
+    **/
+    server.route({
+        method: 'PUT',
+        path: '/api/wazuh-api/updateApiHostname/{id}',
+        handler: updateApiHostname
+    });	
+
 };
