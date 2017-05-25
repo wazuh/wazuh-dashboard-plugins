@@ -152,8 +152,13 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 		};
 
         testConnection.check(tmpData).then(function (data) {
-			notify.info("Connection success");
-		}, printError);
+            tmpData.manager = data;
+            var index = $scope.apiEntries.indexOf(item);
+            $http.put("/api/wazuh-api/updateApiHostname/" + $scope.apiEntries[index]._id, tmpData).success(function (data) {
+                $scope.apiEntries[index]._source.manager = tmpData.manager;
+            });
+            notify.info("Connection success");
+        }, printError);
     };
 
     // Process form
