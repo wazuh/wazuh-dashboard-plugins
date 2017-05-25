@@ -1,3 +1,4 @@
+import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
     .service('apiReq', function ($q, $http) {
         return {
@@ -22,7 +23,7 @@ require('ui/modules').get('app/wazuh', [])
                     }
                 }
 
-                $http.post('/api/wazuh-api/request', requestData, requestHeaders)
+                $http.post(chrome.addBasePath('/api/wazuh-api/request'), requestData, requestHeaders)
                     .success(function (data) {
                         if (data.error) {
                             defered.reject(data);

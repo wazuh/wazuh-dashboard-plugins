@@ -1,3 +1,4 @@
+import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
     .service('genericReq', function ($q, $http, errlog) {
         var _request = function (method, url) {
@@ -13,7 +14,7 @@ require('ui/modules').get('app/wazuh', [])
                 }
             }
             if (method == "GET") {
-                $http.get(url, requestHeaders)
+                $http.get(chrome.addBasePath(url), requestHeaders)
                     .success(function (data) {
                         if (data.error) {
                             defered.reject(data);
@@ -30,7 +31,7 @@ require('ui/modules').get('app/wazuh', [])
                     });
             }
 			if (method == "PUT") {
-                $http.put(url, requestHeaders)
+                $http.put(chrome.addBasePath(url), requestHeaders)
                     .success(function (data) {
                         if (data.error) {
                             defered.reject(data);

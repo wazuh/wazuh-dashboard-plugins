@@ -1,3 +1,4 @@
+import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
     .service('testConnection', function ($q, $http) {
         return {
@@ -5,7 +6,7 @@ require('ui/modules').get('app/wazuh', [])
                 var defered = $q.defer();
                 var promise = defered.promise;
 
-                $http.get("/api/wazuh-api/check")
+                $http.get(chrome.addBasePath("/api/wazuh-api/check"))
                     .success(function (data) {
                         if (data.error) {
                             defered.reject(data);
@@ -23,7 +24,7 @@ require('ui/modules').get('app/wazuh', [])
                 var defered = $q.defer();
                 var promise = defered.promise;
 
-                $http.post("/api/wazuh-api/check", data)
+                $http.post(chrome.addBasePath("/api/wazuh-api/check"), data)
                     .success(function (data) {
                         if (data.error) {
                             defered.reject(data);

@@ -2,6 +2,7 @@
 var app = require('ui/modules').get('app/wazuh', []);
 // Require utils
 var base64 = require('plugins/wazuh/utils/base64.js');
+import chrome from 'ui/chrome';
 
 app.controller('settingsController', function ($scope, $http, testConnection, appState, Notifier, $routeParams, $location) {
 
@@ -59,7 +60,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	// Set manager default
 	$scope.setDefault = function(item) {
 		var index = $scope.apiEntries.indexOf(item);
-		$http.put("/api/wazuh-api/apiEntries/"+$scope.apiEntries[index]._id).success(function (data, status) {
+		$http.put(chrome.addBasePath("/api/wazuh-api/apiEntries/")+$scope.apiEntries[index]._id).success(function (data, status) {
 			appState.setDefaultManager($scope.apiEntries[index]._source.manager);
 			$scope.apiEntries[$scope.currentDefault]._source.active	= "false";
 			$scope.apiEntries[index]._source.active	= "true";
@@ -73,7 +74,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	
     // Get settings function
     $scope.getSettings = function () {
-			$http.get("/api/wazuh-api/apiEntries").success(function (data, status) {
+			$http.get(chrome.addBasePath("/api/wazuh-api/apiEntries")).success(function (data, status) {
 				$scope.apiEntries = data;
 				angular.forEach($scope.apiEntries, function (value, key) {
 					if(value._source.active == "true"){
@@ -115,7 +116,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			tmpData.manager = data;
 			tmpData.extensions = {"oscap": true, "audit": true, "pci": true};
 			// Insert new API entry
-			$http.put("/api/wazuh-api/settings", tmpData).success(function (data, status) {
+			$http.put(chrome.addBasePath("/api/wazuh-api/settings"), tmpData).success(function (data, status) {
 				var newEntry = {'_id': data.response._id, _source: { manager: tmpData.manager, active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } }; 
 				$scope.apiEntries.push(newEntry);
 				notify.info('Wazuh API successfully added');
@@ -154,8 +155,8 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.check(tmpData).then(function (data) {
             tmpData.manager = data;
             var index = $scope.apiEntries.indexOf(item);
-            $http.put("/api/wazuh-api/updateApiHostname/" + $scope.apiEntries[index]._id, tmpData).success(function (data) {
-                $scope.apiEntries[index]._source.manager = tmpData.manager;
+            $http.put(chrome.addBasePath("/api/wazuh-api/updateApiHostname/") + $scope.apiEntries[index]._id, tmpData).success(function (data) {
+				$scope.apiEntries[index]._source.manager = tmpData.manager;
             });
             notify.info("Connection success");
         }, printError);
@@ -171,7 +172,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	// Toggle extension
 	$scope.toggleExtension = function(extension,state) {
 		if(extension == "oscap" || extension == "audit" || extension == "pci"){
-			$http.put("/api/wazuh-api/extension/toggle/"+$scope.apiEntries[$scope.currentDefault]._id+"/"+extension+"/"+state).success(function (data, status) {	
+			$http.put(chrome.addBasePath("/api/wazuh-api/extension/toggle/")+$scope.apiEntries[$scope.currentDefault]._id+"/"+extension+"/"+state).success(function (data, status) {	
 			}).error(function (data, status) {
 				notify.error("Invalid request when toggle extension state.");
 			})
@@ -210,7 +211,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     };
 	
 	$scope.getAppInfo = function () {
-		$http.get("/elasticsearch/.kibana/wazuh-setup/1").success(function (data, status) {
+		$http.get(chrome.addBasePath("/elasticsearch/.kibana/wazuh-setup/1")).success(function (data, status) {
 			$scope.appInfo = {};
 			$scope.appInfo["app-version"] = data._source["app-version"];
 			$scope.appInfo["installationDate"] = data._source["installationDate"];
