@@ -1,3 +1,4 @@
+import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
     .service('errlog', function ($q, $http) {
         return {
@@ -21,7 +22,7 @@ require('ui/modules').get('app/wazuh', [])
                     }
                 }
 
-                $http.post('/api/wazuh/errlog', requestData, requestHeaders)
+                $http.post(chrome.addBasePath('/api/wazuh/errlog'), requestData, requestHeaders)
                     .success(function () {
                         defered.resolve();
                     })
