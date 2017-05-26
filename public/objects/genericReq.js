@@ -1,7 +1,7 @@
 import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
     .service('genericReq', function ($q, $http, errlog) {
-        var _request = function (method, url) {
+        var _request = function (method, url, payload = null) {
             var defered = $q.defer();
             var promise = defered.promise;
             if (!method || !url) {
@@ -31,7 +31,42 @@ require('ui/modules').get('app/wazuh', [])
                     });
             }
 			if (method == "PUT") {
-                $http.put(chrome.addBasePath(url), requestHeaders)
+                $http.put(chrome.addBasePath(url), payload, requestHeaders)
+                    .success(function (data) {
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.resolve(data);
+                        }
+                    })
+                    .error(function (data) {
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
+                        }
+                    });
+            }
+            if (method == "POST") {
+                $http.post(chrome.addBasePath(url), payload, requestHeaders)
+                    .success(function (data) {
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.resolve(data);
+                        }
+                    })
+                    .error(function (data) {
+                        if (data.error) {
+                            defered.reject(data);
+                        } else {
+                            defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
+                        }
+                    });
+            }
+
+            if (method == "DELETE") {
+                $http.delete(chrome.addBasePath(url))
                     .success(function (data) {
                         if (data.error) {
                             defered.reject(data);
@@ -87,7 +122,7 @@ require('ui/modules').get('app/wazuh', [])
         };
 
         return {
-            request: function (method, path) {
+            request: function (method, path, payload = null) {
                 var defered = $q.defer();
                 var promise = defered.promise;
                 if (!method || !path) {
@@ -95,7 +130,7 @@ require('ui/modules').get('app/wazuh', [])
                     return promise;
                 }
 
-                _request(method, path)
+                _request(method, path, payload)
                     .then(function (data) {
                         defered.resolve(data);
                     }, function (data) {

@@ -4,9 +4,7 @@ var app = require('ui/modules').get('app/wazuh', []);
 var base64 = require('plugins/wazuh/utils/base64.js');
 import chrome from 'ui/chrome';
 
-app.controller('settingsController', function ($scope, $http, testConnection, appState, Notifier, $routeParams, $location) {
-
-
+app.controller('settingsController', function ($scope, $http, testConnection, appState, Notifier, $routeParams, $location, genericReq) {
 
 	// Initialize
 	const notify = new Notifier({location: 'Settings'});
@@ -49,32 +47,32 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			notify.error("Please set another default manager before removing this one");
 			return;
 		}
-			
-		$http.delete("/api/wazuh-api/apiEntries/"+$scope.apiEntries[index]._id).success(function (data, status) {
-			$scope.apiEntries.splice(index, 1);   
-		}).error(function (data, status) {
+		
+        genericReq.request('DELETE', '/api/wazuh-api/apiEntries/'+$scope.apiEntries[index]._id).then(function (data) {
+			$scope.apiEntries.splice(index, 1);
+		}, function (data, status) {
 			notify.error("Could not remove manager");
-		})	 
+		});
 	}
 
 	// Set manager default
 	$scope.setDefault = function(item) {
 		var index = $scope.apiEntries.indexOf(item);
-		$http.put(chrome.addBasePath("/api/wazuh-api/apiEntries/")+$scope.apiEntries[index]._id).success(function (data, status) {
+        genericReq.request('PUT', '/api/wazuh-api/apiEntries/'+$scope.apiEntries[index]._id).then(function (data) {
 			appState.setDefaultManager($scope.apiEntries[index]._source.manager);
 			$scope.apiEntries[$scope.currentDefault]._source.active	= "false";
 			$scope.apiEntries[index]._source.active	= "true";
 			$scope.currentDefault = index;
 			$scope.extensions = $scope.apiEntries[$scope.currentDefault]._source.extensions;
 			notify.info("Manager "+$scope.apiEntries[index]._source.manager+" set as default");			
-		}).error(function (data, status) {
+		}, function (data, status) {
 			notify.error("Could not set that manager as default");
-		})	 
+		});
 	}
 	
     // Get settings function
     $scope.getSettings = function () {
-			$http.get(chrome.addBasePath("/api/wazuh-api/apiEntries")).success(function (data, status) {
+			genericReq.request('GET', '/api/wazuh-api/apiEntries').then(function (data, status) {
 				$scope.apiEntries = data;
 				angular.forEach($scope.apiEntries, function (value, key) {
 					if(value._source.active == "true"){
@@ -90,9 +88,9 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 						
 				});
 
-			}).error(function (data, status) {
+			},function (data, status) {
 				notify.error("Error getting API entries");
-			})
+			});
     };
 
     // Save settings function
@@ -116,7 +114,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			tmpData.manager = data;
 			tmpData.extensions = {"oscap": true, "audit": true, "pci": true};
 			// Insert new API entry
-			$http.put(chrome.addBasePath("/api/wazuh-api/settings"), tmpData).success(function (data, status) {
+			genericReq.request('PUT', '/api/wazuh-api/settings', tmpData).then(function (data) {
 				var newEntry = {'_id': data.response._id, _source: { manager: tmpData.manager, active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } }; 
 				$scope.apiEntries.push(newEntry);
 				notify.info('Wazuh API successfully added');
@@ -126,17 +124,17 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 				$scope.formData.url = "";
 				$scope.formData.port = "";
 				// Fetch agents on demand
-				$http.get("/api/wazuh-api/fetchAgents").error(function (data, status) {
+                genericReq.request('GET', '/api/wazuh-api/fetchAgents').then(function(data){} , function (data, status) {
 					notify.error("Error fetching agents");
 				});
 			
-			}).error(function (data, status) {
+			}, function (data, status) {
 				if (status == '400') {
 					notify.error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
 				} else {
 					notify.error("Some error ocurred, could not save data in elasticsearch.");
 				}
-			})
+			});
 		}, printError);
     };
 
@@ -155,7 +153,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.check(tmpData).then(function (data) {
             tmpData.manager = data;
             var index = $scope.apiEntries.indexOf(item);
-            $http.put(chrome.addBasePath("/api/wazuh-api/updateApiHostname/") + $scope.apiEntries[index]._id, tmpData).success(function (data) {
+            genericReq.request('PUT', '/api/wazuh-api/updateApiHostname/' + $scope.apiEntries[index]._id).then(function (data) {
 				$scope.apiEntries[index]._source.manager = tmpData.manager;
             });
             notify.info("Connection success");
@@ -172,7 +170,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	// Toggle extension
 	$scope.toggleExtension = function(extension,state) {
 		if(extension == "oscap" || extension == "audit" || extension == "pci"){
-			$http.put(chrome.addBasePath("/api/wazuh-api/extension/toggle/")+$scope.apiEntries[$scope.currentDefault]._id+"/"+extension+"/"+state).success(function (data, status) {	
+            genericReq.request('PUT', '/api/wazuh-api/extension/toggle/'+$scope.apiEntries[scope.currentDefault]._id + '/' + extension + '/' + state).success(function (data, status) {
 			}).error(function (data, status) {
 				notify.error("Invalid request when toggle extension state.");
 			})
@@ -211,15 +209,14 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     };
 	
 	$scope.getAppInfo = function () {
-		$http.get(chrome.addBasePath("/elasticsearch/.kibana/wazuh-setup/1")).success(function (data, status) {
+            genericReq.request('GET', '/elasticsearch/.kibana/wazuh-setup/1').then(function (data, status) {
 			$scope.appInfo = {};
 			$scope.appInfo["app-version"] = data._source["app-version"];
 			$scope.appInfo["installationDate"] = data._source["installationDate"];
 			$scope.appInfo["revision"] = data._source["revision"];
-		}).error(function (data, status) {
-			notify.error("Error when loading Wazuh setup info");
-		})
-		
+		}, function (data, status) {
+			notify.error("Error when loading Wazuh setup info" + basePath);
+		});
 	}
 	
 	// Loading data
