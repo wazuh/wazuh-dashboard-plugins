@@ -37,7 +37,7 @@
 					<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
 				</md-nav-item>
 				<md-nav-item md-nav-click="tabView = 'discover'" name="discover">
-					<img style="width: 16px; margin-right: 6px;" src="/plugins/wazuh/img/discover.svg">Discover
+					<img style="width: 16px; margin-right: 6px;" kbn-src="/plugins/wazuh/img/discover.svg">Discover
 				</md-nav-item>
 			</md-nav-bar> 
 		</md-content>

@@ -7,14 +7,13 @@ require('ui/modules').get('app/wazuh', [])
                 var promise = defered.promise;
 
                 $http.get(chrome.addBasePath("/api/wazuh-api/check"))
-                    .success(function (data) {
+                    .then(function (data) {
                         if (data.error) {
                             defered.reject(data);
                         } else {
                             defered.resolve(data);
                         }
-                    })
-                    .error(function (data) {
+                    }, function (data) {
                         defered.reject(data);
                     })
 
@@ -25,14 +24,13 @@ require('ui/modules').get('app/wazuh', [])
                 var promise = defered.promise;
 
                 $http.post(chrome.addBasePath("/api/wazuh-api/check"), data)
-                    .success(function (data) {
+                    .then(function (data) {
                         if (data.error) {
                             defered.reject(data);
                         } else {
                             defered.resolve(data);
                         }
-                    })
-                    .error(function (data) {
+                    }, function (data) {
                         defered.reject(data);
                     })
 

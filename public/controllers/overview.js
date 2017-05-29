@@ -87,7 +87,8 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		angular.extend(payload, fields, managerName, timeInterval);
 		
 		var deferred = $q.defer();
-		$http.post(chrome.addBasePath('/api/wazuh-elastic/alerts-count/'), payload).then(function (data) {
+        
+        genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
 			if(data.data.data != 0)
 				deferred.resolve(true);
 			else
