@@ -31,7 +31,13 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	timefilter.enabled = true;
 	
 	// Set default time
-	if($route.current.params._g == "()"){
+	var gParameter;
+	if($route.current.params._g.startsWith("h@")){
+		gParameter = sessionStorage.getItem($route.current.params._g);
+	}else{
+		gParameter = $route.current.params._g;
+	}
+	if (gParameter == "()"){
 		timefilter.time.from = "now-24h";
 		timefilter.time.to = "now";
 	}
