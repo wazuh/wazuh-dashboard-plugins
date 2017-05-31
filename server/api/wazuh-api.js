@@ -181,7 +181,27 @@ module.exports = function (server, options) {
             }
         }
     };
-
+    
+    var getPath = function(wapi_config){
+        var path = wapi_config.url;
+        var protocol;
+        if(wapi_config.url.startsWith("https://")){
+            protocol = "https://";
+        }
+        else if(wapi_config.url.startsWith("http://")){
+            protocol = "http://";
+        }
+        
+        if(path.lastIndexOf("/") > protocol.length){
+            path = path.substr(0, path.substr(protocol.length).indexOf("/") + protocol.length) +
+            ":" + wapi_config.port + path.substr(path.substr(protocol.length).indexOf("/") + protocol.length);
+        }
+        else{
+            path = wapi_config.url + ':' + wapi_config.port;
+        }
+        return path;
+    }
+    
     var testApiAux1 = function (error, response, wapi_config, needle, callback) {
         if (!error && response && response.body.data && checkVersion(response.body.data)) {
             callback({ 'statusCode': 200, 'data': 'ok', 'manager' : wapi_config.manager, 'extensions' : wapi_config.extensions});
@@ -190,7 +210,7 @@ module.exports = function (server, options) {
         } else if (!error && response && (!response.body.data || !checkVersion(response.body.data)) ) {
             callback({ 'statusCode': 200, 'error': '1', 'data': 'bad_url' });
         } else {
-            needle.request('get', wapi_config.url+":"+wapi_config.port+'/version', {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
+            needle.request('get', getPath(wapi_config)+'/version', {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
                 callback(testApiAux2(error, response, wapi_config));
             });
         }
@@ -218,7 +238,7 @@ module.exports = function (server, options) {
             if ((wapi_config.url.indexOf('https://') == -1) && (wapi_config.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
-                needle.request('get', wapi_config.url+":"+wapi_config.port+'/version', {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
+                needle.request('get', getPath(wapi_config)+'/version', {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
                     testApiAux1(error, response, wapi_config, needle, function (test_result) {
                         reply(test_result);
                     });
@@ -245,10 +265,10 @@ module.exports = function (server, options) {
             if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
-                needle.request('get', req.payload.url+":"+req.payload.port+'/version', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
+                needle.request('get', getPath(req.payload)+'/version', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
                     testApiAux1(error, response, req.payload, needle, function (test_result) {
 						if(test_result.data == "ok"){
-							needle.request('get', req.payload.url+":"+req.payload.port+'/agents/000', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
+							needle.request('get', getPath(req.payload)+'/agents/000', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
 								if(!error && !response.body.error)
 									reply(response.body.data.name);
 								else if(response.body.error)
@@ -306,7 +326,7 @@ module.exports = function (server, options) {
                 rejectUnauthorized: !wapi_config.insecure
             };
 
-            var fullUrl = wapi_config.url + ":" + wapi_config.port + path;
+            var fullUrl = getPath(wapi_config) + path;
             needle.request(method, fullUrl, data, options, function (error, response) {
                 var errorData = errorControl(error, response);
                 if (errorData.isError) {

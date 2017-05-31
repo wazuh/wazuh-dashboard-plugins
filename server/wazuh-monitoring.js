@@ -55,6 +55,26 @@ module.exports = function (server, options) {
 			});
 	}
 
+    var getPath = function(wapi_config){
+        var path = wapi_config.url;
+        var protocol;
+        if(wapi_config.url.startsWith("https://")){
+            protocol = "https://";
+        }
+        else if(wapi_config.url.startsWith("http://")){
+            protocol = "http://";
+        }
+        
+        if(path.lastIndexOf("/") > protocol.length){
+            path = path.substr(0, path.substr(protocol.length).indexOf("/") + protocol.length) +
+            ":" + wapi_config.port + path.substr(path.substr(protocol.length).indexOf("/") + protocol.length);
+        }
+        else{
+            path = wapi_config.url + ':' + wapi_config.port;
+        }
+        return path;
+    }
+    
 	// Check API status twice and get agents total items
 	var checkAndSaveStatus = function (apiEntry) {
 
@@ -77,7 +97,7 @@ module.exports = function (server, options) {
 		};
 
 
-		needle.request('get', apiEntry.url + ':' + apiEntry.port +'/agents', payload, options, function (error, response) {
+		needle.request('get', getPath(apiEntry) +'/agents', payload, options, function (error, response) {
 
 			if (!error && !response.error && response.body.data && response.body.data.totalItems) {
 				checkStatus(apiEntry, response.body.data.totalItems);
@@ -107,7 +127,7 @@ module.exports = function (server, options) {
 			rejectUnauthorized: !apiEntry.insecure
 		};
 
-		needle.request('get', apiEntry.url + ':' + apiEntry.port + '/agents', payload, options, function (error, response) {
+		needle.request('get', getPath(apiEntry) + '/agents', payload, options, function (error, response) {
 			if (!error && !response.error && response.body.data.items) {
 				agentsArray = agentsArray.concat(response.body.data.items);
 				if ((payload.limit + payload.offset) < maxSize) {
