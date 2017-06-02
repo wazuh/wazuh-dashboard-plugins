@@ -30,7 +30,8 @@ app.factory('Agents', function($http, DataFactory) {
 });
 
 app.controller('agentsPreviewController', function ($scope, DataFactory, Notifier, errlog, genericReq, Agents) {
-
+    var ring = document.getElementsByClassName("uil-ring-css");
+    ring[0].style.display="block";
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';

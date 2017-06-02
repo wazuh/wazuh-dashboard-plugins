@@ -23,6 +23,8 @@ app.controller('managerController', function ($scope, $route, $routeParams, $loc
 
 app.controller('managerStatusController', function ($scope, DataFactory, genericReq, errlog, Notifier) {
     //Initialization
+    var ring = document.getElementsByClassName("uil-ring-css");
+    ring[0].style.display="block";
     $scope.load = true;
     $scope.timeFilter = "24h";
 	const notify = new Notifier({location: 'Manager - Status'});
@@ -99,6 +101,8 @@ app.controller('managerStatusController', function ($scope, DataFactory, generic
 
 app.controller('managerConfigurationController', function ($scope, DataFactory, errlog, Notifier) {
     //Initialization
+    var ring = document.getElementsByClassName("uil-ring-css");
+    ring[0].style.display="block";
     $scope.load = true;
 	$scope.isArray = angular.isArray;
 	const notify = new Notifier({location: 'Manager - Configuration'});

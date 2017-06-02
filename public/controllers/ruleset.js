@@ -55,6 +55,8 @@ app.factory('Decoders', function($http, DataFactory) {
 
 app.controller('rulesController', function ($scope, $q, DataFactory, Notifier, errlog, $window, $document, Rules) {
     //Initialization
+    var ring = document.getElementsByClassName("uil-ring-css");
+    ring[0].style.display="block";
     $scope.load = true;
 	$scope.setRulesTab('rules');
 	$scope.ruleActive = false;

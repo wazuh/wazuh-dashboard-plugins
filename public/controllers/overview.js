@@ -9,7 +9,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
-	$scope.results = false;
+	$scope.results = true;
 	var tab = "";
 	var view = ""; 
 	
@@ -52,9 +52,9 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		if($scope.submenuNavItem != tab){
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
-			$scope.presentData().then(function (data) {$scope.results = data;});
+			$scope.presentData().then(function (data) {$scope.results = data;}, function(){$scope.results = false;});
 		}else{
-			$scope.presentData().then(function (data) {$scope.results = data;});
+			$scope.presentData().then(function (data) {$scope.results = data;}, function(){$scope.results = false;});
 			$rootScope.$broadcast('fetchVisualization');
 		}
 	};
@@ -112,18 +112,19 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 				$scope.timeLT = currentTimeFilter.time.to;
 				
 				//Check for present data for the selected tab
-				$scope.presentData().then(function (data) {$scope.results = data;});
+				$scope.presentData().then(function (data) {$scope.results = data;},function(){$scope.results = false;});
 			}
 		}
 	});
 	
 	// Load
-	$scope.presentData().then(function (data) {$scope.results = data;});
+	$scope.presentData().then(function (data) {$scope.results = data;},function(){$scope.results = false;});
 
 });
 
 app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, errlog, $route) {
-	
+	var ring = document.getElementsByClassName("uil-ring-css");
+    ring[0].style.display="block";
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('general');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
