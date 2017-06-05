@@ -52,8 +52,8 @@
             </div>
 
             <div class="discover-table" fixed-scroll ng-style="{ 'height': tableHeight }">
-              <doc-table hits="rows" index-pattern="indexPattern" sorting="state.sort" columns="state.columns" infinite-scroll="infiniteScroll"
-                filter="filterQuery">
+              <doc-table hits="rows" index-pattern="indexPattern" sorting="state.sort" columns="state.columns" infinite-scroll="true"
+                filter="filterQuery" on-add-column="addColumn" on-remove-column="removeColumn">
               </doc-table>
 
               <div ng-if="rows.length == opts.sampleSize" class="discover-table-footer">
