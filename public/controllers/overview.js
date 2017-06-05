@@ -60,7 +60,13 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	
 	// Decode and set time filter
 	if($route.current.params._g){
-		var decodedTimeFilter = rison.decode($route.current.params._g);
+        	var decodedTimeFilter;
+	        if($route.current.params._g.startsWith("h@")){
+	            decodedTimeFilter = JSON.parse(sessionStorage.getItem($route.current.params._g));
+	        }else{
+	            decodedTimeFilter = rison.decode($route.current.params._g);    
+	        }
+        
 		if(decodedTimeFilter.time){
 			$scope.timeGTE = decodedTimeFilter.time.from;
 			$scope.timeLT = decodedTimeFilter.time.to;
@@ -105,7 +111,13 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		if($location.search()._g && $location.search()._g != "()"){
 			var currentTimeFilter = rison.decode($location.search()._g);
 			// Check if timefilter has changed and update values
-			if($route.current.params._g != "()" && currentTimeFilter.time && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+			var gParameter;
+			if($route.current.params._g.startsWith("h@")){
+				gParameter = sessionStorage.getItem($route.current.params._g);
+			}else{
+				gParameter = $route.current.params._g;
+			}
+			if(gParameter != "{}" && gParameter != "()" && currentTimeFilter.time && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
 				$scope.timeGTE = currentTimeFilter.time.from;
 				$scope.timeLT = currentTimeFilter.time.to;
 				
