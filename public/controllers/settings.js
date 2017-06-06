@@ -189,7 +189,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
                 text = 'Credentials were found, but they are not valid.';
                 break;
             case 'bad_url':
-                text = 'The given URL does not contains a valid Wazuh RESTful API installation.';
+                text = 'The given URL does not contain a valid Wazuh RESTful API installation.';
                 break;
             case 'self_signed':
                 text = 'The request to Wazuh RESTful API was blocked, because it is using a selfsigned SSL certificate. Please, enable <b>"Accept selfsigned SSL"</b> option if you want to connect anyway.';
