@@ -17,8 +17,7 @@ var app = require('ui/modules').get('app/wazuh', [])
 		  visWidth: '@visWidth',
 		  visSearchable: '@visSearchable',
 		  visClickable: '@visClickable',
-		  visTimefilter: '@visTimefilter',
-		  showRing: '@showRing'
+		  visTimefilter: '@visTimefilter'
 		},
 		template: require('../templates/directives/kibana-visualization-template.html')
     }
@@ -203,10 +202,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.$on('$destroy', updateQueryWatch);
 		$scope.$on('$destroy', fetchVisualizationWatch);
 		$scope.$on('$destroy', visFilterWatch);
-		if($scope.showRing == 'hide'){
-		    var ring = document.getElementsByClassName("uil-ring-css");
-		    ring[0].style.display="none";
-        }
+        
     };
 
   });

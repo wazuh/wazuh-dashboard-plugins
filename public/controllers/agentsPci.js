@@ -2,8 +2,6 @@
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('PCIController', function ($scope, DataFactory, errlog, appState, genericReq) {
-    var ring = document.getElementsByClassName("uil-ring-css");
-    ring[0].style.display="block";
 	$scope.defaultManagerName = appState.getDefaultManager().name;
 	
 	var tabs = [];

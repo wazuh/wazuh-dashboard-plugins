@@ -1,6 +1,6 @@
 import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
-    .service('errlog', function ($q, $http, genericReq) {
+    .service('errlog', function ($q, $http) {
         return {
             log: function (message, details) {
                 var defered = $q.defer();
@@ -16,7 +16,7 @@ require('ui/modules').get('app/wazuh', [])
                     'details': details
                 }
 
-                genericReq.request('POST', '/api/wazuh-api/errlog', requestData)
+                $http.post(chrome.addBasePath('/api/wazuh-api/errlog'), requestData)
                     .then(function () {
                         defered.resolve();
                     }, function (data) {

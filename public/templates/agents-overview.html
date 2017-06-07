@@ -2,7 +2,7 @@
 
 	<!-- Kibana search bar -->
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
-	<div class='uil-ring-css' ng-show="load"><div></div></div>
+	<div class='uil-ring-css' ng-show='chrome.httpActive.length'><div></div></div>
 	<div ng-if="tabView == 'panels'">
 		<md-content layout="row">
 			<md-card flex layout="column">

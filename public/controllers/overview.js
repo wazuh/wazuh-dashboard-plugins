@@ -3,7 +3,6 @@ import chrome from 'ui/chrome';
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location, $http, $rootScope) {
-	
     $scope.state = appState;
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
@@ -123,8 +122,6 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 });
 
 app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, errlog, $route) {
-	var ring = document.getElementsByClassName("uil-ring-css");
-    ring[0].style.display="block";
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('general');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
