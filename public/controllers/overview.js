@@ -9,9 +9,14 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
 	$scope.results = true;
+    $scope.loadedBoxes = false;
+    $scope.hideRing = function(items){ 
+        if($(".vis-editor-content" ).length >= items)
+            return true;
+        return false;
+    }    
 	var tab = "";
 	var view = ""; 
-	
 	// Object for matching nav items and Wazuh groups
 	var tabGroups = {
 		"general": {"group": "*"},
@@ -125,7 +130,6 @@ app.controller('overviewGeneralController', function ($scope, DataFactory, gener
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('general');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-	
 });
 
 app.controller('overviewFimController', function ($scope, DataFactory, genericReq, errlog, $route) {
@@ -133,7 +137,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('fim');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-
 });
 
 app.controller('overviewPMController', function ($scope, DataFactory, genericReq, errlog, $route) {
@@ -164,7 +167,7 @@ app.controller('overviewPCIController', function ($scope, $compile, DataFactory,
     $scope.load = true;
     $scope.$parent.state.setOverviewState('pci');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-	
+
 	var tabs = [];
 	genericReq.request('GET', '/api/wazuh-api/pci/all').then(function (data) {
 		angular.forEach(data, function(value, key) {

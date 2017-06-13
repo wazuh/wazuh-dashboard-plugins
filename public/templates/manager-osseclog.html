@@ -1,6 +1,6 @@
 <md-content ng-if="!load && submenuNavItem =='logs'" ng-controller="osseclogController" layout="row" flex>
-    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-    <md-virtual-repeat-container auto-size-container ng-if="!load" flex layout="column" layout-padding ng-style="autoSizeStyle" style="background: white;">
+    <div class='uil-ring-css' ng-show="load"><div></div></div>
+    <md-virtual-repeat-container ng-show="!load" auto-size-container ng-if="!load" flex layout="column" layout-padding ng-style="autoSizeStyle" style="background: white;">
         <div flex layout="row" layout-align="start start" class="horizontal-menu-right" style="background: #f7f7f7">
             <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 15px;margin-left: 20px;padding: 3px;margin-right: 10px;">
                 <md-select id="categoryBox" ng-model="$parent._category" ng-change="categoryFilter(_category)" aria-label="Logs category">

@@ -15,7 +15,12 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
     $scope._os = 'all';
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
-	$scope.results = false;
+	$scope.results = true;
+    $scope.hideRing = function(items){ 
+        if($(".vis-editor-content" ).length >= items)
+            return true;
+        return false;
+    }
 	var objectsArray = [];
 	const notify = new Notifier({location: 'Agents'});
 	
@@ -47,11 +52,11 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
 			if($scope.submenuNavItem != "preview"){
-				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function(){$scope.results = false;});
 			}
 		}else{
 			$rootScope.$broadcast('fetchVisualization');
-			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function(){$scope.results = false;});
 		}
 	};
 	

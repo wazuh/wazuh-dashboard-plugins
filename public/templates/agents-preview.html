@@ -1,7 +1,7 @@
 <div ng-if="submenuNavItem == 'preview'">
 	<md-content flex class="agentsPreview" ng-controller="agentsPreviewController" layout="column" style="height: 100%;" class="md-padding" layout-align="start space-around">
-            <div class='uil-ring-css' ng-show='chrome.httpActive.length'><div></div></div>
-			<div infinite-scroll-module='agents.nextPage()' infinite-scroll-disabled='agents.busy' infinite-scroll-distance='0' style="padding: 0">
+            <div class='uil-ring-css' ng-show='load'><div></div></div>
+			<div infinite-scroll-module='agents.nextPage()' ng-show="!load" infinite-scroll-disabled='agents.busy' infinite-scroll-distance='0' style="padding: 0">
 				<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 					<div flex layout="column" layout-align="space-between stretch">
 						<div layout="row" layout-align="space-between stretch">

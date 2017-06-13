@@ -2,7 +2,7 @@
 
 	<!-- Kibana search bar -->
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
-	<div class='uil-ring-css' ng-show='chrome.httpActive.length'><div></div></div>	
+	<div class='uil-ring-css' ng-show='!hideRing(5)'><div></div></div>	
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels'">
 		<md-card flex layout="column">
@@ -22,7 +22,7 @@
 	</md-content>
 	
 	<!-- View: Panels -->
-	<div ng-if="tabView == 'panels' && results">
+	<div ng-show="hideRing(5)" ng-if="tabView == 'panels' && results">
 		<md-content layout="row" layout-align="center stretch">
 			<md-card flex>
 				<md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">

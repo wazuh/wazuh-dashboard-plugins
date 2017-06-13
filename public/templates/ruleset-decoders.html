@@ -1,6 +1,6 @@
 <md-content layout="column" style="height: 100%;" flex layout-padding ng-if="!load && $parent.submenuNavItem2 == 'decoders'" ng-controller="decodersController" layout-align="start space-around">
-
-	<div infinite-scroll-module='decoders.nextPage()' infinite-scroll-disabled='decoders.busy' infinite-scroll-distance='0' style="padding: 0">
+    <div class='uil-ring-css' ng-show="load"><div></div></div>
+	<div infinite-scroll-module='decoders.nextPage()' ng-show="!load" infinite-scroll-disabled='decoders.busy' infinite-scroll-distance='0' style="padding: 0">
 		<div layout="row" layout-align="center start" style="padding: 0px;  height: 250px;  min-height: 250px; ">
 			
 			<md-card flex="100" style="margin: 0">
