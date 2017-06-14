@@ -15,7 +15,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
     $scope._os = 'all';
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
-	$scope.results = true;
+	$scope.results = false;
     $scope.hideRing = function(items){ 
         if($(".vis-editor-content" ).length >= items)
             return true;
@@ -52,11 +52,11 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
 			if($scope.submenuNavItem != "preview"){
-				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function(){$scope.results = false;});
+				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
 			}
 		}else{
 			$rootScope.$broadcast('fetchVisualization');
-			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function(){$scope.results = false;});
+			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
 		}
 	};
 	
@@ -96,7 +96,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 		
 		var deferred = $q.defer();
         genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
-			if(data.data.data != 0)
+			if(data.data.data != 0 && data.data.data)
 				deferred.resolve(true);
 			else
 				deferred.resolve(false);

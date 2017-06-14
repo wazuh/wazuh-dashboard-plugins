@@ -8,7 +8,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
-	$scope.results = true;
+	$scope.results = false;
     $scope.loadedBoxes = false;
     $scope.hideRing = function(items){ 
         if($(".vis-editor-content" ).length >= items)
@@ -56,9 +56,10 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		if($scope.submenuNavItem != tab){
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
-			$scope.presentData().then(function (data) {$scope.results = data;}, function(){$scope.results = false;});
+            
+			$scope.presentData().then(function (data) {$scope.results = data;});
 		}else{
-			$scope.presentData().then(function (data) {$scope.results = data;}, function(){$scope.results = false;});
+			$scope.presentData().then(function (data) {$scope.results = data;});
 			$rootScope.$broadcast('fetchVisualization');
 		}
 	};
@@ -93,8 +94,9 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		var deferred = $q.defer();
         
         genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
-			if(data.data.data != 0)
+			if(data.data.data != 0 && data.data.data){
 				deferred.resolve(true);
+            }
 			else
 				deferred.resolve(false);
 		});
@@ -116,13 +118,13 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 				$scope.timeLT = currentTimeFilter.time.to;
 				
 				//Check for present data for the selected tab
-				$scope.presentData().then(function (data) {$scope.results = data;},function(){$scope.results = false;});
+				$scope.presentData().then(function (data) {$scope.results = data;});
 			}
 		}
 	});
 	
 	// Load
-	$scope.presentData().then(function (data) {$scope.results = data;},function(){$scope.results = false;});
+	$scope.presentData().then(function (data) {$scope.results = data;});
 
 });
 
@@ -148,7 +150,7 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
 });
 
 app.controller('overviewOSCAPController', function ($scope, DataFactory, genericReq, errlog, $route) {
-
+    
     $scope.load = false;
     $scope.$parent.state.setOverviewState('oscap');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
