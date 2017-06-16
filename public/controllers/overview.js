@@ -90,11 +90,10 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		var managerName = {"manager" : $scope.defaultManager};
 		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
 		angular.extend(payload, fields, managerName, timeInterval);
-		
 		var deferred = $q.defer();
         
         genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
-			if(data.data.data != 0 && data.data.data){
+			if(data.data != 0){
 				deferred.resolve(true);
             }
 			else

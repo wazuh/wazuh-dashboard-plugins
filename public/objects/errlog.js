@@ -17,9 +17,9 @@ require('ui/modules').get('app/wazuh', [])
                 }
 
                 $http.post(chrome.addBasePath('/api/wazuh-api/errlog'), requestData)
-                    .then(function () {
+                    .success(function () {
                         defered.resolve();
-                    }, function (data) {
+                    }).error(function (data) {
                         if (data.error) {
                             defered.reject(data);
                         } else {

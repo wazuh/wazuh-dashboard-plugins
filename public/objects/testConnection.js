@@ -23,13 +23,13 @@ require('ui/modules').get('app/wazuh', [])
                 var defered = $q.defer();
                 var promise = defered.promise;
                 $http.post(chrome.addBasePath("/api/wazuh-api/check"), data)
-                    .then(function (data) {
+                    .success(function (data) {
                         if (data.error) {
                             defered.reject(data);
                         } else {
                             defered.resolve(data);
                         }
-                    }, function (data) {
+                    }).error(function (data) {
                         defered.reject(data);
                     })
 
