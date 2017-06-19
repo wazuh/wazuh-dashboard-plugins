@@ -1,4 +1,3 @@
-import chrome from 'ui/chrome';
 import rison from 'rison-node';
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
@@ -96,7 +95,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 		
 		var deferred = $q.defer();
         genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
-			if(data.data.data != 0 && data.data.data)
+			if(data.data != 0)
 				deferred.resolve(true);
 			else
 				deferred.resolve(false);

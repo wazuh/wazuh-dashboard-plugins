@@ -7,13 +7,13 @@ require('ui/modules').get('app/wazuh', [])
                 var promise = defered.promise;
 
                 $http.get(chrome.addBasePath("/api/wazuh-api/check"))
-                    .then(function (data) {
+                    .success(function (data) {
                         if (data.error) {
                             defered.reject(data);
                         } else {
                             defered.resolve(data);
                         }
-                    }, function (data) {
+                    }).error(function (data) {
                         defered.reject(data);
                     })
 

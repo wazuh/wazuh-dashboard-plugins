@@ -1,5 +1,4 @@
 import rison from 'rison-node';
-import chrome from 'ui/chrome';
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location, $http, $rootScope) {

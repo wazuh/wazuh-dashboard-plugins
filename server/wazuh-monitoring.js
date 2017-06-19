@@ -77,7 +77,6 @@ module.exports = function (server, options) {
     
 	// Check API status twice and get agents total items
 	var checkAndSaveStatus = function (apiEntry) {
-
 		apiEntry.user;
 		apiEntry.password;
 		apiEntry.url;
@@ -101,7 +100,6 @@ module.exports = function (server, options) {
 
 			if (!error && !response.error && response.body.data && response.body.data.totalItems) {
 				checkStatus(apiEntry, response.body.data.totalItems);
-
 			} else {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
 				return;

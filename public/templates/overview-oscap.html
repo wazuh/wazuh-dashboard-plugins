@@ -2,7 +2,7 @@
 
 	<!-- Kibana search bar -->
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
-    <div class='uil-ring-css' ng-show='!hideRing(14)'><div></div></div>
+    <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(14)'><div></div></div>
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels' && hideRing(14)">
 		<md-card flex layout="column">

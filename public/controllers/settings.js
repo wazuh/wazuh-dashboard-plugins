@@ -175,8 +175,8 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	// Toggle extension
 	$scope.toggleExtension = function(extension,state) {
 		if(extension == "oscap" || extension == "audit" || extension == "pci"){
-            genericReq.request('PUT', '/api/wazuh-api/extension/toggle/'+$scope.apiEntries[scope.currentDefault]._id + '/' + extension + '/' + state).success(function (data, status) {
-			}).error(function (data, status) {
+            genericReq.request('PUT', '/api/wazuh-api/extension/toggle/'+$scope.apiEntries[$scope.currentDefault]._id + '/' + extension + '/' + state).then(function (data, status) {
+			}, function (data, status) {
 				notify.error("Invalid request when toggle extension state.");
 			})
 		}
