@@ -94,8 +94,37 @@ module.exports = function (server, options) {
 				checkStatus(apiEntry, response.body.data.totalItems);
 
 			} else {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
-				return;
+                needle.request('get', apiEntry.url + ':' + apiEntry.port +'/version', payload, options, function (error, response) {
+                    if (!error && !response.error && response.body.data) {
+                        server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
+                        return;
+                    }
+                    else{
+                        options = {
+                            headers: { 'api-version': 'v2.0.0' },
+                            username: apiEntry.user,
+                            password: apiEntry.password,
+                            rejectUnauthorized: !apiEntry.insecure
+                        }
+                        needle.request('get', apiEntry.url + ':' + apiEntry.port +'/version', payload, options, function (error, response) {
+                            if (!error && !response.error && response.body.data) {
+                                var newConfigFile = {
+                                    wazuhapi : {
+                                        requests: { timeout : 5000 },
+                                        version: "v2.0.0"
+                                    }
+                                };
+                                try {
+                                    fs.writeFileSync(path.resolve(__dirname, wazuh_config_file), JSON.stringify(newConfigFile));
+                                } catch (e) {
+                                    server.log([blueWazuh, 'initialize', 'error'], 'Wazuh API config file is broken.');
+                                }
+                            } else {
+                                server.log([blueWazuh, 'initialize', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');                        
+                            }
+                        });
+                    }
+                });
 			}
 		});
 	};
@@ -293,7 +322,7 @@ module.exports = function (server, options) {
 	checkElasticStatus();
 
 	// Cron tab for getting agent status.
-	cron.schedule('0 */10 * * * *', function () {
+	cron.schedule('*/10 * * * * *', function () {
 		agentsArray.length = 0;
 		getConfig(loadCredentials);
 	}, true);
