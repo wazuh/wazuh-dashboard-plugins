@@ -32,12 +32,17 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	
 	// Set default time
 	var gParameter;
-	if($route.current.params._g.startsWith("h@")){
-		gParameter = sessionStorage.getItem($route.current.params._g);
-	}else{
-		gParameter = $route.current.params._g;
-	}
-	if (gParameter == "()"){
+    if($route.current.params._g){
+        if($route.current.params._g.startsWith("h@")){
+            gParameter = sessionStorage.getItem($route.current.params._g);
+        }else{
+            gParameter = $route.current.params._g;
+        }
+    }
+    else{
+        gParameter="()";
+    }
+    if (gParameter == "()"){
 		timefilter.time.from = "now-24h";
 		timefilter.time.to = "now";
 	}
