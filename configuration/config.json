@@ -3,6 +3,6 @@
         "requests": {
             "timeout" : 5000
         },
-        "version": "v2.0"
+        "version": "v2.0.0"
     }
 }
