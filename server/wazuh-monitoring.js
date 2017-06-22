@@ -322,7 +322,7 @@ module.exports = function (server, options) {
 	checkElasticStatus();
 
 	// Cron tab for getting agent status.
-	cron.schedule('* */10 * * * *', function () {
+	cron.schedule('0 */10 * * * *', function () {
 		agentsArray.length = 0;
 		getConfig(loadCredentials);
 	}, true);
