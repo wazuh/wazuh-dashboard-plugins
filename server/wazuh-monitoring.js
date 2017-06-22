@@ -111,11 +111,12 @@ module.exports = function (server, options) {
                                 var newConfigFile = {
                                     wazuhapi : {
                                         requests: { timeout : 5000 },
-                                        version: "v2.0.0"
+                                        version: "v2.0.0",
+                                        version_patched: wazuh_api_version
                                     }
                                 };
                                 try {
-                                    fs.writeFileSync(path.resolve(__dirname, wazuh_config_file), JSON.stringify(newConfigFile));
+                                    fs.writeFileSync(path.resolve(__dirname, wazuh_config_file), JSON.stringify(newConfigFile, null, 4));
                                 } catch (e) {
                                     server.log([blueWazuh, 'initialize', 'error'], 'Wazuh API config file is broken.');
                                 }
@@ -322,7 +323,7 @@ module.exports = function (server, options) {
 	checkElasticStatus();
 
 	// Cron tab for getting agent status.
-	cron.schedule('*/10 * * * * *', function () {
+	cron.schedule('0 */10 * * * *', function () {
 		agentsArray.length = 0;
 		getConfig(loadCredentials);
 	}, true);
