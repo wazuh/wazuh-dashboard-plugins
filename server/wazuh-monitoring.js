@@ -40,17 +40,18 @@ module.exports = function (server, options) {
 	var todayIndex = index_prefix + fDate;
 
     // Read Wazuh App configuration file
+    try {
+        wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
+    } catch (e) {
+        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file file.');
+        server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
+        server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+    };
+
     if(fs.existsSync(path.resolve(__dirname, wazuh_temp_file))){
         wazuh_api_version = "v2.0.0";
     } else{
-        try {
-            wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
-            wazuh_api_version = wazuh_config.wazuhapi.version;
-        } catch (e) {
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file file.');
-            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
-            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-        };
+        wazuh_api_version = wazuh_config.wazuhapi.version;
     }
 
 	// Load Wazuh API credentials from Elasticsearch document
