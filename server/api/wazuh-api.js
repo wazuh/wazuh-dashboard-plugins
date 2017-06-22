@@ -5,21 +5,27 @@ module.exports = function (server, options) {
 	const path = require('path');
 	var fetchAgentsExternal = require(path.resolve(__dirname, "../wazuh-monitoring.js"));
 	const wazuh_config_file = '../../configuration/config.json';
+    const wazuh_temp_file = '../configuration/.patch_version';
 	var colors = require('ansicolors');
 	var blueWazuh = colors.blue('wazuh');
 	var wazuh_config = {};
 
 	// Read Wazuh App configuration file
-	try {
-		wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
-	} catch (e) {
-		server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file file.');
-		server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
-		server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-	};
-
-	const wazuh_api_version = wazuh_config.wazuhapi.version;
-
+    fs.open(wazuh_temp_file, 'r', function (err, file) {
+        if (err){
+            try {
+                wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
+                const wazuh_api_version = wazuh_config.wazuhapi.version;
+            } catch (e) {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file file.');
+                server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
+                server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+            };
+        }
+        else{
+            const wazuh_api_version = "v2.0.0";
+        }
+    });
 
 	// Elastic JS Client
 	const serverConfig = server.config();
