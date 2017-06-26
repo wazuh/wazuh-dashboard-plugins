@@ -10,17 +10,18 @@ module.exports = function (server, options) {
 	var colors = require('ansicolors');
 	var blueWazuh = colors.blue('wazuh');
 	var wazuh_config = {};
+    var appInfo = {}
     var wazuh_api_version;
     
 	// Read Wazuh App configuration file
     try {
         wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
     } catch (e) {
-        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file file.');
+        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file.');
         server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
         server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
     };
-
+    
     if(fs.existsSync(path.resolve(__dirname, wazuh_temp_file))){
         wazuh_api_version = "v2.0.0";
     } else{
@@ -31,6 +32,15 @@ module.exports = function (server, options) {
 	const serverConfig = server.config();
 	const elasticsearch = require('elasticsearch');
 	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
+    
+    elasticRequest.callWithInternalUser('search', { index: '.kibana', type: 'wazuh-setup'}).then(
+			function (data) {
+                appInfo["app-version"] = data.hits.hits[0]._source['app-version'];
+                appInfo["installationDate"] = data.hits.hits[0]._source['installationDate'];
+                appInfo["revision"] = data.hits.hits[0]._source['revision'];
+			}, function (error) {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh App version.');
+			});
 
     //Handlers - Generic
 
@@ -46,8 +56,6 @@ module.exports = function (server, options) {
 					callback({ 'error': 'no elasticsearch', 'error_code': 2 });
 			});
     };
-
-
 
     var getAPI_entries = function (req,reply) {
 		elasticRequest.callWithRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration'}).then(
@@ -284,7 +292,7 @@ module.exports = function (server, options) {
             }
 
             var options = {
-                headers: { 'api-version': wazuh_api_version },
+                headers: { 'api-version': wazuh_api_version, 'wazuh-app-version': appInfo['app-version'] },
                 username: wapi_config.user,
                 password: wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
@@ -321,7 +329,7 @@ module.exports = function (server, options) {
         }
         
         var options = {
-			headers: { 'api-version': wazuh_api_version },
+			headers: { 'api-version': wazuh_api_version, 'wazuh-app-version': appInfo['app-version'] },
 			username: req.payload.user,
 			password: req.payload.password,
 			rejectUnauthorized: !req.payload.insecure
@@ -330,7 +338,7 @@ module.exports = function (server, options) {
         needle.request('get', req.payload.url + ':' + req.payload.port +'/version', {}, options, function (error, response) {
             if (error || response.error || !response.body.data) {
                 options = {
-                    headers: { 'api-version': 'v2.0.0' },
+                    headers: { 'api-version': 'v2.0.0', 'wazuh-app-version': appInfo['app-version'] },
                     username: req.payload.user,
                     password: req.payload.password,
                     rejectUnauthorized: !req.payload.insecure

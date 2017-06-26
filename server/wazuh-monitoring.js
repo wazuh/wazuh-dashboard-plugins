@@ -1,11 +1,20 @@
 module.exports = function (server, options) {
 
-
+    var appInfo = {};
 	// Elastic JS Client
 	const serverConfig = server.config();
 	const elasticsearch = require('elasticsearch');
 	const elasticRequest = server.plugins.elasticsearch.getCluster('admin');
 
+    elasticRequest.callWithInternalUser('search', { index: '.kibana', type: 'wazuh-setup'}).then(
+			function (data) {
+                appInfo["app-version"] = data.hits.hits[0]._source['app-version'];
+                appInfo["installationDate"] = data.hits.hits[0]._source['installationDate'];
+                appInfo["revision"] = data.hits.hits[0]._source['revision'];
+			}, function (error) {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh App version.');
+			});
+            
 	// External libraries
 	const fs = require('fs');
 	const path = require('path');
@@ -86,7 +95,7 @@ module.exports = function (server, options) {
 		};
 
 		var options = {
-			headers: { 'api-version': wazuh_api_version },
+			headers: { 'api-version': wazuh_api_version, 'wazuh-app-version': appInfo['app-version'] },
 			username: apiEntry.user,
 			password: apiEntry.password,
 			rejectUnauthorized: !apiEntry.insecure
@@ -105,7 +114,7 @@ module.exports = function (server, options) {
                     }
                     else{
                         options = {
-                            headers: { 'api-version': 'v2.0.0' },
+                            headers: { 'api-version': 'v2.0.0', 'wazuh-app-version': appInfo['app-version'] },
                             username: apiEntry.user,
                             password: apiEntry.password,
                             rejectUnauthorized: !apiEntry.insecure
@@ -141,7 +150,7 @@ module.exports = function (server, options) {
 		};
 
 		var options = {
-			headers: { 'api-version': wazuh_api_version },
+			headers: { 'api-version': wazuh_api_version, 'wazuh-app-version': appInfo['app-version'] },
 			username: apiEntry.user,
 			password: apiEntry.password,
 			rejectUnauthorized: !apiEntry.insecure
