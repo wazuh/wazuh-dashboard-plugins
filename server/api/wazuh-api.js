@@ -10,7 +10,7 @@ module.exports = function (server, options) {
 	var colors = require('ansicolors');
 	var blueWazuh = colors.blue('wazuh');
 	var wazuh_config = {};
-    var app_package = {};
+    var appInfo = {}
     var wazuh_api_version;
     
 	// Read Wazuh App configuration file
@@ -33,7 +33,6 @@ module.exports = function (server, options) {
 	const elasticsearch = require('elasticsearch');
 	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
     
-    var appInfo = {}
     elasticRequest.callWithInternalUser('search', { index: '.kibana', type: 'wazuh-setup'}).then(
 			function (data) {
                 appInfo["app-version"] = data.hits.hits[0]._source['app-version'];
