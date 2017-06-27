@@ -159,10 +159,15 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
                     // Set default time
                     var gParameter;
-                    if($route.current.params._g.startsWith("h@")){
-                        gParameter = sessionStorage.getItem($route.current.params._g);
-                    }else{
-                        gParameter = $route.current.params._g;
+                    if($route.current.params._g){
+                        if($route.current.params._g.startsWith("h@")){
+                            gParameter = sessionStorage.getItem($route.current.params._g);
+                        }else{
+                            gParameter = $route.current.params._g;
+                        }
+                    }
+                    else{
+                        gParameter="()";
                     }
                     if (gParameter == "()")
                         $scope.timefilter.time.from = "now-24h";
