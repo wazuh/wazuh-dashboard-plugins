@@ -6,15 +6,12 @@ module.exports = function (server, options) {
 	const needle = require('needle');
 	var fetchAgentsExternal = require(path.resolve(__dirname, "../wazuh-monitoring.js"));
 	const wazuh_config_file = '../../configuration/config.json';
-    const wazuh_temp_file = '../../configuration/.patch_version';
 	var colors = require('ansicolors');
 	var blueWazuh = colors.blue('wazuh');
 	var wazuh_config = {};
-    var wazuh_api_version;
-    var package_info = {};
+	var package_info = {};
     const package_file = '../../package.json';
     var appVersion = "";
-    
     
     // Read Wazuh App package file
     try {
@@ -25,7 +22,6 @@ module.exports = function (server, options) {
         server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + package_file);
         server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
     };
-    
 	// Read Wazuh App configuration file
     try {
         wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
@@ -34,12 +30,6 @@ module.exports = function (server, options) {
         server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
         server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
     };
-    
-    if(fs.existsSync(path.resolve(__dirname, wazuh_temp_file))){
-        wazuh_api_version = "v2.0.0";
-    } else{
-        wazuh_api_version = wazuh_config.wazuhapi.version;
-    }
 
 	// Elastic JS Client
 	const serverConfig = server.config();
@@ -296,7 +286,7 @@ module.exports = function (server, options) {
             }
 
             var options = {
-                headers: { 'api-version': wazuh_api_version, 'wazuh-app-version': appVersion },
+                headers: { 'wazuh-app-version': appVersion },
                 username: wapi_config.user,
                 password: wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
@@ -331,37 +321,6 @@ module.exports = function (server, options) {
             reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
             return;
         }
-        
-        var options = {
-			headers: { 'api-version': wazuh_api_version, 'wazuh-app-version': appVersion },
-			username: req.payload.user,
-			password: req.payload.password,
-			rejectUnauthorized: !req.payload.insecure
-		};
-        
-        needle.request('get', req.payload.url + ':' + req.payload.port +'/version', {}, options, function (error, response) {
-            if (error || response.error || !response.body.data) {
-                options = {
-                    headers: { 'api-version': 'v2.0.0', 'wazuh-app-version': appVersion },
-                    username: req.payload.user,
-                    password: req.payload.password,
-                    rejectUnauthorized: !req.payload.insecure
-                }
-                needle.request('get', req.payload.url + ':' + req.payload.port +'/version', {}, options, function (error, response) {
-                    if (!error && !response.error && response.body.data) {
-                            fs.writeFile(path.resolve(__dirname, wazuh_temp_file), "#Temporal file to avoid inconsistences when using App 2.0.1 with API 2.0.0",function(err){
-                                if(err) server.log([blueWazuh, 'initialize', 'error'], err);
-                                else{
-                                    server.log([blueWazuh, 'initialize', 'info'], 'Temporal file created to use the API 2.0.0');
-                                }
-                            });
-                        
-                    } else {
-                        server.log([blueWazuh, 'initialize', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');                        
-                    }
-                });
-            }
-        });
         
 		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'manager' : req.payload.manager, 'extensions' : req.payload.extensions};
 
