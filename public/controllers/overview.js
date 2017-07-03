@@ -8,6 +8,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
 	$scope.results = true;
+	$scope.loading = true;
     $scope.hideRing = function(items){ 
         if($(".vis-editor-content" ).length >= items)
             return true;
@@ -50,13 +51,14 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	
 	// Switch tab: Refresh or change location and check for present data
 	$scope.switchTab = function (tab) {
+		$scope.loading = true;
 		// Detecting refresh or location
 		if($scope.submenuNavItem != tab){
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
-			$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
+			$scope.presentData().then(function (data) {$scope.results = data; $scope.loading=false;}, function(){ $scope.results = false; $scope.loading=false;});
 		}else{
-			$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
+			$scope.presentData().then(function (data) {$scope.results = data; $scope.loading=false;}, function(){ $scope.results = false; $scope.loading=false;});
 			$rootScope.$broadcast('fetchVisualization');
 		}
 	};
@@ -120,7 +122,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	});
 	
 	// Load
-	$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
+	$scope.presentData().then(function (data) {$scope.results = data; $scope.loading = false;}, function(){	$scope.results = false; $scope.loading = false;});
 });
 
 app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, errlog, $route) {

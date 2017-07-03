@@ -15,6 +15,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.results = true;
+	$scope.loading = true;
     $scope.hideRing = function(items){ 
         if($(".vis-editor-content" ).length >= items)
             return true;
@@ -46,16 +47,17 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	
 	// Switch tab: Refresh or change location and check for present data
 	$scope.switchTab = function (tab) {
+		$scope.loading=true;
 		// Detecting refresh or location
 		if($scope.submenuNavItem != tab){
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
 			if($scope.submenuNavItem != "preview"){
-				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function() { $scope.results = false; });
+				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;	$scope.loading = false;}, function() { $scope.results = false; $scope.loading = false;});
 			}
 		}else{
 			$rootScope.$broadcast('fetchVisualization');
-			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function() { $scope.results = false; });
+			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data; $scope.loading = false;}, function() { $scope.results = false; $scope.loading = false;});
 		}
 	};
 	
@@ -266,6 +268,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
     //Load
     try {
         load();
+		$scope.loading=false;
     } catch (e) {
         notify.error('Unexpected exception loading controller');
         errlog.log('Unexpected exception loading controller', e);
