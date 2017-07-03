@@ -54,7 +54,6 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		if($scope.submenuNavItem != tab){
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
-            
 			$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
 		}else{
 			$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
@@ -122,7 +121,6 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	
 	// Load
 	$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
-
 });
 
 app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, errlog, $route) {
