@@ -4,7 +4,7 @@
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(4)'><div></div></div>
 	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels' && hideRing(4)">
+	<md-content flex layout="row" layout-align="start start" ng-show="!results" ng-if="tabView == 'panels' && hideRing(4)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				No results for selected time interval

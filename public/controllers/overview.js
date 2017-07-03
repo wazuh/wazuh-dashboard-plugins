@@ -7,8 +7,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
-	$scope.results = false;
-    $scope.loadedBoxes = false;
+	$scope.results = true;
     $scope.hideRing = function(items){ 
         if($(".vis-editor-content" ).length >= items)
             return true;
@@ -56,9 +55,9 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
             
-			$scope.presentData().then(function (data) {$scope.results = data;});
+			$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
 		}else{
-			$scope.presentData().then(function (data) {$scope.results = data;});
+			$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
 			$rootScope.$broadcast('fetchVisualization');
 		}
 	};
@@ -116,13 +115,13 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 				$scope.timeLT = currentTimeFilter.time.to;
 				
 				//Check for present data for the selected tab
-				$scope.presentData().then(function (data) {$scope.results = data;});
+				$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
 			}
 		}
 	});
 	
 	// Load
-	$scope.presentData().then(function (data) {$scope.results = data;});
+	$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
 
 });
 

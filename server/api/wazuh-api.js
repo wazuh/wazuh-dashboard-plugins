@@ -576,5 +576,5 @@ module.exports = function (server, options) {
         path: '/api/wazuh-api/updateApiHostname/{id}',
         handler: updateApiHostname
     });
-	
+
 };
