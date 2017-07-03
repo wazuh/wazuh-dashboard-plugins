@@ -8,6 +8,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
 	$scope.results = false;
+	$scope.loadState = "loading";
     $scope.loadedBoxes = false;
     $scope.hideRing = function(items){ 
         if($(".vis-editor-content" ).length >= items)
@@ -56,9 +57,9 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
             
-			$scope.presentData().then(function (data) {$scope.results = data;});
+			$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.loadState = "no-results";});
 		}else{
-			$scope.presentData().then(function (data) {$scope.results = data;});
+			$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.loadState = "no-results";});
 			$rootScope.$broadcast('fetchVisualization');
 		}
 	};
@@ -116,13 +117,13 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 				$scope.timeLT = currentTimeFilter.time.to;
 				
 				//Check for present data for the selected tab
-				$scope.presentData().then(function (data) {$scope.results = data;});
+				$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.loadState = "no-results";});
 			}
 		}
 	});
 	
 	// Load
-	$scope.presentData().then(function (data) {$scope.results = data;});
+	$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.loadState = "no-results";});
 
 });
 

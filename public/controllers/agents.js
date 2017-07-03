@@ -15,6 +15,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.results = false;
+	$scope.loadState = "loading";
     $scope.hideRing = function(items){ 
         if($(".vis-editor-content" ).length >= items)
             return true;
@@ -51,11 +52,11 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
 			if($scope.submenuNavItem != "preview"){
-				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function() { $scope.loadState = "no-results"; });
 			}
 		}else{
 			$rootScope.$broadcast('fetchVisualization');
-			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function() { $scope.loadState = "no-results"; });
 		}
 	};
 	
@@ -238,7 +239,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				
 				//Check for present data for the selected tab
 				if($scope.submenuNavItem != "preview"){
-					$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+					$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function() { $scope.loadState = "no-results"; });
 				}
 			}
 		}
