@@ -1,11 +1,10 @@
 module.exports = function (server, options) {
 
-
 	// Elastic JS Client
 	const serverConfig = server.config();
 	const elasticsearch = require('elasticsearch');
 	const elasticRequest = server.plugins.elasticsearch.getCluster('admin');
-
+            
 	// External libraries
 	const fs = require('fs');
 	const path = require('path');
@@ -27,8 +26,6 @@ module.exports = function (server, options) {
 	const KIBANA_FIELDS_FILE = 'startup/integration_files/kibana_fields_file.json';
 	const TEMPLATE_FILE = 'startup/integration_files/template_file.json';
 	const MONITORING_SAMPLE_FILE = 'startup/integration_files/monitoring_sample.json';
-    const wazuh_config_file = '../configuration/config.json';
-
 	var monitoring_sample = {};
 	var kibana_fields_data = {};
 	var map_jsondata = {};
@@ -38,17 +35,20 @@ module.exports = function (server, options) {
 	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
 	var todayIndex = index_prefix + fDate;
 
-    // Read Wazuh App configuration file
-	try {
-		wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
-	} catch (e) {
-		server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file file.');
-		server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
-		server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-	};
-
-	const wazuh_api_version = wazuh_config.wazuhapi.version;
-
+	var package_info = {};
+    const package_file = '../package.json';
+    var appVersion = "";
+    
+    // Read Wazuh App package file
+    try {
+        package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, package_file), 'utf8'));
+        appVersion = package_info.version;
+    } catch (e) {
+        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
+        server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + package_file);
+        server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+    };
+	
 	// Load Wazuh API credentials from Elasticsearch document
 	var loadCredentials = function (apiEntries) {
 
@@ -101,7 +101,7 @@ module.exports = function (server, options) {
 		};
 
 		var options = {
-			headers: { 'api-version': wazuh_api_version },
+			headers: { 'wazuh-app-version': appVersion },
 			username: apiEntry.user,
 			password: apiEntry.password,
 			rejectUnauthorized: !apiEntry.insecure
@@ -109,10 +109,8 @@ module.exports = function (server, options) {
 
 
 		needle.request('get', getPath(apiEntry) +'/agents', payload, options, function (error, response) {
-
 			if (!error && !response.error && response.body.data && response.body.data.totalItems) {
 				checkStatus(apiEntry, response.body.data.totalItems);
-
 			} else {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it for start monitoring agents.');
 				return;
@@ -132,7 +130,7 @@ module.exports = function (server, options) {
 		};
 
 		var options = {
-			headers: { 'api-version': wazuh_api_version },
+			headers: { 'wazuh-app-version': appVersion },
 			username: apiEntry.user,
 			password: apiEntry.password,
 			rejectUnauthorized: !apiEntry.insecure
