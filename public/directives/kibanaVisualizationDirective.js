@@ -74,7 +74,13 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		// Decode and set time filter
 		if($route.current.params._g){
-			var decodedTimeFilter = rison.decode($route.current.params._g);
+			var decodedTimeFilter;
+			if($route.current.params._g.startsWith("h@")){
+				decodedTimeFilter = JSON.parse(sessionStorage.getItem($route.current.params._g));
+			}else{
+				decodedTimeFilter = rison.decode($route.current.params._g);    
+			}
+
 			if(decodedTimeFilter.time){
 				timefilter.time.from  = decodedTimeFilter.time.from;
 				timefilter.time.to = decodedTimeFilter.time.to;

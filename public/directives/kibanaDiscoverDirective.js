@@ -41,7 +41,7 @@ import uiModules from 'ui/modules';
 import indexTemplate from 'plugins/wazuh/templates/directives/dis-template.html';
 import StateProvider from 'ui/state_management/state';
 import stateMonitorFactory  from 'ui/state_management/state_monitor_factory';
-
+import * as columnActions from 'ui/doc_table/actions/columns';
 import 'ui/debounce';
 import 'plugins/kibana/discover/saved_searches/saved_searches';
 import 'plugins/kibana/discover/directives/no_results';
@@ -94,6 +94,14 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
     $scope.stateQuery = $scope.disFilter;
     $scope.chrome = {};
+    $scope.removeColumn = function removeColumn(columnName) {
+    $scope.indexPattern.popularizeField(columnName, 1);
+        columnActions.removeColumn($scope.state.columns, columnName);
+    };
+    $scope.addColumn = function addColumn(columnName) {
+        $scope.indexPattern.popularizeField(columnName, 1);
+        columnActions.addColumn($scope.state.columns, columnName);
+    };
     $scope.chrome.getVisible = function() {
         return true;
     }
@@ -150,7 +158,18 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     $scope.timefilter = timefilter;
 
                     // Set default time
-                    if ($route.current.params._g == "()")
+                    var gParameter;
+                    if($route.current.params._g){
+                        if($route.current.params._g.startsWith("h@")){
+                            gParameter = sessionStorage.getItem($route.current.params._g);
+                        }else{
+                            gParameter = $route.current.params._g;
+                        }
+                    }
+                    else{
+                        gParameter="()";
+                    }
+                    if (gParameter == "()")
                         $scope.timefilter.time.from = "now-24h";
 
                     // the saved savedSearch
