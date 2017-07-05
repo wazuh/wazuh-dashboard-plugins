@@ -37,6 +37,8 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
     $scope._os = 'all';
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
+	$scope.osPlatforms = [];
+	$scope.osVersions = new Set();
 	const notify = new Notifier({location: 'Agents - Preview'});
 	
     var objectsArray = [];
@@ -89,16 +91,27 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 		});
     };
     
-    $scope.agentOSFilter = function (os) {
-        if (os == 'all') {
-            DataFactory.filters.unset(objectsArray['/agents'], 'os');
+    $scope.agentOSPlatformFilter = function (osName) {
+        if (osName == 'all') {
+            DataFactory.filters.unset(objectsArray['/agents'], 'os.platform');
         } else {
-            DataFactory.filters.set(objectsArray['/agents'], 'os', os);
+            DataFactory.filters.set(objectsArray['/agents'], 'os.platform', osName);
         }
 		DataFactory.setOffset(objectsArray['/agents'],0);
 		DataFactory.get(objectsArray['/agents']).then(function (data) { 
 			$scope.agents.items = data.data.items;
+			if(osName == 'all'){
+				$scope.osVersions = [];
+			}
+			else{
+				var osVersions = new Set();
+				$scope.agents.items.forEach(function(agent){
+					osVersions.add(agent.os.version);
+				});
+				$scope.osVersions = Array.from(osVersions);
+			}
 		});
+		
     };
 
     var load = function () {
@@ -107,11 +120,16 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
 				DataFactory.filters.register(objectsArray['/agents'], 'status', 'string');
-                DataFactory.filters.register(objectsArray['/agents'], 'os', 'string');
+                DataFactory.filters.register(objectsArray['/agents'], 'os.platform', 'string');
 				DataFactory.filters.register(objectsArray['/agents'], 'filter-sort', 'string');
                 DataFactory.get(objectsArray['/agents'])
                     .then(function (data) {
 						$scope.agents = new Agents(objectsArray, data.data.items, data.data.os_list);
+						var osPlatforms = new Set();
+						$scope.agents.items.forEach(function(agent){
+							osPlatforms.add(agent.os.platform);
+						});
+						$scope.osPlatforms = Array.from(osPlatforms);
                         $scope.load = false;
                     }, printError);
             }, printError);
