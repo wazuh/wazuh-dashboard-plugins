@@ -55,7 +55,7 @@
 									flex>
 							</div>
 							<div layout="row" class="sideNavBox" flex="20">
-								<md-input-container flex class="md-whiteframe-z1" style="margin:18px 20px 0 0">
+								<md-input-container flex class="md-whiteframe-z1 md-input-margin">
 									<md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
 										<md-option value="all">All states</md-option>
 										<md-option value="active">Active</md-option>
@@ -65,7 +65,7 @@
 								</md-input-container>
 							</div>
 							<div layout="row" class="sideNavBox" flex="20">
-								<md-input-container flex class="md-whiteframe-z1" style="margin:18px 20px 0 0">
+								<md-input-container flex class="md-whiteframe-z1 md-input-margin">
 									<md-select id="eventBox" ng-model="$parent._osPlatform" ng-change="agentOSPlatformFilter($parent._osPlatform)" aria-label="Filter by operative system">
 										<md-option value="all">All OS platforms</md-option>
                                         <md-option ng-repeat='platform in osPlatforms' value="{{platform}}">

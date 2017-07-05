@@ -106,7 +106,8 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 			else{
 				var osVersions = new Set();
 				$scope.agents.items.forEach(function(agent){
-					osVersions.add(agent.os.version);
+					if(agent.os)
+						osVersions.add(agent.os.version);
 				});
 				$scope.osVersions = Array.from(osVersions);
 			}
@@ -127,7 +128,8 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 						$scope.agents = new Agents(objectsArray, data.data.items, data.data.os_list);
 						var osPlatforms = new Set();
 						$scope.agents.items.forEach(function(agent){
-							osPlatforms.add(agent.os.platform);
+							if(agent.os)
+								osPlatforms.add(agent.os.platform);
 						});
 						$scope.osPlatforms = Array.from(osPlatforms);
                         $scope.load = false;
