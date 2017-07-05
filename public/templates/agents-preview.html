@@ -49,29 +49,37 @@
 						</div>
 						<div layout="row" layout-align="start stretch">
 
-							<div layout="row" class="sideNavBox" flex="80">
+							<div layout="row" class="sideNavBox" flex="50">
 
 								<input placeholder="Filter" type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)" class="input-filter-box"
 									flex>
 							</div>
 							<div layout="row" class="sideNavBox" flex="20">
-								<md-input-container flex class="md-whiteframe-z1">
+								<md-input-container flex class="md-whiteframe-z1" style="margin:18px 20px 0 0">
 									<md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
-										<md-option value="all">All</md-option>
+										<md-option value="all">All states</md-option>
 										<md-option value="active">Active</md-option>
 										<md-option value="disconnected">Disconnected</md-option>
 										<md-option value="Never Connected">Never connected</md-option>
 									</md-select>
 								</md-input-container>
 							</div>
-						</div>
-						<div layout="row" layout-align="start stretch" flex>
 							<div layout="row" class="sideNavBox" flex="20">
+								<md-input-container flex class="md-whiteframe-z1" style="margin:18px 20px 0 0">
+									<md-select id="eventBox" ng-model="$parent._osPlatform" ng-change="agentOSPlatformFilter($parent._osPlatform)" aria-label="Filter by operative system">
+										<md-option value="all">All OS platforms</md-option>
+                                        <md-option ng-repeat='platform in osPlatforms' value="{{platform}}">
+                                            {{platform}}
+                                        </md-option>
+									</md-select>
+								</md-input-container>
+							</div>
+							<div layout="row" class="sideNavBox" flex="10">
 								<md-input-container flex class="md-whiteframe-z1">
-									<md-select id="eventBox" ng-model="$parent._os" ng-change="agentOSFilter($parent._os)" aria-label="Filter by operative system">
-										<md-option value="all">All</md-option>
-                                        <md-option ng-repeat='os in agents.os_list' value="{{os.os_family}}-{{os.os_distribution}}-{{os.os_version}}-{{os.os_architecture}}">
-                                            {{os.os_family}} {{os.os_distribution}} {{os.os_version}} {{os.os_architecture}}
+									<md-select id="eventBox" ng-model="$parent._osVersion" ng-change="agentOSFilter($parent._osVersion)" aria-label="Filter by operative system">
+										<md-option value="all">All OS versions</md-option>
+                                        <md-option ng-repeat='version in osVersions' value="{{version}}">
+                                            {{version}}
                                         </md-option>
 									</md-select>
 								</md-input-container>
@@ -85,11 +93,13 @@
 										<i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 									<span flex="25" ng-click="setSort('name')">Name
 										<i class="fa" ng-class="_sort === 'name' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-									<span flex="25" ng-click="setSort('ip')">IP
+									<span flex="20" ng-click="setSort('ip')">IP
 										<i class="fa" ng-class="_sort === 'ip' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-									<span flex="25" ng-click="setSort('status')">Status
+									<span flex="20" ng-click="setSort('status')">Status
 										<i class="fa" ng-class="_sort === 'status' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-									<span flex="15" ng-click="setSort('os_family')">OS
+									<span flex="15" ng-click="setSort('os.platform')">OS platform
+										<i class="fa" ng-class="_sort === 'os' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+									<span flex="10" ng-click="setSort('os.version')">OS version
 										<i class="fa" ng-class="_sort === 'os' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 								</div>
 							</md-toolbar>
@@ -99,10 +109,11 @@
 						<md-list-item>
 							<span flex="10">{{agent.id}}</span>
 							<span flex="25">{{agent.name}}</span>
-							<span flex="25">{{agent.ip}}</span>
-							<span flex="15">{{agent.status}}</span>
+							<span flex="20">{{agent.ip}}</span>
+							<span flex="10">{{agent.status}}</span>
 							<span flex="10"> <span ng-class="getAgentStatusClass(agent.status)" class="round status"></span></span>
-							<span flex="15">{{agent.os_family}} {{agent.os_distribution}} {{agent.os_version}} {{agent.os_architecture}}</span>
+							<span flex="15">{{agent.os.platform}}</span>
+							<span flex="10">{{agent.os.version}}</span>
 						</md-list-item>
 					</md-list>
 					<md-divider></md-divider>
