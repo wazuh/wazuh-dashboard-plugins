@@ -11,7 +11,8 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	$scope.tabView = "panels";	
     $scope.state = appState;
 	$scope._status = 'all';
-    $scope._os = 'all';
+    $scope._osPlatform = 'all';
+	$scope._osVersion = 'all';
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.results = true;

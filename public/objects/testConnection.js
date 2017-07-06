@@ -5,7 +5,6 @@ require('ui/modules').get('app/wazuh', [])
             check_stored: function () {
                 var defered = $q.defer();
                 var promise = defered.promise;
-
                 $http.get(chrome.addBasePath("/api/wazuh-api/check"))
                     .success(function (data) {
                         if (data.error) {
