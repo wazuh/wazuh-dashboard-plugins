@@ -51,8 +51,9 @@ import 'plugins/kibana/discover/components/field_chooser/field_chooser';
 import 'plugins/kibana/discover/styles/main.less';
 import 'ui/doc_table/components/table_row';
 
-import savedObjectRegistry from 'ui/saved_objects/saved_object_registry';
-savedObjectRegistry.register(require('plugins/kibana/discover/saved_searches/saved_search_register'));
+import { SavedObjectRegistryProvider } from 'ui/saved_objects/saved_object_registry';
+
+SavedObjectRegistryProvider.register(require('plugins/kibana/discover/saved_searches/saved_search_register'));
 
 var app = require('ui/modules').get('app/wazuh', [])
     .directive('kbnDis', [function() {
