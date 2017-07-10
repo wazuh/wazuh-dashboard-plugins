@@ -21,6 +21,20 @@ body{
     display: none;
 }
 
+.no-legend .vis-editor-canvas{
+	padding: 0;
+}
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+	.no-legend svg{
+		padding-top: 10px;
+	}
+}
+@supports (-ms-accelerator:true) {
+	.no-legend svg{
+		padding-top: 10px;
+	}
+}
+
 md-input-container > md-select {
 	background: #3caed2;
 	border-radius: 3px;

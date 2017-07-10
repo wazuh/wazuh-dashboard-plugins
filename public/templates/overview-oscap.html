@@ -141,7 +141,7 @@
 		
 		</md-content>
 		
-		<md-content layout="row" layout-align="center stretch" >
+		<md-content layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex="20" layout="column">
 					<md-card-content style="text-align: center;">
 						<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score,customLabel:'Higher score'),schema:metric,type:max)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="*"></kbn-vis>
