@@ -1,7 +1,7 @@
 import rison from 'rison-node';
-import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
-import StateProvider from 'ui/state_management/state';
-import AggTypesBucketsIntervalOptionsProvider from 'ui/agg_types/buckets/_interval_options';
+import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
+import { StateProvider } from 'ui/state_management/state';
+import { AggTypesBucketsIntervalOptionsProvider } from 'ui/agg_types/buckets/_interval_options';
 
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnSearchbar', [function () {
@@ -78,6 +78,5 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	
 	// Listen for destroy 
 	$scope.$on('$destroy', visCounterWatch);
-
 });
   
