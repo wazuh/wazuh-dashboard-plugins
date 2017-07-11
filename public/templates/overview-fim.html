@@ -24,7 +24,7 @@
 	<!-- View: Panels -->
 	<div ng-if="tabView == 'panels' && results">
 		<md-content layout="row">
-			<div flex="10" layout="column">
+			<div flex="10" layout="column" class="no-legend">
 				<md-card>
 					<md-card-content>
 						<kbn-vis vis-height="72px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Added),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 554'>
@@ -115,7 +115,7 @@
 				</md-card-title>
 				<md-card-content>
 					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
-						vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry'>
+						vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry'></kbn-vis>
 				</md-card-content>
 			</md-card>
 
@@ -127,7 +127,7 @@
 				</md-card-title>
 				<md-card-content>
 					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
-						vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry AND root'>
+						vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry AND root'></kbn-vis>
 				</md-card-content>
 			</md-card>
 
@@ -139,7 +139,7 @@
 				</md-card-title>
 				<md-card-content>
 					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20_exists_:syscheck.perm_after%20AND%20%20(syscheck.perm_after:%2F%5B0-7%5D%7B5%7D(%5B2367%5D).*%2F)')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Files',type:pie))"
-						vis-filter='rule.groups:"syscheck" AND _exists_:syscheck.perm_after AND (syscheck.perm_after:/[0-7]{5}([2367]).*/) '>
+						vis-filter='rule.groups:"syscheck" AND _exists_:syscheck.perm_after AND (syscheck.perm_after:/[0-7]{5}([2367]).*/) '></kbn-vis>
 				</md-card-content>
 			</md-card>
 			
