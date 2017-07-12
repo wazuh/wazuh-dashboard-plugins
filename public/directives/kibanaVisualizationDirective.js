@@ -1,7 +1,7 @@
 import rison from 'rison-node';
-import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
-import UtilsBrushEventProvider from 'ui/utils/brush_event';
-import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_click_handler';
+import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
+import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
+import { FilterBarClickHandlerProvider } from 'ui/filter_bar/filter_bar_click_handler';
 
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnVis', [function () {
@@ -40,7 +40,6 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 
 require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
-
 
 	if(typeof $rootScope.visCounter === "undefined")
 		$rootScope.visCounter = 0;
@@ -111,7 +110,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.searchSource = $scope.newVis.searchSource;
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
-		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
+		const filterBarClickHandler = Private(FilterBarClickHandlerProvider);
 		$timeout(
 		function() {
 
@@ -208,7 +207,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.$on('$destroy', updateQueryWatch);
 		$scope.$on('$destroy', fetchVisualizationWatch);
 		$scope.$on('$destroy', visFilterWatch);
-
     };
 
   });
