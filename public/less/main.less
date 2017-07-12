@@ -7,6 +7,39 @@ body{
 	margin:18px 20px 0 0
 }
 
+.no-legend visualize-legend{
+    visibility: hidden;
+    width: 0px;
+    height: 0px;
+    border: 0px;
+    padding: 0px;
+    display: none;
+}
+
+.no-legend .vis-alerts{
+	visibility: hidden;
+    width: 0px;
+    height: 0px;
+    border: 0px;
+    padding: 0px;
+    display: none;
+}
+
+.no-legend .vis-editor-canvas{
+	padding: 0;
+}
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+	.no-legend svg{
+		padding-top: 10px;
+	}
+}
+
+@supports (-ms-ime-align:auto) {
+    .no-legend svg{
+		padding-top: 10px;
+	}
+}
+
 md-input-container > md-select {
 	background: #3caed2;
 	border-radius: 3px;

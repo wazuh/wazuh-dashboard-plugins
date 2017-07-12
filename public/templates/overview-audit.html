@@ -23,7 +23,7 @@
 	
 	<!-- View: Panels -->
 	<div ng-if="tabView == 'panels' && results">
-		<md-content layout="row" layout-align="center stretch">
+		<md-content layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex="10" layout="column">
 					<md-card-content style="text-align: center;">
 						<kbn-vis vis-height="80px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'New files'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="rule.groups: audit AND rule.id: 80790"></kbn-vis>
