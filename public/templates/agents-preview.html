@@ -85,11 +85,22 @@
 								</md-input-container>
 							</div>
 						</div>
-						
+						<div layout="row" layout-align="start stretch">
+							<div layout="row" class="sideNavBox" flex="20">
+								<md-input-container flex class="md-whiteframe-z1 md-input-margin">
+									<md-select id="eventBox" ng-model="$parent._bulkOperation" ng-change="bulkOperation($parent._bulkOperation)" aria-label="Filter by status">
+										<md-option value="nothing">Action</md-option>
+										<md-option value="delete">Delete selected</md-option>
+										<md-option value="restart">Restart selected</md-option>
+									</md-select>
+								</md-input-container>
+							</div>
+						</div>
 						<div>
 							<md-toolbar layout="row">
 								<div class="md-toolbar-tools">
-									<span flex="10" ng-click="setSort('id')">ID
+									<span flex="5" ng-click="setSort('id')"></span>
+									<span flex="5" ng-click="setSort('id')">ID
 										<i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 									<span flex="25" ng-click="setSort('name')">Name
 										<i class="fa" ng-class="_sort === 'name' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
@@ -105,15 +116,18 @@
 							</md-toolbar>
 						</div>
 					</div>
-					<md-list ng-repeat='agent in agents.items' class="agents-preview-table" ng-click="applyAgent(agent)">
+					<md-list ng-repeat='agent in agents.items' class="agents-preview-table">
 						<md-list-item>
-							<span flex="10">{{agent.id}}</span>
-							<span flex="25">{{agent.name}}</span>
-							<span flex="20">{{agent.ip}}</span>
-							<span flex="10">{{agent.status}}</span>
-							<span flex="10"> <span ng-class="getAgentStatusClass(agent.status)" class="round status"></span></span>
-							<span flex="15">{{agent.os.platform}}</span>
-							<span flex="10">{{agent.os.version}}</span>
+							<span flex="5">
+								<input class="agent-checkbox" ng-model="agent.selected" value="{{agent.id}}" type="checkbox"/>
+							</span>
+							<span flex="5" ng-click="applyAgent(agent)">{{agent.id}}</span>
+							<span flex="25" ng-click="applyAgent(agent)">{{agent.name}}</span>
+							<span flex="20" ng-click="applyAgent(agent)">{{agent.ip}}</span>
+							<span flex="10" ng-click="applyAgent(agent)">{{agent.status}}</span>
+							<span flex="10" ng-click="applyAgent(agent)"> <span ng-class="getAgentStatusClass(agent.status)" class="round status"></span></span>
+							<span flex="15" ng-click="applyAgent(agent)">{{agent.os.platform}}</span>
+							<span flex="10" ng-click="applyAgent(agent)">{{agent.os.version}}</span>
 						</md-list-item>
 					</md-list>
 					<md-divider></md-divider>

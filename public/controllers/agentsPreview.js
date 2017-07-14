@@ -29,8 +29,7 @@ app.factory('Agents', function($http, DataFactory) {
   return Agents;
 });
 
-app.controller('agentsPreviewController', function ($scope, DataFactory, Notifier, errlog, genericReq, Agents) {
-
+app.controller('agentsPreviewController', function ($scope, DataFactory, Notifier, errlog, genericReq, Agents, apiReq) {
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';
@@ -114,6 +113,37 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 		});
 		
     };
+	
+	$scope.bulkOperation= function (operation){
+		var selectedAgents = [];
+		angular.forEach($scope.agents.items, function(agent){
+			if(agent.selected){
+				selectedAgents.push(agent.id);
+			}
+		});
+		var requestData = {
+			'ids': selectedAgents
+		}
+		if(selectedAgents.length > 0){
+			switch (operation){
+				case "delete":
+					if(confirm("Do you want to delete the selected agents?")){
+						apiReq.request('POST', '/api/wazuh-api/deleteAgents', requestData)
+							.then(function (data) {
+								load();
+							}, function (data) {
+							});
+
+					}
+					break;	
+				case "restart":
+					if(confirm("Do you want to restart the selected agents?")){
+						
+					}
+			}
+		}
+		$scope.$parent._bulkOperation="nothing";
+	}
 
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 30, 0)
