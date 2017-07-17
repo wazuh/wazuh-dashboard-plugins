@@ -405,13 +405,6 @@ module.exports = function (server, options) {
             reply({ 'statusCode': 200, 'message': 'Error logged succesfully' });
         }
     };
-	
-	var deleteAgents = function (req, reply) {
-		var index;
-		for(index=0; index < req.payload.body.length; index++){
-			makeRequest("DELETE", "/agents/" + req.payload.body[index], {}, reply);
-		}
-	};
 
     //Server routes
 
@@ -569,17 +562,6 @@ module.exports = function (server, options) {
         method: 'PUT',
         path: '/api/wazuh-api/updateApiHostname/{id}',
         handler: updateApiHostname
-    });
-	
-	/*
-    * POST /api/wazuh-api/deleteAgents
-    * Delete the given agents
-    *
-    **/
-    server.route({
-        method: 'POST',
-        path: '/api/wazuh-api/deleteAgents',
-        handler: deleteAgents
     });
 
 };
