@@ -38,6 +38,7 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
 	$scope.osPlatforms = [];
 	$scope.osVersions = new Set();
+	$scope.agentsStatus = false;
 	const notify = new Notifier({location: 'Agents - Preview'});
 	
     var objectsArray = [];
@@ -114,7 +115,7 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 		
     };
 	
-	$scope.bulkOperation= function (operation){
+	$scope.bulkOperation = function (operation){
 		var selectedAgents = [];
 		angular.forEach($scope.agents.items, function(agent){
 			if(agent.selected){
@@ -128,21 +129,30 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 			switch (operation){
 				case "delete":
 					if(confirm("Do you want to delete the selected agents?")){
-						apiReq.request('POST', '/api/wazuh-api/deleteAgents', requestData)
+						apiReq.request('DELETE', '/agents', requestData)
 							.then(function (data) {
 								load();
-							}, function (data) {
-							});
+								if(data.data.length != 0){
+									data.data.forEach(function(error) {
+										notify.error(error);
+									});
+								} 
+								else{
+									notify.info("The agents were successfully deleted.");
+								}
+							}, printError);
 
 					}
 					break;	
-				case "restart":
-					if(confirm("Do you want to restart the selected agents?")){
-						
-					}
 			}
 		}
 		$scope.$parent._bulkOperation="nothing";
+	}
+	
+	$scope.changeAgentsStatus = function (){
+		angular.forEach($scope.agents.items, function(agent){
+			agent.selected = $scope.agentsStatus;
+		});
 	}
 
     var load = function () {

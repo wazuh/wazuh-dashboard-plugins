@@ -99,7 +99,9 @@
 						<div>
 							<md-toolbar layout="row">
 								<div class="md-toolbar-tools">
-									<span flex="5" ng-click="setSort('id')"></span>
+									<span flex="5">
+										<input class="agent-checkbox" ng-model="agentsStatus" value="all-agents-status" ng-change="changeAgentsStatus()" type="checkbox"/>
+									</span>
 									<span flex="5" ng-click="setSort('id')">ID
 										<i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 									<span flex="25" ng-click="setSort('name')">Name
