@@ -132,13 +132,13 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 						apiReq.request('DELETE', '/agents', requestData)
 							.then(function (data) {
 								load();
-								if(data.data.length != 0){
-									data.data.forEach(function(error) {
-										notify.error(error);
+								if(data.data.ids.length!=0){
+									data.data.ids.forEach(function(id) {
+										notify.error('The agent ' + id + ' was not deleted.');
 									});
 								} 
 								else{
-									notify.info("The agents were successfully deleted.");
+									notify.info(data.data.msg);
 								}
 							}, printError);
 
