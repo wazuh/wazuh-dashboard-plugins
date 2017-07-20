@@ -1,10 +1,8 @@
-require('plugins/kibana/discover/styles/main.less');
 require('ui/doc_table/doc_table.js');
 require('ui/styles/sidebar.less');
 require('ui/styles/table.less');
 require('ui/doc_viewer/doc_viewer.js');
 require('ui/doc_title/doc_title.js');
-require('ui/styles/truncate.less');
 require('ui/style_compile/style_compile.js');
 require('ui/registry/doc_views.js');
 require('plugins/kbn_doc_views/kbn_doc_views.js');
@@ -36,11 +34,12 @@ import PluginsKibanaDiscoverHitSortFnProvider from 'plugins/kibana/discover/_hit
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { FilterManagerProvider } from 'ui/filter_manager';
 import { AggTypesBucketsIntervalOptionsProvider } from 'ui/agg_types/buckets/_interval_options';
-import { uiRoutes } from 'ui/routes';
-import { uiModules } from 'ui/modules';
-import { indexTemplate } from 'plugins/wazuh/templates/directives/dis-template.html';
-import { StateProvider } from 'ui/state_management/state';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
+import uiRoutes from 'ui/routes';
+import { uiModules } from 'ui/modules';
+import indexTemplate from 'plugins/wazuh/templates/directives/dis-template.html';
+import { StateProvider } from 'ui/state_management/state';
+import { documentationLinks } from 'ui/documentation_links/documentation_links';
 import * as columnActions from 'ui/doc_table/actions/columns';
 import 'ui/debounce';
 import 'plugins/kibana/discover/saved_searches/saved_searches';
@@ -48,14 +47,16 @@ import 'plugins/kibana/discover/directives/no_results';
 import 'plugins/kibana/discover/directives/timechart';
 import 'ui/collapsible_sidebar';
 import 'plugins/kibana/discover/components/field_chooser/field_chooser';
+import 'plugins/kibana/discover/controllers/discover';
 import 'plugins/kibana/discover/styles/main.less';
 import 'ui/doc_table/components/table_row';
-
 import { SavedObjectRegistryProvider } from 'ui/saved_objects/saved_object_registry';
+import { savedSearchProvider } from 'plugins/kibana/discover/saved_searches/saved_search_register';
 
-SavedObjectRegistryProvider.register(require('plugins/kibana/discover/saved_searches/saved_search_register'));
+SavedObjectRegistryProvider.register(savedSearchProvider);
 
-var app = require('ui/modules').get('app/wazuh', [])
+
+var app = uiModules.get('app/wazuh', [])
     .directive('kbnDis', [function() {
         return {
             restrict: 'E',
@@ -71,7 +72,7 @@ var app = require('ui/modules').get('app/wazuh', [])
         }
     }]);
 
-var app = require('ui/modules').get('app/wazuh', [])
+var app = uiModules.get('app/wazuh', [])
     .directive('kbnDisfull', [function() {
         return {
             restrict: 'E',
@@ -88,11 +89,10 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 
 
-require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
+uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
 
     $scope.defaultManagerName = appState.getDefaultManager().name;
-
     $scope.stateQuery = $scope.disFilter;
     $scope.chrome = {};
     $scope.removeColumn = function removeColumn(columnName) {
@@ -145,6 +145,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     const queryFilter = Private(FilterBarQueryFilterProvider);
                     const filterManager = Private(FilterManagerProvider);
 
+					$scope.queryDocLinks = documentationLinks.query;
                     $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
                     $scope.showInterval = false;
 
@@ -197,8 +198,10 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         $scope.state.sort = disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern);
                     }
 					
-                    const $appStatus = $scope.appStatus = {};
                     let stateMonitor;
+					const $appStatus = $scope.appStatus = {
+						dirty: !savedSearch.id
+					};
                     const $state = $scope.state;
                     $scope.uiState = $state.makeStateful('uiState');
                     $scope.uiState.set('vis.legendOpen', false);
@@ -241,7 +244,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
 						stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
 						stateMonitor.onChange((status) => {
-							$appStatus.dirty = status.dirty;
+							$appStatus.dirty = status.dirty || !savedSearch.id;
 						});
 						$scope.$on('$destroy', () => stateMonitor.destroy());
 						
