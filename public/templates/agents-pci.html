@@ -28,7 +28,7 @@
 			<md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">
 				<md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
 					<md-content style="background-color: white;" class="md-padding">
-						<h1 class="md-display-2" style="line-height: 40px; margin: 0;">PCI DSS Requirement: {{tab.title}}</h1>
+						<h1 class="md-display-2 wazuh-h1" style="line-height: 40px; margin: 0;">PCI DSS Requirement: {{tab.title}}</h1>
 						<div ng-bind-html="tab.content"></div>
 					</md-content>
 				</md-tab>
