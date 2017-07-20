@@ -153,7 +153,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.check(tmpData).then(function (data) {
             tmpData.manager = data;
             var index = $scope.apiEntries.indexOf(item);
-            genericReq.request('PUT', '/api/wazuh-api/updateApiHostname/' + $scope.apiEntries[index]._id).then(function (data) {
+            genericReq.request('PUT', '/api/wazuh-api/updateApiHostname/' + $scope.apiEntries[index]._id, {"manager":tmpData.manager}).then(function (data) {
 				$scope.apiEntries[index]._source.manager = tmpData.manager;
             });
             notify.info("Connection success");

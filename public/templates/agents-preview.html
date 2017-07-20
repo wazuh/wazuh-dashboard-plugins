@@ -85,7 +85,18 @@
 								</md-input-container>
 							</div>
 						</div>
-						
+						<div layout="row" layout-align="start stretch">
+							<div layout="row" class="top-bulk-action" layout-align="center center">
+									<md-card ng-click="addNewAgent()" class="md-input-margin new-agent-button" layout="column">
+										<div ng-animate="{enter: 'rotate', leave: 'rotateCounterwise'}" ng-class="{true: 'rotate', false: 'rotateCounterwise'}[isAddingAgent]"><md-icon md-font-library="material-icons">add</md-icon></div>
+									</md-card>
+							</div>
+							<div ng-show="isAddingAgent" layout="row" class="top-bulk-action" layout-align="center center">
+								<md-card ng-click="saveNewAgent()" class="md-input-margin new-agent-button" layout="column">
+									<md-icon class="done-icon" md-font-library="material-icons">done</md-icon>
+								</md-card>
+							</div>
+						</div>
 						<div>
 							<md-toolbar layout="row">
 								<div class="md-toolbar-tools">
@@ -105,18 +116,32 @@
 							</md-toolbar>
 						</div>
 					</div>
-					<md-list ng-repeat='agent in agents.items' class="agents-preview-table" ng-click="applyAgent(agent)">
+					<md-list ng-show="isAddingAgent" ng-animate="{enter: 'show-new-agent', leave: 'hide-new-agent'}" ng-class="{true: 'show-new-agent', false: 'hide-new-agent'}[isAddingAgent]" class="agents-preview-table">
 						<md-list-item>
-							<span flex="10">{{agent.id}}</span>
-							<span flex="25">{{agent.name}}</span>
-							<span flex="20">{{agent.ip}}</span>
-							<span flex="10">{{agent.status}}</span>
-							<span flex="10"> <span ng-class="getAgentStatusClass(agent.status)" class="round status"></span></span>
-							<span flex="15">{{agent.os.platform}}</span>
-							<span flex="10">{{agent.os.version}}</span>
+							<span flex="10"></span>
+							<span flex="25"><input ng-model="newAgent.name" class="new-agent-data"></input></span>
+							<span flex="20"><input ng-model="newAgent.ip" class="new-agent-data"></input></span>
+							<span flex="10"></span>
+							<span flex="10"></span>
+							<span flex="15"></span>
+							<span flex="10"></span>
 						</md-list-item>
 					</md-list>
 					<md-divider></md-divider>
+					<div flex layout="column" layout-align="space-between stretch">
+						<div layout="row" layout-align="start stretch">
+								<div layout="row" class="sideNavBox" layout-align="center center">
+									<md-card ng-click="addNewAgent()" class="md-input-margin new-agent-button" layout="column">
+										<div ng-animate="{enter: 'rotate', leave: 'rotateCounterwise'}" ng-class="{true: 'rotate', false: 'rotateCounterwise'}[isAddingAgent]"><md-icon md-font-library="material-icons">add</md-icon></div>
+									</md-card>
+								</div>
+								<div ng-show="isAddingAgent" layout="row" class="sideNavBox" layout-align="center center">
+									<md-card ng-click="saveNewAgent()" class="md-input-margin new-agent-button" layout="column">
+										<md-icon class="done-icon" md-font-library="material-icons">done</md-icon>
+									</md-card>
+								</div>
+						</div>
+					</div>
 			</div>
 			<md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="agents.busy"></md-progress-linear></md-content>
 	</md-content>
