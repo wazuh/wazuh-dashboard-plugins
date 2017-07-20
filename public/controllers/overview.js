@@ -3,7 +3,6 @@ import chrome from 'ui/chrome';
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location, $http, $rootScope) {
-	
     $scope.state = appState;
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
@@ -65,7 +64,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	        if($route.current.params._g.startsWith("h@")){
 	            decodedTimeFilter = JSON.parse(sessionStorage.getItem($route.current.params._g));
 	        }else{
-	            decodedTimeFilter = rison.decode($route.current.params._g);    
+	            decodedTimeFilter = rison.decode($route.current.params._g);
 	        }
         
 		if(decodedTimeFilter.time){
@@ -114,11 +113,16 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 			var currentTimeFilter = rison.decode($location.search()._g);
 			// Check if timefilter has changed and update values
 			var gParameter;
-			if($route.current.params._g.startsWith("h@")){
-				gParameter = sessionStorage.getItem($route.current.params._g);
-			}else{
-				gParameter = $route.current.params._g;
-			}
+            if($route.current.params._g){
+                if($route.current.params._g.startsWith("h@")){
+                    gParameter = sessionStorage.getItem($route.current.params._g);
+                }else{
+                    gParameter = $route.current.params._g;
+                }
+            }
+            else{
+                gParameter="{}";
+            }
 			if(gParameter != "{}" && gParameter != "()" && currentTimeFilter.time && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
 				$scope.timeGTE = currentTimeFilter.time.from;
 				$scope.timeLT = currentTimeFilter.time.to;

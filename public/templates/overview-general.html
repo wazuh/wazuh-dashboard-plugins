@@ -23,7 +23,7 @@
 
 	<!-- View: Panels -->
 	<div ng-if="tabView == 'panels' && results">
-		<div layout="row" layout-align="center stretch">
+		<div layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex layout="column">
 				<md-card-content>
 					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Alerts',type:metric))"

@@ -3,29 +3,39 @@ module.exports = function (server, options) {
 	const pciRequirementsFile = '';
 	const fs = require('fs');
 	const path = require('path');
+	const needle = require('needle');
 	var fetchAgentsExternal = require(path.resolve(__dirname, "../wazuh-monitoring.js"));
 	const wazuh_config_file = '../../configuration/config.json';
 	var colors = require('ansicolors');
 	var blueWazuh = colors.blue('wazuh');
 	var wazuh_config = {};
-
+	var package_info = {};
+    const package_file = '../../package.json';
+    var appVersion = "";
+    
+    // Read Wazuh App package file
+    try {
+        package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, package_file), 'utf8'));
+        appVersion = package_info.version;
+    } catch (e) {
+        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
+        server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + package_file);
+        server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+    };
 	// Read Wazuh App configuration file
-	try {
-		wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
-	} catch (e) {
-		server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file file.');
-		server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
-		server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-	};
-
-	const wazuh_api_version = wazuh_config.wazuhapi.version;
-
+    try {
+        wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
+    } catch (e) {
+        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file.');
+        server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
+        server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+    };
 
 	// Elastic JS Client
 	const serverConfig = server.config();
 	const elasticsearch = require('elasticsearch');
 	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
-
+    
     //Handlers - Generic
 
     var getConfig = function (callback) {
@@ -40,8 +50,6 @@ module.exports = function (server, options) {
 					callback({ 'error': 'no elasticsearch', 'error_code': 2 });
 			});
     };
-
-
 
     var getAPI_entries = function (req,reply) {
 		elasticRequest.callWithRequest(req, 'search', { index: '.kibana', type: 'wazuh-configuration'}).then(
@@ -298,7 +306,7 @@ module.exports = function (server, options) {
             }
 
             var options = {
-                headers: { 'api-version': wazuh_api_version },
+                headers: { 'wazuh-app-version': appVersion },
                 username: wapi_config.user,
                 password: wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
@@ -333,6 +341,7 @@ module.exports = function (server, options) {
             reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
             return;
         }
+        
 		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'manager' : req.payload.manager, 'extensions' : req.payload.extensions};
 
         elasticRequest.callWithRequest(req, 'index', { index: '.kibana', type: 'wazuh-configuration', body: settings, refresh: true })

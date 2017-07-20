@@ -24,22 +24,30 @@ import 'ui/filter_bar'
 
 
 import Notifier from 'ui/notify/notifier';
-import RegistryVisTypesProvider from 'ui/registry/vis_types';
-require('plugins/metric_vis/metric_vis');
+import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
+import histogramVisTypeProvider from 'plugins/kbn_vislib_vis_types/histogram';
+import lineVisTypeProvider from 'plugins/kbn_vislib_vis_types/line';
+import pieVisTypeProvider from 'plugins/kbn_vislib_vis_types/pie';
+import areaVisTypeProvider from 'plugins/kbn_vislib_vis_types/area';
+import tileMapVisTypeProvider from 'plugins/kbn_vislib_vis_types/tile_map';
+import metricVisTypeProvider from 'plugins/kbn_vislib_vis_types/metric';
+
+VisTypesRegistryProvider.register(histogramVisTypeProvider);
+VisTypesRegistryProvider.register(lineVisTypeProvider);
+VisTypesRegistryProvider.register(pieVisTypeProvider);
+VisTypesRegistryProvider.register(areaVisTypeProvider);
+VisTypesRegistryProvider.register(tileMapVisTypeProvider);
+VisTypesRegistryProvider.register(metricVisTypeProvider);
+
 require('plugins/table_vis/table_vis');
 require('plugins/markdown_vis/markdown_vis');
-RegistryVisTypesProvider.register(require('plugins/kbn_vislib_vis_types/histogram'));
-RegistryVisTypesProvider.register(require('plugins/kbn_vislib_vis_types/line'));
-RegistryVisTypesProvider.register(require('plugins/kbn_vislib_vis_types/pie'));
-RegistryVisTypesProvider.register(require('plugins/kbn_vislib_vis_types/area'));
-RegistryVisTypesProvider.register(require('plugins/kbn_vislib_vis_types/tile_map'));
-
+require('plugins/metrics/visualizations');
 import DocTitleProvider from 'ui/doc_title';
 import UtilsBrushEventProvider from 'ui/utils/brush_event';
 
 import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_click_handler';
 import uiRoutes from 'ui/routes';
-import uiModules from 'ui/modules';
+import { uiModules } from 'ui/modules';
 
 import 'ui/state_management/app_state';
 import StateManagementAppStateProvider from 'ui/state_management/app_state';
