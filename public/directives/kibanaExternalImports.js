@@ -47,7 +47,7 @@ import UtilsBrushEventProvider from 'ui/utils/brush_event';
 
 import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_click_handler';
 import uiRoutes from 'ui/routes';
-import uiModules from 'ui/modules';
+import { uiModules } from 'ui/modules';
 
 import 'ui/state_management/app_state';
 import StateManagementAppStateProvider from 'ui/state_management/app_state';
