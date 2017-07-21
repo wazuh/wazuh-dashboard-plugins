@@ -1,7 +1,7 @@
 <md-content ng-if="submenuNavItem == 'oscap' && _agent" id="agents-oscap" ng-controller="oscapController">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
 	
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels'">
