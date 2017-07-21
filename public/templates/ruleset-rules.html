@@ -150,7 +150,7 @@
 					
 						<md-card flex layout="column" ng-if="rule.groups.length  > 0">
 							<md-card-content>
-								<h3>Groups</h3>
+								<h3 class="wazuh-h3">Groups</h3>
 								<span ng-repeat="group in rule.groups">
 									<span class="listHover" ng-click="rulesApplyFilter({type: 'group', value: group})" layout="row" layout-align="space-between center"><p>{{ group }}</p></span>
 									<md-divider ng-if="!$last"></md-divider>
@@ -160,7 +160,7 @@
 						
 						<md-card flex layout="column" ng-if="rule.pci.length  > 0">
 							<md-card-content>
-								<h3>PCI DSS </h3>
+								<h3 class="wazuh-h3">PCI DSS </h3>
 								<span ng-repeat="pci in rule.pci">
 									<span class="listHover" ng-click="rulesApplyFilter({type: 'pci', value: pci})" layout="row" layout-align="space-between center"><p>{{ pci }}</p></span>
 									<md-divider ng-if="!$last"></md-divider>
@@ -170,7 +170,7 @@
 						
 						<md-card flex layout="column">
 							<md-card-content>
-								<h3>Extra settings</h3>
+								<h3 class="wazuh-h3">Extra settings</h3>
 								<span ng-repeat="(detailk, detailv) in rule.details">
 									<span layout="row" layout-align="space-between center">
 										<p>{{detailk}}</p>
