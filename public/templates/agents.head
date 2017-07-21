@@ -39,7 +39,7 @@
 						</div>
 						
 						<div ng-if="!_agent"> 
-							<h2 style="text-transform: none; font-size: 20px;">
+							<h2 class="wazuh-h2" style="text-transform: none; font-size: 20px;">
 								<i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents overview
 							</h2>
 						</div>
