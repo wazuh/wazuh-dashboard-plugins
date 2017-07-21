@@ -57,7 +57,7 @@ SavedObjectRegistryProvider.register(savedSearchProvider);
 
 
 var app = uiModules.get('app/wazuh', [])
-    .directive('kbnDis', [function() {
+    .directive('kbnDis', [function() { 
         return {
             restrict: 'E',
             scope: {

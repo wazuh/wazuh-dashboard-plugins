@@ -3,6 +3,19 @@ body{
    width:100%;
 }
 
+.vis-editor-content text, h2.index-pattern-label{
+	font-weight: normal !important;
+}
+
+.wazuh-discover-searchbar{
+	margin-top: -50px !important;
+	z-index:9999;
+}
+
+.wazuh-searchbar navbar{
+	margin-top: -40px !important;
+}
+
 .no-legend visualize-legend{
     visibility: hidden;
     width: 0px;
@@ -50,7 +63,7 @@ span.md-headline {
 .md-headline-small{
 	font-size: 18px;
 }
-.h3, h3 {
+.wazuh-h3 {
 	font-size: 18px !important;
 	font-weight: 400 !important;
 }
@@ -444,7 +457,7 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 	border: none !important;
 }
 
-.md-toolbar-tools h1, .md-toolbar-tools h2, .md-toolbar-tools h3 {
+.md-toolbar-tools h1, .md-toolbar-tools .wazuh-h2, .md-toolbar-tools h3 {
     font-size: inherit;
     font-weight: 500;
     text-transform: uppercase;
@@ -591,6 +604,7 @@ md-autocomplete input:-ms-input-placeholder {
 .wazuh-h1 {
 	font-size: 24px !important;
 }
+
 md-chips.md-default-theme .md-chips, md-chips .md-chips {
 	box-shadow: none;
 }
