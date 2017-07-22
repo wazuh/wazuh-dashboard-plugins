@@ -47,7 +47,7 @@ module.exports = function (server, options) {
         var setup_info = {"name" : "Wazuh App", "app-version": packageJSON.version, "revision": packageJSON.revision, "installationDate": new Date().toISOString() };
 		
 		if(type == "install"){
-			elasticRequest.callWithInternalUser('create', { index: ".kibana", type: 'wazuh-setup', id: 1, body: setup_info }).then(
+			elasticRequest.callWithInternalUser('create', { index: ".wazuh", type: 'wazuh-setup', id: 1, body: setup_info }).then(
 				function () {
 					server.log([blueWazuh, 'initialize', 'info'], 'Wazuh set up info inserted');
 				}, function () {
@@ -56,12 +56,22 @@ module.exports = function (server, options) {
 		}
 		
 		if(type == "upgrade"){
-			elasticRequest.callWithInternalUser('update', { index: ".kibana", type: 'wazuh-setup', id: 1, body: {doc: setup_info}}).then(
+			elasticRequest.callWithInternalUser('update', { index: ".wazuh", type: 'wazuh-setup', id: 1, body: {doc: setup_info}}).then(
 				function () {
 					server.log([blueWazuh, 'initialize', 'info'], 'Wazuh set up info updated');
 				}, function () {
 					server.log([blueWazuh, 'initialize', 'error'], 'Could not upgrade Wazuh set up info');
 				});
+		}
+		
+		if(type == "migration"){
+			elasticRequest.callWithInternalUser('create', { index: ".wazuh", type: 'wazuh-setup', id: 1, body: setup_info }).then(
+				function () {
+					server.log([blueWazuh, 'initialize', 'info'], 'Wazuh set up info inserted');
+				}, function (error) {
+					server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh set up info');
+				});
+			
 		}
     };
 
@@ -131,6 +141,32 @@ module.exports = function (server, options) {
             });
     };
 	
+	var importConfigurationFromKibana = function () {
+		elasticRequest.callWithInternalUser('search',{ index: '.kibana', type: 'wazuh-configuration'})
+			.then(function (data) {
+				if (data.hits.total > 0) {
+					var body = '';
+					data.hits.hits.forEach(function (element) {
+						body += '{ "index":  { "_index": ".wazuh", "_type": "wazuh-configuration", "_id": "'+element._id+'" } }\n';
+						body += JSON.stringify(element._source) + "\n";
+					});
+					elasticRequest.callWithInternalUser('bulk',{
+						index: '.wazuh',
+						body: body
+					}).then(function () {
+						elasticRequest.callWithInternalUser('indices.refresh',{ index: ['.wazuh', 'wazuh-configuration'] });
+						server.log([blueWazuh, 'initialize', 'info'], 'wazuh-configuration documents were successfully imported.');
+					}, function (err) {
+						server.log([blueWazuh, 'initialize', 'error'], 'Error importing wazuh-configuration documents into .wazuh index. Bulk request failed.');
+					});
+				}
+				else{
+					server.log([blueWazuh, 'initialize', 'info'], 'No wazuh-configuration documents were found in .kibana index.');
+				}
+			}, function () {
+				server.log([blueWazuh, 'initialize', 'error'], 'wazuh-configuration documents could not be imported from .kibana index to .wazuh index.');
+			});
+	}
 	
 	// Configure Kibana status: Index pattern, default index pattern, default time, import dashboards.
 	var configureKibana = function (type) {
@@ -144,6 +180,10 @@ module.exports = function (server, options) {
 			importObjects();			
 		}
 		
+		if(type == "migration"){
+			importConfigurationFromKibana();
+			importObjects();			
+		}
 		// Save Setup Info
 		saveSetupInfo(type);
 
@@ -152,13 +192,19 @@ module.exports = function (server, options) {
 
 	// Init function. Check for "wazuh-setup" document existance.
     var init = function () {
-        elasticRequest.callWithInternalUser('get', { index: ".kibana", type: "wazuh-setup", id: "1" }).then(
+        elasticRequest.callWithInternalUser('get', { index: ".wazuh", type: "wazuh-setup", id: "1" }).then(
             function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document already exists. Proceed to upgrade.');
 				configure("upgrade");
             }, function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document does not exist. Initializating configuration...');
-                configure("install");
+		elasticRequest.callWithInternalUser('get', { index: ".kibana", type: "wazuh-setup", id: "1" }).then(
+			function (result) {
+				configure("migration");
+			}, function () {
+				configure("install");
+			}
+		);
             }
         );
     };

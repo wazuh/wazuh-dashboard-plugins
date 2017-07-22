@@ -205,7 +205,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     };
 	
 	$scope.getAppInfo = function () {
-		$http.get("/elasticsearch/.kibana/wazuh-setup/1").success(function (data, status) {
+		$http.get("/elasticsearch/.wazuh/wazuh-setup/1").success(function (data, status) {
 			$scope.appInfo = {};
 			$scope.appInfo["app-version"] = data._source["app-version"];
 			$scope.appInfo["installationDate"] = data._source["installationDate"];
