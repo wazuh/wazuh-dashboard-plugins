@@ -154,7 +154,7 @@ module.exports = function (server, options) {
 						index: '.wazuh',
 						body: body
 					}).then(function () {
-						elasticRequest.callWithInternalUser('indices.refresh',{ index: ['.wazuh', 'wazuh-configuration'] });
+						elasticRequest.callWithInternalUser('indices.refresh',{ index: '.wazuh' });
 						server.log([blueWazuh, 'initialize', 'info'], 'wazuh-configuration documents were successfully imported.');
 					}, function (err) {
 						server.log([blueWazuh, 'initialize', 'error'], 'Error importing wazuh-configuration documents into .wazuh index. Bulk request failed.');
