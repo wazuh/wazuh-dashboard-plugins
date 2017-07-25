@@ -19,6 +19,8 @@
 | 5.4.2  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.4.2.zip  |
 | 5.4.3  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.4.3.zip  |
 | 5.5.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.5.0.zip  |
+| 5.5.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0.1_5.5.1.zip  |
+
 ## Upgrade
 
 Remove the App using kibana-plugin tool
