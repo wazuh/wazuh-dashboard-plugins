@@ -120,6 +120,21 @@ module.exports = function (server, options) {
         });
     };
 
+	var getSetupInfo = function (req, reply) {
+		elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-setup' })
+			.then(function (data) {
+				if (data.hits.total == 0) {
+					reply({ 'statusCode': 200, 'data': '' });	
+				}
+				else {
+					reply({ 'statusCode': 200, 'data': data.hits.hits[0]._source });
+				}
+			}, function (error) {
+				console.log(error);
+				reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
+			});
+    };
+	
 	var putWazuhAlertsPattern = function (req, reply) {
 
 		try {
@@ -311,6 +326,17 @@ module.exports = function (server, options) {
         method: 'GET',
         path: '/api/wazuh-elastic/last/{manager}/{field}/{fieldFilter}/{fieldValue}',
         handler: getLastField
+    });
+	
+	/*
+    * GET /api/wazuh-elastic/setup
+    * Return Wazuh Appsetup info
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/setup',
+        handler: getSetupInfo
     });
 	
 	/*
