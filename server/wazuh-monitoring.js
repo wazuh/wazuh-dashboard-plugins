@@ -187,7 +187,7 @@ module.exports = function (server, options) {
 
 	// Get API configuration from elastic and callback to loadCredentials
 	var getConfig = function (callback) {
-		elasticRequest.callWithInternalUser('search',{ index: '.kibana', type: 'wazuh-configuration'})
+		elasticRequest.callWithInternalUser('search',{ index: '.wazuh', type: 'wazuh-configuration'})
 			.then(function (data) {
 				if (data.hits.total > 0) {
 					callback(data.hits);

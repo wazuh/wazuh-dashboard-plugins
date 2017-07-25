@@ -205,11 +205,11 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     };
 	
 	$scope.getAppInfo = function () {
-		$http.get("/elasticsearch/.kibana/wazuh-setup/1").success(function (data, status) {
+		$http.get("/api/wazuh-elastic/setup").success(function (data, status) {
 			$scope.appInfo = {};
-			$scope.appInfo["app-version"] = data._source["app-version"];
-			$scope.appInfo["installationDate"] = data._source["installationDate"];
-			$scope.appInfo["revision"] = data._source["revision"];
+			$scope.appInfo["app-version"] = data.data["app-version"];
+			$scope.appInfo["installationDate"] = data.data["installationDate"];
+			$scope.appInfo["revision"] = data.data["revision"];
 		}).error(function (data, status) {
 			notify.error("Error when loading Wazuh setup info");
 		})
