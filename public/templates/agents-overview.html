@@ -1,7 +1,7 @@
 <md-content ng-if="submenuNavItem == 'overview' && agentInfo" ng-controller="agentsOverviewController">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
 	
 	<div ng-if="tabView == 'panels'">
 		<md-content layout="row">
