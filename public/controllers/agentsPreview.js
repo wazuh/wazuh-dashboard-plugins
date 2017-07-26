@@ -143,7 +143,25 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 							}, printError);
 
 					}
-					break;	
+					break;
+				
+				case "restart":
+					if(confirm("Do you want to restart the selected agents?")){
+						apiReq.request('POST', '/agents/restart', requestData)
+							.then(function (data) {
+								load();
+								if(data.data.ids.length!=0){
+									data.data.ids.forEach(function(id) {
+										notify.error('The agent ' + id + ' was not restarted.');
+									});
+								} 
+								else{
+									notify.info(data.data.msg);
+								}
+							}, printError);
+
+					}
+					break;
 			}
 		}
 		$scope.$parent._bulkOperation="nothing";
