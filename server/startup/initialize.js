@@ -132,7 +132,7 @@ module.exports = function (server, options) {
 	var setDefaultKibanaSettings = function () {
         server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default values: Index pattern, time picker and metaFields...');
 			
-        uiSettings.setMany(req,{'defaultIndex':'wazuh-alerts-*', 'timepicker:timeDefaults':'{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}','metaFields':[]})
+        uiSettings.setMany(req,{'defaultIndex':'wazuh-alerts-*', 'timepicker:timeDefaults':'{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}','metaFields':['_source']})
             .then(function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Kibana default values set');
             }).catch(function (data) {

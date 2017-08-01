@@ -241,7 +241,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			}else{
 				gParameter = $route.current.params._g;
 			}
-			if(gParameter != "()" && gParametercurrentTimeFilter.time && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+			if(gParameter != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
 				$scope.timeGTE = currentTimeFilter.time.from;
 				$scope.timeLT = currentTimeFilter.time.to;
 				

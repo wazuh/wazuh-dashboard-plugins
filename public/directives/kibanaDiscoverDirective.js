@@ -208,15 +208,15 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
                     $state.query = ($scope.stateQuery ? $scope.stateQuery : '*');
 
                     function getStateDefaults() {
-                        return {
-                            query: $scope.disFilter ? $scope.disFilter : '',
-                            sort: disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern),
-                            columns: disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns'),
-                            index: disDecoded.index ? disDecoded.index : $scope.indexPattern.id,
-                            interval: 'auto',
-                            filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
-                        };
-                    }
+    return {
+      query: $scope.searchSource.get('query') || '',
+      sort: getSort.array(savedSearch.sort, $scope.indexPattern),
+      columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
+      index: $scope.indexPattern.id,
+      interval: 'auto',
+      filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
+    };
+  }
 					
                     $state.index = $scope.indexPattern.id;
                     $state.sort = getSort.array($state.sort, $scope.indexPattern);

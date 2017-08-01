@@ -3,6 +3,27 @@ body{
    width:100%;
 }
 
+.sidebar-container {
+	font-family: "Open Sans", Helvetica, Arial, sans-serif
+}
+kbn-vis-value table{
+	table-layout: fixed;
+}
+
+kbn-vis-value div{
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.filter-bar {
+	background-color: #e4e4e4 !important;
+}
+
+.fa-search-plus, .fa-search-minus {
+	font-size: initial !important;
+}
+
 .md-input-margin {
 	margin:18px 20px 0 0
 }
@@ -12,8 +33,12 @@ body{
 }
 
 .wazuh-discover-searchbar{
-	margin-top: -50px !important;
+	margin-top: -60px !important;
 	z-index:9999;
+}
+
+.wazuh-discover-searchbar h1{
+	padding-bottom: 10px !important;
 }
 
 .wazuh-searchbar navbar{
