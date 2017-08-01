@@ -21,7 +21,7 @@
 		</kbn-disfull>
 	</md-content>
 	
-    <div flex ng-if="tabView == 'panels' && results" layout="column">
+    <div flex ng-if="tabView == 'panels' && results && !load" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
             <md-content layout="row">
                 <md-card flex="50">

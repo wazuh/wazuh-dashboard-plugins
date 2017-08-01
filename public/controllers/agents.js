@@ -147,9 +147,10 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
     };
 	
     $scope.applyAgent = function (agent) {
+		$scope.load = true;
         if (agent) {
 			if($scope.submenuNavItem == 'preview'){
-				$scope.submenuNavItem = 'overview';		
+				$scope.submenuNavItem = 'overview';
 				$location.search('tab', $scope.submenuNavItem);
 			}
 			$scope.agentInfo = {};
