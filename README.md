@@ -39,12 +39,6 @@ Install the App
 * [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html)
 * [Screenshots](https://documentation.wazuh.com/current/index.html#example-screenshots)
 
-## Branches
-
-* `stable` branch on correspond to the last stable version.
-* `master` branch contains the latest code, be aware of possible bugs on this branch.
-* `development` branch includes all the new features we're adding and testing.
-
 ## Contribute
 
 If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/wazuh), by sending an email to [wazuh+subscribe@googlegroups.com](mailto:wazuh+subscribe@googlegroups.com), to ask questions and participate in discussions.
