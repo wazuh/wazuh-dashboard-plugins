@@ -27,19 +27,19 @@
 			<div flex="10" layout="column" class="no-legend">
 				<md-card>
 					<md-card-content>
-						<kbn-vis vis-height="72px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Added),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 554'>
+						<kbn-vis vis-height="105px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Added),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 554'>
 						</kbn-vis>
 					</md-card-content>
 				</md-card>
 				<md-card>
 					<md-card-content>
-						<kbn-vis vis-height="72px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Modified'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555)'>
+						<kbn-vis vis-height="105px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Modified'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555)'>
 						</kbn-vis>
 					</md-card-content>
 				</md-card>
 				<md-card>
 					<md-card-content>
-						<kbn-vis vis-height="72px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22was%20deleted%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Deleted),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 553'>
+						<kbn-vis vis-height="104px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22was%20deleted%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Deleted),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 553'>
 						</kbn-vis>
 					</md-card-content>
 				</md-card>
@@ -50,7 +50,7 @@
 				<md-card>
 					<md-card-content>
 						<span class="md-headline">Events over time</span>
-						<kbn-vis vis-height="280px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:8),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:step-after,legendPosition:right,mode:stacked,orderBucketsBySum:!t,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'FIM%20Alerts%20over%20time',type:area))"
+						<kbn-vis vis-height="380px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:8),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:step-after,legendPosition:right,mode:stacked,orderBucketsBySum:!t,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'FIM%20Alerts%20over%20time',type:area))"
 					vis-filter='rule.groups:"syscheck"'>
 					</md-card-content>
 				</md-card>
@@ -61,14 +61,14 @@
 				<md-card>
 					<md-card-content>
 						<span class="md-headline">Top user owners</span>
-						<kbn-vis vis-height="100px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.uname_after,order:desc,orderBy:'1',size:3),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
+						<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.uname_after,order:desc,orderBy:'1',size:3),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
 						vis-filter='rule.groups:"syscheck"'>
 					</md-card-content>
 				</md-card>
 				<md-card>
 					<md-card-content>
 						<span class="md-headline">Top group owners</span>
-						<kbn-vis vis-height="100px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.gname_after,order:desc,orderBy:'1',size:3),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))" vis-filter='rule.groups:"syscheck"'>
+						<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.gname_after,order:desc,orderBy:'1',size:3),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))" vis-filter='rule.groups:"syscheck"'>
 					</md-card-content>
 				</md-card>
 
