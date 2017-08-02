@@ -78,7 +78,7 @@
 							</div>
 							<div layout="row" class="sideNavBox" flex="10">
 								<md-input-container flex class="md-whiteframe-z1">
-									<md-select id="eventBox" ng-model="$parent._osVersion" ng-change="agentOSFilter($parent._osVersion)" aria-label="Filter by operative system">
+									<md-select id="eventBox" ng-model="$parent._osVersion" ng-change="agentOSVersionFilter($parent._osVersion)" aria-label="Filter by operative system">
 										<md-option value="all">All OS versions</md-option>
                                         <md-option ng-repeat='version in osVersions' value="{{version}}">
                                             {{version}}

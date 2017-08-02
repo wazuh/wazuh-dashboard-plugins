@@ -97,6 +97,9 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
     };
     
     $scope.agentOSPlatformFilter = function (osName) {
+		$scope.$parent._osVersion='all';
+		DataFactory.filters.unset(objectsArray['/agents'], 'os.version');
+		
         if (osName == 'all') {
             DataFactory.filters.unset(objectsArray['/agents'], 'os.platform');
         } else {
@@ -120,6 +123,19 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		
     };
 	
+	$scope.agentOSVersionFilter = function (osVersion) {
+        if (osVersion == 'all') {
+            DataFactory.filters.unset(objectsArray['/agents'], 'os.version');
+        } else {
+            DataFactory.filters.set(objectsArray['/agents'], 'os.version', osVersion);
+        }
+		DataFactory.setOffset(objectsArray['/agents'],0);
+		DataFactory.get(objectsArray['/agents']).then(function (data) { 
+			$scope.agents.items = data.data.items;
+		});
+		
+    };
+
 	function bulkOperation(operation){
 		var selectedAgents = [];
 		angular.forEach($scope.agents.items, function(agent){
@@ -260,6 +276,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
 				DataFactory.filters.register(objectsArray['/agents'], 'status', 'string');
                 DataFactory.filters.register(objectsArray['/agents'], 'os.platform', 'string');
+                DataFactory.filters.register(objectsArray['/agents'], 'os.version', 'string');
 				DataFactory.filters.register(objectsArray['/agents'], 'filter-sort', 'string');
                 DataFactory.get(objectsArray['/agents'])
                     .then(function (data) {
