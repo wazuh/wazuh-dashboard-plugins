@@ -1,3 +1,5 @@
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
 <div ng-if="submenuNavItem == 'preview'">
 	<md-content flex class="agentsPreview" ng-controller="agentsPreviewController" layout="column" style="height: 100%;" class="md-padding" layout-align="start space-around">
 			<div infinite-scroll-module='agents.nextPage()' infinite-scroll-disabled='agents.busy' infinite-scroll-distance='0' style="padding: 0">
@@ -85,17 +87,6 @@
 								</md-input-container>
 							</div>
 						</div>
-						<div layout="row" layout-align="start stretch">
-							<div class="top-bulk-action" layout="row" class="sideNavBox" flex="20">
-								<md-input-container flex class="md-whiteframe-z1 md-input-margin">
-									<md-select id="eventBox" ng-model="$parent._bulkOperation" ng-change="bulkOperation($parent._bulkOperation)" aria-label="Filter by status">
-										<md-option value="nothing">Action</md-option>
-										<md-option value="restart">Restart selected</md-option>
-										<md-option value="delete">Delete selected</md-option>
-									</md-select>
-								</md-input-container>
-							</div>
-						</div>
 						<div>
 							<md-toolbar layout="row">
 								<div class="md-toolbar-tools">
@@ -133,20 +124,52 @@
 						</md-list-item>
 					</md-list>
 					<md-divider></md-divider>
-										<div flex layout="column" layout-align="space-between stretch">
-
-					<div layout="row" layout-align="start stretch">
-							<div layout="row" class="sideNavBox" flex="20">
-								<md-input-container flex class="md-whiteframe-z1 md-input-margin">
-									<md-select id="eventBox" ng-model="$parent._bulkOperation" ng-change="bulkOperation($parent._bulkOperation)" aria-label="Filter by status">
-										<md-option value="nothing">Action</md-option>
-										<md-option value="restart">Restart selected</md-option>
-										<md-option value="delete">Delete selected</md-option>
-									</md-select>
+			</div>
+			<div class="agent-buttons">
+				<md-button class="md-fab add-agent-icon" ng-click="showNewAgentDialog($event)"  >
+					<md-icon md-font-library="material-icons">add</md-icon>
+				</md-button>
+				
+				<md-button class="md-fab restart-agent-icon" ng-click="showRestartConfirm($event)"  >
+					<md-icon md-font-library="material-icons">refresh</md-icon>
+				</md-button>
+				
+				<md-button class="md-fab delete-agent-icon" ng-click="showDeletePrompt($event)"  >
+					<md-icon md-font-library="material-icons">delete</md-icon>
+				</md-button>
+			</div>
+			<div style="visibility: hidden">
+				<div class="md-dialog-container" id="newAgentDialog">
+					<div ng-show="newAgentKey != ''">
+						<md-dialog class="new-agent-key" layout-padding>
+							<h3 class="agent-key">Agent key</h3>
+								<p class="agent-key">{{newAgentKey}}</p>
+								<md-button ng-click="hidePrerenderedDialog()">Close</md-button>
+						</md-dialog>
+					</div>
+					<div ng-show="newAgentKey == ''">
+						<md-dialog layout-padding>
+							<h3>New agent</h3>
+							<form name="newAgentForm">
+								  <div layout="row">
+								<md-input-container class="md-block" flex-gt-sm>
+									<label>Name</label>
+									<input required name="name" ng-model="newAgent.name" />
 								</md-input-container>
-							</div>
+								<md-input-container class="md-block" flex-gt-sm>
+									<label>IP</label>
+									<input required name="ip" ng-model="newAgent.ip" />
+								</md-input-container>
+								</div>
+								<section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+									<md-button ng-click="saveNewAgent()">Add</md-button>
+									<md-button ng-click="hidePrerenderedDialog()">Close</md-button>
+								</section>
+							</form>
+						</md-dialog>
 					</div>
-					</div>
+					
+				</div>
 			</div>
 			<md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="agents.busy"></md-progress-linear></md-content>
 	</md-content>

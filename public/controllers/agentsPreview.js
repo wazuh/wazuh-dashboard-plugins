@@ -29,7 +29,7 @@ app.factory('Agents', function($http, DataFactory) {
   return Agents;
 });
 
-app.controller('agentsPreviewController', function ($scope, DataFactory, Notifier, errlog, genericReq, Agents, apiReq) {
+app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFactory, Notifier, errlog, genericReq, Agents, apiReq) {
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';
@@ -39,6 +39,11 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 	$scope.osPlatforms = [];
 	$scope.osVersions = new Set();
 	$scope.agentsStatus = false;
+	$scope.newAgent = {
+		'name': '', 'ip': ''
+	};
+	$scope.newAgentKey = '';
+	
 	const notify = new Notifier({location: 'Agents - Preview'});
 	
     var objectsArray = [];
@@ -115,7 +120,7 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 		
     };
 	
-	$scope.bulkOperation = function (operation){
+	function bulkOperation(operation){
 		var selectedAgents = [];
 		angular.forEach($scope.agents.items, function(agent){
 			if(agent.selected){
@@ -128,39 +133,33 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 		if(selectedAgents.length > 0){
 			switch (operation){
 				case "delete":
-					if(confirm("Do you want to delete the selected agents?")){
-						apiReq.request('DELETE', '/agents', requestData)
-							.then(function (data) {
-								load();
-								if(data.data.ids.length!=0){
-									data.data.ids.forEach(function(id) {
-										notify.error('The agent ' + id + ' was not deleted.');
-									});
-								} 
-								else{
-									notify.info(data.data.msg);
-								}
-							}, printError);
-
-					}
+					apiReq.request('DELETE', '/agents', requestData)
+						.then(function (data) {
+							if(data.data.ids.length!=0){
+								data.data.ids.forEach(function(id) {
+									notify.error('The agent ' + id + ' was not deleted.');
+								});
+							} 
+							else{
+								notify.info(data.data.msg);
+							}
+							load();
+						}, printError);
 					break;
-				
-				case "restart":
-					if(confirm("Do you want to restart the selected agents?")){
-						apiReq.request('POST', '/agents/restart', requestData)
-							.then(function (data) {
-								load();
-								if(data.data.ids.length!=0){
-									data.data.ids.forEach(function(id) {
-										notify.error('The agent ' + id + ' was not restarted.');
-									});
-								} 
-								else{
-									notify.info(data.data.msg);
-								}
-							}, printError);
 
-					}
+				case "restart":
+					apiReq.request('POST', '/agents/restart', requestData)
+						.then(function (data) {
+							if(data.data.ids.length!=0){
+								data.data.ids.forEach(function(id) {
+								notify.error('The agent ' + id + ' was not restarted.');
+								});
+							} 
+							else{
+								notify.info(data.data.msg);
+							}
+							load();
+						}, printError);
 					break;
 			}
 		}
@@ -173,7 +172,88 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 		});
 	}
 
+	$scope.saveNewAgent = function (){
+		if($scope.newAgent.name != '') {
+			var requestData = {
+				'name': $scope.newAgent.name,
+				'ip': $scope.newAgent.ip == '' ? 'any' : $scope.newAgent.ip
+			}
+			apiReq.request('POST', '/agents', requestData)
+				.then(function (data) {
+					if(data.error=='0'){
+						notify.info('The agent was added successfully.');
+						apiReq.request('GET', '/agents/' + data.data + '/key', {})
+							.then(function(data) {
+								$scope.newAgentKey = data.data;
+								load();
+							});
+					}
+					else{
+						$scope.hidePrerenderedDialog();
+						notify.error('There was an error adding the new agent.');
+					}
+				}, 
+				function(error){
+					printError(error);
+					$scope.hidePrerenderedDialog();
+				});
+		}
+		else{
+			$scope.hidePrerenderedDialog();
+			notify.error('The agent name is mandatory.');
+		}
+	}
+	
+	$scope.showNewAgentDialog = function(ev) {
+		$mdDialog.show({
+			contentElement: '#newAgentDialog',
+			parent: angular.element(document.body),
+			targetEvent: ev,
+			clickOutsideToClose: true
+		});
+	};
+	
+	$scope.showDeletePrompt = function(ev) {
+		// Appending dialog to document.body to cover sidenav in docs app
+		var confirm = $mdDialog.prompt()
+			.title('Remove selected agents')
+			.textContent('Write REMOVE to remove all the selected agents. CAUTION! This action can not be undone.')
+			.targetEvent(ev)
+			.ok('Remove')
+			.cancel('Close');
+
+		$mdDialog.show(confirm).then(function(result) {
+			if(result==='REMOVE'){
+				bulkOperation('delete');
+			};
+		});
+	};
+	
+	$scope.showRestartConfirm = function(ev) {
+		// Appending dialog to document.body to cover sidenav in docs app
+		var confirm = $mdDialog.confirm()
+			.title('Restart agents')
+			.textContent('Confirm to restart all the selected agents.')
+			.targetEvent(ev)
+			.ok('Restart')
+			.cancel('Close');
+
+		$mdDialog.show(confirm).then(function() {
+			bulkOperation('restart');
+		});
+	};
+	
+	$scope.hidePrerenderedDialog = function(ev) {
+		$scope.newAgentKey = '';
+		$mdDialog.hide('#newAgentDialog');
+	};
+	
     var load = function () {
+		$scope.newAgent = {
+			'name': '', 'ip': ''
+		};
+		$scope.agentsStatus = false;
+		
         DataFactory.initialize('get', '/agents', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;

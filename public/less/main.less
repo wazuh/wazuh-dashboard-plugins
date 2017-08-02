@@ -3,12 +3,77 @@ body{
    width:100%;
 }
 
+.md-button.md-fab {
+	line-height: 5.6rem;
+	min-width: 0;
+	width: 5.6rem;
+	height: 5.6rem;
+	border-radius: 50%;
+}
+
+.md-button.md-fab md-icon{
+	color: white;
+}
+
+div.agent-buttons {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	margin: 30px;
+	z-index: 5;
+}
+.md-button.add-agent-icon {
+position:relative;
+	margin: 0 10px 20px 0;
+}
+
+.md-button.delete-agent-icon {
+	background-color: #e8488b;
+	position: relative;
+	margin: 0 30px 20px 0;
+}
+
+.md-button.restart-agent-icon {
+	background-color: #7e3cd3;
+	position: relative;
+	margin: 0 10px 20px 0;
+}
+
+.new-agent-key{
+	max-width: 100% !important;
+}
+
 .top-bulk-action {
 	margin-bottom:17px
 }
 
+.sidebar-container {
+	font-family: "Open Sans", Helvetica, Arial, sans-serif
+}
+kbn-vis-value table{
+	table-layout: fixed;
+}
+
+kbn-vis-value div{
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.filter-bar {
+	background-color: #e4e4e4 !important;
+}
+
+.fa-search-plus, .fa-search-minus {
+	font-size: initial !important;
+}
+
 .md-input-margin {
 	margin:18px 20px 0 0
+}
+
+.md-input-margin {
+	margin: 18px 20px 0 0
 }
 
 .vis-editor-content text, h2.index-pattern-label{
@@ -16,8 +81,12 @@ body{
 }
 
 .wazuh-discover-searchbar{
-	margin-top: -50px !important;
+	margin-top: -60px !important;
 	z-index:9999;
+}
+
+.wazuh-discover-searchbar h1{
+	padding-bottom: 10px !important;
 }
 
 .wazuh-searchbar navbar{

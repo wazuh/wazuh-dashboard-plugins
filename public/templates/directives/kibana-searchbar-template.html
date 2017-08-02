@@ -6,7 +6,7 @@
  
   <navbar name="discover-search">
     <form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
-      <div class="typeahead" kbn-typeahead="discover">
+      <div class="typeahead" kbn-typeahead="discover" on-select="">
         <div class="input-group"
           ng-class="discoverSearch.$invalid ? 'has-error' : ''">
           <input

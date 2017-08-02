@@ -19,29 +19,52 @@
 	  
       <!-- Search. -->
       <navbar name="discover-search">
-		<form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
-		  <div class="typeahead" kbn-typeahead="discover">
-			<div class="input-group"
-			  ng-class="discoverSearch.$invalid ? 'has-error' : ''">
-			  <input
-				parse-query
-				input-focus
-				kbn-typeahead-input
-				ng-model="stateQuery"
-				placeholder="Search..."
-				aria-label="Search input"
-				type="text"
-				class="form-control">
-			  <button type="submit"
-				ng-disabled="discoverSearch.$invalid"
-				aria-label="Search">
-				<span aria-hidden="true" class="fa fa-search"></span></button>
-			</div>
-			<kbn-typeahead-items></kbn-typeahead-items>
-		  </div>
-		</form>
-		<div class="button-group" role="toolbar"></div>
+		<form
+			class="fullWidth"
+			role="form"
+			name="discoverSearch"
+			ng-submit="fetch()"
+		>
+        <div class="typeahead" kbn-typeahead="discover" on-select="">
+          <div class="kuiLocalSearch">
+            <div class="kuiLocalSearchAssistedInput">
+              <input
+                parse-query
+                input-focus
+                kbn-typeahead-input
+                ng-model="stateQuery"
+                placeholder="Search... (e.g. status:200 AND extension:PHP)"
+                aria-label="Search input"
+                type="text"
+                class="kuiLocalSearchInput kuiLocalSearchInput--lucene"
+                ng-class="{'kuiLocalSearchInput-isInvalid': discoverSearch.$invalid}"
+              >
+              <div class="kuiLocalSearchAssistedInput__assistance">
+                <p class="kuiText">
+                  <a
+                    class="kuiLink"
+                    ng-href="{{queryDocLinks.luceneQuerySyntax}}"
+                    target="_blank"
+                  >
+                    Uses lucene query syntax
+                  </a>
+                </p>
+              </div>
+            </div>
+            <button
+              type="submit"
+              aria-label="Search"
+              class="kuiLocalSearchButton"
+              ng-disabled="discoverSearch.$invalid"
+            >
+              <span class="kuiIcon fa-search" aria-hidden="true"></span>
+            </button>
+          </div>
+          <kbn-typeahead-items></kbn-typeahead-items>
+        </div>
+      </form>
 	  </navbar>
+	  
     </div>
 
   <div class="container-fluid" role="main">
@@ -65,7 +88,7 @@
           state="state"
           on-add-field="addColumn"
           on-add-filter="filterQuery"
-          on-remove-field="removeColumn"
+          on-remove-field="removeColumn">
         </disc-field-chooser>
       </div>
 
