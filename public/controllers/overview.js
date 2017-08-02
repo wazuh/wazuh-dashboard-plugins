@@ -104,7 +104,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	
 	// Watchers
 	$scope.$watch('tabView', function() {
-		$location.search('view', $scope.tabView);		
+		$location.search('view', $scope.tabView);
 	});
 	
 	// Watch for timefilter changes
