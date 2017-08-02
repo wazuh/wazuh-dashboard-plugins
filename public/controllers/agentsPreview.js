@@ -38,6 +38,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
 	$scope.osPlatforms = [];
 	$scope.osVersions = new Set();
+	$scope.agentsStatus = false;
 	$scope.newAgent = {
 		'name': '', 'ip': ''
 	};
@@ -118,6 +119,43 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		});
 		
     };
+	
+	function bulkOperation(operation){
+		var selectedAgents = [];
+		angular.forEach($scope.agents.items, function(agent){
+			if(agent.selected){
+				selectedAgents.push(agent.id);
+			}
+		});
+		var requestData = {
+			'ids': selectedAgents
+		}
+		if(selectedAgents.length > 0){
+			switch (operation){
+				case "delete":
+					apiReq.request('DELETE', '/agents', requestData)
+						.then(function (data) {
+							load();
+							if(data.data.ids.length!=0){
+								data.data.ids.forEach(function(id) {
+									notify.error('The agent ' + id + ' was not deleted.');
+								});
+							} 
+							else{
+								notify.info(data.data.msg);
+							}
+						}, printError);
+					break;	
+			}
+		}
+		$scope.$parent._bulkOperation="nothing";
+	}
+	
+	$scope.changeAgentsStatus = function (){
+		angular.forEach($scope.agents.items, function(agent){
+			agent.selected = $scope.agentsStatus;
+		});
+	}
 
 	$scope.saveNewAgent = function (){
 		if($scope.newAgent.name != '') {
@@ -145,12 +183,28 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		}
 	}
 	
-	$scope.showPrerenderedDialog = function(ev) {
+	$scope.showNewAgentDialog = function(ev) {
 		$mdDialog.show({
 			contentElement: '#newAgentDialog',
 			parent: angular.element(document.body),
 			targetEvent: ev,
 			clickOutsideToClose: true
+		});
+	};
+	
+	$scope.showDeletePrompt = function(ev) {
+		// Appending dialog to document.body to cover sidenav in docs app
+		var confirm = $mdDialog.prompt()
+			.title('Remove selected agents')
+			.textContent('Write REMOVE to remove all the selected agents. CAUTION! This action can not be undone.')
+			.targetEvent(ev)
+			.ok('Remove')
+			.cancel('Close');
+
+		$mdDialog.show(confirm).then(function(result) {
+			if(result==='REMOVE'){
+				bulkOperation('delete');
+			};
 		});
 	};
 	

@@ -14,6 +14,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	$scope._status = 'all';
     $scope._osPlatform = 'all';
 	$scope._osVersion = 'all';
+	$scope._bulkOperation = 'nothing';
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.results = false;
