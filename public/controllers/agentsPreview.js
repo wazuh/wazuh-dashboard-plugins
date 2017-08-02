@@ -120,7 +120,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		
     };
 	
-	$scope.bulkOperation = function (operation){
+	function bulkOperation(operation){
 		var selectedAgents = [];
 		angular.forEach($scope.agents.items, function(agent){
 			if(agent.selected){
@@ -133,21 +133,18 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		if(selectedAgents.length > 0){
 			switch (operation){
 				case "delete":
-					if(confirm("Do you want to delete the selected agents?")){
-						apiReq.request('DELETE', '/agents', requestData)
-							.then(function (data) {
-								load();
-								if(data.data.ids.length!=0){
-									data.data.ids.forEach(function(id) {
-										notify.error('The agent ' + id + ' was not deleted.');
-									});
-								} 
-								else{
-									notify.info(data.data.msg);
-								}
-							}, printError);
-
-					}
+					apiReq.request('DELETE', '/agents', requestData)
+						.then(function (data) {
+							load();
+							if(data.data.ids.length!=0){
+								data.data.ids.forEach(function(id) {
+									notify.error('The agent ' + id + ' was not deleted.');
+								});
+							} 
+							else{
+								notify.info(data.data.msg);
+							}
+						}, printError);
 					break;	
 			}
 		}
@@ -186,12 +183,28 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		}
 	}
 	
-	$scope.showPrerenderedDialog = function(ev) {
+	$scope.showNewAgentDialog = function(ev) {
 		$mdDialog.show({
 			contentElement: '#newAgentDialog',
 			parent: angular.element(document.body),
 			targetEvent: ev,
 			clickOutsideToClose: true
+		});
+	};
+	
+	$scope.showDeletePrompt = function(ev) {
+		// Appending dialog to document.body to cover sidenav in docs app
+		var confirm = $mdDialog.prompt()
+			.title('Remove selected agents')
+			.textContent('Write REMOVE to remove all the selected agents. CAUTION! This action can not be undone.')
+			.targetEvent(ev)
+			.ok('Remove')
+			.cancel('Close');
+
+		$mdDialog.show(confirm).then(function(result) {
+			if(result==='REMOVE'){
+				bulkOperation('delete');
+			};
 		});
 	};
 	
