@@ -38,7 +38,6 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
 	$scope.osPlatforms = [];
 	$scope.osVersions = new Set();
-	$scope.isAddingAgent = false;
 	$scope.newAgent = {
 		'name': '', 'ip': ''
 	};
@@ -120,10 +119,6 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		
     };
 
-	$scope.addNewAgent = function (){
-		$scope.isAddingAgent = !$scope.isAddingAgent;
-	}
-	
 	$scope.saveNewAgent = function (){
 		if($scope.newAgent.name != '') {
 			var requestData = {
@@ -165,7 +160,6 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 	};
 	
     var load = function () {
-		$scope.isAddingAgent = false;
 		$scope.newAgent = {
 			'name': '', 'ip': ''
 		};
