@@ -16,7 +16,7 @@ require('ui/modules').get('app/wazuh', [])
                     'details': details
                 }
 
-                $http.post('/api/wazuh-api/errlog', requestData)
+                $http.post(chrome.addBasePath('/api/wazuh-api/errlog'), requestData)
                     .success(function () {
                         defered.resolve();
                     }).error(function (data) {

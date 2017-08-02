@@ -3,8 +3,94 @@ body{
    width:100%;
 }
 
+.md-button.md-fab {
+	line-height: 5.6rem;
+	min-width: 0;
+	width: 5.6rem;
+	height: 5.6rem;
+	border-radius: 50%;
+}
+
+.md-button.md-fab md-icon{
+	color: white;
+}
+
+div.agent-buttons {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	margin: 30px;
+	z-index: 5;
+}
+.md-button.add-agent-icon {
+position:relative;
+	margin: 0 10px 20px 0;
+}
+
+.md-button.delete-agent-icon {
+	background-color: #e8488b;
+	position: relative;
+	margin: 0 30px 20px 0;
+}
+
+.md-button.restart-agent-icon {
+	background-color: #7e3cd3;
+	position: relative;
+	margin: 0 10px 20px 0;
+}
+
+.new-agent-key{
+	max-width: 100% !important;
+}
+
+.top-bulk-action {
+	margin-bottom:17px
+}
+
+.sidebar-container {
+	font-family: "Open Sans", Helvetica, Arial, sans-serif
+}
+kbn-vis-value table{
+	table-layout: fixed;
+}
+
+kbn-vis-value div{
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.filter-bar {
+	background-color: #e4e4e4 !important;
+}
+
+.fa-search-plus, .fa-search-minus {
+	font-size: initial !important;
+}
+
 .md-input-margin {
 	margin:18px 20px 0 0
+}
+
+.md-input-margin {
+	margin: 18px 20px 0 0
+}
+
+.vis-editor-content text, h2.index-pattern-label{
+	font-weight: normal !important;
+}
+
+.wazuh-discover-searchbar{
+	margin-top: -60px !important;
+	z-index:9999;
+}
+
+.wazuh-discover-searchbar h1{
+	padding-bottom: 10px !important;
+}
+
+.wazuh-searchbar navbar{
+	margin-top: -40px !important;
 }
 
 .no-legend visualize-legend{
@@ -54,7 +140,7 @@ span.md-headline {
 .md-headline-small{
 	font-size: 18px;
 }
-.h3, h3 {
+.wazuh-h3 {
 	font-size: 18px !important;
 	font-weight: 400 !important;
 }
@@ -448,7 +534,7 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 	border: none !important;
 }
 
-.md-toolbar-tools h1, .md-toolbar-tools h2, .md-toolbar-tools h3 {
+.md-toolbar-tools h1, .md-toolbar-tools .wazuh-h2, .md-toolbar-tools h3 {
     font-size: inherit;
     font-weight: 500;
     text-transform: uppercase;
@@ -592,9 +678,10 @@ md-autocomplete input:-ms-input-placeholder {
 	font-weight: normal;
 }
 
-.h1, h1 {
+.wazuh-h1 {
 	font-size: 24px !important;
 }
+
 md-chips.md-default-theme .md-chips, md-chips .md-chips {
 	box-shadow: none;
 }
@@ -812,10 +899,6 @@ md-select-menu.md-default-theme md-content md-option:not([disabled]):focus, md-s
 }
 svg:not(:root) {
 	overflow: visible !important;
-}
-.localBreadcrumbs {
-    margin-left: 13px;
-    font-weight: bold;
 }
 
 md-tooltip.md-default-theme, md-tooltip {

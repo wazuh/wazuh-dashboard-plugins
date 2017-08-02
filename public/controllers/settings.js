@@ -153,7 +153,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.check(tmpData).then(function (data) {
             tmpData.manager = data;
             var index = $scope.apiEntries.indexOf(item);
-            genericReq.request('PUT', '/api/wazuh-api/updateApiHostname/' + $scope.apiEntries[index]._id).then(function (data) {
+            genericReq.request('PUT', '/api/wazuh-api/updateApiHostname/' + $scope.apiEntries[index]._id, {"manager":tmpData.manager}).then(function (data) {
 				$scope.apiEntries[index]._source.manager = tmpData.manager;
             });
             notify.info("Connection success");
@@ -210,14 +210,14 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     };
 	
 	$scope.getAppInfo = function () {
-            genericReq.request('GET', '/elasticsearch/.kibana/wazuh-setup/1').then(function (data, status) {
+		$http.get("/api/wazuh-elastic/setup").success(function (data, status) {
 			$scope.appInfo = {};
-			$scope.appInfo["app-version"] = data._source["app-version"];
-			$scope.appInfo["installationDate"] = data._source["installationDate"];
-			$scope.appInfo["revision"] = data._source["revision"];
-		}, function (data, status) {
-			notify.error("Error when loading Wazuh setup info" + basePath);
-		});
+			$scope.appInfo["app-version"] = data.data["app-version"];
+			$scope.appInfo["installationDate"] = data.data["installationDate"];
+			$scope.appInfo["revision"] = data.data["revision"];
+		}).error(function (data, status) {
+			notify.error("Error when loading Wazuh setup info");
+		})
 	}
 	
 	// Loading data
