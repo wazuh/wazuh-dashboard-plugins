@@ -249,7 +249,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		// Appending dialog to document.body to cover sidenav in docs app
 		var confirm = $mdDialog.confirm()
 			.title('Restart agents')
-			.textContent('Confirm to restart all the selected agents.')
+			.textContent('Confirm restarting all the selected agents.')
 			.targetEvent(ev)
 			.ok('Restart')
 			.cancel('Close');
