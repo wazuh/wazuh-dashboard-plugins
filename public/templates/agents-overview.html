@@ -2,8 +2,8 @@
 
 	<!-- Kibana search bar -->
 	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
-	
-	<div ng-if="tabView == 'panels'">
+	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
+	<div ng-show='hideRing(7) && results && !loading' ng-if="tabView == 'panels'">
 		<md-content class="no-legend" layout="row">
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
@@ -70,7 +70,7 @@
 	</div>
 	
 	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels'">
+	<md-content id="prueba" flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(7)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				No results for selected time interval
@@ -88,7 +88,7 @@
 
 
 	<!-- View: Panels -->
-	<div ng-if="tabView == 'panels' && results && !load">
+	<div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !load">
 		<md-content layout="row">
 				<md-card flex="33">
 					<md-card-title>

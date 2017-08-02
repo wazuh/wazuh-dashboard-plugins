@@ -2,9 +2,10 @@
 
 	<!-- Kibana search bar -->
 	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
+    <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(14)'><div></div></div>
 	
 	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels'">
+	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(14)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				No results for selected time interval
@@ -21,7 +22,7 @@
 	</md-content> 
 	
 	<!-- View: Panels -->
-	<div ng-if="tabView == 'panels' && results">
+	<div ng-show="hideRing(14) && results && !loading" ng-if="tabView == 'panels'">
 		<md-content class="no-legend" layout="row" layout-align="center stretch">
 			<md-card flex="20" layout="column">
 					<md-card-content style="text-align: center;">

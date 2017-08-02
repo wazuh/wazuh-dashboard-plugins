@@ -112,6 +112,11 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.check(tmpData).then(function (data) {
 			// API Check correct, get Manager name
 			tmpData.manager = data;
+            
+            if(activeStatus){
+                appState.setDefaultManager(tmpData.manager);
+            }
+            
 			tmpData.extensions = {"oscap": true, "audit": true, "pci": true};
 			// Insert new API entry
 			genericReq.request('PUT', '/api/wazuh-api/settings', tmpData).then(function (data) {
@@ -125,7 +130,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 				$scope.formData.port = "";
 				// Fetch agents on demand
                 genericReq.request('GET', '/api/wazuh-api/fetchAgents').then(function(data){} , function (data, status) {
-					notify.error("Error fetching agents");
+                    notify.error("Error fetching agents");
 				});
 			
 			}, function (data, status) {
@@ -225,6 +230,3 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	$scope.getAppInfo();
 
 });
-
-
-

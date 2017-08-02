@@ -1,4 +1,3 @@
-import chrome from 'ui/chrome';
 import rison from 'rison-node';
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
@@ -17,7 +16,13 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	$scope._bulkOperation = 'nothing';
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
-	$scope.results = false;
+	$scope.results = true;
+	$scope.loading = true;
+    $scope.hideRing = function(items){ 
+        if($(".vis-editor-content" ).length >= items)
+            return true;
+        return false;
+    }
 	var objectsArray = [];
 	const notify = new Notifier({location: 'Agents'});
 	
@@ -44,16 +49,17 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	
 	// Switch tab: Refresh or change location and check for present data
 	$scope.switchTab = function (tab) {
+		$scope.loading=true;
 		// Detecting refresh or location
 		if($scope.submenuNavItem != tab){
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
 			if($scope.submenuNavItem != "preview"){
-				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;	$scope.loading = false;}, function() { $scope.results = false; $scope.loading = false;});
 			}
 		}else{
 			$rootScope.$broadcast('fetchVisualization');
-			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data; $scope.loading = false;}, function() { $scope.results = false; $scope.loading = false;});
 		}
 	};
 	
@@ -169,7 +175,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				$scope.search = data.data.name;
 				$location.search('id', $scope._agent.id);
 				$scope.presentData($scope._agent.name).then(function (data) {
-					$scope.results = data;
+					$scope.results = data;					
 					$scope.load = false;
 				});
 				
@@ -249,7 +255,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				
 				//Check for present data for the selected tab
 				if($scope.submenuNavItem != "preview"){
-					$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;});
+					$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function() { $scope.results = false; });
 				}
 			}
 		}
@@ -277,6 +283,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
     //Load
     try {
         load();
+		$scope.loading=false;
     } catch (e) {
         notify.error('Unexpected exception loading controller');
         errlog.log('Unexpected exception loading controller', e);

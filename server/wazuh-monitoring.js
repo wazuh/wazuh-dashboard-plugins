@@ -88,7 +88,6 @@ module.exports = function (server, options) {
     
 	// Check API status twice and get agents total items
 	var checkAndSaveStatus = function (apiEntry) {
-
 		apiEntry.user;
 		apiEntry.password;
 		apiEntry.url;

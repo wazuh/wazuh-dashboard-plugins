@@ -1,6 +1,6 @@
 <md-content flex layout="column" ng-if="!load && submenuNavItem == 'status'" ng-controller="managerStatusController"> 
-<div flex layout="column" layout-align="start stretch">
-
+    <div class='uil-ring-css' ng-show="load"><div></div></div>
+<div flex layout="column" ng-show="!load" layout-align="start stretch">
 	<md-content class="joinCardsRow" layout="row" layout-align="start start">
 		<md-card flex layout-align="start stretch" ng-repeat="(k,v) in daemons">
 			<md-card-content layout="column" flex layout-align="start center">
