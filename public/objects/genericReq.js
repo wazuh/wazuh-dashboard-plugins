@@ -16,7 +16,6 @@ require('ui/modules').get('app/wazuh', [])
             if (method == "GET") {
                 $http.get(chrome.addBasePath(url), requestHeaders)
                     .success(function (data) {
-						console.log(data);
                         if (data.error && data.error != '0') {
                             defered.reject(data);
                         } else {
