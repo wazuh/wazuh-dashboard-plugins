@@ -135,7 +135,6 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				case "delete":
 					apiReq.request('DELETE', '/agents', requestData)
 						.then(function (data) {
-							load();
 							if(data.data.ids.length!=0){
 								data.data.ids.forEach(function(id) {
 									notify.error('The agent ' + id + ' was not deleted.');
@@ -144,8 +143,24 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 							else{
 								notify.info(data.data.msg);
 							}
+							load();
 						}, printError);
-					break;	
+					break;
+
+				case "restart":
+					apiReq.request('POST', '/agents/restart', requestData)
+						.then(function (data) {
+							if(data.data.ids.length!=0){
+								data.data.ids.forEach(function(id) {
+								notify.error('The agent ' + id + ' was not restarted.');
+								});
+							} 
+							else{
+								notify.info(data.data.msg);
+							}
+							load();
+						}, printError);
+					break;
 			}
 		}
 		$scope.$parent._bulkOperation="nothing";
@@ -174,11 +189,17 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 							});
 					}
 					else{
+						$scope.hidePrerenderedDialog();
 						notify.error('There was an error adding the new agent.');
 					}
-				}, printError);
+				}, 
+				function(error){
+					printError(error);
+					$scope.hidePrerenderedDialog();
+				});
 		}
 		else{
+			$scope.hidePrerenderedDialog();
 			notify.error('The agent name is mandatory.');
 		}
 	}
@@ -208,15 +229,31 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		});
 	};
 	
+	$scope.showRestartConfirm = function(ev) {
+		// Appending dialog to document.body to cover sidenav in docs app
+		var confirm = $mdDialog.confirm()
+			.title('Restart agents')
+			.textContent('Confirm to restart all the selected agents.')
+			.targetEvent(ev)
+			.ok('Restart')
+			.cancel('Close');
+
+		$mdDialog.show(confirm).then(function() {
+			bulkOperation('restart');
+		});
+	};
+	
 	$scope.hidePrerenderedDialog = function(ev) {
 		$scope.newAgentKey = '';
-		$mdDialog.hide();
+		$mdDialog.hide('#newAgentDialog');
 	};
 	
     var load = function () {
 		$scope.newAgent = {
 			'name': '', 'ip': ''
 		};
+		$scope.agentsStatus = false;
+		
         DataFactory.initialize('get', '/agents', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
