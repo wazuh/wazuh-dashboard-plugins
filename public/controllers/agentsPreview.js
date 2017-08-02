@@ -29,8 +29,7 @@ app.factory('Agents', function($http, DataFactory) {
   return Agents;
 });
 
-app.controller('agentsPreviewController', function ($scope, DataFactory, Notifier, errlog, genericReq, Agents) {
-
+app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFactory, Notifier, errlog, genericReq, Agents, apiReq) {
     $scope.load = true;
     $scope.agents = [];
     $scope._status = 'all';
@@ -39,6 +38,11 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
 	$scope.osPlatforms = [];
 	$scope.osVersions = new Set();
+	$scope.newAgent = {
+		'name': '', 'ip': ''
+	};
+	$scope.newAgentKey = '';
+	
 	const notify = new Notifier({location: 'Agents - Preview'});
 	
     var objectsArray = [];
@@ -115,7 +119,50 @@ app.controller('agentsPreviewController', function ($scope, DataFactory, Notifie
 		
     };
 
+	$scope.saveNewAgent = function (){
+		if($scope.newAgent.name != '') {
+			var requestData = {
+				'name': $scope.newAgent.name,
+				'ip': $scope.newAgent.ip == '' ? 'any' : $scope.newAgent.ip
+			}
+			apiReq.request('POST', '/agents', requestData)
+				.then(function (data) {
+					if(data.error=='0'){
+						notify.info('The agent was added successfully.');
+						apiReq.request('GET', '/agents/' + data.data + '/key', {})
+							.then(function(data) {
+								$scope.newAgentKey = data.data;
+								load();
+							});
+					}
+					else{
+						notify.error('There was an error adding the new agent.');
+					}
+				}, printError);
+		}
+		else{
+			notify.error('The agent name is mandatory.');
+		}
+	}
+	
+	$scope.showPrerenderedDialog = function(ev) {
+		$mdDialog.show({
+			contentElement: '#newAgentDialog',
+			parent: angular.element(document.body),
+			targetEvent: ev,
+			clickOutsideToClose: true
+		});
+	};
+	
+	$scope.hidePrerenderedDialog = function(ev) {
+		$scope.newAgentKey = '';
+		$mdDialog.hide();
+	};
+	
     var load = function () {
+		$scope.newAgent = {
+			'name': '', 'ip': ''
+		};
         DataFactory.initialize('get', '/agents', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
