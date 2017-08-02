@@ -1,52 +1,78 @@
 <div ng-controller="discoverW" class="app-container">
 
-  <kbn-top-nav name="discover-search" config="topNavMenu">
+  <kbn-top-nav name="discover" config="topNavMenu">
     <!-- Transcluded elements. -->
-
-    <div data-transclude-slots>
-      <!-- Breadcrumbs. -->
-      <div data-transclude-slot="topLeftCorner" class="localBreadcrumbs">
-        <div class="localBreadcrumb">
-          <span ng-show="opts.savedSearch.id" class="localBreadcrumb__emphasis">
-            <span data-test-subj="discoverCurrentQuery" ng-bind="::opts.savedSearch.title"></span>
-            <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
-          </span>
-          <span data-test-subj="discoverQueryHits" class="localBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
-          <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
-        </div>
-      </div>
-    </div>
+    
   </kbn-top-nav>
-
-  <navbar name="discover-search">
-    <form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
-      <div class="typeahead" kbn-typeahead="discover">
-        <div class="input-group"
-          ng-class="discoverSearch.$invalid ? 'has-error' : ''">
-          <input
-            parse-query
-            input-focus
-            kbn-typeahead-input
-            ng-model="stateQuery"
-            placeholder="Search..."
-            aria-label="Search input"
-            type="text"
-            class="form-control">
-          <button type="submit"
-            ng-disabled="discoverSearch.$invalid"
-            aria-label="Search">
-            <span aria-hidden="true" class="fa fa-search"></span></button>
-        </div>
-        <kbn-typeahead-items></kbn-typeahead-items>
+	<div data-transclude-slots class="wazuh-discover-searchbar">
+      <!-- Breadcrumbs. -->
+      <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
+        <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb">
+          <span ng-show="opts.savedSearch.id" class="kuiLocalBreadcrumb__emphasis">
+            <span data-test-subj="discoverCurrentQuery" ng-bind="opts.savedSearch.lastSavedTitle"></span>
+            <i id="reload_saved_search" tabindex="0" aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
+          </span>
+          <span data-test-subj="discoverQueryHits" class="kuiLocalBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
+          <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
+        </h1>
       </div>
-    </form>
-    <div class="button-group" role="toolbar"></div>
-  </navbar>
-
+	  
+      <!-- Search. -->
+      <navbar name="discover-search">
+		<form
+			class="fullWidth"
+			role="form"
+			name="discoverSearch"
+			ng-submit="fetch()"
+		>
+        <div class="typeahead" kbn-typeahead="discover" on-select="">
+          <div class="kuiLocalSearch">
+            <div class="kuiLocalSearchAssistedInput">
+              <input
+                parse-query
+                input-focus
+                kbn-typeahead-input
+                ng-model="stateQuery"
+                placeholder="Search... (e.g. status:200 AND extension:PHP)"
+                aria-label="Search input"
+                type="text"
+                class="kuiLocalSearchInput kuiLocalSearchInput--lucene"
+                ng-class="{'kuiLocalSearchInput-isInvalid': discoverSearch.$invalid}"
+              >
+              <div class="kuiLocalSearchAssistedInput__assistance">
+                <p class="kuiText">
+                  <a
+                    class="kuiLink"
+                    ng-href="{{queryDocLinks.luceneQuerySyntax}}"
+                    target="_blank"
+                  >
+                    Uses lucene query syntax
+                  </a>
+                </p>
+              </div>
+            </div>
+            <button
+              type="submit"
+              aria-label="Search"
+              class="kuiLocalSearchButton"
+              ng-disabled="discoverSearch.$invalid"
+            >
+              <span class="kuiIcon fa-search" aria-hidden="true"></span>
+            </button>
+          </div>
+          <kbn-typeahead-items></kbn-typeahead-items>
+        </div>
+      </form>
+	  </navbar>
+	  
+    </div>
 
   <div class="container-fluid" role="main">
   <div class="row">
-      <filter-bar state="state"></filter-bar>
+      <filter-bar
+        state="state"
+        index-patterns="[indexPattern]"
+      ></filter-bar>
     </div>
 
 
@@ -55,13 +81,14 @@
 	<div class="col-md-2 sidebar-container collapsible-sidebar">
         <disc-field-chooser
           columns="state.columns"
-          refresh="refreshFieldList"
           hits="rows"
           field-counts="fieldCounts"
-          filter="filterQuery"
           index-pattern="searchSource.get('index')"
           index-pattern-list="opts.indexPatternList"
-          state="state">
+          state="state"
+          on-add-field="addColumn"
+          on-add-filter="filterQuery"
+          on-remove-field="removeColumn">
         </disc-field-chooser>
       </div>
 

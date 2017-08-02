@@ -1,8 +1,9 @@
 <md-content ng-if="submenuNavItem == 'fim' && _agent" id="agents-fim" ng-controller="fimController">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(8)'><div></div></div>
+	
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(8)">
 		<md-card flex layout="column">
@@ -21,7 +22,7 @@
 	</md-content>
 
 	<!-- View: Panels -->	
-    <div flex layout="column" ng-show='hideRing(8) && results && !loading' ng-if="tabView == 'panels'">
+    <div flex layout="column"  ng-show='hideRing(8) && results && !loading' ng-if="tabView == 'panels' && !load">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
         <md-content layout="row">
             <md-card flex="33">

@@ -13,6 +13,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	$scope._status = 'all';
     $scope._osPlatform = 'all';
 	$scope._osVersion = 'all';
+	$scope._bulkOperation = 'nothing';
 	$scope.defaultManager = $scope.state.getDefaultManager().name;
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.results = true;
@@ -154,8 +155,9 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 	
     $scope.applyAgent = function (agent) {
         if (agent) {
+			$scope.load = true;
 			if($scope.submenuNavItem == 'preview'){
-				$scope.submenuNavItem = 'overview';		
+				$scope.submenuNavItem = 'overview';
 				$location.search('tab', $scope.submenuNavItem);
 			}
 			$scope.agentInfo = {};
@@ -247,7 +249,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			}else{
 				gParameter = $route.current.params._g;
 			}
-			if(gParameter != "()" && gParametercurrentTimeFilter.time && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
+			if(gParameter != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
 				$scope.timeGTE = currentTimeFilter.time.from;
 				$scope.timeLT = currentTimeFilter.time.to;
 				

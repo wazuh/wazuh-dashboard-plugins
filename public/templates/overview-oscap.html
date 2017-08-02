@@ -1,8 +1,9 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'oscap'" ng-controller="overviewOSCAPController" layout-align="start">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
     <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(14)'><div></div></div>
+	
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(14)">
 		<md-card flex layout="column">
@@ -13,7 +14,7 @@
 	</md-content> 
 	
 	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'">
 		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="rule.groups:oscap AND manager.name: {{defaultManager ? defaultManager : '*'}}"
 		infinite-scroll="true">
@@ -22,7 +23,7 @@
 	
 	<!-- View: Panels -->
 	<div ng-show="hideRing(14) && results && !loading" ng-if="tabView == 'panels'">
-		<md-content layout="row" layout-align="center stretch">
+		<md-content class="no-legend" layout="row" layout-align="center stretch">
 			<md-card flex="20" layout="column">
 					<md-card-content style="text-align: center;">
 						<kbn-vis-value vis-height="37px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:oscap.scan.score,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="*"></kbn-vis-value>
@@ -141,7 +142,7 @@
 		
 		</md-content>
 		
-		<md-content layout="row" layout-align="center stretch" >
+		<md-content layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex="20" layout="column">
 					<md-card-content style="text-align: center;">
 						<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score,customLabel:'Higher score'),schema:metric,type:max)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="*"></kbn-vis>
