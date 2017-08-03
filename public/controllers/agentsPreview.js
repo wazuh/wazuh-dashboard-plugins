@@ -277,14 +277,15 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				notify.error("Error while loading agents permissions.");
 			})
 	}
-	getAgentsPermissions();
+
     var load = function () {
 		$scope.newAgent = {
 			'name': '', 'ip': ''
 		};
 		$scope.agentsStatus = false;
-		
-        DataFactory.initialize('get', '/agents', {}, 30, 0)
+		getAgentsPermissions();
+        
+		DataFactory.initialize('get', '/agents', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
