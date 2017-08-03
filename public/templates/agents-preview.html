@@ -139,7 +139,7 @@
 					<md-icon md-font-library="material-icons">delete</md-icon>
 				</md-button>
 			</div>
-			<div style="visibility: hidden">
+			<div ng-show="showingNewAgentDialog" style="visibility: hidden">
 				<div class="md-dialog-container" id="newAgentDialog">
 					<div ng-show="newAgentKey != ''">
 						<md-dialog class="new-agent-key" layout-padding>
