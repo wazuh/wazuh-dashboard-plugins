@@ -127,15 +127,15 @@
 					<md-divider></md-divider>
 			</div>
 			<div class="agent-buttons">
-				<md-button class="md-fab add-agent-icon" ng-click="showNewAgentDialog($event)"  >
+				<md-button ng-if="permissions.add" class="md-fab add-agent-icon" ng-click="showNewAgentDialog($event)"  >
 					<md-icon md-font-library="material-icons">add</md-icon>
 				</md-button>
 				
-				<md-button class="md-fab restart-agent-icon" ng-click="showRestartConfirm($event)"  >
+				<md-button ng-if="permissions.restart" class="md-fab restart-agent-icon" ng-click="showRestartConfirm($event)"  >
 					<md-icon md-font-library="material-icons">refresh</md-icon>
 				</md-button>
 				
-				<md-button class="md-fab delete-agent-icon" ng-click="showDeletePrompt($event)"  >
+				<md-button ng-if="permissions.delete" class="md-fab delete-agent-icon" ng-click="showDeletePrompt($event)"  >
 					<md-icon md-font-library="material-icons">delete</md-icon>
 				</md-button>
 			</div>

@@ -12,6 +12,11 @@
     "wazuh",
     "ossec"
   ],
+  "agents": {
+	"add": true,
+	"delete": true,
+	"restart": true
+  },
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "repository": {
