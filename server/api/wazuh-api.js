@@ -12,7 +12,7 @@ module.exports = function (server, options) {
 	var package_info = {};
     const package_file = '../../package.json';
     var appVersion = "";
-    
+    var permissions = {}
     // Read Wazuh App package file
     try {
         package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, package_file), 'utf8'));
@@ -272,7 +272,20 @@ module.exports = function (server, options) {
 
 
     };
-
+	
+	var getAgentsPermissions = function (req, reply) {
+		try {
+			package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, package_file), 'utf8'));
+			permissions = package_info.agents;
+			reply(permissions);
+		} catch (e) {
+			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
+			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + package_file);
+			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+			reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not load agents permissions' }).code(500);
+		};
+		
+	}
 
     //Handlers - Route request
 
@@ -529,6 +542,17 @@ module.exports = function (server, options) {
         method: 'GET',
         path: '/api/wazuh-api/pci/{requirement}',
         handler: getPciRequirement
+    });
+	
+	/*
+    * GET /api/wazuh-api/agents/permissions
+    * Return the permissions on agents
+    *
+    **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-api/agents/permissions',
+        handler: getAgentsPermissions
     });
 
 	/*

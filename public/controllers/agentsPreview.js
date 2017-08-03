@@ -43,6 +43,11 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		'name': '', 'ip': ''
 	};
 	$scope.newAgentKey = '';
+	$scope.permissions = {
+		'add': false,
+		'delete':false,
+		'restart': false
+	};
 	
 	const notify = new Notifier({location: 'Agents - Preview'});
 	
@@ -264,13 +269,23 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		$mdDialog.hide('#newAgentDialog');
 	};
 	
+	var getAgentsPermissions = function () {
+		genericReq.request('GET', '/api/wazuh-api/agents/permissions')
+			.then(function (data, status) {
+				$scope.permissions = data;
+			}, function (data, status) {
+				notify.error("Error while loading agents permissions.");
+			})
+	}
+
     var load = function () {
 		$scope.newAgent = {
 			'name': '', 'ip': ''
 		};
 		$scope.agentsStatus = false;
-		
-        DataFactory.initialize('get', '/agents', {}, 30, 0)
+		getAgentsPermissions();
+        
+		DataFactory.initialize('get', '/agents', {}, 30, 0)
             .then(function (data) {
                 objectsArray['/agents'] = data;
 				DataFactory.filters.register(objectsArray['/agents'], 'search', 'string');
