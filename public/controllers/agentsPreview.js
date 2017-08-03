@@ -48,6 +48,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		'delete':false,
 		'restart': false
 	};
+	$scope.showingNewAgentDialog = false;
 	
 	const notify = new Notifier({location: 'Agents - Preview'});
 	
@@ -226,6 +227,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 	}
 	
 	$scope.showNewAgentDialog = function(ev) {
+		$scope.showingNewAgentDialog = true;
 		$mdDialog.show({
 			contentElement: '#newAgentDialog',
 			parent: angular.element(document.body),
@@ -266,6 +268,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 	
 	$scope.hidePrerenderedDialog = function(ev) {
 		$scope.newAgentKey = '';
+		$scope.showingNewAgentDialog = false;
 		$mdDialog.hide('#newAgentDialog');
 	};
 	
