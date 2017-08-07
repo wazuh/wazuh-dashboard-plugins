@@ -2,9 +2,10 @@
 
 	<!-- Kibana search bar -->
 	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
-	
+	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(4)'><div></div></div>
+
 	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels'">
+	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(4)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				No results for selected time interval
@@ -14,14 +15,14 @@
 	
 	
 	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'" >
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'" >
 		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="rule.groups:rootcheck AND agent.name: {{_agent.name ? _agent.name : '*'}} AND manager.name: {{defaultManager ? defaultManager : '*'}}"
 		infinite-scroll="true"> 
 		</kbn-disfull>
 	</md-content>
 	
-    <div flex ng-if="tabView == 'panels' && results && !load" layout="column">
+    <div flex ng-show="hideRing(4) && results && !loading" ng-if="tabView == 'panels' && !load" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
             <md-content layout="row">
                 <md-card flex="50">

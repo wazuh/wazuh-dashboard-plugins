@@ -112,6 +112,11 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.check(tmpData).then(function (data) {
 			// API Check correct, get Manager name
 			tmpData.manager = data;
+            
+            if(activeStatus){
+                appState.setDefaultManager(tmpData.manager);
+            }
+            
 			tmpData.extensions = {"oscap": true, "audit": true, "pci": true};
 			// Insert new API entry
 			genericReq.request('PUT', '/api/wazuh-api/settings', tmpData).then(function (data) {
@@ -125,7 +130,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 				$scope.formData.port = "";
 				// Fetch agents on demand
                 genericReq.request('GET', '/api/wazuh-api/fetchAgents').then(function(data){} , function (data, status) {
-					notify.error("Error fetching agents");
+                    notify.error("Error fetching agents");
 				});
 			
 			}, function (data, status) {
@@ -153,7 +158,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.check(tmpData).then(function (data) {
             tmpData.manager = data;
             var index = $scope.apiEntries.indexOf(item);
-            genericReq.request('PUT', '/api/wazuh-api/updateApiHostname/' + $scope.apiEntries[index]._id).then(function (data) {
+            genericReq.request('PUT', '/api/wazuh-api/updateApiHostname/' + $scope.apiEntries[index]._id, {"manager":tmpData.manager}).then(function (data) {
 				$scope.apiEntries[index]._source.manager = tmpData.manager;
             });
             notify.info("Connection success");
@@ -170,10 +175,11 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	// Toggle extension
 	$scope.toggleExtension = function(extension,state) {
 		if(extension == "oscap" || extension == "audit" || extension == "pci"){
-            genericReq.request('PUT', '/api/wazuh-api/extension/toggle/'+$scope.apiEntries[scope.currentDefault]._id + '/' + extension + '/' + state).success(function (data, status) {
-			}).error(function (data, status) {
-				notify.error("Invalid request when toggle extension state.");
-			})
+            genericReq.request('PUT', '/api/wazuh-api/extension/toggle/'+$scope.apiEntries[$scope.currentDefault]._id + '/' + extension + '/' + state)
+				.then(function(){}, 
+				function (data, status) {
+					notify.error("Invalid request when toggle extension state.");
+				});
 		}
 	};
 	
@@ -224,6 +230,3 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	$scope.getAppInfo();
 
 });
-
-
-

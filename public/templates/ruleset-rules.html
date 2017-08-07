@@ -1,6 +1,6 @@
 <md-content style="height: 100%;" id="rulesContainer" layout="column" flex layout-padding ng-if="!load && submenuNavItem == 'ruleset' && $parent.submenuNavItem2 == 'rules'" ng-controller="rulesController" layout-align="start space-around" >
-	
-	<div infinite-scroll-module='rules.nextPage()' infinite-scroll-disabled='rules.busy' infinite-scroll-distance='0' style="padding: 0">
+	<div class='uil-ring-css' ng-show="load"><div></div></div>
+	<div infinite-scroll-module='rules.nextPage()' ng-show="!load" infinite-scroll-disabled='rules.busy' infinite-scroll-distance='0' style="padding: 0">
 		<div layout="row" layout-align="center start" style="padding: 0px;  height: 208px;  min-height: 208px;" class="visFilterDisabled">
 			
 			<md-card flex="25" style="margin: 0">

@@ -1,5 +1,4 @@
 import rison from 'rison-node';
-import chrome from 'ui/chrome';
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location, $http, $rootScope) {
@@ -8,10 +7,15 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	$scope.extensions = $scope.state.getExtensions().extensions;
 	$scope.submenuNavItem = "general";
 	$scope.tabView = "panels";
-	$scope.results = false;
+	$scope.results = true;
+	$scope.loading = true;
+    $scope.hideRing = function(items){ 
+        if($(".vis-editor-content" ).length >= items)
+            return true;
+        return false;
+    }    
 	var tab = "";
 	var view = ""; 
-	
 	// Object for matching nav items and Wazuh groups
 	var tabGroups = {
 		"general": {"group": "*"},
@@ -47,13 +51,14 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 	
 	// Switch tab: Refresh or change location and check for present data
 	$scope.switchTab = function (tab) {
+		$scope.loading = true;
 		// Detecting refresh or location
 		if($scope.submenuNavItem != tab){
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
-			$scope.presentData().then(function (data) {$scope.results = data;});
+			$scope.presentData().then(function (data) {$scope.results = data; $scope.loading=false;}, function(){ $scope.results = false; $scope.loading=false;});
 		}else{
-			$scope.presentData().then(function (data) {$scope.results = data;});
+			$scope.presentData().then(function (data) {$scope.results = data; $scope.loading=false;}, function(){ $scope.results = false; $scope.loading=false;});
 			$rootScope.$broadcast('fetchVisualization');
 		}
 	};
@@ -90,12 +95,12 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		var managerName = {"manager" : $scope.defaultManager};
 		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
 		angular.extend(payload, fields, managerName, timeInterval);
-		
 		var deferred = $q.defer();
         
         genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
-			if(data.data.data != 0)
+			if(data.data != 0){
 				deferred.resolve(true);
+            }
 			else
 				deferred.resolve(false);
 		});
@@ -128,22 +133,19 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 				$scope.timeLT = currentTimeFilter.time.to;
 				
 				//Check for present data for the selected tab
-				$scope.presentData().then(function (data) {$scope.results = data;});
+				$scope.presentData().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
 			}
 		}
 	});
 	
 	// Load
-	$scope.presentData().then(function (data) {$scope.results = data;});
-
+	$scope.presentData().then(function (data) {$scope.results = data; $scope.loading = false;}, function(){	$scope.results = false; $scope.loading = false;});
 });
 
 app.controller('overviewGeneralController', function ($scope, DataFactory, genericReq, errlog, $route) {
-	
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('general');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-	
 });
 
 app.controller('overviewFimController', function ($scope, DataFactory, genericReq, errlog, $route) {
@@ -151,7 +153,6 @@ app.controller('overviewFimController', function ($scope, DataFactory, genericRe
     $scope.load = true;
 	$scope.$parent.state.setOverviewState('fim');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-
 });
 
 app.controller('overviewPMController', function ($scope, DataFactory, genericReq, errlog, $route) {
@@ -163,7 +164,7 @@ app.controller('overviewPMController', function ($scope, DataFactory, genericReq
 });
 
 app.controller('overviewOSCAPController', function ($scope, DataFactory, genericReq, errlog, $route) {
-
+    
     $scope.load = false;
     $scope.$parent.state.setOverviewState('oscap');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
@@ -182,7 +183,7 @@ app.controller('overviewPCIController', function ($scope, $compile, DataFactory,
     $scope.load = true;
     $scope.$parent.state.setOverviewState('pci');
 	$scope.defaultManager = $scope.$parent.state.getDefaultManager().name;
-	
+
 	var tabs = [];
 	genericReq.request('GET', '/api/wazuh-api/pci/all').then(function (data) {
 		angular.forEach(data, function(value, key) {

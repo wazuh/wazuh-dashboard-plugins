@@ -2,9 +2,10 @@
 
 	<!-- Kibana search bar -->
 	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
+	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(15)'><div></div></div>
 	
 	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-if="!results && tabView == 'panels'">
+	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(15)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				No results for selected time interval
@@ -14,7 +15,7 @@
 	
 	
 	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'">
 		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="manager.name: {{defaultManager ? defaultManager : '*'}}"
 		infinite-scroll="true">
@@ -22,7 +23,7 @@
 	</md-content>
 
 	<!-- View: Panels -->
-	<div ng-if="tabView == 'panels' && results">
+	<div ng-show="hideRing(15) && results && !loading" ng-if="tabView == 'panels'">
 		<div layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex layout="column">
 				<md-card-content>
@@ -108,7 +109,7 @@
 			</md-card>
 		</div>
 		
-		<div layout="row" layout-align="center stretch">
+		<div class="no-legend" layout="row" layout-align="center stretch">
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
 					<kbn-vis-value vis-height="29px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:srcuser,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="*"></kbn-vis-value>

@@ -1,6 +1,6 @@
 <md-content flex layout="column" ng-if="!load && submenuNavItem == 'configuration'" ng-controller="managerConfigurationController">
-
-    <md-content flex layout="row" layout-sm="column" layout-xs="column">
+    <div class='uil-ring-css' ng-show="load"><div></div></div>
+    <md-content flex layout="row" ng-show="!load" layout-sm="column" layout-xs="column">
 
 		<div flex layout="column" ng-if="managerConfiguration.global">	
             <md-card>
