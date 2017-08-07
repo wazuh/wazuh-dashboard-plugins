@@ -1,6 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file
 
+## [v2.1.0]
+
+## Added
+- Loading icon while Wazuh loads the visualizations.
+- Add/Delete/Restart agents.
+- OS agent filter
+
+### Changed
+- Using genericReq when possible.
+
 ## [v2.0.1]
 
 ### Changed
