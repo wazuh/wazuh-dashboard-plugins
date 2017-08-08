@@ -3,9 +3,6 @@
   "AlertsFile": "sample",
   "title": "sample",
   "full_log": "sample",
-  "id": "sample",
-  "srcuser": "sample",
-  "srcip": "sample",
   "location": "sample",
   "GeoLocation": {
     "country_name": "sample",
@@ -29,6 +26,21 @@
       "mode": "sample",
       "name": "sample"
     }
+  },
+  "data": {
+    "protocol": "sample",
+    "action": "sample",
+    "srcip": "sample",
+    "dstip": "sample",
+    "srcport": "sample",
+    "dstport": "sample",
+    "srcuser": "sample",
+    "dstuser": "sample",
+    "id": "sample",
+    "status": "sample",
+    "data": "sample",
+    "system_name": "sample",
+    "url": "sample",
   },
   "oscap": {
     "check": {
