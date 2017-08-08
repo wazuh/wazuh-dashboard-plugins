@@ -1,7 +1,6 @@
 {
   "@timestamp": "2015-03-18T15:55:55.000Z",
   "AlertsFile": "sample",
-  "title": "sample",
   "full_log": "sample",
   "location": "sample",
   "GeoLocation": {
@@ -11,23 +10,8 @@
   "agent": {
     "name": "sample"
   },
-  "audit": {
-    "command": "sample",
-    "type": "sample",
-    "egid": "sample",
-    "euid": "sample",
-    "exe": "sample",
-    "gid": "sample",
-    "uid": "sample",
-    "directory": {
-      "name": "sample"
-    },
-    "file": {
-      "mode": "sample",
-      "name": "sample"
-    }
-  },
   "data": {
+    "title": "sample",
     "protocol": "sample",
     "action": "sample",
     "srcip": "sample",
@@ -40,20 +24,36 @@
     "status": "sample",
     "data": "sample",
     "system_name": "sample",
-    "url": "sample"
-  },
-  "oscap": {
-    "check": {
-      "result": "sample",
-      "severity": "sample",
-      "title": "sample"
-    },
-    "scan": {
-	  "id": "sample",
-      "content": "sample",
-      "score": 1.55,
-      "profile": {
+    "url": "sample",
+	"audit": {
+      "command": "sample",
+      "type": "sample",
+      "egid": "sample",
+      "euid": "sample",
+      "exe": "sample",
+      "gid": "sample",
+      "uid": "sample",
+      "directory": {
+        "name": "sample"
+      },
+      "file": {
+        "mode": "sample",
+        "name": "sample"
+      }
+	},
+	"oscap": {
+      "check": {
+        "result": "sample",
+        "severity": "sample",
         "title": "sample"
+      },
+      "scan": {
+        "id": "sample",
+        "content": "sample",
+        "score": 1.55,
+        "profile": {
+          "title": "sample"
+        }
       }
     }
   },
