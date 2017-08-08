@@ -313,7 +313,7 @@
             "dstip": {
               "type": "keyword",
               "doc_values": "true"
-            ,
+            },
             "srcport": {
               "type": "keyword",
               "doc_values": "true"
