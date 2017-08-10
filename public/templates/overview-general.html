@@ -102,7 +102,7 @@
 			<md-card layout="column" flex="35">
 				<md-card-content>
 					<span class="md-headline">Agents status</span>
-					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-monitoring-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:data.id),schema:metric,type:cardinality),(enabled:!t,id:'4',params:(field:data.status,order:asc,orderBy:'3',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Agents Status',type:line))"
+					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-monitoring-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'auto',min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:id),schema:metric,type:cardinality),(enabled:!t,id:'4',params:(field:status,order:asc,orderBy:'3',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Agents Status',type:line))"
 						vis-filter="manager.name: {{defaultManager}}">
 					</kbn-vis>
 				</md-card-content>
