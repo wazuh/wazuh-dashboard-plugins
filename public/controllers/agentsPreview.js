@@ -101,7 +101,20 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 			$scope.agents.items = data.data.items;
 		});
     };
-    
+	
+    $scope.agentOSPlatformFilter = function (osName) {
+        if (osName == 'all') {
+            DataFactory.filters.unset(objectsArray['/agents'], 'os.platform');
+        } else {
+            DataFactory.filters.set(objectsArray['/agents'], 'os.platform', osName);
+        }
+		DataFactory.setOffset(objectsArray['/agents'],0);
+		DataFactory.get(objectsArray['/agents']).then(function (data) { 
+			$scope.agents.items = data.data.items;
+		});
+		
+    };
+	
 	function bulkOperation(operation){
 		var selectedAgents = [];
 		angular.forEach($scope.agents.items, function(agent){

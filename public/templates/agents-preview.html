@@ -52,13 +52,13 @@
 						</div>
 						<div layout="row" layout-align="start stretch">
 
-							<div layout="row" class="sideNavBox" flex="80">
+							<div layout="row" class="sideNavBox" flex="60">
 
 								<input placeholder="Filter" type="text" id="searchBox" ng-model="$parent._agentSearch" ng-change="agentSearchFilter($parent._agentSearch)" class="input-filter-box"
 									flex>
 							</div>
 							<div layout="row" class="sideNavBox" flex="20">
-								<md-input-container flex class="md-whiteframe-z1">
+								<md-input-container flex class="md-whiteframe-z1 md-input-margin">
 									<md-select id="eventBox" ng-model="$parent._status" ng-change="agentStatusFilter($parent._status)" aria-label="Filter by status">
 										<md-option value="all">All states</md-option>
 										<md-option value="active">Active</md-option>
@@ -67,7 +67,18 @@
 									</md-select>
 								</md-input-container>
 							</div>
+							<div layout="row" class="sideNavBox" flex="20">
+								<md-input-container flex class="md-whiteframe-z1">
+									<md-select id="eventBox" ng-model="$parent._osPlatform" ng-change="agentOSPlatformFilter($parent._osPlatform)" aria-label="Filter by operative system">
+										<md-option value="all">All OS platforms</md-option>
+                                        <md-option ng-repeat='platform in osPlatforms' value="{{platform}}">
+                                            {{platform}}
+                                        </md-option>
+									</md-select>
+								</md-input-container>
+							</div>
 						</div>
+
 						<div>
 							<md-toolbar layout="row">
 								<div class="md-toolbar-tools">

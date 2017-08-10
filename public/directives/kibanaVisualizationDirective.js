@@ -1,7 +1,7 @@
 import rison from 'rison-node';
-import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
-import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
-import { FilterBarClickHandlerProvider } from 'ui/filter_bar/filter_bar_click_handler';
+import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
+import UtilsBrushEventProvider from 'ui/utils/brush_event';
+import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_click_handler';
 
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnVis', [function () {
@@ -110,7 +110,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.searchSource = $scope.newVis.searchSource;
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
-		const filterBarClickHandler = Private(FilterBarClickHandlerProvider);
+		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
 		$timeout(
 		function() {
 

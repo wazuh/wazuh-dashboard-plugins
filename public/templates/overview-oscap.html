@@ -106,7 +106,7 @@
 					</md-card-title>
 					<md-card-content>
 						<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:grouped,scale:linear,setYExtents:!f,times:!()),title:'New%20Visualization',type:histogram))"
-							vis-filter="rule.groups: oscap AND oscap.check.severity: high">
+							vis-filter="rule.groups: oscap AND data.oscap.check.severity: high">
 						</kbn-vis>
 					</md-card-content>
 				</md-card>
