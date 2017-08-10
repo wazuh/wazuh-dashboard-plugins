@@ -96,7 +96,9 @@
 									</span>
 									<span flex="5" ng-click="setSort('id')">ID
 										<i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-									<span flex="25" ng-click="setSort('name')">Name
+									<span flex="10" ng-click="setSort('version')">Version
+										<i class="fa" ng-class="_sort === 'version' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+									<span flex="15" ng-click="setSort('name')">Name
 										<i class="fa" ng-class="_sort === 'name' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 									<span flex="20" ng-click="setSort('ip')">IP
 										<i class="fa" ng-class="_sort === 'ip' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
@@ -116,7 +118,8 @@
 								<input class="agent-checkbox" ng-model="agent.selected" value="{{agent.id}}" type="checkbox"/>
 							</span>
 							<span flex="5" ng-click="applyAgent(agent)">{{agent.id}}</span>
-							<span flex="25" ng-click="applyAgent(agent)">{{agent.name}}</span>
+							<span flex="10" ng-click="applyAgent(agent)">{{agent.version}}</span>
+							<span flex="15" ng-click="applyAgent(agent)">{{agent.name}}</span>
 							<span flex="20" ng-click="applyAgent(agent)">{{agent.ip}}</span>
 							<span flex="10" ng-click="applyAgent(agent)">{{agent.status}}</span>
 							<span flex="10" ng-click="applyAgent(agent)"> <span ng-class="getAgentStatusClass(agent.status)" class="round status"></span></span>
