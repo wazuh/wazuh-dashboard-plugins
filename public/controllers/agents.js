@@ -237,12 +237,13 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 
 		DataFactory.getAndClean('put', path, {})
 			.then(function (data) {
-				if(data.error != 0)
-					var alert = data.message;
-				else
-					var alert = data.data;
-
-				notify.info(alert);
+				if(data.error == 0)
+					notify.info("The agent was successfully restarted");
+				else{
+					console.log(data);
+					notify.error("The agent was not restarted");
+				}
+				
 
 			}, printError);
 	};
