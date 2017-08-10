@@ -5,28 +5,29 @@
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
 	<div ng-show='hideRing(7) && results && !loading' ng-if="tabView == 'panels'">
 		<md-content class="no-legend" layout="row">
-			<md-card class="text-centered" flex layout="column">
+			<md-card  flex layout="column">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
 					<div class="ng-binding">Name</div>
 				</md-card-content>
 			</md-card>
-			<md-card class="text-centered" flex="10" layout="column">
+			<md-card  flex="10" layout="column">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.ip}}</div>
 					<div class="ng-binding">IP Address</div>
 				</md-card-content>
 			</md-card>
-			<md-card class="text-centered" flex="10" layout="column">
+			<md-card  flex="10" layout="column">
 				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.version}}</div>
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{ agentInfo.version | limitTo: 12 }}{{agentInfo.version.length > 12 ? '...' : ''}}</div>
+					<md-tooltip md-direction="bottom">{{ agentInfo.version }}</md-tooltip>
 					<div class="ng-binding">Version</div>
 				</md-card-content>
 			</md-card>
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding"  class="legend-value-title ng-binding legend-value-truncate" style="font-size: 14pt;">{{ agentInfo.os | limitTo: 70 }}{{agentInfo.os.length > 70 ? '...' : ''}}</div>
-					<md-tooltip md-direction="bottom">{{ agentInfo.os }}</md-tooltip>
+					<div class="metric-value ng-binding"  class="legend-value-title ng-binding legend-value-truncate" style="font-size: 14pt;">{{ agentOs }}</div>
+					<md-tooltip md-direction="bottom">{{ agentOs }}</md-tooltip>
 					<div class="ng-binding">OS</div>
 				</md-card-content>
 			</md-card>
