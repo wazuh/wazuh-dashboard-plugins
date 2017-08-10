@@ -102,46 +102,6 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		});
     };
     
-    $scope.agentOSPlatformFilter = function (osName) {
-		$scope.$parent._osVersion='all';
-		DataFactory.filters.unset(objectsArray['/agents'], 'os.version');
-		
-        if (osName == 'all') {
-            DataFactory.filters.unset(objectsArray['/agents'], 'os.platform');
-        } else {
-            DataFactory.filters.set(objectsArray['/agents'], 'os.platform', osName);
-        }
-		DataFactory.setOffset(objectsArray['/agents'],0);
-		DataFactory.get(objectsArray['/agents']).then(function (data) { 
-			$scope.agents.items = data.data.items;
-			if(osName == 'all'){
-				$scope.osVersions = [];
-			}
-			else{
-				var osVersions = new Set();
-				$scope.agents.items.forEach(function(agent){
-					if(agent.os)
-						osVersions.add(agent.os.version);
-				});
-				$scope.osVersions = Array.from(osVersions);
-			}
-		});
-		
-    };
-	
-	$scope.agentOSVersionFilter = function (osVersion) {
-        if (osVersion == 'all') {
-            DataFactory.filters.unset(objectsArray['/agents'], 'os.version');
-        } else {
-            DataFactory.filters.set(objectsArray['/agents'], 'os.version', osVersion);
-        }
-		DataFactory.setOffset(objectsArray['/agents'],0);
-		DataFactory.get(objectsArray['/agents']).then(function (data) { 
-			$scope.agents.items = data.data.items;
-		});
-		
-    };
-
 	function bulkOperation(operation){
 		var selectedAgents = [];
 		angular.forEach($scope.agents.items, function(agent){
