@@ -3,16 +3,6 @@ body{
    width:100%;
 }
 
-md-card.text-centered {
-	position: relative;
-}
-
-md-card.text-centered md-card-content {
-	position: absolute;
-	top: 50%; left: 50%;
-	transform: translate(-50%,-50%);
-}
-
 @-webkit-keyframes uil-ring-anim {
   0% {
     -webkit-transform: rotate(0deg);
@@ -978,6 +968,13 @@ md-select-menu.md-default-theme md-content md-option:not([disabled]):focus, md-s
 .metric-vis .metric-value {
   font-weight: normal;
 }
+
+.metric-value {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
 .managerConfigurationArrow {
 	float: right;
 	margin-top: 6px;

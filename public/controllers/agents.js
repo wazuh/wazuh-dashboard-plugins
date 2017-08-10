@@ -166,8 +166,22 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				$scope.agentInfo = data.data;
 				if(angular.isUndefined($scope.agentInfo.version))
 					$scope.agentInfo.version = "Unknown";
-				if(angular.isUndefined($scope.agentInfo.os))
-					$scope.agentInfo.os = "Unknown";
+				if(angular.isUndefined($scope.agentInfo.os)) {
+					$scope.agentOs = "Unknown";
+				}
+				else {
+					if(!angular.isUndefined($scope.agentInfo.os.name)) {
+						$scope.agentOs = $scope.agentInfo.os.name + ' ' + $scope.agentInfo.os.version;
+					}
+					else {
+						if(!angular.isUndefined($scope.agentInfo.os.uname)){
+							$scope.agentOs = $scope.agentInfo.os.uname;
+						}
+						else {
+							$scope.agentOs = "Unknown";
+						}
+					}
+				}
 				if(angular.isUndefined($scope.agentInfo.lastKeepAlive))
 					$scope.agentInfo.lastKeepAlive = "Unknown";
 				
