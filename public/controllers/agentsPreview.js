@@ -231,8 +231,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		$mdDialog.show({
 			contentElement: '#newAgentDialog',
 			parent: angular.element(document.body),
-			targetEvent: ev,
-			clickOutsideToClose: true
+			targetEvent: ev
 		});
 	};
 	
