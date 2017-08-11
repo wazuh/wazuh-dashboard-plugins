@@ -15,7 +15,7 @@
 
 
 	<!-- View: Discover -->
-	<md-content ng-if="_agent.name" style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'" >
+	<md-content ng-if="agentInfo.name" style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'" >
 		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="_exists_:rule.pci_dss "
 		infinite-scroll="true">
