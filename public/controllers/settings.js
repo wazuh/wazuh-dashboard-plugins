@@ -12,6 +12,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     $scope.formData.user = "";
     $scope.formData.password = "";
     $scope.formData.url = "";
+    $scope.formData.cluster = "";
     $scope.accept_ssl = true;
     $scope.editConfiguration = true;
     $scope.menuNavItem = 'settings';
@@ -104,6 +105,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 			'password': base64.encode($scope.formData.password),
 			'url': $scope.formData.url,
 			'port': $scope.formData.port,
+			'cluster': $scope.formData.cluster,
 			'manager': "",
 			'insecure': "true",
 			'active': activeStatus

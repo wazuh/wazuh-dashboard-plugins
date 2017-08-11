@@ -355,7 +355,7 @@ module.exports = function (server, options) {
             return;
         }
         
-		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'manager' : req.payload.manager, 'extensions' : req.payload.extensions};
+		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'manager' : req.payload.manager, 'extensions' : req.payload.extensions, 'cluster' : req.payload.cluster};
 
         elasticRequest.callWithRequest(req, 'index', { index: '.wazuh', type: 'wazuh-configuration', body: settings, refresh: true })
             .then(function (response) {
