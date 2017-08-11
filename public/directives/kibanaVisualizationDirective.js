@@ -49,7 +49,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	// Set filters
 	$scope.filter = {};
 	$scope.defaultManagerName = appState.getDefaultManager().name;
-	$scope.defaultClusterName = "";
+	$scope.defaultClusterName = appState.getDefaultManager().cluster;
 	$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
 
 	$scope.filter.current = $scope.filter.raw;
@@ -197,30 +197,14 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		// Watcher
 		var visFilterWatch = $scope.$watch("visFilter", function () {
-			$scope.cluster = "";
-			genericReq.request('GET', '/api/wazuh-api/apiEntries').then(function (data, status) {
-				$scope.apiEntries = data;
-				angular.forEach($scope.apiEntries, function (value, key) {
-					if(value._source.active == "true"){
-						$scope.cluster=value._source.cluster;
-					}
-				});
-				if($scope.cluster != ""){
-					$scope.defaultClusterName = appState.getDefaultManager().cluster;
-				}
-				if($scope.cluster==""){
-					$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
-				}
-				else{
-					$scope.filter.raw = $scope.visFilter + " AND cluster.name: " + $scope.cluster;
-				}
-				$scope.filter.current = $scope.filter.raw;
-				$scope.fetch();
-			},function (data, status) {
-				notify.error("Error getting API entries");
-			});
-			
-			
+			if($scope.defaultClusterName==""){
+				$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
+			}
+			else{
+				$scope.filter.raw = $scope.visFilter + " AND cluster.name: " + $scope.cluster;
+			}
+			$scope.filter.current = $scope.filter.raw;
+			$scope.fetch();
 		});		
 		 
 		// Destroy
