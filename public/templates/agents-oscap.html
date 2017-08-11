@@ -15,7 +15,7 @@
 	
 	
 	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'" >
+	<md-content ng-if="_agent.name" style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'" >
 		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="rule.groups:oscap AND agent.name: {{_agent.name ? _agent.name : '*'}} AND manager.name: {{defaultManager ? defaultManager : '*'}}"
 		infinite-scroll="true">
@@ -112,7 +112,7 @@
 					</md-card-title>
 					<md-card-content>
 						<kbn-vis vis-height="160px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:oscap%20AND%20agent.name:localCentos')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',customLabel:'Daily scans',extended_bounds:(),field:'@timestamp',interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-							vis-filter="rule.groups: oscap AND oscap.check.result:fail AND agent.name: {{_agent.name ? _agent.name : '*'}}">
+							vis-filter="rule.groups: oscap AND data.oscap.check.result:fail AND agent.name: {{_agent.name ? _agent.name : '*'}}">
 						</kbn-vis>
 					</md-card-content>
 				</md-card>
@@ -128,7 +128,7 @@
 				</md-card-title>
 				<md-card-content>
 					<kbn-vis class="vis-expand-leyend" vis-height="300px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:data.oscap.check.title,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'OSCAP%20Top%2020%20failed%20checks',type:pie))"
-						vis-filter="oscap.check.result: fail AND rule.groups:oscap AND rule.groups: oscap-result AND oscap.check.result:fail AND agent.name: {{_agent.name ? _agent.name : '*'}}">
+						vis-filter="data.oscap.check.result: fail AND rule.groups:oscap AND rule.groups: oscap-result AND data.oscap.check.result:fail AND agent.name: {{_agent.name ? _agent.name : '*'}}">
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
