@@ -48,12 +48,12 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 	// Set filters
 	$scope.filter = {};
-	$scope.defaultManagerName = appState.getDefaultManager().name;
-	$scope.defaultClusterName = appState.getDefaultManager().cluster;
-	$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
+	$scope.cluster_info = appState.getClusterInfo();
+  $scope.cluster_filter = " AND cluster.name: " + $scope.cluster_info.cluster;
+	$scope.filter.raw = $scope.visFilter + $scope.cluster_filter
 
 	$scope.filter.current = $scope.filter.raw;
-	
+
 
 	// Initialize and decode params
 	var visState = {};
@@ -80,7 +80,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			if($route.current.params._g.startsWith("h@")){
 				decodedTimeFilter = JSON.parse(sessionStorage.getItem($route.current.params._g));
 			}else{
-				decodedTimeFilter = rison.decode($route.current.params._g);    
+				decodedTimeFilter = rison.decode($route.current.params._g);
 			}
 
 			if(decodedTimeFilter.time){
@@ -94,13 +94,13 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			timefilter.time.from = "now-1d";
 			timefilter.time.to = "now";
 		}
-	
+
 		// Set time filter if needed
 		if($scope.visTimefilter){
 			timefilter.time.from = "now-"+$scope.visTimefilter;
 			timefilter.time.to = "now";
 		}
-		
+
 		// Initialize time
 		$scope.timefilter = timefilter;
 
@@ -117,12 +117,12 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$timeout(
 		function() {
 
-		
+
 			// Bind visualization, index pattern and state
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
 			$scope.state = $state;
-			
+
 			// Build visualization
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
@@ -144,7 +144,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 				$rootScope.visCounter--;
 				return;
 			}
-			
+
 			$scope.vis.setUiState($scope.uiState);
 			$scope.vis.setState(visState);
 			$rootScope.visCounter--;
@@ -197,21 +197,16 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		// Watcher
 		var visFilterWatch = $scope.$watch("visFilter", function () {
-			if($scope.defaultClusterName==""){
-				$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
-			}
-			else{
-				$scope.filter.raw = $scope.visFilter + " AND cluster.name: " + $scope.cluster;
-			}
+      $scope.filter.raw = $scope.visFilter + $scope.cluster_filter
 			$scope.filter.current = $scope.filter.raw;
 			$scope.fetch();
-		});		
-		 
+		});
+
 		// Destroy
 		$scope.$on('$destroy', function () {
 			$scope.newVis.destroy();
 		});
-		
+
 		$scope.$on('$destroy', updateQueryWatch);
 		$scope.$on('$destroy', fetchVisualizationWatch);
 		$scope.$on('$destroy', visFilterWatch);
