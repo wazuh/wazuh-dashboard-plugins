@@ -3,24 +3,24 @@
 	<!-- Kibana search bar -->
 	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
     <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(14)'><div></div></div>
-	
+
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(14)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				No results for selected time interval
 			</md-card-content>
-		</md-card>		
-	</md-content> 
-	
+		</md-card>
+	</md-content>
+
 	<!-- View: Discover -->
 	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'">
-		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-		dis-filter="rule.groups:oscap AND manager.name: {{defaultManager ? defaultManager : '*'}}"
+		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+		dis-filter="rule.groups:oscap"
 		infinite-scroll="true">
 		</kbn-disfull>
-	</md-content> 
-	
+	</md-content>
+
 	<!-- View: Panels -->
 	<div ng-show="hideRing(14) && results && !loading" ng-if="tabView == 'panels'">
 		<md-content class="no-legend" layout="row" layout-align="center stretch">
@@ -43,7 +43,7 @@
 					</md-card-content>
 			</md-card>
 		</md-content>
-		
+
 
 		<md-content layout="row" layout-align="center stretch">
 				<md-card flex="25">
@@ -82,7 +82,7 @@
 						</kbn-vis>
 					</md-card-content>
 				</md-card>
-				
+
 				<md-card flex="25">
 					<md-card-title>
 						<md-card-title-text>
@@ -111,8 +111,8 @@
 					</md-card-content>
 				</md-card>
 		</md-content>
-		
-		
+
+
 		<md-content layout="row" layout-align="center stretch">
 			<md-card flex="50">
 				<md-card-title>
@@ -126,7 +126,7 @@
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
-			
+
 			<md-card flex="50">
 				<md-card-title>
 					<md-card-title-text>
@@ -139,9 +139,9 @@
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
-		
+
 		</md-content>
-		
+
 		<md-content layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex="20" layout="column">
 					<md-card-content style="text-align: center;">
@@ -160,8 +160,8 @@
 					</md-card-content>
 			</md-card>
 		</md-content>
-		
-		
+
+
 		<md-content layout-align="center stretch">
 			<md-card flex>
 				<md-card-title>

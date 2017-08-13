@@ -9,6 +9,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
     $scope.load = true;
     $scope.search = '';
     $scope.submenuNavItem = 'preview';
+    $rootScope.page = "agents";
     $scope.tabView = "panels";
     $scope._status = 'all';
     $scope._osPlatform = 'all';
@@ -166,6 +167,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
     			// Get Agent Info
     			DataFactory.getAndClean('get', '/agents/' + agent.id, {}).then(function (data) {
     				$scope.agentInfo = data.data;
+            $rootScope.agent = $scope.agentInfo
             $scope.filters.global.agent = "AND agent.id: " + $scope.agentInfo.id;
     				if(angular.isUndefined($scope.agentInfo.version))
     					$scope.agentInfo.version = "Unknown";

@@ -49,9 +49,20 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	// Set filters
 	$scope.filter = {};
 	$scope.cluster_info = appState.getClusterInfo();
-  $scope.cluster_filter = " AND cluster.name: " + $scope.cluster_info.cluster;
-	$scope.filter.raw = $scope.visFilter + $scope.cluster_filter
+  $scope.agent_info = $rootScope.agent;
 
+  $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
+
+  if($rootScope.page == "agents"){
+      $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
+      $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
+  }else
+      $scope.global_filter = $scope.cluster_filter;
+
+  if($scope.visFilter != "")
+      $scope.global_filter = $scope.visFilter + " AND " + $scope.global_filter;
+
+	$scope.filter.raw = $scope.global_filter;
 	$scope.filter.current = $scope.filter.raw;
 
 
@@ -197,7 +208,15 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		// Watcher
 		var visFilterWatch = $scope.$watch("visFilter", function () {
-      $scope.filter.raw = $scope.visFilter + $scope.cluster_filter
+      if($rootScope.page == "agents"){
+          $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
+          $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
+      }else
+          $scope.global_filter = $scope.cluster_filter;
+
+      if($scope.visFilter != "")
+          $scope.global_filter = $scope.visFilter + " AND " + $scope.global_filter;
+    	$scope.filter.raw = $scope.global_filter;
 			$scope.filter.current = $scope.filter.raw;
 			$scope.fetch();
 		});

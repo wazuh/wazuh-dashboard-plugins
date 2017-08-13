@@ -92,6 +92,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
 
     $scope.stateQuery = $scope.disFilter;
+    console.log($scope.disFilter);
     $scope.chrome = {};
     $scope.removeColumn = function removeColumn(columnName) {
     $scope.indexPattern.popularizeField(columnName, 1);

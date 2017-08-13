@@ -65,35 +65,15 @@ require('ui/modules').get('app/wazuh', [])
             },
       			getClusterInfo: function () {
       				if($cookies.getObject('_clusterInfo'))
-<<<<<<< HEAD
       					return $cookies.getObject('_clusterInfo');
-=======
-      					return { name: $cookies.getObject('_clusterInfo')};
->>>>>>> 991c3c0... Getting Cluster info from /cluster/node
       				else
       					return {"node": "*","manager": "*","cluster": "*"};
 
-                  },
+            },
             setClusterInfo: function (cluster_info) {
-<<<<<<< HEAD
               if (cluster_info) {
-=======
-              if (name) {
->>>>>>> 991c3c0... Getting Cluster info from /cluster/node
                       $cookies.putObject('_clusterInfo', cluster_info);
                   }
-              },
-      			getDisState: function (tab) {
-      				if($cookies.getObject(tab))
-      					return { value: $cookies.getObject(tab)};
-      				else
-      					return { value: "*"};
-
-                  },
-                  setDisState: function (tab,value) {
-                      if (tab && value) {
-                          $cookies.putObject(tab, value);
-                      }
-                  }
+              }
           };
     });
