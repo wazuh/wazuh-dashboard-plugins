@@ -91,8 +91,22 @@ var app = require('ui/modules').get('app/wazuh', [])
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
 
-    $scope.defaultManagerName = appState.getDefaultManager().name;
-    $scope.stateQuery = $scope.disFilter;
+    $scope.cluster_info = appState.getClusterInfo();
+    $scope.agent_info = $rootScope.agent;
+
+    $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
+
+    if($rootScope.page == "agents"){
+        $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
+        $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
+    }else
+        $scope.global_filter = $scope.cluster_filter;
+
+    if($scope.disFilter != "")
+        $scope.global_filter = $scope.disFilter + " AND " + $scope.global_filter;
+
+    $scope.stateQuery = $scope.global_filter;
+
     $scope.chrome = {};
     $scope.removeColumn = function removeColumn(columnName) {
     $scope.indexPattern.popularizeField(columnName, 1);
@@ -185,7 +199,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         docTitle.change(savedSearch.title);
                     }
 
-					
+
                     // Configure AppState. Get App State, if there is no App State create new one
                     let currentAppState = getAppState();
                     if (!currentAppState) {
@@ -195,7 +209,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         $scope.state.columns = disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns');
                         $scope.state.sort = disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern);
                     }
-					
+
                     const $appStatus = $scope.appStatus = {};
                     let stateMonitor;
                     const $state = $scope.state;
@@ -213,10 +227,10 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                             filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
                         };
                     }
-					
+
                     $state.index = $scope.indexPattern.id;
                     $state.sort = getSort.array($state.sort, $scope.indexPattern);
-					
+
                     $scope.opts = {
                         // number of records to fetch, then paginate through
                         sampleSize: config.get('discover:sampleSize'),
@@ -243,7 +257,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 							$appStatus.dirty = status.dirty;
 						});
 						$scope.$on('$destroy', () => stateMonitor.destroy());
-						
+
                         $scope.updateDataSource()
                             .then(function() {
                                 $scope.$listen(timefilter, 'fetch', function() {
@@ -405,7 +419,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         }
 
                         if (!$scope.rows) flushResponseData();
-						
+
 						if(!$state.sort)
 							$state.sort = ["@timestamp","desc"];
                         const sort = $state.sort;

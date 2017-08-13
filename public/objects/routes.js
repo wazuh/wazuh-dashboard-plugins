@@ -7,7 +7,7 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
     var deferred = $q.defer();
     testConnection.check_stored().then(function (data)
     {
-		appState.setDefaultManager(data.manager);
+		appState.setClusterInfo(data.cluster_info);
 		appState.setExtensions(data.extensions);
 		deferred.resolve();
 	}, function (data) {
@@ -74,4 +74,4 @@ routes
     })
     .otherwise({
         redirectTo: '/overview/'
-    }); 
+    });

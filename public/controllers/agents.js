@@ -4,29 +4,32 @@ var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, appState, errlog, $window, genericReq, $routeParams, $route, $location, $http, $rootScope) {
     //Initialization
-	$scope.state = appState;
+    $scope.filters = {"global": {"agent": "", "cluster": ""}}
+    $scope.state = appState;
     $scope.load = true;
     $scope.search = '';
     $scope.submenuNavItem = 'preview';
-	$scope.tabView = "panels";	
-    $scope.state = appState;
-	$scope._status = 'all';
+    $rootScope.page = "agents";
+    $scope.tabView = "panels";
+    $scope._status = 'all';
     $scope._osPlatform = 'all';
-	$scope._osVersion = 'all';
-	$scope._bulkOperation = 'nothing';
-	$scope.defaultManager = $scope.state.getDefaultManager().name;
-	$scope.extensions = $scope.state.getExtensions().extensions;
-	$scope.results = true;
-	$scope.loading = true;
-    $scope.hideRing = function(items){ 
+    $scope._osVersion = 'all';
+    $scope._bulkOperation = 'nothing';
+    $scope.cluster_info = $scope.state.getClusterInfo();
+    $scope.filters.global.cluster = "AND cluster.name: " + $scope.cluster_info.cluster;
+
+    $scope.extensions = $scope.state.getExtensions().extensions;
+    $scope.results = true;
+    $scope.loading = true;
+    $scope.hideRing = function(items){
         if($(".vis-editor-content" ).length >= items)
             return true;
         return false;
     }
 	var objectsArray = [];
 	const notify = new Notifier({location: 'Agents'});
-	
-	var agentId = "";	
+
+	var agentId = "";
 	// Object for matching nav items and Wazuh groups
 	var tabGroups = {
 		"overview": {"group": "*"},
@@ -36,17 +39,17 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 		"audit": {"group": "audit"},
 		"pci": {"group": "*"}
 	};
-	
+
 	if($routeParams.id)
 		agentId = $routeParams.id;
     if($routeParams.tab)
 		$scope.submenuNavItem = $routeParams.tab;
 	if($routeParams.view)
 		$scope.tabView  = $routeParams.view;
-	
-	
+
+
 	//Functions
-	
+
 	// Switch tab: Refresh or change location and check for present data
 	$scope.switchTab = function (tab) {
 		$scope.loading=true;
@@ -55,30 +58,30 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			$scope.submenuNavItem = tab;
 			$location.search('tab', $scope.submenuNavItem);
 			if($scope.submenuNavItem != "preview"){
-				$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;	$scope.loading = false;}, function() { $scope.results = false; $scope.loading = false;});
+				$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;	$scope.loading = false;}, function() { $scope.results = false; $scope.loading = false;});
 			}
 		}else{
 			$rootScope.$broadcast('fetchVisualization');
-			$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data; $scope.loading = false;}, function() { $scope.results = false; $scope.loading = false;});
+			$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data; $scope.loading = false;}, function() { $scope.results = false; $scope.loading = false;});
 		}
 	};
-	
+
     //Print Error
     var printError = function (error) {
         notify.error(error.message);
     };
 
 	// Checking for alerts count
-	
+
 	// Decode and set time filter
 	if($route.current.params._g){
 		var decodedTimeFilter;
 		if($route.current.params._g.startsWith("h@")){
 			decodedTimeFilter = JSON.parse(sessionStorage.getItem($route.current.params._g));
 		}else{
-			decodedTimeFilter = rison.decode($route.current.params._g);    
+			decodedTimeFilter = rison.decode($route.current.params._g);
 		}
-        
+
 		if(decodedTimeFilter.time){
 			$scope.timeGTE = decodedTimeFilter.time.from;
 			$scope.timeLT = decodedTimeFilter.time.to;
@@ -90,19 +93,19 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 		$scope.timeGTE = "now-1d";
 		$scope.timeLT = "now";
 	}
-	
-	// Check if there are any alert. 
-	$scope.presentData = function (agentName) {
+
+	// Check if there are any alert.
+	$scope.presentData = function (agent_id) {
 		var group = tabGroups[$scope.submenuNavItem].group;
 		var payload = {};
-		var fields = {"fields" : [{"field": "rule.groups", "value": group},{"field": "agent.name", "value": agentName}]};
+		var fields = {"fields" : [{"field": "rule.groups", "value": group},{"field": "agent.id", "value": agent_id}]};
 		// No filter needed for general/pci
 		if(group == "*")
-			fields = {"fields" : [{"field": "agent.name", "value": agentName}]};
-		var managerName = {"manager" : $scope.defaultManager};
+			fields = {"fields" : [{"field": "agent.id", "value": agent_id}]};
+		var clusterName = {"cluster" : $scope.cluster_info.cluster};
 		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
-		angular.extend(payload, fields, managerName, timeInterval);
-		
+		angular.extend(payload, fields, clusterName, timeInterval);
+
 		var deferred = $q.defer();
         genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
 			if(data.data != 0)
@@ -148,85 +151,87 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
             });
         return promise;
     };
-	
+
 	$scope.extensionStatus = function (extension) {
 		return $scope.extensions[extension];
     };
-	
+
     $scope.applyAgent = function (agent) {
-        if (agent) {
-			$scope.load = true;
-			if($scope.submenuNavItem == 'preview'){
-				$scope.submenuNavItem = 'overview';
-				$location.search('tab', $scope.submenuNavItem);
-			}
-			$scope.agentInfo = {};
-			// Get Agent Info
-			DataFactory.getAndClean('get', '/agents/' + agent.id, {}).then(function (data) {
-				$scope.agentInfo = data.data;
-				if(angular.isUndefined($scope.agentInfo.version))
-					$scope.agentInfo.version = "Unknown";
-				if(angular.isUndefined($scope.agentInfo.os)) {
-					$scope.agentOs = "Unknown";
-				}
-				else {
-					if(!angular.isUndefined($scope.agentInfo.os.name)) {
-						$scope.agentOs = $scope.agentInfo.os.name + ' ' + $scope.agentInfo.os.version;
-					}
-					else {
-						if(!angular.isUndefined($scope.agentInfo.os.uname)){
-							$scope.agentOs = $scope.agentInfo.os.uname;
-						}
-						else {
-							$scope.agentOs = "Unknown";
-						}
-					}
-				}
-				if(angular.isUndefined($scope.agentInfo.lastKeepAlive))
-					$scope.agentInfo.lastKeepAlive = "Unknown";
-				
-				$scope._agent = data.data;
-				$scope.search = data.data.name;
-				$location.search('id', $scope._agent.id);
-				$scope.presentData($scope._agent.name).then(function (data) {
-					$scope.results = data;					
-					$scope.load = false;
-				});
-				
-				// Get syscheck info
-				DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
-					$scope.agentInfo.syscheck = data.data;
-					$scope.agentInfo.syscheck.duration = "Unknown";
-					if($scope.agentInfo.syscheck.syscheckEndTime != null && $scope.agentInfo.syscheck.syscheckTime != null){
-						var syscheckTime = new Date($scope.agentInfo.syscheck.syscheckTime);
-						var syscheckEndTime = new Date($scope.agentInfo.syscheck.syscheckEndTime);
-						var minutes = ((syscheckEndTime-syscheckTime)/1000)/60;
-						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);			
-					}else if($scope.agentInfo.syscheck.syscheckEndTime == null){
-						$scope.agentInfo.syscheck.syscheckEndTime = "Unknown";
-					}else{
-						$scope.agentInfo.syscheck.syscheckTime = "Unknown";
-					}
-				}, printError);
-				
-				// Get rootcheck info
-				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
-					$scope.agentInfo.rootcheck = data.data;
-					$scope.agentInfo.rootcheck.duration = "Unknown";
-					if($scope.agentInfo.rootcheck.rootcheckEndTime != null && $scope.agentInfo.rootcheck.rootcheckTime != null){
-						var rootcheckTime = new Date($scope.agentInfo.rootcheck.rootcheckTime);
-						var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.rootcheckEndTime);
-						var minutes = ((rootcheckEndTime-rootcheckTime)/1000)/60;
-						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);			
-					}else if($scope.agentInfo.rootcheck.rootcheckEndTime == null){
-						$scope.agentInfo.rootcheck.rootcheckEndTime = "Unknown";
-					}else{
-						$scope.agentInfo.rootcheck.rootcheckTime = "Unknown";
-					}						
-				}, printError);				
-				
-			}, printError);	
-			
+      if (agent) {
+    			$scope.load = true;
+    			if($scope.submenuNavItem == 'preview'){
+    				$scope.submenuNavItem = 'overview';
+    				$location.search('tab', $scope.submenuNavItem);
+    			}
+    			$scope.agentInfo = {};
+    			// Get Agent Info
+    			DataFactory.getAndClean('get', '/agents/' + agent.id, {}).then(function (data) {
+    				$scope.agentInfo = data.data;
+            $rootScope.agent = $scope.agentInfo
+            $scope.filters.global.agent = "AND agent.id: " + $scope.agentInfo.id;
+    				if(angular.isUndefined($scope.agentInfo.version))
+    					$scope.agentInfo.version = "Unknown";
+    				if(angular.isUndefined($scope.agentInfo.os)) {
+    					$scope.agentOs = "Unknown";
+    				}
+    				else {
+    					if(!angular.isUndefined($scope.agentInfo.os.name)) {
+    						$scope.agentOs = $scope.agentInfo.os.name + ' ' + $scope.agentInfo.os.version;
+    					}
+    					else {
+    						if(!angular.isUndefined($scope.agentInfo.os.uname)){
+    							$scope.agentOs = $scope.agentInfo.os.uname;
+    						}
+    						else {
+    							$scope.agentOs = "Unknown";
+    						}
+    					}
+    				}
+    				if(angular.isUndefined($scope.agentInfo.lastKeepAlive))
+    					$scope.agentInfo.lastKeepAlive = "Unknown";
+
+    				$scope._agent = data.data;
+    				$scope.search = data.data.name;
+    				$location.search('id', $scope._agent.id);
+    				$scope.presentData($scope._agent.id).then(function (data) {
+    					$scope.results = data;
+    					$scope.load = false;
+    				});
+
+    				// Get syscheck info
+    				DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
+    					$scope.agentInfo.syscheck = data.data;
+    					$scope.agentInfo.syscheck.duration = "Unknown";
+    					if($scope.agentInfo.syscheck.syscheckEndTime != null && $scope.agentInfo.syscheck.syscheckTime != null){
+    						var syscheckTime = new Date($scope.agentInfo.syscheck.syscheckTime);
+    						var syscheckEndTime = new Date($scope.agentInfo.syscheck.syscheckEndTime);
+    						var minutes = ((syscheckEndTime-syscheckTime)/1000)/60;
+    						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);
+    					}else if($scope.agentInfo.syscheck.syscheckEndTime == null){
+    						$scope.agentInfo.syscheck.syscheckEndTime = "Unknown";
+    					}else{
+    						$scope.agentInfo.syscheck.syscheckTime = "Unknown";
+    					}
+    				}, printError);
+
+    				// Get rootcheck info
+    				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
+    					$scope.agentInfo.rootcheck = data.data;
+    					$scope.agentInfo.rootcheck.duration = "Unknown";
+    					if($scope.agentInfo.rootcheck.rootcheckEndTime != null && $scope.agentInfo.rootcheck.rootcheckTime != null){
+    						var rootcheckTime = new Date($scope.agentInfo.rootcheck.rootcheckTime);
+    						var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.rootcheckEndTime);
+    						var minutes = ((rootcheckEndTime-rootcheckTime)/1000)/60;
+    						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);
+    					}else if($scope.agentInfo.rootcheck.rootcheckEndTime == null){
+    						$scope.agentInfo.rootcheck.rootcheckEndTime = "Unknown";
+    					}else{
+    						$scope.agentInfo.rootcheck.rootcheckTime = "Unknown";
+    					}
+    				}, printError);
+
+    			}, printError);
+
 
         }
     };
@@ -240,19 +245,18 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				if(data.error == 0)
 					notify.info("The agent was successfully restarted");
 				else{
-					console.log(data);
 					notify.error("The agent was not restarted");
 				}
-				
+
 
 			}, printError);
 	};
 
 	// Watchers
 	$scope.$watch('tabView', function() {
-		$location.search('view', $scope.tabView);		
+		$location.search('view', $scope.tabView);
 	});
-	
+
 	// Watch for timefilter changes
 	$scope.$on('$routeUpdate', function(){
 		if($location.search()._g && $location.search()._g != "()"){
@@ -267,10 +271,10 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			if(gParameter != "()" && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)){
 				$scope.timeGTE = currentTimeFilter.time.from;
 				$scope.timeLT = currentTimeFilter.time.to;
-				
+
 				//Check for present data for the selected tab
 				if($scope.submenuNavItem != "preview"){
-					$scope.presentData($scope._agent.name).then(function (data) {$scope.results = data;}, function() { $scope.results = false; });
+					$scope.presentData($scope._agent.id).then(function (data) {$scope.results = data;}, function() { $scope.results = false; });
 				}
 			}
 		}
@@ -281,7 +285,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			$scope.search = "";
 		}
 	});
-	
+
     var load = function () {
         DataFactory.initialize('get', '/agents', {}, 5, 0)
             .then(function (data) {
