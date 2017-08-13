@@ -245,7 +245,6 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				if(data.error == 0)
 					notify.info("The agent was successfully restarted");
 				else{
-					console.log(data);
 					notify.error("The agent was not restarted");
 				}
 

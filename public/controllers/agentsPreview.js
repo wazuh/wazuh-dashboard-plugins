@@ -35,7 +35,6 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
   $scope._status = 'all';
   $scope._os = 'all';
 	$scope.cluster_info = $scope.$parent.$parent.cluster_info;
-  console.log($scope.cluster_info);
 	$scope.mostActiveAgent = {"name" : "", "id" : ""};
 	$scope.osPlatforms = [];
 	$scope.osVersions = new Set();
