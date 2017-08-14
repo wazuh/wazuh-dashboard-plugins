@@ -368,7 +368,7 @@ module.exports = function (server, options) {
    	//Handlers - Update API Hostname
 
     var updateApiHostname = function (req,reply) {
-        elasticRequest.callWithRequest(req, 'update', { index: '.kibana', type: 'wazuh-configuration', id:req.params.id, body: {doc: {"manager": req.payload.manager}} }).then(
+        elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id:req.params.id, body: {doc: {"manager": req.payload.manager}} }).then(
             function () {
                 reply({ 'statusCode': 200, 'message': 'ok' });
             }, function (error) {
