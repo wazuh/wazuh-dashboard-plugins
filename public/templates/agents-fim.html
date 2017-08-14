@@ -14,7 +14,7 @@
 	</md-content> 
 	
 	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="$parent.tabView == 'discover'" >
+	<md-content ng-if="agentInfo.name" style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="$parent.tabView == 'discover'" >
 		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="rule.groups:syscheck AND agent.name: {{_agent.name ? _agent.name : '*'}} AND manager.name: {{defaultManager ? defaultManager : '*'}}"
 		infinite-scroll="true">
