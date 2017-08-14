@@ -166,8 +166,23 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				$scope.agentInfo = data.data;
 				if(angular.isUndefined($scope.agentInfo.version))
 					$scope.agentInfo.version = "Unknown";
-				if(angular.isUndefined($scope.agentInfo.os))
+				if(angular.isUndefined($scope.agentInfo.os)) {
 					$scope.agentInfo.os = "Unknown";
+				}
+				else {
+					if(!angular.isUndefined($scope.agentInfo.os.name)) {
+ 						$scope.agentOs = $scope.agentInfo.os.name + ' ' + $scope.agentInfo.os.version;
+ 					}
+ 					else {
+ 						if(!angular.isUndefined($scope.agentInfo.os.uname)){
+ 							$scope.agentOs = $scope.agentInfo.os.uname;
+ 						}
+ 						else {
+ 							$scope.agentOs = "Unknown";
+ 						}
+ 					}
+				}
+				
 				if(angular.isUndefined($scope.agentInfo.lastKeepAlive))
 					$scope.agentInfo.lastKeepAlive = "Unknown";
 				
@@ -223,12 +238,10 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 
 		DataFactory.getAndClean('put', path, {})
 			.then(function (data) {
-				if(data.error != 0)
-					var alert = data.message;
+				if(data.error == 0)
+					notify.info("The agent was successfully restarted");
 				else
-					var alert = data.data;
-
-				notify.info(alert);
+					notify.error("The agent was not restarted");
 
 			}, printError);
 	};

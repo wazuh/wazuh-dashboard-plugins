@@ -120,7 +120,7 @@
 					</span>
 					<span layout="row">
 						<p style="font-weight: bold; min-width: 150px" >Operating system</p>
-						<p class="right-text">{{agentInfo.os ? agentInfo.os : '-'}}</p>
+						<p class="right-text">{{agentInfo.os.name ? agentInfo.os.name + agentInfo.os.version : agentInfo.os.uname ? agentInfo.os.uname : '-'}}</p>
 					</span>	
 				</div>
 			</md-card-content>
