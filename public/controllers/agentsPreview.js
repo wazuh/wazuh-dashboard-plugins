@@ -157,7 +157,8 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				case "delete":
 					apiReq.request('DELETE', '/agents', requestData)
 						.then(function (data) {
-							if(data.data.ids.length!=0){
+							console.log(data);
+							if(data.data.ids){
 								data.data.ids.forEach(function(id) {
 									notify.error('The agent ' + id + ' was not deleted.');
 								});
@@ -172,7 +173,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				case "restart":
 					apiReq.request('POST', '/agents/restart', requestData)
 						.then(function (data) {
-							if(data.data.ids.length!=0){
+							if(data.data.ids){
 								data.data.ids.forEach(function(id) {
 								notify.error('The agent ' + id + ' was not restarted.');
 								});
