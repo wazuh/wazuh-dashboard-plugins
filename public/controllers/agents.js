@@ -197,15 +197,15 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
 					$scope.agentInfo.syscheck = data.data;
 					$scope.agentInfo.syscheck.duration = "Unknown";
-					if($scope.agentInfo.syscheck.syscheckEndTime != null && $scope.agentInfo.syscheck.syscheckTime != null){
-						var syscheckTime = new Date($scope.agentInfo.syscheck.syscheckTime);
-						var syscheckEndTime = new Date($scope.agentInfo.syscheck.syscheckEndTime);
+					if($scope.agentInfo.syscheck.end != null && $scope.agentInfo.syscheck.start != null){
+						var syscheckTime = new Date($scope.agentInfo.syscheck.start);
+						var syscheckEndTime = new Date($scope.agentInfo.syscheck.end);
 						var minutes = ((syscheckEndTime-syscheckTime)/1000)/60;
 						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);			
-					}else if($scope.agentInfo.syscheck.syscheckEndTime == null){
-						$scope.agentInfo.syscheck.syscheckEndTime = "Unknown";
+					}else if($scope.agentInfo.syscheck.end == null){
+						$scope.agentInfo.syscheck.end = "Unknown";
 					}else{
-						$scope.agentInfo.syscheck.syscheckTime = "Unknown";
+						$scope.agentInfo.syscheck.start = "Unknown";
 					}
 				}, printError);
 				
@@ -213,15 +213,15 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
 					$scope.agentInfo.rootcheck = data.data;
 					$scope.agentInfo.rootcheck.duration = "Unknown";
-					if($scope.agentInfo.rootcheck.rootcheckEndTime != null && $scope.agentInfo.rootcheck.rootcheckTime != null){
-						var rootcheckTime = new Date($scope.agentInfo.rootcheck.rootcheckTime);
-						var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.rootcheckEndTime);
+					if($scope.agentInfo.rootcheck.end != null && $scope.agentInfo.rootcheck.start != null){
+						var rootcheckTime = new Date($scope.agentInfo.rootcheck.start);
+						var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.end);
 						var minutes = ((rootcheckEndTime-rootcheckTime)/1000)/60;
 						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);			
-					}else if($scope.agentInfo.rootcheck.rootcheckEndTime == null){
-						$scope.agentInfo.rootcheck.rootcheckEndTime = "Unknown";
+					}else if($scope.agentInfo.rootcheck.end == null){
+						$scope.agentInfo.rootcheck.end = "Unknown";
 					}else{
-						$scope.agentInfo.rootcheck.rootcheckTime = "Unknown";
+						$scope.agentInfo.rootcheck.start = "Unknown";
 					}						
 				}, printError);				
 				
