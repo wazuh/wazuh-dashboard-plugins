@@ -47,10 +47,10 @@
 			</md-card>
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.syscheck.syscheckEndTime}}</div>
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.syscheck.end}}</div>
 					<md-tooltip md-direction="bottom">
-						Start time: {{ agentInfo.syscheck.syscheckTime }} <br>
-						End time: {{ agentInfo.syscheck.syscheckEndTime }} <br>
+						Start time: {{ agentInfo.syscheck.start }} <br>
+						End time: {{ agentInfo.syscheck.end }} <br>
 						Duration time: {{ agentInfo.syscheck.duration }} minutes
 					</md-tooltip>
 					<div class="ng-binding">Last syscheck scan</div>
@@ -58,10 +58,10 @@
 			</md-card>
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.rootcheck.rootcheckEndTime}}</div>
+					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.rootcheck.end}}</div>
 					<md-tooltip md-direction="bottom">
-						Start time: {{ agentInfo.rootcheck.rootcheckTime }} <br>
-						End time: {{ agentInfo.rootcheck.rootcheckEndTime }} <br>
+						Start time: {{ agentInfo.rootcheck.start }} <br>
+						End time: {{ agentInfo.rootcheck.end }} <br>
 						Duration time: {{ agentInfo.rootcheck.duration }} minutes
 					</md-tooltip>
 					<div class="ng-binding">Last rootcheck scan</div>

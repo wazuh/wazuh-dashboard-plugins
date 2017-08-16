@@ -157,82 +157,78 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
     };
 
     $scope.applyAgent = function (agent) {
-      if (agent) {
-    			$scope.load = true;
-    			if($scope.submenuNavItem == 'preview'){
-    				$scope.submenuNavItem = 'overview';
-    				$location.search('tab', $scope.submenuNavItem);
-    			}
-    			$scope.agentInfo = {};
-    			// Get Agent Info
-    			DataFactory.getAndClean('get', '/agents/' + agent.id, {}).then(function (data) {
-    				$scope.agentInfo = data.data;
-            $rootScope.agent = $scope.agentInfo
-            $scope.filters.global.agent = "AND agent.id: " + $scope.agentInfo.id;
-    				if(angular.isUndefined($scope.agentInfo.version))
-    					$scope.agentInfo.version = "Unknown";
-    				if(angular.isUndefined($scope.agentInfo.os)) {
-    					$scope.agentOs = "Unknown";
-    				}
-    				else {
-    					if(!angular.isUndefined($scope.agentInfo.os.name)) {
-    						$scope.agentOs = $scope.agentInfo.os.name + ' ' + $scope.agentInfo.os.version;
-    					}
-    					else {
-    						if(!angular.isUndefined($scope.agentInfo.os.uname)){
-    							$scope.agentOs = $scope.agentInfo.os.uname;
-    						}
-    						else {
-    							$scope.agentOs = "Unknown";
-    						}
-    					}
-    				}
-    				if(angular.isUndefined($scope.agentInfo.lastKeepAlive))
-    					$scope.agentInfo.lastKeepAlive = "Unknown";
-
-    				$scope._agent = data.data;
-    				$scope.search = data.data.name;
-    				$location.search('id', $scope._agent.id);
-    				$scope.presentData($scope._agent.id).then(function (data) {
-    					$scope.results = data;
-    					$scope.load = false;
-    				});
-
-    				// Get syscheck info
-    				DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
-    					$scope.agentInfo.syscheck = data.data;
-    					$scope.agentInfo.syscheck.duration = "Unknown";
-    					if($scope.agentInfo.syscheck.syscheckEndTime != null && $scope.agentInfo.syscheck.syscheckTime != null){
-    						var syscheckTime = new Date($scope.agentInfo.syscheck.syscheckTime);
-    						var syscheckEndTime = new Date($scope.agentInfo.syscheck.syscheckEndTime);
-    						var minutes = ((syscheckEndTime-syscheckTime)/1000)/60;
-    						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);
-    					}else if($scope.agentInfo.syscheck.syscheckEndTime == null){
-    						$scope.agentInfo.syscheck.syscheckEndTime = "Unknown";
-    					}else{
-    						$scope.agentInfo.syscheck.syscheckTime = "Unknown";
-    					}
-    				}, printError);
-
-    				// Get rootcheck info
-    				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
-    					$scope.agentInfo.rootcheck = data.data;
-    					$scope.agentInfo.rootcheck.duration = "Unknown";
-    					if($scope.agentInfo.rootcheck.rootcheckEndTime != null && $scope.agentInfo.rootcheck.rootcheckTime != null){
-    						var rootcheckTime = new Date($scope.agentInfo.rootcheck.rootcheckTime);
-    						var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.rootcheckEndTime);
-    						var minutes = ((rootcheckEndTime-rootcheckTime)/1000)/60;
-    						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);
-    					}else if($scope.agentInfo.rootcheck.rootcheckEndTime == null){
-    						$scope.agentInfo.rootcheck.rootcheckEndTime = "Unknown";
-    					}else{
-    						$scope.agentInfo.rootcheck.rootcheckTime = "Unknown";
-    					}
-    				}, printError);
-
-    			}, printError);
-
-
+        if (agent) {
+			$scope.load = true;
+			if($scope.submenuNavItem == 'preview'){
+				$scope.submenuNavItem = 'overview';
+				$location.search('tab', $scope.submenuNavItem);
+			}
+			$scope.agentInfo = {};
+			// Get Agent Info
+			DataFactory.getAndClean('get', '/agents/' + agent.id, {}).then(function (data) {
+				$scope.agentInfo = data.data;
+				if(angular.isUndefined($scope.agentInfo.version))
+					$scope.agentInfo.version = "Unknown";
+				if(angular.isUndefined($scope.agentInfo.os)) {
+					$scope.agentOs = "Unknown";
+				}
+				else {
+					if(!angular.isUndefined($scope.agentInfo.os.name)) {
+						$scope.agentOs = $scope.agentInfo.os.name + ' ' + $scope.agentInfo.os.version;
+					}
+					else {
+						if(!angular.isUndefined($scope.agentInfo.os.uname)){
+							$scope.agentOs = $scope.agentInfo.os.uname;
+						}
+						else {
+							$scope.agentOs = "Unknown";
+						}
+					}
+				}
+				if(angular.isUndefined($scope.agentInfo.lastKeepAlive))
+					$scope.agentInfo.lastKeepAlive = "Unknown";
+				
+				$scope._agent = data.data;
+				$scope.search = data.data.name;
+				$location.search('id', $scope._agent.id);
+				$scope.presentData($scope._agent.name).then(function (data) {
+					$scope.results = data;					
+					$scope.load = false;
+				});
+				
+				// Get syscheck info
+				DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
+					$scope.agentInfo.syscheck = data.data;
+					$scope.agentInfo.syscheck.duration = "Unknown";
+					if($scope.agentInfo.syscheck.end != null && $scope.agentInfo.syscheck.start != null){
+						var syscheckTime = new Date($scope.agentInfo.syscheck.start);
+						var syscheckEndTime = new Date($scope.agentInfo.syscheck.end);
+						var minutes = ((syscheckEndTime-syscheckTime)/1000)/60;
+						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);			
+					}else if($scope.agentInfo.syscheck.end == null){
+						$scope.agentInfo.syscheck.end = "Unknown";
+					}else{
+						$scope.agentInfo.syscheck.start = "Unknown";
+					}
+				}, printError);
+				
+				// Get rootcheck info
+				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
+					$scope.agentInfo.rootcheck = data.data;
+					$scope.agentInfo.rootcheck.duration = "Unknown";
+					if($scope.agentInfo.rootcheck.end != null && $scope.agentInfo.rootcheck.start != null){
+						var rootcheckTime = new Date($scope.agentInfo.rootcheck.start);
+						var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.end);
+						var minutes = ((rootcheckEndTime-rootcheckTime)/1000)/60;
+						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);			
+					}else if($scope.agentInfo.rootcheck.end == null){
+						$scope.agentInfo.rootcheck.end = "Unknown";
+					}else{
+						$scope.agentInfo.rootcheck.start = "Unknown";
+					}						
+				}, printError);				
+				
+			}, printError);	
         }
     };
 
