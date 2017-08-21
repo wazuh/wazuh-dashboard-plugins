@@ -167,6 +167,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			// Get Agent Info
 			DataFactory.getAndClean('get', '/agents/' + agent.id, {}).then(function (data) {
 				$scope.agentInfo = data.data;
+				$rootScope.agent = $scope.agentInfo;
 				if(angular.isUndefined($scope.agentInfo.version))
 					$scope.agentInfo.version = "Unknown";
 				if(angular.isUndefined($scope.agentInfo.os)) {
