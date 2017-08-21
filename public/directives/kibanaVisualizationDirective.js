@@ -1,7 +1,7 @@
 import rison from 'rison-node';
-import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
-import UtilsBrushEventProvider from 'ui/utils/brush_event';
-import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_click_handler';
+import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
+import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
+import { FilterBarClickHandlerProvider } from 'ui/filter_bar/filter_bar_click_handler';
 
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnVis', [function () {
@@ -49,18 +49,17 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	// Set filters
 	$scope.filter = {};
 	$scope.cluster_info = appState.getClusterInfo();
-  $scope.agent_info = $rootScope.agent;
+        $scope.agent_info = $rootScope.agent;
+        $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
 
-  $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
+        if($rootScope.page == "agents"){
+      	   $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
+           $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
+        }else
+           $scope.global_filter = $scope.cluster_filter;
 
-  if($rootScope.page == "agents"){
-      $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
-      $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
-  }else
-      $scope.global_filter = $scope.cluster_filter;
-
-  if($scope.visFilter != "")
-      $scope.global_filter = $scope.visFilter + " AND " + $scope.global_filter;
+        if($scope.visFilter != "")
+           $scope.global_filter = $scope.visFilter + " AND " + $scope.global_filter;
 
 	$scope.filter.raw = $scope.global_filter;
 	$scope.filter.current = $scope.filter.raw;
@@ -124,7 +123,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.searchSource = $scope.newVis.searchSource;
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
-		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
+		const filterBarClickHandler = Private(FilterBarClickHandlerProvider);
 		$timeout(
 		function() {
 
