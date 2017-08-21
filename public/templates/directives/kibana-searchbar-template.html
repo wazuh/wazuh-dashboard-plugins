@@ -3,7 +3,7 @@
 <kbn-top-nav name="searchbar" config="topNavMenu">
     <div class="kibana-nav-info"></div>
 </kbn-top-nav>
- 
+
   <navbar name="discover-search">
     <form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
       <div class="typeahead" kbn-typeahead="discover" on-select="">
@@ -30,15 +30,4 @@
   </navbar>
 
   <filter-bar state="$state" class="mainSearchBar"></filter-bar>
-	<div layout="row" layout-align="center stretch" id="pciRequirementBox" style="display: none;">
-		<md-card flex>
-			<md-card-content>
-				<span class="md-headline">
-					PCI DSS Requirement <span id="pciRequirementBox_ReqTitle"></span>
-					<span onClick="$('#pciRequirementBox').hide()" style="float: right"><i class="fa fa-times" aria-hidden="true"></i></span>
-				</span>
-				<p id="pciRequirementBox_ReqContent"></p>
-			</md-card-content>
-		</md-card>
-	</div>
 </div>

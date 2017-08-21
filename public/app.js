@@ -66,7 +66,6 @@ require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');
 require('plugins/wazuh/../node_modules/bootstrap/dist/js/bootstrap.min.js');
 require('plugins/wazuh/utils/fontawesome/css/font-awesome.min.css');
 require('plugins/wazuh/utils/infinite_scroll/infinite-scroll.js');
-require('../../../ui_framework/dist/ui_framework.css');
 
 //Material
 require('plugins/wazuh/../node_modules/angular-material/angular-material.css');

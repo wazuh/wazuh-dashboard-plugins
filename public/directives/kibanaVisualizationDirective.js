@@ -1,7 +1,7 @@
 import rison from 'rison-node';
-import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
-import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
-import { FilterBarClickHandlerProvider } from 'ui/filter_bar/filter_bar_click_handler';
+import FilterBarQueryFilterProvider from 'ui/filter_bar/query_filter';
+import UtilsBrushEventProvider from 'ui/utils/brush_event';
+import FilterBarFilterBarClickHandlerProvider from 'ui/filter_bar/filter_bar_click_handler';
 
 var app = require('ui/modules').get('app/wazuh', [])
   .directive('kbnVis', [function () {
@@ -39,7 +39,7 @@ var app = require('ui/modules').get('app/wazuh', [])
   }]);
 
 
-require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
+require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, $route, genericReq, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
 
 	if(typeof $rootScope.visCounter === "undefined")
 		$rootScope.visCounter = 0;
@@ -48,9 +48,23 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 	// Set filters
 	$scope.filter = {};
-	$scope.defaultManagerName = appState.getDefaultManager().name;
-	$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
+	$scope.cluster_info = appState.getClusterInfo();
+  $scope.agent_info = $rootScope.agent;
+
+  $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
+
+  if($rootScope.page == "agents"){
+      $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
+      $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
+  }else
+      $scope.global_filter = $scope.cluster_filter;
+
+  if($scope.visFilter != "")
+      $scope.global_filter = $scope.visFilter + " AND " + $scope.global_filter;
+
+	$scope.filter.raw = $scope.global_filter;
 	$scope.filter.current = $scope.filter.raw;
+
 
 	// Initialize and decode params
 	var visState = {};
@@ -77,7 +91,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			if($route.current.params._g.startsWith("h@")){
 				decodedTimeFilter = JSON.parse(sessionStorage.getItem($route.current.params._g));
 			}else{
-				decodedTimeFilter = rison.decode($route.current.params._g);    
+				decodedTimeFilter = rison.decode($route.current.params._g);
 			}
 
 			if(decodedTimeFilter.time){
@@ -91,13 +105,13 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			timefilter.time.from = "now-1d";
 			timefilter.time.to = "now";
 		}
-	
+
 		// Set time filter if needed
 		if($scope.visTimefilter){
 			timefilter.time.from = "now-"+$scope.visTimefilter;
 			timefilter.time.to = "now";
 		}
-		
+
 		// Initialize time
 		$scope.timefilter = timefilter;
 
@@ -110,16 +124,16 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.searchSource = $scope.newVis.searchSource;
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
-		const filterBarClickHandler = Private(FilterBarClickHandlerProvider);
+		const filterBarClickHandler = Private(FilterBarFilterBarClickHandlerProvider);
 		$timeout(
 		function() {
 
-		
+
 			// Bind visualization, index pattern and state
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
 			$scope.state = $state;
-			
+
 			// Build visualization
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
@@ -141,7 +155,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 				$rootScope.visCounter--;
 				return;
 			}
-			
+
 			$scope.vis.setUiState($scope.uiState);
 			$scope.vis.setState(visState);
 			$rootScope.visCounter--;
@@ -194,16 +208,24 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		// Watcher
 		var visFilterWatch = $scope.$watch("visFilter", function () {
-			$scope.filter.raw = $scope.visFilter + " AND manager.name: " + $scope.defaultManagerName;
+      if($rootScope.page == "agents"){
+          $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
+          $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
+      }else
+          $scope.global_filter = $scope.cluster_filter;
+
+      if($scope.visFilter != "")
+          $scope.global_filter = $scope.visFilter + " AND " + $scope.global_filter;
+    	$scope.filter.raw = $scope.global_filter;
 			$scope.filter.current = $scope.filter.raw;
 			$scope.fetch();
-		});		
-		 
+		});
+
 		// Destroy
 		$scope.$on('$destroy', function () {
 			$scope.newVis.destroy();
 		});
-		
+
 		$scope.$on('$destroy', updateQueryWatch);
 		$scope.$on('$destroy', fetchVisualizationWatch);
 		$scope.$on('$destroy', visFilterWatch);
