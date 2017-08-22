@@ -88,20 +88,13 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 
 
-require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
+require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, $q, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
     $scope.cluster_info = appState.getClusterInfo();
     $scope.agent_info = $rootScope.agent;
 
     $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
 
-    if($rootScope.page == "agents" && $location.path() != "/discover/"){
-        $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
-        $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
-    }else
-        $scope.global_filter = $scope.cluster_filter;
-
-    console.log($scope.disFilter);
     if(!angular.isUndefined($scope.disFilter))
         $scope.global_filter = $scope.disFilter + " AND " + $scope.global_filter;
 
@@ -150,7 +143,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                 $scope._ip = result;
                 savedSearches.get().then(function(result) {
                     $scope._savedSearch = result;
-
+					var isFilterSet = false;
                     const Vis = Private(VisProvider);
                     const docTitle = Private(DocTitleProvider);
                     const brushEvent = Private(UtilsBrushEventProvider);
@@ -160,7 +153,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     $scope.queryDocLinks = documentationLinks.query;
                     $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
                     $scope.showInterval = false;
-
                     $scope.intervalEnabled = function(interval) {
                         return interval.val !== 'custom';
                     };
@@ -194,6 +186,8 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     $scope.searchSource = savedSearch.searchSource;
                     $scope.indexPattern = resolveIndexPatternLoading();
                     $scope.searchSource.set('index', $scope.indexPattern);
+					
+
 
                     if (savedSearch.id) {
                         docTitle.change(savedSearch.title);
@@ -655,7 +649,25 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     }
 
                     init();
-                });
+	
+		$scope.$parent.$parent.$watch('chrome.httpActive', function() {
+			if(!isFilterSet){
+				const newFilters = [];
+				isFilterSet = true;
+				var negate = false;
+				var index = 'wazuh-alerts-*';
+				var clusterFilter = { meta: { negate, index }, query: { match: {} } };
+				clusterFilter.query.match['cluster.name'] = { query: $scope.cluster_info.cluster, type: 'phrase' };
+				newFilters.push(clusterFilter);
+				if($rootScope.page == "agents" && $location.path() != "/discover/"){
+					var agentFilter = { meta: { negate, index }, query: { match: {} } };
+					agentFilter.query.match['agent.id'] = { query: $scope.agent_info.id, type: 'phrase' };
+					newFilters.push(agentFilter);
+				}
+				queryFilter.addFilters(newFilters);
+			}
+		}, true);
+	});
             });
 
 
