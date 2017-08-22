@@ -8,6 +8,7 @@ require('ui/registry/doc_views.js');
 require('plugins/kbn_doc_views/kbn_doc_views.js');
 require('ui/tooltip/tooltip.js');
 import 'plugins/kibana/discover/components/field_chooser';
+import * as columnActions from 'ui/doc_table/actions/columns';
 import _ from 'lodash';
 import moment from 'moment';
 import { getSort } from 'ui/doc_table/lib/get_sort';
@@ -40,7 +41,6 @@ import { uiModules } from 'ui/modules';
 import indexTemplate from 'plugins/wazuh/templates/directives/dis-template.html';
 import { StateProvider } from 'ui/state_management/state';
 import { documentationLinks } from 'ui/documentation_links/documentation_links';
-import * as columnActions from 'ui/doc_table/actions/columns';
 import 'ui/debounce';
 import 'plugins/kibana/discover/saved_searches/saved_searches';
 import 'plugins/kibana/discover/directives/no_results';
@@ -90,19 +90,19 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
-
     $scope.cluster_info = appState.getClusterInfo();
     $scope.agent_info = $rootScope.agent;
 
     $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
 
-    if($rootScope.page == "agents"){
+    if($rootScope.page == "agents" && $location.path() != "/discover/"){
         $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
         $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
     }else
         $scope.global_filter = $scope.cluster_filter;
 
-    if($scope.disFilter != "")
+    console.log($scope.disFilter);
+    if(!angular.isUndefined($scope.disFilter))
         $scope.global_filter = $scope.disFilter + " AND " + $scope.global_filter;
 
     $scope.stateQuery = $scope.global_filter;
@@ -157,7 +157,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     const HitSortFn = Private(PluginsKibanaDiscoverHitSortFnProvider);
                     const queryFilter = Private(FilterBarQueryFilterProvider);
                     const filterManager = Private(FilterManagerProvider);
-
+                    $scope.queryDocLinks = documentationLinks.query;
                     $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
                     $scope.showInterval = false;
 
@@ -210,7 +210,9 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         $scope.state.sort = disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern);
                     }
 
-                    const $appStatus = $scope.appStatus = {};
+                    const $appStatus = $scope.appStatus = {
+                          dirty: !savedSearch.id
+                    };
                     let stateMonitor;
                     const $state = $scope.state;
                     $scope.uiState = $state.makeStateful('uiState');

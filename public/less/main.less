@@ -3,21 +3,6 @@ body{
    width:100%;
 }
 
-.cluster-checkbox {
-	width: 30px !important;
-}
-
-
-md-card.text-centered {
-	position: relative;
-}
-
-md-card.text-centered md-card-content {
-	position: absolute;
-	top: 50%; left: 50%;
-	transform: translate(-50%,-50%);
-}
-
 @-webkit-keyframes uil-ring-anim {
   0% {
     -webkit-transform: rotate(0deg);
@@ -101,11 +86,6 @@ div.uil-ring-css {
 	border-radius: 50%;
 }
 
-.agent-buttons .md-button {
-	width: 40px !important;
-	height: 40px !important;
-}
-
 .md-button.md-fab md-icon{
 	color: white;
 }
@@ -118,8 +98,9 @@ div.agent-buttons {
 	z-index: 5;
 }
 
-.md-button.add-agent-icon:hover{
-	background-color: #3caed2 !important;
+.agent-buttons .md-button {
+	width: 40px !important;
+	height: 40px !important;
 }
 
 .md-button.add-agent-icon {
@@ -128,10 +109,14 @@ div.agent-buttons {
 	background-color: #83cce2;
 }
 
+.md-button.add-agent-icon:hover{
+	background-color: #3caed2 !important;
+}
+
 .md-button.delete-agent-icon:hover {
 	background-color: #e8488b !important;
 }
-
+  
 .md-button.delete-agent-icon {
 	background-color: #ee77a9;
 	position: relative;
@@ -141,7 +126,7 @@ div.agent-buttons {
 .md-button.restart-agent-icon:hover {
 	background-color: #7e3cd3 !important;
 }
-	
+
 .md-button.restart-agent-icon {
 	background-color: #ac82e3;
 	position: relative;
@@ -189,8 +174,17 @@ kbn-vis-value div{
 	font-weight: normal !important;
 }
 
+.wazuh-discover-searchbar{
+	margin-top: -60px !important;
+	z-index:9999;
+}
+
 .wazuh-discover-searchbar h1{
 	padding-bottom: 10px !important;
+}
+
+.wazuh-searchbar navbar{
+	margin-top: -40px !important;
 }
 
 .no-legend visualize-legend{
@@ -240,7 +234,7 @@ span.md-headline {
 .md-headline-small{
 	font-size: 18px;
 }
-.h3, h3 {
+.wazuh-h3 {
 	font-size: 18px !important;
 	font-weight: 400 !important;
 }
@@ -634,7 +628,7 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 	border: none !important;
 }
 
-.md-toolbar-tools h1, .md-toolbar-tools h2, .md-toolbar-tools h3 {
+.md-toolbar-tools h1, .md-toolbar-tools .wazuh-h2, .md-toolbar-tools h3 {
     font-size: inherit;
     font-weight: 500;
     text-transform: uppercase;
@@ -778,7 +772,7 @@ md-autocomplete input:-ms-input-placeholder {
 	font-weight: normal;
 }
 
-.h1, h1 {
+.wazuh-h1 {
 	font-size: 24px !important;
 }
 
@@ -993,16 +987,19 @@ md-select-menu.md-default-theme md-content md-option:not([disabled]):focus, md-s
 .metric-vis .metric-value {
   font-weight: normal;
 }
+
+.metric-value {
+ 	text-overflow: ellipsis;
+ 	white-space: nowrap;
+ 	overflow: hidden;
+ }
+ 
 .managerConfigurationArrow {
 	float: right;
 	margin-top: 6px;
 }
 svg:not(:root) {
 	overflow: visible !important;
-}
-.localBreadcrumbs {
-    margin-left: 13px;
-    font-weight: bold;
 }
 
 md-tooltip.md-default-theme, md-tooltip {
