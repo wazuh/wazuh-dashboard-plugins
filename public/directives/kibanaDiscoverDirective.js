@@ -531,27 +531,27 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
                     // TODO: On array fields, negating does not negate the combination, rather all terms
                     $scope.filterQuery = function (field, values, operation) {
-    $scope.indexPattern.popularizeField(field, 1);
-    filterManager.add(field, values, operation, $state.index);
-  };
+                        $scope.indexPattern.popularizeField(field, 1);
+                        filterManager.add(field, values, operation, $state.index);
+                    };
 
-  $scope.addColumn = function addColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
-    columnActions.addColumn($scope.state.columns, columnName);
-  };
+                    $scope.addColumn = function addColumn(columnName) {
+                        $scope.indexPattern.popularizeField(columnName, 1);
+                        columnActions.addColumn($scope.state.columns, columnName);
+                    };
 
-  $scope.removeColumn = function removeColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
-    columnActions.removeColumn($scope.state.columns, columnName);
-  };
+                    $scope.removeColumn = function removeColumn(columnName) {
+                        $scope.indexPattern.popularizeField(columnName, 1);
+                        columnActions.removeColumn($scope.state.columns, columnName);
+                    };
 
-  $scope.moveColumn = function moveColumn(columnName, newIndex) {
-    columnActions.moveColumn($scope.state.columns, columnName, newIndex);
-  };
+                    $scope.moveColumn = function moveColumn(columnName, newIndex) {
+                        columnActions.moveColumn($scope.state.columns, columnName, newIndex);
+                    };
 
-  $scope.toTop = function () {
-    $window.scrollTo(0, 0);
-  };
+                    $scope.toTop = function () {
+                        $window.scrollTo(0, 0);
+                    };
 
                     let loadingVis;
 
@@ -649,25 +649,25 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     }
 
                     init();
-	
-					$scope.$parent.$parent.$watch('chrome.httpActive', function() {
-						if(!isFilterSet){
-							const newFilters = [];
-							isFilterSet = true;
-							var negate = false;
-							var index = 'wazuh-alerts-*';
-							var clusterFilter = { meta: { negate, index }, query: { match: {} } };
-							clusterFilter.query.match['cluster.name'] = { query: $scope.cluster_info.cluster, type: 'phrase' };
-							newFilters.push(clusterFilter);
-							if($rootScope.page == "agents" && $location.path() != "/discover/"){
-								var agentFilter = { meta: { negate, index }, query: { match: {} } };
-								agentFilter.query.match['agent.id'] = { query: $scope.agent_info.id, type: 'phrase' };
-								newFilters.push(agentFilter);
-							}
-							queryFilter.addFilters(newFilters);
-						}
-					}, true);
-				});
+
+                    $scope.$parent.$parent.$watch('chrome.httpActive', function() {
+                        if(!isFilterSet){
+                            const newFilters = [];
+                            isFilterSet = true;
+                            var negate = false;
+                            var index = 'wazuh-alerts-*';
+                            var clusterFilter = { meta: { negate, index }, query: { match: {} } };
+                            clusterFilter.query.match['cluster.name'] = { query: $scope.cluster_info.cluster, type: 'phrase' };
+                            newFilters.push(clusterFilter);
+                            if($rootScope.page == "agents" && $location.path() != "/discover/"){
+                                var agentFilter = { meta: { negate, index }, query: { match: {} } };
+                                agentFilter.query.match['agent.id'] = { query: $scope.agent_info.id, type: 'phrase' };
+                                newFilters.push(agentFilter);
+                            }
+                            queryFilter.addFilters(newFilters);
+                        }
+                    }, true);
+                });
             });
         });
 });
