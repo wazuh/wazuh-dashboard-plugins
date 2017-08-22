@@ -143,7 +143,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                 $scope._ip = result;
                 savedSearches.get().then(function(result) {
                     $scope._savedSearch = result;
-					var isFilterSet = false;
+                    var isFilterSet = false;
                     const Vis = Private(VisProvider);
                     const docTitle = Private(DocTitleProvider);
                     const brushEvent = Private(UtilsBrushEventProvider);
