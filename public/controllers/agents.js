@@ -104,6 +104,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			fields = {"fields" : [{"field": "agent.id", "value": agent_id}]};
 		var clusterName = {"cluster" : $scope.cluster_info.cluster};
 		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
+    console.log(payload);
 		angular.extend(payload, fields, clusterName, timeInterval);
 
 		var deferred = $q.defer();
@@ -188,15 +189,15 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				}
 				if(angular.isUndefined($scope.agentInfo.lastKeepAlive))
 					$scope.agentInfo.lastKeepAlive = "Unknown";
-				
+
 				$scope._agent = data.data;
 				$scope.search = data.data.name;
 				$location.search('id', $scope._agent.id);
-				$scope.presentData($scope._agent.name).then(function (data) {
-					$scope.results = data;					
+				$scope.presentData($scope._agent.id).then(function (data) {
+					$scope.results = data;
 					$scope.load = false;
 				});
-				
+
 				// Get syscheck info
 				DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
 					$scope.agentInfo.syscheck = data.data;
@@ -205,14 +206,14 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 						var syscheckTime = new Date($scope.agentInfo.syscheck.start);
 						var syscheckEndTime = new Date($scope.agentInfo.syscheck.end);
 						var minutes = ((syscheckEndTime-syscheckTime)/1000)/60;
-						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);			
+						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);
 					}else if($scope.agentInfo.syscheck.end == null){
 						$scope.agentInfo.syscheck.end = "Unknown";
 					}else{
 						$scope.agentInfo.syscheck.start = "Unknown";
 					}
 				}, printError);
-				
+
 				// Get rootcheck info
 				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
 					$scope.agentInfo.rootcheck = data.data;
@@ -221,15 +222,15 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 						var rootcheckTime = new Date($scope.agentInfo.rootcheck.start);
 						var rootcheckEndTime = new Date($scope.agentInfo.rootcheck.end);
 						var minutes = ((rootcheckEndTime-rootcheckTime)/1000)/60;
-						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);			
+						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);
 					}else if($scope.agentInfo.rootcheck.end == null){
 						$scope.agentInfo.rootcheck.end = "Unknown";
 					}else{
 						$scope.agentInfo.rootcheck.start = "Unknown";
-					}						
-				}, printError);				
-				
-			}, printError);	
+					}
+				}, printError);
+
+			}, printError);
         }
     };
 
