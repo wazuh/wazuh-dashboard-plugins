@@ -88,7 +88,7 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 
 
-require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, $q, config, courier, $route, $window, Notifier,
+require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
     $scope.cluster_info = appState.getClusterInfo();
     $scope.agent_info = $rootScope.agent;
@@ -650,27 +650,24 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
                     init();
 	
-		$scope.$parent.$parent.$watch('chrome.httpActive', function() {
-			if(!isFilterSet){
-				const newFilters = [];
-				isFilterSet = true;
-				var negate = false;
-				var index = 'wazuh-alerts-*';
-				var clusterFilter = { meta: { negate, index }, query: { match: {} } };
-				clusterFilter.query.match['cluster.name'] = { query: $scope.cluster_info.cluster, type: 'phrase' };
-				newFilters.push(clusterFilter);
-				if($rootScope.page == "agents" && $location.path() != "/discover/"){
-					var agentFilter = { meta: { negate, index }, query: { match: {} } };
-					agentFilter.query.match['agent.id'] = { query: $scope.agent_info.id, type: 'phrase' };
-					newFilters.push(agentFilter);
-				}
-				queryFilter.addFilters(newFilters);
-			}
-		}, true);
-	});
+					$scope.$parent.$parent.$watch('chrome.httpActive', function() {
+						if(!isFilterSet){
+							const newFilters = [];
+							isFilterSet = true;
+							var negate = false;
+							var index = 'wazuh-alerts-*';
+							var clusterFilter = { meta: { negate, index }, query: { match: {} } };
+							clusterFilter.query.match['cluster.name'] = { query: $scope.cluster_info.cluster, type: 'phrase' };
+							newFilters.push(clusterFilter);
+							if($rootScope.page == "agents" && $location.path() != "/discover/"){
+								var agentFilter = { meta: { negate, index }, query: { match: {} } };
+								agentFilter.query.match['agent.id'] = { query: $scope.agent_info.id, type: 'phrase' };
+								newFilters.push(agentFilter);
+							}
+							queryFilter.addFilters(newFilters);
+						}
+					}, true);
+				});
             });
-
-
         });
-
 });
