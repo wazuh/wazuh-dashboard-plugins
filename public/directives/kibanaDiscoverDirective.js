@@ -193,7 +193,11 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     // the actual courier.SearchSource
                     $scope.searchSource = savedSearch.searchSource;
                     $scope.indexPattern = resolveIndexPatternLoading();
-                    $scope.searchSource.set('index', $scope.indexPattern);
+                    $scope.searchSource
+                        .set('index', $scope.indexPattern)
+                        .highlightAll(true)
+                        .version(true);
+
 
                     if (savedSearch.id) {
                         docTitle.change(savedSearch.title);
@@ -525,39 +529,36 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     };
 
                     $scope.updateDataSource = Promise.method(function updateDataSource() {
-
                         $scope.searchSource
                             .size($scope.opts.sampleSize)
                             .sort(getSort($state.sort, $scope.indexPattern))
-                            .query(!$scope.stateQuery ? null : $scope.stateQuery)
-                            .set('filter', queryFilter.getFilters())
-                            .highlightAll(true);
-
+                            .query(!$state.query ? null : $state.query)
+                            .set('filter', queryFilter.getFilters());
                     });
 
                     // TODO: On array fields, negating does not negate the combination, rather all terms
                     $scope.filterQuery = function (field, values, operation) {
-    $scope.indexPattern.popularizeField(field, 1);
-    filterManager.add(field, values, operation, $state.index);
-  };
+                        $scope.indexPattern.popularizeField(field, 1);
+                        filterManager.add(field, values, operation, $state.index);
+                    };
 
-  $scope.addColumn = function addColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
-    columnActions.addColumn($scope.state.columns, columnName);
-  };
+                    $scope.addColumn = function addColumn(columnName) {
+                        $scope.indexPattern.popularizeField(columnName, 1);
+                        columnActions.addColumn($scope.state.columns, columnName);
+                    };
 
-  $scope.removeColumn = function removeColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
-    columnActions.removeColumn($scope.state.columns, columnName);
-  };
+                    $scope.removeColumn = function removeColumn(columnName) {
+                        $scope.indexPattern.popularizeField(columnName, 1);
+                        columnActions.removeColumn($scope.state.columns, columnName);
+                    };
 
-  $scope.moveColumn = function moveColumn(columnName, newIndex) {
-    columnActions.moveColumn($scope.state.columns, columnName, newIndex);
-  };
+                    $scope.moveColumn = function moveColumn(columnName, newIndex) {
+                        columnActions.moveColumn($scope.state.columns, columnName, newIndex);
+                    };
 
-  $scope.toTop = function () {
-    $window.scrollTo(0, 0);
-  };
+                    $scope.toTop = function () {
+                        $window.scrollTo(0, 0);
+                    };
 
                     let loadingVis;
 
@@ -603,7 +604,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                                     timefilter.time.to = moment(e.point.x + e.data.ordered.interval);
                                     timefilter.time.mode = 'absolute';
                                 },
-                                brush: brushEvent($state)
+                                brush: brushEvent($scope.state)
                             },
                             aggs: visStateAggs
                         });

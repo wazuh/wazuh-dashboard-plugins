@@ -2,9 +2,7 @@
 
   <kbn-top-nav name="discover" config="topNavMenu">
     <!-- Transcluded elements. -->
-
-  </kbn-top-nav>
-	<div data-transclude-slots class="wazuh-discover-searchbar">
+    <div data-transclude-slots>
       <!-- Breadcrumbs. -->
       <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
         <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb">
@@ -18,21 +16,21 @@
       </div>
 
       <!-- Search. -->
-      <navbar name="discover-search">
-		<form
-			class="fullWidth"
-			role="form"
-			name="discoverSearch"
-			ng-submit="fetch()"
-		>
-        <div class="typeahead" kbn-typeahead="discover" on-select="">
+      <form
+        data-transclude-slot="bottomRow"
+        class="fullWidth"
+        role="form"
+        name="discoverSearch"
+        ng-submit="fetch()"
+      >
+        <div class="typeahead" kbn-typeahead="discover" on-select="fetch()">
           <div class="kuiLocalSearch">
             <div class="kuiLocalSearchAssistedInput">
               <input
                 parse-query
                 input-focus
                 kbn-typeahead-input
-                ng-model="stateQuery"
+                ng-model="state.query"
                 placeholder="Search... (e.g. status:200 AND extension:PHP)"
                 aria-label="Search input"
                 type="text"
@@ -63,9 +61,8 @@
           <kbn-typeahead-items></kbn-typeahead-items>
         </div>
       </form>
-	  </navbar>
-
     </div>
+  </kbn-top-nav>
 
   <div class="container-fluid" role="main">
   <div class="row">
