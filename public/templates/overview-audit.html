@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'audit'" ng-controller="overviewAuditController" layout-align="space-around">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
     <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(16)'><div></div></div>
 
 	<!-- No results message -->

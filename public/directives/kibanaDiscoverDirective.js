@@ -91,17 +91,15 @@ var app = require('ui/modules').get('app/wazuh', [])
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
     $scope.cluster_info = appState.getClusterInfo();
-    $scope.agent_info = $rootScope.agent;
-
     $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
 
     if($rootScope.page == "agents" && $location.path() != "/discover/"){
-        $scope.agent_filter = "agent.id: " + $scope.agent_info.id;
+        $scope.agent_info = $rootScope.agent;
+        $scope.agent_filter = "agent.id: " + $route.current.params.id;
         $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
     }else
         $scope.global_filter = $scope.cluster_filter;
 
-    console.log($scope.disFilter);
     if(!angular.isUndefined($scope.disFilter))
         $scope.global_filter = $scope.disFilter + " AND " + $scope.global_filter;
 

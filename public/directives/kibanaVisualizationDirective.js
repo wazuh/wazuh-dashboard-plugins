@@ -167,7 +167,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Fetch visualization
 		$scope.fetch = function ()
 		{
-
 			if($scope.visIndexPattern == "wazuh-alerts-*"){
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
 				$scope.searchSource.set('query', $scope.filter.current);
@@ -195,7 +194,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Listen for query changes
 		var updateQueryWatch = $rootScope.$on('updateQuery', function (event, query) {
 			if(query !== "undefined" && !$scope.not_aggregable){
-				$scope.filter.current.query_string.query = $scope.filter.raw+" AND "+query.query_string.query;
+				$scope.filter.current = $scope.filter.raw+" AND "+query;
 				$scope.fetch();
 			}
 		 });
