@@ -54,8 +54,8 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
-        $scope.stateQuery = $scope.stateQuery == "" ? "*" : $scope.stateQuery;
-        $rootScope.$broadcast('updateQuery',"(" + $scope.stateQuery + ")");
+        this.stateQuery = this.stateQuery == "" ? "*" : this.stateQuery;
+        $rootScope.$broadcast('updateQuery',"(" + this.stateQuery + ")");
 	};
 
 	$scope.queryFilter = Private(FilterBarQueryFilterProvider);
