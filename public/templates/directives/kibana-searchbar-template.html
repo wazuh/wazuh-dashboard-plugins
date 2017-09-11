@@ -1,7 +1,8 @@
 <div ng-controller="kibanaSearchBar">
   <kbn-top-nav name="discover" config="topNavMenu">
     <!-- Transcluded elements. -->
-    <div data-transclude-slots>
+      </kbn-top-nav>
+<div data-transclude-slots>
       <!-- Search. -->
       <form
         data-transclude-slot="bottomRow"
@@ -49,7 +50,6 @@
         </div>
       </form>
     </div>
-  </kbn-top-nav>
 
   <filter-bar state="$state" class="mainSearchBar"></filter-bar>
 	<div layout="row" layout-align="center stretch" id="pciRequirementBox" style="display: none;">
