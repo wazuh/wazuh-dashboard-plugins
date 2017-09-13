@@ -8,7 +8,7 @@ module.exports = function (server, options) {
 	//callWithInternalUser
 	
 	// External libraries
-	const uiSettings = server.uiSettings();
+	//const uiSettings = server.uiSettings();
 	const fs = require('fs');
 	const path = require('path');
 
@@ -117,6 +117,7 @@ module.exports = function (server, options) {
 				server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
 				// Once index pattern is created, set it as default, wait few seconds for Kibana.
 				setTimeout(function () {
+					console.log("setting up");
 					setDefaultKibanaSettings();
 				}, 2000)					
 			}, function (response) {
@@ -132,7 +133,18 @@ module.exports = function (server, options) {
 	var setDefaultKibanaSettings = function () {
         server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default values: Index pattern, time picker and metaFields...');
 			
-        uiSettings.setMany(req,{'defaultIndex':'wazuh-alerts-*', 'timepicker:timeDefaults':'{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}','metaFields':['_source']})
+		elasticRequest.callWithInternalUser('update', { 
+        	index: '.kibana', 
+        	type: 'config', 
+        	id: '5.6.0', 
+        	body: { 
+        		doc: {
+        			'defaultIndex':'wazuh-alerts-*', 
+        			'timepicker:timeDefaults':'{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}',
+        			'metaFields':['_source']
+        		}
+        	}
+        })
             .then(function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Kibana default values set');
             }).catch(function (data) {
@@ -261,7 +273,9 @@ module.exports = function (server, options) {
 	var checkKibanaIndex = function () {
 		elasticRequest.callWithInternalUser('exists',{ index: ".kibana", id: packageJSON.kibana.version, type: "config" }).then(
 			function (data) {
-				init();
+				server.plugins.elasticsearch.waitUntilReady().then(function () {
+					init();
+				});
 			}, function (data) {
 				server.log([blueWazuh, 'initialize', 'info'], 'Waiting index ".kibana" to be created and prepared....');
 				setTimeout(function () {checkKibanaIndex()}, 3000)
