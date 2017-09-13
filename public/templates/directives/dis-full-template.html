@@ -110,9 +110,9 @@
     <discover-field
       ng-repeat="field in fields.raw|filter:{display:true}"
       field="field"
-      on-add-field="onAddField"
+      on-add-field="addColumn"
       on-add-filter="onAddFilter"
-      on-remove-field="onRemoveField"
+      on-remove-field="removeColumn"
       on-show-details="computeDetails"
     >
     </discover-field>
@@ -205,9 +205,9 @@
     <discover-field
       ng-repeat="field in popularFields | filter:filter.isFieldFiltered"
       field="field"
-      on-add-field="onAddField"
+      on-add-field="addColumn"
       on-add-filter="onAddFilter"
-      on-remove-field="onRemoveField"
+      on-remove-field="removeColumn"
       on-show-details="computeDetails"
     >
     </discover-field>
@@ -219,9 +219,9 @@
     <discover-field
       ng-repeat="field in unpopularFields | filter:filter.isFieldFiltered"
       field="field"
-      on-add-field="onAddField"
+      on-add-field="addColumn"
       on-add-filter="onAddFilter"
-      on-remove-field="onRemoveField"
+      on-remove-field="removeColumn"
       on-show-details="computeDetails"
     >
     </discover-field>

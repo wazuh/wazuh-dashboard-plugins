@@ -55,6 +55,7 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { savedSearchProvider } from 'plugins/kibana/discover/saved_searches/saved_search_register';
 import { getDefaultQuery } from 'ui/parse_query';
 import { IndexPatternsFieldListProvider } from 'ui/index_patterns/_field_list';
+import { fieldCalculator } from 'plugins/kibana/discover/components/field_chooser/lib/field_calculator';
 
 SavedObjectRegistryProvider.register(savedSearchProvider);
 
@@ -93,6 +94,16 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
+        $scope.$watch(function () {
+            console.log($('a.kuiButton.kuiButton--primary.kuiButton--small.kuiButton--fullWidth.kuiVerticalRhythmSmall').length);
+            return $('a.kuiButton.kuiButton--primary.kuiButton--small.kuiButton--fullWidth.kuiVerticalRhythmSmall').length;
+        }, function() {
+            document.querySelectorAll('.kuiButton.kuiButton--primary.kuiButton--small.kuiButton--fullWidth.kuiVerticalRhythmSmall').forEach(function(elem){
+                //elem.attr('ng-href') = elem.attr('ng-href').replace('/wazuh#', '/kibana#'); 
+            console.log(elem.getAttribute("ng-href").value);
+            });
+        });
+        
         const FieldList = Private(IndexPatternsFieldListProvider);
     $scope.cluster_info = appState.getClusterInfo();
     $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
@@ -111,12 +122,13 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
     $scope.chrome = {};
     $scope.removeColumn = function removeColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
+        $scope.indexPattern.popularizeField(columnName, 1);
         columnActions.removeColumn($scope.state.columns, columnName);
     };
     $scope.addColumn = function addColumn(columnName) {
         $scope.indexPattern.popularizeField(columnName, 1);
         columnActions.addColumn($scope.state.columns, columnName);
+        $scope.columns = $scope.state.columns;
     };
     $scope.chrome.getVisible = function() {
         return true;
@@ -551,15 +563,18 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     $scope.addColumn = function addColumn(columnName) {
                         $scope.indexPattern.popularizeField(columnName, 1);
                         columnActions.addColumn($scope.state.columns, columnName);
+                        $scope.columns = $scope.state.columns;
                     };
 
                     $scope.removeColumn = function removeColumn(columnName) {
                         $scope.indexPattern.popularizeField(columnName, 1);
                         columnActions.removeColumn($scope.state.columns, columnName);
+                        $scope.columns = $scope.state.columns;
                     };
 
                     $scope.moveColumn = function moveColumn(columnName, newIndex) {
                         columnActions.moveColumn($scope.state.columns, columnName, newIndex);
+                        $scope.columns = $scope.state.columns;
                     };
 
                     $scope.toTop = function () {
@@ -849,12 +864,13 @@ $scope.selectedIndexPattern = $scope.indexPatternList.find(
               visualizeUrl: field.visualizable ? getVisualizeUrl(field) : null,
             },
             fieldCalculator.getFieldValueCounts({
-              hits: $scope.hits,
+              hits: $scope.rows,
               field: field,
               count: 5,
               grouped: false
             }),
           );
+          console.log($scope);
           _.each(field.details.buckets, function (bucket) {
             bucket.display = field.format.convert(bucket.value);
           });
