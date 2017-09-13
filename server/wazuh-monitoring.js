@@ -282,7 +282,9 @@ module.exports = function (server, options) {
 	var checkElasticStatus = function () {
 		elasticRequest.callWithInternalUser('info').then(
 			function (data) {
-				init();
+				server.plugins.elasticsearch.waitUntilReady().then(function () {
+					init();
+				});
 			}, function (data) {
 				server.log([blueWazuh, 'initialize', 'info'], 'Waiting Elasticsearch to be up...');
 				setTimeout(function () {checkElasticStatus()}, 3000)
