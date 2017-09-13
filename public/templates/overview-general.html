@@ -25,38 +25,41 @@
 	<div ng-show="hideRing(15) && results && !loading" ng-if="tabView == 'panels'">
 		<div layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex layout="column">
-				<md-card-content>
-					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Alerts',type:metric))"
-					vis-filter="">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
+				<md-card-content class="metric">
 
-			<md-card flex layout="column">
-				<md-card-content>
-					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 12 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Level 12 or above',type:metric))"
-					vis-filter="rule.level:[12 TO *]"
-					>
-					</kbn-vis>
+									<kbn-vis-value vis-height="35px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter=""></kbn-vis-value>
+					<div class="ng-binding">Alerts</div>
 
 				</md-card-content>
 			</md-card>
 
 			<md-card flex layout="column">
-				<md-card-content>
-					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failure'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth failed',type:metric))"
-					vis-filter="(rule.groups: authentication_failed OR rule.groups: authentication_failures)"
-						>
-					</kbn-vis>
+				<md-card-content  class="metric">
+
+									<kbn-vis-value vis-height="35px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="rule.level:[12 TO *]"></kbn-vis-value>
+					<div class="ng-binding">Level 12 or above alerts</div>
+
+
 				</md-card-content>
 			</md-card>
 
 			<md-card flex layout="column">
-				<md-card-content>
-					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication success'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth success',type:metric))"
-					vis-filter="rule.groups: authentication_success"
-					>
-					</kbn-vis>
+				<md-card-content class="metric">
+
+
+				<kbn-vis-value vis-height="35px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="(rule.groups: authentication_failed OR rule.groups: authentication_failures)"></kbn-vis-value>
+
+					<div class="ng-binding">Authentication failure</div>
+
+				</md-card-content>
+			</md-card>
+
+			<md-card flex layout="column">
+				<md-card-content class="metric">
+
+								<kbn-vis-value vis-height="35px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="rule.groups: authentication_success"></kbn-vis-value>
+
+					<div class="ng-binding">Authentication success</div>
 				</md-card-content>
 			</md-card>
 		</div>
