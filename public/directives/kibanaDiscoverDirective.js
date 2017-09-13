@@ -93,32 +93,25 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
-    AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
-        $scope.$watch(function () {
-            console.log($('a.kuiButton.kuiButton--primary.kuiButton--small.kuiButton--fullWidth.kuiVerticalRhythmSmall').length);
-            return $('a.kuiButton.kuiButton--primary.kuiButton--small.kuiButton--fullWidth.kuiVerticalRhythmSmall').length;
-        }, function() {
-            document.querySelectorAll('.kuiButton.kuiButton--primary.kuiButton--small.kuiButton--fullWidth.kuiVerticalRhythmSmall').forEach(function(elem){
-                //elem.attr('ng-href') = elem.attr('ng-href').replace('/wazuh#', '/kibana#'); 
-            console.log(elem.getAttribute("ng-href").value);
-            });
-        });
-        
+    AppState, timefilter, Promise, Private, kbnUrl, $timeout, $location, savedSearches, appState, $rootScope, getAppState) {
+    
         const FieldList = Private(IndexPatternsFieldListProvider);
     $scope.cluster_info = appState.getClusterInfo();
     $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
 
     if($rootScope.page == "agents" && $location.path() != "/discover/"){
         $scope.agent_info = $rootScope.agent;
+
         $scope.agent_filter = "agent.id: " + $route.current.params.id;
         $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
+        $scope.stateQuery = $scope.global_filter;
+
     }else
         $scope.global_filter = $scope.cluster_filter;
 
     if(!angular.isUndefined($scope.disFilter))
         $scope.global_filter = $scope.disFilter + " AND " + $scope.global_filter;
 
-    $scope.stateQuery = $scope.global_filter;
 
     $scope.chrome = {};
     $scope.removeColumn = function removeColumn(columnName) {
@@ -870,7 +863,6 @@ $scope.selectedIndexPattern = $scope.indexPatternList.find(
               grouped: false
             }),
           );
-          console.log($scope);
           _.each(field.details.buckets, function (bucket) {
             bucket.display = field.format.convert(bucket.value);
           });
