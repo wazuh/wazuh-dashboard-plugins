@@ -21,6 +21,11 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
     return deferred.promise;
 }
 
+var goToVisualize = function ($location, $window) {
+    $location.search('id', null);
+    $window.location.href=$location.absUrl().replace('/wazuh#', '/kibana#');
+}
+
 //Routes
 routes.enable();
 routes
@@ -65,6 +70,13 @@ routes
     })
 	.when('/test/', {
         template: require('plugins/wazuh/templates/test.html')
+    })
+    .when('/visualize/create?', {
+        redirectTo: function() {
+        },
+        resolve: {
+            "check": goToVisualize
+        }
     })
     .when('/', {
         redirectTo: '/overview/',

@@ -144,13 +144,15 @@
 		
 		<md-content layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex="20" layout="column">
-					<md-card-content style="text-align: center;">
-						<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score,customLabel:'Higher score'),schema:metric,type:max)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="*"></kbn-vis>
+					<md-card-content class="metric">
+                        <kbn-vis-value vis-height="44px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:max)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:max),title:'Higher score',type:table))" vis-filter="*"></kbn-vis-value>
+                        <div class="ng-binding">Higher score</div>
 					</md-card-content>
 			</md-card>
 			<md-card flex="20" layout="column">
-					<md-card-content style="text-align: center;">
-						<kbn-vis vis-height="70px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score,customLabel:'Lower score'),schema:metric,type:min)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter="*"></kbn-vis>
+					<md-card-content class="metric">
+                        <kbn-vis-value vis-height="44px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:min)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:min),title:'Lower score',type:table))" vis-filter="*"></kbn-vis-value>
+                        <div class="ng-binding">Lower score</div>
 					</md-card-content>
 			</md-card>
 			<md-card  flex="60" layout="column">
