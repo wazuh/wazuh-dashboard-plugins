@@ -27,14 +27,14 @@
 		<md-content layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex="20" layout="column">
 					<md-card-content class="metric">
-                        <kbn-vis-value style="margin-top: 6px" vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:max)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:max),title:'Higher score',type:table))" vis-filter="agent.name: {{_agent.name ? _agent.name : '*'}}"></kbn-vis-value>
-                        <div class="ng-binding">Higher score</div>
+                        <kbn-vis-value style="margin-top: 6px" vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:max)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:max),title:'Highest score',type:table))" vis-filter="agent.name: {{_agent.name ? _agent.name : '*'}}"></kbn-vis-value>
+                        <div class="ng-binding">Highest score</div>
 					</md-card-content>
 			</md-card>
 			<md-card flex="20" layout="column">
 					<md-card-content class="metric">
-						<kbn-vis-value style="margin-top: 6px" vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:min)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:min),title:'Lower score',params:(fontSize:20,handleNoResults:!t),type:table))" vis-filter="agent.name: {{_agent.name ? _agent.name : '*'}}"></kbn-vis-value>
-                        <div class="ng-binding">Lower score</div>
+						<kbn-vis-value style="margin-top: 6px" vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:oscap.scan.score),schema:metric,type:min)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:min),title:'Lowest score',params:(fontSize:20,handleNoResults:!t),type:table))" vis-filter="agent.name: {{_agent.name ? _agent.name : '*'}}"></kbn-vis-value>
+                        <div class="ng-binding">Lowest score</div>
 					</md-card-content>
 			</md-card>
 			<md-card flex="20" layout="column">
