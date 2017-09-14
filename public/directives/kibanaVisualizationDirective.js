@@ -39,7 +39,7 @@ var app = require('ui/modules').get('app/wazuh', [])
   }]);
 
 
-require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
+require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, $route, genericReq, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
 
 	if(typeof $rootScope.visCounter === "undefined")
 		$rootScope.visCounter = 0;
@@ -77,7 +77,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			if($route.current.params._g.startsWith("h@")){
 				decodedTimeFilter = JSON.parse(sessionStorage.getItem($route.current.params._g));
 			}else{
-				decodedTimeFilter = rison.decode($route.current.params._g);    
+				decodedTimeFilter = rison.decode($route.current.params._g);
 			}
 
 			if(decodedTimeFilter.time){
@@ -91,13 +91,13 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			timefilter.time.from = "now-1d";
 			timefilter.time.to = "now";
 		}
-	
+
 		// Set time filter if needed
 		if($scope.visTimefilter){
 			timefilter.time.from = "now-"+$scope.visTimefilter;
 			timefilter.time.to = "now";
 		}
-		
+
 		// Initialize time
 		$scope.timefilter = timefilter;
 
@@ -114,12 +114,12 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$timeout(
 		function() {
 
-		
+
 			// Bind visualization, index pattern and state
 			$scope.vis = $scope.newVis.vis;
 			$scope.indexPattern = $scope.vis.indexPattern;
 			$scope.state = $state;
-			
+
 			// Build visualization
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
@@ -141,7 +141,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 				$rootScope.visCounter--;
 				return;
 			}
-			
+
 			$scope.vis.setUiState($scope.uiState);
 			$scope.vis.setState(visState);
 			$rootScope.visCounter--;
@@ -182,7 +182,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Listen for query changes
 		var updateQueryWatch = $rootScope.$on('updateQuery', function (event, query) {
 			if(query !== "undefined" && !$scope.not_aggregable){
-				$scope.filter.current.query_string.query = $scope.filter.raw+" AND "+query.query_string.query;
+				$scope.filter.current = $scope.filter.raw+" AND "+query;
 				$scope.fetch();
 			}
 		 });

@@ -251,7 +251,7 @@ module.exports = function (server, options) {
             if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
-                needle.request('get', getPath(req.payload)+'/version', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
+                needle.request('get', getPath(req.payload)+'/version', {}, { headers: { 'wazuh-app-version': appVersion }, username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
                     testApiAux1(error, response, req.payload, needle, function (test_result) {
 						if(test_result.data == "ok"){
 							needle.request('get', getPath(req.payload)+'/agents/000', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {

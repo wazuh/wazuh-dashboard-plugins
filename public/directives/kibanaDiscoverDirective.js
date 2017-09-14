@@ -8,6 +8,8 @@ require('ui/registry/doc_views.js');
 require('plugins/kbn_doc_views/kbn_doc_views.js');
 require('ui/tooltip/tooltip.js');
 import 'plugins/kibana/discover/components/field_chooser';
+import 'plugins/kibana/discover/components/field_chooser/field_chooser';
+
 import _ from 'lodash';
 import moment from 'moment';
 import { getSort } from 'ui/doc_table/lib/get_sort';
@@ -51,13 +53,16 @@ import 'plugins/kibana/discover/controllers/discover';
 import 'plugins/kibana/discover/styles/main.less';
 import 'ui/doc_table/components/table_row';
 import { SavedObjectRegistryProvider } from 'ui/saved_objects/saved_object_registry';
+import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { savedSearchProvider } from 'plugins/kibana/discover/saved_searches/saved_search_register';
+import { getDefaultQuery } from 'ui/parse_query';
+import { IndexPatternsFieldListProvider } from 'ui/index_patterns/_field_list';
+import { fieldCalculator } from 'plugins/kibana/discover/components/field_chooser/lib/field_calculator';
 
 SavedObjectRegistryProvider.register(savedSearchProvider);
 
-
-var app = uiModules.get('app/wazuh', [])
-    .directive('kbnDis', [function() { 
+var app = require('ui/modules').get('app/wazuh', [])
+    .directive('kbnDis', [function() {
         return {
             restrict: 'E',
             scope: {
@@ -72,7 +77,7 @@ var app = uiModules.get('app/wazuh', [])
         }
     }]);
 
-var app = uiModules.get('app/wazuh', [])
+var app = require('ui/modules').get('app/wazuh', [])
     .directive('kbnDisfull', [function() {
         return {
             restrict: 'E',
@@ -88,9 +93,10 @@ var app = uiModules.get('app/wazuh', [])
     }]);
 
 
-
-uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
-    AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
+require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
+    AppState, timefilter, Promise, Private, kbnUrl, $timeout, $location, savedSearches, appState, $rootScope, getAppState) {
+    
+        const FieldList = Private(IndexPatternsFieldListProvider);
 
     $scope.defaultManagerName = appState.getDefaultManager().name;
     $scope.stateQuery = $scope.disFilter;
@@ -102,6 +108,7 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
     $scope.addColumn = function addColumn(columnName) {
         $scope.indexPattern.popularizeField(columnName, 1);
         columnActions.addColumn($scope.state.columns, columnName);
+        $scope.columns = $scope.state.columns;
     };
     $scope.chrome.getVisible = function() {
         return true;
@@ -117,19 +124,25 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
     $rootScope.visCounter++;
 
     const State = Private(StateProvider);
-    courier.indexPatterns.getIds()
-        .then(function(list) {
+    const savedObjectsClient = Private(SavedObjectsClientProvider);
 
+    savedObjectsClient.find({
+        type: 'index-pattern',
+        fields: ['title'],
+        perPage: 10000
+      })
+      .then(({ savedObjects }) => {
+            $scope.indexPatternList = savedObjects;
             // Decode discover settings from directive
             var disDecoded = rison.decode($scope.disA);
             const state = disDecoded;
 
             const specified = !!state.index;
-            const exists = _.contains(list, state.index);
+            const exists = _.findIndex(savedObjects, o => o.id === state.index) > -1;
             const id = exists ? state.index : config.get('defaultIndex');
 
             Promise.props({
-                list: list,
+                list: savedObjects,
                 loaded: courier.indexPatterns.get(id),
                 stateVal: state.index,
                 stateValFound: specified && exists
@@ -144,8 +157,7 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
                     const HitSortFn = Private(PluginsKibanaDiscoverHitSortFnProvider);
                     const queryFilter = Private(FilterBarQueryFilterProvider);
                     const filterManager = Private(FilterManagerProvider);
-
-					$scope.queryDocLinks = documentationLinks.query;
+                    $scope.queryDocLinks = documentationLinks.query;
                     $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
                     $scope.showInterval = false;
 
@@ -181,7 +193,11 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
                     // the actual courier.SearchSource
                     $scope.searchSource = savedSearch.searchSource;
                     $scope.indexPattern = resolveIndexPatternLoading();
-                    $scope.searchSource.set('index', $scope.indexPattern);
+                    $scope.searchSource
+                        .set('index', $scope.indexPattern)
+                        .highlightAll(true)
+                        .version(true);
+
 
                     if (savedSearch.id) {
                         docTitle.change(savedSearch.title);
@@ -197,27 +213,27 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
                         $scope.state.columns = disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns');
                         $scope.state.sort = disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern);
                     }
-					
+
+                    const $appStatus = $scope.appStatus = {
+                          dirty: !savedSearch.id
+                    };
                     let stateMonitor;
-					const $appStatus = $scope.appStatus = {
-						dirty: !savedSearch.id
-					};
                     const $state = $scope.state;
                     $scope.uiState = $state.makeStateful('uiState');
                     $scope.uiState.set('vis.legendOpen', false);
                     $state.query = ($scope.stateQuery ? $scope.stateQuery : '*');
 
                     function getStateDefaults() {
-    return {
-      query: $scope.searchSource.get('query') || '',
-      sort: getSort.array(savedSearch.sort, $scope.indexPattern),
-      columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
-      index: $scope.indexPattern.id,
-      interval: 'auto',
-      filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
-    };
-  }
-					
+                        return {
+                            query: $scope.disFilter ? $scope.disFilter : '',
+                            sort: disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern),
+                            columns: disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns'),
+                            index: disDecoded.index ? disDecoded.index : $scope.indexPattern.id,
+                            interval: 'auto',
+                            filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
+                        };
+                    }
+
                     $state.index = $scope.indexPattern.id;
                     $state.sort = getSort.array($state.sort, $scope.indexPattern);
 					
@@ -228,7 +244,7 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
                         index: $scope.indexPattern.id,
                         timefield: $scope.indexPattern.timeFieldName,
                         savedSearch: savedSearch,
-                        indexPatternList: $scope.indexSelector ? $scope._ip.list : [],
+                        indexPatternList: savedObjects,
                         timefilter: $scope.timefilter
                     };
 
@@ -244,7 +260,7 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
 
 						stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
 						stateMonitor.onChange((status) => {
-							$appStatus.dirty = status.dirty || !savedSearch.id;
+							$appStatus.dirty = status.dirty;
 						});
 						$scope.$on('$destroy', () => stateMonitor.destroy());
 						
@@ -517,19 +533,34 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
                         $scope.searchSource
                             .size($scope.opts.sampleSize)
                             .sort(getSort($state.sort, $scope.indexPattern))
-                            .query(!$scope.stateQuery ? null : $scope.stateQuery)
-                            .set('filter', queryFilter.getFilters())
-                            .highlightAll(true);
-
+                            .query(!$state.query ? null : $state.query)
+                            .set('filter', queryFilter.getFilters());
                     });
 
                     // TODO: On array fields, negating does not negate the combination, rather all terms
-                    $scope.filterQuery = function(field, values, operation) {
+                    $scope.filterQuery = function (field, values, operation) {
                         $scope.indexPattern.popularizeField(field, 1);
                         filterManager.add(field, values, operation, $state.index);
                     };
 
-                    $scope.toTop = function() {
+                    $scope.addColumn = function addColumn(columnName) {
+                        $scope.indexPattern.popularizeField(columnName, 1);
+                        columnActions.addColumn($scope.state.columns, columnName);
+                        $scope.columns = $scope.state.columns;
+                    };
+
+                    $scope.removeColumn = function removeColumn(columnName) {
+                        $scope.indexPattern.popularizeField(columnName, 1);
+                        columnActions.removeColumn($scope.state.columns, columnName);
+                        $scope.columns = $scope.state.columns;
+                    };
+
+                    $scope.moveColumn = function moveColumn(columnName, newIndex) {
+                        columnActions.moveColumn($scope.state.columns, columnName, newIndex);
+                        $scope.columns = $scope.state.columns;
+                    };
+
+                    $scope.toTop = function () {
                         $window.scrollTo(0, 0);
                     };
 
@@ -577,7 +608,7 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
                                     timefilter.time.to = moment(e.point.x + e.data.ordered.interval);
                                     timefilter.time.mode = 'absolute';
                                 },
-                                brush: brushEvent($state)
+                                brush: brushEvent($scope.state)
                             },
                             aggs: visStateAggs
                         });
@@ -627,7 +658,240 @@ uiModules.get('app/wazuh', []).controller('discoverW', function($scope, config, 
                         }
                         return loaded;
                     }
+$scope.selectedIndexPattern = $scope.indexPatternList.find(
+        (pattern) => pattern.id === $scope.indexPattern.id
+      );
+      $scope.indexPatternList = _.sortBy($scope.indexPatternList, o => o.get('title'));
+      $scope.setIndexPattern = function (pattern) {
+        $scope.state.index = pattern.id;
+        $scope.state.save();
+      };
 
+      $scope.$watch('state.index', function (id, previousId) {
+        if (previousId == null || previousId === id) return;
+        $route.reload();
+      });
+
+      const filter = $scope.filter = {
+        props: [
+          'type',
+          'aggregatable',
+          'searchable',
+          'missing',
+          'name'
+        ],
+        defaults: {
+          missing: true,
+          type: 'any'
+        },
+        boolOpts: [
+          { label: 'any', value: undefined },
+          { label: 'yes', value: true },
+          { label: 'no', value: false }
+        ],
+        toggleVal: function (name, def) {
+          if (filter.vals[name] !== def) filter.vals[name] = def;
+          else filter.vals[name] = undefined;
+        },
+        reset: function () {
+          filter.vals = _.clone(filter.defaults);
+        },
+        isFieldSelected: function (field) {
+          return field.display;
+        },
+        isFieldFiltered: function (field) {
+          const matchFilter = (filter.vals.type === 'any' || field.type === filter.vals.type);
+          const isAggregatable = (filter.vals.aggregatable == null || field.aggregatable === filter.vals.aggregatable);
+          const isSearchable = (filter.vals.searchable == null || field.searchable === filter.vals.searchable);
+          const scriptedOrMissing = (!filter.vals.missing || field.scripted || field.rowCount > 0);
+          const matchName = (!filter.vals.name || field.name.indexOf(filter.vals.name) !== -1);
+
+          return !field.display
+            && matchFilter
+            && isAggregatable
+            && isSearchable
+            && scriptedOrMissing
+            && matchName
+          ;
+        },
+        popularity: function (field) {
+          return field.count > 0;
+        },
+        getActive: function () {
+          return _.some(filter.props, function (prop) {
+            return filter.vals[prop] !== filter.defaults[prop];
+          });
+        }
+      };
+
+      // set the initial values to the defaults
+      filter.reset();
+
+      $scope.$watchCollection('filter.vals', function () {
+        filter.active = filter.getActive();
+      });
+
+      $scope.$watchMulti([
+        '[]fieldCounts',
+        '[]columns',
+        '[]hits'
+      ], function (cur, prev) {
+        const newHits = cur[2] !== prev[2];
+        let fields = $scope.fields;
+        const columns = $scope.columns || [];
+        const fieldCounts = $scope.fieldCounts;
+
+        if (!fields || newHits) {
+          $scope.fields = fields = getFields();
+        }
+
+        if (!fields) return;
+
+        // group the fields into popular and up-popular lists
+        _.chain(fields)
+        .each(function (field) {
+          field.displayOrder = _.indexOf(columns, field.name) + 1;
+          field.display = !!field.displayOrder;
+          field.rowCount = fieldCounts[field.name];
+        })
+        .sortBy(function (field) {
+          return (field.count || 0) * -1;
+        })
+        .groupBy(function (field) {
+          if (field.display) return 'selected';
+          return field.count > 0 ? 'popular' : 'unpopular';
+        })
+        .tap(function (groups) {
+          groups.selected = _.sortBy(groups.selected || [], 'displayOrder');
+
+          groups.popular = groups.popular || [];
+          groups.unpopular = groups.unpopular || [];
+
+          // move excess popular fields to un-popular list
+          const extras = groups.popular.splice(config.get('fields:popularLimit'));
+          groups.unpopular = extras.concat(groups.unpopular);
+        })
+        .each(function (group, name) {
+          $scope[name + 'Fields'] = _.sortBy(group, name === 'selected' ? 'display' : 'name');
+        })
+        .commit();
+
+        // include undefined so the user can clear the filter
+        $scope.fieldTypes = _.union(['any'], _.pluck(fields, 'type'));
+      });
+
+      $scope.increaseFieldCounter = function (fieldName) {
+        $scope.indexPattern.popularizeField(fieldName, 1);
+      };
+
+      function getVisualizeUrl(field) {
+        if (!$scope.state) {return '';}
+
+        let agg = {};
+        const isGeoPoint = field.type === 'geo_point';
+        const type = isGeoPoint ? 'tile_map' : 'histogram';
+        // If we're visualizing a date field, and our index is time based (and thus has a time filter),
+        // then run a date histogram
+        if (field.type === 'date' && $scope.indexPattern.timeFieldName === field.name) {
+          agg = {
+            type: 'date_histogram',
+            schema: 'segment',
+            params: {
+              field: field.name,
+              interval: 'auto'
+            }
+          };
+
+        } else if (isGeoPoint) {
+          agg = {
+            type: 'geohash_grid',
+            schema: 'segment',
+            params: {
+              field: field.name,
+              precision: 3
+            }
+          };
+        } else {
+          agg = {
+            type: 'terms',
+            schema: 'segment',
+            params: {
+              field: field.name,
+              size: parseInt(config.get('discover:aggs:terms:size'), 10),
+              orderBy: '2'
+            }
+          };
+        }
+
+        return '#/visualize/create?' + $.param(_.assign(_.clone($location.search()), {
+          indexPattern: $scope.state.index,
+          type: type,
+          _a: rison.encode({
+            filters: $scope.state.filters || [],
+            query: $scope.state.query || undefined,
+            vis: {
+              type: type,
+              aggs: [
+                agg,
+                { schema: 'metric', type: 'count', 'id': '2' }
+              ]
+            }
+          })
+        }));
+      }
+
+      $scope.computeDetails = function (field, recompute) {
+        if (_.isUndefined(field.details) || recompute) {
+          field.details = Object.assign(
+            {
+              visualizeUrl: field.visualizable ? getVisualizeUrl(field) : null,
+            },
+            fieldCalculator.getFieldValueCounts({
+              hits: $scope.rows,
+              field: field,
+              count: 5,
+              grouped: false
+            }),
+          );
+          _.each(field.details.buckets, function (bucket) {
+            bucket.display = field.format.convert(bucket.value);
+          });
+          $scope.increaseFieldCounter(field, 1);
+        } else {
+          delete field.details;
+        }
+      };
+
+      function getFields() {
+        const prevFields = $scope.fields;
+        const indexPattern = $scope.indexPattern;
+        const hits = $scope.hits;
+        const fieldCounts = $scope.fieldCounts;
+
+        if (!indexPattern || !hits || !fieldCounts) return;
+
+        const fieldSpecs = indexPattern.fields.slice(0);
+        const fieldNamesInDocs = _.keys(fieldCounts);
+        const fieldNamesInIndexPattern = _.keys(indexPattern.fields.byName);
+
+        _.difference(fieldNamesInDocs, fieldNamesInIndexPattern)
+        .forEach(function (unknownFieldName) {
+          fieldSpecs.push({
+            name: unknownFieldName,
+            type: 'unknown'
+          });
+        });
+
+        const fields = new FieldList(indexPattern, fieldSpecs);
+
+        if (prevFields) {
+          fields.forEach(function (field) {
+            field.details = _.get(prevFields, ['byName', field.name, 'details']);
+          });
+        }
+
+        return fields;
+      }
                     init();
                 });
             });
