@@ -1,6 +1,12 @@
 require('ui/modules').get('app/wazuh', [])
     .service('appState', function ($cookies) {
         return {
+            setGoToVisualize: function (condition) {
+                $cookies.putObject('_outToVisualize', condition);
+            },
+            getGoToVisualize: function () {
+                return $cookies.getObject('_outToVisualize');
+            },
             getDashboardsState: function () {
                 return { name: $cookies.getObject('_dashboardsState_name'), filter: $cookies.getObject('_dashboardsState_filter') };
             },

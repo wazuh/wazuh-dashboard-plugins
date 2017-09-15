@@ -22,8 +22,14 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
 }
 
 var goToVisualize = function ($location, $window) {
-    $location.search('id', null);
-    $window.location.href=$location.absUrl().replace('/wazuh#', '/kibana#');
+	if (!appState.getGoToVisualize()) {
+		appState.setGoToVisualize(true);
+		$location.search('id', null);
+    		$window.location.href=$location.absUrl().replace('/wazuh#', '/kibana#');
+	} else {
+		appState.setGoToVisualize(false);
+		$location.url('/overview/');
+	}
 }
 
 //Routes
