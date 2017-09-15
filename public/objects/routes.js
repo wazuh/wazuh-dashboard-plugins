@@ -21,7 +21,7 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
     return deferred.promise;
 }
 
-var goToVisualize = function ($location, $window) {
+var goToVisualize = function ($location, $window, appState) {
 	if (!appState.getGoToVisualize()) {
 		appState.setGoToVisualize(true);
 		$location.search('id', null);
