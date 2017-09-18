@@ -4,6 +4,8 @@ var routes = require('ui/routes');
 //Installation wizard
 var settingsWizard = function ($location, testConnection, appState, $q, genericReq, Notifier) {
 	const notify = new Notifier();
+
+    appState.setGoToVisualize(false);
     var deferred = $q.defer();
     testConnection.check_stored().then(function (data)
     {
@@ -21,9 +23,15 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
     return deferred.promise;
 }
 
-var goToVisualize = function ($location, $window) {
-    $location.search('id', null);
-    $window.location.href=$location.absUrl().replace('/wazuh#', '/kibana#');
+var goToVisualize = function ($location, $window, appState) {
+    if (!appState.getGoToVisualize()) {
+        appState.setGoToVisualize(true);
+        $location.search('id', null);
+        $window.location.href=$location.absUrl().replace('/wazuh#', '/kibana#');
+    } else {
+        appState.setGoToVisualize(false);
+        $location.url('/overview/');
+    }
 }
 
 //Routes
