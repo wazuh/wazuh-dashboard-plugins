@@ -148,7 +148,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                 $scope._ip = result;
                 savedSearches.get().then(function(result) {
                     $scope._savedSearch = result;
-
+                    var isFilterSet = false;
                     const Vis = Private(VisProvider);
                     const docTitle = Private(DocTitleProvider);
                     const brushEvent = Private(UtilsBrushEventProvider);
@@ -158,7 +158,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     $scope.queryDocLinks = documentationLinks.query;
                     $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
                     $scope.showInterval = false;
-
                     $scope.intervalEnabled = function(interval) {
                         return interval.val !== 'custom';
                     };
@@ -191,6 +190,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     // the actual courier.SearchSource
                     $scope.searchSource = savedSearch.searchSource;
                     $scope.indexPattern = resolveIndexPatternLoading();
+
                     $scope.searchSource
                         .set('index', $scope.indexPattern)
                         .highlightAll(true)
@@ -654,10 +654,25 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     }
 
                     init();
+
+                    $scope.$parent.$parent.$watch('chrome.httpActive', function() {
+                        if(!isFilterSet){
+                            const newFilters = [];
+                            isFilterSet = true;
+                            var negate = false;
+                            var index = 'wazuh-alerts-*';
+                            var clusterFilter = { meta: { negate, index }, query: { match: {} } };
+                            clusterFilter.query.match['cluster.name'] = { query: $scope.cluster_info.cluster, type: 'phrase' };
+                            newFilters.push(clusterFilter);
+                            if($rootScope.page == "agents" && $location.path() != "/discover/"){
+                                var agentFilter = { meta: { negate, index }, query: { match: {} } };
+                                agentFilter.query.match['agent.id'] = { query: $scope.agent_info.id, type: 'phrase' };
+                                newFilters.push(agentFilter);
+                            }
+                            queryFilter.addFilters(newFilters);
+                        }
+                    }, true);
                 });
             });
-
-
         });
-
 });
