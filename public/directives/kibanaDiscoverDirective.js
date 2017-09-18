@@ -104,8 +104,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
         $scope.agent_filter = "agent.id: " + $route.current.params.id;
         $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
-        $scope.stateQuery = $scope.global_filter;
-
     }else
         $scope.global_filter = $scope.cluster_filter;
 
