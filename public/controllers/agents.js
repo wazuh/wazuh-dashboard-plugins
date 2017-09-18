@@ -104,7 +104,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			fields = {"fields" : [{"field": "agent.id", "value": agent_id}]};
 		var clusterName = {"cluster" : $scope.cluster_info.cluster};
 		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
-    console.log(payload);
+    
 		angular.extend(payload, fields, clusterName, timeInterval);
 
 		var deferred = $q.defer();

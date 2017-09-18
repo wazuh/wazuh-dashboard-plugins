@@ -3,6 +3,28 @@ body{
    width:100%;
 }
 
+.kuiLocalNavRow {
+    z-index:9999 !important;
+}
+
+kbn-searchbar .kuiLocalNav {
+    margin-bottom: 0;
+}
+
+.kuiLocalNav {
+    min-height: 0 !important;
+    margin-bottom: -16px;
+}
+
+.kuiLocalNavRow--secondary {
+    display: none !important;
+}
+
+.typeahead {
+    padding: 4px 10px 0 !important;
+        background-color: #e4e4e4 !important;
+
+}
 @-webkit-keyframes uil-ring-anim {
   0% {
     -webkit-transform: rotate(0deg);
@@ -176,7 +198,7 @@ kbn-vis-value div{
 
 .wazuh-discover-searchbar{
 	margin-top: -60px !important;
-	z-index:9999;
+	z-index:9998 !important;
 }
 
 .wazuh-discover-searchbar h1{

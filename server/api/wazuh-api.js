@@ -52,7 +52,7 @@ module.exports = function (server, options) {
     };
 
     var getAPI_entries = function (req,reply) {
-		elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration'}).then(
+		elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration', size: '100'}).then(
 			function (data) {
 				reply(data.hits.hits);
             }, function (data, error) {

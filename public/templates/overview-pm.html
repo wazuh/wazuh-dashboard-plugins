@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'pm'" ng-controller="overviewPMController">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(5)'><div></div></div>
 
 	<!-- No results message -->
@@ -75,7 +75,7 @@
 					</md-card-title-text>
 				</md-card-title>
 				<md-card-content>
-					<kbn-vis vis-height="460px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:3,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Agent name',field:agent.name,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:'Rule description',field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Control,field:title,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
+					<kbn-vis vis-height="460px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:3,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Agent name',field:agent.name,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:'Rule description',field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Control,field:data.title,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
 						vis-filter='rule.groups:"rootcheck"'>
 					</kbn-vis>
 				</md-card-content>

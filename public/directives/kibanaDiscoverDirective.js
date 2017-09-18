@@ -91,9 +91,14 @@ var app = require('ui/modules').get('app/wazuh', [])
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $location, savedSearches, appState, $rootScope, getAppState) {
     $scope.cluster_info = appState.getClusterInfo();
-    $scope.agent_info = $rootScope.agent;
-
     $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
+
+    if($rootScope.page == "agents" && $location.path() != "/discover/"){
+        $scope.agent_info = $rootScope.agent;
+        $scope.agent_filter = "agent.id: " + $route.current.params.id;
+        $scope.global_filter = $scope.cluster_filter + " AND " + $scope.agent_filter;
+    }else
+        $scope.global_filter = $scope.cluster_filter;
 
     if(!angular.isUndefined($scope.disFilter))
         $scope.global_filter = $scope.disFilter + " AND " + $scope.global_filter;
@@ -185,8 +190,11 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     // the actual courier.SearchSource
                     $scope.searchSource = savedSearch.searchSource;
                     $scope.indexPattern = resolveIndexPatternLoading();
-                    $scope.searchSource.set('index', $scope.indexPattern);
-					
+
+                    $scope.searchSource
+                        .set('index', $scope.indexPattern)
+                        .highlightAll(true)
+                        .version(true);
 
 
                     if (savedSearch.id) {
@@ -519,14 +527,11 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     };
 
                     $scope.updateDataSource = Promise.method(function updateDataSource() {
-
                         $scope.searchSource
                             .size($scope.opts.sampleSize)
                             .sort(getSort($state.sort, $scope.indexPattern))
-                            .query(!$scope.stateQuery ? null : $scope.stateQuery)
-                            .set('filter', queryFilter.getFilters())
-                            .highlightAll(true);
-
+                            .query(!$state.query ? null : $state.query)
+                            .set('filter', queryFilter.getFilters());
                     });
 
                     // TODO: On array fields, negating does not negate the combination, rather all terms
@@ -597,7 +602,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                                     timefilter.time.to = moment(e.point.x + e.data.ordered.interval);
                                     timefilter.time.mode = 'absolute';
                                 },
-                                brush: brushEvent($state)
+                                brush: brushEvent($scope.state)
                             },
                             aggs: visStateAggs
                         });

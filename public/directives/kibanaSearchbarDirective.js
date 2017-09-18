@@ -24,12 +24,10 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', function (genericReq, $compile, $scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, Notifier, $rootScope) {
 
-	$scope.stateQuery = $scope.disFilter;
-
 	$route.reloadOnSearch = true;
 
 	timefilter.enabled = true;
-	
+	$scope.stateQuery = "*";
 	// Set default time
 	var gParameter;
     if($route.current.params._g){
@@ -48,21 +46,19 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	}
 	
 	$scope.timefilter = timefilter;
-	
 	let $state = $scope.$state = (function initState() {
-		$state = new AppState();	
+		$state = new AppState();
 		return $state;
 	} ());
 
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
-        $scope.stateQuery.query_string.query="(" + $scope.stateQuery.query_string.query + ")";
-		$rootScope.$broadcast('updateQuery',$scope.stateQuery);
+        this.stateQuery = this.stateQuery == "" ? "*" : this.stateQuery;
+        $rootScope.$broadcast('updateQuery',"(" + this.stateQuery + ")");
 	};
 
 	$scope.queryFilter = Private(FilterBarQueryFilterProvider);
-
 
 	// Watch visCounter, wait for finish and fetch.
 	var visCounterWatch = $rootScope.$watch('visCounter', function (data) {

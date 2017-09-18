@@ -1,7 +1,7 @@
 <md-content ng-if="submenuNavItem == 'audit' && _agent" id="agents-audit" ng-controller="auditController">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(15)'><div></div></div>
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(15)">
@@ -14,7 +14,7 @@
 
 
 	<!-- View: Discover -->
-	<md-content ng-if="agentInfo.name" style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'" >
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover' && agentInfo.name" >
 		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="rule.groups:audit"
 		infinite-scroll="true">
