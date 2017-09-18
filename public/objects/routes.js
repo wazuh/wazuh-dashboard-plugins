@@ -4,6 +4,8 @@ var routes = require('ui/routes');
 //Installation wizard
 var settingsWizard = function ($location, testConnection, appState, $q, genericReq, Notifier) {
 	const notify = new Notifier();
+
+	appState.setGoToVisualize(false);
     var deferred = $q.defer();
     testConnection.check_stored().then(function (data)
     {
