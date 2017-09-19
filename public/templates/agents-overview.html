@@ -3,7 +3,7 @@
 	<!-- Kibana search bar -->
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
-	<div ng-show='hideRing(7) && results && !loading' ng-if="tabView == 'panels'">
+	<div ng-show='hideRing(7) && !loading' ng-if="tabView == 'panels'">
 		<md-content class="no-legend" layout="row">
 			<md-card  flex layout="column">
 				<md-card-content style="text-align: center;">
