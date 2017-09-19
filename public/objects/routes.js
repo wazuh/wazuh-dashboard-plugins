@@ -5,7 +5,6 @@ var routes = require('ui/routes');
 var settingsWizard = function ($location, testConnection, appState, $q, genericReq, Notifier) {
 	const notify = new Notifier();
 
-    appState.setGoToVisualize(false);
     var deferred = $q.defer();
     testConnection.check_stored().then(function (data)
     {
@@ -23,16 +22,15 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
     return deferred.promise;
 }
 
-var goToVisualize = function ($location, $window, appState) {
-    if (!appState.getGoToVisualize()) {
-        appState.setGoToVisualize(true);
-        $location.search('id', null);
-        $window.location.href=$location.absUrl().replace('/wazuh#', '/kibana#');
-    } else {
-        appState.setGoToVisualize(false);
-        $location.url('/overview/');
+var goToKibana = function ($location, $window) {
+    if(sessionStorage.getItem('lastSubUrl:http://192.168.130.145:5601/app/wazuh').includes('/wazuh#/visualize') || 
+        sessionStorage.getItem('lastSubUrl:http://192.168.130.145:5601/app/wazuh').includes('/wazuh#/doc') ||
+        sessionStorage.getItem('lastSubUrl:http://192.168.130.145:5601/app/wazuh').includes('/wazuh#/context')){
+        sessionStorage.setItem('lastSubUrl:http://192.168.130.145:5601/app/wazuh', 'http://192.168.130.145:5601/app/wazuh');
     }
+    $window.location.href=$location.absUrl().replace('/wazuh#', '/kibana#');
 }
+
 
 //Routes
 routes.enable();
@@ -83,7 +81,21 @@ routes
         redirectTo: function() {
         },
         resolve: {
-            "check": goToVisualize
+            "check": goToKibana
+        }
+    })
+    .when('/context/:pattern?/:type?/:id?', {
+        redirectTo: function() {
+        },
+        resolve: {
+            "check": goToKibana
+        }
+    })
+    .when('/doc/:pattern?/:index?/:type?/:id?', {
+        redirectTo: function() {
+        },
+        resolve: {
+            "check": goToKibana
         }
     })
     .when('/', {
