@@ -84,8 +84,7 @@ var app = require('ui/modules').get('app/wazuh', [])
                 disG: '@disG',
                 disFilter: '@disFilter',
                 tableHeight: '@tableHeight',
-                infiniteScroll: '@infiniteScroll',
-                indicesList: '@indicesList'
+                infiniteScroll: '@infiniteScroll'
             },
             template: require('../templates/directives/dis-full-template.html')
         }
@@ -110,7 +109,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
     if(!angular.isUndefined($scope.disFilter))
         $scope.global_filter = $scope.disFilter + " AND " + $scope.global_filter;
 
-
+    $scope.stateQuery = $scope.global_filter;
     $scope.chrome = {};
     $scope.removeColumn = function removeColumn(columnName) {
         $scope.indexPattern.popularizeField(columnName, 1);
@@ -160,7 +159,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                 $scope._ip = result;
                 savedSearches.get().then(function(result) {
                     $scope._savedSearch = result;
-                    //var isFilterSet = false;
                     const Vis = Private(VisProvider);
                     const docTitle = Private(DocTitleProvider);
                     const brushEvent = Private(UtilsBrushEventProvider);
@@ -901,24 +899,6 @@ $scope.selectedIndexPattern = $scope.indexPatternList.find(
         return fields;
       }
                     init();
-
-                    $scope.$parent.$parent.$watch('chrome.httpActive', function() {
-                        if(!isFilterSet){
-                            const newFilters = [];
-                            isFilterSet = true;
-                            var negate = false;
-                            var index = 'wazuh-alerts-*';
-                            var clusterFilter = { meta: { negate, index }, query: { match: {} } };
-                            clusterFilter.query.match['cluster.name'] = { query: $scope.cluster_info.cluster, type: 'phrase' };
-                            newFilters.push(clusterFilter);
-                            if($rootScope.page == "agents" && $location.path() != "/discover/"){
-                                var agentFilter = { meta: { negate, index }, query: { match: {} } };
-                                agentFilter.query.match['agent.id'] = { query: $scope.agent_info.id, type: 'phrase' };
-                                newFilters.push(agentFilter);
-                            }
-                            queryFilter.addFilters(newFilters);
-                        }
-                    }, true);
                 });
             });
         });
