@@ -23,10 +23,15 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
 }
 
 var goToKibana = function ($location, $window) {
-    if(sessionStorage.getItem('lastSubUrl:http://192.168.130.145:5601/app/wazuh').includes('/wazuh#/visualize') || 
-        sessionStorage.getItem('lastSubUrl:http://192.168.130.145:5601/app/wazuh').includes('/wazuh#/doc') ||
-        sessionStorage.getItem('lastSubUrl:http://192.168.130.145:5601/app/wazuh').includes('/wazuh#/context')){
-        sessionStorage.setItem('lastSubUrl:http://192.168.130.145:5601/app/wazuh', 'http://192.168.130.145:5601/app/wazuh');
+    var url = '';
+    url = url + $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
+    
+    if(sessionStorage.getItem('lastSubUrl:' + url).includes('/wazuh#/visualize') || 
+        sessionStorage.getItem('lastSubUrl:' + url).includes('/wazuh#/doc') ||
+        sessionStorage.getItem('lastSubUrl:' + url).includes('/wazuh#/context')){
+            
+        sessionStorage.setItem('lastSubUrl:' + url, url);
+        
     }
     $window.location.href=$location.absUrl().replace('/wazuh#', '/kibana#');
 }
