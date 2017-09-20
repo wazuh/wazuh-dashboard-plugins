@@ -27,7 +27,7 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	$route.reloadOnSearch = true;
 
 	timefilter.enabled = true;
-	$scope.stateQuery = "*";
+	$scope.stateQuery = "";
 	// Set default time
 	var gParameter;
     if($route.current.params._g){
@@ -54,8 +54,14 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
-        this.stateQuery = this.stateQuery == "" ? "*" : this.stateQuery;
-        $rootScope.$broadcast('updateQuery',"(" + this.stateQuery + ")");
+		console.log("hererr");
+
+        if (this.stateQuery == "") {
+	        $rootScope.$broadcast('updateQuery',"(*)");
+        } else {
+	        this.stateQuery = this.stateQuery == "" ? "" : this.stateQuery;
+	        $rootScope.$broadcast('updateQuery',"(" + this.stateQuery + ")");
+        }
 	};
 
 	$scope.queryFilter = Private(FilterBarQueryFilterProvider);
