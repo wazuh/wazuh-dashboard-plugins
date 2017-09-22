@@ -11,7 +11,7 @@ import _ from 'lodash';
 import 'ui/modals';
 
 import 'plugins/kibana/visualize/saved_visualizations/saved_visualizations';
-import 'plugins/kibana/visualize/editor/sidebar';
+//import 'plugins/kibana/visualize/editor/sidebar';
 import 'plugins/kibana/visualize/editor/agg_filter';
 import 'ui/visualize';
 import 'ui/collapsible_sidebar';
@@ -29,8 +29,10 @@ import histogramVisTypeProvider from 'plugins/kbn_vislib_vis_types/histogram';
 import lineVisTypeProvider from 'plugins/kbn_vislib_vis_types/line';
 import pieVisTypeProvider from 'plugins/kbn_vislib_vis_types/pie';
 import areaVisTypeProvider from 'plugins/kbn_vislib_vis_types/area';
-import tileMapVisTypeProvider from 'plugins/kbn_vislib_vis_types/tile_map';
+import tileMapVisTypeProvider from 'plugins/tile_map/tile_map_vis';
 import metricVisTypeProvider from 'plugins/kbn_vislib_vis_types/metric';
+
+
 
 VisTypesRegistryProvider.register(histogramVisTypeProvider);
 VisTypesRegistryProvider.register(lineVisTypeProvider);
@@ -41,7 +43,7 @@ VisTypesRegistryProvider.register(metricVisTypeProvider);
 
 require('plugins/table_vis/table_vis');
 require('plugins/markdown_vis/markdown_vis');
-require('plugins/metrics/visualizations');
+//require('plugins/metrics/visualizations');
 import DocTitleProvider from 'ui/doc_title';
 import UtilsBrushEventProvider from 'ui/utils/brush_event';
 
@@ -53,7 +55,7 @@ import 'ui/state_management/app_state';
 import StateManagementAppStateProvider from 'ui/state_management/app_state';
 import 'plugins/kibana/discover/saved_searches/saved_searches.js';
 
-import 'ui/stringify/register';
+//import 'ui/stringify/register';
 import RegistryFieldFormatsProvider from 'ui/registry/field_formats';
 
 import 'ui/kbn_top_nav';

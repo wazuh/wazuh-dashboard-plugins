@@ -112,8 +112,20 @@ module.exports = function (server, options) {
 		};
 
 		server.log([blueWazuh, 'initialize', 'info'], 'Creating index pattern: ' + index_pattern);
-		elasticRequest.callWithInternalUser('create', { index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_alerts } })
-			.then(function () {
+
+		elasticRequest.callWithInternalUser('create',
+                        {
+                        index: '.kibana',
+                        type: 'doc',
+                        id: index_pattern,
+                        body: {
+                                "index-pattern": {
+                                        title: index_pattern,
+                                        timeFieldName: '@timestamp',
+                                        fields: kibana_fields_data.wazuh_alerts
+                                }
+                        } }
+                ).then(function () {
 				server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
 				// Once index pattern is created, set it as default, wait few seconds for Kibana.
 				setTimeout(function () {
@@ -135,14 +147,16 @@ module.exports = function (server, options) {
 			
 		elasticRequest.callWithInternalUser('update', { 
         	index: '.kibana', 
-        	type: 'config', 
-        	id: '5.6.1', 
-        	body: { 
-        		doc: {
+        	type: 'doc', 
+        	id: 'config:6.0.0-beta2', 
+        	body: {
+			doc: {
+        		config: {
         			'defaultIndex':'wazuh-alerts-*', 
         			'timepicker:timeDefaults':'{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}',
         			'metaFields':['_source']
         		}
+			}
         	}
         })
             .then(function (data) {
@@ -222,7 +236,8 @@ module.exports = function (server, options) {
     };
 
 	var configure = function (type) {
-		loadTemplate(type);
+		configureKibana(type);
+		//loadTemplate(type);
 	}
 	
     var loadTemplate = function (type) {

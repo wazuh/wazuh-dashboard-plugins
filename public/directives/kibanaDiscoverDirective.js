@@ -27,7 +27,7 @@ import 'ui/state_management/app_state';
 import 'ui/timefilter';
 import 'ui/pager_control';
 import 'ui/pager';
-import 'ui/highlight/highlight_tags';
+//import 'plugins/kibana/common/highlight/highlight_tags';
 import 'ui/share';
 import { VisProvider } from 'ui/vis';
 import { DocTitleProvider } from 'ui/doc_title';

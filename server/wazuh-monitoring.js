@@ -260,7 +260,7 @@ module.exports = function (server, options) {
 
 	// Configure Kibana patterns.
 	var configureKibana = function () {
-		loadTemplate();
+		//loadTemplate();
 		try {
 		  kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
 		} catch (e) {
@@ -269,7 +269,19 @@ module.exports = function (server, options) {
 		  server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Exception: ' + e);
 		};
 
-		return elasticRequest.callWithInternalUser('create',{ index: '.kibana', type: 'index-pattern', id: index_pattern, body: { title: index_pattern, timeFieldName: '@timestamp', fields: kibana_fields_data.wazuh_monitoring} });
+		return elasticRequest.callWithInternalUser('create',
+			{ 
+			index: '.kibana', 
+			type: 'doc', 
+			id: index_pattern, 
+			body: { 
+				"index-pattern": {
+					title: index_pattern, 
+					timeFieldName: '@timestamp', 
+					fields: kibana_fields_data.wazuh_monitoring
+				}
+			} }
+		);
 	};
 
 	// fetchAgents on demand

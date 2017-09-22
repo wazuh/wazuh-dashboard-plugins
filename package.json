@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "revision": "0343",
   "kibana": {
-    "version": "5.6.1"
+    "version": "6.0.0"
   },
   "description": "Wazuh App",
   "main": "index.js",
@@ -28,9 +28,9 @@
   },
   "homepage": "https://www.wazuh.com/",
   "dependencies": {
-    "angular-animate": "1.4.7",
-    "angular-aria": "1.4.7",
-    "angular-cookies": "1.4.7",
+    "angular-animate": "1.6.5",
+    "angular-aria": "1.6.5",
+    "angular-cookies": "1.6.5",
     "angular-material": "1.1.1",
     "angular-md5": "^0.1.10",
     "bootstrap": "3.3.6",
