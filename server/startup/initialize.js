@@ -23,9 +23,7 @@ module.exports = function (server, options) {
 
 	// External files template or objects
 	const OBJECTS_FILE = 'integration_files/objects_file.json';
-	const TEMPLATE_FILE = 'integration_files/template_file.json';
 	const KIBANA_FIELDS_FILE = 'integration_files/kibana_fields_file.json';
-	const ALERT_SAMPLE_FILE = 'integration_files/alert_sample.json';
 
 	// Initialize objects
 	var kibana_fields_data = {};
@@ -74,31 +72,6 @@ module.exports = function (server, options) {
 			
 		}
     };
-
-	
-	// Insert sample alert
-	var insertSampleAlert = function () {
-		
-		try {
-			alert_sample = JSON.parse(fs.readFileSync(path.resolve(__dirname, ALERT_SAMPLE_FILE), 'utf8'));
-		} catch (e) {
-			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + ALERT_SAMPLE_FILE);
-			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-		};
-			
-		server.log([blueWazuh, 'initialize', 'info'], 'Inserting sample alert...');
-		elasticRequest.callWithInternalUser('create', { index: todayIndex, type: 'wazuh', id: 'alert_sample', body: alert_sample })
-			.then(function () {
-				server.log([blueWazuh, 'initialize', 'info'], 'Sample alert inserted');				
-			}, function (response) {
-				if (response.statusCode != '409') {
-					server.log([blueWazuh, 'initialize', 'error'], 'Could not insert the sample alert');
-				} else {
-					server.log([blueWazuh, 'initialize', 'info'], 'Skipping alert insertion. Already inserted.');
-				}
-			});
-	}
 	
 	// Create index pattern
 	var createIndexPattern = function () {
@@ -111,25 +84,24 @@ module.exports = function (server, options) {
 		  server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
 		};
 
-		server.log([blueWazuh, 'initialize', 'info'], 'Creating index pattern: ' + index_pattern);
+		server.log([blueWazuh, 'initialize', 'info'], 'Creating index pattern: ' + index_pattern);		
 
 		elasticRequest.callWithInternalUser('create',
-                        {
-                        index: '.kibana',
-                        type: 'doc',
-                        id: index_pattern,
-                        body: {
-                                "index-pattern": {
-                                        title: index_pattern,
-                                        timeFieldName: '@timestamp',
-                                        fields: kibana_fields_data.wazuh_alerts
-                                }
-                        } }
-                ).then(function () {
+            {
+                index: '.kibana',
+                type: 'doc',
+                id: 'wazuh-alerts:22',
+                body: {
+        			'index-pattern': {
+        				'title': index_pattern, 
+        				'timeFieldName': '@timestamp',
+        				'fields': kibana_fields_data.wazuh_alerts
+        			}
+                } 
+            }).then(function () {
 				server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
 				// Once index pattern is created, set it as default, wait few seconds for Kibana.
 				setTimeout(function () {
-					console.log("setting up");
 					setDefaultKibanaSettings();
 				}, 2000)					
 			}, function (response) {
@@ -152,7 +124,7 @@ module.exports = function (server, options) {
         	body: {
 			doc: {
         		config: {
-        			'defaultIndex':'wazuh-alerts-*', 
+        			'defaultIndex':'22', 
         			'timepicker:timeDefaults':'{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}',
         			'metaFields':['_source']
         		}
@@ -197,9 +169,7 @@ module.exports = function (server, options) {
 	// Configure Kibana status: Index pattern, default index pattern, default time, import dashboards.
 	var configureKibana = function (type) {
 
-		if(type == "install"){
-			// Insert sample alert to prevent error "Invalid saved fields" when aggregating/searching
-			insertSampleAlert();
+		if(type == "install") {
 			// Create Index Pattern > Set it as default > Set default time
 			createIndexPattern();
 			// Import objects
@@ -215,48 +185,25 @@ module.exports = function (server, options) {
 
     };
 
-
 	// Init function. Check for "wazuh-setup" document existance.
     var init = function () {
         elasticRequest.callWithInternalUser('get', { index: ".wazuh", type: "wazuh-setup", id: "1" }).then(
             function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document already exists. Proceed to upgrade.');
-				configure("upgrade");
+				configureKibana("upgrade");
             }, function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-setup document does not exist. Initializating configuration...');
-		elasticRequest.callWithInternalUser('get', { index: ".kibana", type: "wazuh-setup", id: "1" }).then(
-			function (result) {
-				configure("migration");
-			}, function () {
-				configure("install");
-			}
-		);
+				elasticRequest.callWithInternalUser('get', { index: ".kibana", type: "wazuh-setup", id: "1" }).then(
+					function (result) {
+						configureKibana("migration");
+					}, function () {
+						configureKibana("install");
+					}
+				);
             }
         );
     };
 
-	var configure = function (type) {
-		configureKibana(type);
-		//loadTemplate(type);
-	}
-	
-    var loadTemplate = function (type) {
-		try {
-			map_jsondata = JSON.parse(fs.readFileSync(path.resolve(__dirname, TEMPLATE_FILE), 'utf8'));
-		} catch (e) {
-			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + TEMPLATE_FILE);
-			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-		};
-		elasticRequest.callWithInternalUser('indices.putTemplate', {name: "wazuh", order: 0, body: map_jsondata}).then(
-			function () {
-				server.log([blueWazuh, 'initialize', 'info'], 'Template installed and loaded: ' +  index_pattern);
-				configureKibana(type);
-			}, function (data) {
-				server.log([blueWazuh, 'initialize', 'error'], 'Could not install template ' +  index_pattern);
-			});
-    };
-	
     var importObjects = function () {
 		
 		server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...');

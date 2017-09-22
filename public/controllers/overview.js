@@ -2,6 +2,7 @@ import rison from 'rison-node';
 var app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, appState, $window, genericReq, $q, $routeParams, $route, $location, $http, $rootScope) {
+
     $scope.state = appState;
 	$scope.cluster_info = $scope.state.getClusterInfo();
 	$scope.extensions = $scope.state.getExtensions().extensions;

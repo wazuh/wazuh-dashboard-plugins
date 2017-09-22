@@ -1,5 +1,4 @@
 module.exports = function (server, options) {
-
 	// Colors for console logging
     const colors = require('ansicolors');
     const blueWazuh = colors.blue('wazuh');
@@ -130,7 +129,6 @@ module.exports = function (server, options) {
 					reply({ 'statusCode': 200, 'data': data.hits.hits[0]._source });
 				}
 			}, function (error) {
-				console.log(error);
 				reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
 			});
     };

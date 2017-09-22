@@ -6,7 +6,8 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
 	const notify = new Notifier();
 
     var deferred = $q.defer();
-    testConnection.check_stored().then(function (data)
+    testConnection.check_stored().then(
+        function (data)
     {
 		appState.setClusterInfo(data.cluster_info);
 		appState.setExtensions(data.extensions);
@@ -16,6 +17,7 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
 			notify.warning("Wazuh App: Please set up Wazuh API credentials.");
 		else
 			notify.error("Could not connect with Wazuh RESTful API.");
+
 		deferred.reject();
 		$location.path('/settings');
     });

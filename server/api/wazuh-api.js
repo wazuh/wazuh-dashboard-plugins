@@ -203,7 +203,6 @@ module.exports = function (server, options) {
     };
 
     var checkStoredAPI = function (req, reply) {
-        var needle = require('needle');
         needle.defaults({
             open_timeout: wazuh_config.wazuhapi.requests.timeout
         });
@@ -217,13 +216,14 @@ module.exports = function (server, options) {
                 return;
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
-                reply({ 'statusCode': 200, 'error': '2', 'data': 'no_credentials' });
+                reply({ 'statusCode': 400, 'error': '2', 'data': 'no_credentials' });
                 return;
             }
 
             if ((wapi_config.url.indexOf('https://') == -1) && (wapi_config.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {
+
                 needle.request('get', getPath(wapi_config)+'/version', {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
                     testApiAux1(error, response, wapi_config, needle, function (test_result) {
                         reply(test_result);
