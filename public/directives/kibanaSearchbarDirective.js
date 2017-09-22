@@ -22,8 +22,7 @@ var app = require('ui/modules').get('app/wazuh', [])
     }
   }]);
 
-require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', function (genericReq, $compile, $scope, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, Notifier, $rootScope) {
-
+require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', function ($scope, $route, timefilter, AppState, $timeout, Private, $rootScope) {
 	$route.reloadOnSearch = true;
 
 	timefilter.enabled = true;
@@ -54,8 +53,6 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	// Fetch / reload visualization
 	$scope.fetch = function () 
 	{
-		console.log("hererr");
-
         if (this.stateQuery == "") {
 	        $rootScope.$broadcast('updateQuery',"(*)");
         } else {
