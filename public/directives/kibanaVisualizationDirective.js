@@ -5,6 +5,7 @@ import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
 import { FilterBarClickHandlerProvider } from 'ui/filter_bar/filter_bar_click_handler';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { StateProvider } from 'ui/state_management/state';
+import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
 
 
 
@@ -45,6 +46,10 @@ var app = require('ui/modules').get('app/wazuh', [])
 
 
 require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, config, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
+    const State = Private(StateProvider);
+    const savedObjectsClient = Private(SavedObjectsClientProvider);
+    var indexId = config.get('defaultIndex');;
+
 	if(typeof $rootScope.visCounter === "undefined")
 		$rootScope.visCounter = 0;
 
@@ -75,16 +80,15 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 	// Initialize Visualization
 	$scope.newVis = new SavedVis({ 'type': visDecoded.vis.type, 'indexPattern': indexId });
-    $scope.savedVis = $scope.newVis;
-	$scope.savedVis.init().then(function () {
+    const { vis, searchSource } = $scope.newVis;
+	$scope.newVis.init().then(function () {
 		// Render visualization
 		$rootScope.visCounter++;
 		renderVisualization();
 	},function () {
 		console.log("Error: Could not load visualization: "+visDecoded.vis.title);
 	});
-    $scope.vis = $scope.savedVis.vis;
-
+    $scope.savedVis = $scope.newVis;
     function renderVisualization() {
 		$scope.loadBeforeShow = false;
 
@@ -119,9 +123,9 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.timefilter = timefilter;
 
 		// Get App State
-		//const $state = getAppState();
-		let $state = new AppState();
-
+        const $state = $scope.state = new AppState();
+		//let $state = new AppState();
+        $state.query = migrateLegacyQuery($scope.filter.current);
 		// Initialize queryFilter and searchSource
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);
 		$scope.searchSource = $scope.newVis.searchSource;
@@ -141,6 +145,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			visState.aggs = visDecoded.vis.aggs;
 			visState.title = visDecoded.vis.title;
 			visState.params = visDecoded.vis.params;
+            visState.filter = $scope.visFilter;
 			if($scope.visClickable != "false")
 				visState.listeners = {brush: brushEvent($state), click: filterBarClickHandler($state)};
 
@@ -172,10 +177,10 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.fetch = function ()
 		{
 			if($scope.visIndexPattern == "wazuh-alerts-*"){
-				$scope.savedVis.searchSource.set('filter', $scope.queryFilter.getFilters());
-				$scope.savedVis.searchSource.set('query', $scope.filter.current);
+				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
+				$scope.searchSource.set('query', migrateLegacyQuery($scope.filter.current));
 			}
-            $scope.vis = $scope.savedVis.vis;
+
 			if ($scope.vis && $scope.vis.type.requiresSearch) {
 				$state.save();
 				courier.fetch();

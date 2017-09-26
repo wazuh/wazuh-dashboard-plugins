@@ -3,13 +3,13 @@
 	<!-- Kibana search bar -->
 	
 		<div layout="row" layout-align="center stretch" class="no-legend">
-<!--			<md-card flex layout="column">
+			<md-card flex layout="column">
 				<md-card-content>
 					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(gauge:(style:(fontSize:20,bgColor:!f),type:simple,colorsRange:!((from:0,to:100)),colorSchema:'Green to Red',percentageMode:!f),handleNoResults:!t),title:'Metric Alerts',type:metric))"
 					vis-filter="*">
 					</kbn-vis>
 				</md-card-content>
-			</md-card> -->
+			</md-card>
             <md-card flex layout="column">
 				<md-card-content>
 					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 12 or above alerts'),schema:metric,type:count)),listeners:(),params:(gauge:(style:(fontSize:20,bgColor:!f),type:simple,colorsRange:!((from:0,to:100)),colorSchema:'Green to Red',percentageMode:!f),handleNoResults:!t),title:'Metric Level 12 or above',type:metric))"
@@ -18,6 +18,23 @@
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
+            <md-card flex layout="column">
+				<md-card-content>
+					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.level:[12 TO *]')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Metric auth failed'),schema:metric,type:count)),listeners:(),params:(gauge:(style:(fontSize:20,bgColor:!f),type:simple,colorsRange:!((from:0,to:100)),colorSchema:'Green to Red',percentageMode:!f),handleNoResults:!t),title:'Metric auth failed',type:metric))"
+					vis-filter="(rule.groups: authentication_failed OR rule.groups: authentication_failures)"
+					>
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+            <md-card flex layout="column">
+				<md-card-content>
+					<kbn-vis vis-height="58px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Metric auth success'),schema:metric,type:count)),listeners:(),params:(gauge:(style:(fontSize:20,bgColor:!f),type:simple,colorsRange:!((from:0,to:100)),colorSchema:'Green to Red',percentageMode:!f),handleNoResults:!t),title:'Metric auth success',type:metric))"
+					vis-filter="rule.groups: authentication_success"
+					>
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
 
-</div>
+        </div>
+   
 </md-content>

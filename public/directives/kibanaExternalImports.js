@@ -82,7 +82,17 @@ RegistryFieldFormatsProvider.register(() => BoolFormat);
 
 import { VisRequestHandlersRegistryProvider } from 'ui/registry/vis_request_handlers';
 import { CourierRequestHandlerProvider } from 'ui/vis/request_handlers/courier';
+import { noneRequestHandlerProvider } from 'ui/vis/request_handlers/none';
+
 VisRequestHandlersRegistryProvider.register(CourierRequestHandlerProvider);
+VisRequestHandlersRegistryProvider.register(noneRequestHandlerProvider);
+
+import { VisResponseHandlersRegistryProvider } from 'ui/registry/vis_response_handlers';
+import { BasicResponseHandlerProvider } from 'ui/vis/response_handlers/basic';
+import { noneResponseHandler } from 'ui/vis/response_handlers/none';
+
+VisResponseHandlersRegistryProvider.register(BasicResponseHandlerProvider);
+VisResponseHandlersRegistryProvider.register(noneResponseHandler);
 
 import { VisEditorTypesRegistryProvider } from 'ui/registry/vis_editor_types';
 import { defaultEditor } from 'ui/vis/editors/default/default';
