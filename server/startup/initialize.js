@@ -136,7 +136,7 @@ module.exports = function (server, options) {
 		elasticRequest.callWithInternalUser('update', { 
         	index: '.kibana', 
         	type: 'config', 
-        	id: '5.6.1', 
+        	id: '5.6.2', 
         	body: { 
         		doc: {
         			'defaultIndex':'wazuh-alerts-*', 
