@@ -84,11 +84,11 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	$scope.newVis.init().then(function () {
 		// Render visualization
 		$rootScope.visCounter++;
+        $scope.savedVis = $scope.newVis;
 		renderVisualization();
 	},function () {
 		console.log("Error: Could not load visualization: "+visDecoded.vis.title);
 	});
-    $scope.savedVis = $scope.newVis;
     function renderVisualization() {
 		$scope.loadBeforeShow = false;
 
@@ -123,9 +123,10 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		$scope.timefilter = timefilter;
 
 		// Get App State
-        const $state = $scope.state = new AppState();
+        const $state = $scope.state = new AppState({interval:'auto'});
 		//let $state = new AppState();
         $state.query = migrateLegacyQuery($scope.filter.current);
+        console.log($state);
 		// Initialize queryFilter and searchSource
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);
 		$scope.searchSource = $scope.newVis.searchSource;
@@ -136,7 +137,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		function() {
 
 			$scope.vis = $scope.savedVis.vis;
-
 			// Bind visualization, index pattern and state
 			$scope.indexPattern = $scope.vis.indexPattern;
 			$scope.state = $state;
