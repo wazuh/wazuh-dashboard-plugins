@@ -90,9 +90,11 @@ VisRequestHandlersRegistryProvider.register(noneRequestHandlerProvider);
 import { VisResponseHandlersRegistryProvider } from 'ui/registry/vis_response_handlers';
 import { BasicResponseHandlerProvider } from 'ui/vis/response_handlers/basic';
 import { noneResponseHandler } from 'ui/vis/response_handlers/none';
+import { TabifyResponseHandlerProvider } from 'ui/vis/response_handlers/tabify';
 
 VisResponseHandlersRegistryProvider.register(BasicResponseHandlerProvider);
 VisResponseHandlersRegistryProvider.register(noneResponseHandler);
+VisResponseHandlersRegistryProvider.register(TabifyResponseHandlerProvider);
 
 import { VisEditorTypesRegistryProvider } from 'ui/registry/vis_editor_types';
 import { defaultEditor } from 'ui/vis/editors/default/default';

@@ -149,7 +149,7 @@ module.exports = function (server, options) {
 	var configureKibana = function () {
 
 		// Call the internal API and wait for the response
-		var options = { headers: { 'kbn-version':'6.0.0-beta2' }, json: true }
+		var options = { headers: { 'kbn-version':'6.0.0-rc1' }, json: true }
 
 		var body = {attributes : {title : index_pattern, timeFieldName : '@timestamp'}}
 
