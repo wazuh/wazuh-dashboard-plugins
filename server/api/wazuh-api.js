@@ -10,30 +10,26 @@ module.exports = function (server, options) {
 	var blueWazuh = colors.blue('wazuh');
 	var wazuh_config = {};
 	var package_info = {};
-    const package_file = '../../package.json';
     var appVersion = "";
     var permissions = {}
+
     // Read Wazuh App package file
     try {
-        package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, package_file), 'utf8'));
+        package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
         appVersion = package_info.version;
     } catch (e) {
         server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
-        server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + package_file);
-        server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+
     };
+
 	// Read Wazuh App configuration file
     try {
         wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
     } catch (e) {
         server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file.');
-        server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + wazuh_config_file);
-        server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
     };
 
 	// Elastic JS Client
-	const serverConfig = server.config();
-	const elasticsearch = require('elasticsearch');
 	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
     //Handlers - Generic
