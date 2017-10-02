@@ -179,11 +179,12 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 			if($scope.visIndexPattern == "wazuh-alerts-*"){
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
 				$scope.searchSource.set('query', migrateLegacyQuery($scope.filter.current));
+                $state.query = migrateLegacyQuery($scope.filter.current);
 			}
 
 			if ($scope.vis && $scope.vis.type.requiresSearch) {
 				$state.save();
-				courier.fetch();
+				$scope.vis.forceReload();
 			}
 
 		};
