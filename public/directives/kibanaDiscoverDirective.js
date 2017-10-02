@@ -56,6 +56,9 @@ import { savedSearchProvider } from 'plugins/kibana/discover/saved_searches/save
 import { getDefaultQuery } from 'ui/parse_query';
 import { IndexPatternsFieldListProvider } from 'ui/index_patterns/_field_list';
 import { fieldCalculator } from 'plugins/kibana/discover/components/field_chooser/lib/field_calculator';
+import { QueryManagerProvider } from 'ui/query_manager';
+import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
+import { BasicResponseHandlerProvider } from 'ui/vis/response_handlers/basic';
 
 SavedObjectRegistryProvider.register(savedSearchProvider);
 
@@ -146,15 +149,13 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
             // Decode discover settings from directive
             var disDecoded = rison.decode($scope.disA);
             const state = disDecoded;
-
-            const specified = !!state.index;
-            const exists = _.findIndex(savedObjects, o => o.id === state.index) > -1;
-            const id = exists ? state.index : config.get('defaultIndex');
+            state.index = config.get('defaultIndex');
+            
             Promise.props({
                 list: savedObjects,
-                loaded: courier.indexPatterns.get(id),
+                loaded: courier.indexPatterns.get(state.index),
                 stateVal: state.index,
-                stateValFound: specified && exists
+                stateValFound: true
             }).then(function(result) {
                 $scope._ip = result;
                 savedSearches.get().then(function(result) {
@@ -164,6 +165,8 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     const brushEvent = Private(UtilsBrushEventProvider);
                     const HitSortFn = Private(PluginsKibanaDiscoverHitSortFnProvider);
                     const queryFilter = Private(FilterBarQueryFilterProvider);
+                    const responseHandler = Private(BasicResponseHandlerProvider).handler;
+
                     const filterManager = Private(FilterManagerProvider);
                     $scope.queryDocLinks = documentationLinks.query;
                     $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
@@ -200,7 +203,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     // the actual courier.SearchSource
                     $scope.searchSource = savedSearch.searchSource;
                     $scope.indexPattern = resolveIndexPatternLoading();
-
                     $scope.searchSource
                         .set('index', $scope.indexPattern)
                         .highlightAll(true)
@@ -227,16 +229,19 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     };
                     let stateMonitor;
                     const $state = $scope.state;
+                    const queryManager = Private(QueryManagerProvider)($state);
+
                     $scope.uiState = $state.makeStateful('uiState');
                     $scope.uiState.set('vis.legendOpen', false);
                     $state.query = ($scope.stateQuery ? $scope.stateQuery : '');
 
                     function getStateDefaults() {
+                         console.log($scope.indexPattern.id);
                         return {
                             query: $scope.disFilter ? $scope.disFilter : '',
                             sort: disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern),
                             columns: disDecoded.columns.length > 0 ? disDecoded.columns : config.get('defaultColumns'),
-                            index: disDecoded.index ? disDecoded.index : $scope.indexPattern.id,
+                            index: $scope.indexPattern.id,
                             interval: 'auto',
                             filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
                         };
@@ -310,7 +315,13 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                                     }
 
                                 });
-
+                                $scope.$watchCollection('state.$newFilters', function (filters = []) {
+                                    // need to convert filters generated from user interaction with viz into kuery AST
+                                    // These are handled by the filter bar directive when lucene is the query language
+                                    Promise.all(filters.map(queryManager.addLegacyFilter))
+                                    .then(() => $scope.state.$newFilters = [])
+                                    .then($scope.fetch);
+                                });
                                 $scope.$watch('vis.aggs', function() {
                                     // no timefield, no vis, nothing to update
                                     if (!$scope.opts.timefield) return;
@@ -409,7 +420,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     };
 
                     $scope.opts.fetch = $scope.fetch = function() {
-
                         // ignore requests to fetch before the app inits
                         if (!init.complete) return;
 
@@ -418,6 +428,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         $scope.updateDataSource()
                             .then(setupVisualization)
                             .then(function() {
+                                $state.save();
                                 return courier.fetch();
                             })
                             .catch(notify.error);
@@ -485,38 +496,46 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                             }
                         }));
 
-                        segmented.on('mergedSegment', function(merged) {
-                            $scope.mergedEsResp = merged;
-                            $scope.hits = merged.hits.total;
-                            const indexPattern = $scope.searchSource.get('index');
+    segmented.on('mergedSegment', function (merged) {
+      $scope.mergedEsResp = merged;
 
-                            // the merge rows, use a new array to help watchers
-                            $scope.rows = merged.hits.hits.slice();
+      if ($scope.opts.timefield) {
+        $scope.searchSource.rawResponse = merged;
+        responseHandler($scope.vis, merged).then(resp => {
+          $scope.visData = resp;
+        });
+      }
 
-                            notify.event('flatten hit and count fields', function() {
-                                let counts = $scope.fieldCounts;
+      $scope.hits = merged.hits.total;
 
-                                // if we haven't counted yet, or need a fresh count because we are sorting, reset the counts
-                                if (!counts || sortFn) counts = $scope.fieldCounts = {};
+      const indexPattern = $scope.searchSource.get('index');
+      // the merge rows, use a new array to help watchers
+      $scope.rows = merged.hits.hits.slice();
 
-                                $scope.rows.forEach(function(hit) {
-                                    // skip this work if we have already done it
-                                    if (hit.$$_counted) return;
+      notify.event('flatten hit and count fields', function () {
+        let counts = $scope.fieldCounts;
 
-                                    // when we are sorting results, we need to redo the counts each time because the
-                                    // "top 500" may change with each response, so don't mark this as counted
-                                    if (!sortFn) hit.$$_counted = true;
+        // if we haven't counted yet, or need a fresh count because we are sorting, reset the counts
+        if (!counts || sortFn) counts = $scope.fieldCounts = {};
 
-                                    const fields = _.keys(indexPattern.flattenHit(hit));
-                                    let n = fields.length;
-                                    let field;
-                                    while (field = fields[--n]) {
-                                        if (counts[field]) counts[field] += 1;
-                                        else counts[field] = 1;
-                                    }
-                                });
-                            });
-                        });
+        $scope.rows.forEach(function (hit) {
+          // skip this work if we have already done it
+          if (hit.$$_counted) return;
+
+          // when we are sorting results, we need to redo the counts each time because the
+          // "top 500" may change with each response, so don't mark this as counted
+          if (!sortFn) hit.$$_counted = true;
+
+          const fields = _.keys(indexPattern.flattenHit(hit));
+          let n = fields.length;
+          let field;
+          while (field = fields[--n]) {
+            if (counts[field]) counts[field] += 1;
+            else counts[field] = 1;
+          }
+        });
+      });
+    });
 
                         segmented.on('complete', function() {
 
@@ -539,7 +558,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                         $scope.searchSource
                             .size($scope.opts.sampleSize)
                             .sort(getSort($state.sort, $scope.indexPattern))
-                            .query(!$state.query ? null : $state.query)
+                            .query(!$state.query ? null : migrateLegacyQuery($state.query))
                             .set('filter', queryFilter.getFilters());
                     });
 
@@ -645,6 +664,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     });
 
                     function resolveIndexPatternLoading() {
+                        console.log($scope._ip);
                         const props = $scope._ip;
                         const loaded = props.loaded;
                         const stateVal = props.stateVal;
@@ -834,7 +854,7 @@ $scope.selectedIndexPattern = $scope.indexPatternList.find(
           type: type,
           _a: rison.encode({
             filters: $scope.state.filters || [],
-            query: $scope.state.query || undefined,
+            query: migrateLegacyQuery($scope.state.query) || undefined,
             vis: {
               type: type,
               aggs: [
