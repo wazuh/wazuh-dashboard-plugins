@@ -50,34 +50,34 @@ app.controller('managerStatusController', function ($scope, DataFactory, generic
     var load = function () {
         DataFactory.getAndClean('get', '/agents/summary', {})
             .then(function (data) {
-                $scope.agentsCountActive = data.data.Active;
-                $scope.agentsCountDisconnected = data.data.Disconnected;
-                $scope.agentsCountNeverConnected = data.data['Never connected'];
-                $scope.agentsCountTotal = data.data.Total;
-                $scope.agentsCoverity = (data.data.Active / data.data.Total) * 100;
+                $scope.agentsCountActive = data.data.data.Active;
+                $scope.agentsCountDisconnected = data.data.data.Disconnected;
+                $scope.agentsCountNeverConnected = data.data.data['Never connected'];
+                $scope.agentsCountTotal = data.data.data.Total;
+                $scope.agentsCoverity = (data.data.data.Active / data.data.data.Total) * 100;
             }, printError);
         DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {
-                $scope.daemons = data.data;
+                $scope.daemons = data.data.data;
             }, printError);
         DataFactory.getAndClean('get', '/manager/info', {})
             .then(function (data) {
-                $scope.managerInfo = data.data;
+                $scope.managerInfo = data.data.data;
                 DataFactory.getAndClean('get', '/rules', { offset: 0, limit: 1 })
                     .then(function (data) {
-                        $scope.totalRules = data.data.totalItems;
+                        $scope.totalRules = data.data.data.totalItems;
                         DataFactory.getAndClean('get', '/decoders', { offset: 0, limit: 1 })
                             .then(function (data) {
-                                $scope.totalDecoders = data.data.totalItems;
+                                $scope.totalDecoders = data.data.data.totalItems;
                                 $scope.load = false;
                             }, printError);
                     }, printError);
             }, printError);
         DataFactory.getAndClean('get', '/agents', { offset: 0, limit: 1, sort: '-id' })
             .then(function (data) {
-                DataFactory.getAndClean('get', '/agents/' + data.data.items[0].id, {})
+                DataFactory.getAndClean('get', '/agents/' + data.data.data.items[0].id, {})
                     .then(function (data) {
-                        $scope.agentInfo = data.data;
+                        $scope.agentInfo = data.data.data;
                     }, printError);
             }, printError);
     };
@@ -112,10 +112,10 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
     var load = function () {
         DataFactory.getAndClean('get', '/manager/status', {})
             .then(function (data) {
-                $scope.daemons = data.data;
+                $scope.daemons = data.data.data;
                 DataFactory.getAndClean('get', '/manager/configuration', {})
                     .then(function (data) {
-                        $scope.managerConfiguration = data.data;
+                        $scope.managerConfiguration = data.data.data;
                         $scope.load = false;
                     }, printError);
             }, printError);
