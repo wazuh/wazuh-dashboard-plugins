@@ -29,23 +29,6 @@ module.exports = function (server, options) {
         server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not read the Wazuh package file.');
     };
 
-	// Load Wazuh API credentials from Elasticsearch document
-	var loadCredentials = function (apiEntries) {
-
-		if ( typeof apiEntries === 'undefined' || typeof apiEntries.hits === 'undefined')
-			return;
-
-			apiEntries.hits.forEach(function (element) {
-				var apiEntry = { 'user': element._source.api_user, 'password': new Buffer(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
-
-				if (apiEntry.error) {
-					server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Error getting wazuh-api data: ' + json.error);
-					return;
-				}
-				checkAndSaveStatus(apiEntry);
-			});
-	}
-
     var getPath = function(wapi_config){
         var path = wapi_config.url;
         var protocol;
@@ -65,35 +48,6 @@ module.exports = function (server, options) {
         }
         return path;
     }
-    
-	// Check API status twice and get agents total items
-	var checkAndSaveStatus = function (apiEntry) {
-		apiEntry.user;
-		apiEntry.password;
-		apiEntry.url;
-		apiEntry.insecure;
-		apiEntry.port;
-
-		console.log("printing path");
-		console.log(getPath(apiEntry));
-		var payload = { 'offset': 0, 'limit': 1 };
-
-		var options = {
-			headers: { 'wazuh-app-version': packageJSON.version },
-			username: apiEntry.user,
-			password: apiEntry.password,
-			rejectUnauthorized: !apiEntry.insecure
-		};
-
-		needle.request('get', getPath(apiEntry) +'/agents', payload, options, function (error, response) {
-			if (!error && !response.error && response.body.data && response.body.data.totalItems) {
-				checkStatus(apiEntry, response.body.data.totalItems);
-			} else {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
-				return;
-			}
-		});
-	};
 
 	// Check status and get agent status array
 	var checkStatus = function (apiEntry, maxSize, offset) {
@@ -125,18 +79,61 @@ module.exports = function (server, options) {
 		});
 	};
 
+	// Check API status twice and get agents total items
+	var checkAndSaveStatus = function (apiEntry) {
+		apiEntry.user;
+		apiEntry.password;
+		apiEntry.url;
+		apiEntry.insecure;
+		apiEntry.port;
+
+		var payload = { 'offset': 0, 'limit': 1 };
+
+		var options = {
+			headers: { 'wazuh-app-version': packageJSON.version },
+			username: apiEntry.user,
+			password: apiEntry.password,
+			rejectUnauthorized: !apiEntry.insecure
+		};
+
+		needle.request('get', getPath(apiEntry) +'/agents', payload, options, function (error, response) {
+			if (!error && !response.error && response.body.data && response.body.data.totalItems) {
+				checkStatus(apiEntry, response.body.data.totalItems);
+			} else {
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
+				return;
+			}
+		});
+	};
+
+	// Load Wazuh API credentials from Elasticsearch document
+	var loadCredentials = function (apiEntries) {
+		if (typeof apiEntries === 'undefined' || typeof apiEntries.hits === 'undefined')
+			return;
+
+		apiEntries.hits.forEach(function (element) {
+			var apiEntry = { 'user': element._source.api_user, 'password': new Buffer(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
+				if (apiEntry.error) {
+					server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Error getting wazuh-api data: ' + json.error);
+					return;
+				}
+				checkAndSaveStatus(apiEntry);
+			});
+	}
+
 	// Get API configuration from elastic and callback to loadCredentials
 	var getConfig = function (callback) {
-		elasticRequest.callWithInternalUser('search',{ index: '.wazuh', type: 'wazuh-configuration'})
-			.then(function (data) {
-				if (data.hits.total > 0) {
+		elasticRequest.callWithInternalUser('search',{ index: '.wazuh', type: 'wazuh-configuration'}).then(
+			function (data) {
+				if (data.hits.total > 1) {
 					callback(data.hits);
 				} else {
 					callback({ 'error': 'no credentials', 'error_code': 1 });
 				}
 			}, function () {
 				callback({ 'error': 'no elasticsearch', 'error_code': 2 });
-			});
+			}
+		);
 	};
 
 	// fetchAgents on demand
@@ -147,6 +144,7 @@ module.exports = function (server, options) {
 
 	// Configure Kibana patterns.
 	var configureKibana = function () {
+		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating index pattern: ' + index_pattern);
 
 		// Call the internal API and wait for the response
 		var options = { headers: { 'kbn-version':'6.0.0-rc1' }, json: true }
@@ -160,6 +158,7 @@ module.exports = function (server, options) {
 	var createIndex = function (todayIndex) {
 		elasticRequest.callWithInternalUser('indices.create',{ index: todayIndex }).then(
 			function () {
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Successfully created today index.');
 				insertDocument(todayIndex);
 			}, function () {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not create ' + todayIndex + ' index on elasticsearch.');
@@ -200,13 +199,9 @@ module.exports = function (server, options) {
 		elasticRequest.callWithInternalUser('indices.exists',{ index: todayIndex }).then(
 			function (result) {
 				if (result) {
-					console.log("inserting");
 					insertDocument(todayIndex);
-					return false;
 				} else {
-					console.log("creating");
 					createIndex(todayIndex);
-					return true;
 				}
 			}, function () {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not check if the index ' + todayIndex + ' exists.');
@@ -217,13 +212,19 @@ module.exports = function (server, options) {
 	// Main. First execution when installing / loading App.
 	var init = function (){
 		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating today index...');
-		if (saveStatus()) {
-			configureKibana().then(function () {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Successfully initialized!');
-			});
-		} else {
-		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Configuring Kibana to work with "' + index_pattern + '" index pattern...');
-		}
+		saveStatus();
+			
+		elasticRequest.callWithInternalUser('search', { index: '.kibana', type: 'doc', q: 'index-pattern.title:"wazuh-monitoring-*"'}).then(
+			function (data) {
+				if (data.hits.total == 1) {
+					server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Skipping index-pattern creation. Already exists.');
+				} else {
+					configureKibana();
+				}
+			}, function (error) {
+				server.log([blueWazuh, 'error'], 'Could not reach elasticsearch.');
+			}
+		);
 	}
 
 	// Wait until Elasticsearch is ready
@@ -234,7 +235,7 @@ module.exports = function (server, options) {
 					init();
 				});
 			}, function (data) {
-				server.log([blueWazuh, 'initialize', 'info'], 'Waiting Elasticsearch to be up...');
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Waiting for Elasticsearch to be up...');
 				setTimeout(function () {checkElasticStatus()}, 3000)
 			}
 		);

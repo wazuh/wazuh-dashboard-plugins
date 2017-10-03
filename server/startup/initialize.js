@@ -80,13 +80,13 @@ module.exports = function (server, options) {
 	var setDefaultKibanaSettings = function (id) {
         server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default values: Index pattern, time picker and metaFields...');
 			
-		// Call the internal API and wait for the response
+		// Call the internal API and wait for the response THE HARDCODED VERSION NUMBER SHOULD BE FIXED UPON KIBANA STABLE RELEASE
 		var options = { headers: {'kbn-version':'6.0.0-rc1'}, json: true}
 
 		var body = {"value": id}
 
 		needle('post', 'http://localhost:' + server.info.port + '/api/kibana/settings/defaultIndex', body, options).then(function(resp) { 
-			server.log([blueWazuh, 'info'], 'Wazuh index-pattern successfully set to default.');
+			server.log([blueWazuh, 'initialize', 'info'], 'Wazuh index-pattern successfully set to default.');
 		}).catch(function(err) { 
 			server.log([blueWazuh, 'error'], 'Could not default Wazuh index-pattern.');
 		});
@@ -96,13 +96,13 @@ module.exports = function (server, options) {
 	var createIndexPattern = function () {
 		server.log([blueWazuh, 'initialize', 'info'], 'Creating index pattern: ' + index_pattern);	
 
-		// Call the internal API and wait for the response
+		// Call the internal API and wait for the response THE HARDCODED VERSION NUMBER SHOULD BE FIXED UPON KIBANA STABLE RELEASE
 		var options = { headers: { 'kbn-version':'6.0.0-rc1' }, json: true }
 
 		var body = {attributes : {title : index_pattern, timeFieldName : '@timestamp'}}
 
 		needle('post', 'http://localhost:' + server.info.port + '/api/saved_objects/index-pattern', body, options).then(function(resp) { 
-			server.log([blueWazuh, 'info'], 'Successfully created index-pattern.');
+			server.log([blueWazuh, 'initialize', 'info'], 'Successfully created index-pattern.');
 			// Save the id somewhere 
 			setDefaultKibanaSettings(resp.body.id);
 		}).catch(function(err) { 
@@ -117,14 +117,14 @@ module.exports = function (server, options) {
 			elasticRequest.callWithInternalUser('search', { index: '.kibana', type: 'index-pattern', q: 'title:"wazuh-alerts-*"'}).then(
 				function (data) {
 					if (data.hits.total == 1) {
-						server.log([blueWazuh, 'info'], 'Skipping index-pattern creation. Already exists.');
+						server.log([blueWazuh, 'initialize', 'info'], 'Skipping index-pattern creation. Already exists.');
 					} else {
 						createIndexPattern();
 					}
 				}, function (error) {
 					server.log([blueWazuh, 'error'], 'Could not reach elasticsearch.');
 			});
-			// Import objects (dashboards and visualizations) CAREFULL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!
+			// Import objects (dashboards and visualizations) CAREFUL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!
 			importObjects();			
 		}
 		
