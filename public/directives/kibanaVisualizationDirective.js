@@ -126,7 +126,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
         const $state = $scope.state = new AppState({interval:'auto'});
 		//let $state = new AppState();
         $state.query = migrateLegacyQuery($scope.filter.current);
-        console.log($state);
 		// Initialize queryFilter and searchSource
 		$scope.queryFilter = Private(FilterBarQueryFilterProvider);
 		$scope.searchSource = $scope.newVis.searchSource;

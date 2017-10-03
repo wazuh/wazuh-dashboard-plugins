@@ -42,7 +42,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	// Remove API entry
 	$scope.removeManager = function(item) {
 		var index = $scope.apiEntries.indexOf(item);
-		if($scope.apiEntries[index]._source.active == "true" && $scope.apiEntries.length != 1){
+		if($scope.apiEntries[index]._source && $scope.apiEntries[index]._source.active == "true" && $scope.apiEntries.length != 1){
 			notify.error("Please set another default manager before removing this one");
 			return;
 		}
@@ -72,9 +72,9 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     // Get settings function
     $scope.getSettings = function () {
 			genericReq.request('GET', '/api/wazuh-api/apiEntries').then(function (data, status) {
-				$scope.apiEntries = data;
+				$scope.apiEntries = data.data;
 				angular.forEach($scope.apiEntries, function (value, key) {
-					if(value._source.active == "true"){
+					if(value._source && value._source.active == "true"){
 						$scope.currentDefault = key;
 						if(value._source.extensions){
 							$scope.extensions = value._source.extensions;
@@ -108,38 +108,46 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 				'active': activeStatus
 			};
 
-	    testConnection.check(tmpData).then(function (data) {
-				// API Check correct. Get Cluster info
-				tmpData.cluster_info = data;
+        testConnection.check(tmpData).then(function (data) {
+            // API Check correct. Get Cluster info
+            tmpData.cluster_info = data.data;
 
-	      if(activeStatus){
-	          appState.setClusterInfo(tmpData.clusterInfo);
-	      }
+            if(activeStatus){
+                appState.setClusterInfo(tmpData.clusterInfo);
+            }
 
-				tmpData.extensions = {"oscap": true, "audit": true, "pci": true};
-				// Insert new API entry
-				genericReq.request('PUT', '/api/wazuh-api/settings', tmpData).then(function (data) {
-					var newEntry = {'_id': data.response._id, _source: { cluster_info: tmpData.cluster_info, active: tmpData.active, url: tmpData.url, api_user: tmpData.user, api_port: tmpData.port } };
-					$scope.apiEntries.push(newEntry);
-					notify.info('Wazuh API successfully added');
-					$scope.addManagerContainer = false;
-					$scope.formData.user = "";
-					$scope.formData.password = "";
-					$scope.formData.url = "";
-					$scope.formData.port = "";
-					// Fetch agents on demand
-	        genericReq.request('GET', '/api/wazuh-api/fetchAgents').then(function(data){} , function (data, status) {
-	            notify.error("Error fetching agents");
-					});
-
-				}, function (data, status) {
-					if (status == '400') {
-						notify.error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
-					} else {
-						notify.error("Some error ocurred, could not save data in elasticsearch.");
-					}
-				});
-			}, printError);
+            tmpData.extensions = {"oscap": true, "audit": true, "pci": true};
+            // Insert new API entry
+            genericReq.request('PUT', '/api/wazuh-api/settings', tmpData).then(function (data) {
+                var newEntry = {
+                    '_id': data.data.response._id,
+                    _source: {
+                        cluster_info: tmpData.cluster_info,
+                        active: tmpData.active,
+                        url: tmpData.url,
+                        api_user: tmpData.user,
+                        api_port: tmpData.port
+                    }
+                };
+                $scope.apiEntries.push(newEntry);
+                notify.info('Wazuh API successfully added');
+                $scope.addManagerContainer = false;
+                $scope.formData.user = "";
+                $scope.formData.password = "";
+                $scope.formData.url = "";
+                $scope.formData.port = "";
+                // Fetch agents on demand
+                genericReq.request('GET', '/api/wazuh-api/fetchAgents').then(function(data){} , function (data, status) {
+                notify.error("Error fetching agents");
+                });
+            }, function (data, status) {
+                if (status == '400') {
+                    notify.error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
+                } else {
+                    notify.error("Some error ocurred, could not save data in elasticsearch.");
+                }
+            });
+        }, printError);
     };
 
 	// Check manager connectivity
@@ -214,12 +222,12 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     };
 
 	$scope.getAppInfo = function () {
-		$http.get("/api/wazuh-elastic/setup").success(function (data, status) {
+		$http.get("/api/wazuh-elastic/setup").then(function (data, status) {
 			$scope.appInfo = {};
 			$scope.appInfo["app-version"] = data.data["app-version"];
 			$scope.appInfo["installationDate"] = data.data["installationDate"];
 			$scope.appInfo["revision"] = data.data["revision"];
-		}).error(function (data, status) {
+		}).catch(function (data, status) {
 			notify.error("Error when loading Wazuh setup info");
 		})
 	}
