@@ -1,4 +1,24 @@
-# Wazuh - Kibana App
+# Wazuh
+
+Wazuh is a security detection, visibility, and compliance open source project. It was born as a fork of OSSEC HIDS, later was integrated with Elastic Stack and OpenSCAP evolving into a more comprehensive solution. You can read more in https://wazuh.com/
+
+## Wazuh - Kibana App Description
+
+Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app plugin.
+
+- Obtain statistics per agent, search alerts and filter by using the different visualizations.
+
+- View the Wazuh manager configuration.
+
+- File integrity monitoring.
+
+## Documentation
+
+* [Full documentation](https://documentation.wazuh.com)
+* [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html)
+* [Screenshots](https://documentation.wazuh.com/current/index.html#example-screenshots)
+
+![Overview](https://wazuh.com/wp-content/uploads/2017/01/Overview_general.png)
 
 ## Requisites
 
@@ -27,6 +47,7 @@
 | 5.6.1  | 2.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.0_5.6.1.zip  |
 | 5.6.1  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.1.zip  |
 | 5.6.2  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.2.zip  |
+
 ## Upgrade
 
 Remove the App using kibana-plugin tool
@@ -36,13 +57,6 @@ Remove the App using kibana-plugin tool
 Install the App
 
 ```/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.x.x.zip ```
-
-
-## Documentation
-
-* [Full documentation](https://documentation.wazuh.com)
-* [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html)
-* [Screenshots](https://documentation.wazuh.com/current/index.html#example-screenshots)
 
 ## Contribute
 
