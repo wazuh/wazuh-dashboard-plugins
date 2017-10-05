@@ -35,7 +35,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
                 DataFactory.scrollTo(objectsArray['/manager/logs'], 75)
                     .then(function (data) {
                         $scope.text.length = 0;
-                        $scope.text = data.data.items;
+                        $scope.text = data.data.data.items;
                         DataFactory.filters.unflag(objectsArray['/manager/logs']);
                         $scope.blocked = false;
                     }, printError);
@@ -44,7 +44,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
                 DataFactory.scrollTo(objectsArray['/manager/logs'], index)
                     .then(function (data) {
                         $scope.text.length = 0;
-                        $scope.text = data.data.items;
+                        $scope.text = data.data.data.items;
                         $scope.blocked = false;
                     }, printError);
             } else {
@@ -82,7 +82,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
     var loadSummary = function () {
         DataFactory.getAndClean('get', '/manager/logs/summary', {})
             .then(function (data) {
-                $scope.summary = data.data;
+                $scope.summary = data.data.data;
                 $scope.load = false;
             }, printError);
     };
@@ -117,7 +117,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
                 DataFactory.get(objectsArray['/manager/logs'])
                     .then(function (data) {
                         $scope.text.length = 0;
-                        $scope.text = data.data.items;
+                        $scope.text = data.data.data.items;
                     }, printError);
             }, 1000);
         }
@@ -130,7 +130,7 @@ app.controller('osseclogController', function ($scope, DataFactory, $sce, $inter
                 DataFactory.filters.register(objectsArray['/manager/logs'], 'category', 'string');
                 DataFactory.filters.register(objectsArray['/manager/logs'], 'type_log', 'string');
                 DataFactory.get(data).then(function (data) {
-                    $scope.text = data.data.items;
+                    $scope.text = data.data.data.items;
                     loadSummary();
                 }, printError);
             }, printError);

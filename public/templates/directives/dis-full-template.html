@@ -274,8 +274,17 @@
 
               </header>
 
-              <visualize ng-if="vis && rows.length != 0 && state.sort" vis="vis" ui-state="uiState" es-resp="mergedEsResp" search-source="searchSource">
-              </visualize>
+              <visualization
+                 ng-if="vis && rows.length != 0"
+                 vis="vis"
+                 ui-state="uiState"
+                 vis-data="visData"
+                 show-spy-panel="true"
+                 search-source="searchSource"
+                 style="height: 200px"
+                >
+              </visualization>
+
             </div>
 
             <div class="discover-table" fixed-scroll ng-style="{ 'height': tableHeight }" ng-if="state.sort && state.columns">
