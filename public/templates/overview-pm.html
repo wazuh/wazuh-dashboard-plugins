@@ -24,7 +24,7 @@
 
 	<!-- View: Panels -->
 	<div ng-show="hideRing(5) && results && !loading" ng-if="tabView == 'panels'">
-		<div layout="row" layout-align="center stretch">
+		<div layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex="50">
 				<md-card-content>
 					<span class="md-headline">Events over time</span>
@@ -55,7 +55,7 @@
 
 		</div>
 
-	<div layout="row" layout-align="center stretch">
+        <div layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex>
 				<md-card-content>
 					<span class="md-headline">Events per agent evolution</span>
@@ -67,7 +67,7 @@
 
 		</div>
 
-		<div layout="row" layout-align="center stretch">
+		<div layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex>
 				<md-card-title>
 					<md-card-title-text>

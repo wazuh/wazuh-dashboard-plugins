@@ -9,8 +9,9 @@ var settingsWizard = function ($location, testConnection, appState, $q, genericR
     testConnection.check_stored().then(
         function (data)
     {
-		appState.setClusterInfo(data.cluster_info);
-		appState.setExtensions(data.extensions);
+        console.log(data);
+		appState.setClusterInfo(data.data.cluster_info);
+		appState.setExtensions(data.data.extensions);
 		deferred.resolve();
 	}, function (data) {
 		if(data.error == 2)
