@@ -22,10 +22,10 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 2.0 or superior
-- Wazuh RESTful API 2.0 or superior
-- Kibana 5.2.2 or superior
-- Elasticsearch 5 or superior
+- Wazuh HIDS 2.0 or newer
+- Wazuh RESTful API 2.0 or newer
+- Kibana 5.2.2 or newer
+- Elasticsearch 5 or newer
 
 ## Installation
 
