@@ -13,7 +13,7 @@ app.factory('Rules', function($http, DataFactory) {
     if (this.busy) return;
     this.busy = true;
 	DataFactory.next(this.objectsArray['/rules']).then(function (data) {
-			var items = data.data.items;
+			var items = data.data.data.items;
 			for (var i = 0; i < items.length; i++) {
 				this.items.push(items[i]);
 			}
@@ -39,7 +39,7 @@ app.factory('Decoders', function($http, DataFactory) {
     if (this.busy) return;
     this.busy = true;
 	DataFactory.next(this.objectsArray['/decoders']).then(function (data) {
-			var items = data.data.items;
+			var items = data.data.data.items;
 			for (var i = 0; i < items.length; i++) {
 				this.items.push(items[i]);
 			}
@@ -105,7 +105,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, Notifier, e
 		
 		DataFactory.setOffset(objectsArray['/rules'],0);
 		DataFactory.get(objectsArray['/rules']).then(function (data) { 
-			$scope.rules.items = data.data.items;
+			$scope.rules.items = data.data.data.items;
 		});
     }
 
@@ -134,7 +134,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, Notifier, e
 		
 		DataFactory.setOffset(objectsArray['/rules'],0);
 		DataFactory.get(objectsArray['/rules']).then(function (data) { 
-			$scope.rules.items = data.data.items;
+			$scope.rules.items = data.data.data.items;
 			$scope.load = false;
 		});
     };
@@ -177,7 +177,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, Notifier, e
 		
 		DataFactory.setOffset(objectsArray['/rules'],0);
 		DataFactory.get(objectsArray['/rules']).then(function (data) { 
-			$scope.rules.items = data.data.items;
+			$scope.rules.items = data.data.data.items;
 			$scope.load = false;
 		});
     };
@@ -207,17 +207,17 @@ app.controller('rulesController', function ($scope, $q, DataFactory, Notifier, e
         DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 5, 'search': search })
             .then(function (data) {
 				
-                angular.forEach(data.data.items, function (value) {
+                angular.forEach(data.data.data.items, function (value) {
                     result.push({ 'type': 'file', 'value': value.file });
                 });
                 DataFactory.getAndClean('get', '/rules/groups', { 'offset': 0, 'limit': 5, 'search': search })
                     .then(function (data) {
-                        angular.forEach(data.data.items, function (value) {
+                        angular.forEach(data.data.data.items, function (value) {
                             result.push({ 'type': 'group', 'value': value });
                         });
                         DataFactory.getAndClean('get', '/rules/pci', { 'offset': 0, 'limit': 5, 'search': search })
                             .then(function (data) {
-                                angular.forEach(data.data.items, function (value) {
+                                angular.forEach(data.data.data.items, function (value) {
                                     result.push({ 'type': 'pci', 'value': value });
                                 });
                                 defered.resolve(result);
@@ -254,7 +254,7 @@ app.controller('rulesController', function ($scope, $q, DataFactory, Notifier, e
 				DataFactory.filters.register(objectsArray['/rules'], 'filter-sort', 'string');
 				DataFactory.filters.set(objectsArray['/rules'], 'filter-sort', '-level');
                 DataFactory.get(objectsArray['/rules']).then(function (data) {
-						$scope.rules = new Rules(objectsArray, data.data.items);
+						$scope.rules = new Rules(objectsArray, data.data.data.items);
                         $scope._sort = 'level';
                         $scope.load = false;
                     }, printError);

@@ -1,47 +1,47 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'fim'" ng-controller="overviewFimController">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(17)'><div></div></div>
-	
+
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(17)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
-				No results for selected time interval 
+				No results for selected time interval
 			</md-card-content>
-		</md-card>		
-	</md-content> 
-	
-	
+		</md-card>
+	</md-content>
+
+
 	<!-- View: Discover -->
 	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'">
 		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-		dis-filter="rule.groups:syscheck AND manager.name: {{defaultManager ? defaultManager : '*'}}" 
+		dis-filter="rule.groups:syscheck"
 		infinite-scroll="true">
 		</kbn-disfull>
 	</md-content>
-	
+
 	<!-- View: Panels -->
 	<div ng-show="hideRing(17) && results && !loading" ng-if="tabView == 'panels'">
 		<md-content layout="row">
 			<div flex="10" layout="column" class="no-legend">
 				<md-card>
-					<md-card-content>
-						<kbn-vis vis-height="105px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Added),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 554'>
-						</kbn-vis>
+					<md-card-content class="metric wide-metric">
+ 						<kbn-vis-value vis-height="44px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="rule.id: 554"></kbn-vis-value>
+ 						<div class="ng-binding">Added</div>
 					</md-card-content>
 				</md-card>
 				<md-card>
-					<md-card-content>
-						<kbn-vis vis-height="105px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Modified'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555)'>
-						</kbn-vis>
+					<md-card-content class="metric wide-metric">
+ 						<kbn-vis-value vis-height="44px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555)"></kbn-vis-value>
+ 						<div class="ng-binding">Modified</div>
 					</md-card-content>
 				</md-card>
 				<md-card>
-					<md-card-content>
-						<kbn-vis vis-height="104px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22was%20deleted%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Deleted),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 553'>
-						</kbn-vis>
+					<md-card-content class="metric wide-metric">
+ 						<kbn-vis-value vis-height="44px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="rule.id: 553"></kbn-vis-value>
+ 						<div class="ng-binding">Deleted</div>
 					</md-card-content>
 				</md-card>
 
@@ -87,7 +87,7 @@
 					<div class="ng-binding">Last file modified</div>
 				</md-card-content>
 			</md-card>
-			<md-card flex layout="column"> 
+			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
 					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
 					vis-filter="syscheck.event: added AND location: syscheck">
@@ -143,14 +143,14 @@
 						vis-filter='rule.groups:"syscheck" AND _exists_:syscheck.perm_after AND (syscheck.perm_after:/[0-7]{5}([2367]).*/) '></kbn-vis>
 				</md-card-content>
 			</md-card>
-			
+
 
 		</md-content>
 
 		<md-content layout="row" flex="100" class="no-legend">
 			<md-card flex="20" layout="column">
 				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*"vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>	
+					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*"vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>
 					<div class="ng-binding">Top agent</div>
 				</md-card-content>
 			</md-card>
@@ -168,13 +168,13 @@
 			</md-card>
 			<md-card flex="40" layout="column">
 				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>	
+					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>
 					<div class="ng-binding">Most modified file</div>
 				</md-card-content>
 			</md-card>
 
 		</md-content>
-		
+
 		<md-content flex layout="row">
 			<md-card flex>
 				<md-card-title>

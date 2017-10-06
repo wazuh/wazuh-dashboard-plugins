@@ -1,7 +1,7 @@
 <md-content ng-if="submenuNavItem == 'pci' && _agent" id="agents-pci" ng-controller="PCIController">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(3)'><div></div></div>
 
 	<!-- No results message -->
@@ -10,19 +10,19 @@
 			<md-card-content style="text-align: center;">
 				No results for selected time interval
 			</md-card-content>
-		</md-card>		
-	</md-content> 
-	
-	
+		</md-card>
+	</md-content>
+
+
 	<!-- View: Discover -->
-	<md-content ng-if="agentInfo.name" style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'" >
+	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover' && agentInfo.name">
 		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-		dis-filter="_exists_:rule.pci_dss AND agent.name: {{_agent.name ? _agent.name : '*'}} AND manager.name: {{defaultManager ? defaultManager : '*'}}"
+		dis-filter="_exists_:rule.pci_dss "
 		infinite-scroll="true">
 		</kbn-disfull>
 	</md-content>
-	
-    <div flex ng-show="hideRing(3) && results && !loading" ng-if="tabView == 'panels' && !load" layout="column"> 
+
+    <div flex ng-show="hideRing(3) && results && !loading" ng-if="tabView == 'panels' && !load" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 		<md-content layout="row" layout-align="center stretch">
 		<md-card flex>
@@ -36,7 +36,7 @@
 			</md-tabs>
 		</md-card>
 	</md-content>
-	
+
 	<md-content layout="row" layout-align="center stretch">
 		<md-card flex="70">
 			<md-card-title>
@@ -45,9 +45,9 @@
 				</md-card-title-text>
 			</md-card-title>
 			<md-card-content>
-				<kbn-vis vis-height="235px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:10),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:grouped,orderBucketsBySum:!f,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'New%20Visualization',type:histogram))"
-					vis-filter="_exists_:rule.pci_dss AND agent.name: {{_agent.name ? _agent.name : '*'}}"">
-				</kbn-vis>
+                <kbn-vis vis-height="235px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:10),schema:group,type:terms),(enabled:!t,id:'2',params:(customLabel:'PCI DSS Requirements',field:rule.pci_dss,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,legendPosition:right,mode:grouped,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'PCI%20Requirements%20%2F%20Agent',type:histogram))"
+                vis-filter="_exists_:rule.pci_dss">
+                </kbn-vis>
 			</md-card-content>
 		</md-card>
 		<md-card flex="30">
@@ -58,12 +58,12 @@
 			</md-card-title>
 			<md-card-content>
 				<kbn-vis vis-height="235px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.groups,order:desc,orderBy:'1',size:10),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,legendPosition:right,shareYAxis:!t),title:'Groups',type:pie))"
-					vis-filter="_exists_:rule.pci_dss AND agent.name: {{_agent.name ? _agent.name : '*'}}"">
+					vis-filter="_exists_:rule.pci_dss"">
 				</kbn-vis>
 			</md-card-content>
 		</md-card>
 	</md-content>
-	
+
 	<md-content layout-align="center stretch">
 		<md-card flex>
 			<md-card-title>
@@ -73,11 +73,11 @@
 			</md-card-title>
 			<md-card-content>
 				<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:3,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'4',params:(customLabel:'Agent name',field:agent.name,order:desc,orderBy:'1',size:99999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Requirement,field:rule.pci_dss,order:desc,orderBy:'1',size:99999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:'Rule description',field:rule.description,order:desc,orderBy:'1',size:99999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Requirements%20by%20agent',type:table))"
-					vis-filter="_exists_:rule.pci_dss AND agent.name: {{_agent.name ? _agent.name : '*'}}"">
+					vis-filter="_exists_:rule.pci_dss"">
 				</kbn-vis>
 			</md-card-content>
 		</md-card>
 	</md-content>
-	
+
 	</div>
 </md-content>

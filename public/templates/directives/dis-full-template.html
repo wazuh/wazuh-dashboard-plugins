@@ -1,10 +1,10 @@
 <div ng-controller="discoverW" class="app-container">
 
   <kbn-top-nav name="discover" config="topNavMenu">
-    <!-- Transcluded elements. -->
     
   </kbn-top-nav>
-	<div data-transclude-slots class="wazuh-discover-searchbar">
+<!-- Transcluded elements. -->
+    <div data-transclude-slots>
       <!-- Breadcrumbs. -->
       <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
         <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb">
@@ -16,23 +16,23 @@
           <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
         </h1>
       </div>
-	  
+
       <!-- Search. -->
-      <navbar name="discover-search">
-		<form
-			class="fullWidth"
-			role="form"
-			name="discoverSearch"
-			ng-submit="fetch()"
-		>
-        <div class="typeahead" kbn-typeahead="discover" on-select="">
+      <form
+        data-transclude-slot="bottomRow"
+        class="fullWidth"
+        role="form"
+        name="discoverSearch"
+        ng-submit="fetch()"
+      >
+        <div class="typeahead" kbn-typeahead="discover" on-select="fetch()">
           <div class="kuiLocalSearch">
             <div class="kuiLocalSearchAssistedInput">
               <input
                 parse-query
                 input-focus
                 kbn-typeahead-input
-                ng-model="stateQuery"
+                ng-model="state.query"
                 placeholder="Search... (e.g. status:200 AND extension:PHP)"
                 aria-label="Search input"
                 type="text"
@@ -63,10 +63,7 @@
           <kbn-typeahead-items></kbn-typeahead-items>
         </div>
       </form>
-	  </navbar>
-	  
     </div>
-
   <div class="container-fluid" role="main">
   <div class="row">
       <filter-bar
@@ -79,17 +76,158 @@
     <div class="row">
 
 	<div class="col-md-2 sidebar-container collapsible-sidebar">
-        <disc-field-chooser
-          columns="state.columns"
-          hits="rows"
-          field-counts="fieldCounts"
-          index-pattern="searchSource.get('index')"
-          index-pattern-list="opts.indexPatternList"
-          state="state"
-          on-add-field="addColumn"
-          on-add-filter="filterQuery"
-          on-remove-field="removeColumn">
-        </disc-field-chooser>
+<div class="sidebar-list">
+  <div ng-show="indexPatternList.length > 1">
+    <ui-select
+      class="index-pattern-selection"
+      ng-model="selectedIndexPattern"
+      on-select="setIndexPattern($item)"
+    >
+      <ui-select-match>
+        {{$select.selected.get('title')}}
+      </ui-select-match>
+      <ui-select-choices repeat="pattern in indexPatternList | filter:$select.search">
+        <div ng-bind-html="pattern.get('title') | highlight: $select.search"></div>
+      </ui-select-choices>
+    </ui-select>
+  </div>
+  <div ng-hide="indexPatternList.length > 1">
+    <div class="index-pattern">
+      <h2
+        class="index-pattern-label"
+        id="index_pattern_id"
+        tabindex="0"
+        css-truncate>
+
+        {{ indexPattern.title }}</h2>
+    </div>
+  </div>
+
+  <div class="sidebar-list-header">
+    <h3 class="sidebar-list-header-label" id="selected_fields" tabindex="0">Selected Fields</h3>
+  </div>
+  <ul class="list-unstyled discover-selected-fields" >
+    <discover-field
+      ng-repeat="field in fields.raw|filter:{display:true}"
+      field="field"
+      on-add-field="addColumn"
+      on-add-filter="onAddFilter"
+      on-remove-field="removeColumn"
+      on-show-details="computeDetails"
+    >
+    </discover-field>
+  </ul>
+
+  <div class="sidebar-list-header sidebar-item">
+    <h3 class="sidebar-list-header-label" id="available_fields" tabindex="0">Available Fields
+      <span
+        ng-class="{ 'fa-chevron-right': !showFields, 'fa-chevron-down': showFields }"
+        ng-click="showFields = !showFields"
+        aria-hidden="true"
+        class="fa visible-xs visible-sm pull-right field-collapse-toggle"
+      ></span>
+
+      <button
+        type="button"
+        ng-class="{ 'kuiButton--basic': !filter.active, 'kuiButton--primary': filter.active, 'hidden-xs': !showFields, 'hidden-sm': !showFields }"
+        class="kuiButton kuiButton--small pull-right discover-field-filter-toggle"
+        ng-click="showFilter = !showFilter"
+        aria-label="Show field settings"
+        aria-haspopup="true"
+        aria-expanded="{{showFilter}}"
+      >
+        <span aria-hidden="true" class="kuiIcon fa-gear"></span>
+      </button>
+    </h3>
+  </div>
+
+  <div class="sidebar-item" ng-show="showFilter">
+    <form role="form" class="discover-field-details">
+      <div class="form-group">
+        <label>
+          Aggregatable
+        </label>
+        <select
+          ng-options="opt.value as opt.label for opt in filter.boolOpts"
+          ng-model="filter.vals.aggregatable"
+          class="form-control">
+        </select>
+      </div>
+      <div class="form-group">
+        <label>
+          Searchable
+        </label>
+        <select
+          ng-options="opt.value as opt.label for opt in filter.boolOpts"
+          ng-model="filter.vals.searchable"
+          class="form-control">
+        </select>
+      </div>
+      <div class="form-group">
+        <label>
+          Type
+        </label>
+        <select
+          ng-options="field as field for field in fieldTypes"
+          ng-model="filter.vals.type"
+          class="form-control">
+        </select>
+      </div>
+      <div class="form-group">
+        <label>
+          Field name
+        </label>
+        <input type="text" class="form-control" ng-model="filter.vals.name">
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" ng-model="filter.vals.missing">
+          Hide Missing Fields
+        </label>
+      </div>
+    </form>
+    <button
+      ng-click="filter.reset()"
+      ng-disabled="!filter.active"
+      class="kuiButton kuiButton--danger kuiButton--fullWidth"
+    >
+      Reset Filters
+    </button>
+  </div>
+
+  <ul
+    ng-show="(popularFields | filter:filter.isFieldFiltered).length > 0"
+    ng-class="{ 'hidden-sm': !showFields, 'hidden-xs': !showFields }"
+    class="list-unstyled sidebar-well discover-popular-fields">
+    <li class="sidebar-item sidebar-list-header">
+      <h6>Popular</h6>
+    </li>
+    <discover-field
+      ng-repeat="field in popularFields | filter:filter.isFieldFiltered"
+      field="field"
+      on-add-field="addColumn"
+      on-add-filter="onAddFilter"
+      on-remove-field="removeColumn"
+      on-show-details="computeDetails"
+    >
+    </discover-field>
+  </ul>
+
+  <ul
+    ng-class="{ 'hidden-sm': !showFields, 'hidden-xs': !showFields  }"
+    class="list-unstyled discover-unpopular-fields">
+    <discover-field
+      ng-repeat="field in unpopularFields | filter:filter.isFieldFiltered"
+      field="field"
+      on-add-field="addColumn"
+      on-add-filter="onAddFilter"
+      on-remove-field="removeColumn"
+      on-show-details="computeDetails"
+    >
+    </discover-field>
+  </ul>
+
+</div>
       </div>
 
 
@@ -136,14 +274,37 @@
 
               </header>
 
-              <visualize ng-if="vis && rows.length != 0 && state.sort" vis="vis" ui-state="uiState" es-resp="mergedEsResp" search-source="searchSource">
-              </visualize>
+              <visualization
+                 ng-if="vis && rows.length != 0"
+                 vis="vis"
+                 ui-state="uiState"
+                 vis-data="visData"
+                 show-spy-panel="true"
+                 search-source="searchSource"
+                 style="height: 200px"
+                >
+              </visualization>
+
             </div>
 
             <div class="discover-table" fixed-scroll ng-style="{ 'height': tableHeight }" ng-if="state.sort && state.columns">
-              <doc-table hits="rows" index-pattern="indexPattern" sorting="state.sort" columns="state.columns" infinite-scroll="infiniteScroll"
-                filter="filterQuery" on-add-column="addColumn" on-remove-column="removeColumn">
-              </doc-table>
+              <doc-table
+                hits="rows"
+                index-pattern="indexPattern"
+                sorting="state.sort"
+                columns="state.columns"
+                infinite-scroll="true"
+                filter="filterQuery"
+                filters="state.filters"
+                data-shared-item
+                data-title="{{opts.savedSearch.lastSavedTitle}}"
+                data-description="{{opts.savedSearch.description}}"
+                render-counter
+                on-add-column="addColumn"
+                on-change-sort-order="setSortOrder"
+                on-move-column="moveColumn"
+                on-remove-column="removeColumn"
+              ></doc-table>
 
               <div ng-if="rows.length == opts.sampleSize" class="discover-table-footer">
                 <center>

@@ -5,32 +5,34 @@ require('ui/modules').get('app/wazuh', [])
             check_stored: function () {
                 var defered = $q.defer();
                 var promise = defered.promise;
-                $http.get(chrome.addBasePath("/api/wazuh-api/check"))
-                    .success(function (data) {
-                        if (data.error) {
-                            defered.reject(data);
+                $http.get(chrome.addBasePath("/api/wazuh-api/check")).then(function successCallback(response) {
+                        if (response.error) {
+                            defered.reject(response);
                         } else {
-                            defered.resolve(data);
+                            defered.resolve(response);
                         }
-                    }).error(function (data) {
-                        defered.reject(data);
-                    })
+                }, function errorCallback(response) {
+                    if (response.error) {
+                        defered.reject(response);
+                    }
+                });
 
                 return promise;
             },
 			check: function (data) {
                 var defered = $q.defer();
                 var promise = defered.promise;
-                $http.post(chrome.addBasePath("/api/wazuh-api/check"), data)
-                    .success(function (data) {
-                        if (data.error) {
-                            defered.reject(data);
+                $http.post(chrome.addBasePath("/api/wazuh-api/check"), data).then(function successCallback(response) {
+                        if (response.error) {
+                            defered.reject(response);
                         } else {
-                            defered.resolve(data);
+                            defered.resolve(response);
                         }
-                    }).error(function (data) {
-                        defered.reject(data);
-                    })
+                }, function errorCallback(response) {
+                    if (response.error) {
+                        defered.reject(response);
+                    }
+                });
 
                 return promise;
             }

@@ -11,7 +11,7 @@ import _ from 'lodash';
 import 'ui/modals';
 
 import 'plugins/kibana/visualize/saved_visualizations/saved_visualizations';
-import 'plugins/kibana/visualize/editor/sidebar';
+import 'ui/vis/editors/default/sidebar';
 import 'plugins/kibana/visualize/editor/agg_filter';
 import 'ui/visualize';
 import 'ui/collapsible_sidebar';
@@ -29,19 +29,19 @@ import histogramVisTypeProvider from 'plugins/kbn_vislib_vis_types/histogram';
 import lineVisTypeProvider from 'plugins/kbn_vislib_vis_types/line';
 import pieVisTypeProvider from 'plugins/kbn_vislib_vis_types/pie';
 import areaVisTypeProvider from 'plugins/kbn_vislib_vis_types/area';
-import tileMapVisTypeProvider from 'plugins/kbn_vislib_vis_types/tile_map';
 import metricVisTypeProvider from 'plugins/kbn_vislib_vis_types/metric';
+
+
 
 VisTypesRegistryProvider.register(histogramVisTypeProvider);
 VisTypesRegistryProvider.register(lineVisTypeProvider);
 VisTypesRegistryProvider.register(pieVisTypeProvider);
 VisTypesRegistryProvider.register(areaVisTypeProvider);
-VisTypesRegistryProvider.register(tileMapVisTypeProvider);
 VisTypesRegistryProvider.register(metricVisTypeProvider);
 
 require('plugins/table_vis/table_vis');
 require('plugins/markdown_vis/markdown_vis');
-require('plugins/metrics/visualizations');
+//require('plugins/metrics/visualizations');
 import DocTitleProvider from 'ui/doc_title';
 import UtilsBrushEventProvider from 'ui/utils/brush_event';
 
@@ -53,8 +53,52 @@ import 'ui/state_management/app_state';
 import StateManagementAppStateProvider from 'ui/state_management/app_state';
 import 'plugins/kibana/discover/saved_searches/saved_searches.js';
 
-import 'ui/stringify/register';
-import RegistryFieldFormatsProvider from 'ui/registry/field_formats';
+import { RegistryFieldFormatsProvider } from 'ui/registry/field_formats';
+import { UrlFormat } from 'plugins/kibana/../common/field_formats/types/url';
+import { BytesFormat } from 'plugins/kibana/../common/field_formats/types/bytes';
+import { DateFormat } from 'plugins/kibana/../common/field_formats/types/date';
+import { DurationFormat } from 'plugins/kibana/../common/field_formats/types/duration';
+import { IpFormat } from 'plugins/kibana/../common/field_formats/types/ip';
+import { NumberFormat } from 'plugins/kibana/../common/field_formats/types/number';
+import { PercentFormat } from 'plugins/kibana/../common/field_formats/types/percent';
+import { StringFormat } from 'plugins/kibana/../common/field_formats/types/string';
+import { SourceFormat } from 'plugins/kibana/../common/field_formats/types/source';
+import { ColorFormat } from 'plugins/kibana/../common/field_formats/types/color';
+import { TruncateFormat } from 'plugins/kibana/../common/field_formats/types/truncate';
+import { BoolFormat } from 'plugins/kibana/../common/field_formats/types/boolean';
+
+RegistryFieldFormatsProvider.register(() => UrlFormat);
+RegistryFieldFormatsProvider.register(() => BytesFormat);
+RegistryFieldFormatsProvider.register(() => DateFormat);
+RegistryFieldFormatsProvider.register(() => DurationFormat);
+RegistryFieldFormatsProvider.register(() => IpFormat);
+RegistryFieldFormatsProvider.register(() => NumberFormat);
+RegistryFieldFormatsProvider.register(() => PercentFormat);
+RegistryFieldFormatsProvider.register(() => StringFormat);
+RegistryFieldFormatsProvider.register(() => SourceFormat);
+RegistryFieldFormatsProvider.register(() => ColorFormat);
+RegistryFieldFormatsProvider.register(() => TruncateFormat);
+RegistryFieldFormatsProvider.register(() => BoolFormat);
+
+import { VisRequestHandlersRegistryProvider } from 'ui/registry/vis_request_handlers';
+import { CourierRequestHandlerProvider } from 'ui/vis/request_handlers/courier';
+import { noneRequestHandlerProvider } from 'ui/vis/request_handlers/none';
+
+VisRequestHandlersRegistryProvider.register(CourierRequestHandlerProvider);
+VisRequestHandlersRegistryProvider.register(noneRequestHandlerProvider);
+
+import { VisResponseHandlersRegistryProvider } from 'ui/registry/vis_response_handlers';
+import { BasicResponseHandlerProvider } from 'ui/vis/response_handlers/basic';
+import { noneResponseHandler } from 'ui/vis/response_handlers/none';
+import { TabifyResponseHandlerProvider } from 'ui/vis/response_handlers/tabify';
+
+VisResponseHandlersRegistryProvider.register(BasicResponseHandlerProvider);
+VisResponseHandlersRegistryProvider.register(noneResponseHandler);
+VisResponseHandlersRegistryProvider.register(TabifyResponseHandlerProvider);
+
+import { VisEditorTypesRegistryProvider } from 'ui/registry/vis_editor_types';
+import { defaultEditor } from 'ui/vis/editors/default/default';
+VisEditorTypesRegistryProvider.register(defaultEditor);
 
 import 'ui/kbn_top_nav';
 import 'ui/timepicker';
