@@ -24,7 +24,7 @@
 
     <div flex ng-show="hideRing(13) && results && !loading" ng-if="tabView == 'panels' && !load" layout="column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-		<md-content layout="row" layout-align="center stretch" class="no-legend">
+		<md-content layout="row" layout-align="center stretch" class="no-legend" class="no-legend">
 			<md-card flex="20" layout="column">
 					<md-card-content class="metric">
                         <kbn-vis-value style="margin-top: 6px" vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:data.oscap.scan.score),schema:metric,type:max)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:max),title:'Highest score',type:table))" vis-filter="agent.name: {{_agent.name ? _agent.name : '*'}}"></kbn-vis-value>
@@ -52,7 +52,7 @@
 		</md-content>
 
 
-		<md-content layout="row" layout-align="center stretch">
+		<md-content layout="row" layout-align="center stretch" class="no-legend">
 				<md-card flex="25">
 					<md-card-title>
 						<md-card-title-text>
@@ -104,7 +104,7 @@
 				</md-card>
 		</md-content>
 
-		<md-content layout="row" layout-align="start stretch">
+		<md-content layout="row" layout-align="start stretch" class="no-legend">
 			<md-card flex>
 					<md-card-title>
 						<md-card-title-text>
@@ -120,7 +120,7 @@
 		</md-content>
 
 
-		<md-content layout="row" layout-align="center stretch">
+		<md-content layout="row" layout-align="center stretch" class="no-legend">
 			<md-card flex="50">
 				<md-card-title>
 					<md-card-title-text>
@@ -149,7 +149,7 @@
 
 		</md-content>
 
-		<md-content layout="row" layout-align="center stretch" class="no-legend">
+		<md-content layout="row" layout-align="center stretch" class="no-legend" class="no-legend">
 			<md-card  flex="100" layout="column">
 					<md-card-content style="text-align: center;">
 						<kbn-vis-value vis-height="44px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:data.oscap.check.title,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="data.oscap.check.result: fail AND rule.groups:oscap">
@@ -160,7 +160,7 @@
 		</md-content>
 
 
-		<md-content layout-align="center stretch">
+		<md-content layout-align="center stretch" class="no-legend">
 			<md-card flex>
 				<md-card-title>
 					<md-card-title-text>

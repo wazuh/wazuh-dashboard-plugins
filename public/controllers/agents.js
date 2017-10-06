@@ -167,7 +167,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 			$scope.agentInfo = {};
 			// Get Agent Info
 			DataFactory.getAndClean('get', '/agents/' + agent.id, {}).then(function (data) {
-				$scope.agentInfo = data.data;
+				$scope.agentInfo = data.data.data;
 				$rootScope.agent = $scope.agentInfo;
 				if(angular.isUndefined($scope.agentInfo.version))
 					$scope.agentInfo.version = "Unknown";
@@ -190,8 +190,8 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				if(angular.isUndefined($scope.agentInfo.lastKeepAlive))
 					$scope.agentInfo.lastKeepAlive = "Unknown";
 
-				$scope._agent = data.data;
-				$scope.search = data.data.name;
+				$scope._agent = data.data.data;
+				$scope.search = data.data.data.name;
 				$location.search('id', $scope._agent.id);
 				$scope.presentData($scope._agent.id).then(function (data) {
 					$scope.results = data;
@@ -200,7 +200,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 
 				// Get syscheck info
 				DataFactory.getAndClean('get', '/syscheck/' + agent.id + '/last_scan', {}).then(function (data) {
-					$scope.agentInfo.syscheck = data.data;
+					$scope.agentInfo.syscheck = data.data.data;
 					$scope.agentInfo.syscheck.duration = "Unknown";
 					if($scope.agentInfo.syscheck.end != null && $scope.agentInfo.syscheck.start != null){
 						var syscheckTime = new Date($scope.agentInfo.syscheck.start);
@@ -216,7 +216,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 
 				// Get rootcheck info
 				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
-					$scope.agentInfo.rootcheck = data.data;
+					$scope.agentInfo.rootcheck = data.data.data;
 					$scope.agentInfo.rootcheck.duration = "Unknown";
 					if($scope.agentInfo.rootcheck.end != null && $scope.agentInfo.rootcheck.start != null){
 						var rootcheckTime = new Date($scope.agentInfo.rootcheck.start);

@@ -277,7 +277,7 @@ module.exports = function (server, options) {
 
 	var getAgentsPermissions = function (req, reply) {
 		try {
-			package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, package_file), 'utf8'));
+			package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
 			permissions = package_info.agents;
 			reply(permissions);
 		} catch (e) {

@@ -15,7 +15,7 @@ app.factory('Agents', function($http, DataFactory) {
     if (this.busy) return;
     this.busy = true;
 	DataFactory.next(this.objectsArray['/agents']).then(function (data) {
-			var items = data.data.items;
+			var items = data.data.data.items;
 			for (var i = 0; i < items.length; i++) {
 				this.items.push(items[i]);
 			}
@@ -74,7 +74,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 
 		DataFactory.setOffset(objectsArray['/agents'],0);
 		DataFactory.get(objectsArray['/agents']).then(function (data) {
-			$scope.agents.items = data.data.items;
+			$scope.agents.items = data.data.data.items;
 		});
     };
 
@@ -86,7 +86,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
         }
 		DataFactory.setOffset(objectsArray['/agents'],0);
 		DataFactory.get(objectsArray['/agents']).then(function (data) {
-			$scope.agents.items = data.data.items;
+			$scope.agents.items = data.data.data.items;
 		});
     };
 
@@ -98,7 +98,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
         }
 		DataFactory.setOffset(objectsArray['/agents'],0);
 		DataFactory.get(objectsArray['/agents']).then(function (data) {
-			$scope.agents.items = data.data.items;
+			$scope.agents.items = data.data.data.items;
 		});
     };
     
@@ -113,7 +113,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 		}
 		DataFactory.setOffset(objectsArray['/agents'],0);
 		DataFactory.get(objectsArray['/agents']).then(function (data) { 
-			$scope.agents.items = data.data.items;
+			$scope.agents.items = data.data.data.items;
 		if(osName == 'all'){
 			$scope.osVersions = [];
 		}
@@ -142,13 +142,13 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				case "delete":
 					apiReq.request('DELETE', '/agents', requestData)
 						.then(function (data) {
-							if(data.data.ids.length!=0){
-								data.data.ids.forEach(function(id) {
+							if(data.data.data.ids.length!=0){
+								data.data.data.ids.forEach(function(id) {
 									notify.error('The agent ' + id + ' was not deleted.');
 								});
 							}
 							else{
-								notify.info(data.data.msg);
+								notify.info(data.data.data.msg);
 							}
 							load();
 						}, printError);
@@ -157,13 +157,13 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				case "restart":
 					apiReq.request('POST', '/agents/restart', requestData)
 						.then(function (data) {
-							if(data.data.ids.length!=0){
-								data.data.ids.forEach(function(id) {
+							if(data.data.data.ids.length!=0){
+								data.data.data.ids.forEach(function(id) {
 								notify.error('The agent ' + id + ' was not restarted.');
 								});
 							}
 							else{
-								notify.info(data.data.msg);
+								notify.info(data.data.data.msg);
 							}
 							load();
 						}, printError);
@@ -189,9 +189,9 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				.then(function (data) {
 					if(data.error=='0'){
 						notify.info('The agent was added successfully.');
-						apiReq.request('GET', '/agents/' + data.data + '/key', {})
+						apiReq.request('GET', '/agents/' + data.data.data + '/key', {})
 							.then(function(data) {
-								$scope.newAgentKey = data.data;
+								$scope.newAgentKey = data.data.data;
 								load();
 							});
 					}
@@ -282,7 +282,7 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 				DataFactory.filters.register(objectsArray['/agents'], 'filter-sort', 'string');
                 DataFactory.get(objectsArray['/agents'])
                     .then(function (data) {
-						$scope.agents = new Agents(objectsArray, data.data.items, data.data.os_list);
+						$scope.agents = new Agents(objectsArray, data.data.data.items, data.data.data.os_list);
 						var osPlatforms = new Set();
 						$scope.agents.items.forEach(function(agent){
 							if(agent.os)
@@ -295,27 +295,27 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 
 		DataFactory.getAndClean('get', '/agents', { offset: 0, limit: 1, sort: '-id' })
             .then(function (data) {
-                DataFactory.getAndClean('get', '/agents/' + data.data.items[0].id, {})
+                DataFactory.getAndClean('get', '/agents/' + data.data.data.items[0].id, {})
                     .then(function (data) {
-                        $scope.lastAgent = data.data;
+                        $scope.lastAgent = data.data.data;
                     }, printError);
             }, printError);
 
 		// Tops
         genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.cluster_info.cluster+'/agent.name')
             .then(function (data) {
-				if(data.data == ""){
+				if(data.data.data == ""){
 						$scope.mostActiveAgent.name = $scope.cluster_info.manager;
 						$scope.mostActiveAgent.id = "000";
 						return;
 				}
-				$scope.mostActiveAgent.name = data.data;
+				$scope.mostActiveAgent.name = data.data.data;
 				genericReq.request('GET', '/api/wazuh-elastic/top/'+$scope.cluster_info.cluster+'/agent.id')
 				.then(function (data) {
-					if(data.data == "" && $scope.mostActiveAgent.name != ""){
+					if(data.data.data == "" && $scope.mostActiveAgent.name != ""){
 						$scope.mostActiveAgent.id = "000";
 					}else{
-						$scope.mostActiveAgent.id = data.data;
+						$scope.mostActiveAgent.id = data.data.data;
 					}
 
 				}, printError);
@@ -323,11 +323,11 @@ app.controller('agentsPreviewController', function ($scope, $mdDialog, DataFacto
 
 		DataFactory.getAndClean('get', '/agents/summary', {})
             .then(function (data) {
-                $scope.agentsCountActive = data.data.Active;
-                $scope.agentsCountDisconnected = data.data.Disconnected;
-                $scope.agentsCountNeverConnected = data.data['Never connected'];
-                $scope.agentsCountTotal = data.data.Total;
-                $scope.agentsCoverity = (data.data.Active / data.data.Total) * 100;
+                $scope.agentsCountActive = data.data.data.Active;
+                $scope.agentsCountDisconnected = data.data.data.Disconnected;
+                $scope.agentsCountNeverConnected = data.data.data['Never connected'];
+                $scope.agentsCountTotal = data.data.data.Total;
+                $scope.agentsCoverity = (data.data.data.Active / data.data.data.Total) * 100;
             }, printError);
     };
 

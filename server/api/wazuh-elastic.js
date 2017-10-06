@@ -46,7 +46,8 @@ module.exports = function (server, options) {
 
         fetchElastic(req, payload).then(function (data) {
             reply({ 'statusCode': 200, 'data': data.hits.total });
-        }, function () {
+        }, function (data) {
+            console.log(data);
             reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
         });
     };

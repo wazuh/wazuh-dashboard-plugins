@@ -4,7 +4,7 @@
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
 	<div ng-show='hideRing(7) && !loading' ng-if="tabView == 'panels'">
-		<md-content class="no-legend" layout="row">
+		<md-content class="no-legend" layout="row" class="no-legend">
 			<md-card  flex layout="column">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
@@ -32,7 +32,7 @@
 				</md-card-content>
 			</md-card>
 		</md-content>
-		<md-content layout="row">
+		<md-content layout="row"  class="no-legend">
 			<md-card flex layout="column" ng-show="agentInfo.id != '000'">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.lastKeepAlive}}</div>
@@ -88,7 +88,7 @@
 
 	<!-- View: Panels -->
 	<div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !load">
-		<md-content layout="row">
+		<md-content layout="row"  class="no-legend">
 				<md-card flex="33">
 					<md-card-title>
 						<md-card-title-text>
@@ -127,7 +127,7 @@
 				</md-card>
 
 			</md-content>
-		<md-content layout="row" layout-align="start stretch">
+		<md-content layout="row" layout-align="start stretch" class="no-legend">
 			<md-card flex class="visBox-alert-level-evolution">
 					<md-card-title>
 						<md-card-title-text>
@@ -155,7 +155,7 @@
 			</md-card>
 
 		</md-content>
-		<md-content layout="row">
+		<md-content layout="row" class="no-legend">
 			<md-card  flex="60">
 				<md-card-title>
 					<md-card-title-text>
