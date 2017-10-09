@@ -152,6 +152,9 @@ module.exports = function (server, options) {
 
 	// Save agent status into elasticsearch, create index and/or insert document
 	var saveStatus = function () {
+		fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
+		todayIndex = index_prefix + fDate;
+
 		elasticRequest.callWithInternalUser('indices.exists',{ index: todayIndex }).then(
 			function (result) {
 				if (result) {
