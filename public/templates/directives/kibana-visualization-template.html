@@ -42,18 +42,13 @@
 
         <div class="vis-editor-content">
             <div class="vis-editor-canvas" flex="auto">
-                <visualize
-                    show-spy-panel="chrome.getVisible()"
-                    editor-mode="true"
-                    saved-obj="savedVis"
-                    app-state="state"
+                <visualization
+                    vis="vis"
+                    vis-data="visData"
                     ui-state="uiState"
-                    data-shared-item
-                    data-title="{{savedVis.lastSavedTitle}}"
-                    data-description="{{savedVis.description}}"
-                    render-counter
-                    >
-                </visualize>
+                    search-source="savedVis.searchSource"
+                    show-spy-panel="true"
+                />
 
             </div>
         </div>

@@ -23,7 +23,7 @@
 
     <div flex ng-show="hideRing(15) && results && !loading" ng-if="tabView == 'panels' && !load" layout="column">
 		<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-		<md-content layout="row" layout-align="center stretch" class="no-legend">
+		<md-content layout="row" layout-align="center stretch">
 			<md-card flex="10" layout="column">
 					<md-card-content class="metric">
 						<kbn-vis-value vis-height="80px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="rule.groups: audit AND rule.id: 80790"></kbn-vis-value>
@@ -57,7 +57,7 @@
 		</md-content>
 
 
-		<md-content layout="row" layout-align="center stretch" class="no-legend">
+		<md-content layout="row" layout-align="center stretch">
 				<md-card flex="33">
 					<md-card-title>
 						<md-card-title-text>
@@ -97,7 +97,7 @@
 				</md-card>
 		</md-content>
 
-		<md-content layout="row" layout-align="center stretch" class="no-legend">
+		<md-content layout="row" layout-align="center stretch">
 			<md-card flex="100">
 					<md-card-title>
 						<md-card-title-text>
@@ -113,7 +113,7 @@
 		</md-content>
 
 
-		<md-content style="height: 448px" layout="row" layout-align="center stretch" class="no-legend">
+		<md-content style="height: 448px" layout="row" layout-align="center stretch">
 			<md-content flex="20" layout="column" layout-align="center stretch">
 
 				<md-card flex="50">
@@ -189,7 +189,7 @@
 
 		</md-content>
 
-		<md-content layout-align="center stretch" class="no-legend">
+		<md-content layout-align="center stretch">
 			<md-card flex>
 				<md-card-title>
 					<md-card-title-text>

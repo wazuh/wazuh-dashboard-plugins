@@ -6,6 +6,8 @@ import { FilterBarClickHandlerProvider } from 'ui/filter_bar/filter_bar_click_ha
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { StateProvider } from 'ui/state_management/state';
 import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
+import { VisRequestHandlersRegistryProvider } from 'ui/registry/vis_request_handlers';
+import { VisResponseHandlersRegistryProvider } from 'ui/registry/vis_response_handlers';
 
 
 
@@ -85,6 +87,13 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		// Render visualization
 		$rootScope.visCounter++;
         $scope.savedVis = $scope.newVis;
+        $scope.vis = $scope.savedVis.vis;
+        $scope.vis.editorMode = false;
+        $scope.vis.visualizeScope = true;
+        
+        if (!$scope.appState) $scope.appState = getAppState();
+        
+
 		renderVisualization();
 	},function () {
 		console.log("Error: Could not load visualization: "+visDecoded.vis.title);
@@ -174,7 +183,37 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
 		// Fetch visualization
 		$scope.fetch = function ()
-		{
+		{        
+            const requestHandlers = Private(VisRequestHandlersRegistryProvider);
+            const responseHandlers = Private(VisResponseHandlersRegistryProvider);
+
+            function getHandler(from, name) {
+                if (typeof name === 'function') return name;
+                    return from.find(handler => handler.name === name).handler;
+            }
+
+            const requestHandler = getHandler(requestHandlers, $scope.vis.type.requestHandler);
+            const responseHandler = getHandler(responseHandlers, $scope.vis.type.responseHandler);
+
+            requestHandler($scope.vis, $scope.appState, $scope.uiState, $scope.queryFilter, $scope.savedVis.searchSource)
+            .then(requestHandlerResponse => {
+                const canSkipResponseHandler = (
+                    $scope.previousRequestHandlerResponse && $scope.previousRequestHandlerResponse === requestHandlerResponse &&
+                    $scope.previousVisState && _.isEqual($scope.previousVisState, $scope.vis.getState())
+                );
+
+                $scope.previousVisState = $scope.vis.getState();
+                $scope.previousRequestHandlerResponse = requestHandlerResponse;
+                return canSkipResponseHandler ? $scope.visData : responseHandler($scope.vis, requestHandlerResponse);
+
+            })
+            .then(resp => {
+                $scope.visData = resp;
+                $scope.$apply();
+                $scope.$broadcast('render');
+                return resp;
+            });
+
 			if($scope.visIndexPattern == "wazuh-alerts-*"){
 				$scope.searchSource.set('filter', $scope.queryFilter.getFilters());
 				$scope.searchSource.set('query', migrateLegacyQuery($scope.filter.current));

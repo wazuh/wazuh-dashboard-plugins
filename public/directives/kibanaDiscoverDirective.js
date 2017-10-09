@@ -236,7 +236,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     $state.query = ($scope.stateQuery ? $scope.stateQuery : '');
 
                     function getStateDefaults() {
-                         console.log($scope.indexPattern.id);
                         return {
                             query: $scope.disFilter ? $scope.disFilter : '',
                             sort: disDecoded.sort.length > 0 ? disDecoded.sort : getSort.array(savedSearch.sort, $scope.indexPattern),
@@ -664,7 +663,6 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     });
 
                     function resolveIndexPatternLoading() {
-                        console.log($scope._ip);
                         const props = $scope._ip;
                         const loaded = props.loaded;
                         const stateVal = props.stateVal;

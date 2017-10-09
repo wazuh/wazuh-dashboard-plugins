@@ -3,6 +3,10 @@ body{
    width:100%;
 }
 
+.vis-type-metric{
+    margin-top:-60px;
+}
+
 .no-legend .metric {
   text-align: center;  
 }
@@ -865,40 +869,41 @@ md-content._md.layout-row {
 	display: none;
 }
 
-.kibanaVisualizationValue thead{
+kbn-vis-value thead{
 	display: none;
 }
 
-.kibanaVisualizationValue .table>tbody>tr>td {
-	border: none;
+kbn-vis-value td {
+	border: none !important;
 	padding: 0px;
 }
-.kibanaVisualizationValue .numeric-value {
+kbn-vis-value .numeric-value {
 	display: none;
 }
-.kibanaVisualizationValue .pagination-container {
+kbn-vis-value .pagination-container {
 	display: none;
 }
 
-.kibanaVisualizationValue .table {
+kbn-vis-value .table {
 	margin-bottom: 0px;
 }
 
-.kibanaVisualizationValue .cell-hover {
+kbn-vis-value .cell-hover {
 	color: rgba(0,0,0,0.87);
 	font-size: 16pt;
+    border: none;
 }
 
-.kibanaVisualizationValue .agg-table-paginated .cell-hover:hover {
+kbn-vis-value .agg-table-paginated .cell-hover:hover {
 	 background-color: white;
 }
-.kibanaVisualizationValue h2 {
+kbn-vis-value h2 {
 	display: none;
 }
-.kibanaVisualizationValue .h4, .kibanaVisualizationValue .h5, .kibanaVisualizationValue .h6, .kibanaVisualizationValue h4, .kibanaVisualizationValue h5, .kibanaVisualizationValue h6 {
+kbn-vis-value .h4, kbn-vis-value .h5, kbn-vis-value .h6, kbn-vis-value h4, kbn-vis-value h5, kbn-vis-value h6 {
 	margin: 0px;
 }
-.kibanaVisualizationValue .table .table-condensed td:nth-child(2) {
+kbn-vis-value .table .table-condensed td:nth-child(2) {
     display: none
 }
 

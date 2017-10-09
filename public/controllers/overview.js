@@ -100,7 +100,7 @@ app.controller('overviewController', function ($scope, appState, $window, generi
 		var deferred = $q.defer();
 
         genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
-			if(data.data != 0){
+			if(data.data.data != 0){
 				deferred.resolve(true);
             }
 			else
