@@ -5,7 +5,7 @@ app.controller('PCIController', function ($scope, DataFactory, errlog, appState,
 	
 	var tabs = [];
 	genericReq.request('GET', '/api/wazuh-api/pci/all').then(function (data) {
-		angular.forEach(data, function(value, key) {
+		angular.forEach(data.data, function(value, key) {
 			tabs.push({"title": key, "content": value});
 		});
 

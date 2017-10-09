@@ -145,7 +145,7 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 
         DataFactory.get(objectsArray['/agents'])
             .then(function (data) {
-                defered.resolve(data.data.items);
+                defered.resolve(data.data.data.items);
             }, function (data) {
                 printError(data);
                 defered.reject();
