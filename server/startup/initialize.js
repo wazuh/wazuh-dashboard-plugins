@@ -40,7 +40,8 @@ module.exports = function (server, options) {
         var configuration = {"name" : "Wazuh App", "app-version": packageJSON.version, "revision": packageJSON.revision, "installationDate": new Date().toISOString() };
 		
 		if(type == "install" || type == "migration"){
-			elasticRequest.callWithInternalUser('create', { index: ".wazuh", type: 'wazuh-configuration', id: 1, body: configuration }).then(
+            elasticRequest.callWithInternalUser('indices.create',{ index: '.wazuh' });
+			elasticRequest.callWithInternalUser('create', { index: ".wazuh-version", type: 'wazuh-version', id: 1, body: configuration }).then(
 				function () {
 					server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
 				}, function () {

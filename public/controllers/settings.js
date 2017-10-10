@@ -22,7 +22,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	$scope.extensions.audit = true;
 	$scope.extensions.pci = true;
 	$scope.addManagerContainer = false;
-
+    
 	// Tabs
 
 	// Default tab
@@ -72,7 +72,7 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
     // Get settings function
     $scope.getSettings = function () {
 			genericReq.request('GET', '/api/wazuh-api/apiEntries').then(function (data, status) {
-				$scope.apiEntries = data.data;
+                $scope.apiEntries = data.data.length > 0 ? data.data : [];
 				angular.forEach($scope.apiEntries, function (value, key) {
 					if(value._source && value._source.active == "true"){
 						$scope.currentDefault = key;
@@ -111,7 +111,6 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
         testConnection.check(tmpData).then(function (data) {
             // API Check correct. Get Cluster info
             tmpData.cluster_info = data.data;
-
             if(activeStatus){
                 appState.setClusterInfo(tmpData.clusterInfo);
             }
@@ -224,9 +223,9 @@ app.controller('settingsController', function ($scope, $http, testConnection, ap
 	$scope.getAppInfo = function () {
 		$http.get("/api/wazuh-elastic/setup").then(function (data, status) {
 			$scope.appInfo = {};
-			$scope.appInfo["app-version"] = data.data["app-version"];
-			$scope.appInfo["installationDate"] = data.data["installationDate"];
-			$scope.appInfo["revision"] = data.data["revision"];
+			$scope.appInfo["app-version"] = data.data.data["app-version"];
+			$scope.appInfo["installationDate"] = data.data.data["installationDate"];
+			$scope.appInfo["revision"] = data.data.data["revision"];
 		}).catch(function (data, status) {
 			notify.error("Error when loading Wazuh setup info");
 		})

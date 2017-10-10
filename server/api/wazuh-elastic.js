@@ -79,7 +79,7 @@ module.exports = function (server, options) {
     };
 
 	var getSetupInfo = function (req, reply) {
-		elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration' })
+		elasticRequest.callWithRequest(req, 'search', { index: '.wazuh-version', type: 'wazuh-version' })
 			.then(function (data) {
 				if (data.hits.total == 0) {
 					reply({ 'statusCode': 200, 'data': '' });
