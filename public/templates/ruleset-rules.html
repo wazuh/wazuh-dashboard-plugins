@@ -1,46 +1,44 @@
 <md-content style="height: 100%;" id="rulesContainer" layout="column" flex layout-padding ng-if="!load && submenuNavItem == 'ruleset' && $parent.submenuNavItem2 == 'rules'" ng-controller="rulesController" layout-align="start space-around" >
 	<div class='uil-ring-css' ng-show="load"><div></div></div>
+    <div ng-if="!load" layout="row" layout-align="center stretch">
+        <md-card flex="25" style="margin: 0">
+            <md-card-content>
+                <span class="md-headline-small">Top 24h - Rule ID</span>
+                <kbn-vis vis-height="160px" vis-timefilter="24h" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.id,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                    vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+    
+        <md-card flex="25" style="margin: 0">
+            <md-card-content>
+                <span class="md-headline-small">Top 24h - Groups</span>
+                <kbn-vis vis-height="160px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                    vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+        
+        <md-card flex="25" style="margin: 0">
+            <md-card-content>
+                <span class="md-headline-small">Top 24h - PCI DSS requirements</span>
+                <kbn-vis vis-height="160px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                    vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+        
+        <md-card flex="25" style="margin: 0">
+            <md-card-content>
+                <span class="md-headline-small">Top 24h - Level</span>
+                <kbn-vis vis-height="160px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.level,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
+                    vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+		
 	<div infinite-scroll-module='rules.nextPage()' ng-show="!load" infinite-scroll-disabled='rules.busy' infinite-scroll-distance='0' style="padding: 0">
-		<div layout="row" layout-align="center start" style="padding: 0px;  height: 208px;  min-height: 208px;" class="visFilterDisabled no-legend">
-			
-			<md-card flex="25" style="margin: 0">
-				<md-card-content>
-					<span class="md-headline-small">Top 24h - Rule ID</span>
-					<kbn-vis vis-height="160px" vis-timefilter="24h" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.id,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-		
-			<md-card flex="25" style="margin: 0">
-				<md-card-content>
-					<span class="md-headline-small">Top 24h - Groups</span>
-					<kbn-vis vis-height="160px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			
-			<md-card flex="25" style="margin: 0">
-				<md-card-content>
-					<span class="md-headline-small">Top 24h - PCI DSS requirements</span>
-					<kbn-vis vis-height="160px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			
-			<md-card flex="25" style="margin: 0">
-				<md-card-content>
-					<span class="md-headline-small">Top 24h - Level</span>
-					<kbn-vis vis-height="160px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.level,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,shareYAxis:!t),title:'New%20Visualization',type:pie))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-		</div>
-		
-		
 		<div id="content" layout="row" layout-align="start start" style="padding-left: 0px; padding-right: 0px; min-height: 53px; height: 53px;padding-top: 5px; padding-bottom: 0px;  ">
 
 			<span layout="row" style="padding-left: 0px;margin-top: 6px;margin-right: 5px; " flex layout-align="space-between center">
