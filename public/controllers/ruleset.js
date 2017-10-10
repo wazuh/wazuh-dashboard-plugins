@@ -40,6 +40,8 @@ app.factory('Decoders', function($http, DataFactory) {
     this.busy = true;
 	DataFactory.next(this.objectsArray['/decoders']).then(function (data) {
 			var items = data.data.data.items;
+            				console.log(items);
+
 			for (var i = 0; i < items.length; i++) {
 				this.items.push(items[i]);
 			}
@@ -206,7 +208,6 @@ app.controller('rulesController', function ($scope, $q, DataFactory, Notifier, e
 
         DataFactory.getAndClean('get', '/rules/files', { 'offset': 0, 'limit': 5, 'search': search })
             .then(function (data) {
-				
                 angular.forEach(data.data.data.items, function (value) {
                     result.push({ 'type': 'file', 'value': value.file });
                 });
@@ -353,7 +354,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, No
 				DataFactory.setOffset(objectsArray['/decoders'],0);
                 DataFactory.get(objectsArray['/decoders'])
                     .then(function (data) {
-						$scope.decoders = new Decoders(objectsArray, data.data.items);
+						$scope.decoders = new Decoders(objectsArray, data.data.data.items);
                         $scope.load = false;                        
                     }, printError);
             }, printError);
@@ -370,7 +371,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, No
 		
 		DataFactory.setOffset(objectsArray['/decoders'],0);
 		DataFactory.get(objectsArray['/decoders']).then(function (data) { 
-			$scope.decoders.items = data.data.items;
+			$scope.decoders.items = data.data.data.items;
 		});
     }
 	
@@ -387,7 +388,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, No
         }
 		DataFactory.setOffset(objectsArray['/decoders'],0);
 		DataFactory.get(objectsArray['/decoders']).then(function (data) { 
-			$scope.decoders.items = data.data.items;
+			$scope.decoders.items = data.data.data.items;
 			$scope.load = false;
 		});
     };
@@ -415,7 +416,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, No
         }
 		DataFactory.setOffset(objectsArray['/decoders'],0);
 		DataFactory.get(objectsArray['/decoders']).then(function (data) { 
-			$scope.decoders.items = data.data.items;
+			$scope.decoders.items = data.data.data.items;
 			$scope.load = false;
 		});
     };
@@ -441,7 +442,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, No
 
         DataFactory.getAndClean('get', '/decoders/files', { 'offset': 0, 'limit': 14, 'search': search })
             .then(function (data) {
-                angular.forEach(data.data.items, function (value) {
+                angular.forEach(data.data.data.items, function (value) {
                     result.push({ 'type': 'file', 'value': value.file });
                 });
                 defered.resolve(result);
@@ -466,7 +467,7 @@ app.controller('decodersController', function ($scope, $q, $sce, DataFactory, No
                 DataFactory.get(objectsArray['/decoders'])
                     .then(function (data) {
 						$scope._sort = 'name';
-						$scope.decoders = new Decoders(objectsArray, data.data.items);
+						$scope.decoders = new Decoders(objectsArray, data.data.data.items);
                         $scope.load = false;
                     }, printError);
             }, printError);

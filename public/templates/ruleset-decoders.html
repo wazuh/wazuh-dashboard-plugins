@@ -1,18 +1,18 @@
 <md-content layout="column" style="height: 100%;" flex layout-padding ng-if="!load && $parent.submenuNavItem2 == 'decoders'" ng-controller="decodersController" layout-align="start space-around">
     <div class='uil-ring-css' ng-show="load"><div></div></div>
-	<div infinite-scroll-module='decoders.nextPage()' ng-show="!load" infinite-scroll-disabled='decoders.busy' infinite-scroll-distance='0' style="padding: 0">
-		<div layout="row" layout-align="center start" style="padding: 0px;  height: 250px;  min-height: 250px; ">
-			
-			<md-card flex="100" style="margin: 0">
-				<md-card-content>
-					<span class="md-headline-small">Top 24h - Decoder name</span>
-					<kbn-vis vis-height="200px" vis-timefilter="24h" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:decoder.name,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!f,times:!(),yAxis:()),title:'New%20Visualization',type:area))"
-						vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
+    <div ng-if="!load" layout="row" layout-align="center start" style="padding: 0px;  height: 250px;  min-height: 250px; ">
+        <md-card flex="100" style="margin: 0">
+            <md-card-content>
+                <span class="md-headline-small">Top 24h - Decoder name</span>
+                <kbn-vis vis-height="200px" vis-timefilter="24h" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:decoder.name,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!f,times:!(),yAxis:()),title:'New%20Visualization',type:area))"
+                    vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
 
-		</div>
+    </div>
+
+	<div infinite-scroll-module='decoders.nextPage()' ng-show="!load" infinite-scroll-disabled='decoders.busy' infinite-scroll-distance='0' style="padding: 0">
 		
 		<div id="content" layout="row" layout-align="start start" style="padding-left: 0px; padding-right: 0px; min-height: 53px; height: 53px;padding-top: 5px; padding-bottom: 0px;  ">
 
