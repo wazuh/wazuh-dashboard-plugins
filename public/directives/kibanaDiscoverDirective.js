@@ -97,7 +97,7 @@ var app = require('ui/modules').get('app/wazuh', [])
 require('ui/modules').get('app/wazuh', []).controller('discoverW', function($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, $timeout, $location, savedSearches, appState, $rootScope, getAppState) {
     
-        const FieldList = Private(IndexPatternsFieldListProvider);
+    const FieldList = Private(IndexPatternsFieldListProvider);
     $scope.cluster_info = appState.getClusterInfo();
     $scope.cluster_filter = "cluster.name: " + $scope.cluster_info.cluster;
 
@@ -113,6 +113,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
         $scope.global_filter = $scope.disFilter + " AND " + $scope.global_filter;
 
     $scope.stateQuery = $scope.global_filter;
+
     $scope.chrome = {};
     $scope.removeColumn = function removeColumn(columnName) {
         $scope.indexPattern.popularizeField(columnName, 1);
@@ -234,7 +235,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
                     $scope.uiState = $state.makeStateful('uiState');
                     $scope.uiState.set('vis.legendOpen', false);
                     $state.query = ($scope.stateQuery ? $scope.stateQuery : '');
-
+                    console.log($scope.disFilter);
                     function getStateDefaults() {
                         return {
                             query: $scope.disFilter ? $scope.disFilter : '',
