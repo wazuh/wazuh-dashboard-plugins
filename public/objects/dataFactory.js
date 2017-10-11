@@ -22,7 +22,7 @@ require('ui/modules').get('app/wazuh', [])
             if ((method === 'get') && (pageSize)) {
                 apiReq.request('get', path + "?offset=0&limit=1", body)
                     .then(function (data) {
-                        limit = data.data.totalItems;
+                        limit = data.data.data.totalItems;
                         _instances[instance] = {
                             'method': method, 'path': path, 'body': body, 'pageSize': pageSize,
                             'offset': offset, 'limit': limit, 'pagination': true, 'filters': []
@@ -168,8 +168,8 @@ require('ui/modules').get('app/wazuh', [])
 			
             apiReq.request(_instances[instanceId]['method'], _instances[instanceId]['path'], preparedBody)
                 .then(function (data) {
-                    if ((_instances[instanceId]['pagination']) && (data.data.totalItems != _instances[instanceId]['limit'])) {
-                        _instances[instanceId]['limit'] = data.data.totalItems;
+                    if ((_instances[instanceId]['pagination']) && (data.data.data.totalItems != _instances[instanceId]['limit'])) {
+                        _instances[instanceId]['limit'] = data.data.data.totalItems;
                     }
                     defered.resolve(data);
                 }, function (data) {
