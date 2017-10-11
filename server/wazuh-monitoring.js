@@ -147,7 +147,7 @@ module.exports = function (server, options) {
 		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating index pattern: ' + index_pattern);
 
 		// Call the internal API and wait for the response
-		var options = { headers: { 'kbn-version':'6.0.0-rc1' }, json: true }
+		var options = { headers: { 'kbn-version': packageJSON.kibana.version }, json: true }
 
 		var body = {attributes : {title : index_pattern, timeFieldName : '@timestamp'}}
 
@@ -213,7 +213,7 @@ module.exports = function (server, options) {
 	};
 
 	// Main. First execution when installing / loading App.
-	var init = function (){
+	var init = function () {
 		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating today index...');
 		saveStatus();
 			
@@ -225,7 +225,7 @@ module.exports = function (server, options) {
 					configureKibana();
 				}
 			}, function (error) {
-				server.log([blueWazuh, 'error'], 'Could not reach elasticsearch.');
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not reach elasticsearch.');
 			}
 		);
 	}
@@ -234,9 +234,7 @@ module.exports = function (server, options) {
 	var checkElasticStatus = function () {
 		elasticRequest.callWithInternalUser('info').then(
 			function (data) {
-				server.plugins.elasticsearch.waitUntilReady().then(function () {
-					init();
-				});
+				server.plugins.elasticsearch.waitUntilReady().then(function () { init(); });
 			}, function (data) {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Waiting for Elasticsearch to be up...');
 				setTimeout(function () {checkElasticStatus()}, 3000)

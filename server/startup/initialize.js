@@ -14,42 +14,37 @@ module.exports = function (server, options) {
 
 	// Initialize variables
 	var index_pattern = "wazuh-alerts-*";
-	var index_prefix = "wazuh-alerts-";
 
 	// External files template or objects
 	const OBJECTS_FILE = 'integration_files/objects_file.json';
 
 	// Initialize objects
 	var objects = {};
-
 	var packageJSON = {};
 
 	// Read config from package JSON
 	try {
     	packageJSON = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
     } catch (e) {
-        server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not read the Wazuh package file.');
+        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
     };
-
-	// Today
-	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
-	var todayIndex = index_prefix + fDate;
 
 	// Save Wazuh App first set up for future executions
 	var saveConfiguration = function (type) {
         var configuration = {"name" : "Wazuh App", "app-version": packageJSON.version, "revision": packageJSON.revision, "installationDate": new Date().toISOString() };
 		
-		if(type == "install" || type == "migration"){
-            elasticRequest.callWithInternalUser('indices.create',{ index: '.wazuh' });
+		if(type == "install"){
 			elasticRequest.callWithInternalUser('create', { index: ".wazuh-version", type: 'wazuh-version', id: 1, body: configuration }).then(
 				function () {
 					server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
 				}, function () {
 					server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh configuration');
-				});
+				}
+			);
 		}
     };
 	
+	// Importing Wazuh built-in visualizations and dashboards
     var importObjects = function () {
 		server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...');
 
@@ -81,8 +76,8 @@ module.exports = function (server, options) {
 	var setDefaultKibanaSettings = function (id) {
         server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default values: Index pattern, time picker and metaFields...');
 			
-		// Call the internal API and wait for the response THE HARDCODED VERSION NUMBER SHOULD BE FIXED UPON KIBANA STABLE RELEASE
-		var options = { headers: {'kbn-version':'6.0.0-rc1'}, json: true}
+		// Call the internal API and wait for the response
+		var options = { headers: { 'kbn-version': packageJSON.kibana.version }, json: true}
 
 		var body = {"value": id}
 
@@ -97,17 +92,17 @@ module.exports = function (server, options) {
 	var createIndexPattern = function () {
 		server.log([blueWazuh, 'initialize', 'info'], 'Creating index pattern: ' + index_pattern);	
 
-		// Call the internal API and wait for the response THE HARDCODED VERSION NUMBER SHOULD BE FIXED UPON KIBANA STABLE RELEASE
-		var options = { headers: { 'kbn-version':'6.0.0-rc1' }, json: true }
+		// Call the internal API and wait for the response
+		var options = { headers: { 'kbn-version': packageJSON.kibana.version }, json: true }
 
 		var body = {attributes : {title : index_pattern, timeFieldName : '@timestamp'}}
 
 		needle('post', 'http://localhost:' + server.info.port + '/api/saved_objects/index-pattern', body, options).then(function(resp) { 
 			server.log([blueWazuh, 'initialize', 'info'], 'Successfully created index-pattern.');
-			// Save the id somewhere 
+			// Set the index-pattern as default in the Kibana configuration
 			setDefaultKibanaSettings(resp.body.id);
 		}).catch(function(err) { 
-			server.log([blueWazuh, 'error'], 'Error creating index-pattern.');
+			server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
 		});
     };
 
@@ -117,28 +112,26 @@ module.exports = function (server, options) {
 			// Create Index Pattern > Set it as default > Set default time
 			elasticRequest.callWithInternalUser('search', { index: '.kibana', type: 'index-pattern', q: 'title:"wazuh-alerts-*"'}).then(
 				function (data) {
-					if (data.hits.total == 1) {
+					if (data.hits.total >= 1) {
 						server.log([blueWazuh, 'initialize', 'info'], 'Skipping index-pattern creation. Already exists.');
 					} else {
 						createIndexPattern();
 					}
 				}, function (error) {
-					server.log([blueWazuh, 'error'], 'Could not reach elasticsearch.');
+					server.log([blueWazuh, 'initialize', 'error'], 'Could not reach elasticsearch.');
 			});
 			// Import objects (dashboards and visualizations) CAREFUL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!
 			importObjects();			
 		}
-		
 		// Save Setup Info
 		saveConfiguration(type);
     };
 
-	// Init function. Check for "wazuh-documentation" document existance.
+	// Init function. Check for "wazuh-version" document existance.
     var init = function () {
-        elasticRequest.callWithInternalUser('get', { index: ".wazuh", type: "wazuh-configuration", id: "1" }).then(
+        elasticRequest.callWithInternalUser('get', { index: ".wazuh-version", type: "wazuh-version", id: "1" }).then(
             function (data) {
-                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-configuration document already exists. Proceed to upgrade.');
-				configureKibana("upgrade");
+                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-configuration document already exists. Nothing to be done.');
             }, function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-configuration document does not exist. Initializating configuration...');
 				configureKibana("install");
@@ -148,7 +141,7 @@ module.exports = function (server, options) {
 
     // Wait until Kibana index is created / loaded and initialize Wazuh App
 	var checkKibanaIndex = function () {
-		elasticRequest.callWithInternalUser('exists',{ index: ".kibana", id: packageJSON.kibana.version, type: "config" }).then(
+		elasticRequest.callWithInternalUser('exists', { index: ".kibana", id: packageJSON.kibana.version, type: "config" }).then(
 			function (data) {
 				server.plugins.elasticsearch.waitUntilReady().then(function () {
 					init();
@@ -160,6 +153,6 @@ module.exports = function (server, options) {
 		);
 	}
 	
-	// Check Kibana index and if it is prepared, start the initialization of wazuh App.
+	// Check Kibana index and if it is prepared, start the initialization of Wazuh App.
 	checkKibanaIndex();
 };

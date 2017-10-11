@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "revision": "0343",
   "kibana": {
-    "version": "6.0.0"
+    "version": "6.0.0-rc1"
   },
   "description": "Wazuh App",
   "main": "index.js",
