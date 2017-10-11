@@ -129,6 +129,20 @@ module.exports = function (server, options) {
 
 	// Init function. Check for "wazuh-version" document existance.
     var init = function () {
+        elasticRequest.callWithInternalUser('indices.exists',{ index: '.wazuh' }).then(
+            function (result) {
+                if (!result) {
+                    elasticRequest.callWithInternalUser('indices.create',{ index: '.wazuh' }).then(
+                        function () {
+                            server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
+                        }, function () {
+                            server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh.');
+                        });
+                }
+            },
+            function () {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not check if the index .wazuh exists.');
+            });
         elasticRequest.callWithInternalUser('get', { index: ".wazuh-version", type: "wazuh-version", id: "1" }).then(
             function (data) {
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-configuration document already exists. Nothing to be done.');
@@ -144,6 +158,8 @@ module.exports = function (server, options) {
 		elasticRequest.callWithInternalUser('exists', { index: ".kibana", id: packageJSON.kibana.version, type: "config" }).then(
 			function (data) {
 				server.plugins.elasticsearch.waitUntilReady().then(function () {
+                    
+
 					init();
 				});
 			}, function (data) {
