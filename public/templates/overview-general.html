@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'general'" ng-controller="overviewGeneralController" layout-align="start">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+	<kbn-searchbar dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))" ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(15)'><div></div></div>
 
 	<!-- No results message -->
@@ -13,12 +13,9 @@
 		</md-card>
 	</md-content>
 
-
 	<!-- View: Discover -->
 	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
-		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-		infinite-scroll="true">
-		</kbn-disfull>
+		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"></kbn-disfull>
 	</md-content>
 
 	<!-- View: Panels -->

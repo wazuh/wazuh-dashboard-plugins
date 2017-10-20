@@ -1,6 +1,6 @@
-<md-content style="height: 100%;" id="rulesContainer" layout="column" flex layout-padding ng-if="!load && submenuNavItem == 'ruleset' && $parent.submenuNavItem2 == 'rules'" ng-controller="rulesController" layout-align="start space-around" >
-	<div class='uil-ring-css' ng-show="load"><div></div></div>
-    <div ng-if="!load" layout="row" layout-align="center stretch">
+<md-content style="height: 100%;" id="rulesContainer" layout="column" flex layout-padding ng-if="!loading && submenuNavItem == 'ruleset' && $parent.submenuNavItem2 == 'rules'" ng-controller="rulesController" layout-align="start space-around" >
+	<div class='uil-ring-css' ng-show="loading"><div></div></div>
+    <div ng-if="!loading" layout="row" layout-align="center stretch">
         <md-card flex="25" style="margin: 0">
             <md-card-content>
                 <span class="md-headline-small">Top 24h - Rule ID</span>
@@ -38,24 +38,21 @@
         </md-card>
     </div>
 		
-	<div infinite-scroll-module='rules.nextPage()' ng-show="!load" infinite-scroll-disabled='rules.busy' infinite-scroll-distance='0' style="padding: 0">
+	<div when-scrolled="rules.nextPage('')" ng-show="!loading" style="padding: 0">
 		<div id="content" layout="row" layout-align="start start" style="padding-left: 0px; padding-right: 0px; min-height: 53px; height: 53px;padding-top: 5px; padding-bottom: 0px;  ">
-
 			<span layout="row" style="padding-left: 0px;margin-top: 6px;margin-right: 5px; " flex layout-align="space-between center">
-				<md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="_filter" md-selected-item-change="rulesApplyFilter(_filter)" md-search-text="$parent.search"
-				md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
-				placeholder="Search for rule file, group or PCI requirement" md-search-text-change="fileSearchFilter(search)">
+				<md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="filter" md-selected-item-change="rules.addFilter(filter.type, filter.name)" md-search-text="searchTerm" md-items="rule in autoComplete | filter : searchTerm" md-item-text="rule.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" md-search-text-change="analizeRules(searchTerm)" placeholder="Search for rule file, group or PCI requirement">
 					<md-item-template>
 						<span class="item-title">
-							<span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.value}} </strong></span>
+							<span><strong md-highlight-text="search" md-highlight-flags="i"> {{rule.name}} </strong></span>
 						</span>
 						<span class="item-metadata">
-							<span class="item-metastat" ng-if="item.type != 'pci'"> {{item.type}} </span>
-							<span class="item-metastat" ng-if="item.type == 'pci'">PCI control</span>
+							<span class="item-metastat" ng-if="rule.type != 'pci'"> {{rule.type}} </span>
+							<span class="item-metastat" ng-if="rule.type == 'pci'">PCI control</span>
 						</span>
 					</md-item-template>
 					<md-not-found>
-						No results matching "{{search}}" were found.
+						No results matching "{{searchTerm}}" were found.
 					</md-not-found>
 				</md-autocomplete>
 			</span>
@@ -68,38 +65,33 @@
 			ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
 				Decoders
 			</md-button>
-
 		</div>
 
-		<md-chips style="background-color: #f7f7f7; margin-top: 16px; " readonly="true" ng-show="rulesHasFilter('search') || rulesHasFilter('file') || rulesHasFilter('group') || rulesHasFilter('pci')">
-		  <md-chip ng-click="rulesUnset('search')" ng-if="rulesHasFilter('search')">
-			<span class="bold">Search: {{rulesGetFilter('search')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+		<md-chips style="background-color: #f7f7f7; margin-top: 16px; " readonly="true" ng-show="rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('group') || rules.hasFilter('pci')">
+		  <md-chip ng-click="rules.removeFilter('search', true)" ng-if="rules.hasFilter('search')">
+			<span class="bold">Search: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
 		  </md-chip>
-		  <md-chip ng-click="rulesUnset('file')" ng-if="rulesHasFilter('file');">
-			<span class="bold">File: {{rulesGetFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+		  <md-chip ng-click="rules.removeFilter('file', true)" ng-if="rules.hasFilter('file');">
+			<span class="bold">File: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
 		  </md-chip>
-		  <md-chip ng-click="rulesUnset('group')" ng-if="rulesHasFilter('group');">
-			<span class="bold">Group: {{rulesGetFilter('group')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+		  <md-chip ng-click="rules.removeFilter('group', true)" ng-if="rules.hasFilter('group');">
+			<span class="bold">Group: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
 		  </md-chip>
-		  <md-chip ng-click="rulesUnset('pci')" ng-if="rulesHasFilter('pci');">
-			<span>PCI control: {{rulesGetFilter('pci')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+		  <md-chip ng-click="rules.removeFilter('pci', true)" ng-if="rules.hasFilter('pci');">
+			<span>PCI control: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
 		  </md-chip>
 		</md-chips>
 
-
 		<md-toolbar layout="row" class="md-toolbar-tools" style=" margin-top: 13px; min-height: 38px;height: 38px; padding: 8px; padding-top: 10px; ">
-			<span flex="5" ng-click="setSort('id')">ID <i class="fa" ng-class="_sort === 'id' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-			<span flex="15" ng-click="setSort('file')">File <i class="fa" ng-class="_sort === 'file' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-			<span flex="35" ng-click="setSort('description')">Description <i class="fa" ng-class="_sort === 'description' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+			<span flex="5" ng-click="rules.sort('id')">ID <i class="fa" ng-class="rules.sortValue === 'id' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+			<span flex="15" ng-click="rules.sort('file')">File <i class="fa" ng-class="rules.sortValue === 'file' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+			<span flex="35" ng-click="rules.sort('description')">Description <i class="fa" ng-class="rules.sortValue === 'description' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 			<span flex="25">Groups</span>
 			<span flex="15">Requirement</span>
-			<span flex="5" ng-click="setSort('level')">Level <i class="fa" ng-class="_sort === 'level' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+			<span flex="5" ng-click="rules.sort('level')">Level <i class="fa" ng-class="rules.sortValue === 'level' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
 		</md-toolbar>
 
-			
-
-		<md-list ng-repeat='rule in rules.items' ng-class-odd="'odd'" ng-class-even="'even'" class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
-		
+		<md-list  ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class-odd="'odd'" ng-class-even="'even'" class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
 			<md-list-item class="rules-item-list" ng-click="showDetails[rule.id] = !showDetails[rule.id]" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
 			  <span flex="5">{{rule.id}}</span>
 			  <span flex="15">{{rule.file}}</span>
@@ -112,40 +104,33 @@
 			<div class="ruleset_card_info" layout="column" flex layout-align="start stretch" ng-show="showDetails[rule.id]" style="margin-top: 19px; height: 100%;padding: 0px; padding-top: 3px; margin-top: 15px;">
 				<md-content flex>	
 					<div class="ruleset_card_info" layout="row" flex layout-align="center start" ng-show="showDetails[rule.id]" style="padding-left: 0px; padding-right: 0px; padding-bottom: 0px;">
-					
 						<md-card flex="10" layout="column">
 							<md-card-content style="text-align: center;">
-							<div class="ng-binding" style="font-weight: bold">ID</div>
+								<div class="ng-binding" style="font-weight: bold">ID</div>
 								<div class="metric-value ng-binding" style="font-size: 12pt;">{{rule.id}}</div>
-								
 							</md-card-content>
 						</md-card>
 						<md-card flex layout="column">
 							<md-card-content style="text-align: center;">
-							<div class="ng-binding" style="font-weight: bold">Description</div>
+								<div class="ng-binding" style="font-weight: bold">Description</div>
 								<div class="metric-value ng-binding" style="font-size: 12pt;">{{rule.description}}</div>
-								
 							</md-card-content>
 						</md-card>
 						<md-card flex="10" layout="column">
 							<md-card-content style="text-align: center;">
-							<div class="ng-binding" style="font-weight: bold">Level</div>
+								<div class="ng-binding" style="font-weight: bold">Level</div>
 								<div class="metric-value ng-binding" style="font-size: 12pt;">{{rule.level}}</div>
-								
 							</md-card-content>
 						</md-card>
 						<md-card class="cardHover" ng-click="rulesApplyFilter({type: 'file', value: rule.file}); $event.stopPropagation();" flex="20" layout="column">
 							<md-card-content style="text-align: center;">
-							<div class="ng-binding" style="font-weight: bold">File</div>
+								<div class="ng-binding" style="font-weight: bold">File</div>
 								<div class="metric-value ng-binding" style="font-size: 12pt;">{{rule.file}}</div>
 							</md-card-content>
 						</md-card>
 					</div>
-
-					
 					
 					<div class="ruleset_card_info" layout="row" flex layout-align="space-between stretch" ng-show="showDetails[rule.id]" style="padding-left: 0px; padding-right: 0px; padding-bottom: 0px; ">
-					
 						<md-card flex layout="column" ng-if="rule.groups.length  > 0">
 							<md-card-content>
 								<h3 class="wazuh-h3">Groups</h3>
@@ -178,12 +163,10 @@
 								</span>
 							</md-card-content>
 						</md-card>
-						
 					</div>
 				</md-content>	
 			</div>
 		</md-list>      
-		
 	</div>
 	<md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="rules.busy"></md-progress-linear></md-content>
 </md-content>

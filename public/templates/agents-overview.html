@@ -1,5 +1,4 @@
 <md-content ng-if="submenuNavItem == 'overview' && agentInfo" ng-controller="agentsOverviewController">
-
 	<!-- Kibana search bar -->
 	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
@@ -87,58 +86,57 @@
 	</md-content>
 
 	<!-- View: Panels -->
-	<div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !load">
+	<div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !loading">
 		<md-content layout="row">
-				<md-card flex="33">
-					<md-card-title>
-						<md-card-title-text>
-							<span class="md-headline">Top 5 alerts</span>
-						</md-card-title-text>
-					</md-card-title>
-					<md-card-content>
-						<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 5',type:pie))"
-							vis-filter="">
-						</kbn-vis>
-					</md-card-content>
-				</md-card>
-				<md-card flex="33">
-					<md-card-title>
-						<md-card-title-text>
-							<span class="md-headline">Top 5 groups</span>
-						</md-card-title-text>
-					</md-card-title>
-					<md-card-content>
-						<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top groups',type:pie))"
-							vis-filter="">
-						</kbn-vis>
-					</md-card-content>
-				</md-card>
-				<md-card flex="33">
-					<md-card-title>
-						<md-card-title-text>
-							<span class="md-headline">Top 5 PCI DSS Requirements</span>
-						</md-card-title-text>
-					</md-card-title>
-					<md-card-content>
-						<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top pci',type:pie))"
-							vis-filter="">
-						</kbn-vis>
-					</md-card-content>
-				</md-card>
-
-			</md-content>
+			<md-card flex="33">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Top 5 alerts</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 5',type:pie))"
+						vis-filter="">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="33">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Top 5 groups</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top groups',type:pie))"
+						vis-filter="">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+			<md-card flex="33">
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Top 5 PCI DSS Requirements</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top pci',type:pie))"
+						vis-filter="">
+					</kbn-vis>
+				</md-card-content>
+			</md-card>
+		</md-content>
 		<md-content layout="row" layout-align="start stretch">
 			<md-card flex class="visBox-alert-level-evolution">
-					<md-card-title>
-						<md-card-title-text>
-							<span class="md-headline">Alert level evolution</span>
-						</md-card-title-text>
-					</md-card-title>
-					<md-card-content>
-						<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.level,order:desc,orderBy:'1',size:10),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:cardinal,legendPosition:right,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert%20level%20evolution',type:line))"
-							vis-filter="">
-						</kbn-vis>
-					</md-card-content>
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">Alert level evolution</span>
+					</md-card-title-text>
+				</md-card-title>
+				<md-card-content>
+					<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.level,order:desc,orderBy:'1',size:10),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:cardinal,legendPosition:right,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert%20level%20evolution',type:line))"
+						vis-filter="">
+					</kbn-vis>
+				</md-card-content>
 			</md-card>
 
 			<md-card flex="60">
@@ -153,7 +151,6 @@
 					</kbn-vis>
 				</md-card-content>
 			</md-card>
-
 		</md-content>
 		<md-content layout="row">
 			<md-card  flex="60">

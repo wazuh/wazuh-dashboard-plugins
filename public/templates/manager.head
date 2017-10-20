@@ -19,6 +19,7 @@
 			<md-nav-item md-nav-click="submenuNavItem = 'ruleset'" name="ruleset">Ruleset</md-nav-item>
 			<md-nav-item md-nav-click="submenuNavItem = 'configuration'" name="configuration">Configuration</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'logs'" name="logs">Logs</md-nav-item>
+            <md-nav-item md-nav-click="submenuNavItem = 'groups'" name="groups">Groups</md-nav-item>
         </md-nav-bar>
     </md-content>
 

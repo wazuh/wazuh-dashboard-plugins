@@ -1,6 +1,6 @@
-<md-content layout="column" style="height: 100%;" flex layout-padding ng-if="!load && $parent.submenuNavItem2 == 'decoders'" ng-controller="decodersController" layout-align="start space-around">
-    <div class='uil-ring-css' ng-show="load"><div></div></div>
-    <div ng-if="!load" layout="row" layout-align="center start" style="padding: 0px;  height: 250px;  min-height: 250px; ">
+<md-content layout="column" style="height: 100%;" flex layout-padding ng-if="!loading && $parent.submenuNavItem2 == 'decoders'" ng-controller="decodersController" layout-align="start space-around">
+    <div class='uil-ring-css' ng-show="loading"><div></div></div>
+    <div ng-if="!loading" layout="row" layout-align="center start" style="padding: 0px;  height: 250px;  min-height: 250px; ">
         <md-card flex="100" style="margin: 0">
             <md-card-content>
                 <span class="md-headline-small">Top 24h - Decoder name</span>
@@ -9,101 +9,85 @@
                 </kbn-vis>
             </md-card-content>
         </md-card>
-
     </div>
 
-	<div infinite-scroll-module='decoders.nextPage()' ng-show="!load" infinite-scroll-disabled='decoders.busy' infinite-scroll-distance='0' style="padding: 0">
-		
+	<div when-scrolled="decoders.nextPage('')" ng-show="!loading" style="padding: 0">
 		<div id="content" layout="row" layout-align="start start" style="padding-left: 0px; padding-right: 0px; min-height: 53px; height: 53px;padding-top: 5px; padding-bottom: 0px;  ">
-
-				<span layout="row" style="padding-left: 0px;margin-top: 6px;margin-right: 5px; " flex layout-align="space-between center">
-						<md-autocomplete flex md-no-cache="true" md-selected-item="_filter" md-selected-item-change="decodersApplyFilter(_filter)" md-search-text="$parent.search"
-							md-items="item in filtersSearch($parent.search)" md-item-text="item.value" md-min-length="0" md-select-on-match="true" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
-							placeholder="Search file">
-							<md-item-template>
-								<span class="item-title">
-				<span><strong md-highlight-text="search" md-highlight-flags="i"> {{item.value}} </strong></span>
-				</span>
-				<span class="item-metadata">
-						<span class="item-metastat"> {{item.type}} </span>
-				</span>
-				</md-item-template>
-				<md-not-found>
-					No results matching "{{search}}" were found.
-				</md-not-found>
+			<span layout="row" style="padding-left: 0px;margin-top: 6px;margin-right: 5px; " flex layout-align="space-between center">
+				<md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="filter" md-selected-item-change="decoders.addFilter(filter.type, filter.name)" md-search-text="searchTerm" md-items="decoder in autoComplete | filter : searchTerm" md-item-text="decoder.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" md-search-text-change="analizeDecoders(searchTerm)" placeholder="Search file">
+					<md-item-template>
+						<span class="item-title">
+							<span><strong md-highlight-text="search" md-highlight-flags="i"> {{decoder.name}} </strong></span>
+						</span>
+						<span class="item-metadata">
+							<span class="item-metastat"> {{decoder.type}} </span>
+						</span>
+					</md-item-template>
+					<md-not-found> No results matching "{{searchTerm}}" were found. </md-not-found>
 				</md-autocomplete>
-				</span>
-
+			</span>
 				
-				<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('rules')"
-				class="md-primary">
+			<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('rules')" class="md-primary">
 				Rules
 			</md-button>
-			<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" 
-				ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
+			<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
 				Decoders
 			</md-button>
 			
-			
-				<md-input-container flex="20" style="margin-top: 6px;margin-bottom: 0;border-radius: 3px;margin-left: 10px;"
-			class="md-whiteframe-z1">
-					<md-select ng-model="typeFilter" ng-change="decoderTypeFilter(typeFilter)" aria-label="Filter by type">
-						<md-option value="all">All</md-option>
-						<md-option value="parents">Parents only</md-option>
-					</md-select>
-				</md-input-container>
-			</div>
+			<md-input-container flex="20" style="margin-top: 6px;margin-bottom: 0;border-radius: 3px;margin-left: 10px;" class="md-whiteframe-z1">
+				<md-select ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type">
+					<md-option value="all">All</md-option>
+					<md-option value="parents">Parents only</md-option>
+				</md-select>
+			</md-input-container>
+		</div>
 
-			<md-chips style="background-color: #f7f7f7; margin-top: 16px; " readonly="true" ng-show="decodersHasFilter('search') || decodersHasFilter('file')">
-				<md-chip ng-click="decodersUnset('search')" ng-if="decodersHasFilter('search')">
-					<span class="bold">Search: {{decodersGetFilter('search')}} <i class="fa fa-times" aria-hidden="true"></i></span>
-				</md-chip>
-				<md-chip ng-click="decodersUnset('file')" ng-if="decodersHasFilter('file');">
-					<span class="bold">File: {{decodersGetFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
-				</md-chip>
-			</md-chips>
+		<md-chips style="background-color: #f7f7f7; margin-top: 16px; " readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file')">
+			<md-chip ng-click="decoders.removeFilter('search', true)" ng-if="decoders.hasFilter('search')">
+				<span class="bold">Search: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
+			</md-chip>
+			<md-chip ng-click="decoders.removeFilter('file', true)" ng-if="decoders.hasFilter('file');">
+				<span class="bold">File: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
+			</md-chip>
+		</md-chips>
 
-			<md-toolbar layout="row" class="md-toolbar-tools" style=" margin-top: 13px; min-height: 38px;height: 38px; padding: 8px; padding-top: 10px; ">
-				<span flex="20" ng-click="setSort('name')">Name <i class="fa" ng-class="_sort === 'name' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-				<span flex="20">Program name</span>
-				<span flex="40">Fields</span>
-				<span flex="20" ng-click="setSort('file')">File <i class="fa" ng-class="_sort === 'file' ? (_sortOrder ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-			</md-toolbar>
+		<md-toolbar layout="row" class="md-toolbar-tools" style=" margin-top: 13px; min-height: 38px;height: 38px; padding: 8px; padding-top: 10px; ">
+			<span flex="20" ng-click="decoders.sort('name')">Name <i class="fa" ng-class="decoders.sortValue === 'name' ? (decoders.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+			<span flex="20">Program name</span>
+			<span flex="40">Fields</span>
+			<span flex="20" ng-click="decoders.sort('file')">File <i class="fa" ng-class="decoders.sortValue === 'file' ? (decoders.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+		</md-toolbar>
 			
-			
-			
-				<md-list class="agents-preview-table" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='decoder in decoders.items' ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
-					<md-list-item class="rules-item-list" ng-click="showDetails[decoder.name] = ! showDetails[decoder.name]" ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
-						<span flex="20">{{decoder.name}}</span>
-						<span flex="20">{{decoder.details["program_name"]}}</span>
-						<span flex="40">{{ decoder.details["order"] | limitTo: 80 }}{{decoder.details["order"].length > 80 ? '...' : ''}}</span>
-						<md-button md-no-ink class="invisibleButton" flex="20" ng-if="$parent.typeFilter == 'all'" ng-click="decodersApplyFilter({type: 'file', value: decoder.file}); $event.stopPropagation();">{{decoder.file}}</md-button>
-						<span flex="20" ng-if="$parent.typeFilter != 'all'">{{decoder.file}}</span>
-					</md-list-item>
-					<md-list ng-show="showDetails[decoder.name]" ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
-						<md-list-item>
-							<span style="font-weight: bold" flex="15">Full path</span>
-							<span flex="35">{{decoder.full_path}}</span>
-						</md-list-item>
-						<md-list-item>
-							<span style="font-weight: bold" flex="15">Position</span>
-							<span flex="35">{{decoder.position}}</span>
-						</md-list-item>
-						<md-list-item ng-if="decoder.details.parent">
-							<span style="font-weight: bold" flex="15">Parent</span>
-							<span flex="35">{{decoder.details.parent}}</span>
-						</md-list-item>
-						<md-list-item ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
-							<span style="font-weight: bold" flex="15">{{detailk}}</span>
-							<span ng-if="(detailk !== 'regex') && (detailk !== 'order')" flex="35">{{detailv}}</span>
-							<span ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)" flex="35">{{colorRegex(detailv)}}</span>
-							<span ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)" flex="35">{{colorOrder(detailv)}}</span>
-						</md-list-item>
-					</md-list>
-				</md-list>
-				<md-divider></md-divider>
-			</div>
-	<md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="decoders.busy"></md-progress-linear></md-content>
+		<md-list class="agents-preview-table" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='decoder in decoders.items | orderBy : decoders.sortValue : decoders.sortDir' ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
+			<md-list-item class="rules-item-list" ng-click="showDetails[decoder.name] = ! showDetails[decoder.name]" ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
+				<span flex="20">{{decoder.name}}</span>
+				<span flex="20">{{decoder.details["program_name"]}}</span>
+				<span flex="40">{{ decoder.details["order"] | limitTo: 80 }}{{decoder.details["order"].length > 80 ? '...' : ''}}</span>
+				<md-button md-no-ink class="invisibleButton" flex="20" ng-if="$parent.typeFilter == 'all'" ng-click="decodersApplyFilter({type: 'file', value: decoder.file}); $event.stopPropagation();">{{decoder.file}}</md-button>
+				<span flex="20" ng-if="$parent.typeFilter != 'all'">{{decoder.file}}</span>
+			</md-list-item>
+			<md-list ng-show="showDetails[decoder.name]" ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
+				<md-list-item>
+					<span style="font-weight: bold" flex="15">Full path</span>
+					<span flex="35">{{decoder.path}}</span>
+				</md-list-item>
+				<md-list-item>
+					<span style="font-weight: bold" flex="15">Position</span>
+					<span flex="35">{{decoder.position}}</span>
+				</md-list-item>
+				<md-list-item ng-if="decoder.details.parent">
+					<span style="font-weight: bold" flex="15">Parent</span>
+					<span flex="35">{{decoder.details.parent}}</span>
+				</md-list-item>
+				<md-list-item ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
+					<span style="font-weight: bold" flex="15">{{detailk}}</span>
+					<span ng-if="(detailk !== 'regex') && (detailk !== 'order')" flex="35">{{detailv}}</span>
+					<span ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)" flex="35">{{colorRegex(detailv)}}</span>
+					<span ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)" flex="35">{{colorOrder(detailv)}}</span>
+				</md-list-item>
+			</md-list>
+		</md-list>
+		<md-divider></md-divider>
 	</div>
-	
+	<md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="decoders.busy"></md-progress-linear></md-content>
 </md-content>
