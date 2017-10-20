@@ -19,6 +19,19 @@ module.exports = function (server, options) {
 		return elasticRequest.callWithRequest(req, 'search', { index: 'wazuh-alerts-*', type: 'wazuh', body: payload });
     };
 
+    var getConfig = function (callback) {
+        elasticRequest.callWithInternalUser('search', { index: '.wazuh', type: 'wazuh-configuration', q: 'active:true' }).then(
+            function (data) {
+                if (data.hits.total == 1) {
+                    callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'cluster_info': data.hits.hits[0]._source.cluster_info, 'extensions': data.hits.hits[0]._source.extensions });
+                } else {
+                    callback({ 'error': 'no credentials', 'error_code': 1 });
+                }
+            }, function (error) {
+                callback({ 'error': 'no elasticsearch', 'error_code': 2 });
+            });
+    };
+
 	// Returns alerts count for fields/value array between timeGTE and timeLT
     var alertsCount = function (req, reply) {
 
@@ -47,7 +60,6 @@ module.exports = function (server, options) {
         fetchElastic(req, payload).then(function (data) {
             reply({ 'statusCode': 200, 'data': data.hits.total });
         }, function (data) {
-            console.log(data);
             reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
         });
     };
@@ -91,6 +103,8 @@ module.exports = function (server, options) {
 				reply({ 'statusCode': 500, 'error': 9, 'message': 'Could not get data from elasticsearch' }).code(500);
 			});
     };
+
+    module.exports = getConfig;
 
     //Server routes
 

@@ -24,7 +24,7 @@ module.exports = function (server, options) {
 
 	// Read config from package JSON
 	try {
-    	packageJSON = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
+    	packageJSON = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'));
     } catch (e) {
         server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
     };

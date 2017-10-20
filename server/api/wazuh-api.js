@@ -1,166 +1,86 @@
 module.exports = function (server, options) {
 	// Require some libraries
-	const pciRequirementsFile = '';
 	const fs = require('fs');
 	const path = require('path');
 	const needle = require('needle');
-	var fetchAgentsExternal = require(path.resolve(__dirname, "../wazuh-monitoring.js"));
-	const wazuh_config_file = '../../configuration/config.json';
+
+    // External references 
+	var fetchAgentsExternal = require(path.resolve(__dirname, "../monitoring.js"));
+    var getConfig = require(path.resolve(__dirname, "./wazuh-elastic.js"));
+
+    // Colors for console logging 
 	var colors = require('ansicolors');
 	var blueWazuh = colors.blue('wazuh');
-	var wazuh_config = {};
-	var package_info = {};
-    var appVersion = "";
-    var permissions = {}
 
-    // Read Wazuh App package file
+    // Variables
+    const pciRequirementsFile = '../integration_files/pci_requirements.json';
+	var package_info = {};
+
+    // Read Wazuh app package file
     try {
         package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
-        appVersion = package_info.version;
     } catch (e) {
         server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
-
     };
 
-	// Read Wazuh App configuration file
-    try {
-        wazuh_config = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
-    } catch (e) {
-        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh configuration file.');
-    };
-
-	// Elastic JS Client
-	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
-
-    //Handlers - Generic
-
-    var getConfig = function (callback) {
-		elasticRequest.callWithInternalUser('search', { index: '.wazuh', type: 'wazuh-configuration', q: 'active:true'}).then(
-			function (data) {
-					if (data.hits.total == 1) {
-						callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'cluster_info': data.hits.hits[0]._source.cluster_info, 'extensions': data.hits.hits[0]._source.extensions });
-					} else {
-						callback({ 'error': 'no credentials', 'error_code': 1 });
-					}
-			}, function (error) {
-					callback({ 'error': 'no elasticsearch', 'error_code': 2 });
-			});
-    };
-
-    var getAPI_entries = function (req,reply) {
-        elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration', size: '100'}).then(
-            function (data) {
-                reply(data.hits.hits);
-            }, function (data, error) {
-                reply(data);
-            });
-    };
-
-    var deleteAPI_entries = function (req,reply) {
-		elasticRequest.callWithRequest(req, 'delete', { index: '.wazuh', type: 'wazuh-configuration', id: req.params.id}).then(
-			function (data) {
-				reply(data);
-            }, function (data, error) {
-				reply(data);
-            });
-    };
-
-    var setAPI_entry_default = function (req,reply) {
-		// Searching for previous default
-		elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration', q: 'active:true'}).then(
-            function (data) {
-                if (data.hits.total == 1) {
-					// Setting off previous default
-                    var idPreviousActive = data.hits.hits[0]._id;
-					elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id: idPreviousActive, body: {doc: {"active": "false"}} }).then(
-					function () {
-						// Set new default
-						elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
-						function () {
-							reply({ 'statusCode': 200, 'message': 'ok' });
-						}, function (error) {
-							reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-						});
-					}, function (error) {
-						reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-					});
-                }else{
-					// Set new default
-					elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
-					function () {
-						reply({ 'statusCode': 200, 'message': 'ok' });
-					}, function (error) {
-						reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-					});
-				}
-            }, function () {
-                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not set API default entry' }).code(500);
-         });
-
-
-    };
-
-	var getPciRequirement = function (req,reply) {
-
-		const pciRequirementsFile = '../startup/integration_files/pci_requirements.json';
-		var pciRequirements = {};
-
-		try {
-			pciRequirements = JSON.parse(fs.readFileSync(path.resolve(__dirname, pciRequirementsFile), 'utf8'));
-		} catch (e) {
-			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + pciRequirementsFile);
-			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-		};
-		var pci_description = "";
-
-		if(req.params.requirement == "all"){
-			reply(pciRequirements);
-			return;
-		}
-
-		if(pciRequirements[req.params.requirement])
-			pci_description = pciRequirements[req.params.requirement];
-		reply({pci: {requirement: req.params.requirement, description: pci_description}});
-    };
-
-	var getExtensions = function (req,reply) {
-        elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration'}).then(
-			function (data) {
-				reply(data.hits.hits);
-            }, function (data, error) {
-				reply(data);
-            });
-    };
-
-    var toggleExtension = function (req,reply) {
-		// Toggle extenion state
-		var extension = {};
-		extension[req.params.extensionName] = (req.params.extensionValue == "true") ? true : false;
-
-		elasticRequest.callWithRequest(req, 'update',{ index: '.wazuh', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"extensions" : extension}} }).then(
-		function () {
-			reply({ 'statusCode': 200, 'message': 'ok' });
-		}, function (error) {
-			reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-		});
-    };
-
-    //Handlers - Test API
-
-    var testApiAux2 = function (error, response, wapi_config) {
-        if (!error && response && response.body.data) {
-            return { 'statusCode': 200, 'data': 'ok', 'cluster_info' : wapi_config.cluster_info, 'extensions' : wapi_config.extensions };
-        } else if (response && response.statusCode == 401) {
-            return { 'statusCode': 200, 'error': '1', 'data': 'unauthorized' };
-        } else if (!error && response && (!response.body.data) ) {
-            return { 'statusCode': 200, 'error': '1', 'data': 'bad_url' };
-        } else {
-            if (!wapi_config.insecure) {
-                return { 'statusCode': 200, 'error': '1', 'data': 'self_signed' };
-            } else {
-                return { 'statusCode': 200, 'error': '1', 'data': 'not_running' };
+    var checkStoredAPI = function (req, reply) {
+        // Get config from elasticsearch
+        getConfig(function (wapi_config) {
+            if (wapi_config.error_code > 1) {
+                // Can not connect to elasticsearch
+                reply({ 'statusCode': 200, 'error': '1', 'data': 'no_elasticsearch' });
+                return;
+            } else if (wapi_config.error_code > 0) {
+                // Credentials not found
+                reply({ 'statusCode': 400, 'error': '2', 'data': 'no_credentials' });
+                return;
             }
+            needle('get', wapi_config.url + ':' + wapi_config.port + '/version', {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }).then(function (response) {
+                if (response.body.error == 0 && response.body.data) {
+                    wapi_config.password = "You shall not pass";
+                    reply({ 'statusCode': 200, 'data': wapi_config });
+                } else {
+                    reply({ 'statusCode': 500, 'error': 7, 'message': response.body });
+                }
+            });
+        });
+    };
+
+    var checkAPI = function (req, reply) {
+        req.payload.password = new Buffer(req.payload.password, 'base64').toString("ascii");
+
+        if (!req.payload.user) {
+            reply({ 'statusCode': 400, 'error': 3, 'message': 'Missing param: API USER' });
+        } else if (!req.payload.password) {
+            reply({ 'statusCode': 400, 'error': 4, 'message': 'Missing param: API PASSWORD' });
+        } else if (!req.payload.url) {
+            reply({ 'statusCode': 400, 'error': 5, 'message': 'Missing param: API URL' });
+        } else if (!req.payload.port) {
+            reply({ 'statusCode': 400, 'error': 6, 'message': 'Missing param: API PORT' });
+        } else if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
+            reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
+        } else {
+            needle('get', req.payload.url + ':' + req.payload.port + '/version', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }).then(function (response) {
+                if (response.body.error == 0 && response.body.data) {
+                    needle('get', req.payload.url + ':' + req.payload.port + '/agents/000', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }).then(function (response) {
+                        if(!response.body.error) {
+                            var manager_name = response.body.data.name;
+                            needle('get', req.payload.url + ':' + req.payload.port + '/cluster/node', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }).then(function (response) {
+                                if(!response.body.error){
+                                    reply({"manager": manager_name, "node": response.body.data.node, "cluster": response.body.data.cluster});
+                                }else if(response.body.error)
+                                    reply({ 'statusCode': 500, 'error': 7, 'message': response.body.message }).code(500);
+                            });
+                        }else if(response.body.error)
+                            reply({ 'statusCode': 500, 'error': 5, 'message': response.body.message }).code(500);
+                        else
+                            reply({ 'statusCode': 500, 'error': 5, 'message': 'Error occurred' }).code(500);
+                    });
+                } else if(response.body.error)
+                    reply({ 'statusCode': 500, 'error': 5, 'message': response.body.message }).code(500);
+                else
+                    reply({ 'statusCode': 500, 'error': 5, 'message': 'Error occurred' }).code(500);
+            });
         }
     };
 
@@ -184,112 +104,27 @@ module.exports = function (server, options) {
         return path;
     }
 
-    var testApiAux1 = function (error, response, wapi_config, needle, callback) {
-        if (!error && response && response.body.data) {
-            callback({ 'statusCode': 200, 'data': 'ok', 'cluster_info' : wapi_config.cluster_info, 'extensions' : wapi_config.extensions});
-        } else if (response && response.statusCode == 401) {
-            callback({ 'statusCode': 200, 'error': '1', 'data': 'unauthorized' });
-        } else if (!error && response && (!response.body.data) ) {
-            callback({ 'statusCode': 200, 'error': '1', 'data': 'bad_url' });
-        } else {
-            needle.request('get', getPath(wapi_config)+'/version', {}, { username: wapi_config.user, password: wapi_config.password, rejectUnauthorized: !wapi_config.insecure }, function (error, response) {
-                callback(testApiAux2(error, response, wapi_config));
-            });
-        }
-    };
+    var getPciRequirement = function (req,reply) {
+        var pciRequirements = {};
+        var pci_description = "";
 
-    var checkStoredAPI = function (req, reply) {
-        needle.defaults({
-            open_timeout: wazuh_config.wazuhapi.requests.timeout
-        });
+        try {
+            pciRequirements = JSON.parse(fs.readFileSync(path.resolve(__dirname, pciRequirementsFile), 'utf8'));
+        } catch (e) {
+            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
+            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + pciRequirementsFile);
+            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+        };
 
-        //Get config from elasticsearch
-        getConfig(function (wapi_config) {
-
-            if (wapi_config.error_code > 1) {
-                //Can not connect to elasticsearch
-                reply({ 'statusCode': 200, 'error': '1', 'data': 'no_elasticsearch' });
-                return;
-            } else if (wapi_config.error_code > 0) {
-                //Credentials not found
-                reply({ 'statusCode': 400, 'error': '2', 'data': 'no_credentials' });
-                return;
-            }
-
-            if ((wapi_config.url.indexOf('https://') == -1) && (wapi_config.url.indexOf('http://') == -1)) {
-                reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
-            } else {
-
-                needle.request('get', getPath(wapi_config)+'/version', {}, { username: wapi_config.user, password: wapi_config.password }, function (error, response) {
-                    testApiAux1(error, response, wapi_config, needle, function (test_result) {
-                        reply(test_result);
-                    });
-                });
-            }
-        });
-    };
-
-	var checkAPI = function (req, reply) {
-        var needle = require('needle');
-        needle.defaults({
-            open_timeout: 1500
-        });
-		if (!req.payload.user) {
-            reply({ 'statusCode': 400, 'error': 3, 'message': 'Missing param: API USER' }).code(400);
-        } else if (!req.payload.password) {
-            reply({ 'statusCode': 400, 'error': 4, 'message': 'Missing param: API PASSWORD' }).code(400);
-		} else if (!req.payload.url) {
-            reply({ 'statusCode': 400, 'error': 4, 'message': 'Missing param: API URL' }).code(400);
-		} else if (!req.payload.port) {
-            reply({ 'statusCode': 400, 'error': 4, 'message': 'Missing param: API PORT' }).code(400);
-        } else {
-			req.payload.password = new Buffer(req.payload.password, 'base64').toString("ascii");
-            if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
-                reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
-            } else {
-                needle.request('get', getPath(req.payload)+'/version', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
-                    testApiAux1(error, response, req.payload, needle, function (test_result) {
-						if(test_result.data == "ok"){
-							needle.request('get', getPath(req.payload)+'/agents/000', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
-								if(!error && !response.body.error){
-									var manager_name = response.body.data.name;
-									needle.request('get', getPath(req.payload)+'/cluster/node', {}, { username: req.payload.user, password: req.payload.password, rejectUnauthorized: !req.payload.insecure }, function (error, response) {
-										if(!error && !response.body.error){
-											reply({"manager": manager_name, "node": response.body.data.node, "cluster": response.body.data.cluster});
-										}else if(response.body.error)
-											reply({ 'statusCode': 500, 'error': 5, 'message': response.body.message }).code(500);
-									});
-								}else if(response.body.error)
-									reply({ 'statusCode': 500, 'error': 5, 'message': response.body.message }).code(500);
-								else
-									reply({ 'statusCode': 500, 'error': 5, 'message': 'Error occurred' }).code(500);
-							});
-						}else{
-							reply(test_result);
-						}
-                    });
-                });
-            }
+        if(req.params.requirement == "all"){
+            reply(pciRequirements);
+            return;
         }
 
-
+        if(pciRequirements[req.params.requirement])
+            pci_description = pciRequirements[req.params.requirement];
+        reply({pci: {requirement: req.params.requirement, description: pci_description}});
     };
-
-	var getAgentsPermissions = function (req, reply) {
-		try {
-			package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, wazuh_config_file), 'utf8'));
-			permissions = package_info.agents;
-			reply(permissions);
-		} catch (e) {
-			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
-			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + package_file);
-			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-			reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not load agents permissions' }).code(500);
-		};
-
-	}
-
-    //Handlers - Route request
 
     var errorControl = function (error, response) {
         if (error) {
@@ -311,17 +146,11 @@ module.exports = function (server, options) {
                 reply({ 'statusCode': 404, 'error': 1, 'message': 'Credentials does not exists' }).code(404);
                 return;
             }
-            var needle = require('needle');
-            needle.defaults({
-                open_timeout: wazuh_config.wazuhapi.requests.timeout
-            });
 
-            if (!data) {
-                data = {};
-            }
+            if (!data) { data = {}; }
 
             var options = {
-                headers: { 'wazuh-app-version': appVersion },
+                headers: { 'wazuh-app-version': package_info.version },
                 username: wapi_config.user,
                 password: wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
@@ -349,40 +178,8 @@ module.exports = function (server, options) {
         }
     };
 
-    //Handlers - Save config
-
-    var saveApi = function (req, reply) {
-        if (!(req.payload.user && req.payload.password && req.payload.url && req.payload.port)) {
-            reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
-            return;
-        }
-
-		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'cluster_info' : req.payload.cluster_info, 'extensions' : req.payload.extensions};
-
-        elasticRequest.callWithRequest(req, 'index', { index: '.wazuh', type: 'wazuh-configuration', body: settings, refresh: true })
-            .then(function (response) {
-                reply({ 'statusCode': 200, 'message': 'ok', 'response' : response });
-            }, function (error) {
-                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-            });
-    };
-
-   	//Handlers - Update API Hostname
-
-    var updateApiHostname = function (req,reply) {
-        elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id:req.params.id, body: {doc: {"cluster_info": req.payload.cluster_info}} }).then(
-            function () {
-                reply({ 'statusCode': 200, 'message': 'ok' });
-            }, function (error) {
-                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-            });
-    };
-
-	//Handlers - Get API Settings
-
     var getApiSettings = function (req, reply) {
 		getConfig(function (wapi_config) {
-
 			if (wapi_config.error_code > 1) {
 				//Can not connect to elasticsearch
 				reply({ 'statusCode': 200, 'error': '1', 'data': 'no_elasticsearch' });
@@ -392,19 +189,14 @@ module.exports = function (server, options) {
 				reply({ 'statusCode': 200, 'error': '1', 'data': 'no_credentials' });
 				return;
 			}
-
 		});
-
     };
+
 	// Fetch agent status and insert it directly on demand
-	var fetchAgents = function (req, reply){
+	var fetchAgents = function (req, reply) {
 		fetchAgentsExternal();
 		reply({ 'statusCode': 200, 'error': '0', 'data': '' });
 	}
-
-
-
-    //Handlers - error loggin
 
     var postErrorLog = function (req, reply) {
 
@@ -430,7 +222,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-api/check',
+        path: '/api/wazuh-api/checkAPI',
         handler: checkStoredAPI
     });
 
@@ -442,7 +234,7 @@ module.exports = function (server, options) {
     **/
     server.route({
         method: 'POST',
-        path: '/api/wazuh-api/check',
+        path: '/api/wazuh-api/checkAPI',
         handler: checkAPI
     });
 
@@ -458,17 +250,6 @@ module.exports = function (server, options) {
     });
 
     /*
-    * PUT /api/wazuh-api/settings
-    * Save the given settings into elasticsearch
-    *
-    **/
-    server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/settings',
-        handler: saveApi
-    });
-
-    /*
     * GET /api/wazuh-api/settings
     * Get Wazuh-API settings from elasticsearch index
     *
@@ -480,62 +261,6 @@ module.exports = function (server, options) {
     });
 
     /*
-    * GET /api/wazuh-api/apiEntries
-    * Get Wazuh-API entries list (Multimanager) from elasticsearch index
-    *
-    **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/apiEntries',
-        handler: getAPI_entries
-    });
-
-    /*
-    * DELETE /api/wazuh-api/settings
-    * Delete Wazuh-API entry (multimanager) from elasticsearch index
-    *
-    **/
-    server.route({
-        method: 'DELETE',
-        path: '/api/wazuh-api/apiEntries/{id}',
-        handler: deleteAPI_entries
-    });
-
-    /*
-    * PUT /api/wazuh-api/settings
-    * Set Wazuh-API as default (multimanager) on elasticsearch index
-    *
-    **/
-    server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/apiEntries/{id}',
-        handler: setAPI_entry_default
-    });
-
-
-    /*
-    * PUT /api/wazuh-api/extension/toggle/documentId/extensionName/trueorfalse
-    * Toggle extension state: Enable / Disable
-    *
-    **/
-    server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/extension/toggle/{id}/{extensionName}/{extensionValue}',
-        handler: toggleExtension
-    });
-
-    /*
-    * GET /api/wazuh-api/extension
-    * Return extension state list
-    *
-    **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/extension',
-        handler: getExtensions
-    });
-
-    /*
     * GET /api/wazuh-api/pci/requirement
     * Return a PCI requirement description
     *
@@ -544,17 +269,6 @@ module.exports = function (server, options) {
         method: 'GET',
         path: '/api/wazuh-api/pci/{requirement}',
         handler: getPciRequirement
-    });
-
-	/*
-    * GET /api/wazuh-api/agents/permissions
-    * Return the permissions on agents
-    *
-    **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/agents/permissions',
-        handler: getAgentsPermissions
     });
 
 	/*
@@ -578,16 +292,4 @@ module.exports = function (server, options) {
         path: '/api/wazuh-api/fetchAgents',
         handler: fetchAgents
     });
-
-    /*
-    * PUT /api/wazuh-api/updateApiHostname/apiId
-    * Update the API hostname
-    *
-    **/
-    server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/updateApiHostname/{id}',
-        handler: updateApiHostname
-    });
-
 };
