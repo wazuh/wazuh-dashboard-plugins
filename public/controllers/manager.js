@@ -1,8 +1,7 @@
 // Require config
 var app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, $route, $routeParams, $location) {
-
+app.controller('managerController', function ($scope, $routeParams, $location) {
 	$scope.submenuNavItem = "status";
 	$scope.submenuNavItem2 = "rules";
 
@@ -17,19 +16,12 @@ app.controller('managerController', function ($scope, $route, $routeParams, $loc
 	$scope.setRulesTab = function(tab) {
 		$scope.submenuNavItem2 = tab;
 	};
-
 });
 
-
-app.controller('managerStatusController', function ($scope, DataFactory, genericReq, errlog, Notifier) {
+app.controller('managerStatusController', function ($scope, Notifier, apiReq) {
     //Initialization
+    const notify = new Notifier({ location: 'Manager - Status' });
     $scope.load = true;
-    $scope.timeFilter = "24h";
-	const notify = new Notifier({location: 'Manager - Status'});
-    $scope.stats = [];
-    $scope.stats['/top/agent'] = '-';
-    $scope.stats['/overview/alerts'] = { "alerts": 0, "ip": "-", "group": "-" };
-    $scope.stats['/overview/fim'] = { "alerts": 0, "agent": "-", "file": "-" };
 
     //Print Error
     var printError = function (error) {
@@ -40,46 +32,39 @@ app.controller('managerStatusController', function ($scope, DataFactory, generic
     $scope.getDaemonStatusClass = function (daemonStatus) {
         if (daemonStatus == "running")
             return "status green"
-        else if (daemonStatus == "stopped")
-            return "status red";
         else
             return "status red";
     };
 
-
     var load = function () {
-        DataFactory.getAndClean('get', '/agents/summary', {})
-            .then(function (data) {
-                $scope.agentsCountActive = data.data.data.Active;
-                $scope.agentsCountDisconnected = data.data.data.Disconnected;
-                $scope.agentsCountNeverConnected = data.data.data['Never connected'];
-                $scope.agentsCountTotal = data.data.data.Total;
-                $scope.agentsCoverity = (data.data.data.Active / data.data.data.Total) * 100;
+        apiReq.request('GET', '/agents/summary', {}).then(function (data) {
+            $scope.agentsCountActive = data.data.data.Active;
+            $scope.agentsCountDisconnected = data.data.data.Disconnected;
+            $scope.agentsCountNeverConnected = data.data.data['Never connected'];
+            $scope.agentsCountTotal = data.data.data.Total;
+            $scope.agentsCoverity = (data.data.data.Active / data.data.data.Total) * 100;
+        }, printError);
+
+        apiReq.request('GET', '/manager/status', {}).then(function (data) {
+            $scope.daemons = data.data.data;
+        }, printError);
+
+        apiReq.request('GET', '/manager/info', {}).then(function (data) {
+            $scope.managerInfo = data.data.data;
+            apiReq.request('GET', '/rules', { offset: 0, limit: 1 }).then(function (data) {
+                $scope.totalRules = data.data.data.totalItems;
+                apiReq.request('GET', '/decoders', { offset: 0, limit: 1 }).then(function (data) {
+                    $scope.totalDecoders = data.data.data.totalItems;
+                    $scope.load = false;
+                }, printError);
             }, printError);
-        DataFactory.getAndClean('get', '/manager/status', {})
-            .then(function (data) {
-                $scope.daemons = data.data.data;
+        }, printError);
+
+        apiReq.request('GET', '/agents', { offset: 0, limit: 1, sort: '-id' }).then(function (data) {
+            apiReq.request('GET', '/agents/' + data.data.data.items[0].id, {}).then(function (data) {
+                $scope.agentInfo = data.data.data;
             }, printError);
-        DataFactory.getAndClean('get', '/manager/info', {})
-            .then(function (data) {
-                $scope.managerInfo = data.data.data;
-                DataFactory.getAndClean('get', '/rules', { offset: 0, limit: 1 })
-                    .then(function (data) {
-                        $scope.totalRules = data.data.data.totalItems;
-                        DataFactory.getAndClean('get', '/decoders', { offset: 0, limit: 1 })
-                            .then(function (data) {
-                                $scope.totalDecoders = data.data.data.totalItems;
-                                $scope.load = false;
-                            }, printError);
-                    }, printError);
-            }, printError);
-        DataFactory.getAndClean('get', '/agents', { offset: 0, limit: 1, sort: '-id' })
-            .then(function (data) {
-                DataFactory.getAndClean('get', '/agents/' + data.data.data.items[0].id, {})
-                    .then(function (data) {
-                        $scope.agentInfo = data.data.data;
-                    }, printError);
-            }, printError);
+        }, printError);
     };
 
     //Load
@@ -87,21 +72,14 @@ app.controller('managerStatusController', function ($scope, DataFactory, generic
         load();
     } catch (e) {
         notify.error("Unexpected exception loading controller");
-        errlog.log('Unexpected exception loading controller', e);
     }
-
-    //Destroy
-    $scope.$on("$destroy", function () {
-        $scope.stats.length = 0;
-    });
-
 });
 
-app.controller('managerConfigurationController', function ($scope, DataFactory, errlog, Notifier) {
+app.controller('managerConfigurationController', function ($scope, Notifier, apiReq) {
     //Initialization
+    const notify = new Notifier({ location: 'Manager - Configuration' });
     $scope.load = true;
 	$scope.isArray = angular.isArray;
-	const notify = new Notifier({location: 'Manager - Configuration'});
 	
     //Print Error
     var printError = function (error) {
@@ -110,15 +88,13 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
 
     //Functions
     var load = function () {
-        DataFactory.getAndClean('get', '/manager/status', {})
-            .then(function (data) {
-                $scope.daemons = data.data.data;
-                DataFactory.getAndClean('get', '/manager/configuration', {})
-                    .then(function (data) {
-                        $scope.managerConfiguration = data.data.data;
-                        $scope.load = false;
-                    }, printError);
+        apiReq.request('GET', '/manager/status', {}).then(function (data) {
+            $scope.daemons = data.data.data;
+            apiReq.request('GET', '/manager/configuration', {}).then(function (data) {
+                $scope.managerConfiguration = data.data.data;
+                $scope.load = false;
             }, printError);
+        }, printError);
     };
 
     //Load
@@ -126,12 +102,5 @@ app.controller('managerConfigurationController', function ($scope, DataFactory, 
         load();
     } catch (e) {
 		notify.error("Unexpected exception loading controller");
-        errlog.log('Unexpected exception loading controller', e);
     }
-
-    //Destroy
-    $scope.$on("$destroy", function () {
-        $scope.managerConfiguration.length = 0;
-    });
-
 });
