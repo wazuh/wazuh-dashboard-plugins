@@ -1,8 +1,0 @@
-{
-    "wazuhapi" : {
-        "requests": {
-            "timeout" : 5000
-        },
-        "version": "v3.0"
-    }
-}
