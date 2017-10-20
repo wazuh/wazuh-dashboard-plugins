@@ -13,13 +13,13 @@ require('ui/modules').get('app/wazuh', [])
                 }
             },
       			getExtensions: function () {
-                      return { extensions: $cookies.getObject('extensions') };
-                  },
-                  setExtensions: function (extensions) {
-                      if (extensions) {
-                          $cookies.putObject('extensions', extensions);
-                      }
-                  },
+                return { extensions: $cookies.getObject('extensions') };
+            },
+            setExtensions: function (extensions) {
+                if (extensions) {
+                    $cookies.putObject('extensions', extensions);
+                }
+            },
       			unsetDashboardsState: function () {
                           $cookies.putObject('_dashboardsState_name', "");
                           $cookies.putObject('_dashboardsState_filter', "");
@@ -64,11 +64,7 @@ require('ui/modules').get('app/wazuh', [])
                 }
             },
       			getClusterInfo: function () {
-      				if($cookies.getObject('_clusterInfo'))
-      					return $cookies.getObject('_clusterInfo');
-      				else
-      					return {"node": "*","manager": "*","cluster": "*"};
-
+              return $cookies.getObject('_clusterInfo');
             },
             setClusterInfo: function (cluster_info) {
               if (cluster_info) {
