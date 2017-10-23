@@ -38,7 +38,7 @@ module.exports = function (server, options) {
 		elasticRequest.callWithInternalUser('search', { index: '.wazuh', type: 'wazuh-configuration', q: 'active:true'}).then(
 			function (data) {
 					if (data.hits.total == 1) {
-						callback({ 'user': data.hits.hits[0]._source.api_user, 'password': new Buffer(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'cluster_info': data.hits.hits[0]._source.cluster_info, 'extensions': data.hits.hits[0]._source.extensions });
+						callback({ 'user': data.hits.hits[0]._source.api_user, 'password': Buffer.from(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"), 'url': data.hits.hits[0]._source.url, 'port': data.hits.hits[0]._source.api_port, 'insecure': data.hits.hits[0]._source.insecure, 'cluster_info': data.hits.hits[0]._source.cluster_info, 'extensions': data.hits.hits[0]._source.extensions });
 					} else {
 						callback({ 'error': 'no credentials', 'error_code': 1 });
 					}
@@ -243,7 +243,7 @@ module.exports = function (server, options) {
 		} else if (!req.payload.port) {
             reply({ 'statusCode': 400, 'error': 4, 'message': 'Missing param: API PORT' }).code(400);
         } else {
-			req.payload.password = new Buffer(req.payload.password, 'base64').toString("ascii");
+			req.payload.password = Buffer.from(req.payload.password, 'base64').toString("ascii");
             if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
                 reply({ 'statusCode': 200, 'error': '1', 'data': 'protocol_error' });
             } else {

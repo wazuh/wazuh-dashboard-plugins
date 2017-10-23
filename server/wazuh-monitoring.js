@@ -112,7 +112,7 @@ module.exports = function (server, options) {
 			return;
 
 		apiEntries.hits.forEach(function (element) {
-			var apiEntry = { 'user': element._source.api_user, 'password': new Buffer(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
+			var apiEntry = { 'user': element._source.api_user, 'password': Buffer.from(element._source.api_password, 'base64').toString("ascii"), 'url': element._source.url, 'port': element._source.api_port, 'insecure': element._source.insecure }
 				if (apiEntry.error) {
 					server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Error getting wazuh-api data: ' + json.error);
 					return;
