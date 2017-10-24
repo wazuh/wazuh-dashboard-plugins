@@ -141,37 +141,37 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
 		const filterBarClickHandler = Private(FilterBarClickHandlerProvider);
+        
+        $scope.vis = $scope.savedVis.vis;
+        // Bind visualization, index pattern and state
+        $scope.indexPattern = $scope.vis.indexPattern;
+        $scope.state = $state;
 
-			$scope.vis = $scope.savedVis.vis;
-			// Bind visualization, index pattern and state
-			$scope.indexPattern = $scope.vis.indexPattern;
-			$scope.state = $state;
-
-			// Build visualization
-			visState.aggs = visDecoded.vis.aggs;
-			visState.title = visDecoded.vis.title;
-			visState.params = visDecoded.vis.params;
-            visState.filter = $scope.visFilter;
-			if($scope.visClickable != "false")
-				visState.listeners = {brush: brushEvent($state), click: filterBarClickHandler($state)};
+        // Build visualization
+        visState.aggs = visDecoded.vis.aggs;
+        visState.title = visDecoded.vis.title;
+        visState.params = visDecoded.vis.params;
+        visState.filter = $scope.visFilter;
+        if($scope.visClickable != "false")
+            visState.listeners = {brush: brushEvent($state), click: filterBarClickHandler($state)};
 
 
-			// Set Vis states
-			$scope.uiState = $state.makeStateful('uiState');
+        // Set Vis states
+        $scope.uiState = $state.makeStateful('uiState');
 
-			// Hide legend if needed
-			if(typeof visDecoded.uiState.vis !== "undefined" && typeof visDecoded.uiState.vis.legendOpen !== "undefined" && !visDecoded.uiState.vis.legendOpen)
-				$scope.uiState.set('vis.legendOpen', false);
-			else
-				$scope.uiState.set('vis.legendOpen', true);
+        // Hide legend if needed
+        if(typeof visDecoded.uiState.vis !== "undefined" && typeof visDecoded.uiState.vis.legendOpen !== "undefined" && !visDecoded.uiState.vis.legendOpen)
+            $scope.uiState.set('vis.legendOpen', false);
+        else
+            $scope.uiState.set('vis.legendOpen', true);
 
-			if($scope.not_aggregable){
-				return;
-			}
+        if($scope.not_aggregable){
+            return;
+        }
 
-			$scope.vis.setUiState($scope.uiState);
-			$scope.vis.setState(visState);
-			$scope.loadBeforeShow = true;
+        $scope.vis.setUiState($scope.uiState);
+        $scope.vis.setState(visState);
+        $scope.loadBeforeShow = true;
 
 
 
