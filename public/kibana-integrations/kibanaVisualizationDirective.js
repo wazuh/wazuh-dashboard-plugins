@@ -50,13 +50,11 @@ var app = require('ui/modules').get('app/wazuh', [])
 require('ui/modules').get('app/wazuh', []).controller('VisController', function ($scope, config, $route, timefilter, AppState, appState, $location, kbnUrl, $timeout, courier, Private, Promise, savedVisualizations, SavedVis, getAppState, $rootScope) {
     const State = Private(StateProvider);
     const savedObjectsClient = Private(SavedObjectsClientProvider);
-    var indexId = config.get('defaultIndex');;
 
 	if(typeof $rootScope.visCounter === "undefined")
 		$rootScope.visCounter = 0;
 
 
-    var indexId = config.get('defaultIndex');;
 	// Set filters
 	$scope.filter = {};
 	$scope.cluster_info = appState.getClusterInfo();
@@ -81,23 +79,31 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 	var visDecoded = rison.decode($scope.visA);
 
 	// Initialize Visualization
-	$scope.newVis = new SavedVis({ 'type': visDecoded.vis.type, 'indexPattern': indexId });
-    const { vis, searchSource } = $scope.newVis;
-	$scope.newVis.init().then(function () {
-		// Render visualization
-		$rootScope.visCounter++;
-        $scope.savedVis = $scope.newVis;
-        $scope.vis = $scope.savedVis.vis;
-        $scope.vis.editorMode = false;
-        $scope.vis.visualizeScope = true;
-        
-        if (!$scope.appState) $scope.appState = getAppState();
-        
+    savedObjectsClient.find({
+        type: 'index-pattern',
+        fields: ['title'],
+        perPage: 10000
+    })
+    .then(({ savedObjects }) => {
+        var indexId;
+        indexId = savedObjects.find(index => index.attributes.title === $scope.visIndexPattern).id;
+        $scope.newVis = new SavedVis({ 'type': visDecoded.vis.type, 'indexPattern': indexId });
+        const { vis, searchSource } = $scope.newVis;
+        $scope.newVis.init().then(function () {
+            // Render visualization
+            $rootScope.visCounter++;
+            $scope.savedVis = $scope.newVis;
+            $scope.vis = $scope.savedVis.vis;
+            $scope.vis.editorMode = false;
+            $scope.vis.visualizeScope = true;
+            
+            if (!$scope.appState) $scope.appState = getAppState();
 
-		renderVisualization();
-	},function () {
-		console.log("Error: Could not load visualization: "+visDecoded.vis.title);
-	});
+            renderVisualization();
+        },function () {
+            console.log("Error: Could not load visualization: "+visDecoded.vis.title);
+        });
+    });
     function renderVisualization() {
 		$scope.loadBeforeShow = false;
 
