@@ -234,7 +234,7 @@ require('ui/modules').get('app/wazuh', []).controller('discoverW', function($sco
 
                     $scope.uiState = $state.makeStateful('uiState');
                     $scope.uiState.set('vis.legendOpen', false);
-                    $state.query = ($scope.stateQuery ? $scope.stateQuery : '');
+                    $state.query = migrateLegacyQuery($scope.stateQuery ? $scope.stateQuery : '');
                     console.log($scope.disFilter);
                     function getStateDefaults() {
                         return {
