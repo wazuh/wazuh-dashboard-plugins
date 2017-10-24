@@ -63,15 +63,5 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 
 	$scope.queryFilter = Private(FilterBarQueryFilterProvider);
 
-	// Watch visCounter, wait for finish and fetch.
-	var visCounterWatch = $rootScope.$watch('visCounter', function (data) {
-
-		if($rootScope.visCounter == 0){
-		}
-
-	});
-	
-	// Listen for destroy 
-	$scope.$on('$destroy', visCounterWatch);
 });
   
