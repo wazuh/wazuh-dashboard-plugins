@@ -51,10 +51,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
     const State = Private(StateProvider);
     const savedObjectsClient = Private(SavedObjectsClientProvider);
 
-	if(typeof $rootScope.visCounter === "undefined")
-		$rootScope.visCounter = 0;
-
-
 	// Set filters
 	$scope.filter = {};
 	$scope.cluster_info = appState.getClusterInfo();
@@ -85,13 +81,11 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
         perPage: 10000
     })
     .then(({ savedObjects }) => {
-        var indexId;
-        indexId = savedObjects.find(index => index.attributes.title === $scope.visIndexPattern).id;
+        var indexId = savedObjects.find(index => index.attributes.title === $scope.visIndexPattern).id;
         $scope.newVis = new SavedVis({ 'type': visDecoded.vis.type, 'indexPattern': indexId });
         const { vis, searchSource } = $scope.newVis;
         $scope.newVis.init().then(function () {
             // Render visualization
-            $rootScope.visCounter++;
             $scope.savedVis = $scope.newVis;
             $scope.vis = $scope.savedVis.vis;
             $scope.vis.editorMode = false;
@@ -147,8 +141,6 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 		courier.setRootSearchSource($scope.searchSource);
 		const brushEvent = Private(UtilsBrushEventProvider);
 		const filterBarClickHandler = Private(FilterBarClickHandlerProvider);
-		$timeout(
-		function() {
 
 			$scope.vis = $scope.savedVis.vis;
 			// Bind visualization, index pattern and state
@@ -174,22 +166,19 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 				$scope.uiState.set('vis.legendOpen', true);
 
 			if($scope.not_aggregable){
-				$rootScope.visCounter--;
 				return;
 			}
 
 			$scope.vis.setUiState($scope.uiState);
 			$scope.vis.setState(visState);
-			$rootScope.visCounter--;
 			$scope.loadBeforeShow = true;
 
 
-		}, 0);
 
 
 		// Fetch visualization
 		$scope.fetch = function ()
-		{        
+		{
             const requestHandlers = Private(VisRequestHandlersRegistryProvider);
             const responseHandlers = Private(VisResponseHandlersRegistryProvider);
 
@@ -203,15 +192,7 @@ require('ui/modules').get('app/wazuh', []).controller('VisController', function 
 
             requestHandler($scope.vis, $scope.appState, $scope.uiState, $scope.queryFilter, $scope.savedVis.searchSource)
             .then(requestHandlerResponse => {
-                const canSkipResponseHandler = (
-                    $scope.previousRequestHandlerResponse && $scope.previousRequestHandlerResponse === requestHandlerResponse &&
-                    $scope.previousVisState && _.isEqual($scope.previousVisState, $scope.vis.getState())
-                );
-
-                $scope.previousVisState = $scope.vis.getState();
-                $scope.previousRequestHandlerResponse = requestHandlerResponse;
-                return canSkipResponseHandler ? $scope.visData : responseHandler($scope.vis, requestHandlerResponse);
-
+                return responseHandler($scope.vis, requestHandlerResponse);
             })
             .then(resp => {
                 $scope.visData = resp;

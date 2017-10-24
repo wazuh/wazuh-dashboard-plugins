@@ -67,10 +67,6 @@ require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', functio
 	var visCounterWatch = $rootScope.$watch('visCounter', function (data) {
 
 		if($rootScope.visCounter == 0){
-			$timeout(
-			function() {
-				$rootScope.$broadcast('fetchVisualization');
-			}, 0);
 		}
 
 	});
