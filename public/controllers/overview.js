@@ -20,6 +20,7 @@ var app = require('ui/modules').get('app/wazuh', []).controller('overviewControl
 	var tabGroups = { "general": {"group": "*"}, "fim": {"group": "syscheck"}, "pm": {"group": "rootcheck"}, "oscap": {"group": "oscap"}, "audit": {"group": "audit"}, "pci": {"group": "*"} };
 
     $scope.hideRing = function(items) {
+    	console.log("hidering is getting called");
         if($(".vis-editor-content" ).length >= items)
             return true;
         return false;

@@ -65,9 +65,9 @@
 						<md-nav-item md-nav-click="switchTab('overview')" name="overview">Overview</md-nav-item>
 						<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
 						<md-nav-item md-nav-click="switchTab('policy_monitoring');" name="policy_monitoring">Policy Monitoring</md-nav-item>
-						<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensions.oscap">SCAP</md-nav-item>
-						<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit">Audit</md-nav-item> 
-						<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item> 
+						<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensionStatus('oscap')">SCAP</md-nav-item>
+						<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensionStatus('audit')">Audit</md-nav-item> 
+						<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensionStatus('pci')">PCI DSS</md-nav-item> 
 					</md-nav-bar>
 				</md-content>
 				
