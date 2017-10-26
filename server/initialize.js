@@ -45,7 +45,7 @@ module.exports = function (server, options) {
     };
 	
 	// Importing Wazuh built-in visualizations and dashboards
-    var importObjects = function () {
+    var importObjects = function (id) {
 		server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...');
 
 		try {
@@ -58,8 +58,15 @@ module.exports = function (server, options) {
 
 		var body = '';
 		objects.forEach(function (element) {
-			body += '{ "index":  { "_index": ".kibana", "_type": "'+element._type+'", "_id": "'+element._id+'" } }\n';
-			body += JSON.stringify(element._source) + "\n";
+			body += '{ "index":  { "_index": ".kibana", "_type": "doc", "_id": "'+element._type+':'+element._id+'" } }\n';
+			var temp = {}
+			var aux = JSON.stringify(element._source);
+			aux = aux.replace("wazuh-alerts", id);
+			aux = JSON.parse(aux);
+			temp[element._type] = aux;
+			if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
+			temp["type"] = element._type;
+			body += JSON.stringify(temp) + "\n";
 		});
 		elasticRequest.callWithInternalUser('bulk',{
 			index: '.kibana',
@@ -101,6 +108,8 @@ module.exports = function (server, options) {
 			server.log([blueWazuh, 'initialize', 'info'], 'Successfully created index-pattern.');
 			// Set the index-pattern as default in the Kibana configuration
 			setDefaultKibanaSettings(resp.body.id);
+			// Import objects (dashboards and visualizations) CAREFUL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!
+			importObjects(resp.body.id);
 		}).catch(function(err) { 
 			server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
 		});
@@ -119,9 +128,7 @@ module.exports = function (server, options) {
 					}
 				}, function (error) {
 					server.log([blueWazuh, 'initialize', 'error'], 'Could not reach elasticsearch.');
-			});
-			// Import objects (dashboards and visualizations) CAREFUL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!
-			importObjects();			
+			});			
 		}
 		// Save Setup Info
 		saveConfiguration(type);

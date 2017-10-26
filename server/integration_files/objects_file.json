@@ -131,7 +131,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.level: [9 TO *]\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.level: [9 TO *]\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}}},\"filter\":[]}"
       },
       "sort": [
         "@timestamp",
@@ -154,7 +154,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"_exists_:rule.cis\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"_exists_:rule.cis\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[]}"
       },
       "sort": [
         "@timestamp",
@@ -179,7 +179,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}}},\"filter\":[]}"
       },
       "sort": [
         "@timestamp",
@@ -205,7 +205,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
       },
       "sort": [
         "@timestamp",
@@ -228,7 +228,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"rule.groups:syscheck\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"rule.groups:syscheck\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
       },
       "sort": [
         "@timestamp",
@@ -254,7 +254,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-result\\\"\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-result\\\"\",\"analyze_wildcard\":true}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
       },
       "sort": [
         "@timestamp",
@@ -277,7 +277,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"_exists_:rule.pci_dss\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"_exists_:rule.pci_dss\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[]}"
       },
       "sort": [
         "rule.groups",
@@ -301,7 +301,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-report\\\"\",\"analyze_wildcard\":true}}}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-report\\\"\",\"analyze_wildcard\":true}}}"
       },
       "sort": [
         "@timestamp",
@@ -326,7 +326,7 @@
       "description": "",
       "hits": 0,
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}}}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647},\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}}}"
       },
       "sort": [
         "@timestamp",
@@ -342,7 +342,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"rule.groups:syscheck\"}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"rule.groups:syscheck\"}},\"filter\":[]}"
       },
       "title": "FIM Top 15 Agents",
       "uiStateJSON": "{}",
@@ -356,7 +356,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Group ownership was\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Group ownership was\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 15 new groups",
       "uiStateJSON": "{}",
@@ -370,7 +370,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Ownership was\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Ownership was\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 15 changed users",
       "uiStateJSON": "{}",
@@ -384,7 +384,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI Requirements / Agent",
       "uiStateJSON": "{}",
@@ -398,7 +398,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Signature: Area Chart",
       "uiStateJSON": "{}",
@@ -412,7 +412,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Permissions changed from\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Permissions changed from\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 15 changed permissions",
       "uiStateJSON": "{}",
@@ -426,7 +426,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "CIS: Requirements by agent",
       "uiStateJSON": "{}",
@@ -440,7 +440,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PM Top 10 monitored files",
       "uiStateJSON": "{}",
@@ -454,7 +454,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Permissions changed from\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Permissions changed from\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 15 new permissions",
       "uiStateJSON": "{}",
@@ -468,7 +468,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Groups and Benchmarks",
       "uiStateJSON": "{}",
@@ -482,7 +482,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PM Top 15 Agents",
       "uiStateJSON": "{}",
@@ -496,7 +496,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Agents and Benchmarks",
       "uiStateJSON": "{}",
@@ -510,7 +510,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Integrity checksum changed",
       "uiStateJSON": "{}",
@@ -524,7 +524,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PM Top 10 Alerts",
       "uiStateJSON": "{}",
@@ -538,7 +538,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Alerts: By country",
       "uiStateJSON": "{}",
@@ -552,7 +552,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Pie Chart: Signature",
       "uiStateJSON": "{}",
@@ -566,7 +566,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Alerts: Geolocation",
       "uiStateJSON": "{}",
@@ -580,7 +580,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "CIS: By time",
       "uiStateJSON": "{}",
@@ -594,7 +594,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Requirements by agent",
       "uiStateJSON": "{}",
@@ -608,7 +608,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Stacked Groups",
       "uiStateJSON": "{}",
@@ -622,7 +622,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PM Top 10 Type of alerts",
       "uiStateJSON": "{}",
@@ -636,7 +636,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI DSS: Requirement 10.6.1",
       "uiStateJSON": "{}",
@@ -650,7 +650,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "CIS: Evolution by agent",
       "uiStateJSON": "{}",
@@ -664,7 +664,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI DSS: Requirement 10.6",
       "uiStateJSON": "{}",
@@ -678,7 +678,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "High Risk Alerts / PCI DSS",
       "uiStateJSON": "{}",
@@ -692,7 +692,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Alerts: Top 5 Groups",
       "uiStateJSON": "{}",
@@ -706,7 +706,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI Requirements by time",
       "uiStateJSON": "{}",
@@ -720,7 +720,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PM Alerts over time",
       "uiStateJSON": "{}",
@@ -734,7 +734,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND (syscheck.udata.id_after:\\\"0\\\" OR syscheck.udata.id_before:\\\"0\\\" or syscheck.gudata.id_after:\\\"root\\\" or syscheck.gudata.id_before:\\\"0\\\")\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND (syscheck.udata.id_after:\\\"0\\\" OR syscheck.udata.id_before:\\\"0\\\" or syscheck.gudata.id_after:\\\"root\\\" or syscheck.gudata.id_before:\\\"0\\\")\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 10 files with Root/Admin owner",
       "uiStateJSON": "{}",
@@ -748,7 +748,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Total Alerts Time Bar",
       "uiStateJSON": "{}",
@@ -762,7 +762,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PM Top 10 CIS Requirements",
       "uiStateJSON": "{}",
@@ -776,7 +776,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Agents",
       "uiStateJSON": "{}",
@@ -790,7 +790,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Location Bar Alerts",
       "uiStateJSON": "{}",
@@ -804,7 +804,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Requirements",
       "uiStateJSON": "{}",
@@ -818,7 +818,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Content",
       "uiStateJSON": "{}",
@@ -832,7 +832,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI DSS: Requirement 10.5",
       "uiStateJSON": "{}",
@@ -846,7 +846,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "File table integrity checksum changed",
       "uiStateJSON": "{}",
@@ -860,7 +860,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-result\\\" AND data.oscap.check.result:\\\"fail\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-result\\\" AND data.oscap.check.result:\\\"fail\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Top 20 failed checks",
       "uiStateJSON": "{}",
@@ -874,7 +874,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-report\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-report\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Scans: Score average",
       "uiStateJSON": "{}",
@@ -888,7 +888,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Signature counts",
       "uiStateJSON": "{}",
@@ -902,7 +902,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80781\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80781\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: File write access",
       "uiStateJSON": "{}",
@@ -916,7 +916,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
       },
       "title": "Agents total alerts",
       "uiStateJSON": "{}",
@@ -930,7 +930,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Rule groups",
       "uiStateJSON": "{}",
@@ -944,7 +944,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80782\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80782\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Directory write access",
       "uiStateJSON": "{}",
@@ -958,7 +958,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI DSS: Requirement 6.4",
       "uiStateJSON": "{}",
@@ -972,7 +972,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Binaries",
       "uiStateJSON": "{}",
@@ -986,7 +986,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80784\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80784\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: File read access",
       "uiStateJSON": "{}",
@@ -1000,7 +1000,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI DSS: Requirement 10.2.5",
       "uiStateJSON": "{}",
@@ -1014,7 +1014,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Commands",
       "uiStateJSON": "{}",
@@ -1028,7 +1028,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Alerts over time",
       "uiStateJSON": "{}",
@@ -1042,7 +1042,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-report\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-report\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Scans: Score ranges",
       "uiStateJSON": "{}",
@@ -1056,7 +1056,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Group ID",
       "uiStateJSON": "{}",
@@ -1070,7 +1070,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Effective group ID",
       "uiStateJSON": "{}",
@@ -1084,7 +1084,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80787\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80787\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: File attributes modified",
       "uiStateJSON": "{}",
@@ -1098,7 +1098,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Alerts group over time",
       "uiStateJSON": "{}",
@@ -1112,7 +1112,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Group ownership was\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Group ownership was\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 15 changed groups",
       "uiStateJSON": "{}",
@@ -1126,7 +1126,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI DSS: Requirement 11.4",
       "uiStateJSON": "{}",
@@ -1140,7 +1140,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"_exists_:rule.cis\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"_exists_:rule.cis\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "CIS: Security breaches by agent",
       "uiStateJSON": "{}",
@@ -1154,7 +1154,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"_exists_:rule.pci_dss\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"_exists_:rule.pci_dss\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI DSS: Signature Area Chart",
       "uiStateJSON": "{}",
@@ -1168,7 +1168,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PM Top 10 PCI DSS Requirements",
       "uiStateJSON": "{}",
@@ -1182,7 +1182,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Ownership was\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Ownership was\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 15 new users",
       "uiStateJSON": "{}",
@@ -1196,7 +1196,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Alerts over time",
       "uiStateJSON": "{}",
@@ -1210,7 +1210,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"rule.groups:syscheck\"}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"rule.groups:syscheck\"}},\"filter\":[]}"
       },
       "title": "FIM Top 5 files changed at the same time",
       "uiStateJSON": "{}",
@@ -1224,7 +1224,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Alert level evolution",
       "uiStateJSON": "{}",
@@ -1238,7 +1238,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Top CIS Breaches",
       "uiStateJSON": "{}",
@@ -1252,7 +1252,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
       },
       "title": "CIS: Sections",
       "uiStateJSON": "{}",
@@ -1266,7 +1266,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Requirements / Groups",
       "uiStateJSON": "{}",
@@ -1280,7 +1280,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[]}"
       },
       "title": "CIS: Sections",
       "uiStateJSON": "{}",
@@ -1294,7 +1294,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "CIS: Requirements by time",
       "uiStateJSON": "{}",
@@ -1308,7 +1308,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Alerts",
       "uiStateJSON": "{}",
@@ -1322,7 +1322,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "PCI DSS: Requirement 10.2.2",
       "uiStateJSON": "{}",
@@ -1336,7 +1336,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Integrity checksum changed\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Integrity checksum changed\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 10 Changed",
       "uiStateJSON": "{}",
@@ -1350,7 +1350,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-report\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-report\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Scans: History",
       "uiStateJSON": "{}",
@@ -1364,7 +1364,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"added\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"added\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 10 Added",
       "uiStateJSON": "{}",
@@ -1378,7 +1378,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"errors\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"errors\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Errors",
       "uiStateJSON": "{}",
@@ -1392,7 +1392,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-result\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-result\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Checks: Severity",
       "uiStateJSON": "{}",
@@ -1406,7 +1406,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"errors\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"errors\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Errors: History",
       "uiStateJSON": "{}",
@@ -1420,7 +1420,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Files",
       "uiStateJSON": "{}",
@@ -1434,7 +1434,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-result\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND rule.groups:\\\"oscap-result\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Checks: Result",
       "uiStateJSON": "{}",
@@ -1448,7 +1448,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Agents",
       "uiStateJSON": "{}",
@@ -1462,7 +1462,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND _exists_:syscheck.perm_before AND  (syscheck.perm_after:/[0-7]{3}([1357]|[0-7]([1357]|[0-7][1357])).*/) AND NOT (syscheck.perm_before:/[0-7]{3}([1357]|[0-7]([1357]|[0-7][1357])).*/)\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND _exists_:syscheck.perm_before AND  (syscheck.perm_after:/[0-7]{3}([1357]|[0-7]([1357]|[0-7][1357])).*/) AND NOT (syscheck.perm_before:/[0-7]{3}([1357]|[0-7]([1357]|[0-7][1357])).*/)\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 10 Files converted to executable",
       "uiStateJSON": "{}",
@@ -1476,7 +1476,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Files mode",
       "uiStateJSON": "{}",
@@ -1490,7 +1490,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"was deleted\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"was deleted\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 10 Deleted",
       "uiStateJSON": "{}",
@@ -1504,7 +1504,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80791\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80791\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Files deleted",
       "uiStateJSON": "{}",
@@ -1518,7 +1518,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Profiles",
       "uiStateJSON": "{}",
@@ -1532,7 +1532,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "OSCAP Benchmarks",
       "uiStateJSON": "{}",
@@ -1546,7 +1546,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Directories",
       "uiStateJSON": "{}",
@@ -1560,7 +1560,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Effective user ID",
       "uiStateJSON": "{}",
@@ -1574,7 +1574,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Events",
       "uiStateJSON": "{}",
@@ -1588,7 +1588,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: User ID",
       "uiStateJSON": "{}",
@@ -1602,7 +1602,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80790\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80790\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Files created",
       "uiStateJSON": "{}",
@@ -1616,7 +1616,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80785\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80785\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "Audit: Directory read access",
       "uiStateJSON": "{}",
