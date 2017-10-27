@@ -1,6 +1,6 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.factory('DataHandler', ($q, apiReq) => {
+app.factory('DataHandler', function ($q, apiReq) {
     class DataHandler {
         constructor() {
             this.items        = [];

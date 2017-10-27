@@ -3,7 +3,7 @@ import rison from 'rison-node';
 let app = require('ui/modules')
 .get('app/wazuh', [])
 .controller('overviewController', 
-($scope, $q, $routeParams, $route, $location, $rootScope, appState, genericReq) => {
+function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, genericReq) {
 
 	$rootScope.page       = "overview";
 	$scope.submenuNavItem = "general";
@@ -141,27 +141,27 @@ let app = require('ui/modules')
 	});
 });
 
-app.controller('overviewGeneralController', ($scope, appState) => {
+app.controller('overviewGeneralController', function ($scope, appState) {
 	appState.setOverviewState('general');
 });
 
-app.controller('overviewFimController', ($scope, appState) => {
+app.controller('overviewFimController', function ($scope, appState) {
 	appState.setOverviewState('fim');
 });
 
-app.controller('overviewPMController', ($scope, appState) => {
+app.controller('overviewPMController', function ($scope, appState) {
 	appState.setOverviewState('pm');
 });
 
-app.controller('overviewOSCAPController', ($scope, appState) => {
+app.controller('overviewOSCAPController', function ($scope, appState) {
 	appState.setOverviewState('oscap');
 });
 
-app.controller('overviewAuditController', ($scope, appState) => {
+app.controller('overviewAuditController', function ($scope, appState) {
 	appState.setOverviewState('audit');
 });
 
-app.controller('overviewPCIController', ($scope, genericReq, appState) => {
+app.controller('overviewPCIController', function ($scope, genericReq, appState) {
 	appState.setOverviewState('pci');
 
 	let tabs = [];

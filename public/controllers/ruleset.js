@@ -1,67 +1,94 @@
-var app = require('ui/modules').get('app/wazuh'); 
+var app = require('ui/modules').get('app/wazuh');
 
 // We are using the DataHandler template and customize its path to get information
-app.factory('Rules', function(DataHandler) {
-  var Rules = new DataHandler();
-  Rules.path = '/rules';
-  return Rules;
+app.factory('Rules', function (DataHandler) {
+    var Rules  = new DataHandler();
+    Rules.path = '/rules';
+    return Rules;
 });
 
-app.factory('Decoders', function(DataHandler) {
-  var Decoders = new DataHandler();
-  Decoders.path = '/decoders';
-  return Decoders;
+app.factory('Decoders', function (DataHandler) {
+    var Decoders  = new DataHandler();
+    Decoders.path = '/decoders';
+    return Decoders;
 });
 
 app.controller('rulesController', function ($scope, Notifier, Rules) {
     //Initialization
-    const notify = new Notifier({location: 'Manager - Rules'});
+    const notify   = new Notifier({ location: 'Manager - Rules' });
     $scope.loading = true;
-    $scope.rules = Rules;
-	$scope.setRulesTab('rules');
+    $scope.rules   = Rules;
+    $scope.setRulesTab('rules');
 
-    $scope.analizeRules = function (search) {
+    $scope.analizeRules = (search) => {
         $scope.autoComplete = [];
-        if (search != '') $scope.autoComplete.push({'name': search, 'type': 'search'});
-        angular.forEach($scope.rules.items, function(element) {
-            angular.forEach(element.pci, function(pci) {
-                $scope.autoComplete.push({'name': pci, 'type': 'pci'});
-            });
-            angular.forEach(element.groups, function(group) {
-                $scope.autoComplete.push({'name': group, 'type': 'group'});
-            });
-            $scope.autoComplete.push({'name': element.file, 'type': 'file'})
+        
+        if (search != '') $scope.autoComplete.push({
+            'name': search,
+            'type': 'search'
         });
+        
+        for(let element of $scope.rules.items){
+            for(let pci of element.pci){
+                $scope.autoComplete.push({
+                    'name': pci,
+                    'type': 'pci'
+                });
+            }
+            for(let group of element.groups){
+                $scope.autoComplete.push({
+                    'name': group,
+                    'type': 'group'
+                });
+            }
+            $scope.autoComplete.push({
+                'name': element.file,
+                'type': 'file'
+            });
+        }
+
         $scope.autoComplete = new Set($scope.autoComplete.map(e => JSON.stringify(e)));
         $scope.autoComplete = Array.from($scope.autoComplete).map(e => JSON.parse(e));
     };
 
     //Load
     try {
-        $scope.rules.nextPage('').then(function (data) { $scope.loading = false; $scope.analizeRules(''); });
+        $scope.rules.nextPage('')
+        .then((data) => {
+            $scope.loading = false;
+            $scope.analizeRules('');
+        });
     } catch (e) {
         notify.error("Unexpected exception loading controller");
     }
-	
+
     //Destroy
-    $scope.$on("$destroy", function () {
-        $scope.rules.reset();
-    });
+    $scope.$on("$destroy", () => $scope.rules.reset());
 });
 
 app.controller('decodersController', function ($scope, $sce, Notifier, Decoders) {
     //Initialization
-    const notify = new Notifier({location: 'Manager - Decoders'});
-    $scope.loading = true;
+    const notify    = new Notifier({ location: 'Manager - Decoders' });
+    $scope.loading  = true;
     $scope.decoders = Decoders;
-	$scope.setRulesTab('decoders');
+    $scope.setRulesTab('decoders');
 
-    $scope.analizeDecoders = function (search) {
+    $scope.analizeDecoders = (search) => {
         $scope.autoComplete = [];
-        if (search != '') $scope.autoComplete.push({'name': search, 'type': 'search'});
-        angular.forEach($scope.decoders.items, function(element) {
-            $scope.autoComplete.push({'name': element.file, 'type': 'file'})
-        });
+        if (search !== '') {
+            $scope.autoComplete.push({
+                'name': search,
+                'type': 'search'
+            });
+        }
+
+        for(let element of $scope.decoders.items){
+            $scope.autoComplete.push({
+                'name': element.file,
+                'type': 'file'
+            });
+        }
+
         $scope.autoComplete = new Set($scope.autoComplete.map(e => JSON.stringify(e)));
         $scope.autoComplete = Array.from($scope.autoComplete).map(e => JSON.parse(e));
         console.log($scope.autoComplete);
@@ -76,7 +103,7 @@ app.controller('decodersController', function ($scope, $sce, Notifier, Decoders)
             '#7EB26D', '#EAB839', '#6ED0E0', '#EF843C', '#E24D42', '#1F78C1', '#BA43A9', '#705DA0', // Normal
             '#9AC48A', '#F2C96D', '#65C5DB', '#F9934E', '#EA6460', '#5195CE', '#D683CE', '#806EB7', //5
             '#B7DBAB', '#F4D598', '#70DBED', '#F9BA8F', '#F29191', '#82B5D8', '#E5A8E2', '#AEA2E0', //3
-            '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7'  //7
+            '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7' //7
         ];
         var valuesArray = regex.match(/\(((?!<\/span>).)*?\)(?!<\/span>)/gmi);
         var coloredString = regex;
@@ -95,7 +122,7 @@ app.controller('decodersController', function ($scope, $sce, Notifier, Decoders)
             '#7EB26D', '#EAB839', '#6ED0E0', '#EF843C', '#E24D42', '#1F78C1', '#BA43A9', '#705DA0', // Normal
             '#9AC48A', '#F2C96D', '#65C5DB', '#F9934E', '#EA6460', '#5195CE', '#D683CE', '#806EB7', //5
             '#B7DBAB', '#F4D598', '#70DBED', '#F9BA8F', '#F29191', '#82B5D8', '#E5A8E2', '#AEA2E0', //3
-            '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7'  //7
+            '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7' //7
         ];
         var valuesArray = order.split(',');
         var coloredString = order;
@@ -107,11 +134,14 @@ app.controller('decodersController', function ($scope, $sce, Notifier, Decoders)
 
     //Load
     try {
-        $scope.decoders.nextPage('').then(function (data) { $scope.loading = false; $scope.analizeDecoders(''); });
+        $scope.decoders.nextPage('').then(function (data) {
+            $scope.loading = false;
+            $scope.analizeDecoders('');
+        });
     } catch (e) {
         notify.error("Unexpected exception loading controller");
     }
-	
+
     //Destroy
     $scope.$on("$destroy", function () {
         $scope.decoders.reset();
