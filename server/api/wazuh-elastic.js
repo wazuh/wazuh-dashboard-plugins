@@ -16,8 +16,8 @@ module.exports = (server, options) => {
         elasticRequest
         .callWithInternalUser('search', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
-            q: 'active:true'
+            type:  'wazuh-configuration',
+            q:     'active:true'
         })
         .then((data) => {
                 if (data.hits.total === 1) {
@@ -46,7 +46,7 @@ module.exports = (server, options) => {
     };
 
     // Returns alerts count for fields/value array between timeGTE and timeLT
-    var alertsCount = function (req, reply) {
+    const alertsCount = (req, reply) => {
 
         var payload = {
             "size": 1,
@@ -63,30 +63,29 @@ module.exports = (server, options) => {
         };
 
         // Set up time interval, default to Last 24h
-        const timeGTE = req.payload.timeinterval.gte ? req.payload.timeinterval.gte : "now-1d";
-        const timeLT = req.payload.timeinterval.lt ? req.payload.timeinterval.lt : "now";
-        payload.query.bool.filter.range['@timestamp']["gte"] = timeGTE;
-        if (timeLT != "now")
-            payload.query.bool.filter.range['@timestamp']["lte"] = timeLT;
-        else
-            payload.query.bool.filter.range['@timestamp']["lt"] = timeLT;
+        const timeGTE = req.payload.timeinterval.gte ? req.payload.timeinterval.gte : 'now-1d';
+        const timeLT  = req.payload.timeinterval.lt  ? req.payload.timeinterval.lt  : 'now';
+        payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
+
+        if (timeLT !== 'now'){
+            payload.query.bool.filter.range['@timestamp']['lte'] = timeLT;
+        } else {
+            payload.query.bool.filter.range['@timestamp']['lt'] = timeLT;
+        }
 
         // Set up match for default cluster name
         payload.query.bool.must.push({
-            "match": {
-                "cluster.name": req.payload.cluster
+            'match': {
+                'cluster.name': req.payload.cluster
             }
         });
 
         // Set up match for different pairs field/value
-        req.payload.fields.forEach(function (item) {
-            var obj = {};
+        for(let item of req.payload.fields){
+            let obj = {};
             obj[item.field] = item.value;
-            payload.query.bool.must.push({
-                "match": obj
-            });
-        })
-
+            payload.query.bool.must.push({ 'match': obj });
+        }
 
         fetchElastic(req, payload).then(function (data) {
             reply({
