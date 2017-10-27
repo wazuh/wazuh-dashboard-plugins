@@ -130,104 +130,112 @@ module.exports = (server, options) => {
         });
     };
 
-    const toggleExtension = function (req, reply) {
+    const toggleExtension = (req, reply) => {
         // Toggle extenion state
-        var extension = {};
-        extension[req.params.extensionName] = (req.params.extensionValue == "true") ? true : false;
+        let extension = {};
+        extension[req.params.extensionName] = (req.params.extensionValue === 'true') ? true : false;
 
-        elasticRequest.callWithRequest(req, 'update', {
+        elasticRequest
+        .callWithRequest(req, 'update', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
-            id: req.params.id,
+            type:  'wazuh-configuration',
+            id:    req.params.id,
             body: {
                 doc: {
                     "extensions": extension
                 }
             }
-        }).then(
-            function () {
-                reply({
-                    'statusCode': 200,
-                    'message': 'ok'
-                });
-            },
-            function (error) {
-                reply({
-                    'statusCode': 500,
-                    'error': 8,
-                    'message': 'Could not save data in elasticsearch'
-                }).code(500);
+        })
+        .then(() => {
+            reply({
+                'statusCode': 200,
+                'message':    'ok'
             });
+        })
+        .catch((error) => {
+            reply({
+                'statusCode': 500,
+                'error':      8,
+                'message':    'Could not save data in elasticsearch'
+            }).code(500);
+        });
     };
 
-    const saveAPI = function (req, reply) {
-        if (!(req.payload.user && req.payload.password && req.payload.url && req.payload.port)) {
-            reply({
+    const saveAPI = (req, reply) => {
+        if (!('user'     in req.payload) ||
+            !('password' in req.payload) ||
+            !('url'      in req.payload) ||
+            !('port'     in req.payload)) {
+
+                return reply({
                 'statusCode': 400,
-                'error': 7,
-                'message': 'Missing data'
+                'error':      7,
+                'message':    'Missing data'
             }).code(400);
-            return;
+
         }
 
-        var settings = {
-            'api_user': req.payload.user,
+        let settings = {
+            'api_user':     req.payload.user,
             'api_password': req.payload.password,
-            'url': req.payload.url,
-            'api_port': req.payload.port,
-            'insecure': req.payload.insecure,
-            'component': 'API',
-            'active': req.payload.active,
+            'url':          req.payload.url,
+            'api_port':     req.payload.port,
+            'insecure':     req.payload.insecure,
+            'component':    'API',
+            'active':       req.payload.active,
             'cluster_info': req.payload.cluster_info,
-            'extensions': req.payload.extensions
+            'extensions':   req.payload.extensions
         };
 
-        elasticRequest.callWithRequest(req, 'create', {
-                index: '.wazuh',
-                type: 'wazuh-configuration',
-                id: req.payload.id,
-                body: settings,
+        elasticRequest
+        .callWithRequest(req, 'create', {
+                index:   '.wazuh',
+                type:    'wazuh-configuration',
+                id:      req.payload.id,
+                body:    settings,
                 refresh: true
-            })
-            .then(function (response) {
-                reply({
-                    'statusCode': 200,
-                    'message': 'ok',
-                    'response': response
-                });
-            }, function (error) {
-                reply({
-                    'statusCode': 500,
-                    'error': 8,
-                    'message': 'Could not save data in elasticsearch'
-                }).code(500);
+        })
+        .then((response) => {
+            reply({
+                'statusCode': 200,
+                'message':    'ok',
+                'response':   response
             });
+        })
+        .catch((error) => {
+            reply({
+                'statusCode': 500,
+                'error':      8,
+                'message':    'Could not save data in elasticsearch'
+            }).code(500);
+        });
     };
 
-    const updateAPIHostname = function (req, reply) {
-        elasticRequest.callWithRequest(req, 'update', {
+    const updateAPIHostname = (req, reply) => {
+        elasticRequest
+        .callWithRequest(req, 'update', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
-            id: req.params.id,
+            type:  'wazuh-configuration',
+            id:    req.params.id,
             body: {
                 doc: {
                     "cluster_info": req.payload.cluster_info
                 }
             }
-        }).then(
-            function () {
-                reply({
-                    'statusCode': 200,
-                    'message': 'ok'
-                });
-            },
-            function (error) {
-                reply({
-                    'statusCode': 500,
-                    'error': 8,
-                    'message': 'Could not save data in elasticsearch'
-                }).code(500);
+        })
+        .then(() => {
+            reply({
+                'statusCode': 200,
+                'message':    'ok'
             });
+        })
+        .catch((error) => {
+            reply({
+                'statusCode': 500,
+                'error':      8,
+                'message':    'Could not save data in elasticsearch'
+            }).code(500);
+        });
     };
 
     //Server routes
