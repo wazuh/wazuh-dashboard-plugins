@@ -1,41 +1,48 @@
 // Require routes
-var routes = require('ui/routes');
+let routes = require('ui/routes');
 
 //Installation wizard
-var settingsWizard = function ($location, $q, Notifier, testAPI, appState) {
-	const notify = new Notifier();
+const settingsWizard = ($location, $q, Notifier, testAPI, appState) => {
+    const notify = new Notifier();
 
-    var deferred = $q.defer();
-    testAPI.check_stored().then(
-        function (data) {
-            if (data.data.error) {
-                if(data.data.error == 2)
-                    notify.warning("Wazuh App: Please set up Wazuh API credentials.");
-                else
-                    notify.error("Could not connect with Wazuh RESTful API.");
-
-                deferred.reject();
-                $location.path('/settings');
+    let deferred = $q.defer();
+    testAPI.check_stored()
+    .then((data) => {
+        if (data.data.error) {
+            if (data.data.error === 2){
+                notify.warning("Wazuh App: Please set up Wazuh API credentials.");
             } else {
-                appState.setClusterInfo(data.data.data.cluster_info);
-                appState.setExtensions(data.data.data.extensions);
-                deferred.resolve();  
+                notify.error("Could not connect with Wazuh RESTful API.");
             }
-        }, function (data) {
-            notify.error("Could not connect with Wazuh RESTful API.");
-        });
+            deferred.reject();
+            $location.path('/settings');
+        } else {
+            appState.setClusterInfo(data.data.data.cluster_info);
+            appState.setExtensions(data.data.data.extensions);
+            deferred.resolve();
+        }
+    })
+    .catch((error) => {
+        notify.error("Could not connect with Wazuh RESTful API.");
+    });
+    
     return deferred.promise;
-}
+};
 
 // Manage leaving the app to another Kibana tab
-var goToKibana = function ($location, $window) {
-    var url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
-    
-    if(sessionStorage.getItem('lastSubUrl:' + url).includes('/wazuh#/visualize') || sessionStorage.getItem('lastSubUrl:' + url).includes('/wazuh#/doc') || sessionStorage.getItem('lastSubUrl:' + url).includes('/wazuh#/context'))
-        sessionStorage.setItem('lastSubUrl:' + url, url);
+const goToKibana = ($location, $window) => {
+    let url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
+
+    if (sessionStorage.getItem(`lastSubUrl:${url}`).includes('/wazuh#/visualize') || 
+        sessionStorage.getItem(`lastSubUrl:${url}`).includes('/wazuh#/doc') || 
+        sessionStorage.getItem(`lastSubUrl:${url}`).includes('/wazuh#/context')){
+
+            sessionStorage.setItem(`lastSubUrl:${url}`, url);
+           
+    }        
 
     $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
-}
+};
 
 //Routes
 routes.enable();
@@ -52,7 +59,7 @@ routes
             "checkAPI": settingsWizard
         }
     })
-	.when('/overview/', {
+    .when('/overview/', {
         template: require('plugins/wazuh/templates/overview.jade'),
         resolve: {
             "checkAPI": settingsWizard
@@ -64,7 +71,7 @@ routes
             "checkAPI": settingsWizard
         }
     })
-	.when('/discover/', {
+    .when('/discover/', {
         template: require('plugins/wazuh/templates/discover.jade'),
         resolve: {
             "checkAPI": settingsWizard
@@ -74,22 +81,19 @@ routes
         template: require('plugins/wazuh/templates/settings.html')
     })
     .when('/visualize/create?', {
-        redirectTo: function() {
-        },
+        redirectTo: function () {},
         resolve: {
             "checkAPI": goToKibana
         }
     })
     .when('/context/:pattern?/:type?/:id?', {
-        redirectTo: function() {
-        },
+        redirectTo: function () {},
         resolve: {
             "checkAPI": goToKibana
         }
     })
     .when('/doc/:pattern?/:index?/:type?/:id?', {
-        redirectTo: function() {
-        },
+        redirectTo: function () {},
         resolve: {
             "checkAPI": goToKibana
         }

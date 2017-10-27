@@ -1,87 +1,58 @@
 import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
     .service('genericReq', function ($q, $http) {
-        var _request = function (method, url, payload = null) {
-            var defered = $q.defer();
-            var promise = defered.promise;
+
+        const _request = (method, url, payload = null) => {
+            let defered = $q.defer();
+  
             if (!method || !url) {
-                defered.reject({ 'error': -1, 'message': 'Missing parameters' });
-                return promise;
-            }
-            var requestHeaders = {
-                headers: {
-                    "Content-Type": 'application/json'
-                }
-            }
-            if (method == "GET") {
-                $http.get(chrome.addBasePath(url), requestHeaders)
-                    .then(function (data) {
-                        if (data.error && data.error != '0') {
-                            defered.reject(data);
-                        } else {
-                            defered.resolve(data);
-                        }
-                    }, function (data) {
-                        if (data.error && data.error != '0') {
-                            defered.reject(data);
-                        } else {
-                            defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
-                        }
-                    });
-            }
-			if (method == "PUT") {
-                $http.put(chrome.addBasePath(url), payload, requestHeaders)
-                    .then(function (data) {
-                        if (data.error && data.error != '0') {
-                            defered.reject(data);
-                        } else {
-                            defered.resolve(data);
-                        }
-                    }, function (data) {
-                        if (data.error && data.error != '0') {
-                            defered.reject(data);
-                        } else {
-                            defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
-                        }
-                    });
-            }
-            if (method == "POST") {
-                $http.post(chrome.addBasePath(url), payload, requestHeaders)
-                    .then(function (data) {
-                        if (data.error && data.error != '0') {
-                            defered.reject(data);
-                        } else {
-                            defered.resolve(data);
-                        }
-                    }, function (data) {
-                        if (data.error && data.error != '0') {
-                            defered.reject(data);
-                        } else {
-                            defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
-                        }
-                    });
+                defered.reject({
+                    'error':   -1,
+                    'message': 'Missing parameters'
+                });
+                return defered.promise;
             }
 
-            if (method == "DELETE") {
-                $http.delete(chrome.addBasePath(url))
-                    .then(function (data) {
-                        if (data.error && data.error != '0') {
-                            defered.reject(data);
-                        } else {
-                            defered.resolve(data);
-                        }
-                    },function (data) {
-                        if (data.error && data.error != '0') {
-                            defered.reject(data);
-                        } else {
-                            defered.reject({ 'error': -2, 'message': 'Error doing a request to Kibana API.' });
-                        }
-                    });
+            let requestHeaders = { headers: { "Content-Type": 'application/json' } };
+
+            let tmpUrl = chrome.addBasePath(url), tmp = null;
+
+            if (method === "GET")    tmp = $http.get(tmpUrl, requestHeaders);
+            if (method === "PUT")    tmp = $http.put(tmpUrl, payload, requestHeaders);
+            if (method === "POST")   tmp = $http.post(tmpUrl, payload, requestHeaders);
+            if (method === "DELETE") tmp = $http.delete(tmpUrl);
+            
+            if(!tmp) {
+                defered.reject({
+                    'error': -2,
+                    'message': 'Error doing a request to Kibana API.'
+                });
+                return defered.promise;
             }
-            return promise;
+
+            tmp
+            .then((data) => {
+                if (data.error && data.error !== '0') {
+                    defered.reject(data);
+                } else {
+                    defered.resolve(data);
+                }
+            })
+            .catch((error) => {
+                if (error.error && error.error !== '0') {
+                    defered.reject(error);
+                } else {
+                    defered.reject({
+                        'error': -2,
+                        'message': 'Error doing a request to Kibana API.'
+                    });
+                }
+            });
+
+            return defered.promise;
         };
 
-        var prepError = function (err) {
+        const prepError = (err) => {
             if (err.error < 0) {
                 err['html'] = "Unexpected error located on controller. Error: <b>" + err.message + " (code " + err.error + ")</b>.";
                 err.message = "Unexpected error located on controller. Error: " + err.message + " (code " + err.error + ").";
@@ -117,21 +88,22 @@ require('ui/modules').get('app/wazuh', [])
         };
 
         return {
-            request: function (method, path, payload = null) {
-                var defered = $q.defer();
-                var promise = defered.promise;
+            request: (method, path, payload = null) => {
+                let defered = $q.defer();
+ 
                 if (!method || !path) {
-                    defered.reject(prepError({ 'error': -1, 'message': 'Missing parameters' }));
-                    return promise;
+                    defered.reject(prepError({
+                        'error': -1,
+                        'message': 'Missing parameters'
+                    }));
+                    return defered.promise;
                 }
 
                 _request(method, path, payload)
-                    .then(function (data) {
-                        defered.resolve(data);
-                    }, function (data) {
-                        defered.reject(prepError(data));
-                    });
-                return promise;
+                    .then((data) => defered.resolve(data))
+                    .catch((error) => defered.reject(prepError(error)));
+
+                    return defered.promise;
             }
         };
     });
