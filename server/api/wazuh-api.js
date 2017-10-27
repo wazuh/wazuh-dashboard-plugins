@@ -84,7 +84,8 @@ module.exports = function (server, options) {
         }
     };
 
-    var getPath = function(wapi_config){
+    const getPath = (wapi_config) => {
+        console.log(wapi_config);
         var path = wapi_config.url;
         var protocol;
         if(wapi_config.url.startsWith("https://")){
@@ -101,8 +102,9 @@ module.exports = function (server, options) {
         else{
             path = wapi_config.url + ':' + wapi_config.port;
         }
+        console.log(path);
         return path;
-    }
+    };
 
     var getPciRequirement = function (req,reply) {
         var pciRequirements = {};
