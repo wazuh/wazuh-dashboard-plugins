@@ -5,7 +5,6 @@ module.exports = (server, options) => {
     // Handlers
 
     const getAPIEntries = (req, reply) => {
-        console.log('called');
         elasticRequest
         .callWithRequest(req, 'search', {
             index: '.wazuh',
@@ -20,120 +19,115 @@ module.exports = (server, options) => {
         });
     };
 
-    const deleteAPIEntries = function (req, reply) {
-        elasticRequest.callWithRequest(req, 'delete', {
+    const deleteAPIEntries = (req, reply) => {
+        elasticRequest
+        .callWithRequest(req, 'delete', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
-            id: req.params.id
-        }).then(
-            function (data) {
-                reply(data);
-            },
-            function (data, error) {
-                reply(data);
-            });
+            type:  'wazuh-configuration',
+            id:    req.params.id
+        })
+        .then((data) => {
+            reply(data);
+        })
+        .catch((error) => {
+            reply(error);
+        });
     };
 
-    const setAPIEntryDefault = function (req, reply) {
+    const setAPIEntryDefault = (req, reply) => {
         // Searching for previous default
-        elasticRequest.callWithRequest(req, 'search', {
+        elasticRequest
+        .callWithRequest(req, 'search', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
-            q: 'active:true'
-        }).then(
-            function (data) {
-                if (data.hits.total == 1) {
-                    // Setting off previous default
-                    elasticRequest.callWithRequest(req, 'update', {
-                        index: '.wazuh',
-                        type: 'wazuh-configuration',
-                        id: data.hits.hits[0]._id,
-                        body: {
-                            doc: {
-                                "active": "false"
-                            }
+            type:  'wazuh-configuration',
+            q:     'active:true'
+        })
+        .then((data) => {
+            if (data.hits.total == 1) {
+                // Setting off previous default
+                elasticRequest.callWithRequest(req, 'update', {
+                    index: '.wazuh',
+                    type:  'wazuh-configuration',
+                    id:    data.hits.hits[0]._id,
+                    body: {
+                        doc: {
+                            "active": "false"
                         }
-                    }).then(
-                        function () {
-                            // Set new default
-                            elasticRequest.callWithRequest(req, 'update', {
-                                index: '.wazuh',
-                                type: 'wazuh-configuration',
-                                id: req.params.id,
-                                body: {
-                                    doc: {
-                                        "active": "true"
-                                    }
-                                }
-                            }).then(
-                                function () {
-                                    reply({
-                                        'statusCode': 200,
-                                        'message': 'ok'
-                                    });
-                                },
-                                function (error) {
-                                    reply({
-                                        'statusCode': 500,
-                                        'error': 8,
-                                        'message': 'Could not save data in elasticsearch'
-                                    }).code(500);
-                                });
-                        },
-                        function (error) {
-                            reply({
-                                'statusCode': 500,
-                                'error': 8,
-                                'message': 'Could not save data in elasticsearch'
-                            }).code(500);
-                        });
-                } else {
-                    // Set new default
-                    elasticRequest.callWithRequest(req, 'update', {
+                    }
+                })
+                .then(() => elasticRequest.callWithRequest(req, 'update', {
                         index: '.wazuh',
-                        type: 'wazuh-configuration',
-                        id: req.params.id,
+                        type:  'wazuh-configuration',
+                        id:    req.params.id,
                         body: {
                             doc: {
                                 "active": "true"
                             }
                         }
-                    }).then(
-                        function () {
-                            reply({
-                                'statusCode': 200,
-                                'message': 'ok'
-                            });
-                        },
-                        function (error) {
-                            reply({
-                                'statusCode': 500,
-                                'error': 8,
-                                'message': 'Could not save data in elasticsearch'
-                            }).code(500);
-                        });
-                }
-            },
-            function () {
-                reply({
-                    'statusCode': 500,
-                    'error': 8,
-                    'message': 'Could not set API default entry'
-                }).code(500);
-            });
+                    })
+                )
+                .then(() => {
+                    reply({
+                        'statusCode': 200,
+                        'message':    'ok'
+                    });
+                })
+                .catch((error) => {
+                    reply({
+                        'statusCode': 500,
+                        'error':      8,
+                        'message':    'Could not save data in elasticsearch'
+                    }).code(500);
+                });
+            } else {
+                // Set new default
+                elasticRequest
+                .callWithRequest(req, 'update', {
+                    index: '.wazuh',
+                    type:  'wazuh-configuration',
+                    id:    req.params.id,
+                    body: {
+                        doc: {
+                            "active": "true"
+                        }
+                    }
+                })
+                .then(() => {
+                    reply({
+                        'statusCode': 200,
+                        'message':    'ok'
+                    });
+                })
+                .catch((error) => {
+                    reply({
+                        'statusCode': 500,
+                        'error':      8,
+                        'message':    'Could not save data in elasticsearch'
+                    }).code(500);
+                });
+            }
+        })
+        .catch((error) => {
+            reply({
+                'statusCode': 500,
+                'error':      8,
+                'message':    'Could not set API default entry'
+            }).code(500);
+        });
     };
 
-    const getExtensions = function (req, reply) {
-        elasticRequest.callWithRequest(req, 'search', {
+    const getExtensions = (req, reply) => {
+        elasticRequest
+        .callWithRequest(req, 'search', {
             index: '.wazuh',
-            type: 'wazuh-configuration'
-        }).then(
-            function (data) {
-                reply(data.hits.hits);
-            },
-            function (data, error) {
-                reply(data);
-            });
+            type:  'wazuh-configuration'
+        })
+        .then((data) => {
+            reply(data.hits.hits);
+        })
+        .catch((error) => {
+            reply(error);
+        });
     };
 
     const toggleExtension = function (req, reply) {
