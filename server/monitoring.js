@@ -210,9 +210,7 @@ module.exports = (server, options) => {
 				type:  'agent',
 				body:  body
 			})
-			.then((response) => {
-				agentsArray.length = 0;
-			})
+			.then((response) => agentsArray.length = 0)
 			.catch((err) => {
 				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
 						'Error inserting agent data into elasticsearch. Bulk request failed.');
@@ -283,10 +281,10 @@ module.exports = (server, options) => {
 	checkElasticStatus();
 
 	// Cron tab for getting agent status.
-	cron.schedule('0 */10 * * * *', function () {
+	cron.schedule('0 */10 * * * *', () => {
 		agentsArray.length = 0;
 		getConfig(loadCredentials);
 	}, true);
 
 	module.exports = fetchAgents;
-}
+};
