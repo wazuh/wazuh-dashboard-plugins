@@ -20,7 +20,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, gen
 	$scope.timeLT  = "now";
 
 	// Object for matching nav items and Wazuh groups
-	var tabGroups = {
+	let tabGroups = {
 		"general": {
 			"group": "*"
 		},
