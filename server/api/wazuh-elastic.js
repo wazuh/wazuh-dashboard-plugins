@@ -87,21 +87,23 @@ module.exports = (server, options) => {
             payload.query.bool.must.push({ 'match': obj });
         }
 
-        fetchElastic(req, payload).then(function (data) {
+        fetchElastic(req, payload)
+        .then((data) => {
             reply({
                 'statusCode': 200,
-                'data': data.hits.total
+                'data':       data.hits.total
             });
-        }, function (data) {
+        })
+        .catch((error) => {
             reply({
                 'statusCode': 500,
-                'error': 9,
-                'message': 'Could not get data from elasticsearch'
+                'error':      9,
+                'message':    'Could not get data from elasticsearch'
             }).code(500);
         });
     };
 
-    var getFieldTop = function (req, reply) {
+    const getFieldTop = (req, reply) => {
 
         // Top field payload
         var payload = {
@@ -127,13 +129,13 @@ module.exports = (server, options) => {
                     }
                 }
             }
-        }
+        };
 
         // Set up time interval, default to Last 24h
-        const timeGTE = "now-1d";
-        const timeLT = "now";
-        payload.query.bool.filter.range['@timestamp']["gte"] = timeGTE;
-        payload.query.bool.filter.range['@timestamp']["lt"] = timeLT;
+        const timeGTE = 'now-1d';
+        const timeLT  = 'now';
+        payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
+        payload.query.bool.filter.range['@timestamp']['lt']  = timeLT;
 
         // Set up match for default cluster name
         payload.query.bool.must.push({
@@ -143,51 +145,56 @@ module.exports = (server, options) => {
         });
         payload.aggs['2'].terms.field = req.params.field;
 
-        fetchElastic(req, payload).then(function (data) {
+        fetchElastic(req, payload)
+        .then((data) => {
 
-            if (data.hits.total == 0 || typeof data.aggregations['2'].buckets[0] === 'undefined')
+            if (data.hits.total === 0 || typeof data.aggregations['2'].buckets[0] === 'undefined'){
                 reply({
                     'statusCode': 200,
-                    'data': ''
+                    'data':       ''
                 });
-            else
+            } else {
                 reply({
                     'statusCode': 200,
-                    'data': data.aggregations['2'].buckets[0].key
+                    'data':       data.aggregations['2'].buckets[0].key
                 });
-        }, function () {
+            }
+        })
+        .catch((error) => {
             reply({
                 'statusCode': 500,
-                'error': 9,
-                'message': 'Could not get data from elasticsearch'
+                'error':      9,
+                'message':    'Could not get data from elasticsearch'
             }).code(500);
         });
     };
 
-    var getSetupInfo = function (req, reply) {
-        elasticRequest.callWithRequest(req, 'search', {
+    const getSetupInfo = (req, reply) => {
+        elasticRequest
+        .callWithRequest(req, 'search', {
                 index: '.wazuh-version',
                 type: 'wazuh-version'
-            })
-            .then(function (data) {
-                if (data.hits.total == 0) {
-                    reply({
-                        'statusCode': 200,
-                        'data': ''
-                    });
-                } else {
-                    reply({
-                        'statusCode': 200,
-                        'data': data.hits.hits[0]._source
-                    });
-                }
-            }, function (error) {
+        })
+        .then((data) => {
+            if (data.hits.total === 0) {
                 reply({
-                    'statusCode': 500,
-                    'error': 9,
-                    'message': 'Could not get data from elasticsearch'
-                }).code(500);
-            });
+                    'statusCode': 200,
+                    'data':       ''
+                });
+            } else {
+                reply({
+                    'statusCode': 200,
+                    'data':       data.hits.hits[0]._source
+                });
+            }
+        })
+        .catch((error) => {
+            reply({
+                'statusCode': 500,
+                'error':      9,
+                'message':    'Could not get data from elasticsearch'
+            }).code(500);
+        });
     };
 
     module.exports = getConfig;
