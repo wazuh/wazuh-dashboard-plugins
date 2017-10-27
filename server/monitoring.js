@@ -67,12 +67,12 @@ module.exports = (server, options) => {
 
 	// Check API status twice and get agents total items
 	const checkAndSaveStatus = (apiEntry) => {
-		var payload = {
+		let payload = {
 			'offset': 0,
 			'limit':  1
 		};
 
-		var options = {
+		let options = {
 			headers: {
 				'wazuh-app-version': packageJSON.version
 			},
@@ -80,60 +80,62 @@ module.exports = (server, options) => {
 			password: apiEntry.password,
 			rejectUnauthorized: !apiEntry.insecure
 		};
-		needle('get', getPath(apiEntry) + '/agents', payload, options).then(function (response) {
+		needle('get', `${getPath(apiEntry)}/agents`, payload, options)
+		.then((response) => {
 			if (!response.error && response.body.data && response.body.data.totalItems) {
 				checkStatus(apiEntry, response.body.data.totalItems);
 			} else {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
-				return;
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+				'Wazuh API credentials not found or are not correct. '+
+				'Open the app in your browser and configure it to start monitoring agents.');
 			}
 		});
 	};
 
 	// Load Wazuh API credentials from Elasticsearch document
-	var loadCredentials = function (apiEntries) {
-		if (typeof apiEntries === 'undefined' || typeof apiEntries.hits === 'undefined')
-			return;
+	const loadCredentials = (apiEntries) => {
+		if (typeof apiEntries === 'undefined' || !('hits' in apiEntries)) return;
 
-		apiEntries.hits.forEach(function (element) {
-			var apiEntry = {
-				'user': element._source.api_user,
-				'password': new Buffer(element._source.api_password, 'base64').toString("ascii"),
-				'url': element._source.url,
-				'port': element._source.api_port,
+		for(let element of apiEntries.hits){
+			let apiEntry = {
+				'user':     element._source.api_user,
+				'password': Buffer.from(element._source.api_password, 'base64').toString("ascii"),
+				'url':      element._source.url,
+				'port':     element._source.api_port,
 				'insecure': element._source.insecure
-			}
+			};
 			if (apiEntry.error) {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Error getting wazuh-api data: ' + apiEntry.error);
-				return;
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+						`Error getting wazuh-api data: ${apiEntry.error}`);
+				break;
 			}
 			checkAndSaveStatus(apiEntry);
-		});
-	}
+		}
+	};
 
 	// Get API configuration from elastic and callback to loadCredentials
-	var getConfig = function (callback) {
-		elasticRequest.callWithInternalUser('search', {
+	const getConfig = (callback) => {
+		elasticRequest
+		.callWithInternalUser('search', {
 			index: '.wazuh',
-			type: 'wazuh-configuration'
-		}).then(
-			function (data) {
-				if (data.hits.total == 1) {
-					callback(data.hits);
-				} else {
-					callback({
-						'error': 'no credentials',
-						'error_code': 1
-					});
-				}
-			},
-			function () {
+			type:  'wazuh-configuration'
+		})
+		.then((data) => {
+			if (data.hits.total == 1) {
+				callback(data.hits);
+			} else {
 				callback({
-					'error': 'no elasticsearch',
-					'error_code': 2
+					'error': 'no credentials',
+					'error_code': 1
 				});
 			}
-		);
+		})
+		.catch(() => {
+			callback({
+				'error':      'no elasticsearch',
+				'error_code': 2
+			});
+		});
 	};
 
 	// fetchAgents on demand
