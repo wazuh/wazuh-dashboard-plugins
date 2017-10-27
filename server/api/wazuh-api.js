@@ -15,11 +15,10 @@ const blueWazuh = colors.blue('wazuh');
 
 const pciRequirementsFile = '../integration_files/pci_requirements.json';
 
-module.exports = function (server, options) {
-
+module.exports = (server, options) => {
 
     // Variables
-    var packageInfo = {};
+    let packageInfo;
 
     // Read Wazuh app package file
     try {
@@ -35,8 +34,8 @@ module.exports = function (server, options) {
                 // Can not connect to elasticsearch
                 reply({
                     'statusCode': 200,
-                    'error': '1',
-                    'data': 'no_elasticsearch'
+                    'error':      '1',
+                    'data':       'no_elasticsearch'
                 });
                 return;
             } else if (wapi_config.error_code > 0) {
@@ -72,98 +71,113 @@ module.exports = function (server, options) {
         });
     };
 
-    var checkAPI = function (req, reply) {
-        req.payload.password = new Buffer(req.payload.password, 'base64').toString("ascii");
+    const checkAPI = (req, reply) => {
+        
+        if (!('user' in req.payload)) {
+            return reply({
+                'statusCode': 400,
+                'error':      3,
+                'message':    'Missing param: API USER'
+            });
+        } 
 
-        if (!req.payload.user) {
-            reply({
+        if (!('password' in req.payload)) {
+            return reply({
                 'statusCode': 400,
-                'error': 3,
-                'message': 'Missing param: API USER'
+                'error':      4,
+                'message':    'Missing param: API PASSWORD'
             });
-        } else if (!req.payload.password) {
-            reply({
+        } 
+        
+        if (!('url' in req.payload)) {
+            return reply({
                 'statusCode': 400,
-                'error': 4,
-                'message': 'Missing param: API PASSWORD'
+                'error':      5,
+                'message':    'Missing param: API URL'
             });
-        } else if (!req.payload.url) {
-            reply({
+        } 
+        
+        if (!('port' in req.payload)) {
+            return reply({
                 'statusCode': 400,
-                'error': 5,
-                'message': 'Missing param: API URL'
+                'error':      6,
+                'message':    'Missing param: API PORT'
             });
-        } else if (!req.payload.port) {
-            reply({
-                'statusCode': 400,
-                'error': 6,
-                'message': 'Missing param: API PORT'
-            });
-        } else if ((req.payload.url.indexOf('https://') == -1) && (req.payload.url.indexOf('http://') == -1)) {
-            reply({
+        } 
+        
+        if (!(req.payload.url.includes('https://')) && !(req.payload.url.includes('http://'))) {
+            return reply({
                 'statusCode': 200,
-                'error': '1',
-                'data': 'protocol_error'
+                'error':      '1',
+                'data':       'protocol_error'
             });
-        } else {
-            needle('get', req.payload.url + ':' + req.payload.port + '/version', {}, {
-                username: req.payload.user,
-                password: req.payload.password,
-                rejectUnauthorized: !req.payload.insecure
-            }).then(function (response) {
-                if (response.body.error == 0 && response.body.data) {
-                    needle('get', req.payload.url + ':' + req.payload.port + '/agents/000', {}, {
-                        username: req.payload.user,
-                        password: req.payload.password,
-                        rejectUnauthorized: !req.payload.insecure
-                    }).then(function (response) {
-                        if (!response.body.error) {
-                            var manager_name = response.body.data.name;
-                            needle('get', req.payload.url + ':' + req.payload.port + '/cluster/node', {}, {
-                                username: req.payload.user,
-                                password: req.payload.password,
-                                rejectUnauthorized: !req.payload.insecure
-                            }).then(function (response) {
-                                if (!response.body.error) {
-                                    reply({
-                                        "manager": manager_name,
-                                        "node": response.body.data.node,
-                                        "cluster": response.body.data.cluster
-                                    });
-                                } else if (response.body.error)
-                                    reply({
-                                        'statusCode': 500,
-                                        'error': 7,
-                                        'message': response.body.message
-                                    }).code(500);
-                            });
-                        } else if (response.body.error)
-                            reply({
-                                'statusCode': 500,
-                                'error': 5,
-                                'message': response.body.message
-                            }).code(500);
-                        else
-                            reply({
-                                'statusCode': 500,
-                                'error': 5,
-                                'message': 'Error occurred'
-                            }).code(500);
-                    });
-                } else if (response.body.error)
-                    reply({
-                        'statusCode': 500,
-                        'error': 5,
-                        'message': response.body.message
-                    }).code(500);
-                else
-                    reply({
-                        'statusCode': 500,
-                        'error': 5,
-                        'message': 'Error occurred'
-                    }).code(500);
-            });
-        }
+        } 
+        
+        req.payload.password = Buffer.from(req.payload.password, 'base64').toString("ascii");
+        
+        needle('get', `${req.payload.url}:${req.payload.port}/version`, {}, {
+            username:           req.payload.user,
+            password:           req.payload.password,
+            rejectUnauthorized: !req.payload.insecure
+        })
+        .then((response) => {
+            if (response.body.error == 0 && response.body.data) {
+                needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
+                    username:           req.payload.user,
+                    password:           req.payload.password,
+                    rejectUnauthorized: !req.payload.insecure
+                })
+                .then((response) => {
+                    if (!response.body.error) {
+                        let managerName = response.body.data.name;
+                        needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
+                            username:           req.payload.user,
+                            password:           req.payload.password,
+                            rejectUnauthorized: !req.payload.insecure
+                        })
+                        .then((response) => {
+                            if (!response.body.error) {
+                                reply({
+                                    "manager": managerName,
+                                    "node":    response.body.data.node,
+                                    "cluster": response.body.data.cluster
+                                });
+                            } else if (response.body.error){
+                                reply({
+                                    'statusCode': 500,
+                                    'error':      7,
+                                    'message':    response.body.message
+                                }).code(500);
+                            }
+                        });
+                    } else if (response.body.error){
+                        reply({
+                            'statusCode': 500,
+                            'error':      5,
+                            'message':    response.body.message
+                        }).code(500);
+                    } else {
+                        reply({
+                            'statusCode': 500,
+                            'error':      5,
+                            'message':    'Error occurred'
+                        }).code(500);
+                    }
+                });
+            } else if (response.body.error){
+                reply({
+                    'statusCode': 500,
+                    'error': 5,
+                    'message': response.body.message
+                }).code(500);
+            } else {
+                reply({
+                    'statusCode': 500,
+                    'error': 5,
+                    'message': 'Error occurred'
+                }).code(500);
+            }
+        });        
     };
 
     var getPciRequirement = function (req, reply) {
@@ -171,7 +185,7 @@ module.exports = function (server, options) {
         var pci_description = "";
 
         try {
-            pciRequirements = JSON.parse(fs.readFileSync(path.resolve(__dirname, pciRequirementsFile), 'utf8'));
+            pciRequirements = require(pciRequirementsFile);
         } catch (e) {
             server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
             server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + pciRequirementsFile);
