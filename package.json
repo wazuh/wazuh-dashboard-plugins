@@ -33,6 +33,7 @@
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.1",
     "angular-md5": "^0.1.10",
+    "ansicolors": "^0.3.2",
     "bootstrap": "3.3.6",
     "install": "^0.10.1",
     "needle": "^2.0.1",

@@ -1,3 +1,5 @@
+const getPath = require('../../util/get-path');
+
 module.exports = function (server, options) {
 	// Require some libraries
 	const fs = require('fs');
@@ -82,28 +84,6 @@ module.exports = function (server, options) {
                     reply({ 'statusCode': 500, 'error': 5, 'message': 'Error occurred' }).code(500);
             });
         }
-    };
-
-    const getPath = (wapi_config) => {
-        console.log(wapi_config);
-        var path = wapi_config.url;
-        var protocol;
-        if(wapi_config.url.startsWith("https://")){
-            protocol = "https://";
-        }
-        else if(wapi_config.url.startsWith("http://")){
-            protocol = "http://";
-        }
-
-        if(path.lastIndexOf("/") > protocol.length){
-            path = path.substr(0, path.substr(protocol.length).indexOf("/") + protocol.length) +
-            ":" + wapi_config.port + path.substr(path.substr(protocol.length).indexOf("/") + protocol.length);
-        }
-        else{
-            path = wapi_config.url + ':' + wapi_config.port;
-        }
-        console.log(path);
-        return path;
     };
 
     var getPciRequirement = function (req,reply) {

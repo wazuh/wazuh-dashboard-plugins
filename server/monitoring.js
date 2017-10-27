@@ -3,7 +3,7 @@ const fs        = require('fs');
 const path      = require('path');
 var cron        = require('node-cron');
 var needle      = require('needle');
-
+const getPath   = require('../util/get-path');
 // Colors for console logging 
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
@@ -29,26 +29,6 @@ module.exports = function (server, options) {
 	} catch (e) {
 		server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not read the Wazuh package file.');
 	}
-
-	const getPath = (wapi_config) => {
-		console.log(wapi_config);
-		var path = wapi_config.url;
-		var protocol;
-		if (wapi_config.url.startsWith("https://")) {
-			protocol = "https://";
-		} else if (wapi_config.url.startsWith("http://")) {
-			protocol = "http://";
-		}
-
-		if (path.lastIndexOf("/") > protocol.length) {
-			path = path.substr(0, path.substr(protocol.length).indexOf("/") + protocol.length) +
-				":" + wapi_config.port + path.substr(path.substr(protocol.length).indexOf("/") + protocol.length);
-		} else {
-			path = wapi_config.url + ':' + wapi_config.port;
-		}
-		console.log(path);
-		return path;
-	};
 
 	// Check status and get agent status array
 	var checkStatus = function (apiEntry, maxSize, offset) {
