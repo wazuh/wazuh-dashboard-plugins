@@ -1,81 +1,75 @@
 // External libraries
-const fs        = require('fs');
-const path      = require('path');
-var cron        = require('node-cron');
-var needle      = require('needle');
+const cron      = require('node-cron');
+const needle    = require('needle');
 const getPath   = require('../util/get-path');
+
 // Colors for console logging 
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
-module.exports = function (server, options) {
+module.exports = (server, options) => {
 	// Elastic JS Client
 	const elasticRequest = server.plugins.elasticsearch.getCluster('admin');
 
-
 	// Initialize
-	var agentsArray = [];
-	var index_pattern = "wazuh-monitoring-*";
-	var index_prefix = "wazuh-monitoring-";
-
-	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
-	var todayIndex = index_prefix + fDate;
-
-	var packageJSON = {};
+	let agentsArray   = [];
+	let index_pattern = "wazuh-monitoring-*";
+	let index_prefix  = "wazuh-monitoring-";
+	let fDate         = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/: /g, '').slice(0, -7);
+	let todayIndex    = index_prefix + fDate;
+	let packageJSON   = {};
 
 	// Read Wazuh App package file
 	try {
-		packageJSON = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'));
+		packageJSON = require('../package.json');
 	} catch (e) {
 		server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not read the Wazuh package file.');
 	}
 
 	// Check status and get agent status array
-	var checkStatus = function (apiEntry, maxSize, offset) {
+	const checkStatus = (apiEntry, maxSize, offset) => {
 		if (!maxSize) {
 			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'You must provide a max size');
 		}
 
-		var payload = {
-			'offset': offset ? offset : 0,
-			'limit': (250 < maxSize) ? 250 : maxSize
+		let payload = {
+			'offset': offset ? offset: 0,
+			'limit':  (250 < maxSize) ? 250 : maxSize
 		};
 
-		var options = {
+		let options = {
 			headers: {
 				'wazuh-app-version': packageJSON.version
 			},
-			username: apiEntry.user,
-			password: apiEntry.password,
+			username:           apiEntry.user,
+			password:           apiEntry.password,
 			rejectUnauthorized: !apiEntry.insecure
 		};
 
-		needle.request('get', getPath(apiEntry) + '/agents', payload, options, function (error, response) {
+		needle
+			.request('get', `${getPath(apiEntry)}/agents`, payload, options, (error, response) => {
 			if (!error && !response.error && response.body.data.items) {
 				agentsArray = agentsArray.concat(response.body.data.items);
 				if ((payload.limit + payload.offset) < maxSize) {
-					checkStatus(apiEntry, response.body.data.totalItems, payload.limit + payload.offset);
+					checkStatus(apiEntry, 
+								response.body.data.totalItems, 
+								payload.limit + payload.offset
+					);
 				} else {
 					saveStatus();
 				}
 			} else {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Can not access Wazuh API');
-				return;
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+						'Can not access Wazuh API');
 			}
 		});
 	};
 
 	// Check API status twice and get agents total items
-	var checkAndSaveStatus = function (apiEntry) {
-		apiEntry.user;
-		apiEntry.password;
-		apiEntry.url;
-		apiEntry.insecure;
-		apiEntry.port;
-
+	const checkAndSaveStatus = (apiEntry) => {
 		var payload = {
 			'offset': 0,
-			'limit': 1
+			'limit':  1
 		};
 
 		var options = {
