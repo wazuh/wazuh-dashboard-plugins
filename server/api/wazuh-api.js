@@ -1,7 +1,5 @@
 
 // Require some libraries
-const fs     = require('fs');
-const path   = require('path');
 const needle = require('needle');
 
 // External references 
@@ -54,7 +52,7 @@ module.exports = (server, options) => {
                 rejectUnauthorized: !wapi_config.insecure
             })
             .then((response) => {
-                if (response.body.error == 0 && response.body.data) {
+                if (response.body.error === 0 && response.body.data) {
                     wapi_config.password = "You shall not pass";
                     reply({
                         'statusCode': 200,
@@ -112,7 +110,7 @@ module.exports = (server, options) => {
                 'data':       'protocol_error'
             });
         } 
-        
+
         req.payload.password = Buffer.from(req.payload.password, 'base64').toString("ascii");
         
         needle('get', `${req.payload.url}:${req.payload.port}/version`, {}, {
@@ -121,7 +119,7 @@ module.exports = (server, options) => {
             rejectUnauthorized: !req.payload.insecure
         })
         .then((response) => {
-            if (response.body.error == 0 && response.body.data) {
+            if (response.body.error === 0 && response.body.data) {
                 needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
                     username:           req.payload.user,
                     password:           req.payload.password,
@@ -167,22 +165,22 @@ module.exports = (server, options) => {
             } else if (response.body.error){
                 reply({
                     'statusCode': 500,
-                    'error': 5,
-                    'message': response.body.message
+                    'error':      5,
+                    'message':    response.body.message
                 }).code(500);
             } else {
                 reply({
                     'statusCode': 500,
-                    'error': 5,
-                    'message': 'Error occurred'
+                    'error':      5,
+                    'message':    'Error occurred'
                 }).code(500);
             }
         });        
     };
 
-    var getPciRequirement = function (req, reply) {
-        var pciRequirements = {};
-        var pci_description = "";
+    const getPciRequirement = (req, reply) => {
+        let pciRequirements = {};
+        let pci_description = '';
 
         try {
             pciRequirements = require(pciRequirementsFile);
@@ -190,15 +188,16 @@ module.exports = (server, options) => {
             server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
             server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + pciRequirementsFile);
             server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-        };
-
-        if (req.params.requirement == "all") {
-            reply(pciRequirements);
-            return;
         }
 
-        if (pciRequirements[req.params.requirement])
+        if (req.params.requirement === 'all') {
+            return reply(pciRequirements);
+        }
+
+        if (typeof pciRequirements[req.params.requirement] !== 'undefined'){
             pci_description = pciRequirements[req.params.requirement];
+        }
+        
         reply({
             pci: {
                 requirement: req.params.requirement,
@@ -207,14 +206,14 @@ module.exports = (server, options) => {
         });
     };
 
-    var errorControl = function (error, response) {
+    const errorControl = (error, response) => {
         if (error) {
             return ({
                 'isError': true,
                 'body': {
-                    'statusCode': 500,
-                    'error': 5,
-                    'message': 'Request error',
+                    'statusCode':   500,
+                    'error':        5,
+                    'message':      'Request error',
                     'errorMessage': error.message
                 }
             });
@@ -223,9 +222,9 @@ module.exports = (server, options) => {
                 'isError': true,
                 'body': {
                     'statusCode': 500,
-                    'error': 6,
-                    'message': 'Wazuh api error',
-                    'errorData': response.body
+                    'error':      6,
+                    'message':    'Wazuh api error',
+                    'errorData':  response.body
                 }
             });
         }
@@ -234,24 +233,24 @@ module.exports = (server, options) => {
         });
     };
 
-    var makeRequest = function (method, path, data, reply) {
-        getConfig(function (wapi_config) {
+    const makeRequest = (method, path, data, reply) => {
+        getConfig((wapi_config) => {
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
-                reply({
+                return reply({
                     'statusCode': 404,
-                    'error': 2,
-                    'message': 'Could not connect with elasticsearch'
+                    'error':      2,
+                    'message':    'Could not connect with elasticsearch'
                 }).code(404);
-                return;
+                
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
-                reply({
+                return reply({
                     'statusCode': 404,
-                    'error': 1,
-                    'message': 'Credentials does not exists'
+                    'error':      1,
+                    'message':    'Credentials does not exists'
                 }).code(404);
-                return;
+                
             }
 
             if (!data) {
@@ -262,14 +261,15 @@ module.exports = (server, options) => {
                 headers: {
                     'wazuh-app-version': packageInfo.version
                 },
-                username: wapi_config.user,
-                password: wapi_config.password,
+                username:           wapi_config.user,
+                password:           wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
             };
 
-            var fullUrl = getPath(wapi_config) + path;
-            needle.request(method, fullUrl, data, options, function (error, response) {
-                var errorData = errorControl(error, response);
+            let fullUrl = getPath(wapi_config) + path;
+
+            needle.request(method, fullUrl, data, options, (error, response) => {
+                let errorData = errorControl(error, response);
                 if (errorData.isError) {
                     reply(errorData.body).code(500);
                 } else {
@@ -279,73 +279,74 @@ module.exports = (server, options) => {
         });
     };
 
-    var requestApi = function (req, reply) {
+    const requestApi = (req, reply) => {
         if (!req.payload.method) {
             reply({
                 'statusCode': 400,
-                'error': 3,
-                'message': 'Missing param: Method'
+                'error':      3,
+                'message':    'Missing param: Method'
             }).code(400);
         } else if (!req.payload.path) {
             reply({
                 'statusCode': 400,
-                'error': 4,
-                'message': 'Missing param: Path'
+                'error':      4,
+                'message':    'Missing param: Path'
             }).code(400);
         } else {
             makeRequest(req.payload.method, req.payload.path, req.payload.body, reply);
         }
     };
 
-    var getApiSettings = function (req, reply) {
-        getConfig(function (wapi_config) {
+    const getApiSettings = (req, reply) => {
+        getConfig((wapi_config) => {
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
-                reply({
+                return reply({
                     'statusCode': 200,
                     'error': '1',
                     'data': 'no_elasticsearch'
                 });
-                return;
+                
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
-                reply({
+                return reply({
                     'statusCode': 200,
                     'error': '1',
                     'data': 'no_credentials'
-                });
-                return;
+                });                
             }
         });
     };
 
     // Fetch agent status and insert it directly on demand
-    var fetchAgents = function (req, reply) {
+    const fetchAgents = (req, reply) => {
         fetchAgentsExternal();
-        reply({
+        return reply({
             'statusCode': 200,
-            'error': '0',
-            'data': ''
+            'error':      '0',
+            'data':       ''
         });
-    }
+    };
 
-    var postErrorLog = function (req, reply) {
+    const postErrorLog = (req, reply) => {
 
         if (!req.payload.message) {
             server.log([blueWazuh, 'server', 'error'], 'Error logging failed:');
-            server.log([blueWazuh, 'server', 'error'], 'You must provide at least one error message to log');
-            reply({
+            server.log([blueWazuh, 'server', 'error'], 
+                       'You must provide at least one error message to log');
+
+            return reply({
                 'statusCode': 500,
-                'message': 'You must provide at least one error message to log'
+                'message':    'You must provide at least one error message to log'
             });
         } else {
             server.log([blueWazuh, 'client', 'error'], req.payload.message);
             if (req.payload.details) {
                 server.log([blueWazuh, 'client', 'error'], req.payload.details);
             }
-            reply({
+            return reply({
                 'statusCode': 200,
-                'message': 'Error logged succesfully'
+                'message':    'Error logged succesfully'
             });
         }
     };
@@ -358,8 +359,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/checkAPI',
+        method:  'GET',
+        path:    '/api/wazuh-api/checkAPI',
         handler: checkStoredAPI
     });
 
@@ -370,8 +371,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'POST',
-        path: '/api/wazuh-api/checkAPI',
+        method:  'POST',
+        path:    '/api/wazuh-api/checkAPI',
         handler: checkAPI
     });
 
@@ -381,8 +382,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'POST',
-        path: '/api/wazuh-api/request',
+        method:  'POST',
+        path:    '/api/wazuh-api/request',
         handler: requestApi
     });
 
@@ -392,8 +393,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/settings',
+        method:  'GET',
+        path:    '/api/wazuh-api/settings',
         handler: getApiSettings
     });
 
@@ -403,8 +404,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/pci/{requirement}',
+        method:  'GET',
+        path:    '/api/wazuh-api/pci/{requirement}',
         handler: getPciRequirement
     });
 
@@ -414,8 +415,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'POST',
-        path: '/api/wazuh/errlog',
+        method:  'POST',
+        path:    '/api/wazuh/errlog',
         handler: postErrorLog
     });
 
@@ -425,8 +426,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/fetchAgents',
+        method:  'GET',
+        path:    '/api/wazuh-api/fetchAgents',
         handler: fetchAgents
     });
 };
