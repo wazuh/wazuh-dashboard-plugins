@@ -72,7 +72,10 @@ app.factory('DataHandler', function ($q, apiReq) {
         }
 
         removeFilter (filterName, search) {
+            console.log(this.filters);
             angular.forEach(this.filters, function (filter, key) {
+                console.log(filter);
+                console.log(key);
                 if (filterName === filter.name) {
                     this.filters.splice(key, 1);
                 }
