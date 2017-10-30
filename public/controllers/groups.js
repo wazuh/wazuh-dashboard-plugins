@@ -1,47 +1,43 @@
-var app = require('ui/modules').get('app/wazuh', []);
+let app = require('ui/modules').get('app/wazuh', []);
 
 // We are using the DataHandler template and customize its path to get information about groups
 app.factory('Groups', function (DataHandler) {
-    var Groups = new DataHandler();
+    let Groups  = new DataHandler();
     Groups.path = '/agents/groups';
     return Groups;
 });
 
 app.factory('GroupAgents', function (DataHandler) {
-    var GroupAgents = new DataHandler();
-    return GroupAgents;
+    return new DataHandler();
 });
 
 app.factory('GroupFiles', function (DataHandler) {
-    var GroupFiles = new DataHandler();
-    return GroupFiles;
+    return new DataHandler();
 });
 
 // Groups preview controller
 app.controller('groupsPreviewController', function ($scope, apiReq, Groups, GroupFiles, GroupAgents) {
-    $scope.searchTerm = '';
-    $scope.load = true;
-
-    $scope.groups = Groups;
+    $scope.searchTerm  = '';
+    $scope.load        = true;
+    $scope.groups      = Groups;
     $scope.groupAgents = GroupAgents;
-    $scope.groupFiles = GroupFiles;
+    $scope.groupFiles  = GroupFiles;
 
     // Actual execution in the controller's initialization
-    $scope.groups.nextPage('').then(function (data) {
-        $scope.loadGroup(0);
-    });
+    $scope.groups.nextPage('')
+    .then(() => $scope.loadGroup(0));
 
     $scope.load = false;
 
-    $scope.showFiles = function (index) {
+    $scope.showFiles = (index) => {
         $scope.groupFiles.reset();
-        $scope.groupFiles.path = '/agents/groups/' + $scope.groups.items[index].name + "/files";
+        $scope.groupFiles.path = `/agents/groups/${$scope.groups.items[index].name}/files`;
         $scope.groupFiles.nextPage('');
-    }
+    };
 
     $scope.showAgents = (index) => {
         $scope.groupAgents.reset();
-        $scope.groupAgents.path = '/agents/groups/' + $scope.groups.items[index].name;
+        $scope.groupAgents.path = `/agents/groups/${$scope.groups.items[index].name}`;
         $scope.groupAgents.nextPage('')
         .then(() => {
             let promises = [];
@@ -87,7 +83,7 @@ app.controller('groupsPreviewController', function ($scope, apiReq, Groups, Grou
     // Changing the view to overview a specific group
     $scope.groupOverview = (group) => {
         $scope.$parent.$parent.groupName  = group;
-        $scope.$parent.$parent.groupsMenu = "overview";
+        $scope.$parent.$parent.groupsMenu = 'overview';
     };
 
     // Resetting the factory configuration
@@ -99,6 +95,6 @@ app.controller('groupsPreviewController', function ($scope, apiReq, Groups, Grou
 });
 
 app.controller('groupsController', function ($scope) {
-    $scope.groupsMenu = "preview";
+    $scope.groupsMenu = 'preview';
     $scope.groupName  = '';
 });

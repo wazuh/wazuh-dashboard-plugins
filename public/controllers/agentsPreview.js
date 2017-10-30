@@ -1,74 +1,83 @@
-var app = require('ui/modules').get('app/wazuh', []);
+let app = require('ui/modules').get('app/wazuh', []);
 
 // We are using the DataHandler template and customize its path to get information about agents
-app.factory('Agents', function(DataHandler) {
-	var Agents = new DataHandler();
-	Agents.path = '/agents';
-	return Agents;
+app.factory('Agents', function (DataHandler) {
+    let Agents  = new DataHandler();
+    Agents.path = '/agents';
+    return Agents;
 });
 
 app.controller('agentsPreviewController', function ($scope, Notifier, genericReq, apiReq, appState, Agents) {
-	const notify = new Notifier({location: 'Agents - Preview'});
-	$scope.loading = true;
-	$scope.agents = Agents;
-	$scope.status = 'all';
-	$scope.osPlatform = 'all';
-	$scope.osPlatforms = []
-	$scope.mostActiveAgent = {"name" : "", "id" : ""};
-
-    //Print Error
-    var printError = function (error) {
-        notify.error(error.message);
+    const notify       = new Notifier({ location: 'Agents - Preview' });
+    $scope.loading     = true;
+    $scope.agents      = Agents;
+    $scope.status      = 'all';
+    $scope.osPlatform  = 'all';
+    $scope.osPlatforms = [];
+    $scope.mostActiveAgent = {
+        "name": "",
+        "id":   ""
     };
 
-    var load = function () {
-		$scope.agents.nextPage('').then(function (data) {
-			// Retrieve os list
-			angular.forEach($scope.agents.items, function(agent) {
-				$scope.osPlatforms.push(agent.os.name);
-			});
-			$scope.osPlatforms = new Set($scope.osPlatforms);
-			$scope.osPlatforms = Array.from($scope.osPlatforms); // Angularjs doesn't support ES6 objects
-		});
+    //Print Error
+    const printError = (error) => notify.error(error.message);
 
-		// Get last agent !!!!!!!
+    const load = () => {
+        $scope.agents.nextPage('')
+        .then(() => {
+            // Retrieve os list
+            for(let agent of $scope.agents.items){
+                $scope.osPlatforms.push(agent.os.name);
+            }
 
-        genericReq.request('GET', '/api/wazuh-elastic/top/' + appState.getClusterInfo().cluster + '/agent.name').then(function (data) {
-			if(data.data.data == "") {
-				$scope.mostActiveAgent.name = $scope.cluster_info.manager;
-				$scope.mostActiveAgent.id = "000";
-				return;
-			}
-			$scope.mostActiveAgent.name = data.data.data;
-			genericReq.request('GET', '/api/wazuh-elastic/top/' + appState.getClusterInfo().cluster + '/agent.id').then(function (data) {
-				if(data.data.data == "" && $scope.mostActiveAgent.name != "") {
-					$scope.mostActiveAgent.id = "000";
-				}else{
-					$scope.mostActiveAgent.id = data.data.data;
-				}
-				$scope.loading = false;
-			}, printError);
-		}, printError);
+            $scope.osPlatforms = new Set($scope.osPlatforms);
+            $scope.osPlatforms = Array.from($scope.osPlatforms); 
+        });
 
-        apiReq.request('GET', '/agents/summary', {}).then(function (data) {
-			$scope.agentsCountActive = data.data.data.Active;
-			$scope.agentsCountDisconnected = data.data.data.Disconnected;
-			$scope.agentsCountNeverConnected = data.data.data['Never connected'];
-			$scope.agentsCountTotal = data.data.data.Total;
-			$scope.agentsCoverity = (data.data.data.Active / data.data.data.Total) * 100;
-			$scope.loading = false;
-		}, printError);
+        // Get last agent !!!!!!!
+        let tmpUrl  = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.name`;
+        let tmpUrl2 = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.id`;
+
+        genericReq.request('GET', tmpUrl)
+        .then((data) => {
+            if (data.data.data === '') {
+                $scope.mostActiveAgent.name = $scope.cluster_info.manager;
+                $scope.mostActiveAgent.id   = '000';
+                return;
+            }
+            $scope.mostActiveAgent.name = data.data.data;
+            genericReq.request('GET', tmpUrl2)
+            .then((data) => {
+                if (data.data.data === '' && $scope.mostActiveAgent.name !== '') {
+                    $scope.mostActiveAgent.id = '000';
+                } else {
+                    $scope.mostActiveAgent.id = data.data.data;
+                }
+                $scope.loading = false;
+            })
+            .catch((error) => printError(error));
+        })
+        .catch((error) => printError(error));
+
+        apiReq.request('GET', '/agents/summary', {})
+        .then((data) => {
+            $scope.agentsCountActive         = data.data.data.Active;
+            $scope.agentsCountDisconnected   = data.data.data.Disconnected;
+            $scope.agentsCountNeverConnected = data.data.data['Never connected'];
+            $scope.agentsCountTotal          = data.data.data.Total;
+            $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
+            $scope.loading                   = false;
+        })
+        .catch((error) => printError(error));
     };
 
     //Load
     try {
         load();
     } catch (e) {
-		notify.error("Unexpected exception loading controller");
+        notify.error("Unexpected exception loading controller");
     }
 
     //Destroy
-    $scope.$on("$destroy", function () {
-    	$scope.agents.reset();
-    });
+    $scope.$on("$destroy", () => $scope.agents.reset());
 });
