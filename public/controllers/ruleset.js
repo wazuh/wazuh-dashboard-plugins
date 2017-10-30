@@ -23,27 +23,27 @@ app.controller('rulesController', function ($scope, Notifier, Rules) {
     $scope.analizeRules = (search) => {
         $scope.autoComplete = [];
         
-        if (search != '') $scope.autoComplete.push({
-            'name': search,
-            'type': 'search'
+        if (search !== '') $scope.autoComplete.push({
+            name: search,
+            type: 'search'
         });
         
         for(let element of $scope.rules.items){
             for(let pci of element.pci){
                 $scope.autoComplete.push({
-                    'name': pci,
-                    'type': 'pci'
+                    name: pci,
+                    type: 'pci'
                 });
             }
             for(let group of element.groups){
                 $scope.autoComplete.push({
-                    'name': group,
-                    'type': 'group'
+                    name: group,
+                    type: 'group'
                 });
             }
             $scope.autoComplete.push({
-                'name': element.file,
-                'type': 'file'
+                name: element.file,
+                type: 'file'
             });
         }
 
@@ -54,16 +54,16 @@ app.controller('rulesController', function ($scope, Notifier, Rules) {
     //Load
     try {
         $scope.rules.nextPage('')
-        .then((data) => {
+        .then(() => {
             $scope.loading = false;
             $scope.analizeRules('');
         });
     } catch (e) {
-        notify.error("Unexpected exception loading controller");
+        notify.error('Unexpected exception loading controller');
     }
 
     //Destroy
-    $scope.$on("$destroy", () => $scope.rules.reset());
+    $scope.$on('$destroy', () => $scope.rules.reset());
 });
 
 app.controller('decodersController', function ($scope, $sce, Notifier, Decoders) {
@@ -77,15 +77,15 @@ app.controller('decodersController', function ($scope, $sce, Notifier, Decoders)
         $scope.autoComplete = [];
         if (search !== '') {
             $scope.autoComplete.push({
-                'name': search,
-                'type': 'search'
+                name: search,
+                type: 'search'
             });
         }
 
         for(let element of $scope.decoders.items){
             $scope.autoComplete.push({
-                'name': element.file,
-                'type': 'file'
+                name: element.file,
+                type: 'file'
             });
         }
 
@@ -140,7 +140,7 @@ app.controller('decodersController', function ($scope, $sce, Notifier, Decoders)
             $scope.analizeDecoders('');
         });
     } catch (e) {
-        notify.error("Unexpected exception loading controller");
+        notify.error('Unexpected exception loading controller');
     }
 
     //Destroy

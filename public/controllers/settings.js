@@ -66,12 +66,12 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
         genericReq.request('PUT', tmpUrl)
         .then(() => {
 			appState.setClusterInfo($scope.apiEntries[index]._source.cluster);
-			$scope.apiEntries[$scope.currentDefault]._source.active = "false";
-			$scope.apiEntries[index]._source.active = "true";
+			$scope.apiEntries[$scope.currentDefault]._source.active = 'false';
+			$scope.apiEntries[index]._source.active = 'true';
 			$scope.currentDefault = index;
 			$scope.extensions = $scope.apiEntries[$scope.currentDefault]._source.extensions;
-            notify.info("Manager " + $scope.apiEntries[index]._source.cluster_info.manager + 
-                        " set as default");
+            notify.info(`Manager ${$scope.apiEntries[index]._source.cluster_info.manager}` + 
+                        ` set as default`);
         })
         .catch(() => {
 			notify.error("Could not set that manager as default");
@@ -84,7 +84,7 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
         .then((data) => {
 			$scope.apiEntries = data.data.length > 0 ? data.data : [];
 			angular.forEach($scope.apiEntries, (value, key) => {
-				if (value._source && value._source.active === "true") {
+				if (value._source && value._source.active === 'true') {
 					$scope.currentDefault = key;
 					if (value._source.extensions) {
 						$scope.extensions = value._source.extensions;
@@ -103,7 +103,7 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
 
 	// Save settings function
 	$scope.saveSettings = () => {
-		let activeStatus = ($scope.apiEntries.length === 0) ? "true" : "false";
+		let activeStatus = ($scope.apiEntries.length === 0) ? 'true' : 'false';
 
 		let tmpData = {
 			'user':         $scope.formData.user,
@@ -111,7 +111,7 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
 			'url':          $scope.formData.url,
 			'port':         $scope.formData.port,
 			'cluster_info': {},
-			'insecure':     "true",
+			'insecure':     'true',
 			'active':       activeStatus,
 			'id':           $scope.apiEntries.length
 		};

@@ -5,19 +5,19 @@ let app = require('ui/modules')
 .controller('overviewController', 
 function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, genericReq) {
 
-	$rootScope.page       = "overview";
-	$scope.submenuNavItem = "general";
+	$rootScope.page       = 'overview';
+	$scope.submenuNavItem = 'general';
 	$scope.extensions     = appState.getExtensions().extensions;
 
 	if ($location.search().tabView){
 		$scope.tabView = $location.search().tabView;
 	} else {
-		$scope.tabView = "panels";
-		$location.search("tabView", "panels");
+		$scope.tabView = 'panels';
+		$location.search('tabView', 'panels');
 	}
 
-	$scope.timeGTE = "now-1d";
-	$scope.timeLT  = "now";
+	$scope.timeGTE = 'now-1d';
+	$scope.timeLT  = 'now';
 
 	// Object for matching nav items and Wazuh groups
 	let tabGroups = {

@@ -61,22 +61,22 @@ module.exports = (server, options) => {
                         id:    req.params.id,
                         body: {
                             doc: {
-                                "active": "true"
+                                "active": 'true'
                             }
                         }
                     })
                 )
                 .then(() => {
                     reply({
-                        'statusCode': 200,
-                        'message':    'ok'
+                        statusCode: 200,
+                        message:    'ok'
                     });
                 })
                 .catch((error) => {
                     reply({
-                        'statusCode': 500,
-                        'error':      8,
-                        'message':    'Could not save data in elasticsearch'
+                        statusCode: 500,
+                        error:      8,
+                        message:    'Could not save data in elasticsearch'
                     }).code(500);
                 });
             } else {
@@ -133,7 +133,7 @@ module.exports = (server, options) => {
     const toggleExtension = (req, reply) => {
         // Toggle extenion state
         let extension = {};
-        extension[req.params.extensionName] = (req.params.extensionValue === 'true') ? true : false;
+        extension[req.params.extensionName] = (req.params.extensionValue === 'true');
 
         elasticRequest
         .callWithRequest(req, 'update', {
@@ -176,15 +176,15 @@ module.exports = (server, options) => {
         }
 
         let settings = {
-            'api_user':     req.payload.user,
-            'api_password': req.payload.password,
-            'url':          req.payload.url,
-            'api_port':     req.payload.port,
-            'insecure':     req.payload.insecure,
-            'component':    'API',
-            'active':       req.payload.active,
-            'cluster_info': req.payload.cluster_info,
-            'extensions':   req.payload.extensions
+            api_user:     req.payload.user,
+            api_password: req.payload.password,
+            url:          req.payload.url,
+            api_port:     req.payload.port,
+            insecure:     req.payload.insecure,
+            component:    'API',
+            active:       req.payload.active,
+            cluster_info: req.payload.cluster_info,
+            extensions:   req.payload.extensions
         };
 
         elasticRequest
@@ -197,16 +197,16 @@ module.exports = (server, options) => {
         })
         .then((response) => {
             reply({
-                'statusCode': 200,
-                'message':    'ok',
-                'response':   response
+                statusCode: 200,
+                message:    'ok',
+                response:   response
             });
         })
         .catch((error) => {
             reply({
-                'statusCode': 500,
-                'error':      8,
-                'message':    'Could not save data in elasticsearch'
+                statusCode: 500,
+                error:      8,
+                message:    'Could not save data in elasticsearch'
             }).code(500);
         });
     };
@@ -225,15 +225,15 @@ module.exports = (server, options) => {
         })
         .then(() => {
             reply({
-                'statusCode': 200,
-                'message':    'ok'
+                statusCode: 200,
+                message:    'ok'
             });
         })
         .catch((error) => {
             reply({
-                'statusCode': 500,
-                'error':      8,
-                'message':    'Could not save data in elasticsearch'
+                statusCode: 500,
+                error:      8,
+                message:    'Could not save data in elasticsearch'
             }).code(500);
         });
     };
@@ -246,8 +246,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/settings',
+        method:  'PUT',
+        path:    '/api/wazuh-api/settings',
         handler: saveAPI
     });
 
@@ -257,8 +257,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/apiEntries',
+        method:  'GET',
+        path:    '/api/wazuh-api/apiEntries',
         handler: getAPIEntries
     });
 
@@ -268,8 +268,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'DELETE',
-        path: '/api/wazuh-api/apiEntries/{id}',
+        method:  'DELETE',
+        path:    '/api/wazuh-api/apiEntries/{id}',
         handler: deleteAPIEntries
     });
 
@@ -279,8 +279,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/apiEntries/{id}',
+        method:  'PUT',
+        path:    '/api/wazuh-api/apiEntries/{id}',
         handler: setAPIEntryDefault
     });
 
@@ -291,8 +291,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/extension/toggle/{id}/{extensionName}/{extensionValue}',
+        method:  'PUT',
+        path:    '/api/wazuh-api/extension/toggle/{id}/{extensionName}/{extensionValue}',
         handler: toggleExtension
     });
 
@@ -302,8 +302,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/extension',
+        method:  'GET',
+        path:    '/api/wazuh-api/extension',
         handler: getExtensions
     });
 
@@ -313,8 +313,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/updateApiHostname/{id}',
+        method:  'PUT',
+        path:    '/api/wazuh-api/updateApiHostname/{id}',
         handler: updateAPIHostname
     });
 
