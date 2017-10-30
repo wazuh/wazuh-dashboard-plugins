@@ -13,4 +13,4 @@ notifications:
 
 branches:
   only:
-    - 3.0-rebrand
+    - "3.0-rebrand"
