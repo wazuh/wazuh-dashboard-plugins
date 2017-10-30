@@ -38,7 +38,7 @@ app.factory('DataHandler', function ($q, apiReq) {
             let deferred = $q.defer();
             apiReq.request('GET', this.path, requestData)
             .then(function (data) {
-                if (data.data.data == 0){
+                if (data.data.data === 0){
                     deferred.resolve(false);
                 }
                 let totalItems = data.data.data.totalItems;

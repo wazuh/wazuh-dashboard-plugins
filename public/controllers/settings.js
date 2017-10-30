@@ -183,7 +183,7 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
         .then((data) => {
 			tmpData.cluster_info = data.data;
             let index  = $scope.apiEntries.indexOf(item);
-            let tmpUrl = '/api/wazuh-api/updateApiHostname/' + $scope.apiEntries[index]._id;
+            let tmpUrl = `/api/wazuh-api/updateApiHostname/${$scope.apiEntries[index]._id}`;
 			genericReq.request('PUT',tmpUrl , { "cluster_info": tmpData.cluster_info })
             .then(() => {
 				$scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
@@ -202,10 +202,9 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
 	// Toggle extension
 	$scope.toggleExtension = (extension, state) => {
 		if (['oscap','audit','pci'].includes(extension)) {
-            let tmpUrl = '/api/wazuh-api/extension/toggle/' + 
-                        $scope.apiEntries[$scope.currentDefault]._id + '/' + 
-                        extension + '/' + 
-                        state;
+            let tmpUrl = `/api/wazuh-api/extension/toggle/` + 
+                        `${$scope.apiEntries[$scope.currentDefault]._id}/` + 
+                        `${extension}/${state}`;
 
             genericReq.request('PUT', tmpUrl)
             .then(() => {})

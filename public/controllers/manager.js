@@ -72,7 +72,7 @@ app.controller('managerStatusController', function ($scope, Notifier, apiReq) {
             limit:  1,
             sort:   '-id'
         })
-        .then((data) => apiReq.request('GET', '/agents/' + data.data.data.items[0].id, {}))
+        .then((data) => apiReq.request('GET', `/agents/${data.data.data.items[0].id}`, {}))
         .then((data) => $scope.agentInfo = data.data.data)
         .catch((error) => printError(error));
     };

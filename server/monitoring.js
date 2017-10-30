@@ -200,7 +200,7 @@ module.exports = (server, options) => {
 				body                 += JSON.stringify(element) + "\n";
 			}
 
-			if (body == '') {
+			if (body === '') {
 				return;
 			}
 

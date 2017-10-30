@@ -43,7 +43,7 @@ module.exports = (server, options) => {
             q:     'active:true'
         })
         .then((data) => {
-            if (data.hits.total == 1) {
+            if (data.hits.total === 1) {
                 // Setting off previous default
                 elasticRequest.callWithRequest(req, 'update', {
                     index: '.wazuh',
