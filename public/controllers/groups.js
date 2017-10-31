@@ -15,8 +15,10 @@ app.factory('GroupFiles', function (DataHandler) {
     return new DataHandler();
 });
 
+
 // Groups preview controller
-app.controller('groupsPreviewController', function ($scope, apiReq, Groups, GroupFiles, GroupAgents) {
+app.controller('groupsPreviewController', 
+function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents) {
     $scope.searchTerm  = '';
     $scope.load        = true;
     $scope.groups      = Groups;
@@ -32,28 +34,18 @@ app.controller('groupsPreviewController', function ($scope, apiReq, Groups, Grou
     $scope.showFiles = (index) => {
         $scope.groupFiles.reset();
         $scope.groupFiles.path = `/agents/groups/${$scope.groups.items[index].name}/files`;
-        $scope.groupFiles.nextPage('');
+        $scope.groupFiles.nextPage('')
+        .then(() => console.log($scope.groupFiles.items));
     };
 
     $scope.showAgents = (index) => {
         $scope.groupAgents.reset();
         $scope.groupAgents.path = `/agents/groups/${$scope.groups.items[index].name}`;
-        $scope.groupAgents.nextPage('')
-        .then(() => {
-            let promises = [];
-            for(let agent of $scope.groupAgents.items){
-                promises.push(apiReq.request('GET', `/agents/${agent.id}`, {}));
-            }
-            return Promise.all(promises);
-        })
-        .then((resolvedArray) => {
-            for(let data of resolvedArray){
-                console.log(data);
-            }
-        });
+        $scope.groupAgents.nextPage('');        
     };
 
     $scope.loadGroup = (index) => {
+        $scope.fileViewer = false;
         $scope.groupAgents.reset();
         $scope.groupFiles.reset();
         $scope.selectedGroup = index;
@@ -72,12 +64,17 @@ app.controller('groupsPreviewController', function ($scope, apiReq, Groups, Grou
     };
 
     $scope.showFile = (index) => {
-        $scope.test = !$scope.test;
+        $scope.fileViewer = true;
         $scope.file = 'Loading...';
         let tmpName = `/agents/groups/${$scope.groups.items[$scope.selectedGroup].name}`+
                       `/files/${$scope.groupFiles.items[index].filename}`;
         apiReq.request('GET', tmpName, {})
-        .then((data) => $scope.file = data.data);
+        .then((data) => $scope.file = data.data.data)
+        .catch((err) => $scope.file = {
+            group: $scope.groups.items[$scope.selectedGroup].name,
+            file: $scope.groupFiles.items[index].filename,
+            error: err.message || err
+        });
     };
 
     // Changing the view to overview a specific group

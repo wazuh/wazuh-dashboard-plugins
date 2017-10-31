@@ -1,71 +1,105 @@
-<div flex ng-cloak layout="row" ng-controller="groupsPreviewController" layout-align="space-around" style="background-color: #e3e3e3;" ng-if="groupsMenu == 'preview'">
+<div flex ng-cloak layout="row" ng-controller="groupsPreviewController" layout-align="space-around" style="background-color: #e3e3e3;"
+    ng-if="groupsMenu == 'preview'">
 
-  <div flex="25" layout="column">
-    <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)" style="height: 35px; margin: 5px;">
+    <div flex="25" layout="column">
+      
 
-    <md-card flex style="overflow: auto; height:400px; overflow-y: scroll;" when-scrolled="groups.nextPage('')">
-      <md-content flex layout="column" ng-init="selectedGroup = 0;">
-        <md-card ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-class="{selectedItem:($parent.selectedGroup == $index)}" ng-click="$parent.loadGroup($index)" layout="row">
-          <md-card-title>
-            <md-card-title-text>
-              <span class="md-headline" flex="25">{{group.name}}</span>
-              <span class="md-subhead" flex="25">This is a sample description of the group.</span>
-            </md-card-title-text>
-          </md-card-title>
+        <md-card flex style="overflow: auto; height:400px; overflow-y: scroll;" when-scrolled="groups.nextPage('')">
+            <md-content flex layout="column" ng-init="selectedGroup = 0;">
+                <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)" class="input-filter-box" style="height: 35px; margin: 5px;">
+                    
+                <md-card ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-class="{selectedItem:($parent.selectedGroup == $index)}"
+                    ng-click="$parent.loadGroup($index)" layout="row">
+                    <md-card-title>
+                        <md-card-title-text>
+                            <span class="md-headline" flex="25">{{group.name}}</span>
+                            <md-divider></md-divider>
+                            <span class="md-subhead" flex="auto">This is a sample description of the group.</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                </md-card>
+            </md-content>
+            <md-content>
+                <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groups.busy && !groups.end"></md-progress-linear>
+            </md-content>
         </md-card>
-      </md-content>
-      <md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groups.busy && !groups.end"></md-progress-linear></md-content>
-    </md-card>
-  </div>
+    </div>
 
-  <div flex="75" layout="column" style="width: auto; margin:10px;">
+    <div flex="75" layout="column" style="width: auto; margin:10px;">
 
-  <md-tabs class="groupContentTabs" layout-fill flex>
-  <md-tab label="Agents">
-    <md-tab-content flex layout fill >
-      <md-toolbar style="overflow:hidden;" layout-fill>
-        <div flex layout="row" layout-fill>
-          <md-card flex style="overflow: auto; height:400px;" layout-fill when-scrolled="groupAgents.nextPage('')">
-            <md-list flex layout="column">
-              <md-list-item ng-repeat="agent in groupAgents.items | filter : searchTerm | orderBy : agent.sortValue : agent.sortDir" layout="row" ng-init="test=false" ng-click="$parent.showFile($index);" style="margin: 5px;">
-                <span flex>{{agent.name}}</span>
-                  <div flex layout="row" layout-align="end center"></div>
-              </md-list-item>
-            </md-list>
-            <md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groupAgents.busy && !groupAgents.end"></md-progress-linear></md-content>
-          </md-card>
-        </div>
-      </md-toolbar>
-    </md-tab-content>
-  </md-tab>
-  <md-tab style="background-color: white;" layout-fill flex label="Files">
-  <md-tab-content flex layout fill >
-  <md-toolbar style="overflow:hidden;" layout-fill>
+        <md-tabs class="headBar" layout-fill flex>
+            <md-tab label="Agents">
+                <md-tab-content flex layout fill>
+                    <md-toolbar style="overflow:hidden;" layout-fill>
+                        <div flex layout="row" layout-fill>
+                            <md-card flex style="overflow: auto; height:400px;" layout-fill when-scrolled="groupAgents.nextPage('')">
 
-    <md-sidenav flex="100" layout-fill md-is-open="test" md-disable-backdrop="true" class="md-whiteframe-z1  md-sidenav-right">
-      <md-content flex layout-fill>
-        <pre flex layout-fill style="background-color: #ffffff;">
-  {{file | json}}
-</pre>
-      </md-content>
-    </md-sidenav>
+                                <md-toolbar layout="row">
+                                    <div class="md-toolbar-tools">
+                                        <span flex="5">ID</span>
+                                        <span flex="25">Name</span>
+                                        <span flex="15">IP</span>
+                                        <span flex="15">Status</span>
+                                        <span flex="10">OS platform</span>
+                                        <span flex="10">OS version</span>
+                                        <span flex="15">Agent version</span>
+                                    </div>
+                                </md-toolbar>
 
-    <div flex layout="row" layout-fill>
+                                <md-list ng-repeat='agent in groupAgents.items' class="agents-preview-table">
+                                    <md-list-item class="md-subhead">
+                                        <span flex="5" ng-click="applyAgent(agent)">{{agent.id || '---'}}</span>
+                                        <span flex="25">{{agent.name || '---'}}</span>
+                                        <span flex="15">{{agent.ip || '---'}}</span>
+                                        <span flex="15">{{agent.status || '---'}}</span>
+                                        <span flex="10">{{agent.os.platform || '---'}}</span>
+                                        <span flex="10">{{agent.os.version || '---'}}</span>
+                                        <span flex="15">{{agent.version || '---'}}</span>
+                                    </md-list-item>
+                                </md-list>
 
-        <md-card flex style="overflow: auto; height:400px;" layout-fill when-scrolled="files.nextPage('')">
-      <md-list flex layout="column">
-        <md-list-item ng-repeat="file in groupFiles.items | filter : searchTerm | orderBy : files.sortValue : files.sortDir" layout="row" ng-init="test=false" ng-click="$parent.showFile($index);" style="margin: 5px;">
-            <span flex>{{file.filename}}</span>
-            <div flex layout="row" layout-align="end center">
-            </div>
-          </md-list-item>
-      </md-list>
-      <md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="files.busy && !files.end"></md-progress-linear></md-content>
-    </md-card>
-</div>
-    </md-toolbar>
-    </md-tab-content>
-    </md-tab>
-    </md-tabs>
-  </div>
+                                <md-content>
+                                    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groupAgents.busy && !groupAgents.end"></md-progress-linear>
+                                </md-content>
+                            </md-card>
+                        </div>
+                    </md-toolbar>
+                </md-tab-content>
+            </md-tab>
+
+            <md-tab style="background-color: white;" layout-fill flex label="Files">
+                <md-tab-content flex layout fill>
+                    <md-toolbar style="overflow:hidden;" layout-fill>
+
+                        <div flex layout="row" layout-fill>
+
+                            <md-card flex style="overflow: auto; height:400px;" layout-fill when-scrolled="files.nextPage('')" ng-show="!fileViewer">
+                                <md-toolbar layout="row">
+                                    <div class="md-toolbar-tools">
+                                        <span flex="30">File</span>
+                                    </div>
+                                </md-toolbar>
+                                <md-list flex layout="column" ng-repeat="file in groupFiles.items | filter : searchTerm | orderBy : files.sortValue : files.sortDir"
+                                    layout="row" ng-init="fileViewer=false" ng-click="$parent.showFile($index);" style="margin: 5px;">
+                                    <md-list-item class="md-subhead">
+                                        <span flex="30">{{file.filename}}</span>
+                                    </md-list-item>
+                                </md-list>
+                                <md-content>
+                                    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="files.busy && !files.end"></md-progress-linear>
+                                </md-content>
+                            </md-card>
+                            <md-sidenav flex="100" layout-fill md-is-open="fileViewer" md-disable-backdrop="true" class="md-whiteframe-z1  md-sidenav-right">
+                                <md-content flex layout-fill>
+                                    <md-button class="md-raised md-primary pull-right" style="border-radius: 10px 0 0 10px;" ng-click="fileViewer=false">Close</md-button>
+                                    <pre flex layout-fill style="background-color: #ffffff;">{{file | json}}</pre>
+                                </md-content>
+                            </md-sidenav>
+                        </div>
+                    </md-toolbar>
+                </md-tab-content>
+            </md-tab>
+
+        </md-tabs>
+    </div>
 </div>

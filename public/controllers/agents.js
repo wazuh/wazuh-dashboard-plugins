@@ -9,7 +9,8 @@ app.factory('AgentsAutoComplete', function (DataHandler) {
 	return AgentsAutoComplete;
 });
 
-app.controller('agentsController', function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
+app.controller('agentsController', 
+function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
 	const notify              = new Notifier({ location: 'Agents' });
 	$rootScope.page           = 'agents';
 	$scope.submenuNavItem     = 'preview';
@@ -133,8 +134,9 @@ app.controller('agentsController', function ($scope, $q, $routeParams, $route, $
 			.then((data) => {
 				$scope.agentInfo = data.data.data;
 				$rootScope.agent = $scope.agentInfo;
-				if (typeof $scope.agentInfo.version === 'undefined')
+				if (typeof $scope.agentInfo.version === 'undefined'){
 					$scope.agentInfo.version = "Unknown";
+				}
 				if (typeof $scope.agentInfo.os === 'undefined') {
 					$scope.agentOs = "Unknown";
 				} else {
