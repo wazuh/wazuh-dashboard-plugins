@@ -15,11 +15,15 @@ app.factory('GroupFiles', function (DataHandler) {
     return new DataHandler();
 });
 
+app.filter('prettyJSON', function () {
+    return function(json) { return angular.toJson(json, true); };
+});
 
 // Groups preview controller
 app.controller('groupsPreviewController', 
 function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents) {
     $scope.searchTerm  = '';
+    $scope.searchTermAgent = '';
     $scope.load        = true;
     $scope.groups      = Groups;
     $scope.groupAgents = GroupAgents;
@@ -39,6 +43,7 @@ function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, G
     };
 
     $scope.showAgents = (index) => {
+        $scope.fileViewer = false;
         $scope.groupAgents.reset();
         $scope.groupAgents.path = `/agents/groups/${$scope.groups.items[index].name}`;
         $scope.groupAgents.nextPage('');        

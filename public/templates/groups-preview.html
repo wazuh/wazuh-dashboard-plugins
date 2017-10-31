@@ -2,12 +2,13 @@
     ng-if="groupsMenu == 'preview'">
 
     <div flex="25" layout="column">
-      
+
 
         <md-card flex style="overflow: auto; height:400px; overflow-y: scroll;" when-scrolled="groups.nextPage('')">
             <md-content flex layout="column" ng-init="selectedGroup = 0;">
-                <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)" class="input-filter-box" style="height: 35px; margin: 5px;">
-                    
+                <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
+                    class="input-filter-box" style="height: 35px; margin: 5px;">
+
                 <md-card ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-class="{selectedItem:($parent.selectedGroup == $index)}"
                     ng-click="$parent.loadGroup($index)" layout="row">
                     <md-card-title>
@@ -33,7 +34,10 @@
                     <md-toolbar style="overflow:hidden;" layout-fill>
                         <div flex layout="row" layout-fill>
                             <md-card flex style="overflow: auto; height:400px;" layout-fill when-scrolled="groupAgents.nextPage('')">
-
+                                <md-toolbar layout="row">
+                                    <input flex="none" placeholder="Filter agents" type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)"
+                                            class="input-filter-box" style="width: 100%; height: 35px;">
+                                </md-toolbar>
                                 <md-toolbar layout="row">
                                     <div class="md-toolbar-tools">
                                         <span flex="5">ID</span>
@@ -67,22 +71,23 @@
                 </md-tab-content>
             </md-tab>
 
-            <md-tab style="background-color: white;" layout-fill flex label="Files">
+            <md-tab label="Files">
                 <md-tab-content flex layout fill>
                     <md-toolbar style="overflow:hidden;" layout-fill>
-
                         <div flex layout="row" layout-fill>
-
                             <md-card flex style="overflow: auto; height:400px;" layout-fill when-scrolled="files.nextPage('')" ng-show="!fileViewer">
+                                <md-toolbar layout="row">
+                                    <input flex="none" placeholder="Filter files" type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
+                                            class="input-filter-box" style="width: 100%; height: 35px;">
+                                </md-toolbar>
                                 <md-toolbar layout="row">
                                     <div class="md-toolbar-tools">
                                         <span flex="30">File</span>
                                     </div>
                                 </md-toolbar>
-                                <md-list flex layout="column" ng-repeat="file in groupFiles.items | filter : searchTerm | orderBy : files.sortValue : files.sortDir"
-                                    layout="row" ng-init="fileViewer=false" ng-click="$parent.showFile($index);" style="margin: 5px;">
+                                <md-list ng-repeat="file in groupFiles.items" class="agents-preview-table" ng-init="fileViewer=false">
                                     <md-list-item class="md-subhead">
-                                        <span flex="30">{{file.filename}}</span>
+                                        <span flex="30" ng-click="$parent.showFile($index);">{{file.filename}}</span>
                                     </md-list-item>
                                 </md-list>
                                 <md-content>
@@ -92,7 +97,7 @@
                             <md-sidenav flex="100" layout-fill md-is-open="fileViewer" md-disable-backdrop="true" class="md-whiteframe-z1  md-sidenav-right">
                                 <md-content flex layout-fill>
                                     <md-button class="md-raised md-primary pull-right" style="border-radius: 10px 0 0 10px;" ng-click="fileViewer=false">Close</md-button>
-                                    <pre flex layout-fill style="background-color: #ffffff;">{{file | json}}</pre>
+                                    <pre flex layout-fill style="background-color: #ffffff;">{{file | prettyJSON}}</pre>
                                 </md-content>
                             </md-sidenav>
                         </div>
