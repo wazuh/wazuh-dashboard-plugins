@@ -37,10 +37,10 @@ function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, G
     $scope.load = false;
 
     $scope.showFiles = (index) => {
+        $scope.fileViewer = false;
         $scope.groupFiles.reset();
         $scope.groupFiles.path = `/agents/groups/${$scope.groups.items[index].name}/files`;
-        $scope.groupFiles.nextPage('')
-        .then(() => console.log($scope.groupFiles.items));
+        $scope.groupFiles.nextPage('');
     };
 
     $scope.showAgents = (index) => {
@@ -95,6 +95,8 @@ function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, G
         $scope.groupsFiles.reset();
         $scope.groupsAgents.reset();
     });
+    
+
 });
 
 app.controller('groupsController', function ($scope) {
