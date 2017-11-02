@@ -22,12 +22,13 @@ app.filter('prettyJSON', function () {
 // Groups preview controller
 app.controller('groupsPreviewController', 
 function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents) {
-    $scope.searchTerm  = '';
+    $scope.searchTerm      = '';
     $scope.searchTermAgent = '';
-    $scope.load        = true;
-    $scope.groups      = Groups;
-    $scope.groupAgents = GroupAgents;
-    $scope.groupFiles  = GroupFiles;
+    $scope.searchTermFile  = '';
+    $scope.load            = true;
+    $scope.groups          = Groups;
+    $scope.groupAgents     = GroupAgents;
+    $scope.groupFiles      = GroupFiles;
 
     // Actual execution in the controller's initialization
     $scope.groups.nextPage('')
@@ -77,7 +78,7 @@ function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, G
         .then((data) => $scope.file = data.data.data)
         .catch((err) => $scope.file = {
             group: $scope.groups.items[$scope.selectedGroup].name,
-            file: $scope.groupFiles.items[index].filename,
+            file:  $scope.groupFiles.items[index].filename,
             error: err.message || err
         });
     };
