@@ -27,12 +27,21 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
         .then(() => {
             // Retrieve os list
             for(let agent of $scope.agents.items){
-                $scope.osPlatforms.push(agent.os.name);
+                if('os' in agent && 'name' in agent.os){
+                    let exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name &&
+                                                     e.platform === agent.os.platform &&
+                                                     e.version === agent.os.version);
+                    if(!exists.length){
+                        $scope.osPlatforms.push({
+                            name:     agent.os.name,
+                            platform: agent.os.platform,
+                            version:  agent.os.version
+                        });
+                    }
+                }
             }
-
-            $scope.osPlatforms = new Set($scope.osPlatforms);
-            $scope.osPlatforms = Array.from($scope.osPlatforms); 
         });
+
 
         // Get last agent !!!!!!!
         let tmpUrl  = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.name`;
