@@ -13,9 +13,9 @@
     "ossec"
   ],
   "agents": {
-	"add": true,
-	"delete": true,
-	"restart": true
+    "add": true,
+    "delete": true,
+    "restart": true
   },
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
@@ -33,10 +33,20 @@
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.1",
     "angular-md5": "^0.1.10",
+    "ansicolors": "^0.3.2",
     "bootstrap": "3.3.6",
     "install": "^0.10.1",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
     "npm": "^5.3.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "chai": "^4.1.2",
+    "eslint": "^4.7.2",
+    "eslint-plugin-async-await": "0.0.0",
+    "eslint-plugin-mocha": "^4.11.0",
+    "eslint-plugin-node": "^5.1.1",
+    "mocha": "^3.5.3"
   }
 }

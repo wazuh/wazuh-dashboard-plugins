@@ -1,201 +1,320 @@
-module.exports = function (server, options) {
-	// Require some libraries
-	const fs = require('fs');
-	const path = require('path');
-
-    // Colors for console logging 
-	var colors = require('ansicolors');
-	var blueWazuh = colors.blue('wazuh');
-    
-	var package_info = {};
-
-    // Read Wazuh App package file
-    try {
-        package_info = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
-    } catch (e) {
-        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
-
-    };
-
-	// Elastic JS Client
-	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
+module.exports = (server, options) => {
+    // Elastic JS Client
+    const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
     // Handlers
 
-    var getAPIEntries = function (req, reply) {
-        elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration', size: '100' }).then(
-            function (data) {
-                reply(data.hits.hits);
-            }, function (data, error) {
-                reply(data);
+    const getAPIEntries = (req, reply) => {
+        elasticRequest
+        .callWithRequest(req, 'search', {
+            index: '.wazuh',
+            type:  'wazuh-configuration',
+            size:  '100'
+        })
+        .then((data) => {
+            reply(data.hits.hits);
+        })
+        .catch((error) => {
+            reply(error);
+        });
+    };
+
+    const deleteAPIEntries = (req, reply) => {
+        elasticRequest
+        .callWithRequest(req, 'delete', {
+            index: '.wazuh',
+            type:  'wazuh-configuration',
+            id:    req.params.id
+        })
+        .then((data) => {
+            reply(data);
+        })
+        .catch((error) => {
+            reply(error);
+        });
+    };
+
+    const setAPIEntryDefault = (req, reply) => {
+        // Searching for previous default
+        elasticRequest
+        .callWithRequest(req, 'search', {
+            index: '.wazuh',
+            type:  'wazuh-configuration',
+            q:     'active:true'
+        })
+        .then((data) => {
+            if (data.hits.total === 1) {
+                // Setting off previous default
+                elasticRequest.callWithRequest(req, 'update', {
+                    index: '.wazuh',
+                    type:  'wazuh-configuration',
+                    id:    data.hits.hits[0]._id,
+                    body: {
+                        doc: {
+                            "active": "false"
+                        }
+                    }
+                })
+                .then(() => elasticRequest.callWithRequest(req, 'update', {
+                        index: '.wazuh',
+                        type:  'wazuh-configuration',
+                        id:    req.params.id,
+                        body: {
+                            doc: {
+                                "active": 'true'
+                            }
+                        }
+                    })
+                )
+                .then(() => {
+                    reply({
+                        statusCode: 200,
+                        message:    'ok'
+                    });
+                })
+                .catch((error) => {
+                    reply({
+                        statusCode: 500,
+                        error:      8,
+                        message:    'Could not save data in elasticsearch'
+                    }).code(500);
+                });
+            } else {
+                // Set new default
+                elasticRequest
+                .callWithRequest(req, 'update', {
+                    index: '.wazuh',
+                    type:  'wazuh-configuration',
+                    id:    req.params.id,
+                    body: {
+                        doc: {
+                            "active": "true"
+                        }
+                    }
+                })
+                .then(() => {
+                    reply({
+                        'statusCode': 200,
+                        'message':    'ok'
+                    });
+                })
+                .catch((error) => {
+                    reply({
+                        'statusCode': 500,
+                        'error':      8,
+                        'message':    'Could not save data in elasticsearch'
+                    }).code(500);
+                });
+            }
+        })
+        .catch((error) => {
+            reply({
+                'statusCode': 500,
+                'error':      8,
+                'message':    'Could not set API default entry'
+            }).code(500);
+        });
+    };
+
+    const getExtensions = (req, reply) => {
+        elasticRequest
+        .callWithRequest(req, 'search', {
+            index: '.wazuh',
+            type:  'wazuh-configuration'
+        })
+        .then((data) => {
+            reply(data.hits.hits);
+        })
+        .catch((error) => {
+            reply(error);
+        });
+    };
+
+    const toggleExtension = (req, reply) => {
+        // Toggle extenion state
+        let extension = {};
+        extension[req.params.extensionName] = (req.params.extensionValue === 'true');
+
+        elasticRequest
+        .callWithRequest(req, 'update', {
+            index: '.wazuh',
+            type:  'wazuh-configuration',
+            id:    req.params.id,
+            body: {
+                doc: {
+                    "extensions": extension
+                }
+            }
+        })
+        .then(() => {
+            reply({
+                'statusCode': 200,
+                'message':    'ok'
             });
+        })
+        .catch((error) => {
+            reply({
+                'statusCode': 500,
+                'error':      8,
+                'message':    'Could not save data in elasticsearch'
+            }).code(500);
+        });
     };
 
-    var deleteAPIEntries = function (req,reply) {
-		elasticRequest.callWithRequest(req, 'delete', { index: '.wazuh', type: 'wazuh-configuration', id: req.params.id }).then(
-			function (data) {
-				reply(data);
-            }, function (data, error) {
-				reply(data);
-            });
-    };
+    const saveAPI = (req, reply) => {
+        if (!('user'     in req.payload) ||
+            !('password' in req.payload) ||
+            !('url'      in req.payload) ||
+            !('port'     in req.payload)) {
 
-    var setAPIEntryDefault = function (req,reply) {
-		// Searching for previous default
-		elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration', q: 'active:true' }).then(
-            function (data) {
-                if (data.hits.total == 1) {
-					// Setting off previous default
-					elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id: data.hits.hits[0]._id, body: {doc: {"active": "false"}} }).then(
-					function () {
-						// Set new default
-						elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
-						function () {
-							reply({ 'statusCode': 200, 'message': 'ok' });
-						}, function (error) {
-							reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-						});
-					}, function (error) {
-						reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-					});
-                }else {
-					// Set new default
-					elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"active": "true"}} }).then(
-					function () {
-						reply({ 'statusCode': 200, 'message': 'ok' });
-					}, function (error) {
-						reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-					});
-				}
-            }, function () {
-                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not set API default entry' }).code(500);
-         });
-    };
+                return reply({
+                'statusCode': 400,
+                'error':      7,
+                'message':    'Missing data'
+            }).code(400);
 
-    var getExtensions = function (req,reply) {
-        elasticRequest.callWithRequest(req, 'search', { index: '.wazuh', type: 'wazuh-configuration'}).then(
-            function (data) {
-                reply(data.hits.hits);
-            }, function (data, error) {
-                reply(data);
-            });
-    };
-
-    var toggleExtension = function (req,reply) {
-		// Toggle extenion state
-		var extension = {};
-		extension[req.params.extensionName] = (req.params.extensionValue == "true") ? true : false;
-
-		elasticRequest.callWithRequest(req, 'update',{ index: '.wazuh', type: 'wazuh-configuration', id: req.params.id, body: {doc: {"extensions" : extension}} }).then(
-		function () {
-			reply({ 'statusCode': 200, 'message': 'ok' });
-		}, function (error) {
-			reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
-		});
-    };
-
-    var saveAPI = function (req, reply) {
-        if (!(req.payload.user && req.payload.password && req.payload.url && req.payload.port)) {
-            reply({ 'statusCode': 400, 'error': 7, 'message': 'Missing data' }).code(400);
-            return;
         }
 
-		var settings = { 'api_user': req.payload.user, 'api_password': req.payload.password, 'url': req.payload.url, 'api_port': req.payload.port , 'insecure': req.payload.insecure, 'component' : 'API', 'active' : req.payload.active, 'cluster_info' : req.payload.cluster_info, 'extensions' : req.payload.extensions };
+        let settings = {
+            api_user:     req.payload.user,
+            api_password: req.payload.password,
+            url:          req.payload.url,
+            api_port:     req.payload.port,
+            insecure:     req.payload.insecure,
+            component:    'API',
+            active:       req.payload.active,
+            cluster_info: req.payload.cluster_info,
+            extensions:   req.payload.extensions
+        };
 
-        elasticRequest.callWithRequest(req, 'create', { index: '.wazuh', type: 'wazuh-configuration', id: req.payload.id, body: settings, refresh: true })
-            .then(function (response) {
-                reply({ 'statusCode': 200, 'message': 'ok', 'response' : response });
-            }, function (error) {
-                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+        elasticRequest
+        .callWithRequest(req, 'create', {
+                index:   '.wazuh',
+                type:    'wazuh-configuration',
+                id:      req.payload.id,
+                body:    settings,
+                refresh: true
+        })
+        .then((response) => {
+            reply({
+                statusCode: 200,
+                message:    'ok',
+                response:   response
             });
+        })
+        .catch((error) => {
+            reply({
+                statusCode: 500,
+                error:      8,
+                message:    'Could not save data in elasticsearch'
+            }).code(500);
+        });
     };
 
-    var updateAPIHostname = function (req,reply) {
-        elasticRequest.callWithRequest(req, 'update', { index: '.wazuh', type: 'wazuh-configuration', id:req.params.id, body: {doc: {"cluster_info": req.payload.cluster_info}} }).then(
-            function () {
-                reply({ 'statusCode': 200, 'message': 'ok' });
-            }, function (error) {
-                reply({ 'statusCode': 500, 'error': 8, 'message': 'Could not save data in elasticsearch' }).code(500);
+    const updateAPIHostname = (req, reply) => {
+        elasticRequest
+        .callWithRequest(req, 'update', {
+            index: '.wazuh',
+            type:  'wazuh-configuration',
+            id:    req.params.id,
+            body: {
+                doc: {
+                    "cluster_info": req.payload.cluster_info
+                }
+            }
+        })
+        .then(() => {
+            reply({
+                statusCode: 200,
+                message:    'ok'
             });
+        })
+        .catch((error) => {
+            reply({
+                statusCode: 500,
+                error:      8,
+                message:    'Could not save data in elasticsearch'
+            }).code(500);
+        });
     };
 
     //Server routes
 
     /*
-    * PUT /api/wazuh-api/settings
-    * Save the given API into elasticsearch
-    *
-    **/
+     * PUT /api/wazuh-api/settings
+     * Save the given API into elasticsearch
+     *
+     **/
     server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/settings',
+        method:  'PUT',
+        path:    '/api/wazuh-api/settings',
         handler: saveAPI
     });
 
     /*
-    * GET /api/wazuh-api/apiEntries
-    * Get Wazuh-API entries list (Multimanager) from elasticsearch index
-    *
-    **/
+     * GET /api/wazuh-api/apiEntries
+     * Get Wazuh-API entries list (Multimanager) from elasticsearch index
+     *
+     **/
     server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/apiEntries',
+        method:  'GET',
+        path:    '/api/wazuh-api/apiEntries',
         handler: getAPIEntries
     });
 
     /*
-    * DELETE /api/wazuh-api/settings
-    * Delete Wazuh-API entry (multimanager) from elasticsearch index
-    *
-    **/
+     * DELETE /api/wazuh-api/settings
+     * Delete Wazuh-API entry (multimanager) from elasticsearch index
+     *
+     **/
     server.route({
-        method: 'DELETE',
-        path: '/api/wazuh-api/apiEntries/{id}',
+        method:  'DELETE',
+        path:    '/api/wazuh-api/apiEntries/{id}',
         handler: deleteAPIEntries
     });
 
     /*
-    * PUT /api/wazuh-api/settings
-    * Set Wazuh-API as default (multimanager) on elasticsearch index
-    *
-    **/
+     * PUT /api/wazuh-api/settings
+     * Set Wazuh-API as default (multimanager) on elasticsearch index
+     *
+     **/
     server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/apiEntries/{id}',
+        method:  'PUT',
+        path:    '/api/wazuh-api/apiEntries/{id}',
         handler: setAPIEntryDefault
     });
 
 
     /*
-    * PUT /api/wazuh-api/extension/toggle/documentId/extensionName/trueorfalse
-    * Toggle extension state: Enable / Disable
-    *
-    **/
+     * PUT /api/wazuh-api/extension/toggle/documentId/extensionName/trueorfalse
+     * Toggle extension state: Enable / Disable
+     *
+     **/
     server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/extension/toggle/{id}/{extensionName}/{extensionValue}',
+        method:  'PUT',
+        path:    '/api/wazuh-api/extension/toggle/{id}/{extensionName}/{extensionValue}',
         handler: toggleExtension
     });
 
     /*
-    * GET /api/wazuh-api/extension
-    * Return extension state list
-    *
-    **/
+     * GET /api/wazuh-api/extension
+     * Return extension state list
+     *
+     **/
     server.route({
-        method: 'GET',
-        path: '/api/wazuh-api/extension',
+        method:  'GET',
+        path:    '/api/wazuh-api/extension',
         handler: getExtensions
     });
 
     /*
-    * PUT /api/wazuh-api/updateApiHostname/apiId
-    * Update the API hostname
-    *
-    **/
+     * PUT /api/wazuh-api/updateApiHostname/apiId
+     * Update the API hostname
+     *
+     **/
     server.route({
-        method: 'PUT',
-        path: '/api/wazuh-api/updateApiHostname/{id}',
+        method:  'PUT',
+        path:    '/api/wazuh-api/updateApiHostname/{id}',
         handler: updateAPIHostname
     });
 
