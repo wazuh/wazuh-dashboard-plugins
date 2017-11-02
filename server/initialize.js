@@ -4,7 +4,7 @@ const needle = require('needle');
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
-const OBJECTS_FILE = 'integration_files/objects_file.json';
+const OBJECTS_FILE = './integration_files/objects_file.json';
 
 module.exports = (server, options) => {
 	//const uiSettings = server.uiSettings();
@@ -150,11 +150,12 @@ module.exports = (server, options) => {
 			}
 		};
 
-		let tmpUrl = `http://localhost:${server.info.port}/api/saved_objects/index-pattern'`;
+		let tmpUrl = `http://localhost:${server.info.port}/api/saved_objects/index-pattern`;
 
 		needle('post', tmpUrl, body, options)
 		.then((resp) => {
 			server.log([blueWazuh, 'initialize', 'info'], 'Successfully created index-pattern.');
+			console.log(resp);
 			// Set the index-pattern as default in the Kibana configuration
 			setDefaultKibanaSettings(resp.body.id);
 			// Import objects (dashboards and visualizations) CAREFUL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!
