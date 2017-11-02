@@ -9,21 +9,18 @@ const settingsWizard = ($location, $q, Notifier, testAPI, appState) => {
     testAPI.check_stored()
     .then((data) => {
         if (data.data.error) {
-            if (data.data.error === 2){
+            if (parseInt(data.data.error) === 2){
                 notify.warning("Wazuh App: Please set up Wazuh API credentials.");
             } else {
                 notify.error("Could not connect with Wazuh RESTful API.");
             }
-            deferred.reject();
             $location.path('/settings');
+            deferred.reject();
         } else {
             appState.setClusterInfo(data.data.data.cluster_info);
             appState.setExtensions(data.data.data.extensions);
             deferred.resolve();
         }
-    })
-    .catch((error) => {
-        notify.error("Could not connect with Wazuh RESTful API.");
     });
     
     return deferred.promise;

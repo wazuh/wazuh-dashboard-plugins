@@ -52,7 +52,7 @@ module.exports = (server, options) => {
                 rejectUnauthorized: !wapi_config.insecure
             })
             .then((response) => {
-                if (response.body.error === 0 && response.body.data) {
+                if (parseInt(response.body.error) === 0 && response.body.data) {
                     wapi_config.password = "You shall not pass";
                     reply({
                         'statusCode': 200,
@@ -119,7 +119,7 @@ module.exports = (server, options) => {
             rejectUnauthorized: !req.payload.insecure
         })
         .then((response) => {
-            if (response.body.error === 0 && response.body.data) {
+            if (parseInt(response.body.error) === 0 && response.body.data) {
                 needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
                     username:           req.payload.user,
                     password:           req.payload.password,
