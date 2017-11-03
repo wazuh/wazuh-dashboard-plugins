@@ -11,6 +11,7 @@ app.factory('AgentsAutoComplete', function (DataHandler) {
 
 app.controller('agentsController', 
 function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
+
 	const notify              = new Notifier({ location: 'Agents' });
 	$rootScope.page           = 'agents';
 	$scope.submenuNavItem     = 'preview';
@@ -128,7 +129,6 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 			$scope.loading        = true;
 			$scope.submenuNavItem = 'overview';
 			$scope.agentInfo      = {};
-
 			// Get Agent Info
 			apiReq.request('GET', `/agents/${agent.id}`, {})
 			.then((data) => {
@@ -204,11 +204,19 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 		}
 	};
 
+	// Copy agent from groups tab
+	if($rootScope.comeFromGroups){
+		let tmpAgent = Object.assign($rootScope.comeFromGroups);
+		delete $rootScope.comeFromGroups;
+		$scope.applyAgent(tmpAgent);
+	}
+
+
 	// Watchers
 	$scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
 
 	// Watch for timefilter changes
-	$scope.$on('$routeUpdate', function () {
+	$scope.$on('$routeUpdate', () => {
 		if ($location.search()._g && $location.search()._g !== '()') {
 			let currentTimeFilter = rison.decode($location.search()._g);
 			// Check if timefilter has changed and update values
@@ -229,9 +237,13 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 
 				//Check for present data for the selected tab
 				if ($scope.submenuNavItem !== "preview") {
-					$scope.checkAlerts($scope._agent.id)
+					if(!('_agent' in $scope)){
+						console.log('Waiting for an agent...');
+					} else {
+						$scope.checkAlerts($scope._agent.id)
 						.then((data) => $scope.results = data)
 						.catch(() => $scope.results = false);
+					}
 				}
 			}
 		}
@@ -255,6 +267,8 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 
 	//Destroy
 	$scope.$on("$destroy", () => $scope.agentsAutoComplete.reset());
+
+
 });
 
 app.controller('agentsOverviewController', function ($scope) {});
