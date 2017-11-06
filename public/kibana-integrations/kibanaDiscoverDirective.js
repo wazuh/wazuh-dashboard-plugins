@@ -64,7 +64,6 @@ SavedObjectRegistryProvider.register(savedSearchProvider);
 
 var app = require('ui/modules').get('app/wazuh', [])
     .directive('kbnDis', [function() {
-        console.log('Ahora app es simple');
         return {
             restrict: 'E',
             scope: {
@@ -79,7 +78,6 @@ var app = require('ui/modules').get('app/wazuh', [])
         };
     }])
     .directive('kbnDisfull', [function() {
-        console.log('Ahora app es full');
         return {
             restrict: 'E',
             scope: {
