@@ -64,33 +64,33 @@ SavedObjectRegistryProvider.register(savedSearchProvider);
 
 var app = require('ui/modules').get('app/wazuh', [])
     .directive('kbnDis', [function() {
+        console.log('Ahora app es simple');
         return {
             restrict: 'E',
             scope: {
-                disA: '@disA',
-                disG: '@disG',
-                disFilter: '@disFilter',
-                tableHeight: '@tableHeight',
+                disA:           '@disA',
+                disG:           '@disG',
+                disFilter:      '@disFilter',
+                tableHeight:    '@tableHeight',
                 infiniteScroll: '@infiniteScroll',
-                indexSelector: '@indexSelector'
+                indexSelector:   '@indexSelector'
             },
             template: require('../templates/directives/dis-template.html')
-        }
-    }]);
-
-var app = require('ui/modules').get('app/wazuh', [])
+        };
+    }])
     .directive('kbnDisfull', [function() {
+        console.log('Ahora app es full');
         return {
             restrict: 'E',
             scope: {
-                disA: '@disA',
-                disG: '@disG',
-                disFilter: '@disFilter',
+                disA:        '@disA',
+                disG:        '@disG',
+                disFilter:   '@disFilter',
                 tableHeight: '@tableHeight',
                 infiniteScroll: '@infiniteScroll'
             },
             template: require('../templates/directives/dis-full-template.html')
-        }
+        };
     }]);
 
 
