@@ -67,30 +67,28 @@ var app = require('ui/modules').get('app/wazuh', [])
         return {
             restrict: 'E',
             scope: {
-                disA: '@disA',
-                disG: '@disG',
-                disFilter: '@disFilter',
-                tableHeight: '@tableHeight',
+                disA:           '@disA',
+                disG:           '@disG',
+                disFilter:      '@disFilter',
+                tableHeight:    '@tableHeight',
                 infiniteScroll: '@infiniteScroll',
-                indexSelector: '@indexSelector'
+                indexSelector:   '@indexSelector'
             },
             template: require('../templates/directives/dis-template.html')
-        }
-    }]);
-
-var app = require('ui/modules').get('app/wazuh', [])
+        };
+    }])
     .directive('kbnDisfull', [function() {
         return {
             restrict: 'E',
             scope: {
-                disA: '@disA',
-                disG: '@disG',
-                disFilter: '@disFilter',
+                disA:        '@disA',
+                disG:        '@disG',
+                disFilter:   '@disFilter',
                 tableHeight: '@tableHeight',
                 infiniteScroll: '@infiniteScroll'
             },
             template: require('../templates/directives/dis-full-template.html')
-        }
+        };
     }]);
 
 
