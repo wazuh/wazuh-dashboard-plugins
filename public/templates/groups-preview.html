@@ -47,14 +47,14 @@
                                 </md-toolbar>
 
                                 <md-list ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' class="agents-preview-table">
-                                    <md-list-item class="md-subhead" >
-                                        <span ng-click="showAgent(agent)" flex="5">{{agent.id || '---'}}</span>
-                                        <span ng-click="showAgent(agent)" flex="25">{{agent.name || '---'}}</span>
-                                        <span ng-click="showAgent(agent)" flex="10">{{agent.ip || '---'}}</span>
-                                        <span ng-click="showAgent(agent)" flex="15">{{agent.status || '---'}}</span>
-                                        <span ng-click="showAgent(agent)" flex="15">{{agent.os.platform || '---'}}</span>
-                                        <span ng-click="showAgent(agent)" flex="15">{{agent.os.version || '---'}}</span>
-                                        <span ng-click="showAgent(agent)" flex="15">{{agent.version || '---'}}</span>
+                                    <md-list-item class="list-no-hover md-subhead" ng-click="showAgent(agent)">
+                                        <span flex="5">{{agent.id || '---'}}</span>
+                                        <span flex="25">{{agent.name || '---'}}</span>
+                                        <span flex="10">{{agent.ip || '---'}}</span>
+                                        <span flex="15">{{agent.status || '---'}}</span>
+                                        <span flex="15">{{agent.os.platform || '---'}}</span>
+                                        <span flex="15">{{agent.os.version || '---'}}</span>
+                                        <span flex="15">{{agent.version || '---'}}</span>
                                     </md-list-item>
                                 </md-list>
 
