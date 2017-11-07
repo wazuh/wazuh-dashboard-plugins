@@ -1,18 +1,5 @@
 var app = require('ui/modules').get('app/wazuh');
 
-// We are using the DataHandler template and customize its path to get information
-app.factory('Rules', function (DataHandler) {
-    var Rules  = new DataHandler();
-    Rules.path = '/rules';
-    return Rules;
-});
-
-app.factory('Decoders', function (DataHandler) {
-    var Decoders  = new DataHandler();
-    Decoders.path = '/decoders';
-    return Decoders;
-});
-
 app.controller('rulesController', function ($scope, Notifier, Rules) {
     //Initialization
     const notify   = new Notifier({ location: 'Manager - Rules' });

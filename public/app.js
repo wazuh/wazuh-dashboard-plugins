@@ -30,6 +30,11 @@ require('plugins/wazuh/kibana-integrations/kibanaSearchbarDirective.js');
 
 // Require controllers
 
+// Factories
+require('plugins/wazuh/controllers/common/factories.js');
+require('plugins/wazuh/controllers/common/filters.js');
+require('plugins/wazuh/controllers/common/directives.js');
+
 // Overview
 require('plugins/wazuh/controllers/overview.js');
 

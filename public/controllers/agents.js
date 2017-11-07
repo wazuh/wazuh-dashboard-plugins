@@ -2,12 +2,6 @@ import rison from 'rison-node';
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-// We are using the DataHandler template and customize its path to get information about agents
-app.factory('AgentsAutoComplete', function (DataHandler) {
-	let AgentsAutoComplete  = new DataHandler();
-	AgentsAutoComplete.path = '/agents';
-	return AgentsAutoComplete;
-});
 
 app.controller('agentsController', function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
 	const notify              = new Notifier({ location: 'Agents' });
