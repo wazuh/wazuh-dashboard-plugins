@@ -98,7 +98,7 @@
 				</div>
 			</div>
 
-			<md-list ng-repeat='agent in agents.items' class="agents-preview-table">
+			<md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="agents-preview-table">
 				<md-list-item>
 					<span flex="5" ng-click="applyAgent(agent)">{{agent.id}}</span>
 					<span flex="25" ng-click="applyAgent(agent)">{{agent.name}}</span>
