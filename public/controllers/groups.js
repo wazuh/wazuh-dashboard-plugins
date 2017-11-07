@@ -1,19 +1,35 @@
 let app = require('ui/modules').get('app/wazuh', []);
-
+const beautifier = require('plugins/wazuh/utils/json-beautifier');
 // We are using the DataHandler template and customize its path to get information about groups
-app.factory('Groups', function (DataHandler) {
-    let Groups  = new DataHandler();
-    Groups.path = '/agents/groups';
-    return Groups;
-});
-
-app.factory('GroupAgents', function (DataHandler) {
-    return new DataHandler();
-});
-
-app.factory('GroupFiles', function (DataHandler) {
-    return new DataHandler();
-});
+app
+	.factory('Groups', function(DataHandler) {
+		let Groups = new DataHandler();
+		Groups.path = '/agents/groups';
+		return Groups;
+	})
+	.factory('GroupAgents', function(DataHandler) {
+		return new DataHandler();
+	})
+	.factory('GroupFiles', function(DataHandler) {
+		return new DataHandler();
+	})
+	.filter('prettyJSON', function() {
+		return function(json) {
+			return angular.toJson(json, true);
+		};
+	})
+	.directive('dynamic', function($compile) {
+		return {
+			restrict: 'A',
+			replace: true,
+			link: function(scope, ele, attrs) {
+				scope.$watch(attrs.dynamic, function(html) {
+					ele.html(html);
+					$compile(ele.contents())(scope);
+				});
+			},
+		};
+	});
 
 // Groups preview controller
 app.controller('groupsPreviewController', function ($scope, apiReq, Groups, GroupFiles, GroupAgents) {
@@ -77,7 +93,12 @@ app.controller('groupsPreviewController', function ($scope, apiReq, Groups, Grou
         let tmpName = `/agents/groups/${$scope.groups.items[$scope.selectedGroup].name}`+
                       `/files/${$scope.groupFiles.items[index].filename}`;
         apiReq.request('GET', tmpName, {})
-        .then((data) => $scope.file = data.data);
+        .then((data) => $scope.file = beautifier.prettyPrint(data.data.data))
+        .catch((err) => $scope.file = {
+            group: $scope.groups.items[$scope.selectedGroup].name,
+            file:  $scope.groupFiles.items[index].filename,
+            error: err.message || err
+        });
     };
 
     // Changing the view to overview a specific group
