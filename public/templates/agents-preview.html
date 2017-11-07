@@ -104,9 +104,9 @@
 					<span flex="25">{{agent.name}}</span>
 					<span flex="15">{{agent.ip}}</span>
 					<span flex="15">{{agent.status}}</span>
-					<span flex="10">{{agent.os.platform}}</span>
-					<span flex="10">{{agent.os.version}}</span>
-					<span flex="15">{{agent.version}}</span>
+					<span flex="10">{{agent.os.platform || 'Unknown'}}</span>
+					<span flex="10">{{agent.os.version || 'Unknown'}}</span>
+					<span flex="15">{{agent.version || 'Unknown'}}</span>
 				</md-list-item>
 			</md-list>
 			<md-divider></md-divider>
