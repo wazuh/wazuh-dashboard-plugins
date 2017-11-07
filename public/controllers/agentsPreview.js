@@ -40,6 +40,11 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
                     }
                 }
             }
+            $scope.osPlatforms.push({
+                name:     'Unknown',
+                platform: 'Unknown',
+                version:  'Unknown'
+            });
         });
 
 
