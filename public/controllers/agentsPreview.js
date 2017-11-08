@@ -1,12 +1,5 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-// We are using the DataHandler template and customize its path to get information about agents
-app.factory('Agents', function (DataHandler) {
-    let Agents  = new DataHandler();
-    Agents.path = '/agents';
-    return Agents;
-});
-
 app.controller('agentsPreviewController', function ($scope, Notifier, genericReq, apiReq, appState, Agents) {
     const notify       = new Notifier({ location: 'Agents - Preview' });
     $scope.loading     = true;

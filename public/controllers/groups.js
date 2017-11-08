@@ -1,39 +1,5 @@
 let app = require('ui/modules').get('app/wazuh', []);
 const beautifier = require('plugins/wazuh/utils/json-beautifier');
-// We are using the DataHandler template and customize its path to get information about groups
-app
-	.factory('Groups', function(DataHandler) {
-		let Groups = new DataHandler();
-		Groups.path = '/agents/groups';
-		return Groups;
-	})
-	.factory('GroupAgents', function(DataHandler) {
-		return new DataHandler();
-	})
-	.factory('GroupFiles', function(DataHandler) {
-		return new DataHandler();
-	})
-	.filter('prettyJSON', function() {
-		return function(json) {
-			return angular.toJson(json, true);
-		};
-	})
-	.directive('dynamic', function($compile) {
-		return {
-			restrict: 'A',
-			replace: true,
-			link: function(scope, ele, attrs) {
-				scope.$watch(attrs.dynamic, function(html) {
-					ele.html(html);
-					$compile(ele.contents())(scope);
-				});
-			},
-		};
-	});
-
-app.filter('prettyJSON', function () {
-    return function(json) { return angular.toJson(json, true); };
-});
 
 // Groups preview controller
 app.controller('groupsPreviewController', 
