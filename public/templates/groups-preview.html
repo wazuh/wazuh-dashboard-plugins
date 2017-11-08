@@ -52,7 +52,7 @@
 
                                 <md-list ng-repeat='agent in groupAgents.items' class="agents-preview-table">
                                     <md-list-item class="md-subhead">
-                                        <span flex="5">{{agent.id || '---'}}</span>
+                                        <span ng-click="showAgent(agent)" flex="5">{{agent.id || '---'}}</span>
                                         <span flex="25">{{agent.name || '---'}}</span>
                                         <span flex="15">{{agent.ip || '---'}}</span>
                                         <span flex="15">{{agent.status || '---'}}</span>
