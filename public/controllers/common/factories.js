@@ -1,41 +1,29 @@
 const app = require('ui/modules').get('app/wazuh', []);
 
-app
-	.factory('Groups', function(DataHandler) {
-		let Groups = new DataHandler();
-		Groups.path = '/agents/groups';
-		return Groups;
-	})
-	.factory('GroupAgents', function(DataHandler) {
-		return new DataHandler();
-	})
-	.factory('GroupFiles', function(DataHandler) {
-		return new DataHandler();
-    })
-    .factory('AgentsAutoComplete', function (DataHandler) {
-        let AgentsAutoComplete  = new DataHandler();
-        AgentsAutoComplete.path = '/agents';
-        return AgentsAutoComplete;
-    })
-    .factory('Agents', function (DataHandler) {
-        let Agents  = new DataHandler();
-        Agents.path = '/agents';
-        return Agents;
-    })
-    .factory('Logs', function (DataHandler) {
-        let Logs  = new DataHandler();
-        Logs.path = '/manager/logs';
-        return Logs;
-    })
-    .factory('Rules', function (DataHandler) {
-        let Rules  = new DataHandler();
-        Rules.path = '/rules';
-        return Rules;
-    })
-    .factory('Decoders', function (DataHandler) {
-        let Decoders  = new DataHandler();
-        Decoders.path = '/decoders';
-        return Decoders;
-    });
+/**
+ * Main function to build a data handler factory.
+ * @param {*} DataHandler 
+ * @param {*} path 
+ */
+const compose = (DataHandler, path) => {
+    let dataHandler  = new DataHandler();
+    dataHandler.path = path;
+    return dataHandler;
+};
 
-    
+const groups   = DataHandler => compose(DataHandler,'/agents/groups');
+const agents   = DataHandler => compose(DataHandler,'/agents');
+const logs     = DataHandler => compose(DataHandler, '/manager/logs');
+const rules    = DataHandler => compose(DataHandler, '/rules');
+const decoders = DataHandler => compose(DataHandler, '/decoders');
+const simple   = DataHandler => new DataHandler();
+
+app
+	.factory('Groups', groups)
+	.factory('GroupAgents', simple)
+	.factory('GroupFiles', simple)
+    .factory('AgentsAutoComplete', agents)
+    .factory('Agents', agents)
+    .factory('Logs', logs)
+    .factory('Rules', rules)
+    .factory('Decoders', decoders);
