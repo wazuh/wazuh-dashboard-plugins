@@ -1,12 +1,5 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-// We are using the DataHandler template and customize its path to get information about logs
-app.factory('Logs', function (DataHandler) {
-    let Logs  = new DataHandler();
-    Logs.path = '/manager/logs';
-    return Logs;
-});
-
 // Logs controller
 app.controller('managerLogController', function ($scope, Logs, apiReq) {
     $scope.searchTerm  = '';
