@@ -75,10 +75,15 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     };
 
     $scope.showFile = (index) => {
+        let filename = $scope.groupFiles.items[index].filename;
+        if(filename === '../ar.conf') filename = 'ar.conf';
+   
         $scope.fileViewer = true;
         $scope.file = 'Loading...';
         let tmpName = `/agents/groups/${$scope.groups.items[$scope.selectedGroup].name}`+
-                      `/files/${$scope.groupFiles.items[index].filename}`;
+                      `/files/${filename}`;
+   
+
         apiReq.request('GET', tmpName, {})
         .then((data) => $scope.file = data.data.data)
         .catch((err) => $scope.file = {
