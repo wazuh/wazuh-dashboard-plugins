@@ -21,7 +21,7 @@ app.filter('prettyJSON', function () {
 
 // Groups preview controller
 app.controller('groupsPreviewController', 
-function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents) {
+function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents) {
     $scope.searchTerm      = '';
     $scope.searchTermAgent = '';
     $scope.searchTermFile  = '';
@@ -50,6 +50,11 @@ function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, G
         $scope.groupAgents.nextPage('');        
     };
 
+    $scope.showAgent = (agent) => {
+        $rootScope.comeFromGroups = agent;
+        $location.path('/agents');        
+    };
+
     $scope.loadGroup = (index) => {
         $scope.fileViewer = false;
         $scope.groupAgents.reset();
@@ -70,10 +75,15 @@ function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, G
     };
 
     $scope.showFile = (index) => {
+        let filename = $scope.groupFiles.items[index].filename;
+        if(filename === '../ar.conf') filename = 'ar.conf';
+   
         $scope.fileViewer = true;
         $scope.file = 'Loading...';
         let tmpName = `/agents/groups/${$scope.groups.items[$scope.selectedGroup].name}`+
-                      `/files/${$scope.groupFiles.items[index].filename}`;
+                      `/files/${filename}`;
+   
+
         apiReq.request('GET', tmpName, {})
         .then((data) => $scope.file = data.data.data)
         .catch((err) => $scope.file = {
@@ -92,8 +102,8 @@ function ($scope, $timeout, $mdSidenav, $location, apiReq, Groups, GroupFiles, G
     // Resetting the factory configuration
     $scope.$on("$destroy", () => {
         $scope.groups.reset();
-        $scope.groupsFiles.reset();
-        $scope.groupsAgents.reset();
+        $scope.groupFiles.reset();
+        $scope.groupAgents.reset();
     });
     
 
