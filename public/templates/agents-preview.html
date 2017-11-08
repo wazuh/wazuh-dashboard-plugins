@@ -66,10 +66,10 @@
 					</div>
 					<div layout="row" class="sideNavBox" flex="20">
 						<md-input-container flex class="md-whiteframe-z1">
-							<md-select id="eventBox" ng-model="osPlatform" ng-change="agents.addFilter('os.name', osPlatform)" aria-label="Filter by operative system">
+							<md-select id="eventBox" ng-model="osPlatform" ng-change="agents.addFilter('os.platform', osPlatform)" aria-label="Filter by operative system">
 								<md-option value="all">All OS platforms</md-option>
-                                <md-option ng-repeat='platform in osPlatforms' value="{{platform}}">
-                                    {{platform}}
+                                <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}}">
+                                    {{platform.name}}
                                 </md-option>
 							</md-select>
 						</md-input-container>

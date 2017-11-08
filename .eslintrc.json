@@ -17,7 +17,8 @@
       "semi": 2,
       "no-console": 0,
       "no-process-exit": 0,
-      "node/no-unpublished-require":0
+      "node/no-unpublished-require":0,
+      "node/no-unsupported-features":0
     },
     "plugins": ["node","async-await"],
     "extends": ["eslint:recommended", "plugin:node/recommended"]

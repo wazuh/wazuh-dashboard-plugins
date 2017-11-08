@@ -1,80 +1,144 @@
 import rison from 'rison-node';
 
-var app = require('ui/modules').get('app/wazuh', []).controller('overviewController', function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, genericReq) {
+let app = require('ui/modules')
+.get('app/wazuh', [])
+.controller('overviewController', 
+function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, genericReq) {
 
-	$rootScope.page = "overview";
-	$scope.submenuNavItem = "general";
-	$scope.extensions = appState.getExtensions().extensions;
+	$rootScope.page       = 'overview';
+	$scope.submenuNavItem = 'general';
+	$scope.extensions     = appState.getExtensions().extensions;
 
-	if ($location.search().tabView)
+	if ($location.search().tabView){
 		$scope.tabView = $location.search().tabView;
-	else {
-		$scope.tabView = "panels";
-		$location.search("tabView", "panels");
+	} else {
+		$scope.tabView = 'panels';
+		$location.search('tabView', 'panels');
 	}
 
-	$scope.timeGTE = "now-1d";
-	$scope.timeLT = "now";
+	$scope.timeGTE = 'now-1d';
+	$scope.timeLT  = 'now';
 
 	// Object for matching nav items and Wazuh groups
-	var tabGroups = { "general": {"group": "*"}, "fim": {"group": "syscheck"}, "pm": {"group": "rootcheck"}, "oscap": {"group": "oscap"}, "audit": {"group": "audit"}, "pci": {"group": "*"} };
+	let tabGroups = {
+		"general": {
+			"group": "*"
+		},
+		"fim": {
+			"group": "syscheck"
+		},
+		"pm": {
+			"group": "rootcheck"
+		},
+		"oscap": {
+			"group": "oscap"
+		},
+		"audit": {
+			"group": "audit"
+		},
+		"pci": {
+			"group": "*"
+		}
+	};
 
-    $scope.hideRing = function(items) {
-    	console.log("hidering is getting called");
-        if($(".vis-editor-content" ).length >= items)
-            return true;
-        return false;
-    }
+	$scope.hideRing = (items) => {
+		//console.log("hidering is getting called");
+		return $(".vis-editor-content").length >= items;
+	};
 
 	// Switch tab
-	$scope.switchTab = function (tab) {
-		$scope.loading = true;
+	$scope.switchTab = (tab) => {
+		$scope.loading 		  = true;
 		$scope.submenuNavItem = tab;
-		$scope.checkAlerts().then(function (data) { $scope.results = data; $scope.loading = false; }, function(){ $scope.results = false; $scope.loading = false; });
+		$scope.checkAlerts()
+		.then((data) => {
+			$scope.results = data;
+			$scope.loading = false;
+		})
+		.catch(() => {
+			$scope.results = false;
+			$scope.loading = false;
+		});
 	};
 
 	// Check if there are alerts.
-	$scope.checkAlerts = function () {
-		var group = tabGroups[$scope.submenuNavItem].group;
-		var payload = {};
-		var fields = {"fields" : [{"field": "rule.groups", "value": group}]};
+	$scope.checkAlerts = () => {
+		let group   = tabGroups[$scope.submenuNavItem].group;
+		let payload = {};
+		let fields  = {
+			"fields": [{
+				"field": "rule.groups",
+				"value": group
+			}]
+		};
+
 		// No filter needed for general/pci
-		if(group == "*")
-			fields = {"fields" : []};
-		var clusterName = {"cluster" : appState.getClusterInfo().cluster};
-		var timeInterval = {"timeinterval": {"gte" : $scope.timeGTE, "lt": $scope.timeLT}};
+		if (group === '*'){
+			fields = {
+				"fields": []
+			};
+		}
+
+		let clusterName = {
+			"cluster": appState.getClusterInfo().cluster
+		};
+
+		let timeInterval = {
+			"timeinterval": {
+				"gte": $scope.timeGTE,
+				"lt":  $scope.timeLT
+			}
+		};
+		
 		angular.extend(payload, fields, clusterName, timeInterval);
 
-		var deferred = $q.defer();
-        genericReq.request('POST', '/api/wazuh-elastic/alerts-count/', payload).then(function (data) {
-			if(data.data.data != 0)
-				deferred.resolve(true);
-			else
-				deferred.resolve(false);
-		});
+		let deferred = $q.defer();
+
+		genericReq
+			.request('POST', '/api/wazuh-elastic/alerts-count/', payload)
+			.then((data) => {
+				if (data.data.data !== 0){
+					deferred.resolve(true);
+				} else {
+					deferred.resolve(false);
+				}
+			});
+
 		return deferred.promise;
 	};
 
 	// Watch for timefilter changes
-	$scope.$on('$routeUpdate', function() {
-		if($location.search()._g && $location.search()._g != "()") {
-			var currentTimeFilter = rison.decode($location.search()._g);
+	$scope.$on('$routeUpdate', () => {
+		if ($location.search()._g && $location.search()._g !== '()') {
+			let currentTimeFilter = rison.decode($location.search()._g);
 			// Check if timefilter has changed and update values
-			if(currentTimeFilter.time && ($scope.timeGTE != currentTimeFilter.time.from || $scope.timeLT != currentTimeFilter.time.to)) {
+			if (currentTimeFilter.time && 
+				($scope.timeGTE != currentTimeFilter.time.from || 
+				$scope.timeLT != currentTimeFilter.time.to)) {
+
 				$scope.timeGTE = currentTimeFilter.time.from;
-				$scope.timeLT = currentTimeFilter.time.to;
-				$scope.checkAlerts().then(function (data) {$scope.results = data;}, function(){	$scope.results = false;});
+				$scope.timeLT  = currentTimeFilter.time.to;
+				$scope.checkAlerts()
+				.then((data) =>	$scope.results = data)
+				.catch(() => $scope.results = false);
+
 			}
 		}
 	});
 
 	// Watchers
-	$scope.$watch('tabView', function() {
-		$location.search('tabView', $scope.tabView);
-	});
+	$scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
 
 	// Check alerts
-	$scope.checkAlerts().then(function (data) {$scope.results = data; $scope.loading = false;}, function(){	$scope.results = false; $scope.loading = false;});
+	$scope.checkAlerts()
+	.then((data) => {
+		$scope.results = data;
+		$scope.loading = false;
+	})
+	.catch(() => {
+		$scope.results = false;
+		$scope.loading = false;
+	});
 });
 
 app.controller('overviewGeneralController', function ($scope, appState) {
@@ -86,28 +150,33 @@ app.controller('overviewFimController', function ($scope, appState) {
 });
 
 app.controller('overviewPMController', function ($scope, appState) {
-    appState.setOverviewState('pm');
+	appState.setOverviewState('pm');
 });
 
 app.controller('overviewOSCAPController', function ($scope, appState) {
-    appState.setOverviewState('oscap');
+	appState.setOverviewState('oscap');
 });
 
 app.controller('overviewAuditController', function ($scope, appState) {
-    appState.setOverviewState('audit');
+	appState.setOverviewState('audit');
 });
 
 app.controller('overviewPCIController', function ($scope, genericReq, appState) {
-    appState.setOverviewState('pci');
+	appState.setOverviewState('pci');
 
-	var tabs = [];
-	genericReq.request('GET', '/api/wazuh-api/pci/all').then(function (data) {
-		angular.forEach(data.data, function(value, key) {
-			tabs.push({"title": key, "content": value});
+	let tabs = [];
+	
+	genericReq
+		.request('GET', '/api/wazuh-api/pci/all')
+		.then((data) => {
+			angular.forEach(data.data, (value, key) => {
+				tabs.push({
+					"title":   key,
+					"content": value
+				});
+			});
 		});
 
-	});
-
-	$scope.tabs = tabs;
-    $scope.selectedIndex = 0;
+	$scope.tabs 		 = tabs;
+	$scope.selectedIndex = 0;
 });

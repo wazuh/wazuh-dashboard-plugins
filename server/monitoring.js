@@ -121,11 +121,11 @@ module.exports = (server, options) => {
 			type:  'wazuh-configuration'
 		})
 		.then((data) => {
-			if (data.hits.total == 1) {
+			if (data.hits.total === 1) {
 				callback(data.hits);
 			} else {
 				callback({
-					'error': 'no credentials',
+					'error':      'no credentials',
 					'error_code': 1
 				});
 			}
@@ -139,145 +139,152 @@ module.exports = (server, options) => {
 	};
 
 	// fetchAgents on demand
-	var fetchAgents = function () {
-		getConfig(loadCredentials);
-		return;
-	};
+	const fetchAgents = () => getConfig(loadCredentials);
 
 	// Configure Kibana patterns.
-	var configureKibana = function () {
-		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating index pattern: ' + index_pattern);
+	const configureKibana = () => {
+		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 
+					`Creating index pattern: ${index_pattern}`);
 
 		// Call the internal API and wait for the response
-		var options = {
+		let options = {
 			headers: {
 				'kbn-version': packageJSON.kibana.version
 			},
 			json: true
-		}
+		};
 
-		var body = {
+		let body = {
 			attributes: {
-				title: index_pattern,
+				title:         index_pattern,
 				timeFieldName: '@timestamp'
 			}
-		}
+		};
 
-		return needle('post', 'http://localhost:' + server.info.port + '/api/saved_objects/index-pattern', body, options);
-	};
-
-	// Creating wazuh-monitoring index
-	var createIndex = function (todayIndex) {
-		elasticRequest.callWithInternalUser('indices.create', {
-			index: todayIndex
-		}).then(
-			function () {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Successfully created today index.');
-				insertDocument(todayIndex);
-			},
-			function () {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not create ' + todayIndex + ' index on elasticsearch.');
-			}
+		return needle(
+			'post', 
+			`http://localhost:${server.info.port}/api/saved_objects/index-pattern`, 
+			body, 
+			options
 		);
 	};
 
+	// Creating wazuh-monitoring index
+	const createIndex = (todayIndex) => {
+		elasticRequest
+		.callWithInternalUser('indices.create', {
+			index: todayIndex
+		})
+		.then(() => {
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 
+					'Successfully created today index.');
+			insertDocument(todayIndex);
+		})
+		.catch((error) => {
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+					`Could not create ${todayIndex} index on elasticsearch.`);
+		});
+	};
+
 	// Inserting one document per agent into Elastic. Bulk.
-	var insertDocument = function (todayIndex) {
-		var body = '';
+	const insertDocument = (todayIndex) => {
+		let body = '';
 		if (agentsArray.length > 0) {
-			var managerName = agentsArray[0].name;
-			agentsArray.forEach(function (element) {
+			let managerName = agentsArray[0].name;
+
+			for(let element of agentsArray){
 				body += '{ "index":  { "_index": "' + todayIndex + '", "_type": "wazuh-agent" } }\n';
-				var date = new Date(Date.now()).toISOString();
+				let date              = new Date(Date.now()).toISOString();
 				element["@timestamp"] = date;
-				element["host"] = managerName;
-				body += JSON.stringify(element) + "\n";
-			});
-			if (body == '') {
+				element["host"]       = managerName;
+				body                 += JSON.stringify(element) + "\n";
+			}
+
+			if (body === '') {
 				return;
 			}
 
-			elasticRequest.callWithInternalUser('bulk', {
+			elasticRequest
+			.callWithInternalUser('bulk', {
 				index: todayIndex,
-				type: 'agent',
-				body: body
-			}).then(function (response) {
-				agentsArray.length = 0;
-			}, function (err) {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Error inserting agent data into elasticsearch. Bulk request failed.');
+				type:  'agent',
+				body:  body
+			})
+			.then((response) => agentsArray.length = 0)
+			.catch((err) => {
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+						'Error inserting agent data into elasticsearch. Bulk request failed.');
 			});
 		}
 	};
 
 	// Save agent status into elasticsearch, create index and/or insert document
-	var saveStatus = function () {
-		fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
+	const saveStatus = () => {
+		fDate      = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/: /g, '').slice(0, -7);
 		todayIndex = index_prefix + fDate;
 
-		elasticRequest.callWithInternalUser('indices.exists', {
+		elasticRequest
+		.callWithInternalUser('indices.exists', {
 			index: todayIndex
-		}).then(
-			function (result) {
-				if (result) {
-					insertDocument(todayIndex);
-				} else {
-					createIndex(todayIndex);
-				}
-			},
-			function () {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not check if the index ' + todayIndex + ' exists.');
+		})
+		.then((result) => {
+			if (result) {
+				insertDocument(todayIndex);
+			} else {
+				createIndex(todayIndex);
 			}
-		);
+		})
+		.catch((error) => {
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+				`Could not check if the index ${todayIndex} exists.`);
+		});
 	};
 
 	// Main. First execution when installing / loading App.
-	var init = function () {
+	const init = () => {
 		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating today index...');
 		saveStatus();
 
-		elasticRequest.callWithInternalUser('search', {
+		elasticRequest
+		.callWithInternalUser('search', {
 			index: '.kibana',
-			type: 'doc',
-			q: 'index-pattern.title:"wazuh-monitoring-*"'
-		}).then(
-			function (data) {
-				if (data.hits.total == 1) {
-					server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Skipping index-pattern creation. Already exists.');
-				} else {
-					configureKibana();
-				}
-			},
-			function (error) {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not reach elasticsearch.');
+			type:  'doc',
+			q:     'index-pattern.title:"wazuh-monitoring-*"'
+		})
+		.then((data) => {
+			if (data.hits.total === 1) {
+				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 
+							'Skipping index-pattern creation. Already exists.');
+			} else {
+				configureKibana();
 			}
-		);
-	}
+		})
+		.catch((error) => {
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+						'Could not reach elasticsearch.');
+		});
+	};
 
 	// Wait until Elasticsearch is ready
-	var checkElasticStatus = function () {
-		elasticRequest.callWithInternalUser('info').then(
-			function (data) {
-				server.plugins.elasticsearch.waitUntilReady().then(function () {
-					init();
-				});
-			},
-			function (data) {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Waiting for Elasticsearch to be up...');
-				setTimeout(function () {
-					checkElasticStatus()
-				}, 3000)
-			}
-		);
-	}
+	const checkElasticStatus = () => {
+		elasticRequest
+		.callWithInternalUser('info')
+		.then((data) => server.plugins.elasticsearch.waitUntilReady())
+		.then(() => init())
+		.catch((error) => {
+			server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Waiting for Elasticsearch to be up...');
+			setTimeout(() => checkElasticStatus(), 3000);
+		});
+	};
 
 	// Starting
 	checkElasticStatus();
 
 	// Cron tab for getting agent status.
-	cron.schedule('0 */10 * * * *', function () {
+	cron.schedule('0 */10 * * * *', () => {
 		agentsArray.length = 0;
 		getConfig(loadCredentials);
 	}, true);
 
 	module.exports = fetchAgents;
-}
+};

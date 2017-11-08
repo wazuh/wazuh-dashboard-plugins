@@ -1,36 +1,40 @@
 import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
-    .service('testAPI', function ($q, $http) {
-        return {
-            check_stored: function () {
-                var defered = $q.defer();
-                $http.get(chrome.addBasePath("/api/wazuh-api/checkAPI")).then(function successCallback(response) {
-                    if (response.error) {
-                        defered.reject(response);
-                    } else {
-                        defered.resolve(response);
-                    }
-                }, function errorCallback(response) {
-                    if (response.error) {
-                        defered.reject(response);
-                    }
-                });
-                return defered.promise;
-            },
-			check: function (data) {
-                var defered = $q.defer();
-                $http.post(chrome.addBasePath("/api/wazuh-api/checkAPI"), data).then(function successCallback(response) {
-                    if (response.error) {
-                        defered.reject(response);
-                    } else {
-                        defered.resolve(response);
-                    }
-                }, function errorCallback(response) {
-                    if (response.error) {
-                        defered.reject(response);
-                    }
-                });
-                return defered.promise;
-            }
-        };
-    });
+.service('testAPI', function ($q, $http) {
+    return {
+        check_stored: () => {
+            let defered = $q.defer();
+            $http.get(chrome.addBasePath('/api/wazuh-api/checkAPI'))
+            .then((response) => {
+                if (response.error) {
+                    defered.reject(response);
+                } else {
+                    defered.resolve(response);
+                }
+            })
+            .catch((error) => {
+                if (error.error) {
+                    defered.reject(error);
+                }
+            });
+            return defered.promise;
+        },
+        check: (data) => {
+            let defered = $q.defer();
+            $http.post(chrome.addBasePath("/api/wazuh-api/checkAPI"), data)
+            .then((response) => {
+                if (response.error) {
+                    defered.reject(response);
+                } else {
+                    defered.resolve(response);
+                }
+            })
+            .catch((error) => {
+                if (error.error) {
+                    defered.reject(error);
+                }
+            });
+            return defered.promise;
+        }
+    };
+});

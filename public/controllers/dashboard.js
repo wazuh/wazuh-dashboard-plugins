@@ -1,5 +1,5 @@
 // Require config
-var app = require('ui/modules').get('app/wazuh', []);
+let app = require('ui/modules').get('app/wazuh', []);
 import chrome from 'ui/chrome';
 
 app.controller('dashboardController', function ($scope, $location) {
