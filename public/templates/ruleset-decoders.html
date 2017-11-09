@@ -1,4 +1,4 @@
-<md-content layout="column" style="height: 100%;" flex layout-padding ng-if="!loading && $parent.submenuNavItem2 == 'decoders'" ng-controller="decodersController" layout-align="start space-around">
+<md-content layout="column" style="height: 100%;" flex layout-padding ng-if="!loading && globalsubmenuNavItem2 == 'decoders'" ng-controller="decodersController" layout-align="start space-around">
     <div class='uil-ring-css' ng-show="loading"><div></div></div>
     <div ng-if="!loading" layout="row" layout-align="center start" style="padding: 0px;  height: 250px;  min-height: 250px; ">
         <md-card flex="100" style="margin: 0">
@@ -27,10 +27,10 @@
 				</md-autocomplete>
 			</span>
 				
-			<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('rules')" class="md-primary">
+			<md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('rules')" class="md-primary">
 				Rules
 			</md-button>
-			<md-button style="padding: 2px;" flex="10" ng-class="(submenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
+			<md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
 				Decoders
 			</md-button>
 			

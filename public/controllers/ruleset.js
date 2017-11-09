@@ -1,6 +1,7 @@
-var app = require('ui/modules').get('app/wazuh');
+let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, Notifier, Rules) {
+app.controller('rulesController', function ($scope,$rootScope, Notifier, Rules) {
+    $scope.setRulesTab = (tab) => $rootScope.globalsubmenuNavItem2 = tab;
     //Initialization
     const notify   = new Notifier({ location: 'Manager - Rules' });
     $scope.loading = true;
@@ -53,7 +54,8 @@ app.controller('rulesController', function ($scope, Notifier, Rules) {
     $scope.$on('$destroy', () => $scope.rules.reset());
 });
 
-app.controller('decodersController', function ($scope, $sce, Notifier, Decoders) {
+app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier, Decoders) {
+    $scope.setRulesTab = (tab) => $rootScope.globalsubmenuNavItem2 = tab;
     //Initialization
     const notify    = new Notifier({ location: 'Manager - Decoders' });
     $scope.loading  = true;

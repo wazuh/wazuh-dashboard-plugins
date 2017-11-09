@@ -1,21 +1,32 @@
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, $routeParams, $location) {
+app.controller('managerController', function ($scope,$rootScope, $routeParams, $location,apiReq) {
     $scope.submenuNavItem  = 'status';
     $scope.submenuNavItem2 = 'rules';
 
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
-
+    apiReq.request('GET', `/agents/000`, {})
+    .then(data => $rootScope.agent = data.data.data);
     // Watchers
-    $scope.$watch('submenuNavItem', () => $location.search('tab', $scope.submenuNavItem));
+    $scope.$watch('submenuNavItem', () => {
+        console.log(`submenuNavItem: ${$scope.submenuNavItem}`)
+        if($scope.submenuNavItem === 'ruleset') {
+            $rootScope.globalRuleSet = 'ruleset';
+            $rootScope.globalsubmenuNavItem2 = $scope.submenuNavItem2;
+        } else {
+            delete $rootScope.globalRuleSet;
+            delete $rootScope.globalsubmenuNavItem2;
+        }
+        $location.search('tab', $scope.submenuNavItem);
+    });
 
     $scope.setRulesTab = (tab) => $scope.submenuNavItem2 = tab;
 });
 
-app.controller('managerStatusController', function ($scope, Notifier, apiReq) {
+app.controller('managerStatusController', function ($scope,$rootScope, Notifier, apiReq) {
     //Initialization
     const notify = new Notifier({ location: 'Manager - Status' });
     $scope.load  = true;
@@ -85,7 +96,7 @@ app.controller('managerStatusController', function ($scope, Notifier, apiReq) {
     }
 });
 
-app.controller('managerConfigurationController', function ($scope, Notifier, apiReq) {
+app.controller('managerConfigurationController', function ($scope,$rootScope, Notifier, apiReq) {
     //Initialization
     const notify   = new Notifier({ location: 'Manager - Configuration' });
     $scope.load    = true;
