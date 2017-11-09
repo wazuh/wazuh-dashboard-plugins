@@ -15,7 +15,7 @@ module.exports = (server, options) => {
 	let agentsArray   = [];
 	let index_pattern = "wazuh-monitoring-*";
 	let index_prefix  = "wazuh-monitoring-";
-	let fDate         = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/: /g, '').slice(0, -7);
+	let fDate         = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
 	let todayIndex    = index_prefix + fDate;
 	let packageJSON   = {};
 
@@ -220,7 +220,7 @@ module.exports = (server, options) => {
 
 	// Save agent status into elasticsearch, create index and/or insert document
 	const saveStatus = () => {
-		fDate      = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/: /g, '').slice(0, -7);
+		fDate      = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
 		todayIndex = index_prefix + fDate;
 
 		elasticRequest
