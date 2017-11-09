@@ -1,14 +1,15 @@
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope,$rootScope, $routeParams, $location) {
+app.controller('managerController', function ($scope,$rootScope, $routeParams, $location,apiReq) {
     $scope.submenuNavItem  = 'status';
     $scope.submenuNavItem2 = 'rules';
 
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
-
+    apiReq.request('GET', `/agents/000`, {})
+    .then(data => $rootScope.agent = data.data.data);
     // Watchers
     $scope.$watch('submenuNavItem', () => {
         console.log(`submenuNavItem: ${$scope.submenuNavItem}`)
