@@ -33,6 +33,16 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
                     }
                 }
             }
+            return apiReq.request('GET', '/agents/summary', { });
+        })
+        .then(data => {
+            if(parseInt(data.data.data['Never connected']) > 0){
+                $scope.osPlatforms.push({
+                    name:     'Unknown',
+                    platform: 'Unknown',
+                    version:  'Unknown'
+                });
+            }
         });
 
 

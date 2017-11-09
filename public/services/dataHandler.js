@@ -68,6 +68,7 @@ app.factory('DataHandler', function ($q, apiReq) {
                 name:  filterName,
                 value: value
             });
+
             this.search();
         }
 
@@ -97,21 +98,25 @@ app.factory('DataHandler', function ($q, apiReq) {
                 offset: 0,
                 limit:  this.initialBatch
             };
-
+            let isUnknown = false;
             for(let filter of this.filters){
-                if (filter.value !== '') requestData[filter.name] = filter.value;
+                if (filter.value !== '' && filter.value !== 'Unknown') requestData[filter.name] = filter.value;
+                if (filter.value === 'Unknown') isUnknown = true;
             }
 
             apiReq.request('GET', this.path, requestData)
-            .then(function (data) {
+            .then(data => {
                 this.items = [];
                 let items  = data.data.data.items;
                 for (let i = 0,len = items.length; i < len; i++) {
                     this.items.push(items[i]);
                     this.items[i].selected = false;
                 }
+                if(isUnknown){
+                    this.items = this.items.filter(item => typeof item.os === 'undefined');
+                }
                 this.offset = items.length;
-            }.bind(this));
+            });
         }
 
         sort(by) {
