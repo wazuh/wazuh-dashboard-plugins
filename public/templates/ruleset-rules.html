@@ -69,16 +69,16 @@
 
 		<md-chips style="background-color: #f7f7f7; margin-top: 16px; " readonly="true" ng-show="rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('group') || rules.hasFilter('pci')">
 		  <md-chip ng-click="rules.removeFilter('search', true)" ng-if="rules.hasFilter('search')">
-			<span class="bold">Search: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
+			<span class="bold">Search: {{rules.getFilter('search')}} <i class="fa fa-times" aria-hidden="true"></i></span>
 		  </md-chip>
-		  <md-chip ng-click="rules.removeFilter('file', true)" ng-if="rules.hasFilter('file');">
-			<span class="bold">File: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
+		  <md-chip ng-click="rules.removeFilter('file', true)" ng-if="rules.hasFilter('file')">
+			<span class="bold">File: {{rules.getFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
 		  </md-chip>
-		  <md-chip ng-click="rules.removeFilter('group', true)" ng-if="rules.hasFilter('group');">
-			<span class="bold">Group: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
+		  <md-chip ng-click="rules.removeFilter('group', true)" ng-if="rules.hasFilter('group')">
+			<span class="bold">Group: {{rules.getFilter('group')}} <i class="fa fa-times" aria-hidden="true"></i></span>
 		  </md-chip>
-		  <md-chip ng-click="rules.removeFilter('pci', true)" ng-if="rules.hasFilter('pci');">
-			<span>PCI control: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
+		  <md-chip ng-click="rules.removeFilter('pci', true)" ng-if="rules.hasFilter('pci')">
+			<span>PCI control: {{rules.getFilter('pci')}} <i class="fa fa-times" aria-hidden="true"></i></span>
 		  </md-chip>
 		</md-chips>
 
@@ -122,7 +122,7 @@
 								<div class="metric-value ng-binding" style="font-size: 12pt;">{{rule.level}}</div>
 							</md-card-content>
 						</md-card>
-						<md-card class="cardHover" ng-click="rulesApplyFilter({type: 'file', value: rule.file}); $event.stopPropagation();" flex="20" layout="column">
+						<md-card class="cardHover" ng-click="rules.addFilter('file', rule.file); $event.stopPropagation();" flex="20" layout="column">
 							<md-card-content style="text-align: center;">
 								<div class="ng-binding" style="font-weight: bold">File</div>
 								<div class="metric-value ng-binding" style="font-size: 12pt;">{{rule.file}}</div>
@@ -135,7 +135,7 @@
 							<md-card-content>
 								<h3 class="wazuh-h3">Groups</h3>
 								<span ng-repeat="group in rule.groups">
-									<span class="listHover" ng-click="rulesApplyFilter({type: 'group', value: group})" layout="row" layout-align="space-between center"><p>{{ group }}</p></span>
+									<span class="listHover" ng-click="rules.addFilter('group', group)" layout="row" layout-align="space-between center"><p>{{ group }}</p></span>
 									<md-divider ng-if="!$last"></md-divider>
 								</span>
 							</md-card-content>
@@ -145,7 +145,7 @@
 							<md-card-content>
 								<h3 class="wazuh-h3">PCI DSS </h3>
 								<span ng-repeat="pci in rule.pci">
-									<span class="listHover" ng-click="rulesApplyFilter({type: 'pci', value: pci})" layout="row" layout-align="space-between center"><p>{{ pci }}</p></span>
+									<span class="listHover" ng-click="rules.addFilter('pci', pci)" layout="row" layout-align="space-between center"><p>{{ pci }}</p></span>
 									<md-divider ng-if="!$last"></md-divider>
 								</span>
 							</md-card-content>
