@@ -57,6 +57,11 @@ app.factory('DataHandler', function ($q, apiReq) {
             return deferred.promise;
         }
 
+        getFilter (filterName) {
+            let filtered = this.filters.filter((element) => element.name === filterName);
+            return (filtered.length !== 0) ? filtered[0].value : null;           
+        }
+
         hasFilter (filterName) {
             let filtered = this.filters.filter((element) => element.name === filterName);
             return filtered.length !== 0;
