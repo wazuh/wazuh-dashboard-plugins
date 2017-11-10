@@ -8,7 +8,7 @@
 			<div flex layout="column" layout-align="space-between stretch">
 				<div layout="row" layout-align="space-between stretch">
 					<md-card flex class="cardHover" layout="column" style="margin-left: 0px;" ng-click="applyAgent(lastAgent)">
-						<md-card-content style="text-align: center;">
+						<md-card-content style="text-align: center;" ng-click="applyAgent(lastAgent)">
 							<div class="metric-value ng-binding" style="font-size: 16pt;">{{lastAgent.name}}</div>
 							<div class="ng-binding">Last registered agent</div>
 						</md-card-content>
