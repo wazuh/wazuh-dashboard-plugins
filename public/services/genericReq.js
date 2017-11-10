@@ -40,7 +40,6 @@ require('ui/modules').get('app/wazuh', [])
                 }
             })
             .catch((error) => {
-                console.dir(error);
                 if (error.error && error.error !== '0') {
                     defered.reject(error);
                 } else {

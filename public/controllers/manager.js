@@ -12,7 +12,6 @@ app.controller('managerController', function ($scope,$rootScope, $routeParams, $
     .then(data => $rootScope.agent = data.data.data);
     // Watchers
     $scope.$watch('submenuNavItem', () => {
-        console.log(`submenuNavItem: ${$scope.submenuNavItem}`)
         if($scope.submenuNavItem === 'ruleset') {
             $rootScope.globalRuleSet = 'ruleset';
             $rootScope.globalsubmenuNavItem2 = $scope.submenuNavItem2;

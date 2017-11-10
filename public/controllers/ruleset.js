@@ -80,7 +80,6 @@ app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier
 
         $scope.autoComplete = new Set($scope.autoComplete.map(e => JSON.stringify(e)));
         $scope.autoComplete = Array.from($scope.autoComplete).map(e => JSON.parse(e));
-        console.log($scope.autoComplete);
     };
 
     $scope.colorRegex = (regex) => {
