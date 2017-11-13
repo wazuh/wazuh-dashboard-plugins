@@ -1,67 +1,42 @@
-import rison from 'rison-node';
+require('ui/query_bar');
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
-import { StateProvider } from 'ui/state_management/state';
-import { AggTypesBucketsIntervalOptionsProvider } from 'ui/agg_types/buckets/_interval_options';
 
-var app = require('ui/modules').get('app/wazuh', [])
-  .directive('kbnSearchbar', [function () {
-    return {
-		restrict: 'E',
-		scope: {
-		  visType: '@visType',
-		  visIndexPattern: '@visIndexPattern',
-		  visA: '@visA',
-		  visG: '@visG',
-		  visFilter: '@visFilter',
-		  visHeight: '@visHeight',
-		  visWidth: '@visWidth',
-		  visSearchable: '@visSearchable',
-		  visClickable: '@visClickable'
-		},
-		template: require('../templates/directives/kibana-searchbar-template.html')
-    }
-  }]);
+const app = require('ui/modules').get('apps/webinar_app', []);
 
-require('ui/modules').get('app/wazuh', []).controller('kibanaSearchBar', function ($scope, $route, timefilter, AppState, $timeout, Private, $rootScope) {
-	$route.reloadOnSearch = true;
+app.controller('kibanaSearchbar', function ($scope, timefilter, AppState, $timeout, Private, $rootScope, savedVisualizations) {
+    const filterBar = Private(FilterBarQueryFilterProvider);
+    timefilter.enabled = true;
+    let visualizeLoader = null;
+    let currentAppState = null;
+    $scope.indexPattern = [];
 
-	timefilter.enabled = true;
-	$scope.stateQuery = "";
-	// Set default time
-	var gParameter;
-    if($route.current.params._g){
-        if($route.current.params._g.startsWith("h@")){
-            gParameter = sessionStorage.getItem($route.current.params._g);
-        }else{
-            gParameter = $route.current.params._g;
+    savedVisualizations.get('Alert-level-evolution').then(savedObj => {
+        $scope.indexPattern[0] = savedObj.vis.indexPattern;
+
+        // Configure AppState. Get App State, if there is no App State create new one
+        if (!currentAppState) {
+            $scope.state = new AppState(getStateDefaults());
         }
+    });
+
+    function getStateDefaults() {
+        return {
+            query: {'language': 'lucene', 'query': '' },
+            index: $scope.indexPattern[0].id,
+            interval: 'auto',
+            filters: {}
+        };
     }
-    else{
-        gParameter="()";
-    }
-    if (gParameter == "()"){
-		timefilter.time.from = "now-24h";
-		timefilter.time.to = "now";
-	}
-	
-	$scope.timefilter = timefilter;
-	let $state = $scope.$state = (function initState() {
-		$state = new AppState();
-		return $state;
-	} ());
 
-	// Fetch / reload visualization
-	$scope.fetch = function () 
-	{
-        if (this.stateQuery == "") {
-	        $rootScope.$broadcast('updateQuery',"(*)");
-        } else {
-	        this.stateQuery = this.stateQuery == "" ? "" : this.stateQuery;
-	        $rootScope.$broadcast('updateQuery',"(" + this.stateQuery + ")");
-        }
-	};
+    $scope.$listen(filterBar, 'update', function () {
+        $scope.updateQueryAndFetch($scope.state.query);
+    });
 
-	$scope.queryFilter = Private(FilterBarQueryFilterProvider);
+    $scope.updateQueryAndFetch = function (query) {
+        $scope.state.query = query;
+        $scope.state.save();
 
+        $rootScope.$broadcast('updateVis', query, filterBar.getFilters());
+        $rootScope.$broadcast('fetch');
+    };
 });
-  
