@@ -1,154 +1,45 @@
-<md-content flex layout="column" ng-if="submenuNavItem == 'general'" ng-controller="overviewGeneralController" layout-align="start">
+<md-content ng-if="submenuNavItem == 'general'" ng-controller="overviewGeneralController" class="app-container mymain" layout-align="start">
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))" ng-if="tabView == 'panels'"></kbn-searchbar>
-	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(15)'><div></div></div>
+	<!-- Local nav. -->
+	<div ng-controller="kibanaSearchbar">
+	    <kbn-top-nav name="dashboard" config="topNavMenu">
+	      <!-- Transcluded elements. -->
+	      <div data-transclude-slots>
+	        <!-- Title. -->
 
-	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(15)">
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				No results for selected time interval
-			</md-card-content>
-		</md-card>
-	</md-content>
+	        <!-- Search. -->
+	        <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+	          <query-bar
+	            query="state.query"
+	            app-name="'dashboard'"
+	            on-submit="updateQueryAndFetch($query)"
+	          >
+	          </query-bar>
+	        </div>
+	      </div>
+	    </kbn-top-nav>
 
-	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
-		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"></kbn-disfull>
-	</md-content>
+	    <!-- Filters. -->
+	    <filter-bar
+	      ng-show="true"
+	      state="state"
+	      index-patterns="indexPattern"
+	      ng-if="state.query.language === 'lucene'"
+	    ></filter-bar>
+	</div>
 
+	<kbn-vis vis-id="'Alert-level-evolution'" id="Alert-level-evolution"></kbn-vis>
 	<!-- View: Panels -->
-	<div ng-show="hideRing(15) && results && !loading" ng-if="tabView == 'panels'">
+	<div ng-if="tabView == 'panels'">
 		<div layout="row" layout-align="center stretch">
 			<md-card flex layout="column">
-				<md-card-content class="metric">
-					<kbn-vis vis-height="115px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Alerts',type:metric))"
-   					vis-filter="*">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content class="metric">
-					<kbn-vis vis-height="115px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Level 12 or above alerts'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric Level 12 or above',type:metric))"
-   					vis-filter="rule.level:[12 TO *]">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content class="metric">
-                    <kbn-vis vis-height="115px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication failure'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth failed',type:metric))"
-   					vis-filter="(rule.groups: authentication_failed OR rule.groups: authentication_failures)">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content class="metric">
-                    <kbn-vis vis-height="115px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Authentication success'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'Metric auth success',type:metric))"
-   					vis-filter="rule.groups: authentication_success">
-					</kbn-vis>
+				<md-card-content>
+					
 				</md-card-content>
 			</md-card>
 		</div>
-		<div layout="row" layout-align="start stretch">
-			<md-card flex class="visBox-alert-level-evolution">
-				<md-card-content>
-					<span class="md-headline">Alert level evolution</span>
-					<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.level,order:desc,orderBy:'1',size:5),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:'custom',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:cardinal,legendPosition:right,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert%20level%20evolution',type:line))"
-					vis-filter="*">
-						</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="60">
-				<md-card-content>
-					<span class="md-headline">Alerts</span>
-					<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'custom',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Alerts',type:histogram))"
-						vis-filter="*">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-		</div>
-		<div layout="row" layout-align="space-between stretch">
-			<md-card flex>
-				<md-card-content>
-					<span class="md-headline">Top 5 agents</span>
-						<kbn-vis vis-height="170px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top agents',type:pie))"
-						vis-filter="*">
-						</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex>
-				<md-card-content>
-					<span class="md-headline">Alerts evolution - Top 5 agents</span> 
-					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:agent.name,order:desc,orderBy:'1',size:5),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'custom',min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:Agents,type:area))"
-						vis-filter="*"
-						>
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card layout="column" flex="35">
-				<md-card-content>
-					<span class="md-headline">Agents status</span>
-					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-monitoring-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:'custom',min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:id),schema:metric,type:cardinality),(enabled:!t,id:'4',params:(field:status,order:asc,orderBy:'3',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Agents Status',type:line))"
-						vis-filter="manager.name: {{defaultManager}}">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-		</div>
-		
-		<div layout="row" layout-align="center stretch">
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="ng-binding">Top source user</div>
-					<kbn-vis-value vis-height="45px"  vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!f,id:'1',params:(),schema:(group:metrics),type:count),(enabled:!t,id:'2',params:(field:data.srcuser,order:desc,orderBy:'1',size:1),schema:(group:buckets),type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source user',type:table))" vis-filter="*"></kbn-vis-value>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="ng-binding">Top source ip</div>
-					<kbn-vis-value vis-height="45px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:data.srcip,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top source ip',type:table))" vis-filter="*"></kbn-vis-value>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="ng-binding">Top group</div>
-					<kbn-vis-value vis-height="45px" vis-index-pattern="wazuh-alerts-*"  vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top group',type:table))" vis-filter="*"></kbn-vis-value>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="ng-binding">Top PCI DSS requirement</div>
-					<kbn-vis-value vis-height="45px" vis-index-pattern="wazuh-alerts-*"  vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'Top PCI DSS',type:table))" vis-filter="*"></kbn-vis-value>
-				</md-card-content>
-			</md-card>
-		</div>
-		
-		<div layout="row" layout-align="center stretch">
-			<md-card flex="60">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Alerts summary</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:3,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.id,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.level,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:5,direction:desc),totalFunc:sum),title:'Alerts%20summary',type:table))"
-						vis-filter="*">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="40">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Groups summary</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:1,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:Group,field:rule.groups,order:desc,orderBy:'1',size:99999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:5,direction:desc),totalFunc:sum),title:'Groups',type:table))"
-						vis-filter="*">
-					</kbn-vis>
-				</md-card-content>
-			</md-card>
-		</div>
+
 		<div flex></div>
 	</div>
 </md-content>
