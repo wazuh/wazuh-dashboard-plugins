@@ -1,6 +1,6 @@
 // Require CSS
-require('plugins/wazuh/less/loader');
-require('plugins/wazuh/less/ui_framework.less');
+require('plugins/wazuh/less/kbn.less');
+//require('plugins/wazuh/less/ui_framework.less');
 
 // Set up Wazuh app
 var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial'])
@@ -23,6 +23,10 @@ require('plugins/wazuh/services/testAPI.js');
 require('plugins/wazuh/services/routes.js');
 
 // Require Kibana integrations
+require('ui/autoload/all');
+require('ui/chrome');
+
+////////////////////////////////////////////////////////////////////
 require('plugins/wazuh/kibana-integrations/kibanaExternalImports.js');
 require('plugins/wazuh/kibana-integrations/kibanaVisualizationDirective.js');
 require('plugins/wazuh/kibana-integrations/kibanaDiscoverDirective.js');
