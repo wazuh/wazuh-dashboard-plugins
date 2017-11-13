@@ -79,9 +79,8 @@ app.controller('managerStatusController', function ($scope,$rootScope, Notifier,
         .catch((error) => printError(error));
 
         apiReq.request('GET', '/agents', {
-            offset: 0,
             limit:  1,
-            sort:   '-id'
+            sort:   '-date_add'
         })
         .then((data) => apiReq.request('GET', `/agents/${data.data.data.items[0].id}`, {}))
         .then((data) => $scope.agentInfo = data.data.data)
