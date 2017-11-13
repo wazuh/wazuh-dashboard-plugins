@@ -79,7 +79,7 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
             $scope.agentsCountTotal          = data.data.data.Total;
             $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
             $scope.loading                   = false;
-            return apiReq.request('GET', '/agents', { sort:'+dateAdd', limit:1 });
+            return apiReq.request('GET', '/agents', { sort:'-date_add', limit:1 });
         })
         .then(data => $scope.lastAgent = data.data.data.items[0])
         .catch((error) => printError(error));
