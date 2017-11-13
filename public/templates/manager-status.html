@@ -112,7 +112,7 @@
 							<p style="font-weight: bold; min-width: 150px" >Version</p>
 							<p class="right-text">{{agentInfo.version ? agentInfo.version : '-'}}</p>
 						</span>
-						<span layout="row">
+						<span layout="row" ng-if="agentInfo.id !== '000'">
 							<p style="font-weight: bold; min-width: 150px" >Last keep alive</p>
 							<p class="right-text">{{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</p>
 						</span>

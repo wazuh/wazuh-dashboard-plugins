@@ -141,28 +141,27 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, gen
 	});
 });
 
-app.controller('overviewGeneralController', function ($scope, appState) {
-	appState.setOverviewState('general');
+app.controller('overviewGeneralController', function ($scope) {
+
 });
 
-app.controller('overviewFimController', function ($scope, appState) {
-	appState.setOverviewState('fim');
+app.controller('overviewFimController', function ($scope) {
+
 });
 
-app.controller('overviewPMController', function ($scope, appState) {
-	appState.setOverviewState('pm');
+app.controller('overviewPMController', function ($scope) {
+
 });
 
-app.controller('overviewOSCAPController', function ($scope, appState) {
-	appState.setOverviewState('oscap');
+app.controller('overviewOSCAPController', function ($scope) {
+
 });
 
-app.controller('overviewAuditController', function ($scope, appState) {
-	appState.setOverviewState('audit');
+app.controller('overviewAuditController', function ($scope) {
+
 });
 
-app.controller('overviewPCIController', function ($scope, genericReq, appState) {
-	appState.setOverviewState('pci');
+app.controller('overviewPCIController', function ($scope, genericReq) {
 
 	let tabs = [];
 	
