@@ -155,7 +155,6 @@ module.exports = (server, options) => {
 		needle('post', tmpUrl, body, options)
 		.then((resp) => {
 			server.log([blueWazuh, 'initialize', 'info'], 'Successfully created index-pattern.');
-			console.log(resp);
 			// Set the index-pattern as default in the Kibana configuration
 			setDefaultKibanaSettings(resp.body.id);
 			// Import objects (dashboards and visualizations) CAREFUL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!

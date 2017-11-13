@@ -72,14 +72,16 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
         .catch((error) => printError(error));
 
         apiReq.request('GET', '/agents/summary', {})
-        .then((data) => {
+        .then(data => {
             $scope.agentsCountActive         = data.data.data.Active;
             $scope.agentsCountDisconnected   = data.data.data.Disconnected;
             $scope.agentsCountNeverConnected = data.data.data['Never connected'];
             $scope.agentsCountTotal          = data.data.data.Total;
             $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
             $scope.loading                   = false;
+            return apiReq.request('GET', '/agents', { sort:'-date_add', limit:1 });
         })
+        .then(data => $scope.lastAgent = data.data.data.items[0])
         .catch((error) => printError(error));
     };
 

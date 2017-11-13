@@ -11,6 +11,8 @@ app.factory('DataHandler', function ($q, apiReq) {
             this.initial      = true;
             this.initialBatch = 40;
             this.regularBatch = 15;
+            this.busy         = false;
+            this.end          = false;
         }
 
         nextPage () {
@@ -37,7 +39,7 @@ app.factory('DataHandler', function ($q, apiReq) {
 
             let deferred = $q.defer();
             apiReq.request('GET', this.path, requestData)
-            .then(function (data) {
+            .then(data => {
                 if (data.data.data === 0){
                     deferred.resolve(false);
                 }
@@ -52,9 +54,15 @@ app.factory('DataHandler', function ($q, apiReq) {
                 if (data.data.data !== 0){
                     deferred.resolve(true);
                 }
-            }.bind(this));
+            })
+            .catch(console.error);
 
             return deferred.promise;
+        }
+
+        getFilter (filterName) {
+            let filtered = this.filters.filter((element) => element.name === filterName);
+            return (filtered.length !== 0) ? filtered[0].value : null;           
         }
 
         hasFilter (filterName) {
