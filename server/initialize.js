@@ -5,6 +5,7 @@ const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
 const OBJECTS_FILE = './integration_files/objects_file.json';
+const APP_OBJECTS_FILE = './integration_files/app_objects_file.json';
 
 module.exports = (server, options) => {
 	//const uiSettings = server.uiSettings();
@@ -14,6 +15,7 @@ module.exports = (server, options) => {
 
 	let index_pattern = "wazuh-alerts-*";
 	let objects       = {};
+	let app_objects = {};
 	let packageJSON   = {};
 
 	// Read config from package JSON
@@ -102,6 +104,56 @@ module.exports = (server, options) => {
 		});
 	};
 
+	// Importing Wazuh app visualizations and dashboards
+	const importAppObjects = (id) => {
+		server.log([blueWazuh, 'initialize', 'info'], 
+					'Importing Wazuh app visualizations...');
+
+		try {
+			app_objects = require(APP_OBJECTS_FILE);
+		} catch (e) {
+			server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
+			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + APP_OBJECTS_FILE);
+			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+		}
+
+		let body = '';
+		for(let element of app_objects){
+			body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + 
+			'"_id": "' + element._type + ':' + element._id + '" } }\n';
+
+			let temp = {};
+			let aux  = JSON.stringify(element._source);
+			aux      = aux.replace("wazuh-alerts", id);
+			aux      = JSON.parse(aux);
+			temp[element._type] = aux;
+			
+			if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
+				temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
+			}
+			
+			temp["type"] = element._type;
+			body        += JSON.stringify(temp) + "\n";
+		}
+
+		elasticRequest
+		.callWithInternalUser('bulk', {
+			index: '.kibana',
+			body:  body
+		})
+		.then(() => elasticRequest.callWithInternalUser('indices.refresh', {
+			index: ['.kibana', index_pattern]
+		}))
+		.then(() => {
+			server.log([blueWazuh, 'initialize', 'info'], 
+			'Wazuh app visualizations were successfully installed. App ready to be used.');
+		})
+		.catch((error) => {
+			server.log([blueWazuh, 'server', 'error'], 
+					'Error importing objects into elasticsearch. Bulk request failed.');
+		});
+	};
+
 	// Setting default index pattern
 	const setDefaultKibanaSettings = (id) => {
 		server.log([blueWazuh, 'initialize', 'info'], 
@@ -159,6 +211,7 @@ module.exports = (server, options) => {
 			setDefaultKibanaSettings(resp.body.id);
 			// Import objects (dashboards and visualizations) CAREFUL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!
 			importObjects(resp.body.id);
+			importAppObjects(resp.body.id);
 		})
 		.catch((err) => {
 			server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
