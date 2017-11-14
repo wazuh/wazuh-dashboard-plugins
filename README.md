@@ -29,6 +29,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Installation
 
+Be **sure** to run this command as the `kibana` user. If you run it as `root`, you will *break* things.
+
 | Kibana version | Wazuh App version | Installation |
 | :---:         | :---:         |     :---      |
 | 5.2.2  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.2.2.zip  |
