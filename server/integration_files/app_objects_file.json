@@ -100,7 +100,7 @@
   {
     "_id": "Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents",
       "_source": {
-      "title": "Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents",
+      "title": "Wazuh App Overview General Alerts evolution Top 5 agents",
       "visState": "{\"title\":\"Wazuh App Overview General Alerts Evolution Top 5 Agents\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"h\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"agent.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
       "uiStateJSON": "{\"vis\":{\"colors\":{\"ip-10-0-0-157.localdomain\":\"#64B0C8\"}}}",
       "description": "",
@@ -157,7 +157,7 @@
   {
     "_id": "Wazuh-App-Overview-General-Top-group",
       "_source": {
-      "title": "Wazuh-App-Overview-General-Top-group",
+      "title": "Wazuh App Overview General Top group",
       "visState": "{\"title\":\"Wazuh App Overview General Top Group\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule.groups\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Top group\"}}]}",
       "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
       "description": "",
@@ -488,7 +488,7 @@
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"rootcheck\\\"\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-PM-Alerts-summary",
@@ -502,7 +502,7 @@
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"rule.groups:\\\"rootcheck\\\"\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
 
 
@@ -519,7 +519,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Last-agent-scanned",
@@ -533,7 +533,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"oscap.check.result: fail AND rule.groups:oscap\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Last-scan-profile",
@@ -547,7 +547,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Agents",
@@ -559,7 +559,7 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -573,7 +573,7 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -587,7 +587,7 @@
       "description": "",
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"oscap\\\" AND NOT rule.groups:\\\"syslog\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -603,7 +603,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"oscap.check.result: fail AND rule.groups:oscap AND NOT rule.groups: syslog\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Top-5-agents-Severity-high",
@@ -617,7 +617,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"rule.groups: oscap AND oscap.check.severity: high\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Top-10-alerts",
@@ -631,7 +631,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.result: fail AND rule.groups:oscap AND rule.groups: oscap-result AND data.oscap.check.result:fail\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Top-10-high-risk-alerts",
@@ -645,7 +645,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.severity: high AND data.oscap.check.result: fail AND rule.groups:oscap AND rule.groups: oscap-result AND data.oscap.check.result:fail\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Highest-score",
@@ -659,7 +659,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Lowest-score",
@@ -673,7 +673,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Latest-alert",
@@ -687,7 +687,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.result: fail AND rule.groups:oscap AND rule.groups: oscap-result AND data.oscap.check.result:fail\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-OSCAP-Last-alerts",
@@ -701,7 +701,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-Audit-Groups",
@@ -715,7 +715,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-Audit-Agents",
@@ -729,7 +729,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-Audit-Directories",
@@ -743,7 +743,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-Audit-Files",
@@ -757,7 +757,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-Audit-Alerts-over-time",
@@ -769,7 +769,7 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -783,7 +783,7 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80784\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -797,7 +797,7 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80781\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -811,7 +811,7 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -825,7 +825,7 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80790\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -839,7 +839,7 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups: audit AND rule.data.id: 80791\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      },
+      }
     },
     "_type": "visualization"
   },
@@ -855,7 +855,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-PCI-DSS-requirements",
@@ -869,7 +869,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"_exists_:rule.pci_dss\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-PCI-DSS-Groups",
@@ -883,7 +883,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-PCI-DSS-Agents",
@@ -897,7 +897,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"_exists_:rule.pci_dss\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-PCI-DSS-Requirementes-by-agent",
@@ -911,7 +911,7 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"_exists_:rule.pci_dss\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
+    "_type": "visualization"
   },
   {
     "_id": "Wazuh-App-Overview-PCI-DSS-Last-alerts",
@@ -925,6 +925,6 @@
         "searchSourceJSON": "{\"index\":\"212bca30-c546-11e7-be05-e1b36821f115\",\"filter\":[],\"query\":{\"query\":\"_exists_:rule.pci_dss\",\"language\":\"lucene\"}}"
       }
     },
-    "_type": "visualization",
-  },
+    "_type": "visualization"
+  }
 ]
