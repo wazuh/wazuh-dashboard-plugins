@@ -1,5 +1,5 @@
 // Require CSS
-require('plugins/wazuh/less/kbn.less');
+require('plugins/wazuh/less/loader');
 //require('plugins/wazuh/less/ui_framework.less');
 
 // Set up Wazuh app
