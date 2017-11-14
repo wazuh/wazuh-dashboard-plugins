@@ -28,6 +28,11 @@ app.controller('kibanaSearchbar', function ($scope, timefilter, AppState, $timeo
         };
     }
 
+    $scope.showFilterBar = function () {
+        if (filterBar.getFilters().length == 0) return false;
+        else return true;
+    };
+
     $scope.$listen(filterBar, 'update', function () {
         $scope.updateQueryAndFetch($scope.state.query);
     });
