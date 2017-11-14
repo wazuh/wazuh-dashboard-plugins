@@ -42,7 +42,6 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, gen
 	};
 
 	$scope.hideRing = (items) => {
-		//console.log("hidering is getting called");
 		return $(".vis-editor-content").length >= items;
 	};
 
