@@ -16,6 +16,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, gen
 		$location.search('tabView', 'panels');
 	}
 
+	// TODO: We should fix this and take it from AppState
 	$scope.timeGTE = 'now-1d';
 	$scope.timeLT  = 'now';
 
@@ -42,7 +43,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, gen
 	};
 
 	$scope.hideRing = (items) => {
-		return $(".vis-editor-content").length >= items;
+		return $(".vis-container").length >= items;
 	};
 
 	// Switch tab
