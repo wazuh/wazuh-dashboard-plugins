@@ -3,11 +3,11 @@ import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 
 const app = require('ui/modules').get('apps/webinar_app', []);
 
-app.controller('kibanaSearchbar', function ($scope, timefilter, AppState, $timeout, Private, $rootScope, savedVisualizations) {
+app.controller('kibanaSearchbar', function ($scope, timefilter, AppState, $timeout, Private, $rootScope, savedVisualizations, getAppState) {
     const filterBar = Private(FilterBarQueryFilterProvider);
     timefilter.enabled = true;
     let visualizeLoader = null;
-    let currentAppState = null;
+    let currentAppState = getAppState();
     $scope.indexPattern = [];
 
     savedVisualizations.get('Alert-level-evolution').then(savedObj => {
@@ -16,6 +16,8 @@ app.controller('kibanaSearchbar', function ($scope, timefilter, AppState, $timeo
         // Configure AppState. Get App State, if there is no App State create new one
         if (!currentAppState) {
             $scope.state = new AppState(getStateDefaults());
+        } else {
+            $scope.state = currentAppState;
         }
     });
 
