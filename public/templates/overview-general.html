@@ -1,10 +1,11 @@
 <md-content flex layout="column" ng-if="submenuNavItem == 'general'" ng-controller="overviewGeneralController" class="app-container wazuh-column" layout-align="start">
 
-	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(14)'><div></div></div>
+	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(15)'><div></div></div>
+
 	<!-- Kibana search bar -->
 	<!-- Local nav. -->
-	<div ng-controller="kibanaSearchbar">
-	    <kbn-top-nav name="dashboard" config="topNavMenu">
+	<div ng-if="!loading" ng-controller="kibanaSearchbar">
+	    <kbn-top-nav name="overview_general" config="topNavMenu">
 	      <!-- Transcluded elements. -->
 	      <div data-transclude-slots>
 	        <!-- Title. -->
@@ -13,7 +14,7 @@
 	        <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
 	          <query-bar
 	            query="state.query"
-	            app-name="'dashboard'"
+	            app-name="'wazuh'"
 	            on-submit="updateQueryAndFetch($query)"
 	          >
 	          </query-bar>
@@ -31,7 +32,7 @@
 	</div>
 
 	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(14)">
+	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(15)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				No results for selected time interval
@@ -46,7 +47,7 @@
 
 
 	<!-- View: Panels -->
-	<div ng-show="hideRing(14) && results && !loading" ng-if="tabView == 'panels'" class="wazuh-column">
+	<div ng-show="hideRing(15) && results && !loading" ng-if="tabView == 'panels'" class="wazuh-column">
 		<div layout="row" layout-align="center stretch" class="wazuh-row" style="height: 115px;">
 			<md-card class="wazuh-row">
  				<md-card-content class="wazuh-row metric">
@@ -76,7 +77,7 @@
 					<kbn-vis vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'" id="Wazuh-App-Overview-General-Alert-level-evolution"></kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="60" class="wazuh-row">
+			<md-card flex="60" class="wazuh-column">
 				<md-card-content class="wazuh-column">
 					<span class="md-headline">Alerts</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts'" id="Wazuh-App-Overview-General-Alerts"></kbn-vis>

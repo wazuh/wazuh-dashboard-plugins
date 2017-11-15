@@ -1,11 +1,38 @@
-<md-content flex layout="column" ng-if="submenuNavItem == 'fim'" ng-controller="overviewFimController">
+<md-content flex layout="column" ng-if="submenuNavItem == 'fim'" ng-controller="overviewFimController" class="app-container wazuh-column">
+
+	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(16)'><div></div></div>
 
 	<!-- Kibana search bar -->
-	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
-	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(17)'><div></div></div>
+	<!-- Local nav. -->
+	<div ng-if="!loading" ng-controller="kibanaSearchbar">
+	    <kbn-top-nav name="overview_fim" config="topNavMenu">
+	      <!-- Transcluded elements. -->
+	      <div data-transclude-slots>
+	        <!-- Title. -->
+
+	        <!-- Search. -->
+	        <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+	          <query-bar
+	            query="state.query"
+	            app-name="'wazuh'"
+	            on-submit="updateQueryAndFetch($query)"
+	          >
+	          </query-bar>
+	        </div>
+	      </div>
+	    </kbn-top-nav>
+
+	    <!-- Filters. -->
+	    <filter-bar
+	      ng-show="showFilterBar()"
+	      state="state"
+	      index-patterns="indexPattern"
+	      ng-if="state.query.language === 'lucene'"
+	    ></filter-bar>
+	</div>
 
 	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(17)">
+	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(16)">
 		<md-card flex layout="column">
 			<md-card-content style="text-align: center;">
 				No results for selected time interval
@@ -23,171 +50,148 @@
 	</md-content>
 
 	<!-- View: Panels -->
-	<div ng-show="hideRing(17) && results && !loading" ng-if="tabView == 'panels'">
-		<md-content layout="row">
-			<div flex="10" layout="column" class="no-legend column-fim">
-				<md-card>
-					<md-card-content>
-						<kbn-vis vis-height="110px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Added),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 554'>
-						</kbn-vis>
+	<div ng-show="hideRing(16) && results && !loading" ng-if="tabView == 'panels'" class="wazuh-column">
+		<md-content layout="row" class="wazuh-row" style="height: 420px; max-height: 420px;">
+			<div flex="10" layout="column" class="wazuh-column">
+				<md-card class="wazuh-row">
+					<md-card-content class="wazuh-column metric" style="text-align: center;">
+						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Added'" id="Wazuh-App-Overview-FIM-Added"></kbn-vis>
+						<div class="ng-binding">Added</div>
 					</md-card-content>
 				</md-card>
-				<md-card>
-					<md-card-content>
-						<kbn-vis vis-height="110px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22Integrity%20checksum%20changed%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:'Modified'),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555)'>
-						</kbn-vis>
+				<md-card class="wazuh-row">
+					<md-card-content class="wazuh-column metric" style="text-align: center;">
+						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Modified'" id="Wazuh-App-Overview-FIM-Modified"></kbn-vis>
+						<div class="ng-binding">Modified</div>
 					</md-card-content>
 				</md-card>
-				<md-card>
-					<md-card-content>
-						<kbn-vis vis-height="110px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20full_log:%22was%20deleted%22%20NOT%20location:%20syscheck-registry')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(customLabel:Deleted),schema:metric,type:count)),listeners:(),params:(fontSize:20,handleNoResults:!t),title:'New%20Visualization',type:metric))" vis-filter='rule.id: 553'>
-						</kbn-vis>
+				<md-card class="wazuh-row">
+					<md-card-content class="wazuh-column metric" style="text-align: center;">
+						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Deleted'" id="Wazuh-App-Overview-FIM-Deleted"></kbn-vis>
+						<div class="ng-binding">Deleted</div>
 					</md-card-content>
 				</md-card>
 			</div>
 
-			<div flex layout="column">
-				<md-card>
-					<md-card-content>
+			<div flex layout="column" class="wazuh-row">
+				<md-card class="wazuh-row">
+					<md-card-content class="wazuh-column">
 						<span class="md-headline">Events over time</span>
-						<kbn-vis vis-height="380px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:8),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:step-after,legendPosition:right,mode:stacked,orderBucketsBySum:!t,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!t,times:!(),yAxis:()),title:'FIM%20Alerts%20over%20time',type:area))"
-					vis-filter='rule.groups:"syscheck"'>
+						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Events-over-time'" id="Wazuh-App-Overview-FIM-Events-over-time"></kbn-vis>
 					</md-card-content>
 				</md-card>
-
 			</div>
 
-			<div flex="20" layout="column">
-				<md-card>
-					<md-card-content>
+			<div flex="20" layout="column" class="wazuh-column">
+				<md-card class="wazuh-row">
+					<md-card-content class="wazuh-column">
 						<span class="md-headline">Top user owners</span>
-						<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.uname_after,order:desc,orderBy:'1',size:3),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))"
-						vis-filter='rule.groups:"syscheck"'>
+						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-user-owners'" id="Wazuh-App-Overview-FIM-Top-user-owners"></kbn-vis>
 					</md-card-content>
 				</md-card>
-				<md-card>
-					<md-card-content>
+				<md-card class="wazuh-row">
+					<md-card-content class="wazuh-column">
 						<span class="md-headline">Top group owners</span>
-						<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!t)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:syscheck.gname_after,order:desc,orderBy:'1',size:3),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'FIM%20Top%2015%20new%20users',type:pie))" vis-filter='rule.groups:"syscheck"'>
+						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-group-owners'" id="Wazuh-App-Overview-FIM-Top-group-owners"></kbn-vis>
 					</md-card-content>
 				</md-card>
-
 			</div>
-
-
 		</md-content>
 
-		<md-content layout="row">
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-					vis-filter="syscheck.event: modified AND location: syscheck">
-					</kbn-vis-value>
+		<md-content layout="row" class="wazuh-row" style="height: 115px;">
+			<md-card flex layout="column" class="wazuh-column">
+				<md-card-content style="text-align: center;" class="wazuh-column">
+					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Last-file-modified'" id="Wazuh-App-Overview-FIM-Last-file-modified"></kbn-vis>
 					<div class="ng-binding">Last file modified</div>
 				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-					vis-filter="syscheck.event: added AND location: syscheck">
-					</kbn-vis-value>
+			</md-card >
+			<md-card flex layout="column" class="wazuh-column">
+				<md-card-content style="text-align: center;" class="wazuh-column">
+					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Last-file-added'" id="Wazuh-App-Overview-FIM-Last-file-added"></kbn-vis>
 					<div class="ng-binding">Last file added</div>
 				</md-card-content>
 			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(field:'@timestamp'),schema:metric,type:max),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-					vis-filter="syscheck.event: deleted AND location: syscheck">
-					</kbn-vis-value>
+			<md-card flex layout="column" class="wazuh-column">
+				<md-card-content style="text-align: center;" class="wazuh-column">
+					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Last-file-deleted'" id="Wazuh-App-Overview-FIM-Last-file-deleted"></kbn-vis>
 					<div class="ng-binding">Last file deleted</div>
 				</md-card-content>
 			</md-card>
-
 		</md-content>
 
-		<md-content layout="row">
-
-			<md-card flex="33">
+		<md-content layout="row" class="wazuh-row" style="height: 213px;">
+			<md-card flex="33" class="wazuh-column">
 				<md-card-title>
-						<md-card-title-text>
-							<span class="md-headline">Top file changes</span>
-						</md-card-title-text>
+					<md-card-title-text>
+						<span class="md-headline">Top file changes</span>
+					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
-						vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry'></kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-file-changes'" id="Wazuh-App-Overview-FIM-Top-file-changes"></kbn-vis>
 				</md-card-content>
 			</md-card>
 
-			<md-card flex="33">
+			<md-card flex="33" class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Root user file changes</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Changed',type:pie))"
-						vis-filter='rule.groups:"syscheck" AND full_log:"Integrity checksum changed" NOT location: syscheck-registry AND root'></kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Root-user-file-changes'" id="Wazuh-App-Overview-FIM-Root-user-file-changes"></kbn-vis>
 				</md-card-content>
 			</md-card>
 
-			<md-card flex="33">
+			<md-card flex="33" class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">World writable modified files</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="193px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'rule.groups:%22syscheck%22%20AND%20_exists_:syscheck.perm_after%20AND%20%20(syscheck.perm_after:%2F%5B0-7%5D%7B5%7D(%5B2367%5D).*%2F)')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,shareYAxis:!t),title:'FIM%20Top%2010%20Files',type:pie))"
-						vis-filter='rule.groups:"syscheck" AND _exists_:syscheck.perm_after AND (syscheck.perm_after:/[0-7]{5}([2367]).*/) '></kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Overview-FIM-World-writable-modified-files'" id="Wazuh-App-Overview-FIM-World-writable-modified-files"></kbn-vis>
 				</md-card-content>
 			</md-card>
-
-
 		</md-content>
 
-		<md-content layout="row" flex="100">
-			<md-card flex="20" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*"vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:agent.name,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>
+		<md-content layout="row" flex="100" class="wazuh-row"  style="height: 115px;">
+			<md-card flex="20" layout="column" class="wazuh-column">
+				<md-card-content style="text-align: center;" class="wazuh-column">
+					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Top-agent'" id="Wazuh-App-Overview-FIM-Top-agent"></kbn-vis>
 					<div class="ng-binding">Top agent</div>
 				</md-card-content>
 			</md-card>
-			<md-card flex="20" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>
+			<md-card flex="20" layout="column" class="wazuh-column">
+				<md-card-content style="text-align: center;" class="wazuh-column">
+					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Top-PCI-requirement'" id="Wazuh-App-Overview-FIM-Top-PCI-requirement"></kbn-vis>
 					<div class="ng-binding">Top PCI Requirement</div>
 				</md-card-content>
 			</md-card>
-			<md-card flex="20" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*"vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.perm_after,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>
+			<md-card flex="20" layout="column" class="wazuh-column">
+				<md-card-content style="text-align: center;" class="wazuh-column">
+					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Most-common-permissions'" id="Wazuh-App-Overview-FIM-Most-common-permissions"></kbn-vis>
 					<div class="ng-binding">Most common permissions</div>
 				</md-card-content>
 			</md-card>
-			<md-card flex="40" layout="column">
-				<md-card-content style="text-align: center;">
-					<kbn-vis-value vis-height="37px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:syscheck.path,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:1,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))" vis-filter="location: syscheck"></kbn-vis-value>
+			<md-card flex="40" layout="column" class="wazuh-column">
+				<md-card-content style="text-align: center;" class="wazuh-column">
+					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Most-modified-file'" id="Wazuh-App-Overview-FIM-Most-modified-file"></kbn-vis>
 					<div class="ng-binding">Most modified file</div>
 				</md-card-content>
 			</md-card>
-
 		</md-content>
 
-		<md-content flex layout="row">
-			<md-card flex>
+		<md-content flex layout="row" class="wazuh-row" style="height: 470px;">
+			<md-card flex class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Events summary</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:Agent,field:agent.name,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:File,field:syscheck.path,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'5',params:(customLabel:Event,field:syscheck.event,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms),(enabled:!t,id:'6',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:999999999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-						vis-filter="rule.groups: syscheck">
-					</kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Events-summary'" id="Wazuh-App-Overview-FIM-Events-summary"></kbn-vis>
 				</md-card-content>
 			</md-card>
-
 		</md-content>
 	</div>
 </md-content>
