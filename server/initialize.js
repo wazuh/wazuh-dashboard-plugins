@@ -5,7 +5,7 @@ const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
 const OBJECTS_FILE = './integration_files/objects_file.json';
-const APP_OBJECTS_FILE = './integration_files/app_objects_file.json';
+const APP_OBJECTS_FILE = './integration_files/app_objects_file_alerts.json';
 
 module.exports = (server, options) => {
 	//const uiSettings = server.uiSettings();
