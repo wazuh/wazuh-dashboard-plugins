@@ -23,13 +23,13 @@ module.exports = (server, options) => {
 	try {
 		packageJSON = require('../package.json');
 	} catch (e) {
-		server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'Could not read the Wazuh package file.');
+		server.log([blueWazuh, 'monitoring', 'error'], 'Could not read the Wazuh package file.');
 	}
 
 	// Check status and get agent status array
 	const checkStatus = (apiEntry, maxSize, offset) => {
 		if (!maxSize) {
-			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 'You must provide a max size');
+			server.log([blueWazuh, 'monitoring', 'error'], 'You must provide a max size');
 		}
 
 		let payload = {
@@ -59,7 +59,7 @@ module.exports = (server, options) => {
 					saveStatus();
 				}
 			} else {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+				server.log([blueWazuh, 'monitoring', 'error'], 
 						'Can not access Wazuh API');
 			}
 		});
@@ -85,7 +85,7 @@ module.exports = (server, options) => {
 			if (!response.error && response.body.data && response.body.data.totalItems) {
 				checkStatus(apiEntry, response.body.data.totalItems);
 			} else {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+				server.log([blueWazuh, 'monitoring', 'error'], 
 				'Wazuh API credentials not found or are not correct. '+
 				'Open the app in your browser and configure it to start monitoring agents.');
 			}
@@ -105,7 +105,7 @@ module.exports = (server, options) => {
 				'insecure': element._source.insecure
 			};
 			if (apiEntry.error) {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+				server.log([blueWazuh, 'monitoring', 'error'], 
 						`Error getting wazuh-api data: ${apiEntry.error}`);
 				break;
 			}
@@ -143,7 +143,7 @@ module.exports = (server, options) => {
 
 	// Configure Kibana patterns.
 	const configureKibana = () => {
-		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 
+		server.log([blueWazuh, 'monitoring', 'info'], 
 					`Creating index pattern: ${index_pattern}`);
 
 		// Call the internal API and wait for the response
@@ -163,7 +163,7 @@ module.exports = (server, options) => {
 
 		return needle(
 			'post', 
-			`http://localhost:${server.info.port}/api/saved_objects/index-pattern`, 
+			`${server.info.uri}/api/saved_objects/index-pattern`, 
 			body, 
 			options
 		);
@@ -176,12 +176,12 @@ module.exports = (server, options) => {
 			index: todayIndex
 		})
 		.then(() => {
-			server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 
+			server.log([blueWazuh, 'monitoring', 'info'], 
 					'Successfully created today index.');
 			insertDocument(todayIndex);
 		})
 		.catch((error) => {
-			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+			server.log([blueWazuh, 'monitoring', 'error'], 
 					`Could not create ${todayIndex} index on elasticsearch.`);
 		});
 	};
@@ -212,7 +212,7 @@ module.exports = (server, options) => {
 			})
 			.then((response) => agentsArray.length = 0)
 			.catch((err) => {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+				server.log([blueWazuh, 'monitoring', 'error'], 
 						'Error inserting agent data into elasticsearch. Bulk request failed.');
 			});
 		}
@@ -235,14 +235,14 @@ module.exports = (server, options) => {
 			}
 		})
 		.catch((error) => {
-			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+			server.log([blueWazuh, 'monitoring', 'error'], 
 				`Could not check if the index ${todayIndex} exists.`);
 		});
 	};
 
 	// Main. First execution when installing / loading App.
 	const init = () => {
-		server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Creating today index...');
+		server.log([blueWazuh, 'monitoring', 'info'], 'Creating today index...');
 		saveStatus();
 
 		elasticRequest
@@ -253,32 +253,75 @@ module.exports = (server, options) => {
 		})
 		.then((data) => {
 			if (data.hits.total === 1) {
-				server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 
+				server.log([blueWazuh, 'monitoring', 'info'], 
 							'Skipping index-pattern creation. Already exists.');
 			} else {
 				configureKibana();
 			}
 		})
 		.catch((error) => {
-			server.log([blueWazuh, 'Wazuh agents monitoring', 'error'], 
+			server.log([blueWazuh, 'monitoring', 'error'], 
 						'Could not reach elasticsearch.');
 		});
 	};
 
-	// Wait until Elasticsearch is ready
-	const checkElasticStatus = () => {
-		elasticRequest
-		.callWithInternalUser('info')
-		.then((data) => server.plugins.elasticsearch.waitUntilReady())
-		.then(() => init())
-		.catch((error) => {
-			server.log([blueWazuh, 'Wazuh agents monitoring', 'info'], 'Waiting for Elasticsearch to be up...');
-			setTimeout(() => checkElasticStatus(), 3000);
+    // Check Kibana server status
+    const checkKibanaServer  = () => {
+        return new Promise(function (resolve, reject) {
+
+		let requestUrl = `${server.info.uri}/api/saved_objects/index-pattern`;
+		needle('get', requestUrl)
+		.then((resp) => {
+            if (resp.statusCode == "200")
+                resolve(resp)
+            else
+                reject(err)
+		})
+		.catch((err) => {
+            reject(err)
 		});
+        })
+    }
+
+    // Check Elasticsearch Server status and .kibana index presence
+    const checkElasticsearchServer  = () => {
+        return new Promise(function (resolve, reject) {
+            elasticRequest
+            .callWithInternalUser('exists', {
+                index: ".kibana",
+                id:    packageJSON.kibana.version,
+                type:  "config"
+            })
+            .then((data) => {
+                checkKibanaServer().then((data) => {
+                    if (data.statusCode == "200"){
+                        resolve(data)
+                    }else{
+                        reject(data)
+                    }
+                })
+                .catch((err) => {
+                    reject(err)
+                });
+            })
+            .catch((error) => {
+                reject(error)
+            });
+        })
+    }
+
+	// Wait until Kibana server is ready
+	const checkKibanaStatus = () => {
+        checkElasticsearchServer()
+        .then((data) => {init()})
+        .catch((error) => {
+            server.log([blueWazuh, 'monitoring', 'info'], 'Waiting Kibana and Elasticsearch servers to be ready....');
+            setTimeout(() => checkKibanaStatus(), 3000);
+        });
 	};
 
-	// Starting
-	checkElasticStatus();
+	// Check Kibana index and if it is prepared, start the initialization of Wazuh App.
+	checkKibanaStatus();
 
 	// Cron tab for getting agent status.
 	cron.schedule('0 */10 * * * *', () => {

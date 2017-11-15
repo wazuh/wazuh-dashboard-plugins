@@ -171,9 +171,9 @@ module.exports = (server, options) => {
 			"value": id
 		};
 
-		let tmpUrl = `http://localhost:${server.info.port}/api/kibana/settings/defaultIndex`;
+		let requestUrl = `${server.info.uri}/api/kibana/settings/defaultIndex`;
 
-		needle('post', tmpUrl, body, options)
+		needle('post', requestUrl, body, options)
 		.then((resp) => {
 			server.log([blueWazuh, 'initialize', 'info'], 
 					'Wazuh index-pattern successfully set to default.');
@@ -202,14 +202,13 @@ module.exports = (server, options) => {
 			}
 		};
 
-		let tmpUrl = `http://localhost:${server.info.port}/api/saved_objects/index-pattern`;
-
-		needle('post', tmpUrl, body, options)
+		let requestUrl = `${server.info.uri}/api/saved_objects/index-pattern`;
+		needle('post', requestUrl, body, options)
 		.then((resp) => {
 			server.log([blueWazuh, 'initialize', 'info'], 'Successfully created index-pattern.');
 			// Set the index-pattern as default in the Kibana configuration
 			setDefaultKibanaSettings(resp.body.id);
-			// Import objects (dashboards and visualizations) CAREFUL HERE, WE HAVE TO MANAGE SUCESIVE APP INITIATIONS!!!
+			// Import objects (dashboards and visualizations)
 			importObjects(resp.body.id);
 			importAppObjects(resp.body.id);
 		})
@@ -286,23 +285,61 @@ module.exports = (server, options) => {
 		});
 	};
 
-	// Wait until Kibana index is created / loaded and initialize Wazuh App
-	const checkKibanaIndex = () => {
-		elasticRequest
-		.callWithInternalUser('exists', {
-			index: ".kibana",
-			id:    packageJSON.kibana.version,
-			type:  "config"
+    // Check Kibana server status
+    const checkKibanaServer  = () => {
+        return new Promise(function (resolve, reject) {
+
+		let requestUrl = `${server.info.uri}/api/saved_objects/index-pattern`;
+		needle('get', requestUrl)
+		.then((resp) => {
+            if (resp.statusCode == "200")
+                resolve(resp)
+            else
+                reject(err)
 		})
-		.then((data) => server.plugins.elasticsearch.waitUntilReady())
-		.then(() => init())
-		.catch((error) => {
-			server.log([blueWazuh, 'initialize', 'info'], 
-						'Waiting index ".kibana" to be created and prepared....');
-			setTimeout(() => checkKibanaIndex(), 3000);
+		.catch((err) => {
+            reject(err)
 		});
+        })
+    }
+
+    // Check Elasticsearch Server status and .kibana index presence
+    const checkElasticsearchServer  = () => {
+        return new Promise(function (resolve, reject) {
+            elasticRequest
+            .callWithInternalUser('exists', {
+                index: ".kibana",
+                id:    packageJSON.kibana.version,
+                type:  "config"
+            })
+            .then((data) => {
+                checkKibanaServer().then((data) => {
+                    if (data.statusCode == "200"){
+                        resolve(data)
+                    }else{
+                        reject(data)
+                    }
+                })
+                .catch((err) => {
+                    reject(err)
+                });
+            })
+            .catch((error) => {
+                reject(error)
+            });
+        })
+    }
+
+	// Wait until Kibana server is ready
+	const checkKibanaStatus = () => {
+        checkElasticsearchServer()
+        .then((data) => {init()})
+        .catch((error) => {
+            server.log([blueWazuh, 'initialize', 'info'], 'Waiting Kibana and Elasticsearch servers to be ready....');
+            setTimeout(() => checkKibanaStatus(), 3000);
+        });
 	};
 
 	// Check Kibana index and if it is prepared, start the initialization of Wazuh App.
-	checkKibanaIndex();
+	checkKibanaStatus();
 };
