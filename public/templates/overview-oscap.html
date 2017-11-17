@@ -71,7 +71,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" style="height: 215px;">
+        <md-content layout="row" layout-align="center stretch" style="height: 215px;" class="wazuh-row">
             <md-card flex="25" class="wazuh-column">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Agents</span>
@@ -97,7 +97,7 @@
                     <kbn-vis vis-id="'Wazuh-App-Overview-OSCAP-Severity'" id="Wazuh-App-Overview-OSCAP-Severity"></kbn-vis>
                 </md-card-content>
             </md-card>
-        </div>
+        </md-content>
 
         <div layout="row" layout-align="start stretch" style="height: 240px;">
             <md-card flex class="wazuh-column">
@@ -153,14 +153,10 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" style="height: 470px;">
+        <div layout="row" layout-align="center stretch" style="height: 530px;">
             <md-card flex class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Last alerts</span>
-                    </md-card-title-text>
-                </md-card-title>
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Last alerts</span>
                     <kbn-vis vis-id="'Wazuh-App-Overview-OSCAP-Last-alerts'" id="Wazuh-App-Overview-OSCAP-Last-alerts"></kbn-vis>
                 </md-card-content>
             </md-card>

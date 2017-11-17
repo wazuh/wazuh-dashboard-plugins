@@ -59,6 +59,7 @@ app.controller('kibanaSearchbar', function ($scope, timefilter, AppState, $timeo
             fullFilter = implicitFilter;
         else fullFilter = implicitFilter + ' AND ' + query.query;
 
+        console.log("searching with " + fullFilter);  
         $rootScope.$broadcast('updateVis', {'language': 'lucene', 'query': fullFilter}, filterBar.getFilters());
         $rootScope.$broadcast('fetch');
     };

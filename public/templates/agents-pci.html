@@ -1,98 +1,89 @@
-<md-content ng-if="submenuNavItem == 'pci' && _agent" id="agents-pci" ng-controller="PCIController" class="app-container wazuh-column">
+<md-content ng-if="tab == 'pci' && _agent" id="agents-pci" ng-controller="PCIController">
 
-	<!--<div class='uil-ring-css' ng-if="tabView == 'panels'">
-		<div></div>
-	</div>-->
+    <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(3)'><div></div></div>
 
-	<!-- Kibana search bar -->
-	<!-- Local nav. -->
-	<div ng-if="!loading" ng-controller="kibanaSearchbar">
-		<kbn-top-nav name="agents_fim" config="topNavMenu">
-			<!-- Transcluded elements. -->
-			<div data-transclude-slots>
-				<!-- Title. -->
+    <!-- Kibana search bar -->
+    <!-- Local nav. -->
+    <div ng-if="hideRing(3) && !loading" ng-controller="kibanaSearchbar">
+        <kbn-top-nav name="agents_fim" config="topNavMenu">
+            <!-- Transcluded elements. -->
+            <div data-transclude-slots>
+                <!-- Title. -->
 
-				<!-- Search. -->
-				<div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-					<query-bar query="state.query" app-name="'wazuh'" on-submit="updateQueryAndFetch($query)">
-					</query-bar>
-				</div>
-			</div>
-		</kbn-top-nav>
+                <!-- Search. -->
+                <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+                    <query-bar query="state.query" app-name="'wazuh'" on-submit="updateQueryAndFetch($query)">
+                    </query-bar>
+                </div>
+            </div>
+        </kbn-top-nav>
 
-		<!-- Filters. -->
-		<filter-bar ng-show="showFilterBar()" state="state" index-patterns="indexPattern" ng-if="state.query.language === 'lucene'"></filter-bar>
-	</div>
+        <!-- Filters. -->
+        <filter-bar ng-show="showFilterBar()" state="state" index-patterns="indexPattern" ng-if="state.query.language === 'lucene'"></filter-bar>
+    </div>
 
+    <!-- No results message -->
+    <md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(3)">
+        <md-card flex layout="column">
+            <md-card-content style="text-align: center;">
+                No results for selected time interval
+            </md-card-content>
+        </md-card>
+    </md-content>
 
-	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels'">
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				No results for selected time interval
-			</md-card-content>
-		</md-card>
-	</md-content>
+    <!-- View: Discover -->
+    <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover' && agentInfo.name">
+        <kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+        dis-filter="_exists_:rule.pci_dss "
+        infinite-scroll="true">
+        </kbn-disfull>
+    </md-content>
 
+    <!-- View: Panels -->
+    <div flex ng-show="hideRing(3) && results && !loading" ng-if="tabView == 'panels' && !load" class="wazuh-column">
+        <md-content layout="row" layout-align="center stretch">
+	        <md-card flex>
+	            <md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">
+	                <md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
+	                    <md-content style="background-color: white;" class="md-padding">
+	                        <h1 class="md-display-2 wazuh-h1" style="line-height: 40px; margin: 0;">PCI DSS Requirement: {{tab.title}}</h1>
+	                        <div ng-bind-html="tab.content"></div>
+	                    </md-content>
+	                </md-tab>
+	            </md-tabs>
+	        </md-card>
+	    </md-content>
 
-	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover' && agentInfo.name">
-		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-		    dis-filter="_exists_:rule.pci_dss " infinite-scroll="true">
-		</kbn-disfull>
-	</md-content>
+	    <md-content layout="row" layout-align="center stretch" style="height: 255px;">
+	        <md-card flex="70" class="wazuh-column">
+	            <md-card-title>
+	                <md-card-title-text>
+	                    <span class="md-headline">Requirements</span>
+	                </md-card-title-text>
+	            </md-card-title>
+	            <md-card-content class="wazuh-column">
+	                <kbn-vis vis-id="'Wazuh-App-Agents-PCI-Requirements'" id="Wazuh-App-Agents-PCI-Requirements"></kbn-vis>
+	            </md-card-content>
+	        </md-card>
+	        <md-card flex="30" class="wazuh-column">
+	            <md-card-title>
+	                <md-card-title-text>
+	                    <span class="md-headline">Groups</span>
+	                </md-card-title-text>
+	            </md-card-title>
+	            <md-card-content class="wazuh-column">
+	                <kbn-vis vis-id="'Wazuh-App-Agents-PCI-Groups'" id="Wazuh-App-Agents-PCI-Groups"></kbn-vis>
+	            </md-card-content>
+	        </md-card>
+	    </md-content>
 
-	<div flex ng-show="results && !loading" ng-if="tabView == 'panels' && !load" layout="column">
-		<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
-
-		<md-content layout="row" layout-align="center stretch">
-			<md-card flex>
-				<md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">
-					<md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-						<md-content style="background-color: white;" class="md-padding">
-							<h1 class="md-display-2 wazuh-h1" style="line-height: 40px; margin: 0;">PCI DSS Requirement: {{tab.title}}</h1>
-							<div ng-bind-html="tab.content"></div>
-						</md-content>
-					</md-tab>
-				</md-tabs>
-			</md-card>
-		</md-content>
-
-		<div layout="row" layout-align="center stretch" class="wazuh-row" style="height: 255px;">
-			<md-card flex="70" class="wazuh-row">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Requirements</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-row">
-					<kbn-vis vis-id="'Wazuh-App-Agents-PCI-Requirements'" id="Wazuh-App-Agents-PCI-Requirements"></kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="30" class="wazuh-row">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Groups</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-row">
-					<kbn-vis vis-id="'Wazuh-App-Agents-PCI-Groups'" id="Wazuh-App-Agents-PCI-Groups"></kbn-vis>
-				</md-card-content>
-			</md-card>
-		</div>
-
-		<div layout="row" layout-align="center stretch" class="wazuh-row" style="height: 470px;">
-			<md-card flex class="wazuh-row">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline ">Last alerts</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-row">
-					<kbn-vis vis-id="'Wazuh-App-Agents-PCI-Last-alerts'" id="Wazuh-App-Agents-PCI-Last-alerts"></kbn-vis>
-				</md-card-content>
-			</md-card>
-		</div>
-
-	</div>
+	    <div layout-align="center stretch" style="height: 540px;" class="wazuh-column">
+	        <md-card flex class="wazuh-column">
+	            <md-card-content class="wazuh-column">
+	                <span class="md-headline">Last alerts</span>
+	                <kbn-vis vis-id="'Wazuh-App-Agents-PCI-Last-alerts'" id="Wazuh-App-Agents-PCI-Last-alerts"></kbn-vis>
+	            </md-card-content>
+	        </md-card>
+	    </div>
+    </div>
 </md-content>
