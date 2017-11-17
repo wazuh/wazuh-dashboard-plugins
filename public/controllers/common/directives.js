@@ -19,10 +19,10 @@ app
 			`	<md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">` +
 			`		<img aria-hidden="true" kbn-src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>` +
 			`	</md-nav-item>` +
-			`	<md-nav-item style="color:white !important;" md-nav-href="#/overview" name="overview">Overview</md-nav-item>` +
-			`	<md-nav-item style="color:white !important;" md-nav-href="#/manager" name="manager">Manager</md-nav-item>` +
-			`	<md-nav-item style="color:white !important;" md-nav-href="#/agents" name="agents">Agents</md-nav-item>` +
-			`	<md-nav-item style="color:white !important;" md-nav-href="#/discover" name="discover">Discover</md-nav-item>` +
+			`	<md-nav-item md-nav-href="#/overview" name="overview">Overview</md-nav-item>` +
+			`	<md-nav-item md-nav-href="#/manager" name="manager">Manager</md-nav-item>` +
+			`	<md-nav-item md-nav-href="#/agents" name="agents">Agents</md-nav-item>` +
+			`	<md-nav-item md-nav-href="#/discover" name="discover">Discover</md-nav-item>` +
 			`	<md-nav-item style="color:white !important;" class="wazuhMenuNavBar_gear" md-nav-href="#/settings" name="settings"><i class="fa fa-cog ng-scope" aria-hidden="true" ></i></md-nav-item>` +
 			`</md-nav-bar>`
 		};
