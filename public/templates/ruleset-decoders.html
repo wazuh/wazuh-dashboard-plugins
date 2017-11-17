@@ -1,12 +1,12 @@
-<md-content layout="column" style="height: 100%;" flex layout-padding ng-if="!loading && globalsubmenuNavItem2 == 'decoders'" ng-controller="decodersController" layout-align="start space-around">
+<md-content layout="column" style="height: 100%;" flex layout-padding ng-if="!loading && globalsubmenuNavItem2 == 'decoders'" ng-controller="decodersController" layout-align="start space-around" class="app-container wazuh-column">
     <div class='uil-ring-css' ng-show="loading"><div></div></div>
     <div ng-if="!loading" layout="row" layout-align="center start" style="padding: 0px;  height: 250px;  min-height: 250px; ">
-        <md-card flex="100" style="margin: 0">
-            <md-card-content>
-                <span class="md-headline-small">Top 24h - Decoder name</span>
-                <kbn-vis vis-height="200px" vis-timefilter="24h" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'2h',extended_bounds:(),field:'@timestamp',interval:auto,min_doc_count:1),schema:segment,type:date_histogram),(enabled:!t,id:'3',params:(field:decoder.name,order:desc,orderBy:'1',size:5),schema:group,type:terms)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,interpolate:linear,legendPosition:right,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,smoothLines:!f,times:!(),yAxis:()),title:'New%20Visualization',type:area))"
-                    vis-g="(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-24h,mode:quick,to:now))" vis-filter="*" vis-clickable="false">
-                </kbn-vis>
+        <md-card flex style="margin: 0; height: 220px;" class="wazuh-row">
+			<md-card-title><md-card-title-text>
+				<span class="md-headline-small">Top 24h - Decoder name</span>			
+			</md-card-title-text></md-card-title>
+            <md-card-content class="wazuh-row">
+                <kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Decoders-Top-24h-Decoder-name'" id="Wazuh-App-Manager-Ruleset-Decoders-Top-24h-Decoder-name"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
