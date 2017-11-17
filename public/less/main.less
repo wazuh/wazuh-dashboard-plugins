@@ -3,49 +3,64 @@ body {
     width: 100%;
 }
 
-.column-fim md-card-content {
-    padding: 44px 0;
+/* ------------------------------------------------------------------------ */
+/* ------------------ Full angular material overrides --------------------- */
+/* ------------------------------------------------------------------------ */
+
+.md-button.active {
+    background-color: rgba(158, 158, 158, 0.2);
 }
 
-
-.chart {
-    overflow-y: unset !important;
+md-list-item.active._md-button-wrap.ng-scope._md.md-clickable {
+    background-color: rgba(158, 158, 158, 0.2);
 }
 
 md-card-content .ng-binding {
     color: rgb(102, 102, 102);
 }
 
-
-.metrics-audit .vis-editor-canvas {
-    padding: 7px 0;
+.md-button.md-fab {
+    line-height: 5.6rem;
+    min-width: 0;
+    width: 5.6rem;
+    height: 5.6rem;
+    border-radius: 50%;
 }
 
-.no-legend .collapsible-sidebar {
-    display: none;
+.md-button.md-fab md-icon {
+    color: white;
 }
 
-.no-legend .wide-metric {
-    height: 137px !important;
-    padding-top: 30px !important;
+.fa-search-plus,
+.fa-search-minus {
+    font-size: initial !important;
 }
 
-.no-legend .metric span {
-    dominant-baseline: central;
-    font-weight: bold;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    pointer-events: none;
-    text-anchor: middle;
-    font-size: 16pt;
-    margin-top: 6px;
-    fill: rgb(102, 102, 102);
+.md-input-margin {
+    margin: 18px 20px 0 0
 }
 
-.kuiLocalNavRow {
-    z-index: 9999 !important;
+.md-input-margin {
+    margin: 18px 20px 0 0
 }
+
+md-input-container>md-select {
+    background: #3caed2;
+    border-radius: 3px;
+    color: white;
+    padding: 3px;
+}
+
+span.md-headline {
+    color: #555;
+    font-size: 17px;
+}
+
+.md-headline-small {
+    font-size: 18px;
+}
+
+/* Loading ring css */
 
 div.uil-ring-css {
     transform: scale(0.6);
@@ -74,71 +89,9 @@ div.uil-ring-css {
     animation: uil-ring-anim 1.5s linear infinite;
 }
 
-.md-button.md-fab {
-    line-height: 5.6rem;
-    min-width: 0;
-    width: 5.6rem;
-    height: 5.6rem;
-    border-radius: 50%;
-}
-
-.md-button.md-fab md-icon {
-    color: white;
-}
-
+/* Dis full directive */
 .sidebar-container {
     font-family: "Open Sans", Helvetica, Arial, sans-serif
-}
-
-.filter-bar {
-    background-color: #e4e4e4 !important;
-}
-
-.fa-search-plus,
-.fa-search-minus {
-    font-size: initial !important;
-}
-
-.md-input-margin {
-    margin: 18px 20px 0 0
-}
-
-.md-input-margin {
-    margin: 18px 20px 0 0
-}
-
-.no-legend visualize-legend {
-    visibility: hidden;
-    width: 0px;
-    height: 0px;
-    border: 0px;
-    padding: 0px;
-    display: none;
-}
-
-.no-legend .vis-alerts {
-    visibility: hidden;
-    width: 0px;
-    height: 0px;
-    border: 0px;
-    padding: 0px;
-    display: none;
-}
-
-md-input-container>md-select {
-    background: #3caed2;
-    border-radius: 3px;
-    color: white;
-    padding: 3px;
-}
-
-span.md-headline {
-    color: #555;
-    font-size: 17px;
-}
-
-.md-headline-small {
-    font-size: 18px;
 }
 
 .wazuh-h3 {
@@ -146,11 +99,9 @@ span.md-headline {
     font-weight: 400 !important;
 }
 
-.vertical-repeater {
-    height: 100%;
-    min-height: 400px;
-    width: 100%;
-}
+/* ------------------------------------------------------------------------ */
+/* -------------------------- Manager status ------------------------------ */
+/* ------------------------------------------------------------------------ */
 
 .status {
     width: 3%;
@@ -192,13 +143,21 @@ span.md-headline {
     float: right;
 }
 
+.right-text {
+    text-align: right;
+}
+
+/* ------------------------------------------------------------------------ */
+/* -------------------------- Agents preview ------------------------------ */
+/* ------------------------------------------------------------------------ */
+
 .sideNavBox {
     margin-bottom: 0px;
 }
 
-.right-text {
-    text-align: right;
-}
+/* ------------------------------------------------------------------------ */
+/* -------------------------- App nav menu -------------------------------- */
+/* ------------------------------------------------------------------------ */
 
 #header_logo>a {
     padding-top: 0;
@@ -211,71 +170,6 @@ span.md-headline {
 li#header_logo {
     margin-left: 0;
     text-align: left;
-}
-
-.glyphicon-chevron-right {
-    background-color: #3caed2;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-right: 13px;
-    padding-left: 13px;
-    color: white;
-}
-
-.glyphicon-chevron-left {
-    background-color: #3caed2;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-right: 13px;
-    padding-left: 13px;
-    color: white;
-}
-
-.md-button.active {
-    background-color: rgba(158, 158, 158, 0.2);
-}
-
-md-list-item.active._md-button-wrap.ng-scope._md.md-clickable {
-    background-color: rgba(158, 158, 158, 0.2);
-}
-
-.logTable {
-    font-family: Consolas, Helvetica;
-    font-size: 12px;
-    line-height: 1.4;
-    color: #333;
-    word-wrap: break-word;
-    border-collapse: collapse;
-    margin-bottom: 0px;
-    width: 100%;
-}
-
-.logTable tbody tr {
-    min-height: 18px;
-}
-
-.logTable tbody tr td {
-    padding: 0;
-}
-
-.logTableNumber {
-    width: 30px;
-    padding-right: 10px;
-    padding-left: 10px;
-    color: rgba(0, 0, 0, 0.3);
-    text-align: center;
-    border: solid #eee;
-    border-width: 1px;
-}
-
-.logTableCode {
-    overflow: visible;
-    position: relative;
-    padding-right: 5px !important;
-    padding-left: 10px !important;
-    vertical-align: top;
-    border: solid #eee;
-    border-width: 1px;
 }
 
 .autocomplete-custom-agents-bar li {
@@ -380,7 +274,7 @@ pre {
 }
 
 .wazuhMenuNav div nav ul li .md-active {
-    background-color: #005571 !important;
+    background-color: #0079a5 !important;
 }
 
 .wazuhMenuNavBar {
@@ -618,11 +512,6 @@ md-select ._md-select-value._md-select-placeholder {
     background-color: #3caed2 !important;
     color: white !important;
     box-shadow: none !important;
-}
-
-.menuSelectedChangeColor span {
-    color: gray !important;
-    font-weight: bolder !important;
 }
 
 .buttonBlueLightSettings {
