@@ -1,8 +1,8 @@
 import rison from 'rison-node';
 
-let app = require('ui/modules')
-.get('app/wazuh', [])
-.controller('overviewController', 
+let app = require('ui/modules').get('app/wazuh', []);
+
+app.controller('overviewController', 
 function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, genericReq, timefilter) {
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;

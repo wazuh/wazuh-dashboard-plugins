@@ -2,13 +2,10 @@ import rison from 'rison-node';
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-
 app.controller('agentsController', 
-function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
-
+function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
 	const notify              = new Notifier({ location: 'Agents' });
 	$rootScope.page           = 'agents';
-	$scope.submenuNavItem     = 'preview';
 	$scope.agentsAutoComplete = AgentsAutoComplete;
 
 	if ($location.search().tabView){
@@ -18,12 +15,25 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 		$location.search("tabView", "panels");
 	}
 
-	$scope.hideRing = (items) => $(".vis-editor-content").length >= items;
+    //$rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"';
+
+    // Getting the timefilter, defaulting it otherwise
+    if (timefilter.time) {
+    	$scope.timeGTE = timefilter.time.from;
+    	$scope.timeLT  = timefilter.time.to;
+    } else {
+    	$scope.timeGTE = "now-15m";
+    	$scope.timeLT  = "now";
+    }
+
+    $scope.hideRing = (items) => {
+        return $(".vis-container").length >= items;
+    };
 
 	// Object for matching nav items and Wazuh groups
-	let tabGroups = {
+	let tabFilters = {
 		"overview": {
-			"group": "*"
+			"group": ""
 		},
 		"fim": {
 			"group": "syscheck"
@@ -38,13 +48,22 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 			"group": "audit"
 		},
 		"pci": {
-			"group": "*"
+			"group": ""
 		}
 	};
 
 	$scope.switchTab = (tab) => {
+        // Deleing app state traces in the url
+        $location.search('_a', null);
+
 		$scope.loading 		  = true;
-		$scope.submenuNavItem = tab;
+		$scope.tab = tab;
+
+        // Update the implicit filter
+        if ($scope.tab !== 'preview') {
+        	if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"';
+        	else $rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"' + ' rule.groups : "' + tabFilters[$scope.tab].group + '"';
+        }
 		$scope.checkAlerts($scope._agent.id)
 		.then((data) => {
 			$scope.results = data;
@@ -61,7 +80,10 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 
 	// Check if there are any alert.
 	$scope.checkAlerts = (agent_id) => {
-		let group   = tabGroups[$scope.submenuNavItem].group;
+		let group   = null;
+        if (tabFilters[$scope.tab].group === '')
+            group = "*";
+        else group = tabFilters[$scope.tab].group;
 		let payload = {};
 		let fields = {
 			"fields": [{
@@ -121,7 +143,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 	$scope.applyAgent = (agent) => {
 		if (agent) {
 			$scope.loading        = true;
-			$scope.submenuNavItem = 'overview';
+			$scope.tab = 'overview';
 			$scope.agentInfo      = {};
 			// Get Agent Info
 			apiReq.request('GET', `/agents/${agent.id}`, {})
@@ -153,6 +175,11 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 				$scope.search = data.data.data.name;
 				$location.search('id', $scope._agent.id);
 
+	        	// Update the implicit filter
+		        if ($scope.tab !== 'preview') {
+		        	if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"';
+		        	else $rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"' + ' rule.groups : "' + tabFilters[$scope.tab].group + '"';
+		        }
 				$scope.checkAlerts($scope._agent.id)
 				.then((data) => {
 					$scope.results = data;
@@ -230,7 +257,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 				$scope.timeLT  = currentTimeFilter.time.to;
 
 				//Check for present data for the selected tab
-				if ($scope.submenuNavItem !== "preview") {
+				if ($scope.tab !== "preview") {
 					if(!('_agent' in $scope)){
 						console.log('Waiting for an agent...');
 					} else {
@@ -245,7 +272,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, Notifier, app
 		if (typeof $location.search().tab === 'undefined' && 
 			typeof $location.search().id === 'undefined') {
 
-			$scope.submenuNavItem = "preview";
+			$scope.tab = "preview";
 			delete $scope._agent;
 			$scope.search = "";
 		}
