@@ -8,25 +8,41 @@ var app = require('ui/modules').get('apps/webinar_app', [])
             scope: {
                 visID: '=visId',
             },
-            controller: function VisController($scope, savedVisualizations) {
+            controller: function VisController($scope, $rootScope, savedVisualizations) {
 
                 $scope.implicitFilter = '';
+                $scope.visTitle = '';
+                $scope.fullFilter = '';
+
                 // Listen for changes
                 var updateSearchSource = $scope.$on('updateVis', function (event, query, filters) {
-                    if ($scope.implicitFilter !== '') query.query = $scope.implicitFilter + ' AND ' + query.query;
-                    $scope.savedObj.searchSource.set('query', query);
+                    if (query.query == '') {
+                        $scope.fullFilter = $scope.implicitFilter;
+                    }
+                    else {
+                        if ($scope.implicitFilter != '') {
+                            $scope.fullFilter = $scope.implicitFilter + ' AND ' + query.query;
+                        }
+                        else {
+                            $scope.fullFilter = query.query;
+                        }
+                    }
+                    $scope.savedObj.searchSource.set('query',  {
+                        language: 'lucene',
+                        query: $scope.fullFilter 
+                    });
                     $scope.savedObj.searchSource.set('filter', filters);
                 });
 
                 // Initializing the visualization
                 getVisualizeLoader().then(loader => {
                     savedVisualizations.get($scope.visID).then(savedObj => {
-                        if ($scope.implicitFilter.endsWith("AND ")) $scope.implicitFilter = $scope.implicitFilter.substring(0, $scope.implicitFilter.indexOf("AND "));
                         $scope.implicitFilter = savedObj.searchSource.get('query')['query'];
+                        $scope.visTitle = savedObj.vis.title;
                         $scope.savedObj = savedObj;
                         loader.embedVisualizationWithSavedObject($("#"+$scope.visID), $scope.savedObj, {})
                         .then(handler => {
-                            console.log('render complete', handler);
+                            console.log('render complete', $scope.visTitle);
                         });
                     });
                 });
