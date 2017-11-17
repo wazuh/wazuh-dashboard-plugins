@@ -1,19 +1,20 @@
 <div flex ng-cloak layout="row" ng-controller="groupsPreviewController" layout-align="space-around" style="background-color: #e3e3e3;"
     ng-if="groupsMenu == 'preview'">
 
-    <div flex="25" layout="column">
-        <md-card flex style="background-color:#E4E4E4; overflow: auto; height:400px; overflow-y: scroll;" when-scrolled="groups.nextPage('')">
+    <div flex="25" layout="column" style="margin:10px;">
+        <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
+            class="input-filter-box" style="height: 35px; margin: 5px;"/>
+        <md-card flex style="background-color:#E4E4E4; overflow: auto; height:400px;" when-scrolled="groups.nextPage('')">
             <md-content flex layout="column" ng-init="selectedGroup = 0;">
-                <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
-                    class="input-filter-box" style="height: 35px; margin: 5px;">
+     
 
                 <md-card ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-class="{selectedItem:($parent.selectedGroup == $index)}"
-                    ng-click="$parent.loadGroup($index)" layout="row">
+                    ng-click="$parent.loadGroup($index)" layout="row" style="padding-bottom: 130px">
                     <md-card-title>
                         <md-card-title-text>
-                            <span class="md-headline" flex="25">{{group.name}}</span>
+                            <span class="md-headline" >{{group.name}}</span>
                             <md-divider></md-divider>
-                            <span class="md-subhead" flex="auto">This is a sample description of the group.</span>
+                            <span class="md-subhead" >This is a sample description of the group.</span>
                         </md-card-title-text>
                     </md-card-title>
                 </md-card>
