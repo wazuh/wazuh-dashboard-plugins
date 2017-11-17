@@ -4,7 +4,7 @@
 
 	<!-- Kibana search bar -->
 	<!-- Local nav. -->
-	<div ng-show="hideRing(5) && !loading" ng-controller="kibanaSearchbar">
+	<div ng-if="hideRing(5) && !loading" ng-controller="kibanaSearchbar">
 	    <kbn-top-nav name="overview_pm" config="topNavMenu">
 	      <!-- Transcluded elements. -->
 	      <div data-transclude-slots>
