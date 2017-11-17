@@ -1,39 +1,31 @@
 <md-content style="height: 100%;" id="rulesContainer" layout="column" flex layout-padding ng-if="!loading && globalRuleSet == 'ruleset' && globalsubmenuNavItem2 == 'rules'"
     ng-controller="rulesController" layout-align="start space-around" class="app-container wazuh-column">
 
-
-	<div class='uil-ring-css' ng-show="loading">
-		<div></div>
-	</div>
+	<div class='uil-ring-css' ng-show="loading"><div></div></div>
 
 	<!--<div ng-if="!loading" layout="row" layout-align="center stretch">-->
 
-	<div layout="row" layout-align="center stretch" style="height: 180px;" class="wazuh-row">
-
-		<md-card flex="50" class="wazuh-row">
-			<md-card-content class="wazuh-row">
+	<div ng-show="!loading" layout="row" layout-align="center stretch" style="height: 180px;" class="wazuh-row">
+		<md-card flex class="wazuh-column">
+			<md-card-content class="wazuh-column">
 				<span class="md-headline-small">Top 24h - Rule ID</span>
 				<kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Rule-ID'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-Rule-ID"></kbn-vis>
 			</md-card-content>
 		</md-card>
-
-		<md-card flex="50" class="wazuh-row">
-			<md-card-content class="wazuh-row">
+		<md-card flex class="wazuh-column">
+			<md-card-content class="wazuh-column">
 				<span class="md-headline-small">Top 24h - Groups</span>
 				<kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Groups'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-Groups"></kbn-vis>
 			</md-card-content>
 		</md-card>
-	</div>
-	<div layout="row" layout-align="center stretch" class="wazuh-row" style="height: 180px;">
-		<md-card flex="50" class="wazuh-row">
-			<md-card-content>
+		<md-card flex class="wazuh-column">
+			<md-card-content class="wazuh-column">
 				<span class="md-headline-small">Top 24h - PCI DSS requirements</span>
 				<kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-PCI-DSS-requirements'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-PCI-DSS-requirements"></kbn-vis>
 			</md-card-content>
 		</md-card>
-
-		<md-card flex="50" class="wazuh-row">
-			<md-card-content class="wazuh-row">
+		<md-card flex class="wazuh-column">
+			<md-card-content class="wazuh-column">
 				<span class="md-headline-small">Top 24h - Level</span>
 				<kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Level'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-Level"></kbn-vis>
 			</md-card-content>
@@ -114,8 +106,8 @@
 				<i class="fa" ng-class="rules.sortValue === 'level' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
 			</span>
 		</md-toolbar>
-		<div flex style="overflow: auto; height:400px;" layout-fill when-scrolled="rules.nextPage('')">
 
+		<div flex style="overflow: auto; height:400px;" layout-fill when-scrolled="rules.nextPage('')">
 			<md-list ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class-odd="'odd'" ng-class-even="'even'"
 			    class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
 				<md-list-item class="rules-item-list" ng-click="showDetails[rule.id] = !showDetails[rule.id]" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">

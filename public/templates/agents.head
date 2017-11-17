@@ -6,7 +6,7 @@
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="loading"></md-progress-linear>
 
 	<div flex layout="row" style="height: 100%; {{(tabView != 'discover') ? 'background-color: #e4e4e4' : ''}}" >
-		<md-content flex id="content" style="height: 100%;">
+		<md-content flex id="content">
 			<md-content layout="row" layout-align="space-between start" style="background-color: #f7f7f7"> 
 				<md-toolbar style="height: 50px;">
 					<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
