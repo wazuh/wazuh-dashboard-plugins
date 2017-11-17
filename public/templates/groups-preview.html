@@ -4,12 +4,10 @@
     <div flex="25" layout="column" style="margin:10px;">
         <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
             class="input-filter-box" style="height: 35px; margin: 5px;"/>
-        <md-card flex style="background-color:#E4E4E4; overflow: auto; height:400px;" when-scrolled="groups.nextPage('')">
+        <md-card flex style="background-color:#E4E4E4; overflow: auto; height:400px;  box-shadow: 0 0px 0px rgba(10,16,20,.15), 0 0 0px rgba(10,16,20,.12) !important; margin-left:0px; margin-right:0px; width:100%;" when-scrolled="groups.nextPage('')">
             <md-content flex layout="column" ng-init="selectedGroup = 0;">
-     
-
                 <md-card ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-class="{selectedItem:($parent.selectedGroup == $index)}"
-                    ng-click="$parent.loadGroup($index)" layout="row" style="padding-bottom: 130px">
+                    ng-click="$parent.loadGroup($index)" layout="row" style="padding-bottom: 130px;">
                     <md-card-title>
                         <md-card-title-text>
                             <span class="md-headline" >{{group.name}}</span>
