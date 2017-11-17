@@ -1,9 +1,29 @@
-<md-content ng-if="submenuNavItem == 'overview' && agentInfo" ng-controller="agentsOverviewController">
-	<!-- Kibana search bar -->
-	<kbn-searchbar ng-if="tabView == 'panels'"></kbn-searchbar>
+<md-content ng-if="tab == 'overview' && agentInfo" ng-controller="agentsOverviewController">
+
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
+
+	<!-- Kibana search bar -->
+	<!-- Local nav. -->
+	<div ng-if="hideRing(7) && !loading" ng-controller="kibanaSearchbar">
+		<kbn-top-nav name="agents_overview" config="topNavMenu">
+			<!-- Transcluded elements. -->
+			<div data-transclude-slots>
+				<!-- Title. -->
+
+				<!-- Search. -->
+				<div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+					<query-bar query="state.query" app-name="'wazuh'" on-submit="updateQueryAndFetch($query)">
+					</query-bar>
+				</div>
+			</div>
+		</kbn-top-nav>
+
+		<!-- Filters. -->
+		<filter-bar ng-show="showFilterBar()" state="state" index-patterns="indexPattern" ng-if="state.query.language === 'lucene'"></filter-bar>
+	</div>
+
 	<div ng-show='hideRing(7) && !loading' ng-if="tabView == 'panels'">
-		<md-content layout="row">
+		<md-content layout="row" style="height: 100px;">
 			<md-card  flex layout="column">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
@@ -31,7 +51,8 @@
 				</md-card-content>
 			</md-card>
 		</md-content>
-		<md-content layout="row">
+
+		<md-content layout="row" style="height: 100px;">
 			<md-card flex layout="column" ng-show="agentInfo.id != '000'">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.lastKeepAlive}}</div>
@@ -86,95 +107,82 @@
 	</md-content>
 
 	<!-- View: Panels -->
-	<div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !loading">
-		<md-content layout="row">
-			<md-card flex="33">
+	<div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !loading" class="wazuh-column">
+		<md-content layout="row" style="height: 230px;">
+			<md-card flex="33" class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Top 5 alerts</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.description,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top 5',type:pie))"
-						vis-filter="">
-					</kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-alerts'" id="Wazuh-App-Agents-Overview-Top-5-alerts"></kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="33">
+			<md-card flex="33" class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Top 5 groups</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.groups,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top groups',type:pie))"
-						vis-filter="">
-					</kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-groups'" id="Wazuh-App-Agents-Overview-Top-5-groups"></kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="33">
+			<md-card flex="33" class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Top 5 PCI DSS Requirements</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="154px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(field:rule.pci_dss,order:desc,orderBy:'1',size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!t,shareYAxis:!t),title:'Top pci',type:pie))"
-						vis-filter="">
-					</kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements'" id="Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements"></kbn-vis>
 				</md-card-content>
 			</md-card>
 		</md-content>
-		<md-content layout="row" layout-align="start stretch">
-			<md-card flex class="visBox-alert-level-evolution">
+
+		<md-content layout="row" layout-align="start stretch" style="height: 230px;">
+			<md-card flex class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Alert level evolution</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'3',params:(field:rule.level,order:desc,orderBy:'1',size:10),schema:group,type:terms),(enabled:!t,id:'2',params:(customInterval:'1h',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,drawLinesBetweenPoints:!t,interpolate:cardinal,legendPosition:right,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!f,times:!(),yAxis:()),title:'Alert%20level%20evolution',type:line))"
-						vis-filter="">
-					</kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alert-level-evolution'" id="Wazuh-App-Agents-Overview-Alert-level-evolution"></kbn-vis>
 				</md-card-content>
 			</md-card>
-
-			<md-card flex="60">
+			<md-card flex="60" class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Alerts</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="150px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(legendOpen:!f)),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customInterval:'1h',customLabel:'Agent alerts',extended_bounds:(),field:'@timestamp',interval:h,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!f,mode:stacked,scale:linear,setYExtents:!f,shareYAxis:!t,times:!(),yAxis:()),title:'Agentbalerts last 24 days',type:histogram))"
-						vis-filter="">
-					</kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts'" id="Wazuh-App-Agents-Overview-Alerts"></kbn-vis>
 				</md-card-content>
 			</md-card>
 		</md-content>
-		<md-content layout="row">
-			<md-card  flex="60">
+
+		<md-content layout="row" style="height: 540px;">
+			<md-card  flex="60" class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Alerts summary</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="460px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:!n,direction:!n)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:'Rule ID',field:rule.id,order:desc,orderBy:'1',size:99999),schema:bucket,type:terms),(enabled:!t,id:'3',params:(customLabel:Description,field:rule.description,order:desc,orderBy:'1',size:1),schema:bucket,type:terms),(enabled:!t,id:'4',params:(customLabel:Level,field:rule.level,order:desc,orderBy:'1',size:1),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:!n,direction:!n),totalFunc:sum),title:'New%20Visualization',type:table))"
-						vis-filter="">
-					</kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts-summary'" id="Wazuh-App-Agents-Overview-Alerts-summary"></kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="40">
+			<md-card flex="40" class="wazuh-column">
 				<md-card-title>
 					<md-card-title-text>
 						<span class="md-headline">Groups summary</span>
 					</md-card-title-text>
 				</md-card-title>
-				<md-card-content>
-					<kbn-vis vis-height="450px" vis-index-pattern="wazuh-alerts-*" vis-a="(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(vis:(params:(sort:(columnIndex:1,direction:desc)))),vis:(aggs:!((enabled:!t,id:'1',params:(),schema:metric,type:count),(enabled:!t,id:'2',params:(customLabel:Group,field:rule.groups,order:desc,orderBy:'1',size:99999),schema:bucket,type:terms)),listeners:(),params:(perPage:10,showMeticsAtAllLevels:!f,showPartialRows:!f,showTotal:!f,sort:(columnIndex:5,direction:desc),totalFunc:sum),title:'Groups',type:table))"
-						vis-filter="">
-					</kbn-vis>
+				<md-card-content class="wazuh-column">
+					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Groups-summary'" id="Wazuh-App-Agents-Overview-Groups-summary"></kbn-vis>
 				</md-card-content>
 			</md-card>
 		</md-content>

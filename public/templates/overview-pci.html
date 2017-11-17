@@ -1,10 +1,10 @@
-<md-content flex layout="column" ng-if="submenuNavItem == 'pci'" ng-controller="overviewPCIController" class="app-container wazuh-column" layout-align="start">
+<md-content flex layout="column" ng-if="tab == 'pci'" ng-controller="overviewPCIController" class="app-container wazuh-column" layout-align="start">
 
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(5)'><div></div></div>
 
 	<!-- Kibana search bar -->
 	<!-- Local nav. -->
-	<div ng-if="!loading" ng-controller="kibanaSearchbar">
+	<div ng-if="hideRing(5) && !loading" ng-controller="kibanaSearchbar">
 	    <kbn-top-nav name="overview_pci" config="topNavMenu">
 	      <!-- Transcluded elements. -->
 	      <div data-transclude-slots>
@@ -66,61 +66,41 @@
 
 		<md-content layout="row" layout-align="center stretch" style="height: 255px;" class="wazuh-row">
 			<md-card flex="70" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Requirements</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-row">
+				<md-card-content class="wazuh-column">
+					<span class="md-headline">Requirements</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-requirements'" id="Wazuh-App-Overview-PCI-DSS-requirements"></kbn-vis>
 				</md-card-content>
 			</md-card>
 			<md-card flex="30" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Groups</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-row">
+				<md-card-content class="wazuh-column">
+					<span class="md-headline">Groups</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Groups'" id="Wazuh-App-Overview-PCI-DSS-Groups"></kbn-vis>
 				</md-card-content>
 			</md-card>
 		</md-content>
 
-		<md-content layout="row" layout-align="center stretch" style="height: 174px;" class="wazuh-row">
+		<md-content layout="row" layout-align="center stretch" style="height: 255px;" class="wazuh-row">
 			<md-card flex="30" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Agents</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-row">
+				<md-card-content class="wazuh-column">
+					<span class="md-headline">Agents</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Agents'" id="Wazuh-App-Overview-PCI-DSS-Agents"></kbn-vis>
 				</md-card-content>
 			</md-card>
 			<md-card flex="70" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Requirements by agent</span>
-					</md-card-title-text>
-				</md-card-title>
 				<md-card-content class="wazuh-row">
-					<kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Requirementes-by-agent'" id="Wazuh-App-Overview-PCI-DSS-Requirementes-by-agent"></kbn-vis>
+					<span class="md-headline">Requirements by agent</span>
+					<kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent'" id="Wazuh-App-Overview-PCI-DSS-Requirements-by-agent"></kbn-vis>
 				</md-card-content>
 			</md-card>
 		</md-content>
 
-		<md-content layout-align="center stretch" style="height: 470px;" class="wazuh-row">
+		<div layout-align="center stretch" style="height: 530px;" class="wazuh-column">
 			<md-card flex class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Last alerts</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-row">
+				<md-card-content class="wazuh-column">
+					<span class="md-headline">Last alerts</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Last-alerts'" id="Wazuh-App-Overview-PCI-DSS-Last-alerts"></kbn-vis>
 				</md-card-content>
 			</md-card>
-		</md-content>
+		</div>
 	</div>
 </md-content>

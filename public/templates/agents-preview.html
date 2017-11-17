@@ -1,115 +1,115 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-<div ng-if="submenuNavItem == 'preview'" >
-	<md-content flex class="agentsPreview" ng-controller="agentsPreviewController" layout="column" style="height: 100%;" class="md-padding" layout-align="start space-around">
+<div ng-if="tab == 'preview'">
+    <md-content flex class="agentsPreview" ng-controller="agentsPreviewController" layout="column" style="height: 100%;" class="md-padding" layout-align="start space-around">
         <div class='uil-ring-css' ng-show='loading'><div></div></div>
-		<div ng-show="!loading" style="padding: 0;">
-			<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="loading"></md-progress-linear>
-			<div flex layout="column" layout-align="space-between stretch">
-				<div layout="row" layout-align="space-between stretch">
-					<md-card flex class="cardHover" layout="column" style="margin-left: 0px;" ng-click="applyAgent(lastAgent)">
-						<md-card-content style="text-align: center;" ng-click="applyAgent(lastAgent)">
-							<div class="metric-value ng-binding" style="font-size: 16pt;">{{lastAgent.name}}</div>
-							<div class="ng-binding">Last registered agent</div>
-						</md-card-content>
-					</md-card>
+        <div ng-show="!loading" style="padding: 0;">
+            <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="loading"></md-progress-linear>
+            <div flex layout="column" layout-align="space-between stretch">
+                <div layout="row" layout-align="space-between stretch">
+                    <md-card flex class="cardHover" layout="column" style="margin-left: 0px;" ng-click="applyAgent(lastAgent)">
+                        <md-card-content style="text-align: center;" ng-click="applyAgent(lastAgent)">
+                            <div class="metric-value ng-binding" style="font-size: 16pt;">{{lastAgent.name}}</div>
+                            <div class="ng-binding">Last registered agent</div>
+                        </md-card-content>
+                    </md-card>
 
-					<md-card flex layout="column" class="cardHover">
-						<md-card-content style="text-align: center;" ng-click="applyAgent(mostActiveAgent)">
-							<div class="metric-value ng-binding" style="font-size: 16pt;">{{mostActiveAgent.name}}</div>
-							<div class="ng-binding">Higher activity</div>
-						</md-card-content>
-					</md-card>
+                    <md-card flex layout="column" class="cardHover">
+                        <md-card-content style="text-align: center;" ng-click="applyAgent(mostActiveAgent)">
+                            <div class="metric-value ng-binding" style="font-size: 16pt;">{{mostActiveAgent.name}}</div>
+                            <div class="ng-binding">Higher activity</div>
+                        </md-card-content>
+                    </md-card>
 
-					<md-card flex="10" layout="column">
-						<md-card-content style="text-align: center;">
-							<div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountActive}}</div>
-							<div class="ng-binding">Active</div>
-						</md-card-content>
-					</md-card>
+                    <md-card flex="10" layout="column">
+                        <md-card-content style="text-align: center;">
+                            <div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountActive}}</div>
+                            <div class="ng-binding">Active</div>
+                        </md-card-content>
+                    </md-card>
 
-					<md-card flex="10" layout="column">
-						<md-card-content style="text-align: center;">
-							<div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountDisconnected}}</div>
-							<div class="ng-binding">Disconnected</div>
-						</md-card-content>
-					</md-card>
+                    <md-card flex="10" layout="column">
+                        <md-card-content style="text-align: center;">
+                            <div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountDisconnected}}</div>
+                            <div class="ng-binding">Disconnected</div>
+                        </md-card-content>
+                    </md-card>
 
-					<md-card flex="10" layout="column">
-						<md-card-content style="text-align: center;">
-							<div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountNeverConnected}}</div>
-							<div class="ng-binding">Never connected</div>
-						</md-card-content>
-					</md-card>
+                    <md-card flex="10" layout="column">
+                        <md-card-content style="text-align: center;">
+                            <div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountNeverConnected}}</div>
+                            <div class="ng-binding">Never connected</div>
+                        </md-card-content>
+                    </md-card>
 
-					<md-card flex="10" layout="column"  style="margin-right: 0px;">
-						<md-card-content style="text-align: center;">
-							<div class="metric-value ng-binding" style="font-size: 16pt;">{{(agentsCoverity | number:2)}}%</div>
-							<div class="ng-binding">Agents coverage</div>
-						</md-card-content>
-					</md-card>
-				</div>
+                    <md-card flex="10" layout="column"  style="margin-right: 0px;">
+                        <md-card-content style="text-align: center;">
+                            <div class="metric-value ng-binding" style="font-size: 16pt;">{{(agentsCoverity | number:2)}}%</div>
+                            <div class="ng-binding">Agents coverage</div>
+                        </md-card-content>
+                    </md-card>
+                </div>
 
-				<div layout="row" layout-align="start stretch">
-					<div layout="row" class="sideNavBox" flex="60">
-						<input placeholder="Filter agents" type="text" id="searchBox" ng-model="searchTerm" ng-change="agents.addFilter('search', searchTerm)" class="input-filter-box" flex>
-					</div>
-					<div layout="row" class="sideNavBox" flex="20">
-						<md-input-container flex class="md-whiteframe-z1 md-input-margin">
-							<md-select id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
-								<md-option value="all">All states</md-option>
-								<md-option value="active">Active</md-option>
-								<md-option value="disconnected">Disconnected</md-option>
-								<md-option value="Never Connected">Never connected</md-option>
-							</md-select>
-						</md-input-container>
-					</div>
-					<div layout="row" class="sideNavBox" flex="20">
-						<md-input-container flex class="md-whiteframe-z1">
-							<md-select id="eventBox" ng-model="osPlatform" ng-change="agents.addFilter('os.platform', osPlatform)" aria-label="Filter by operative system">
-								<md-option value="all">All OS platforms</md-option>
+                <div layout="row" layout-align="start stretch">
+                    <div layout="row" class="sideNavBox" flex="60">
+                        <input placeholder="Filter agents" type="text" id="searchBox" ng-model="searchTerm" ng-change="agents.addFilter('search', searchTerm)" class="input-filter-box" flex>
+                    </div>
+                    <div layout="row" class="sideNavBox" flex="20">
+                        <md-input-container flex class="md-whiteframe-z1 md-input-margin">
+                            <md-select id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
+                                <md-option value="all">All states</md-option>
+                                <md-option value="active">Active</md-option>
+                                <md-option value="disconnected">Disconnected</md-option>
+                                <md-option value="Never Connected">Never connected</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div layout="row" class="sideNavBox" flex="20">
+                        <md-input-container flex class="md-whiteframe-z1">
+                            <md-select id="eventBox" ng-model="osPlatform" ng-change="agents.addFilter('os.platform', osPlatform)" aria-label="Filter by operative system">
+                                <md-option value="all">All OS platforms</md-option>
                                 <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}}">
                                     {{platform.name}}
                                 </md-option>
-							</md-select>
-						</md-input-container>
-					</div>
-				</div>
-					<md-toolbar layout="row">
-						<div class="md-toolbar-tools">
-							<span flex="5" ng-click="agents.sort('id')">ID
-								<i class="fa" ng-class="agents.sortValue === 'id' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-							<span flex="25" ng-click="agents.sort('name')">Name
-								<i class="fa" ng-class="agents.sortValue === 'name' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-							<span flex="10" ng-click="agents.sort('ip')">IP
-								<i class="fa" ng-class="agents.sortValue === 'ip' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-							<span flex="15" ng-click="agents.sort('status')">Status
-								<i class="fa" ng-class="agents.sortValue === 'status' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-							<span flex="15" ng-click="agents.sort('os.platform')">OS platform
-								<i class="fa" ng-class="agents.sortValue === 'os' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-							<span flex="15" ng-click="agents.sort('os.version')">OS version
-								<i class="fa" ng-class="agents.sortValue === 'os' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-							<span flex="15" ng-click="agents.sort('version')">Agent version
-								<i class="fa" ng-class="agents.sortValue === 'version' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
-						</div>
-					</md-toolbar>
-					<div flex style="overflow: auto; height:400px;" layout-fill when-scrolled="agents.nextPage('')">
-							
-					<md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="agents-preview-table">
-						<md-list-item ng-click="applyAgent(agent)" class="list-no-hover md-subhead">
-							<span flex="5">{{agent.id || 'Unknown'}}</span>
-							<span flex="25">{{agent.name || 'Unknown'}}</span>
-							<span flex="10">{{agent.ip || 'Unknown'}}</span>
-							<span flex="15">{{agent.status || 'Unknown'}}</span>
-							<span flex="15">{{agent.os.platform || 'Unknown'}}</span>
-							<span flex="15">{{agent.os.version || 'Unknown'}}</span>
-							<span flex="15">{{agent.version || 'Unknown'}}</span>
-						</md-list-item>
-					</md-list>
-		</div>
-					<md-divider></md-divider>
-			</div>
-  		</div>
-		<md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="agents.busy && !agents.end"></md-progress-linear></md-content>
-	</md-content>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </div>
+                    <md-toolbar layout="row">
+                        <div class="md-toolbar-tools">
+                            <span flex="5" ng-click="agents.sort('id')">ID
+                                <i class="fa" ng-class="agents.sortValue === 'id' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="25" ng-click="agents.sort('name')">Name
+                                <i class="fa" ng-class="agents.sortValue === 'name' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="10" ng-click="agents.sort('ip')">IP
+                                <i class="fa" ng-class="agents.sortValue === 'ip' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="15" ng-click="agents.sort('status')">Status
+                                <i class="fa" ng-class="agents.sortValue === 'status' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="15" ng-click="agents.sort('os.platform')">OS platform
+                                <i class="fa" ng-class="agents.sortValue === 'os' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="15" ng-click="agents.sort('os.version')">OS version
+                                <i class="fa" ng-class="agents.sortValue === 'os' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                            <span flex="15" ng-click="agents.sort('version')">Agent version
+                                <i class="fa" ng-class="agents.sortValue === 'version' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                        </div>
+                    </md-toolbar>
+                    <div flex style="overflow: auto; height:400px;" layout-fill when-scrolled="agents.nextPage('')">
+                            
+                    <md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="agents-preview-table">
+                        <md-list-item ng-click="applyAgent(agent)" class="list-no-hover md-subhead">
+                            <span flex="5">{{agent.id || 'Unknown'}}</span>
+                            <span flex="25">{{agent.name || 'Unknown'}}</span>
+                            <span flex="10">{{agent.ip || 'Unknown'}}</span>
+                            <span flex="15">{{agent.status || 'Unknown'}}</span>
+                            <span flex="15">{{agent.os.platform || 'Unknown'}}</span>
+                            <span flex="15">{{agent.os.version || 'Unknown'}}</span>
+                            <span flex="15">{{agent.version || 'Unknown'}}</span>
+                        </md-list-item>
+                    </md-list>
+        </div>
+                    <md-divider></md-divider>
+            </div>
+        </div>
+        <md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="agents.busy && !agents.end"></md-progress-linear></md-content>
+    </md-content>
 </div>

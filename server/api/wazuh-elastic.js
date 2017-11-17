@@ -62,8 +62,8 @@ module.exports = (server, options) => {
             }
         };
 
-        // Set up time interval, default to Last 24h
-        const timeGTE = req.payload.timeinterval.gte ? req.payload.timeinterval.gte : 'now-1d';
+        // Set up time interval, default to Last 15m
+        const timeGTE = req.payload.timeinterval.gte ? req.payload.timeinterval.gte : 'now-15m';
         const timeLT  = req.payload.timeinterval.lt  ? req.payload.timeinterval.lt  : 'now';
         payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
 
@@ -171,7 +171,7 @@ module.exports = (server, options) => {
 
     const getSetupInfo = (req, reply) => {
         elasticRequest
-        .callWithRequest(req, 'search', {
+        .callWithInternalUser('search', {
                 index: '.wazuh-version',
                 type: 'wazuh-version'
         })

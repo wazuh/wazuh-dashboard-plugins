@@ -23,6 +23,10 @@ kbn-vis, visualize, visualization {
   flex: 1 1 100%;
 }
 
+.kuiLocalNav {
+  background-color: #e4e4e4;  
+}
+
 .kbn-vis-value td {
   border: none !important;
   padding: 0px;
@@ -59,6 +63,18 @@ kbn-vis, visualize, visualization {
   margin: 0px;
 }
 
+/* Adjusting the height of the visualization when its type is kbn-vis-value */
+.kbn-vis-value .vis-container {
+  margin-top: -12px;  
+}
+
+/* Adjusting the height of the visualization when its type is metric */
 .metric .vis-container {
-  margin-top: -46px;
+  margin-top: -59px;
+}
+
+/* This changes the background and display in the kbn-vis-value in the lens */
+.kbn-vis-value .table-cell-filter {
+  background-color: white !important;
+  display: inherit !important;
 }
