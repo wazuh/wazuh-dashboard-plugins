@@ -250,7 +250,7 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
 	};
 
 	$scope.getAppInfo = () => {
-        $http.get("/api/wazuh-elastic/setup")
+		genericReq.request('GET', '/api/wazuh-elastic/setup')
         .then((data) => {
 			$scope.appInfo = {};
 			$scope.appInfo["app-version"]      = data.data.data["app-version"];
