@@ -23,7 +23,7 @@
 	</div>
 
 	<div ng-show='hideRing(7) && !loading' ng-if="tabView == 'panels'">
-		<md-content layout="row" style="height: 100px;">
+		<md-content layout="row" style="height: 100px; overflow-y: hidden;">
 			<md-card  flex layout="column">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
@@ -36,7 +36,7 @@
 					<div class="ng-binding">IP Address</div>
 				</md-card-content>
 			</md-card>
-			<md-card  flex="10" layout="column">
+			<md-card  flex="25" layout="column">
 				<md-card-content style="text-align: center;">
 					<div class="metric-value ng-binding" style="font-size: 14pt;">{{ agentInfo.version | limitTo: 12 }}{{agentInfo.version.length > 12 ? '...' : ''}}</div>
 					<md-tooltip md-direction="bottom">{{ agentInfo.version }}</md-tooltip>
