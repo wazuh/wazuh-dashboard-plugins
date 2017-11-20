@@ -1,2 +1,2 @@
-<div flex layout="column" ng-if="globalRuleSet == 'ruleset'" style="height: 100%">
+<div flex layout="column" ng-if="globalRuleSet == 'ruleset'">
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
