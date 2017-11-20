@@ -35,7 +35,7 @@
 
     <!-- View: Panels -->
     <div flex ng-show="hideRing(15) && results && !loading" ng-if="tabView == 'panels' && !load" class="wazuh-column">
-        <md-content layout="row" layout-align="center stretch" style="height: 100px;">
+        <md-content layout="row" layout-align="center stretch" style="height: 115px;">
             <md-card flex class="wazuh-column">
                 <md-card-content class="wazuh-column metric">
                     <kbn-vis vis-id="'Wazuh-App-Agents-Audit-New-files-metric'" id="Wazuh-App-Agents-Audit-New-files-metric"></kbn-vis>
@@ -56,7 +56,10 @@
                     <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Removed-files-metric'" id="Wazuh-App-Agents-Audit-Removed-files-metric"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card  flex="50" layout="column" layout-align="center center" class="wazuh-column">
+        </md-content>
+
+        <md-content layout="row" layout-align="center stretch" style="height: 115px;">
+            <md-card  flex layout="column" layout-align="center center" class="wazuh-column">
                 <md-card-content style="text-align: center;" class="wazuh-column">
                     <div class="ng-binding">Latest alert</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-Audit-Latest-alert'" id="Wazuh-App-Agents-Audit-Latest-alert"></kbn-vis>
