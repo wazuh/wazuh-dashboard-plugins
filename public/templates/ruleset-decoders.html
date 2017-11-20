@@ -35,7 +35,7 @@
             </md-button>
             
             <md-input-container flex="20" style="margin-top: 6px;margin-bottom: 0;border-radius: 3px;margin-left: 10px;" class="md-whiteframe-z1">
-                <md-select ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type">
+                <md-select ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
                     <md-option value="all">All</md-option>
                     <md-option value="parents">Parents only</md-option>
                 </md-select>

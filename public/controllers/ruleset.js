@@ -60,6 +60,7 @@ app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier
     const notify    = new Notifier({ location: 'Manager - Decoders' });
     $scope.loading  = true;
     $scope.decoders = Decoders;
+    $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
 
     const colors = [
