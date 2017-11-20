@@ -57,6 +57,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     };
 
     $scope.showFile = (index) => {
+        if($scope.filename) $scope.filename = '';
         let filename = $scope.groupFiles.items[index].filename;
         if(filename === '../ar.conf') filename = 'ar.conf';
    
@@ -67,8 +68,11 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
    
 
         apiReq.request('GET', tmpName, {})
-        .then((data) => $scope.file = beautifier.prettyPrint(data.data.data))
-        .catch((err) => $scope.file = {
+        .then(data => {
+            $scope.file = beautifier.prettyPrint(data.data.data);
+            $scope.filename = filename;
+        })
+        .catch(err => $scope.file = {
             group: $scope.groups.items[$scope.selectedGroup].name,
             file:  $scope.groupFiles.items[index].filename,
             error: err.message || err
