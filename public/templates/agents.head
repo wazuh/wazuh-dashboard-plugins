@@ -5,71 +5,70 @@
 
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="loading"></md-progress-linear>
 
-	<div flex layout="row" style="height: 100%; {{(tabView != 'discover') ? 'background-color: #e4e4e4' : ''}}" >
-		<md-content flex id="content" style="height: 100%;">
-			<md-content layout="row" layout-align="space-between start" style="background-color: #f7f7f7"> 
-				<md-toolbar style="height: 50px;">
-					<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-						<div style="text-transform: none; font-size: 20px;" ng-if="_agent">
-							<div style="float: left;margin-top: 3px;margin-right: 11px;">
-								<span> <i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i>
-								{{_agent.id}} - {{_agent.name}}</span><span ng-show="_agent.id == '000'">(Manager)</span>
-							</div>
+	<div flex layout="column" id="content" style="{{(tabView != 'discover') ? 'background-color: #e4e4e4' : ''}}" >
+		<div layout="row" layout-align="space-between start" style="background-color: #f7f7f7"> 
+			<md-toolbar style="height: 50px;">
+				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+					<div style="text-transform: none; font-size: 20px;" ng-if="_agent">
+						<div style="float: left;margin-top: 3px;margin-right: 11px;">
+							<span> <i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i>
+							{{_agent.id}} - {{_agent.name}}</span><span ng-show="_agent.id == '000'">(Manager)</span>
+						</div>
 
-							<div style="float: left;margin-right: 11px;">
-								<span ng-show="_agent.status" ng-class="getAgentStatusClass(_agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(_agent.status)}}</span>
-							</div>
-							
-							<div ng-click="restartAgent()" style="float: left;" ng-show="_agent.status == 'Active' && _agent.id != '000' ">
-								<span style="width: 100%;background-color: #3caed2;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">Restart</span>
-							</div>
+						<div style="float: left;margin-right: 11px;">
+							<span ng-show="_agent.status" ng-class="getAgentStatusClass(_agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(_agent.status)}}</span>
 						</div>
 						
-						<div ng-if="!_agent"> 
-							<h2 class="wazuh-h2" style="text-transform: none; font-size: 20px;">
-								<i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents preview
-							</h2>
+						<div ng-click="restartAgent()" style="float: left;" ng-show="_agent.status == 'Active' && _agent.id != '000' ">
+							<span style="width: 100%;background-color: #3caed2;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">Restart</span>
 						</div>
-
-						<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-							<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="searchTerm" md-items="agent in agentsAutoComplete.items" md-item-text="agent.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address"> 
-								<md-item-template>
-									<span class="item-title">
-										<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agent.name}} ({{agent.id}}) </strong></span>
-									</span>
-									<span class="item-metadata">
-										<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agent.ip}} ({{agent.status}}) </span>
-									</span>
-								</md-item-template>
-								<md-not-found>
-									No agents matching "{{searchTerm}}" were found.
-								</md-not-found>
-							</md-autocomplete>
-						</span>
 					</div>
-				</md-toolbar>
-			</md-content>
+					
+					<div ng-if="!_agent"> 
+						<h2 class="wazuh-h2" style="text-transform: none; font-size: 20px;">
+							<i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents preview
+						</h2>
+					</div>
+
+					<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
+						<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="searchTerm" md-items="agent in agentsAutoComplete.items" md-item-text="agent.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address"> 
+							<md-item-template>
+								<span class="item-title">
+									<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agent.name}} ({{agent.id}}) </strong></span>
+								</span>
+								<span class="item-metadata">
+									<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agent.ip}} ({{agent.status}}) </span>
+								</span>
+							</md-item-template>
+							<md-not-found>
+								No agents matching "{{searchTerm}}" were found.
+							</md-not-found>
+						</md-autocomplete>
+					</span>
+				</div>
+			</md-toolbar>
+		</div>
+		
+		<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
+			<div ng-show="_agent" class="horizontalTabsBar" layout="column" layout-align="center start">
+				<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+					<md-nav-item md-nav-click="switchTab('overview')" name="overview">Overview</md-nav-item>
+					<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
+					<md-nav-item md-nav-click="switchTab('policy_monitoring');" name="policy_monitoring">Policy Monitoring</md-nav-item>
+					<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensionStatus('oscap')">SCAP</md-nav-item>
+					<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensionStatus('audit')">Audit</md-nav-item> 
+					<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensionStatus('pci')">PCI DSS</md-nav-item> 
+				</md-nav-bar>
+			</div>
 			
-			<md-content layout="row" layout-align="space-between start" class="horizontalTabsBar">
-				<md-content ng-show="_agent" class="horizontalTabsBar" layout="column" layout-align="center start">
-					<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
-						<md-nav-item md-nav-click="switchTab('overview')" name="overview">Overview</md-nav-item>
-						<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
-						<md-nav-item md-nav-click="switchTab('policy_monitoring');" name="policy_monitoring">Policy Monitoring</md-nav-item>
-						<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensionStatus('oscap')">SCAP</md-nav-item>
-						<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensionStatus('audit')">Audit</md-nav-item> 
-						<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensionStatus('pci')">PCI DSS</md-nav-item> 
-					</md-nav-bar>
-				</md-content>
-				
-				<md-content ng-show="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
-					<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
-						<md-nav-item md-nav-click="tabView = 'panels'" name="panels">
-							<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
-						</md-nav-item>
-						<md-nav-item md-nav-click="tabView = 'discover'" name="discover">
-							<img style="width: 16px; margin-right: 6px;" src="/plugins/wazuh/img/discover.svg">Discover
-						</md-nav-item>
-					</md-nav-bar> 
-				</md-content>
-			</md-content>
+			<div ng-show="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
+				<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+					<md-nav-item md-nav-click="tabView = 'panels'" name="panels">
+						<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
+					</md-nav-item>
+					<md-nav-item md-nav-click="tabView = 'discover'" name="discover">
+						<img style="width: 16px; margin-right: 6px;" src="/plugins/wazuh/img/discover.svg">Discover
+					</md-nav-item>
+				</md-nav-bar> 
+			</div>
+		</div>

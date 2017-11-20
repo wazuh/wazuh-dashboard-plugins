@@ -834,7 +834,7 @@
     "_source": {
       "title": "Wazuh App Overview Audit Alerts over time",
       "visState": "{\"params\": {\"scale\": \"linear\", \"yAxis\": {}, \"smoothLines\": true, \"setYExtents\": false, \"legendPosition\": \"right\", \"addTimeMarker\": false, \"interpolate\": \"linear\", \"addLegend\": true, \"shareYAxis\": true, \"mode\": \"overlap\", \"defaultYExtents\": false, \"times\": [], \"addTooltip\": true}, \"listeners\": {}, \"type\": \"area\", \"aggs\": [{\"type\": \"count\", \"enabled\": true, \"id\": \"1\", \"params\": {}, \"schema\": \"metric\"}, {\"type\": \"date_histogram\", \"enabled\": true, \"id\": \"2\", \"params\": {\"customInterval\": \"2h\", \"field\": \"@timestamp\", \"interval\": \"auto\", \"extended_bounds\": {}, \"min_doc_count\": 1}, \"schema\": \"segment\"}, {\"type\": \"terms\", \"enabled\": true, \"id\": \"3\", \"params\": {\"orderBy\": \"1\", \"field\": \"rule.description\", \"order\": \"desc\", \"size\": 10}, \"schema\": \"group\"}], \"title\": \"Audit: Alerts over time\"}",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":false}}",
+      "uiStateJSON": "{}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
