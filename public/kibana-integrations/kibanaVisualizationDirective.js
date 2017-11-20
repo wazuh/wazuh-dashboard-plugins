@@ -42,7 +42,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                         $scope.savedObj = savedObj;
                         loader.embedVisualizationWithSavedObject($("#"+$scope.visID), $scope.savedObj, {})
                         .then(handler => {
-                            console.log('render complete', $scope.visTitle);
+                            //console.log('render complete', $scope.visTitle);
                         });
                     });
                 });
