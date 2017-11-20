@@ -8,10 +8,9 @@
 
 	<!--<div ng-if="!loading" layout="row" layout-align="center stretch">-->
 
-	<div layout="row" layout-align="center stretch" style="height: 180px;" class="wazuh-row">
-
-		<md-card flex="50" class="wazuh-row">
-			<md-card-content class="wazuh-row">
+	<div ng-show="!loading" layout="row" layout-align="center stretch" style="height: 220px;" class="wazuh-row">
+		<md-card flex class="wazuh-column">
+			<md-card-content class="wazuh-column">
 				<span class="md-headline-small">Top 24h - Rule ID</span>
 				<kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Rule-ID'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-Rule-ID"></kbn-vis>
 			</md-card-content>
