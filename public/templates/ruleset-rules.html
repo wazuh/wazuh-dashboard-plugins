@@ -53,12 +53,11 @@
 				</md-autocomplete>
 			</span>
 
-			<md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'"
-			    ng-class="button-disabled" ng-click="setRulesTab('rules')" class="md-primary">
+			<md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'button-active' : 'buttonBlueLightRuleset'" ng-click="setRulesTab('rules')" class="md-primary">
 				Rules
 			</md-button>
-			<md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'"
-			    ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
+			<md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'button-active' : 'buttonBlueLightRuleset'"
+			    ng-click="setRulesTab('decoders')" class="md-primary">
 				Decoders
 			</md-button>
 		</div>
@@ -104,7 +103,7 @@
 			</span>
 		</md-toolbar>
 
-		<div flex style="overflow: auto; height:300px;" when-scrolled="decoders.nextPage('')"> 
+		<div flex style="overflow: auto; height:300px;" when-scrolled="decoders.nextPage('')">
 			<md-content flex layout="column">
 				<md-list ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class-odd="'odd'" ng-class-even="'even'"
 				    class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">

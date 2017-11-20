@@ -5,7 +5,7 @@
     <div ng-show="!loading" layout="row" layout-align="center start" style="padding: 0px;">
         <md-card flex style="margin: 0; height: 220px;" class="wazuh-column">
             <md-card-content class="wazuh-column">
-                <span class="md-headline-small">Top 24h - Decoder name</span>           
+                <span class="md-headline-small">Top 24h - Decoder name</span>
                 <kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Decoders-Top-24h-Decoder-name'" id="Wazuh-App-Manager-Ruleset-Decoders-Top-24h-Decoder-name"></kbn-vis>
             </md-card-content>
         </md-card>
@@ -26,14 +26,14 @@
                     <md-not-found> No results matching "{{searchTerm}}" were found. </md-not-found>
                 </md-autocomplete>
             </span>
-                
-            <md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('rules')" class="md-primary">
+
+            <md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'button-active' : 'buttonBlueLightRuleset'" ng-click="setRulesTab('rules')" class="md-primary">
                 Rules
             </md-button>
-            <md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'button-active' : 'button-disabled'" ng-class="button-disabled" ng-click="setRulesTab('decoders')" class="md-primary">
+            <md-button style="padding: 2px;" flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'button-active' : 'buttonBlueLightRuleset'" ng-click="setRulesTab('decoders')" class="md-primary">
                 Decoders
             </md-button>
-            
+
             <md-input-container flex="20" style="margin-top: 6px;margin-bottom: 0;border-radius: 3px;margin-left: 10px;" class="md-whiteframe-z1">
                 <md-select ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
                     <md-option value="all">All</md-option>
@@ -58,7 +58,7 @@
             <span flex="20" ng-click="decoders.sort('file')">File <i class="fa" ng-class="decoders.sortValue === 'file' ? (decoders.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
         </md-toolbar>
 
-        <div flex style="overflow: auto; height:300px;" when-scrolled="decoders.nextPage('')"> 
+        <div flex style="overflow: auto; height:300px;" when-scrolled="decoders.nextPage('')">
 	        <md-content flex layout="column">
 	            <md-list class="agents-preview-table" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='decoder in decoders.items | orderBy : decoders.sortValue : decoders.sortDir' ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
 	                <md-list-item class="rules-item-list" ng-click="showDetails[decoder.name] = ! showDetails[decoder.name]" ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
