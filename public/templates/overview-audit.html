@@ -50,28 +50,33 @@
 
     <!-- View: Panels -->
     <div ng-show="hideRing(11) && results && !loading" ng-if="tabView == 'panels'" class="wazuh-column">
-        <div layout="row" layout-align="center stretch" style="height: 100px;">
-            <md-card flex="10" class="wazuh-column">
+        <div layout="row" layout-align="center stretch" style="height: 115px;">
+            <md-card flex class="wazuh-column">
                 <md-card-content class="wazuh-column metric">
                     <kbn-vis vis-id="'Wazuh-App-Overview-Audit-New-files'" id="Wazuh-App-Overview-Audit-New-files"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="10" class="wazuh-column">
+            <md-card flex class="wazuh-column">
                 <md-card-content class="metric wazuh-column">
                     <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Read-files'" id="Wazuh-App-Overview-Audit-Read-files"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="10" class="wazuh-column">
+            <md-card flex class="wazuh-column">
                 <md-card-content class="metric wazuh-column">
                     <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Modified-files'" id="Wazuh-App-Overview-Audit-Modified-files"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="10" class="wazuh-column">
+            <md-card flex class="wazuh-column">
                 <md-card-content class="metric wazuh-column">
                     <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Removed-files'" id="Wazuh-App-Overview-Audit-Removed-files"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card  flex="60" class="wazuh-column" layout-align="center center">
+
+        </div>
+
+        <div layout="row" layout-align="center stretch" style="height: 115px;">
+
+            <md-card  flex class="wazuh-column" layout-align="center center">
                 <md-card-content style="text-align: center;"  class="wazuh-column">
                     <div class="ng-binding">Latest alert</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-Audit-Latest-alert'" id="Wazuh-App-Overview-Audit-Latest-alert"></kbn-vis>
