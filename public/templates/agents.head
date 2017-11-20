@@ -3,8 +3,6 @@
 		<menu-top></menu-top>
     </md-content> 
 
-	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="loading"></md-progress-linear>
-
 	<div flex layout="column" id="content" style="{{(tabView != 'discover') ? 'background-color: #e4e4e4' : ''}}" >
 		<div layout="row" layout-align="space-between start" style="background-color: #f7f7f7"> 
 			<md-toolbar style="height: 50px;">
@@ -51,7 +49,7 @@
 		
 		<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
 			<div ng-show="_agent" class="horizontalTabsBar" layout="column" layout-align="center start">
-				<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+				<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="tab"  ng-init="tab = 'preview'" nav-bar-aria-label="navigation submenu">
 					<md-nav-item md-nav-click="switchTab('overview')" name="overview">Overview</md-nav-item>
 					<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
 					<md-nav-item md-nav-click="switchTab('policy_monitoring');" name="policy_monitoring">Policy Monitoring</md-nav-item>
@@ -63,10 +61,10 @@
 			
 			<div ng-show="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
 				<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
-					<md-nav-item md-nav-click="tabView = 'panels'" name="panels">
+					<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
 						<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
 					</md-nav-item>
-					<md-nav-item md-nav-click="tabView = 'discover'" name="discover">
+					<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
 						<img style="width: 16px; margin-right: 6px;" src="/plugins/wazuh/img/discover.svg">Discover
 					</md-nav-item>
 				</md-nav-bar> 

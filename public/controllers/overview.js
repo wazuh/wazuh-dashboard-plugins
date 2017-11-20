@@ -74,6 +74,12 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, gen
         return $(".vis-container").length >= items;
     };
 
+    // Switch subtab
+    $scope.switchSubtab = (subtab) => {
+        $location.search('_a', null);
+        $scope.tabView = subtab;
+    };
+
     // Switch tab
     $scope.switchTab = (tab) => {
         // Deleing app state traces in the url

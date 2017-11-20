@@ -45,7 +45,6 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
             }
         });
 
-
         // Get last agent !!!!!!!
         let tmpUrl  = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.name`;
         let tmpUrl2 = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.id`;

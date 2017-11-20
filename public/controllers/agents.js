@@ -15,6 +15,13 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 		$location.search("tabView", "panels");
 	}
 
+	if ($location.search().tab){
+		$scope.tab = $location.search().tab;
+	} else {
+		$scope.tab = "preview";
+		$location.search("tab", "preview");
+	}
+
     //$rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"';
 
     // Getting the timefilter, defaulting it otherwise
@@ -52,12 +59,20 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 		}
 	};
 
+    // Switch subtab
+    $scope.switchSubtab = (subtab) => {
+        $location.search('_a', null);
+        $scope.tabView = subtab;
+    };
+
 	$scope.switchTab = (tab) => {
         // Deleing app state traces in the url
         $location.search('_a', null);
 
-		$scope.loading 		  = true;
 		$scope.tab = tab;
+		$location.search("tab", tab);
+
+		$scope.loading 		  = true;
 
         // Update the implicit filter
         if ($scope.tab !== 'preview') {
@@ -144,13 +159,16 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 		if (agent) {
 			$scope.loading        = true;
 			$scope.tab = 'overview';
+			$location.search("tab", 'overview');
+
 			$scope.agentInfo      = {};
 			// Get Agent Info
 			apiReq.request('GET', `/agents/${agent.id}`, {})
 			.then((data) => {
+
 				$scope.agentInfo = data.data.data;
 				$rootScope.agent = $scope.agentInfo;
-				if (typeof $scope.agentInfo.version === 'undefined'){
+				if (typeof $scope.agentInfo.version === 'undefined') {
 					$scope.agentInfo.version = "Unknown";
 				}
 				if (typeof $scope.agentInfo.os === 'undefined') {
@@ -167,7 +185,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 					}
 				}
 
-				if (typeof $scope.agentInfo.lastKeepAlive === 'undefined'){
+				if (typeof $scope.agentInfo.lastKeepAlive === 'undefined') {
 					$scope.agentInfo.lastKeepAlive = "Unknown";
 				}
 
@@ -180,6 +198,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 		        	if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"';
 		        	else $rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"' + ' rule.groups : "' + tabFilters[$scope.tab].group + '"';
 		        }
+
 				$scope.checkAlerts($scope._agent.id)
 				.then((data) => {
 					$scope.results = data;
