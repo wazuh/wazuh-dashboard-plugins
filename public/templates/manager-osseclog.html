@@ -1,6 +1,6 @@
-<div flex ng-cloak ng-if="!loading && submenuNavItem == 'logs'" layout="column" ng-controller="managerLogController">
-    <div layout="row" layout-align="start start" class="horizontal-menu-right" style="background: #f7f7f7; height: 70px;">
-        <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 15px;margin-left: 20px;padding: 3px;margin-right: 10px;">
+<div flex ng-cloak ng-if="!loading && submenuNavItem == 'logs'" layout="column" ng-controller="managerLogController" class="manager-background">
+    <div layout="row" layout-align="start start" style="height: 70px;">
+        <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 15px;margin-left: 15px;padding: 3px;">
             <md-select id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
                 aria-label="Logs category">
                 <md-option selected value="all">Choose daemon</md-option>
@@ -32,17 +32,17 @@
         </div>
     </div>
 
-    <input placeholder="Filter" type="text" ng-model="searchTerm" ng-change="logs.addFilter('search', searchTerm)" class="input-filter-box"
-        style="height: 35px; width:auto; margin: 5px;">
+    <input placeholder="Filter" type="text" ng-model="searchTerm" ng-change="logs.addFilter('search', searchTerm)" class="input-filter-box" style="height: 35px; width:auto; margin-right: 15px;margin-left: 15px;padding: 3px;">
 
-    <md-toolbar flex layout="row" class="md-toolbar-tools">
-        <span flex=10>Timestamp</span>
-        <span flex=10>Tag</span>
-        <span flex=10>Level</span>
-        <span flex>Description</span>
-    </md-toolbar>
+    <div flex layout="column" class="md-padding">
 
-    <div flex layout="row">
+        <md-toolbar flex layout="row" class="md-toolbar-tools">
+            <span flex=10>Timestamp</span>
+            <span flex=10>Tag</span>
+            <span flex=10>Level</span>
+            <span flex>Description</span>
+        </md-toolbar>
+
         <div layout="column" flex>
             <div flex style="overflow: auto; height:400px;" id="groups-id" layout="column" when-scrolled="logs.nextPage('')">
                 <md-list>

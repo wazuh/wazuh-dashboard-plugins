@@ -57,6 +57,19 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, appState, gen
         }
     };
 
+    // Listen for changes
+    var updateSearchSource = $scope.$on('updateVis', function (event, query, filters) {
+        $scope.checkAlerts()
+        .then((data) => {
+            $scope.results = data;
+            $scope.loading = false;
+        })
+        .catch(() => {
+            $scope.results = false;
+            $scope.loading = false;
+        });
+    });
+
     $scope.hideRing = (items) => {
         return $(".vis-container").length >= items;
     };
