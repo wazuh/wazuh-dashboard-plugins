@@ -57,6 +57,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     };
 
     $scope.showFile = (index) => {
+        if($scope.filename) $scope.filename = '';
         let filename = $scope.groupFiles.items[index].filename;
         if(filename === '../ar.conf') filename = 'ar.conf';
    
