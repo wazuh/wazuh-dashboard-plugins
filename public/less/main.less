@@ -445,6 +445,11 @@ md-progress-linear ._md-bar {
     background-color: #3caed2;
 }
 
+.button-active.md-button:not([disabled]):hover,
+.buttonBlueLightRuleset.md-button:not([disabled]):hover {
+    background-color: #3caed2 !important;
+}
+
 .button-disabled {
     background: rgba(60, 174, 210, 0.3) !important;
     color: white !important;
@@ -453,8 +458,9 @@ md-progress-linear ._md-bar {
 md-select-menu.md-default-theme md-content,
 md-select-menu md-content,
 .button-active {
-    background: #3caed2 !important;
+    background: #0079a5 !important;
     color: white !important;
+    box-shadow: none !important;
 }
 
 .md-input-focused,
@@ -507,7 +513,8 @@ md-select ._md-select-value._md-select-placeholder {
     box-shadow: none !important;
 }
 
-.buttonBlueLightSettings {
+.buttonBlueLightSettings,
+.buttonBlueLightRuleset {
     background-color: #005571 !important;
     color: white !important;
     box-shadow: none !important;
