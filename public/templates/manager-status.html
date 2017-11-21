@@ -1,128 +1,150 @@
 <md-content flex layout="column" ng-if="!load && submenuNavItem == 'status'" ng-controller="managerStatusController"> 
     <div class='uil-ring-css' ng-show="load"><div></div></div>
-	<div flex layout="column" ng-show="!load" layout-align="start stretch">
-		<md-content class="joinCardsRow" layout="row" layout-align="start start">
-			<md-card flex layout-align="start stretch" ng-repeat="(k,v) in daemons">
-				<md-card-content layout="column" flex layout-align="start center">
-					<p layout="row" style="" ng-class="getDaemonStatusClass(v)" class="round"></p>
-					<p layout="row" style="text-align: center">{{k}}</p>
-				</md-card-content>
-			</md-card>
-		</md-content>		
-		
-		<div class="joinCardsRow" layout="row" layout-align="start start">
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 19pt;">{{agentsCountTotal}}</div>
-					<div class="ng-binding">Total agents</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 19pt;">{{agentsCountActive}}</div>
-					<div class="ng-binding">Active</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 19pt;">{{agentsCountDisconnected}}</div>
-					<div class="ng-binding">Disconnected</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 19pt;">{{agentsCountNeverConnected}}</div>
-					<div class="ng-binding">Never connected</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column" >
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 19pt;text-align: center;">{{(agentsCoverity | number:2)}}%</div>
-					<div class="ng-binding">Agents coverage</div>
-				</md-card-content>
-			</md-card>
-		</div>
-			
-		<div layout="row" layout-align="start start">
-			<md-card layout="column" flex="50">
-				<md-card-content>
-					<h3 class="wazuh-h3">Manager information</h3>
-					<div layout="column">
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Version</p>
-							<p class="right-text">{{managerInfo.version ? managerInfo.version : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Installation date</p>
-							<p class="right-text">{{managerInfo.installation_date ? managerInfo.installation_date : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Installation path</p>
-							<p class="right-text">{{managerInfo.path ? managerInfo.path : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Installation type</p>
-							<p class="right-text">{{managerInfo.type ? managerInfo.type : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Agents limit</p>
-							<p class="right-text">{{managerInfo.max_agents ? managerInfo.max_agents : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >OpenSSL Support</p>
-							<p class="right-text">{{managerInfo.openssl_support ? managerInfo.openssl_support : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Total rules</p>
-							<p class="right-text">{{totalRules ? totalRules : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Total decoders</p>
-							<p class="right-text">{{totalDecoders ? totalDecoders : '-'}}</p>
-						</span>
-					</div>
-				</md-card-content>
-			</md-card>
-			
-			<md-card layout="column" flex="50">
-				<md-card-content>
-					<h3 class="wazuh-h3">Last registered agent</h3>
-					<div layout="column" flex>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Name</p>
-							<p class="right-text">{{agentInfo.name ? agentInfo.name : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >ID</p>
-							<p class="right-text">{{agentInfo.id ? agentInfo.id : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Status</p>
-							<p class="right-text">{{agentInfo.status ? agentInfo.status : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >IP Address</p>
-							<p class="right-text">{{agentInfo.ip ? agentInfo.ip : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Date add</p>
-							<p class="right-text">{{agentInfo.dateAdd ? agentInfo.dateAdd : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Version</p>
-							<p class="right-text">{{agentInfo.version ? agentInfo.version : '-'}}</p>
-						</span>
-						<span layout="row" ng-if="agentInfo.id !== '000'">
-							<p style="font-weight: bold; min-width: 150px" >Last keep alive</p>
-							<p class="right-text">{{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</p>
-						</span>
-						<span layout="row">
-							<p style="font-weight: bold; min-width: 150px" >Operating system</p>
-							<p class="right-text">{{agentInfo.os.name ? agentInfo.os.name + agentInfo.os.version : agentInfo.os.uname ? agentInfo.os.uname : '-'}}</p>
-						</span>	
-					</div>
-				</md-card-content>
-			</md-card>
-		</div>
-	</div>
+    
+    <div flex layout="column" ng-show="!load" layout-align="start stretch">
+        
+        <div class="joinCardsRow" layout="row" layout-align="start stretch">
+            <md-card flex ng-repeat="(k,v) in daemons">
+                <md-card-content class="manager-status-daemons-item">
+                    <center>
+                        <p ng-class="getDaemonStatusClass(v)" class="round"></p>
+                        <p>{{k}}</p>
+                    </center>
+                </md-card-content>
+            </md-card>
+        </div>		
+        
+        <div class="joinCardsRow" layout="row" layout-align="start stretch">
+            <md-card flex>
+                <md-card-content class="manager-status-statistics">
+                    <div class="metric-value ng-binding manager-status-item">{{agentsCountTotal}}</div>
+                    <div class="ng-binding">Total agents</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="manager-status-statistics">
+                    <div class="metric-value ng-binding manager-status-item">{{agentsCountActive}}</div>
+                    <div class="ng-binding">Active</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="manager-status-statistics">
+                    <div class="metric-value ng-binding manager-status-item">{{agentsCountDisconnected}}</div>
+                    <div class="ng-binding">Disconnected</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="manager-status-statistics">
+                    <div class="metric-value ng-binding manager-status-item">{{agentsCountNeverConnected}}</div>
+                    <div class="ng-binding">Never connected</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="manager-status-statistics">
+                    <div class="metric-value ng-binding manager-status-item-coverity">{{(agentsCoverity | number:2)}}%</div>
+                    <div class="ng-binding">Agents coverage</div>
+                </md-card-content>
+            </md-card>
+        </div>
+            
+        <div class="joinCardsRow" layout="row" layout-align="start stretch">
+            <md-card flex="50">
+                <md-card-content>
+                    <h3 class="wazuh-h3">Manager information</h3>
+                    <div layout="column">
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Version</p>
+                            <p class="right-text">{{managerInfo.version ? managerInfo.version : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Installation date</p>
+                            <p class="right-text">{{managerInfo.installation_date ? managerInfo.installation_date : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Installation path</p>
+                            <p class="right-text">{{managerInfo.path ? managerInfo.path : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Installation type</p>
+                            <p class="right-text">{{managerInfo.type ? managerInfo.type : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Agents limit</p>
+                            <p class="right-text">{{managerInfo.max_agents ? managerInfo.max_agents : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">OpenSSL Support</p>
+                            <p class="right-text">{{managerInfo.openssl_support ? managerInfo.openssl_support : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Total rules</p>
+                            <p class="right-text">{{totalRules ? totalRules : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Total decoders</p>
+                            <p class="right-text">{{totalDecoders ? totalDecoders : '-'}}</p>
+                        </span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            
+            <md-card flex="50">
+                <md-card-content>
+                    <h3 class="wazuh-h3">Last registered agent</h3>
+                    <div layout="column" flex>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Name</p>
+                            <p class="right-text">{{agentInfo.name ? agentInfo.name : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">ID</p>
+                            <p class="right-text">{{agentInfo.id ? agentInfo.id : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Status</p>
+                            <p class="right-text">{{agentInfo.status ? agentInfo.status : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">IP Address</p>
+                            <p class="right-text">{{agentInfo.ip ? agentInfo.ip : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Date add</p>
+                            <p class="right-text">{{agentInfo.dateAdd ? agentInfo.dateAdd : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Version</p>
+                            <p class="right-text">{{agentInfo.version ? agentInfo.version : '-'}}</p>
+                        </span>
+                        <span layout="row" ng-if="agentInfo.id !== '000'">
+                            <p class="manager-status-subtitle">Last keep alive</p>
+                            <p class="right-text">{{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</p>
+                        </span>
+                        <span layout="row">
+                            <p class="manager-status-subtitle">Operating system</p>
+                            <p class="right-text">{{agentInfo.os.name ? agentInfo.os.name + agentInfo.os.version : agentInfo.os.uname ? agentInfo.os.uname : '-'}}</p>
+                        </span>	
+                    </div>
+                </md-card-content>
+            </md-card>
+        </div>
+    </div>
 </md-content>
+
+<style>
+    .manager-status-daemons-item,
+    .manager-status-statistics {
+        text-align: center;
+    }
+    .manager-status-item {
+        font-size: 19pt;
+    }
+    .manager-status-item-coverity {
+        font-size: 19pt;
+        text-align: center;
+    }
+    .manager-status-subtitle {
+        font-weight: bold; 
+        min-width: 150px
+    }
+</style>
