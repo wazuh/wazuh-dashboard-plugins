@@ -34,14 +34,14 @@
 	<!-- No results message -->
 	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(17)">
 		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
+			<md-card-content class="overview-fim-no-results">
 				No results for selected time interval
 			</md-card-content>
 		</md-card>
 	</md-content>
 
 	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
+	<md-content class="overview-fim-discover" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
 		<kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
 		dis-filter="rule.groups:syscheck"
 		infinite-scroll="true">
@@ -50,27 +50,28 @@
 
 	<!-- View: Panels -->
 	<div ng-show="hideRing(17) && results && !loading" ng-if="tabView == 'panels'" class="wazuh-column">
-		<md-content layout="row" style="height: 300px;">
+
+		<div layout="row" class="overview-fim-metrics-div">
 			<div flex="10" layout="column">
-				<md-card class="wazuh-column">
-					<md-card-content class="wazuh-column metric">
-						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Added'" id="Wazuh-App-Overview-FIM-Added"></kbn-vis>
+				<md-card flex>
+					<md-card-content class="wazuh-column">
+						<kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Added'" id="Wazuh-App-Overview-FIM-Added"></kbn-vis>
 					</md-card-content>
 				</md-card>
-				<md-card class="wazuh-column">
-					<md-card-content class="wazuh-column metric">
-						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Modified'" id="Wazuh-App-Overview-FIM-Modified"></kbn-vis>
+				<md-card flex>
+					<md-card-content class="wazuh-column">
+						<kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Modified'" id="Wazuh-App-Overview-FIM-Modified"></kbn-vis>
 					</md-card-content>
 				</md-card>
-				<md-card class="wazuh-column">
-					<md-card-content class="wazuh-column metric">
-						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Deleted'" id="Wazuh-App-Overview-FIM-Deleted"></kbn-vis>
+				<md-card flex>
+					<md-card-content class="wazuh-column">
+						<kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Deleted'" id="Wazuh-App-Overview-FIM-Deleted"></kbn-vis>
 					</md-card-content>
 				</md-card>
 			</div>
 
 			<div flex layout="column">
-				<md-card class="wazuh-column">
+				<md-card flex>
 					<md-card-content class="wazuh-column">
 						<span class="md-headline">Events over time</span>
 						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Events-over-time'" id="Wazuh-App-Overview-FIM-Events-over-time"></kbn-vis>
@@ -79,111 +80,125 @@
 			</div>
 
 			<div flex="20" layout="column">
-				<md-card class="wazuh-column">
+				<md-card flex>
 					<md-card-content class="wazuh-column">
 						<span class="md-headline">Top user owners</span>
 						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-user-owners'" id="Wazuh-App-Overview-FIM-Top-user-owners"></kbn-vis>
 					</md-card-content>
 				</md-card>
-				<md-card class="wazuh-column">
+				<md-card flex>
 					<md-card-content class="wazuh-column">
 						<span class="md-headline">Top group owners</span>
 						<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-group-owners'" id="Wazuh-App-Overview-FIM-Top-group-owners"></kbn-vis>
 					</md-card-content>
 				</md-card>
 			</div>
-		</md-content>
+		</div>
 
-		<md-content layout="row" style="height: 100px;">
-			<md-card flex layout="column" class="wazuh-column">
-				<md-card-content style="text-align: center;" class="wazuh-column">
+		<div layout="row" class="overview-fim-last-file-div">
+			<md-card flex>
+				<md-card-content class="wazuh-column overview-fim-last-file">
 					<div class="ng-binding">Last file modified</div>
 					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Last-file-modified'" id="Wazuh-App-Overview-FIM-Last-file-modified"></kbn-vis>
 				</md-card-content>
 			</md-card >
-			<md-card flex layout="column" class="wazuh-column">
-				<md-card-content style="text-align: center;" class="wazuh-column">
+			<md-card flex>
+				<md-card-content class="wazuh-column overview-fim-last-file">
 					<div class="ng-binding">Last file added</div>
 					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Last-file-added'" id="Wazuh-App-Overview-FIM-Last-file-added"></kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex layout="column" class="wazuh-column">
-				<md-card-content style="text-align: center;" class="wazuh-column">
+			<md-card flex>
+				<md-card-content class="wazuh-column overview-fim-last-file">
 					<div class="ng-binding">Last file deleted</div>
 					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Last-file-deleted'" id="Wazuh-App-Overview-FIM-Last-file-deleted"></kbn-vis>
 				</md-card-content>
 			</md-card>
-		</md-content>
+		</div>
 
-		<md-content layout="row" style="height: 213px;">
-			<md-card flex class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top file changes</span>
-					</md-card-title-text>
-				</md-card-title>
+		<div layout="row" class="overview-fim-file-changes-div">
+			<md-card flex>
 				<md-card-content class="wazuh-column">
+					<span class="md-headline">Top file changes</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-file-changes'" id="Wazuh-App-Overview-FIM-Top-file-changes"></kbn-vis>
 				</md-card-content>
 			</md-card>
 
-			<md-card flex class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Root user file changes</span>
-					</md-card-title-text>
-				</md-card-title>
+			<md-card flex>
 				<md-card-content class="wazuh-column">
+					<span class="md-headline">Root user file changes</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Root-user-file-changes'" id="Wazuh-App-Overview-FIM-Root-user-file-changes"></kbn-vis>
 				</md-card-content>
 			</md-card>
 
-			<md-card flex class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">World writable modified files</span>
-					</md-card-title-text>
-				</md-card-title>
+			<md-card flex>
 				<md-card-content class="wazuh-column">
+					<span class="md-headline">World writable modified files</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-FIM-World-writable-modified-files'" id="Wazuh-App-Overview-FIM-World-writable-modified-files"></kbn-vis>
 				</md-card-content>
 			</md-card>
-		</md-content>
+		</div>
 
-		<div layout="row" layout-align="start stretch" style="height: 100px;">
-			<md-card flex="20" class="wazuh-column">
-				<md-card-content style="text-align: center;" class="wazuh-column">
+		<div layout="row" layout-align="start stretch" class="overview-fim-most-file-div">
+			<md-card flex="20">
+				<md-card-content class="wazuh-column overview-fim-most-file">
 					<div class="ng-binding">Top agent</div>
 					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Top-agent'" id="Wazuh-App-Overview-FIM-Top-agent"></kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="20" class="wazuh-column">
-				<md-card-content style="text-align: center;" class="wazuh-column">
+			<md-card flex="20">
+				<md-card-content class="wazuh-column overview-fim-most-file">
 					<div class="ng-binding">Top PCI Requirement</div>
 					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Top-PCI-requirement'" id="Wazuh-App-Overview-FIM-Top-PCI-requirement"></kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="20" class="wazuh-column">
-				<md-card-content style="text-align: center;" class="wazuh-column">
+			<md-card flex="20">
+				<md-card-content class="wazuh-column overview-fim-most-file">
 					<div class="ng-binding">Most common permissions</div>
 					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Most-common-permissions'" id="Wazuh-App-Overview-FIM-Most-common-permissions"></kbn-vis>
 				</md-card-content>
 			</md-card>
-			<md-card flex="40" class="wazuh-column">
-				<md-card-content style="text-align: center;" class="wazuh-column">
+			<md-card flex="40">
+				<md-card-content class="wazuh-column overview-fim-most-file">
 					<div class="ng-binding">Most modified file</div>
 					<kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-FIM-Most-modified-file'" id="Wazuh-App-Overview-FIM-Most-modified-file"></kbn-vis>
 				</md-card-content>
 			</md-card>
 		</div>
 
-		<md-content flex layout="row" style="height: 530px;" class="wazuh-column">
-			<md-card flex class="wazuh-column">
+		<div flex layout="row" class="overview-fim-events-summary">
+			<md-card flex>
 				<md-card-content class="wazuh-column">
 					<span class="md-headline">Events summary</span>
 					<kbn-vis vis-id="'Wazuh-App-Overview-FIM-Events-summary'" id="Wazuh-App-Overview-FIM-Events-summary"></kbn-vis>
 				</md-card-content>
 			</md-card>
-		</md-content>
+		</div>
 	</div>
 </md-content>
+
+<style>
+	.overview-fim-metrics-div{
+		height: 300px;
+	}
+	.overview-fim-no-results {
+		text-align: center;
+	}
+	.overview-fim-discover {
+		background-color: white
+	}
+	.overview-fim-last-file,
+	.overview-fim-most-file {
+		text-align: center;
+	}
+	.overview-fim-file-changes-div {
+		height: 213px;
+	}
+	.overview-fim-last-file-div,
+	.overview-fim-most-file-div {
+		height: 100px;
+	}
+	.overview-fim-events-summary {
+		height: 530px;
+	}
+</style>
