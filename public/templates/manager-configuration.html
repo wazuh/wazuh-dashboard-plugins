@@ -340,8 +340,6 @@
                         </span>
                         <md-divider></md-divider>
                     </span>
-
-
                     <span ng-if="managerConfiguration.rootcheck.system_audit">
                         <span layout="row" layout-align="space-between center">
                             <p class="manager-configuration-p-bold"> System audit files</p>
@@ -369,7 +367,6 @@
                             <p ng-if="item.command" class=".manager-configuration-no-overflow"> {{ item.command }} </p>
                             <p class="right-text">{{ item.log_format }}</p>
                         </span>
-
                         <span ng-if="item.alias">
                             <span layout="row" layout-align="space-between center">
                                 <p>Alias</p>
@@ -388,10 +385,8 @@
                                 <p> {{ item.check_diff }} </p>
                             </span>
                         </span>
-
                         <md-divider></md-divider>
                     </span>
-
                 </md-card-content>
             </md-card>
             <md-card ng-if="managerConfiguration.wodle && managerConfiguration.wodle.name == 'open-scap'">
@@ -686,12 +681,3 @@
         </div>
     </div>
 </md-content>
-
-<style>
-    .manager-configuration-p-bold {
-        font-weight: bold;
-    }
-    .manager-configuration-no-overflow {
-        overflow: hidden;
-    }
-</style>
