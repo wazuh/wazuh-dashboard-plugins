@@ -24,51 +24,51 @@
 
     <div ng-show='hideRing(7) && !loading' ng-if="tabView == 'panels'">
         
-        <div layout="row" style="height: 100px;">
+        <div layout="row" class="agents-overview-top-metric-row">
             <md-card flex>
-                <md-card-content style="text-align: center;">
-                    <div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.name}}</div>
                     <div class="ng-binding">Name</div>
                 </md-card-content>
             </md-card>
             <md-card  flex="10">
-                <md-card-content style="text-align: center;">
-                    <div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.ip}}</div>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.ip}}</div>
                     <div class="ng-binding">IP Address</div>
                 </md-card-content>
             </md-card>
             <md-card flex="10">
-                <md-card-content style="text-align: center;">
-                    <div class="metric-value ng-binding" style="font-size: 14pt;">{{ agentInfo.version | limitTo: 12 }}{{agentInfo.version.length > 12 ? '...' : ''}}</div>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{ agentInfo.version | limitTo: 12 }}{{agentInfo.version.length > 12 ? '...' : ''}}</div>
                     <md-tooltip md-direction="bottom">{{ agentInfo.version }}</md-tooltip>
                     <div class="ng-binding">Version</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
-                <md-card-content style="text-align: center;">
-                    <div class="metric-value legend-value-title ng-binding legend-value-truncate" style="font-size: 14pt;">{{ agentOs }}</div>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value legend-value-title ng-binding legend-value-truncate agents-overview-size-14">{{ agentOs }}</div>
                     <md-tooltip md-direction="bottom">{{ agentOs }}</md-tooltip>
                     <div class="ng-binding">OS</div>
                 </md-card-content>
             </md-card>
         </div>
 
-        <div layout="row" style="height: 100px;">
+        <div layout="row" class="agents-overview-second-row">
             <md-card flex ng-show="agentInfo.id != '000'">
-                <md-card-content style="text-align: center;">
-                    <div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.lastKeepAlive}}</div>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.lastKeepAlive}}</div>
                     <div class="ng-binding">Last keep alive</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
-                <md-card-content style="text-align: center;">
-                    <div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.dateAdd}}</div>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.dateAdd}}</div>
                     <div class="ng-binding">Registration date</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
-                <md-card-content style="text-align: center;">
-                    <div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.syscheck.end}}</div>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.syscheck.end}}</div>
                     <md-tooltip md-direction="bottom">
                         Start time: {{ agentInfo.syscheck.start }} <br>
                         End time: {{ agentInfo.syscheck.end }} <br>
@@ -78,8 +78,8 @@
                 </md-card-content>
             </md-card>
             <md-card flex>
-                <md-card-content style="text-align: center;">
-                    <div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.rootcheck.end}}</div>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.rootcheck.end}}</div>
                     <md-tooltip md-direction="bottom">
                         Start time: {{ agentInfo.rootcheck.start }} <br>
                         End time: {{ agentInfo.rootcheck.end }} <br>
@@ -164,7 +164,8 @@
 </md-content>
 
 <style>
-    .agents-overview-no-results {
+    .agents-overview-no-results,
+    .agents-overview-top-metric-item {
         text-align: center;
     }
     .agents-overview-discover {
@@ -176,5 +177,12 @@
     }
     .agents-overview-summary {
         height: 540px;
+    }
+    .agents-overview-top-metric-row,
+    .agents-overview-second-row {
+        height: 100px;
+    }
+    .agents-overview-size-14 {
+        font-size: 14pt;
     }
 </style>
