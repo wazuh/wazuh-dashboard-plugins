@@ -34,14 +34,14 @@
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(5)">
         <md-card flex layout="column">
-            <md-card-content style="text-align: center;">
+            <md-card-content class="overview-pm-no-results">
                 No results for selected time interval
             </md-card-content>
         </md-card>
     </md-content>
 
     <!-- View: Discover -->
-    <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
+    <md-content class="overview-pm-discover" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
         <kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
         dis-filter="rule.groups:rootcheck"
         infinite-scroll="true">
@@ -50,22 +50,23 @@
 
     <!-- View: Panels -->
     <div ng-show="hideRing(5) && results && !loading" ng-if="tabView == 'panels'" class="wazuh-column">
-        <div layout="row" layout-align="center stretch" style="height: 290px;">
-            <md-card flex="50" class="wazuh-column">
+        
+        <div layout="row" layout-align="center stretch" class="overview-pm-top-row">
+            <md-card flex="50">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Events over time</span>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Events-over-time'" id="Wazuh-App-Overview-PM-Events-over-time"></kbn-vis>
                 </md-card-content>
             </md-card>
 
-            <md-card flex="25" class="wazuh-column">
+            <md-card flex="25">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Top 5 CIS Requirements</span>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Top-5-CIS-requirements'" id="Wazuh-App-Overview-PM-Top-5-CIS-requirements"></kbn-vis>
                 </md-card-content>
             </md-card>
 
-            <md-card flex="25" class="wazuh-column">
+            <md-card flex="25">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Top 5 PCI DSS Requirements</span>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Top-5-PCI-DSS-requirements'" id="Wazuh-App-Overview-PM-Top-5-PCI-DSS-requirements"></kbn-vis>
@@ -73,8 +74,8 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" style="height: 240px;">
-            <md-card flex class="wazuh-column">
+        <div layout="row" layout-align="center stretch" class="overview-pm-events-evolution">
+            <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Events per agent evolution</span>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Events-per-agent-evolution'" id="Wazuh-App-Overview-PM-Events-per-agent-evolution"></kbn-vis>
@@ -82,8 +83,8 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" style="height: 530px;" class="wazuh-column">
-            <md-card flex class="wazuh-column">
+        <div layout="row" layout-align="center stretch" class="overview-pm-alerts-summary">
+            <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Alerts-summary'" id="Wazuh-App-Overview-PM-Alerts-summary"></kbn-vis>
@@ -92,3 +93,21 @@
         </div>
     </div>
 </md-content>
+
+<style>
+    .overview-pm-no-results {
+        text-align: center;
+    }
+    .overview-pm-discover {
+        background-color: white;
+    }
+    .overview-pm-top-row {
+        height: 290px;
+    }
+    .overview-pm-events-evolution {
+        height: 240px;
+    }
+    .overview-pm-alerts-summary {
+        height: 530px;
+    }
+</style>
