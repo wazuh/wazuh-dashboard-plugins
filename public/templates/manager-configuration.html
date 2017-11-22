@@ -1,675 +1,702 @@
 <md-content flex layout="column" ng-if="!load && submenuNavItem == 'configuration'" ng-controller="managerConfigurationController">
-    <div class='uil-ring-css' ng-show="load"><div></div></div>
-    <md-content flex layout="row" ng-show="!load" layout-sm="column" layout-xs="column">
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-		<div flex layout="column" ng-if="managerConfiguration.global">	
+    <div flex layout="row" ng-show="!load" layout-sm="column" layout-xs="column">
+
+        <div flex layout="column" ng-if="managerConfiguration.global">
             <md-card>
-				<md-card-title ng-click="setting.global = !setting.global">
-					<md-card-title-text>
-						<span class="md-headline">Global <i ng-class="(setting.global) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
+                <md-card-title ng-click="setting.global = !setting.global">
+                    <md-card-title-text>
+                        <span class="md-headline">Global
+                            <i ng-class="(setting.global) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
                 <md-card-content ng-show="!setting.global">
-					<span ng-if="managerConfiguration.global.white_list">
-					<span layout="row" layout-align="space-between center">
-					<p>jsonout_output</p>
-					<p>{{managerConfiguration.global.jsonout_output}}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.logall">
-					<span layout="row" layout-align="space-between center">
-					<p>logall</p>
-					<p class="right-text">{{managerConfiguration.global.logall}}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.white_list">
-					<span layout="row" layout-align="space-between center">
-					<p style="font-weight: bold">White List</p>
-					<p class="right-text">
+                    <span ng-if="managerConfiguration.global.white_list">
+                        <span layout="row" layout-align="space-between center">
+                            <p>jsonout_output</p>
+                            <p>{{managerConfiguration.global.jsonout_output}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.logall">
+                        <span layout="row" layout-align="space-between center">
+                            <p>logall</p>
+                            <p class="right-text">{{managerConfiguration.global.logall}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.white_list">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">White List</p>
+                            <p class="right-text">
 
 
-					</p>
-					</span>
-					<p class="right-text" ng-repeat="item in managerConfiguration.global.white_list|orderBy">
-					{{ item }}
-					</p>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.stats">
-					<span layout="row" layout-align="space-between center">
-					<p>Stats</p>
-					<p class="right-text">{{ managerConfiguration.global.stats }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.host_infomation">
-					<span layout="row" layout-align="space-between center">
-					<p>Host information</p>
-					<p class="right-text">{{ managerConfiguration.global.host_infomation }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.alerts.log_alert_level">
-					<span layout="row" layout-align="space-between center">
-					<p>Log alert level</p>
-					<p class="right-text">{{ managerConfiguration.alerts.log_alert_level }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.email_notification">
-					<span layout="row" layout-align="space-between center">
-					<p> Email notifications </p>
-					<p class="right-text">{{ managerConfiguration.global.email_notification }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.email_alert_level">
-					<span layout="row" layout-align="space-between center">
-					<p> Email alert level </p>
-					<p class="right-text">{{ managerConfiguration.global.email_alert_level }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.email_to">
-					<span layout="row" layout-align="space-between center">
-					<p> Email to </p>
-					<p class="right-text">{{ managerConfiguration.global.email_to }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.email_from">
-					<span layout="row" layout-align="space-between center">
-					<p> Email from </p>
-					<p class="right-text">{{ managerConfiguration.global.email_from }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.smtp_server">
-					<span layout="row" layout-align="space-between center">
-					<p> SMTP Server </p>
-					<p class="right-text">{{ managerConfiguration.global.smtp_server }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.email_maxperhour">
-					<p> Max email per hour </p>
-					<p class="right-text">{{ managerConfiguration.global.email_maxperhour }}</p>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.global.email_idsname">
-					<span layout="row" layout-align="space-between center">
-					<p> Email IDS name </p>
-					<p class="right-text">{{ managerConfiguration.global.email_idsname }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.email_alerts.email_to">
-					<span layout="row" layout-align="space-between center">
-					<p> Email to </p>
-					<p class="right-text">{{ managerConfiguration.email_alerts.email_to }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.email_alerts.level">
-					<span layout="row" layout-align="space-between center">
-					<p> Alert level </p>
-					<p class="right-text">{{ managerConfiguration.email_alerts.level }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.email_alerts.group">
-					<span layout="row" layout-align="space-between center">
-					<p> Group </p>
-					<p class="right-text">{{ managerConfiguration.email_alerts.group }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.email_alerts.event_location">
-					<span layout="row" layout-align="space-between center">
-					<p> Event location </p>
-					<p class="right-text">{{ managerConfiguration.email_alerts.event_location }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.email_alerts.format">
-					<span layout="row" layout-align="space-between center">
-					<p> Format </p>
-					<p class="right-text">{{ managerConfiguration.email_alerts.format }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.email_alerts.rule_id">
-					<span layout="row" layout-align="space-between center">
-					<p> Rule ID </p>
-					<p class="right-text">{{ managerConfiguration.email_alerts.rule_id }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.email_alerts.do_not_delay">
-					<span layout="row" layout-align="space-between center">
-					<p> Do not delay </p>
-					<p class="right-text">{{ managerConfiguration.email_alerts.do_not_delay }}</p>
-					</span>
-					<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.email_alerts.do_not_group">
-					<span layout="row" layout-align="space-between center">
-					<p> Do not group </p>
-					<p class="right-text">{{ managerConfiguration.email_alerts.do_not_group }}</p>
-					</span>
-					</span>
-				</md-card-content>
-			</md-card>
-			 <md-card ng-if="managerConfiguration.remote">
-				<md-card-title ng-click="setting.remote = !setting.remote">
-					<md-card-title-text>
-						<span class="md-headline">Remote <i ng-class="(!setting.remote) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
+                            </p>
+                        </span>
+                        <p class="right-text" ng-repeat="item in managerConfiguration.global.white_list|orderBy">
+                            {{ item }}
+                        </p>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.stats">
+                        <span layout="row" layout-align="space-between center">
+                            <p>Stats</p>
+                            <p class="right-text">{{ managerConfiguration.global.stats }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.host_infomation">
+                        <span layout="row" layout-align="space-between center">
+                            <p>Host information</p>
+                            <p class="right-text">{{ managerConfiguration.global.host_infomation }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.alerts.log_alert_level">
+                        <span layout="row" layout-align="space-between center">
+                            <p>Log alert level</p>
+                            <p class="right-text">{{ managerConfiguration.alerts.log_alert_level }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.email_notification">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Email notifications </p>
+                            <p class="right-text">{{ managerConfiguration.global.email_notification }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.email_alert_level">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Email alert level </p>
+                            <p class="right-text">{{ managerConfiguration.global.email_alert_level }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.email_to">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Email to </p>
+                            <p class="right-text">{{ managerConfiguration.global.email_to }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.email_from">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Email from </p>
+                            <p class="right-text">{{ managerConfiguration.global.email_from }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.smtp_server">
+                        <span layout="row" layout-align="space-between center">
+                            <p> SMTP Server </p>
+                            <p class="right-text">{{ managerConfiguration.global.smtp_server }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.email_maxperhour">
+                        <p> Max email per hour </p>
+                        <p class="right-text">{{ managerConfiguration.global.email_maxperhour }}</p>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.global.email_idsname">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Email IDS name </p>
+                            <p class="right-text">{{ managerConfiguration.global.email_idsname }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.email_alerts.email_to">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Email to </p>
+                            <p class="right-text">{{ managerConfiguration.email_alerts.email_to }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.email_alerts.level">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Alert level </p>
+                            <p class="right-text">{{ managerConfiguration.email_alerts.level }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.email_alerts.group">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Group </p>
+                            <p class="right-text">{{ managerConfiguration.email_alerts.group }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.email_alerts.event_location">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Event location </p>
+                            <p class="right-text">{{ managerConfiguration.email_alerts.event_location }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.email_alerts.format">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Format </p>
+                            <p class="right-text">{{ managerConfiguration.email_alerts.format }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.email_alerts.rule_id">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Rule ID </p>
+                            <p class="right-text">{{ managerConfiguration.email_alerts.rule_id }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.email_alerts.do_not_delay">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Do not delay </p>
+                            <p class="right-text">{{ managerConfiguration.email_alerts.do_not_delay }}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.email_alerts.do_not_group">
+                        <span layout="row" layout-align="space-between center">
+                            <p> Do not group </p>
+                            <p class="right-text">{{ managerConfiguration.email_alerts.do_not_group }}</p>
+                        </span>
+                    </span>
+                </md-card-content>
+            </md-card>
+            <md-card ng-if="managerConfiguration.remote">
+                <md-card-title ng-click="setting.remote = !setting.remote">
+                    <md-card-title-text>
+                        <span class="md-headline">Remote
+                            <i ng-class="(!setting.remote) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
                 <md-card-content ng-show="setting.remote">
-					<span ng-if="managerConfiguration.remote" ng-repeat="item in managerConfiguration.remote">
-						<span layout="row" layout-align="space-between center">
-							<p>connection</p>
-							<p>{{item.connection}}</p>
-						</span>
-						<span layout="row" layout-align="space-between center">
-							<p>port</p>
-							<p>{{item.port}}</p>
-						</span>
-						<span layout="row" layout-align="space-between center">
-							<p>protocol</p>
-							<p>{{item.protocol}}</p>
-						</span>
-						<md-divider></md-divider>
-					</span>
-				</md-card-content>	
-			</md-card>
+                    <span ng-if="managerConfiguration.remote" ng-repeat="item in managerConfiguration.remote">
+                        <span layout="row" layout-align="space-between center">
+                            <p>connection</p>
+                            <p>{{item.connection}}</p>
+                        </span>
+                        <span layout="row" layout-align="space-between center">
+                            <p>port</p>
+                            <p>{{item.port}}</p>
+                        </span>
+                        <span layout="row" layout-align="space-between center">
+                            <p>protocol</p>
+                            <p>{{item.protocol}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                </md-card-content>
+            </md-card>
         </div>
 
-		<div flex layout="column">
-		<md-card>
-			    <md-card-title ng-click="setting.syscheck = !setting.syscheck">
-					<md-card-title-text>
-						<span class="md-headline">Syscheck<i ng-class="(!setting.syscheck) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
+        <div flex layout="column">
+            <md-card>
+                <md-card-title ng-click="setting.syscheck = !setting.syscheck">
+                    <md-card-title-text>
+                        <span class="md-headline">Syscheck
+                            <i ng-class="(!setting.syscheck) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
                 <md-card-content ng-show="setting.syscheck">
                     <span ng-if="managerConfiguration.syscheck.disabled">
-              <span layout="row" layout-align="space-between center">
-              <p> Syscheck disabled </p>
-              <p class="right-text">{{managerConfiguration.syscheck.disabled}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Syscheck disabled </p>
+                            <p class="right-text">{{managerConfiguration.syscheck.disabled}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.syscheck['frequency']">
-              <span layout="row" layout-align="space-between center">
-              <p> Frequency </p>
-              <p class="right-text">{{managerConfiguration.syscheck['frequency']}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Frequency </p>
+                            <p class="right-text">{{managerConfiguration.syscheck['frequency']}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.syscheck.scan_time">
-              <span layout="row" layout-align="space-between center">
-              <p> Scan time </p>
-              <p class="right-text">{{managerConfiguration.syscheck.scan_time}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Scan time </p>
+                            <p class="right-text">{{managerConfiguration.syscheck.scan_time}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.syscheck.scan_day">
-              <span layout="row" layout-align="space-between center">
-              <p> Scan day </p>
-              <p class="right-text">{{managerConfiguration.syscheck.scan_day}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Scan day </p>
+                            <p class="right-text">{{managerConfiguration.syscheck.scan_day}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.syscheck.auto_ignore">
-              <span layout="row" layout-align="space-between center">
-              <p> Auto ignore </p>
-              <p class="right-text">{{managerConfiguration.syscheck.auto_ignore}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Auto ignore </p>
+                            <p class="right-text">{{managerConfiguration.syscheck.auto_ignore}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.syscheck.alert_new_files">
-              <span layout="row" layout-align="space-between center">
-              <p> Alert new files </p>
-              <p class="right-text">{{managerConfiguration.syscheck.alert_new_files}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Alert new files </p>
+                            <p class="right-text">{{managerConfiguration.syscheck.alert_new_files}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.syscheck.scan_on_start">
-              <span layout="row" layout-align="space-between center">
-              <p> Scan on start </p>
-              <p class="right-text">{{managerConfiguration.syscheck.scan_on_start}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Scan on start </p>
+                            <p class="right-text">{{managerConfiguration.syscheck.scan_on_start}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
-				<span ng-if="managerConfiguration.syscheck.nodiff">
-              <span layout="row" layout-align="space-between center">
-              <p>No diff</p>
-              <p class="right-text">{{managerConfiguration.syscheck.nodiff}}</p>
-              </span>
-                    <md-divider></md-divider>
-                    </span>	
+                    <span ng-if="managerConfiguration.syscheck.nodiff">
+                        <span layout="row" layout-align="space-between center">
+                            <p>No diff</p>
+                            <p class="right-text">{{managerConfiguration.syscheck.nodiff}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
                     <span ng-if="managerConfiguration.syscheck.skip_nfs">
-              <span layout="row" layout-align="space-between center">
-              <p> Skip NFS </p>
-              <p class="right-text">{{managerConfiguration.syscheck.skip_nfs}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Skip NFS </p>
+                            <p class="right-text">{{managerConfiguration.syscheck.skip_nfs}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
 
                     <span ng-if="managerConfiguration.syscheck.directories">
-              <span layout="row" layout-align="space-between center">
-              <p style="font-weight: bold">Monitoring directories</p>
-              <p class="right-text">
-                  
-                  
-                </p>
-              </span>
-                    <span ng-repeat="item in managerConfiguration.syscheck.directories|orderBy">
-              <p> {{ item }} </p>
-            </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">Monitoring directories</p>
+                            <p class="right-text">
+
+
+                            </p>
+                        </span>
+                        <span ng-repeat="item in managerConfiguration.syscheck.directories|orderBy">
+                            <p> {{ item }} </p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
-									</md-card-content>
+                </md-card-content>
             </md-card>
             <md-card>
                 <md-card-title ng-click="setting.rootcheck = !setting.rootcheck">
-					<md-card-title-text>
-						<span class="md-headline">Rootcheck<i ng-class="(!setting.rootcheck) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">Rootcheck
+                            <i ng-class="(!setting.rootcheck) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
                 <md-card-content ng-show="setting.rootcheck">
                     <span ng-if="managerConfiguration.rootcheck.disabled">
-              <span layout="row" layout-align="space-between center">
-              <p> Rootcheck disabled </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.disabled}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Rootcheck disabled </p>
+                            <p class="right-text">{{managerConfiguration.rootcheck.disabled}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.rootcheck.rootkit_files">
-              <span layout="row" layout-align="space-between center">
-              <p> Rootkit Files </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.rootkit_files}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Rootkit Files </p>
+                            <p class="right-text">{{managerConfiguration.rootcheck.rootkit_files}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.rootcheck.rootkit_trojans">
-              <span layout="row" layout-align="space-between center">
-              <p> Rootkit Trojans </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.rootkit_trojans}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Rootkit Trojans </p>
+                            <p class="right-text">{{managerConfiguration.rootcheck.rootkit_trojans}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.rootcheck.base_directory">
-              <span layout="row" layout-align="space-between center">
-              <p> Base directory </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.base_directory}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Base directory </p>
+                            <p class="right-text">{{managerConfiguration.rootcheck.base_directory}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.rootcheck.scanall">
-              <span layout="row" layout-align="space-between center">
-              <p> Scan all </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.scanall}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Scan all </p>
+                            <p class="right-text">{{managerConfiguration.rootcheck.scanall}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.rootcheck['frequency']">
-              <span layout="row" layout-align="space-between center">
-              <p> Frequency </p>
-              <p class="right-text">{{managerConfiguration.rootcheck['frequency']}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Frequency </p>
+                            <p class="right-text">{{managerConfiguration.rootcheck['frequency']}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
                     <span ng-if="managerConfiguration.rootcheck.skip_nfs">
-              <span layout="row" layout-align="space-between center">
-              <p> Skip NFS </p>
-              <p class="right-text">{{managerConfiguration.rootcheck.skip_nfs}}</p>
-              </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p> Skip NFS </p>
+                            <p class="right-text">{{managerConfiguration.rootcheck.skip_nfs}}</p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
 
 
                     <span ng-if="managerConfiguration.rootcheck.system_audit">
-              <span layout="row" layout-align="space-between center">
-              <p style="font-weight: bold"> System audit files</p>
- 
-              </span>
-                    <span ng-repeat="item in managerConfiguration.rootcheck.system_audit|orderBy">
-              <p> {{ item }} </p>
-            </span>
-                    <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold"> System audit files</p>
+
+                        </span>
+                        <span ng-repeat="item in managerConfiguration.rootcheck.system_audit|orderBy">
+                            <p> {{ item }} </p>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
-									</md-card-content>
+                </md-card-content>
             </md-card>
             <md-card>
                 <md-card-title ng-click="setting.logcollector = !setting.logcollector">
-					<md-card-title-text>
-						<span class="md-headline">Logcollector<i ng-class="(!setting.logcollector) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">Logcollector
+                            <i ng-class="(!setting.logcollector) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
                 <md-card-content ng-show="setting.logcollector">
                     <span ng-repeat='item in managerConfiguration["localfile"]|orderBy:["location", "command"]'>
-              <span layout="row" layout-align="space-between center">
-              <p ng-if="item.location" > {{ item.location }} </p>
-              <p ng-if="item.command" style="overflow: hidden;"> {{ item.command }} </p>
-              <p class="right-text">{{ item.log_format }}</p>
-              </span>
+                        <span layout="row" layout-align="space-between center">
+                            <p ng-if="item.location"> {{ item.location }} </p>
+                            <p ng-if="item.command" style="overflow: hidden;"> {{ item.command }} </p>
+                            <p class="right-text">{{ item.log_format }}</p>
+                        </span>
 
-                    <span ng-if="item.alias">
-              <span layout="row" layout-align="space-between center">
-              <p>Alias</p>
-              <p> {{ item.alias }} </p>
-              </span>
-                    </span>
-                    <span ng-if="item['frequency']">
-              <span layout="row" layout-align="space-between center">
-              <p>Frequency</p>
-              <p> {{ item['frequency'] }} </p>
-              </span>
-                    </span>
-                    <span ng-if="item.check_diff">
-              <span layout="row" layout-align="space-between center">
-              <p>Check diff</p>
-              <p> {{ item.check_diff }} </p>
-              </span>
+                        <span ng-if="item.alias">
+                            <span layout="row" layout-align="space-between center">
+                                <p>Alias</p>
+                                <p> {{ item.alias }} </p>
+                            </span>
+                        </span>
+                        <span ng-if="item['frequency']">
+                            <span layout="row" layout-align="space-between center">
+                                <p>Frequency</p>
+                                <p> {{ item['frequency'] }} </p>
+                            </span>
+                        </span>
+                        <span ng-if="item.check_diff">
+                            <span layout="row" layout-align="space-between center">
+                                <p>Check diff</p>
+                                <p> {{ item.check_diff }} </p>
+                            </span>
+                        </span>
+
+                        <md-divider></md-divider>
                     </span>
 
-                    <md-divider></md-divider>
-                    </span>
-
-			</md-card-content>
-		</md-card>
-		<md-card ng-if="managerConfiguration.wodle && managerConfiguration.wodle.name == 'open-scap'">
-				<md-card-title ng-click="setting.wodle = !setting.wodle">
-					<md-card-title-text>
-						<span class="md-headline">OpenSCAP <i ng-class="(!setting.wodle) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
+                </md-card-content>
+            </md-card>
+            <md-card ng-if="managerConfiguration.wodle && managerConfiguration.wodle.name == 'open-scap'">
+                <md-card-title ng-click="setting.wodle = !setting.wodle">
+                    <md-card-title-text>
+                        <span class="md-headline">OpenSCAP
+                            <i ng-class="(!setting.wodle) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
                 <md-card-content ng-show="setting.wodle">
-					<span ng-if="managerConfiguration.wodle.disabled">
-						<span layout="row" layout-align="space-between center">
-							<p>Disabled</p>
-							<p>{{managerConfiguration.wodle.disabled}}</p>
-						</span>
-						<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.wodle.timeout">
-						<span layout="row" layout-align="space-between center">
-							<p>Timeout</p>
-							<p>{{managerConfiguration.wodle.timeout}}</p>
-						</span>
-						<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.wodle.interval">
-						<span layout="row" layout-align="space-between center">
-							<p>Interval</p>
-							<p>{{managerConfiguration.wodle.interval}}</p>
-						</span>
-						<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.wodle.scan-on-start">
-						<span layout="row" layout-align="space-between center">
-							<p>Scan on start</p>
-							<p>{{managerConfiguration.wodle.scan-on-start}}</p>
-						</span>
-						<md-divider></md-divider>
-					</span>
-					<span ng-if="managerConfiguration.wodle.content">
-						<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold">Content</p>
-							<p class="right-text"></p>
-						</span>
-						<span ng-if="!isArray(managerConfiguration.wodle.content)">
-							<span layout="row" layout-align="space-between center">
-								<p>Policy</p>
-								<p>{{managerConfiguration.wodle.content.path}}</p>
-							</span>
-							<span layout="row" layout-align="space-between center">
-								<p>Type</p>
-								<p>{{managerConfiguration.wodle.content.type}}</p>
-							</span>
-							<span layout="row" layout-align="space-between center">
-								<p style="font-weight: bold">Profiles</p>
-								<p class="right-text"></p>
-							</span>
-							<span ng-if="isArray(managerConfiguration.wodle.content.profile)">
-								<p ng-repeat="item in managerConfiguration.wodle.content.profile track by $index"> {{ item.$t }} </p>
-							</span>
-							<span ng-if="!isArray(managerConfiguration.wodle.content.profile)" layout="row" layout-align="space-between center">
-								<p>{{managerConfiguration.wodle.content.profile.$t}}</p>
-							</span>
-							<md-divider></md-divider>
-						</span>
-						
-						<span ng-if="isArray(managerConfiguration.wodle.content)" ng-repeat="item in managerConfiguration.wodle.content track by $index">
-							<span layout="row" layout-align="space-between center">
-								<p>Policy</p>
-								<p>{{item.path}}</p>
-							</span>
-							<span layout="row" layout-align="space-between center">
-								<p>Type</p>
-								<p>{{item.type}}</p>
-							</span>
-							<span layout="row" layout-align="space-between center">
-								<p style="font-weight: bold">Profiles</p>
-								<p class="right-text"></p>
-							</span>
-							<span ng-if="isArray(item.profile)">
-								<p ng-repeat="item2 in item.profile track by $index"> {{ item2.$t }} </p>
-							</span>
-							<span ng-if="!isArray(item.profile)" layout="row" layout-align="space-between center">
-								<p>{{item.profile.$t}}</p>
-							</span>
-							<md-divider></md-divider>
-						</span>
-					</span>
-				</md-card-content>	
-			</md-card>
-		</div>
+                    <span ng-if="managerConfiguration.wodle.disabled">
+                        <span layout="row" layout-align="space-between center">
+                            <p>Disabled</p>
+                            <p>{{managerConfiguration.wodle.disabled}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.wodle.timeout">
+                        <span layout="row" layout-align="space-between center">
+                            <p>Timeout</p>
+                            <p>{{managerConfiguration.wodle.timeout}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.wodle.interval">
+                        <span layout="row" layout-align="space-between center">
+                            <p>Interval</p>
+                            <p>{{managerConfiguration.wodle.interval}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.wodle.scan-on-start">
+                        <span layout="row" layout-align="space-between center">
+                            <p>Scan on start</p>
+                            <p>{{managerConfiguration.wodle.scan-on-start}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+                    <span ng-if="managerConfiguration.wodle.content">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">Content</p>
+                            <p class="right-text"></p>
+                        </span>
+                        <span ng-if="!isArray(managerConfiguration.wodle.content)">
+                            <span layout="row" layout-align="space-between center">
+                                <p>Policy</p>
+                                <p>{{managerConfiguration.wodle.content.path}}</p>
+                            </span>
+                            <span layout="row" layout-align="space-between center">
+                                <p>Type</p>
+                                <p>{{managerConfiguration.wodle.content.type}}</p>
+                            </span>
+                            <span layout="row" layout-align="space-between center">
+                                <p style="font-weight: bold">Profiles</p>
+                                <p class="right-text"></p>
+                            </span>
+                            <span ng-if="isArray(managerConfiguration.wodle.content.profile)">
+                                <p ng-repeat="item in managerConfiguration.wodle.content.profile track by $index"> {{ item.$t }} </p>
+                            </span>
+                            <span ng-if="!isArray(managerConfiguration.wodle.content.profile)" layout="row" layout-align="space-between center">
+                                <p>{{managerConfiguration.wodle.content.profile.$t}}</p>
+                            </span>
+                            <md-divider></md-divider>
+                        </span>
+
+                        <span ng-if="isArray(managerConfiguration.wodle.content)" ng-repeat="item in managerConfiguration.wodle.content track by $index">
+                            <span layout="row" layout-align="space-between center">
+                                <p>Policy</p>
+                                <p>{{item.path}}</p>
+                            </span>
+                            <span layout="row" layout-align="space-between center">
+                                <p>Type</p>
+                                <p>{{item.type}}</p>
+                            </span>
+                            <span layout="row" layout-align="space-between center">
+                                <p style="font-weight: bold">Profiles</p>
+                                <p class="right-text"></p>
+                            </span>
+                            <span ng-if="isArray(item.profile)">
+                                <p ng-repeat="item2 in item.profile track by $index"> {{ item2.$t }} </p>
+                            </span>
+                            <span ng-if="!isArray(item.profile)" layout="row" layout-align="space-between center">
+                                <p>{{item.profile.$t}}</p>
+                            </span>
+                            <md-divider></md-divider>
+                        </span>
+                    </span>
+                </md-card-content>
+            </md-card>
+        </div>
         <div flex layout="column" ng-if="managerConfiguration.ruleset">
             <md-card>
                 <md-card-title ng-click="setting.ruleset = !setting.ruleset">
-					<md-card-title-text>
-						<span class="md-headline">Ruleset<i ng-class="(!setting.ruleset) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">Ruleset
+                            <i ng-class="(!setting.ruleset) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
                 <md-card-content ng-show="setting.ruleset">
-					<span ng-if="managerConfiguration.ruleset.decoder_dir">
-						<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold"> Decoder directories</p>
-							<p class="right-text"></p>
-						</span>
-						<span ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
-							<p> {{ item }} </p>
-						</span>
-						<md-divider></md-divider>
-					</span>
+                    <span ng-if="managerConfiguration.ruleset.decoder_dir">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold"> Decoder directories</p>
+                            <p class="right-text"></p>
+                        </span>
+                        <span ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
+                            <p> {{ item }} </p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
 
-					<span ng-if="managerConfiguration.ruleset.decoder_exclude">
-						<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold">Decoder excludes</p>
-							<p class="right-text"></p>
-						</span>
-						<span ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
-							<p> {{ item }} </p>
-						</span>
-						<md-divider></md-divider>
-					</span>
-					
-					<span ng-if="managerConfiguration.ruleset.decoder">
-						<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold">Decoders files</p>
-						</span>
-						<span ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
-							<p> {{ item }} </p>
-						</span>
-					</span>
-					
-					<span ng-if="managerConfiguration.ruleset.rule_dir">
-						<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold">Rules directories</p>
-						</span>
-						<span ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
-							<p> {{ item }} </p>
-						</span>
-						<md-divider></md-divider>
-					</span>
+                    <span ng-if="managerConfiguration.ruleset.decoder_exclude">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">Decoder excludes</p>
+                            <p class="right-text"></p>
+                        </span>
+                        <span ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
+                            <p> {{ item }} </p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
 
-					<span ng-if="managerConfiguration.ruleset.include">
-						<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold">Rules files</p>
-						</span>
-						<span ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
-							<p> {{ item }} </p>
-						</span>
-					</span>
-					
-					<span ng-if="managerConfiguration.ruleset.rule_exclude">
-						<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold">Rule excludes</p>
-							<p class="right-text"></p>
-						</span>
+                    <span ng-if="managerConfiguration.ruleset.decoder">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">Decoders files</p>
+                        </span>
+                        <span ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
+                            <p> {{ item }} </p>
+                        </span>
+                    </span>
 
-						<span ng-if="isArray(managerConfiguration.ruleset.rule_exclude)">
-							<p ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index"> {{ item }} </p>
-						</span>
+                    <span ng-if="managerConfiguration.ruleset.rule_dir">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">Rules directories</p>
+                        </span>
+                        <span ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
+                            <p> {{ item }} </p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
 
-						<span ng-if="!isArray(managerConfiguration.ruleset.rule_exclude)">
-							<p> {{ managerConfiguration.ruleset.rule_exclude }} </p>
-						</span>
-						
-						<md-divider></md-divider>
-					</span>
-					
-			  		<span ng-if="managerConfiguration.ruleset.list">
-						<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold">CDB lists</p>
-							<p class="right-text"></p>
-						</span>
+                    <span ng-if="managerConfiguration.ruleset.include">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">Rules files</p>
+                        </span>
+                        <span ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
+                            <p> {{ item }} </p>
+                        </span>
+                    </span>
 
-						<span ng-if="isArray(managerConfiguration.ruleset.list)">
-							<p ng-repeat="item in managerConfiguration.ruleset.list|orderBy"> {{ item }} </p>
-						</span>
+                    <span ng-if="managerConfiguration.ruleset.rule_exclude">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">Rule excludes</p>
+                            <p class="right-text"></p>
+                        </span>
 
-						<span ng-if="!isArray(managerConfiguration.ruleset.list)">
-							<p> {{ managerConfiguration.ruleset.list }} </p>
-						</span>
-						<md-divider></md-divider>
-					</span>
-					
-				</md-card-content>
+                        <span ng-if="isArray(managerConfiguration.ruleset.rule_exclude)">
+                            <p ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index"> {{ item }} </p>
+                        </span>
+
+                        <span ng-if="!isArray(managerConfiguration.ruleset.rule_exclude)">
+                            <p> {{ managerConfiguration.ruleset.rule_exclude }} </p>
+                        </span>
+
+                        <md-divider></md-divider>
+                    </span>
+
+                    <span ng-if="managerConfiguration.ruleset.list">
+                        <span layout="row" layout-align="space-between center">
+                            <p style="font-weight: bold">CDB lists</p>
+                            <p class="right-text"></p>
+                        </span>
+
+                        <span ng-if="isArray(managerConfiguration.ruleset.list)">
+                            <p ng-repeat="item in managerConfiguration.ruleset.list|orderBy"> {{ item }} </p>
+                        </span>
+
+                        <span ng-if="!isArray(managerConfiguration.ruleset.list)">
+                            <p> {{ managerConfiguration.ruleset.list }} </p>
+                        </span>
+                        <md-divider></md-divider>
+                    </span>
+
+                </md-card-content>
             </md-card>
             <md-card ng-if="managerConfiguration['active-response'].length > 0">
                 <md-card-title ng-click="setting.activeResponse = !setting.activeResponse">
-					<md-card-title-text>
-						<span class="md-headline">Active response<i ng-class="(!setting.activeResponse) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
-                <md-card-content ng-show="setting.activeResponse">  
-					<span ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
-						<span ng-if="item.command">
-							<span layout="row" layout-align="space-between center">
-							<p style="font-weight: bold"> {{ item.command }} </p>
-							<p class="right-text">
+                    <md-card-title-text>
+                        <span class="md-headline">Active response
+                            <i ng-class="(!setting.activeResponse) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content ng-show="setting.activeResponse">
+                    <span ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
+                        <span ng-if="item.command">
+                            <span layout="row" layout-align="space-between center">
+                                <p style="font-weight: bold"> {{ item.command }} </p>
+                                <p class="right-text">
 
-							</p>
-							</span>
-								<span ng-if="item.location">
-							<span layout="row" layout-align="space-between center">
-							<p> Location </p>
-							<p class="right-text">{{ item.location }}</p>
-							</span>
-								</span>
-								<span ng-if="item.agent_id">
-							<span layout="row" layout-align="space-between center">
-							<p> Agent ID(s) </p>
-							<p class="right-text">{{ item.agent_id }}</p>
-							</span>
-								</span>
-								<span ng-if="item.level">
-							<span layout="row" layout-align="space-between center">
-							<p> Level </p>
-							<p class="right-text">{{ item.level }}</p>
-							</span>
-								</span>
-								<span ng-if="item.timeout">
-							<span layout="row" layout-align="space-between center">
-							<p> Timeout </p>
-							<p class="right-text">{{ item.timeout }}</p>
-							</span>
-								</span>
-								<span ng-if="item.rules_group" ng-repeat="group in item.rules_group.split(',');">
-							<span layout="row" layout-align="space-between center">
-							<p ng-show="$first"> Rules group </p>
-							<p ng-show="!$first"></p>
-							<p class="right-text">{{ group }}</p>
-							</span>
-								</span>
-								<span ng-if="item.rules_id">
-							<span layout="row" layout-align="space-between center">
-							<p> Rules ID(s) </p>
-							<p class="right-text">{{ item.rules_id }}</p>
-							</span>
-								</span>
-							<span ng-if="item.repeated_offenders">
-								<span layout="row" layout-align="space-between center">
-								<p> Repeated offenders </p>
-								<p class="right-text">{{ item.repeated_offenders }}</p>
-								</span>
-							</span>
-							<md-divider></md-divider>
-						</span>
-					</span>
-				</md-card-content>
+                                </p>
+                            </span>
+                            <span ng-if="item.location">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Location </p>
+                                    <p class="right-text">{{ item.location }}</p>
+                                </span>
+                            </span>
+                            <span ng-if="item.agent_id">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Agent ID(s) </p>
+                                    <p class="right-text">{{ item.agent_id }}</p>
+                                </span>
+                            </span>
+                            <span ng-if="item.level">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Level </p>
+                                    <p class="right-text">{{ item.level }}</p>
+                                </span>
+                            </span>
+                            <span ng-if="item.timeout">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Timeout </p>
+                                    <p class="right-text">{{ item.timeout }}</p>
+                                </span>
+                            </span>
+                            <span ng-if="item.rules_group" ng-repeat="group in item.rules_group.split(',');">
+                                <span layout="row" layout-align="space-between center">
+                                    <p ng-show="$first"> Rules group </p>
+                                    <p ng-show="!$first"></p>
+                                    <p class="right-text">{{ group }}</p>
+                                </span>
+                            </span>
+                            <span ng-if="item.rules_id">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Rules ID(s) </p>
+                                    <p class="right-text">{{ item.rules_id }}</p>
+                                </span>
+                            </span>
+                            <span ng-if="item.repeated_offenders">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Repeated offenders </p>
+                                    <p class="right-text">{{ item.repeated_offenders }}</p>
+                                </span>
+                            </span>
+                            <md-divider></md-divider>
+                        </span>
+                    </span>
+                </md-card-content>
             </md-card>
             <md-card>
                 <md-card-title ng-click="setting.commands = !setting.commands">
-					<md-card-title-text>
-						<span class="md-headline">Commands<i ng-class="(!setting.commands) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow" aria-hidden="true"></i></span>
-					</md-card-title-text>
-				</md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline">Commands
+                            <i ng-class="(!setting.commands) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
                 <md-card-content ng-show="setting.commands">
                     <span ng-repeat="item in managerConfiguration.command|orderBy:'name'">
-              <span ng-if="item.name">
-                <span layout="row" layout-align="space-between center">
-                <p style="font-weight: bold"> {{ item.name }} </p>
-                <p class="right-text">
-                  
-                  
-                </p>
-                </span>
-                    <span ng-if="item.expect">
-                <span layout="row" layout-align="space-between center">
-                <p> Expect </p>
-                <p class="right-text">{{ item.expect }}</p>
-                </span>
-                    </span>
-                    <span ng-if="item.executable">
-                <span layout="row" layout-align="space-between center">
-                <p> Executable </p>
-                <p class="right-text">{{ item.executable }}</p>
-                </span>
-                    </span>
-                    <span ng-if="item.timeout_allowed">
-                <span layout="row" layout-align="space-between center">
-                <p> Timeout allowed </p>
-                <p class="right-text">{{ item.timeout_allowed}}</p>
-                </span>
-                    </span>
-                    </span>
-                    <md-divider></md-divider>
+                        <span ng-if="item.name">
+                            <span layout="row" layout-align="space-between center">
+                                <p style="font-weight: bold"> {{ item.name }} </p>
+                                <p class="right-text">
+
+
+                                </p>
+                            </span>
+                            <span ng-if="item.expect">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Expect </p>
+                                    <p class="right-text">{{ item.expect }}</p>
+                                </span>
+                            </span>
+                            <span ng-if="item.executable">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Executable </p>
+                                    <p class="right-text">{{ item.executable }}</p>
+                                </span>
+                            </span>
+                            <span ng-if="item.timeout_allowed">
+                                <span layout="row" layout-align="space-between center">
+                                    <p> Timeout allowed </p>
+                                    <p class="right-text">{{ item.timeout_allowed}}</p>
+                                </span>
+                            </span>
+                        </span>
+                        <md-divider></md-divider>
                     </span>
 
-                    
+
                 </md-card-content>
-            </md-card>			
+            </md-card>
         </div>
-
-
-    </md-content>
-
+    </div>
 </md-content>
