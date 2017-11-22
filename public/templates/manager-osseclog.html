@@ -44,7 +44,7 @@
         </md-toolbar>
 
         <div layout="column" flex>
-            <div flex class="manager-log-list" id="groups-id" layout="column" when-scrolled="logs.nextPage('')">
+            <md-content flex class="manager-log-list" id="groups-id" when-scrolled="logs.nextPage('')">
                 <md-list>
                     <md-list-item ng-repeat="log in logs.items | filter : searchTerm" ng-mouseover="log.hovered=true" ng-mouseleave="log.hovered=false"
                         layout="row" class="groups-button">
@@ -55,7 +55,7 @@
                         <div flex layout="row" layout-align="end center"></div>
                     </md-list-item>
                 </md-list>
-            </div>
+            </md-content>
         </div>
     </div>
 </div>
@@ -67,6 +67,7 @@
     }
     .manager-log-top-row {
         height: 70px;
+        padding-right: 8px;
     }
     .manager-log-buttonplay-i {
         margin-top: 0px; 
