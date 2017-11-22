@@ -32,11 +32,8 @@
                     </span>
                     <span ng-if="managerConfiguration.global.white_list">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">White List</p>
-                            <p class="right-text">
-
-
-                            </p>
+                            <p class="manager-configuration-p-bold">White List</p>
+                            <p class="right-text"></p>
                         </span>
                         <p class="right-text" ng-repeat="item in managerConfiguration.global.white_list|orderBy">
                             {{ item }}
@@ -274,11 +271,8 @@
 
                     <span ng-if="managerConfiguration.syscheck.directories">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">Monitoring directories</p>
-                            <p class="right-text">
-
-
-                            </p>
+                            <p class="manager-configuration-p-bold">Monitoring directories</p>
+                            <p class="right-text"></p>
                         </span>
                         <span ng-repeat="item in managerConfiguration.syscheck.directories|orderBy">
                             <p> {{ item }} </p>
@@ -350,8 +344,7 @@
 
                     <span ng-if="managerConfiguration.rootcheck.system_audit">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold"> System audit files</p>
-
+                            <p class="manager-configuration-p-bold"> System audit files</p>
                         </span>
                         <span ng-repeat="item in managerConfiguration.rootcheck.system_audit|orderBy">
                             <p> {{ item }} </p>
@@ -373,7 +366,7 @@
                     <span ng-repeat='item in managerConfiguration["localfile"]|orderBy:["location", "command"]'>
                         <span layout="row" layout-align="space-between center">
                             <p ng-if="item.location"> {{ item.location }} </p>
-                            <p ng-if="item.command" style="overflow: hidden;"> {{ item.command }} </p>
+                            <p ng-if="item.command" class=".manager-configuration-no-overflow"> {{ item.command }} </p>
                             <p class="right-text">{{ item.log_format }}</p>
                         </span>
 
@@ -441,7 +434,7 @@
                     </span>
                     <span ng-if="managerConfiguration.wodle.content">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">Content</p>
+                            <p class="manager-configuration-p-bold">Content</p>
                             <p class="right-text"></p>
                         </span>
                         <span ng-if="!isArray(managerConfiguration.wodle.content)">
@@ -454,7 +447,7 @@
                                 <p>{{managerConfiguration.wodle.content.type}}</p>
                             </span>
                             <span layout="row" layout-align="space-between center">
-                                <p style="font-weight: bold">Profiles</p>
+                                <p class="manager-configuration-p-bold">Profiles</p>
                                 <p class="right-text"></p>
                             </span>
                             <span ng-if="isArray(managerConfiguration.wodle.content.profile)">
@@ -476,7 +469,7 @@
                                 <p>{{item.type}}</p>
                             </span>
                             <span layout="row" layout-align="space-between center">
-                                <p style="font-weight: bold">Profiles</p>
+                                <p class="manager-configuration-p-bold">Profiles</p>
                                 <p class="right-text"></p>
                             </span>
                             <span ng-if="isArray(item.profile)">
@@ -504,7 +497,7 @@
                 <md-card-content ng-show="setting.ruleset">
                     <span ng-if="managerConfiguration.ruleset.decoder_dir">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold"> Decoder directories</p>
+                            <p class="manager-configuration-p-bold"> Decoder directories</p>
                             <p class="right-text"></p>
                         </span>
                         <span ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
@@ -515,7 +508,7 @@
 
                     <span ng-if="managerConfiguration.ruleset.decoder_exclude">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">Decoder excludes</p>
+                            <p class="manager-configuration-p-bold">Decoder excludes</p>
                             <p class="right-text"></p>
                         </span>
                         <span ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
@@ -526,7 +519,7 @@
 
                     <span ng-if="managerConfiguration.ruleset.decoder">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">Decoders files</p>
+                            <p class="manager-configuration-p-bold">Decoders files</p>
                         </span>
                         <span ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
                             <p> {{ item }} </p>
@@ -535,7 +528,7 @@
 
                     <span ng-if="managerConfiguration.ruleset.rule_dir">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">Rules directories</p>
+                            <p class="manager-configuration-p-bold">Rules directories</p>
                         </span>
                         <span ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
                             <p> {{ item }} </p>
@@ -545,7 +538,7 @@
 
                     <span ng-if="managerConfiguration.ruleset.include">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">Rules files</p>
+                            <p class="manager-configuration-p-bold">Rules files</p>
                         </span>
                         <span ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
                             <p> {{ item }} </p>
@@ -554,7 +547,7 @@
 
                     <span ng-if="managerConfiguration.ruleset.rule_exclude">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">Rule excludes</p>
+                            <p class="manager-configuration-p-bold">Rule excludes</p>
                             <p class="right-text"></p>
                         </span>
 
@@ -571,7 +564,7 @@
 
                     <span ng-if="managerConfiguration.ruleset.list">
                         <span layout="row" layout-align="space-between center">
-                            <p style="font-weight: bold">CDB lists</p>
+                            <p class="manager-configuration-p-bold">CDB lists</p>
                             <p class="right-text"></p>
                         </span>
 
@@ -600,10 +593,8 @@
                     <span ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
                         <span ng-if="item.command">
                             <span layout="row" layout-align="space-between center">
-                                <p style="font-weight: bold"> {{ item.command }} </p>
-                                <p class="right-text">
-
-                                </p>
+                                <p class="manager-configuration-p-bold"> {{ item.command }} </p>
+                                <p class="right-text"></p>
                             </span>
                             <span ng-if="item.location">
                                 <span layout="row" layout-align="space-between center">
@@ -666,11 +657,8 @@
                     <span ng-repeat="item in managerConfiguration.command|orderBy:'name'">
                         <span ng-if="item.name">
                             <span layout="row" layout-align="space-between center">
-                                <p style="font-weight: bold"> {{ item.name }} </p>
-                                <p class="right-text">
-
-
-                                </p>
+                                <p class="manager-configuration-p-bold"> {{ item.name }} </p>
+                                <p class="right-text"></p>
                             </span>
                             <span ng-if="item.expect">
                                 <span layout="row" layout-align="space-between center">
@@ -693,10 +681,17 @@
                         </span>
                         <md-divider></md-divider>
                     </span>
-
-
                 </md-card-content>
             </md-card>
         </div>
     </div>
 </md-content>
+
+<style>
+    .manager-configuration-p-bold {
+        font-weight: bold;
+    }
+    .manager-configuration-no-overflow {
+        overflow: hidden;
+    }
+</style>
