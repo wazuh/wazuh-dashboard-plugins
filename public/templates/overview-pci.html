@@ -6,28 +6,28 @@
     <!-- Local nav. -->
     <div ng-if="hideRing(5) && !loading" ng-controller="kibanaSearchbar">
         <kbn-top-nav name="overview_pci" config="topNavMenu">
-          <!-- Transcluded elements. -->
-          <div data-transclude-slots>
-            <!-- Title. -->
+            <!-- Transcluded elements. -->
+            <div data-transclude-slots>
+                <!-- Title. -->
 
-            <!-- Search. -->
-            <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-              <query-bar
-                query="state.query"
-                app-name="'wazuh'"
-                on-submit="updateQueryAndFetch($query)"
-              >
-              </query-bar>
+                <!-- Search. -->
+                <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+                    <query-bar
+                        query="state.query"
+                        app-name="'wazuh'"
+                        on-submit="updateQueryAndFetch($query)"
+                    >
+                    </query-bar>
+                </div>
             </div>
-          </div>
         </kbn-top-nav>
 
         <!-- Filters. -->
         <filter-bar
-          ng-show="showFilterBar()"
-          state="state"
-          index-patterns="indexPattern"
-          ng-if="state.query.language === 'lucene'"
+            ng-show="showFilterBar()"
+            state="state"
+            index-patterns="indexPattern"
+            ng-if="state.query.language === 'lucene'"
         ></filter-bar>
     </div>
 
@@ -105,24 +105,3 @@
         </div>
     </div>
 </md-content>
-
-<style>
-    .overview-pci-no-results {
-        text-align: center;
-    }
-    .overview-pci-discover,
-    .overview-pci-tabs-row {
-        background-color: white;
-    }
-    .overview-pci-tabs-item {
-        line-height: 40px; 
-        margin: 0;
-    }
-    .overview-pci-requirements-row,
-    .overview-pci-agents-row {
-        height: 255px;
-    }
-    .overview-pci-last-alerts {
-        height: 530px;
-    }
-</style>

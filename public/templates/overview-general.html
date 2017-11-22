@@ -6,28 +6,28 @@
     <!-- Local nav. -->
     <div ng-if="hideRing(15) && !loading" ng-controller="kibanaSearchbar">
         <kbn-top-nav name="overview_general" config="topNavMenu">
-          <!-- Transcluded elements. -->
-          <div data-transclude-slots>
-            <!-- Title. -->
+            <!-- Transcluded elements. -->
+            <div data-transclude-slots>
+                <!-- Title. -->
 
-            <!-- Search. -->
-            <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-              <query-bar
-                query="state.query"
-                app-name="'wazuh'"
-                on-submit="updateQueryAndFetch($query)"
-              >
-              </query-bar>
+                <!-- Search. -->
+                <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+                    <query-bar
+                        query="state.query"
+                        app-name="'wazuh'"
+                        on-submit="updateQueryAndFetch($query)"
+                    >
+                    </query-bar>
+                </div>
             </div>
-          </div>
         </kbn-top-nav>
 
         <!-- Filters. -->
         <filter-bar
-          ng-show="showFilterBar()"
-          state="state"
-          index-patterns="indexPattern"
-          ng-if="state.query.language === 'lucene'"
+            ng-show="showFilterBar()"
+            state="state"
+            index-patterns="indexPattern"
+            ng-if="state.query.language === 'lucene'"
         ></filter-bar>
     </div>
 
@@ -95,7 +95,7 @@
             </md-card>
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts evolution - Top 5 agents</span> 
+                    <span class="md-headline">Alerts evolution - Top 5 agents</span>
                     <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'" id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents"></kbn-vis>
                 </md-card-content>
             </md-card>
@@ -106,7 +106,7 @@
                 </md-card-content>
             </md-card>
         </div>
-        
+
         <div layout="row" layout-align="center stretch" class="overview-general-metric-row">
             <md-card flex>
                 <md-card-content class="wazuh-column overview-general-top-source">
@@ -133,7 +133,7 @@
                 </md-card-content>
             </md-card>
         </div>
-        
+
         <div layout="row" layout-align="center stretch" class="overview-general-summary">
             <md-card flex="60">
                 <md-card-content class="wazuh-column">
@@ -148,39 +148,5 @@
                 </md-card-content>
             </md-card>
         </div>
-        <div flex></div>
     </div>
 </md-content>
-
-<style>
-/**
- * OVERVIEW - GENERAL 
- */
-.overview-general-no-results {
-    text-align: center;
-}
-
-.overview-general-discover {
-    background-color: white;
-}
-
-.overview-general-metric-row {
-    height: 100px;	
-}
-
-.overview-general-alerts {
-    height: 230px;
-}
-
-.overview-general-top-agents {
-    height: 270px;
-}
-
-.overview-general-top-source {
-    text-align: center;
-}
-
-.overview-general-summary {
-    height: 530px;
-}
-</style>

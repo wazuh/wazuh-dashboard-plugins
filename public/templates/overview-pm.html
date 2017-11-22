@@ -6,28 +6,28 @@
     <!-- Local nav. -->
     <div ng-if="hideRing(5) && !loading" ng-controller="kibanaSearchbar">
         <kbn-top-nav name="overview_pm" config="topNavMenu">
-          <!-- Transcluded elements. -->
-          <div data-transclude-slots>
-            <!-- Title. -->
+            <!-- Transcluded elements. -->
+            <div data-transclude-slots>
+                <!-- Title. -->
 
-            <!-- Search. -->
-            <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-              <query-bar
-                query="state.query"
-                app-name="'wazuh'"
-                on-submit="updateQueryAndFetch($query)"
-              >
-              </query-bar>
+                <!-- Search. -->
+                <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+                    <query-bar
+                        query="state.query"
+                        app-name="'wazuh'"
+                        on-submit="updateQueryAndFetch($query)"
+                    >
+                    </query-bar>
+                </div>
             </div>
-          </div>
         </kbn-top-nav>
 
         <!-- Filters. -->
         <filter-bar
-          ng-show="showFilterBar()"
-          state="state"
-          index-patterns="indexPattern"
-          ng-if="state.query.language === 'lucene'"
+            ng-show="showFilterBar()"
+            state="state"
+            index-patterns="indexPattern"
+            ng-if="state.query.language === 'lucene'"
         ></filter-bar>
     </div>
 
@@ -50,7 +50,7 @@
 
     <!-- View: Panels -->
     <div ng-show="hideRing(5) && results && !loading" ng-if="tabView == 'panels'" class="wazuh-column">
-        
+
         <div layout="row" layout-align="center stretch" class="overview-pm-top-row">
             <md-card flex="50">
                 <md-card-content class="wazuh-column">
@@ -93,21 +93,3 @@
         </div>
     </div>
 </md-content>
-
-<style>
-    .overview-pm-no-results {
-        text-align: center;
-    }
-    .overview-pm-discover {
-        background-color: white;
-    }
-    .overview-pm-top-row {
-        height: 290px;
-    }
-    .overview-pm-events-evolution {
-        height: 240px;
-    }
-    .overview-pm-alerts-summary {
-        height: 530px;
-    }
-</style>
