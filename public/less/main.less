@@ -1,408 +1,9 @@
-body {
-    min-width: 1250px;
-    width: 100%;
-}
-
-/* ------------------------------------------------------------------------ */
-/* ------------------ Full angular material overrides --------------------- */
-/* ------------------------------------------------------------------------ */
-
-.md-button.active {
-    background-color: rgba(158, 158, 158, 0.2);
-}
-
-md-list-item.active._md-button-wrap.ng-scope._md.md-clickable {
-    background-color: rgba(158, 158, 158, 0.2);
-}
-
-md-card-content .ng-binding {
-    color: rgb(102, 102, 102);
-}
-
-.md-button.md-fab {
-    line-height: 5.6rem;
-    min-width: 0;
-    width: 5.6rem;
-    height: 5.6rem;
-    border-radius: 50%;
-}
-
-.md-button.md-fab md-icon {
-    color: white;
-}
-
-.fa-search-plus,
-.fa-search-minus {
-    font-size: initial !important;
-}
-
-.md-input-margin {
-    margin: 18px 20px 0 0
-}
-
-.md-input-margin {
-    margin: 18px 20px 0 0
-}
-
-md-input-container>md-select {
-    background: #3caed2;
-    border-radius: 3px;
-    color: white;
-    padding: 3px;
-}
-
-span.md-headline {
-    color: #555;
-    font-size: 17px;
-}
-
-.md-headline-small {
-    font-size: 18px;
-}
-
-/* Loading ring css */
-
-div.uil-ring-css {
-    transform: scale(0.6);
-    margin: auto;
-}
-
-.uil-ring-css {
-    background: none;
-    position: relative;
-    width: 200px;
-    height: 200px;
-}
-
-.uil-ring-css>div {
-    position: absolute;
-    display: block;
-    width: 160px;
-    height: 160px;
-    top: 20px;
-    left: 20px;
-    border-radius: 80px;
-    box-shadow: 0 3px 0 0 #3caed2;
-    -webkit-transform-origin: 80px 81.5px;
-    transform-origin: 80px 81.5px;
-    -webkit-animation: uil-ring-anim 1.5s linear infinite;
-    animation: uil-ring-anim 1.5s linear infinite;
-}
-
-/* Dis full directive */
-.sidebar-container {
-    font-family: "Open Sans", Helvetica, Arial, sans-serif
-}
-
-.wazuh-h3 {
-    font-size: 18px !important;
-    font-weight: 400 !important;
-}
-
-/* ------------------------------------------------------------------------ */
-/* -------------------------- Manager status ------------------------------ */
-/* ------------------------------------------------------------------------ */
-
-.status {
-    width: 3%;
-}
-
-.green {
-    background-color: rgb(49, 196, 113);
-}
-
-.red {
-    background-color: #da534f;
-}
-
-.statusBox.green {
-    background-color: rgb(49, 196, 113);
-}
-
-.statusBox.red {
-    background-color: #da534f;
-}
-
-.statusBox.orange {
-    background-color: orange;
-}
-
-.status.grey {
-    background-color: grey;
-}
-
-.status.round {
-    border-radius: 50%;
-    height: 15px;
-    width: 15px;
-}
-
-.status.rectangle {
-    width: 8px;
-    height: 20px;
-    float: right;
-}
-
-.right-text {
-    text-align: right;
-}
-
-/* ------------------------------------------------------------------------ */
-/* -------------------------- Agents preview ------------------------------ */
-/* ------------------------------------------------------------------------ */
-
-.sideNavBox {
-    margin-bottom: 0px;
-}
-
-/* ------------------------------------------------------------------------ */
-/* -------------------------- App nav menu -------------------------------- */
-/* ------------------------------------------------------------------------ */
-
-#header_logo>a {
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-left: 15px;
-    margin-right: 27px;
-    padding-left: 0;
-}
-
-li#header_logo {
-    margin-left: 0;
-    text-align: left;
-}
-
-.autocomplete-custom-agents-bar li {
-    border-bottom: 1px solid #ccc;
-    height: auto;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    white-space: normal;
-}
-
-.autocomplete-custom-agents-bar li:last-child {
-    border-bottom-width: 0;
-}
-
-.autocomplete-custom-agents-bar .item-title,
-.autocomplete-custom-agents-bar .item-metadata {
-    display: block;
-    line-height: 2;
-    height: 18px;
-}
-
-.statusBox {
-    padding: 0 6px;
-    margin: 6px 8px;
-    line-height: 36px;
-    min-height: 36px;
-    background: white;
-    white-space: nowrap;
-    min-width: 111px;
-    text-align: center;
-    font-size: 14px;
-    text-align: center;
-    margin-top: 11px !important;
-    color: white;
-    text-transform: uppercase;
-}
-
-.statusBox.large {
-    min-width: 120px !important;
-}
-
-.statusBox.extraLarge {
-    min-width: 150px !important;
-}
-
-.pagination-other-pages-list>li a {
-    text-decoration: none;
-    background-color: #f6f6f6;
-    margin-left: 2px;
-    padding: 8px 11px;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.pagination-other-pages-list {
-    flex: 0 0 auto;
-    display: flex;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-
-body._md-toast-animating {
-    overflow-y: scroll !important;
-}
-
-pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    height: 120px;
-}
-
-.wazuhMenuNav div md-nav-ink-bar {
-    left: 0px !important;
-    width: 0px !important;
-}
-
-.wazuhMenuNav div nav {
-    padding-top: 12px;
-    height: 70px;
-    background-color: #00445a !important;
-    color: #3caed2;
-    font-size: 14px;
-}
-
-.wazuhMenuNav div nav ul li a {
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-    color: #ffffff !important;
-    font-size: 14px !important;
-    padding-bottom: 0px;
-    height: 96%;
-}
-
-.wazuhMenuNav div nav ul li a:hover {
-    background-color: #005571 !important;
-}
-
-.wazuhMenuNav div nav ul li .md-active {
-    background-color: #0079a5 !important;
-}
-
-.wazuhMenuNav .md-button:not([disabled]):hover{
-    background-color: #0079a5 !important;
-}
-
-.wazuhMenuNavBar {
-    min-width: 1015px;
-    background-color: #005571 !important;
-}
-
-.contentMin {
-    min-width: 1200px;
-}
-
-.wazuhMenuNavBar_gear {
-    float: right;
-    position: absolute;
-    right: 10px;
-}
-
-.wazuhMenuNavBar_gear i.fa.fa-cog {
-    font-size: 18px;
-    color:#ffffff;
-}
-
-p {
-    margin-top: 4px !important;
-}
-
-.subNavLine a {
-    margin-bottom: 0px;
-}
-
-.subNavLine div {
-    margin-bottom: 0px;
-    margin-top: 0px;
-}
-
-.subNavLine button {
-    margin-top: 0px;
-    margin-bottom: 4px;
-}
-
-.secondLevelNavLine button {
-    margin-top: 6px !important;
-    margin-bottom: 6px !important;
-}
-
-.secondLevelNavLine div {
-    margin-top: 6px !important;
-    margin-bottom: 6px !important;
-}
-
 ._md-select-value {
     border: none !important;
 }
 
-.md-toolbar-tools {
-    font-size: 15px !important;
-    font-weight: bold !important;
-}
-
-md-list.agents-preview-table:hover {
-    background-color: #c2e4ef;
-}
-
-.table-header-move {
-    visibility: hidden !important;
-}
-
-.invisibleButton {
-    margin: 0px !important;
-    padding: 0px !important;
-    text-align: left !important;
-    text-transform: none !important;
-}
-
-.invisibleButton:hover {
-    color: #000;
-}
-
-.invisibleButton:focus {
-    color: #000;
-}
-
-md-nav-bar {
-    padding-top: 0px !important;
-}
-
-md-select-menu:not(._md-overflow) md-content {
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-}
-
-md-list.agents-preview-table:focus {
-    border: none;
-    outline: none;
-}
-
-.input-filter-box {
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
-    font-size: 14px;
-    padding: 0px 15px;
-    margin-top: 18px;
-    border: none;
-    height: 40px;
-    margin-right: 20px;
-}
-
-md-content {
-    background-color: #e4e4e4;
-}
-
-.md-button.buttonMenu.md-default-theme:not([disabled]):hover,
-.md-button:not([disabled]):hover {
-    background-color: rgba(60, 174, 210, 0.7)
-}
-
-.md-button.buttonMenu {
-    background-color: #3caed2;
-    color: white;
-}
-
 .app-container.vis-editor {
     position: relative;
-}
-
-md-nav-bar.md-default-theme .md-button._md-nav-button.md-unselected,
-md-nav-bar .md-button._md-nav-button.md-unselected {
-    color: #141414;
-    border: none;
 }
 
 .logTableCodeOdd,
@@ -411,8 +12,9 @@ md-toolbar:not(.md-menu-toolbar) {
     background-color: #f7f7f7
 }
 
-.md-nav-bar {
-    border: none !important;
+.md-toolbar-tools {
+    font-size: 15px !important;
+    font-weight: bold !important;
 }
 
 .md-toolbar-tools h1,
@@ -435,54 +37,10 @@ md-list.even {
     background-color: #fafafa;
 }
 
-md-input-container.md-whiteframe-z1.flex.md-input-has-value {
-    box-shadow: none;
-    background-color: white;
-}
-
-md-progress-linear.md-default-theme ._md-bar,
-md-progress-linear ._md-bar {
-    background-color: #3caed2;
-}
-
-.button-active.md-button:not([disabled]):hover,
-.buttonBlueLightRuleset.md-button:not([disabled]):hover {
-    background-color: #3caed2 !important;
-}
-
-.button-disabled {
-    background: rgba(60, 174, 210, 0.3) !important;
-    color: white !important;
-}
-
-md-select-menu.md-default-theme md-content,
-md-select-menu md-content,
-.button-active {
-    background: #0079a5 !important;
-    color: white !important;
-    box-shadow: none !important;
-}
-
 .md-input-focused,
 md-select.md-default-theme:not([disabled]):focus ._md-select-value,
 md-select:not([disabled]):focus ._md-select-value {
     color: white;
-}
-
-input#searchBox,
-md-autocomplete-wrap.md-whiteframe-z1.layout-row ,
-md-input-container.md-whiteframe-z1.flex-20.md-input-has-value {
-    box-shadow: none;
-}
-
-md-input-container.md-whiteframe-z1.flex-20.md-input-has-value {
-    background: white;
-}
-
-
-
-button._md-no-style.md-button.md-ink-ripple {
-    background: none;
 }
 
 .horizontal-menu-right .md-whiteframe-1dp,
@@ -490,39 +48,9 @@ button._md-no-style.md-button.md-ink-ripple {
     box-shadow: none !important;
 }
 
-md-input-container.md-whiteframe-z1.flex-20 {
-    background: white;
-}
-
 md-select.md-default-theme ._md-select-value._md-select-placeholder,
 md-select ._md-select-value._md-select-placeholder {
     color: white;
-}
-
-#settingButtonTop {
-    float: right;
-    clear: both;
-    position: absolute;
-    color: white;
-    right: 0;
-}
-
-.buttonBlueLight {
-    background-color: #3caed2 !important;
-    color: white !important;
-    box-shadow: none !important;
-}
-
-.buttonBlueLightSettings,
-.buttonBlueLightRuleset {
-    background-color: #005571 !important;
-    color: white !important;
-    box-shadow: none !important;
-}
-
-.md-button.buttonBlueLight.md-default-theme:not([disabled]):hover,
-.md-button:not([disabled]):hover {
-    background-color: rgba(60, 174, 210, 0.7)
 }
 
 input.ng-invalid.ng-dirty,
@@ -532,24 +60,6 @@ textarea.ng-invalid.ng-touched,
 select.ng-invalid.ng-dirty,
 select.ng-invalid.ng-touched {
     border-color: #3caed2 !important;
-}
-
-md-input-container.md-default-theme.md-input-invalid label,
-md-input-container.md-input-invalid label {
-    color: rgba(0, 0, 0, 0.38);
-    font-size: 16px;
-}
-
-md-input-container.md-default-theme label.md-required:after,
-md-input-container label.md-required:after {
-    color: #3caed2 !important;
-}
-
-md-input-container.md-default-theme label,
-md-input-container label,
-md-input-container.md-default-theme ._md-placeholder,
-md-input-container ._md-placeholder {
-    font-size: 16px;
 }
 
 md-autocomplete input::-webkit-input-placeholder,
@@ -574,16 +84,24 @@ md-card.cardHover:hover {
     background-color: #c2e4ef;
 }
 
+md-content._md.layout-row {
+    overflow-x: hidden;
+}
+
+md-content {
+    background-color: #e4e4e4;
+}
+
+md-card md-card-content {
+    padding: 5px;
+}
+
 i.fa.fa-times {
     cursor: pointer;
 }
 
 a.pull-right {
     visibility: hidden;
-}
-
-md-content._md.layout-row {
-    overflow-x: hidden;
 }
 
 .visualize-show-spy {
@@ -599,7 +117,6 @@ md-content._md.layout-row {
     display: none;
 }
 
-
 .localNav {
     min-height: 33px;
 }
@@ -614,26 +131,8 @@ visualization .vis-container {
     overflow: hidden;
 }
 
-.md-button:not([disabled]):hover {
-    background-color: #c2e4ef;
-}
-
 .md-whiteframe-1dp {
     box-shadow: none;
-}
-
-md-input-container {
-    margin: 0 0;
-    margin-top: 18px;
-    padding: 0;
-}
-
-md-input-container>md-select {
-    background: white;
-    color: black;
-    padding: 4px;
-    padding-bottom: 6px;
-    border-radius: 0px;
 }
 
 md-select:not([disabled]):focus .md-select-value,
@@ -641,28 +140,6 @@ md-select.md-default-theme .md-select-value,
 md-select .md-select-value {
     border-bottom-width: 0;
     border-bottom-color: white;
-}
-
-.md-select-menu-container.md-active md-select-menu>* {
-    background-color: white !important;
-}
-
-md-select-menu.md-default-theme md-content md-option[selected],
-md-select-menu md-content md-option[selected] {
-    color: black;
-}
-
-md-select-menu.md-default-theme md-content md-option,
-md-select-menu md-content md-option {
-    color: black;
-}
-
-md-select-menu.md-default-theme md-content md-option:not([disabled]):focus,
-md-select-menu md-content md-option:not([disabled]):focus,
-md-select-menu.md-default-theme md-content md-option:not([disabled]):hover,
-md-select-menu md-content md-option:not([disabled]):hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #555;
 }
 
 .vis-expand-leyend .legend-col-wrapper .legend-ul {
@@ -677,35 +154,7 @@ svg:not(:root) {
     overflow: visible !important;
 }
 
-md-tooltip.md-default-theme,
-md-tooltip {
-    color: white;
-    height: auto;
-}
-
-md-tooltip.md-default-theme .md-content,
-md-tooltip .md-content {
-    background-color: black;
-    height: auto;
-}
-
-md-card md-card-content {
-    padding: 5px;
-}
-
 md-select.md-default-theme .md-select-value.md-select-placeholder,
 md-select .md-select-value.md-select-placeholder {
     color: black;
-}
-
-.tab-content .row {
-    margin: 0px;
-}
-
-navbar {
-    padding: 0 0px 6px 7px;
-}
-
-.md-tab.md-active {
-    color: rgb(60, 174, 210) !important;
 }

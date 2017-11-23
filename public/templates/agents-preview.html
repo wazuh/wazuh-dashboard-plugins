@@ -1,5 +1,5 @@
 <div flex ng-if="tab == 'preview'" ng-show="!loading" ng-controller="agentsPreviewController" class="agentsPreview" layout="column" layout-align="start space-around">
-    
+
     <div layout="row" layout-align="space-between stretch">
         <md-card flex class="cardHover agents-preview-metrics-left">
             <md-card-content class="agents-preview-metrics" ng-click="applyAgent(lastAgent)">
@@ -103,24 +103,3 @@
     <md-divider></md-divider>
     <md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="agents.busy && !agents.end"></md-progress-linear></md-content>
 </div>
-
-<style>
-    .agents-preview-metrics {
-        text-align: center;
-    }
-    .agents-preview-metrics-item {
-        font-size: 16pt;
-    }
-    .agents-preview-metrics-right {
-        margin-right: 0px;
-    }
-    .agents-preview-metrics-left {
-        margin-left: 0px;
-    }
-    .agents-preview-search-box {
-        width: 100%;
-    }
-    .agents-preview-agents-list {
-        height:300px;
-    }
-</style>
