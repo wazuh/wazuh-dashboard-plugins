@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="tab == 'general'" ng-controller="overviewGeneralController" class="app-container wazuh-column" layout-align="start">
+<md-content flex layout="column" ng-show="tab == 'general'" ng-controller="overviewGeneralController" class="app-container wazuh-column" layout-align="start">
 
     <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(15)'><div></div></div>
 
@@ -41,8 +41,8 @@
     </md-content>
 
     <!-- View: Discover -->
-    <md-content class="overview-general-discover" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover'">
-        <kbn-disfull  table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"></kbn-disfull>
+    <md-content class="overview-general-discover" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'">
+        <kbn-dis></kbn-dis>
     </md-content>
 
     <!-- View: Panels -->
