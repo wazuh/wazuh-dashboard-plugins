@@ -25,14 +25,14 @@
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(8)">
         <md-card flex layout="column">
-            <md-card-content style="text-align: center;">
+            <md-card-content class="agents-fim-no-results">
                 No results for selected time interval
             </md-card-content>
         </md-card>
     </md-content>
 
     <!-- View: Discover -->
-    <md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="$parent.tabView == 'discover' && agentInfo.name">
+    <md-content class="agents-fim-discover" flex layout="column" layout-align="start space-around" ng-if="$parent.tabView == 'discover' && agentInfo.name">
         <kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
         dis-filter="rule.groups:syscheck "
         infinite-scroll="true">
@@ -41,96 +41,80 @@
 
     <!-- View: Panels -->
     <div flex layout="column"  ng-show='hideRing(8) && results && !loading' ng-if="tabView == 'panels' && !load" class="wazuh-column">
-        <md-content layout="row" style="height: 230px;">
-            <md-card flex="33" class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Users</span>
-                    </md-card-title-text>
-                </md-card-title>
+
+        <div layout="row" class="agents-fim-row">
+            <md-card flex="33">
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Users</span>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Users'" id="Wazuh-App-Agents-FIM-Users">
                 </md-card-content>
             </md-card>
-            <md-card flex="33" class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Groups</span>
-                    </md-card-title-text>
-                </md-card-title>
+            <md-card flex="33">
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Groups</span>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Groups'" id="Wazuh-App-Agents-FIM-Groups">
                 </md-card-content>
             </md-card>
-            <md-card flex="33" class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Permissions</span>
-                    </md-card-title-text>
-                </md-card-title>
+            <md-card flex="33">
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Permissions</span>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Permissions'" id="Wazuh-App-Agents-FIM-Permissions">
                 </md-card-content>
             </md-card>
-        </md-content>
+        </div>
 
-        <md-content layout="row" style="height: 230px;">
-            <md-card flex class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Events</span>
-                    </md-card-title-text>
-                </md-card-title>
+        <div layout="row" class="agents-fim-row">
+            <md-card flex>
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Events</span>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Events'" id="Wazuh-App-Agents-FIM-Events"></kbn-vis>
                 </md-card-content>
             </md-card>
-        </md-content>
+        </div>
 
-        <md-content layout="row" style="height: 230px;">
-            <md-card flex="33" class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Files added</span>
-                    </md-card-title-text>
-                </md-card-title>
+        <div layout="row" class="agents-fim-row">
+            <md-card flex="33">
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Files added</span>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Files-added'" id="Wazuh-App-Agents-FIM-Files-added"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="33" class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Files modified</span>
-                    </md-card-title-text>
-                </md-card-title>
+            <md-card flex="33">
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Files modified</span>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Files-modified'" id="Wazuh-App-Agents-FIM-Files-modified"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="33" class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Files deleted</span>
-                    </md-card-title-text>
-                </md-card-title>
+            <md-card flex="33">
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Files deleted</span>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Files-deleted'" id="Wazuh-App-Agents-FIM-Files-deleted"></kbn-vis>
                 </md-card-content>
             </md-card>
-        </md-content>
+        </div>
 
-        <div layout="row" layout-align="space-between stretch" style="height: 540px;">
-            <md-card flex class="wazuh-column">
-                <md-card-title>
-                    <md-card-title-text>
-                        <span class="md-headline">Alerts summary</span>
-                    </md-card-title-text>
-                </md-card-title>
+        <div layout="row" layout-align="space-between stretch" class="agents-fim-summary-row">
+            <md-card flex>
                 <md-card-content class="wazuh-column">
+                    <span class="md-headline">Alerts summary</span>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Alerts-summary'" id="Wazuh-App-Agents-FIM-Alerts-summary"></kbn-vis>
                 </md-card-content>
             </md-card>
        </div>
     </div>
 </md-content>
+
+<style>
+    .agents-fim-no-results{
+        text-align: center;
+    }
+    .agents-fim-discover {
+        background-color: white;
+    }
+    .agents-fim-row {
+        height: 230px;
+    }
+    .agents-fim-summary-row {
+        height: 540px;
+    }
+</style>
