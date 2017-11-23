@@ -1,47 +1,47 @@
 <div flex ng-if="tab == 'preview'" ng-show="!loading" ng-controller="agentsPreviewController" class="agentsPreview" layout="column" layout-align="start space-around">
+
     <div layout="row" layout-align="space-between stretch">
-        <md-card flex class="cardHover" style="margin-left: 0px;">
-            <md-card-content style="text-align: center;" ng-click="applyAgent(lastAgent)">
-                <div class="metric-value ng-binding" style="font-size: 16pt;">{{lastAgent.name}}</div>
+        <md-card flex class="cardHover agents-preview-metrics-left">
+            <md-card-content class="agents-preview-metrics" ng-click="applyAgent(lastAgent)">
+                <div class="metric-value ng-binding agents-preview-metrics-item">{{lastAgent.name}}</div>
                 <div class="ng-binding">Last registered agent</div>
             </md-card-content>
         </md-card>
         <md-card flex class="cardHover">
-            <md-card-content style="text-align: center;" ng-click="applyAgent(mostActiveAgent)">
-                <div class="metric-value ng-binding" style="font-size: 16pt;">{{mostActiveAgent.name}}</div>
+            <md-card-content class="agents-preview-metrics" ng-click="applyAgent(mostActiveAgent)">
+                <div class="metric-value ng-binding agents-preview-metrics-item">{{mostActiveAgent.name}}</div>
                 <div class="ng-binding">Higher activity</div>
             </md-card-content>
         </md-card>
         <md-card flex="10">
-            <md-card-content style="text-align: center;">
-                <div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountActive}}</div>
+            <md-card-content class="agents-preview-metrics">
+                <div class="metric-value ng-binding agents-preview-metrics-item">{{agentsCountActive}}</div>
                 <div class="ng-binding">Active</div>
             </md-card-content>
         </md-card>
         <md-card flex="10" layout="column">
-            <md-card-content style="text-align: center;">
-                <div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountDisconnected}}</div>
+            <md-card-content class="agents-preview-metrics">
+                <div class="metric-value ng-binding agents-preview-metrics-item">{{agentsCountDisconnected}}</div>
                 <div class="ng-binding">Disconnected</div>
             </md-card-content>
         </md-card>
         <md-card flex="10">
-            <md-card-content style="text-align: center;">
-                <div class="metric-value ng-binding" style="font-size: 16pt;">{{agentsCountNeverConnected}}</div>
+            <md-card-content class="agents-preview-metrics">
+                <div class="metric-value ng-binding agents-preview-metrics-item">{{agentsCountNeverConnected}}</div>
                 <div class="ng-binding">Never connected</div>
             </md-card-content>
         </md-card>
-        <md-card flex="10" style="margin-right: 0px;">
-            <md-card-content style="text-align: center;">
-                <div class="metric-value ng-binding" style="font-size: 16pt;">{{(agentsCoverity | number:2)}}%</div>
+        <md-card flex="10" class="agents-preview-metrics-right">
+            <md-card-content class="agents-preview-metrics">
+                <div class="metric-value ng-binding agents-preview-metrics-item">{{(agentsCoverity | number:2)}}%</div>
                 <div class="ng-binding">Agents coverage</div>
             </md-card-content>
         </md-card>
     </div>
 
     <div layout="row" layout-align="start stretch">
-        <div layout="row" flex="60" class="sideNavBox">
-            <input style="width: 100%;" placeholder="Filter agents" type="text" id="searchBox" ng-model="searchTerm" ng-change="agents.addFilter('search', searchTerm)" class="input-filter-box">
-        </div>
+
+        <input flex="60" placeholder="Filter agents" type="text" id="searchBox" ng-model="searchTerm" ng-change="agents.addFilter('search', searchTerm)" class="input-filter-box agents-preview-search-box"/>
 
         <md-input-container flex="20" class="md-block md-whiteframe-z1 md-input-margin">
             <md-select id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
@@ -86,8 +86,7 @@
         </span>
     </md-toolbar>
 
-    <div flex style="overflow: auto; height:300px;" when-scrolled="agents.nextPage('')">
-    <md-content flex layout="column">
+    <md-content flex when-scrolled="agents.nextPage('')" class="agents-preview-agents-list">
         <md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="agents-preview-table">
             <md-list-item ng-click="applyAgent(agent)" class="list-no-hover md-subhead">
                 <span flex="5">{{agent.id || 'Unknown'}}</span>
@@ -100,7 +99,6 @@
             </md-list-item>
         </md-list>
     </md-content>
-    </div>
 
     <md-divider></md-divider>
     <md-content><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="agents.busy && !agents.end"></md-progress-linear></md-content>

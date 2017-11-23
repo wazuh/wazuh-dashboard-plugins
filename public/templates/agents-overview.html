@@ -1,190 +1,164 @@
 <md-content ng-if="tab == 'overview' && agentInfo" ng-controller="agentsOverviewController">
 
-	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
+    <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
 
-	<!-- Kibana search bar -->
-	<!-- Local nav. -->
-	<div ng-if="hideRing(7) && !loading" ng-controller="kibanaSearchbar">
-		<kbn-top-nav name="agents_overview" config="topNavMenu">
-			<!-- Transcluded elements. -->
-			<div data-transclude-slots>
-				<!-- Title. -->
+    <!-- Kibana search bar -->
+    <!-- Local nav. -->
+    <div ng-if="hideRing(7) && !loading" ng-controller="kibanaSearchbar">
+        <kbn-top-nav name="agents_overview" config="topNavMenu">
+            <!-- Transcluded elements. -->
+            <div data-transclude-slots>
+                <!-- Title. -->
 
-				<!-- Search. -->
-				<div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-					<query-bar query="state.query" app-name="'wazuh'" on-submit="updateQueryAndFetch($query)">
-					</query-bar>
-				</div>
-			</div>
-		</kbn-top-nav>
+                <!-- Search. -->
+                <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+                    <query-bar query="state.query" app-name="'wazuh'" on-submit="updateQueryAndFetch($query)">
+                    </query-bar>
+                </div>
+            </div>
+        </kbn-top-nav>
 
-		<!-- Filters. -->
-		<filter-bar ng-show="showFilterBar()" state="state" index-patterns="indexPattern" ng-if="state.query.language === 'lucene'"></filter-bar>
-	</div>
+        <!-- Filters. -->
+        <filter-bar ng-show="showFilterBar()" state="state" index-patterns="indexPattern" ng-if="state.query.language === 'lucene'"></filter-bar>
+    </div>
 
-	<div ng-show='hideRing(7) && !loading' ng-if="tabView == 'panels'">
-		<md-content layout="row" style="height: 100px;">
-			<md-card  flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.name}}</div>
-					<div class="ng-binding">Name</div>
-				</md-card-content>
-			</md-card>
-			<md-card  flex="10" layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.ip}}</div>
-					<div class="ng-binding">IP Address</div>
-				</md-card-content>
-			</md-card>
-			<md-card  flex="10" layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{ agentInfo.version | limitTo: 12 }}{{agentInfo.version.length > 12 ? '...' : ''}}</div>
-					<md-tooltip md-direction="bottom">{{ agentInfo.version }}</md-tooltip>
-					<div class="ng-binding">Version</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value legend-value-title ng-binding legend-value-truncate" style="font-size: 14pt;">{{ agentOs }}</div>
-					<md-tooltip md-direction="bottom">{{ agentOs }}</md-tooltip>
-					<div class="ng-binding">OS</div>
-				</md-card-content>
-			</md-card>
-		</md-content>
+    <div ng-show='hideRing(7) && !loading' ng-if="tabView == 'panels'">
 
-		<md-content layout="row" style="height: 100px;">
-			<md-card flex layout="column" ng-show="agentInfo.id != '000'">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.lastKeepAlive}}</div>
-					<div class="ng-binding">Last keep alive</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.dateAdd}}</div>
-					<div class="ng-binding">Registration date</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.syscheck.end}}</div>
-					<md-tooltip md-direction="bottom">
-						Start time: {{ agentInfo.syscheck.start }} <br>
-						End time: {{ agentInfo.syscheck.end }} <br>
-						Duration time: {{ agentInfo.syscheck.duration }} minutes
-					</md-tooltip>
-					<div class="ng-binding">Last syscheck scan</div>
-				</md-card-content>
-			</md-card>
-			<md-card flex layout="column">
-				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.rootcheck.end}}</div>
-					<md-tooltip md-direction="bottom">
-						Start time: {{ agentInfo.rootcheck.start }} <br>
-						End time: {{ agentInfo.rootcheck.end }} <br>
-						Duration time: {{ agentInfo.rootcheck.duration }} minutes
-					</md-tooltip>
-					<div class="ng-binding">Last rootcheck scan</div>
-				</md-card-content>
-			</md-card>
-		</md-content>
-	</div>
+        <div layout="row" class="agents-overview-top-metric-row">
+            <md-card flex>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.name}}</div>
+                    <div class="ng-binding">Name</div>
+                </md-card-content>
+            </md-card>
+            <md-card  flex="10">
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.ip}}</div>
+                    <div class="ng-binding">IP Address</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex="10">
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{ agentInfo.version | limitTo: 12 }}{{agentInfo.version.length > 12 ? '...' : ''}}</div>
+                    <md-tooltip md-direction="bottom">{{ agentInfo.version }}</md-tooltip>
+                    <div class="ng-binding">Version</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value legend-value-title ng-binding legend-value-truncate agents-overview-size-14">{{ agentOs }}</div>
+                    <md-tooltip md-direction="bottom">{{ agentOs }}</md-tooltip>
+                    <div class="ng-binding">OS</div>
+                </md-card-content>
+            </md-card>
+        </div>
 
-	<!-- No results message -->
-	<md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(7)">
-		<md-card flex layout="column">
-			<md-card-content style="text-align: center;">
-				No results for selected time interval
-			</md-card-content>
-		</md-card>
-	</md-content>
+        <div layout="row" class="agents-overview-second-row">
+            <md-card flex ng-show="agentInfo.id != '000'">
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.lastKeepAlive}}</div>
+                    <div class="ng-binding">Last keep alive</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.dateAdd}}</div>
+                    <div class="ng-binding">Registration date</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.syscheck.end}}</div>
+                    <md-tooltip md-direction="bottom">
+                        Start time: {{ agentInfo.syscheck.start }} <br>
+                        End time: {{ agentInfo.syscheck.end }} <br>
+                        Duration time: {{ agentInfo.syscheck.duration }} minutes
+                    </md-tooltip>
+                    <div class="ng-binding">Last syscheck scan</div>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="agents-overview-top-metric-item">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.rootcheck.end}}</div>
+                    <md-tooltip md-direction="bottom">
+                        Start time: {{ agentInfo.rootcheck.start }} <br>
+                        End time: {{ agentInfo.rootcheck.end }} <br>
+                        Duration time: {{ agentInfo.rootcheck.duration }} minutes
+                    </md-tooltip>
+                    <div class="ng-binding">Last rootcheck scan</div>
+                </md-card-content>
+            </md-card>
+        </div>
+    </div>
 
-	<!-- View: Discover -->
-	<md-content style="background-color: white" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover' && agentInfo.name" >
-		<kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-		infinite-scroll="true">
-		</kbn-disfull>
-	</md-content>
+    <!-- No results message -->
+    <md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(7)">
+        <md-card flex layout="column">
+            <md-card-content class="agents-overview-no-results">
+                No results for selected time interval
+            </md-card-content>
+        </md-card>
+    </md-content>
 
-	<!-- View: Panels -->
-	<div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !loading" class="wazuh-column">
-		<md-content layout="row" style="height: 230px;">
-			<md-card flex="33" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 5 alerts</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-column">
-					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-alerts'" id="Wazuh-App-Agents-Overview-Top-5-alerts"></kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="33" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 5 groups</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-column">
-					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-groups'" id="Wazuh-App-Agents-Overview-Top-5-groups"></kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="33" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Top 5 PCI DSS Requirements</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-column">
-					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements'" id="Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements"></kbn-vis>
-				</md-card-content>
-			</md-card>
-		</md-content>
+    <!-- View: Discover -->
+    <md-content class="agents-overview-discover" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover' && agentInfo.name" >
+        <kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
+        infinite-scroll="true">
+        </kbn-disfull>
+    </md-content>
 
-		<md-content layout="row" layout-align="start stretch" style="height: 230px;">
-			<md-card flex class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Alert level evolution</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-column">
-					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alert-level-evolution'" id="Wazuh-App-Agents-Overview-Alert-level-evolution"></kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="60" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Alerts</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-column">
-					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts'" id="Wazuh-App-Agents-Overview-Alerts"></kbn-vis>
-				</md-card-content>
-			</md-card>
-		</md-content>
+    <!-- View: Panels -->
+    <div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !loading" class="wazuh-column">
 
-		<md-content layout="row" style="height: 540px;">
-			<md-card  flex="60" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Alerts summary</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-column">
-					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts-summary'" id="Wazuh-App-Agents-Overview-Alerts-summary"></kbn-vis>
-				</md-card-content>
-			</md-card>
-			<md-card flex="40" class="wazuh-column">
-				<md-card-title>
-					<md-card-title-text>
-						<span class="md-headline">Groups summary</span>
-					</md-card-title-text>
-				</md-card-title>
-				<md-card-content class="wazuh-column">
-					<kbn-vis vis-id="'Wazuh-App-Agents-Overview-Groups-summary'" id="Wazuh-App-Agents-Overview-Groups-summary"></kbn-vis>
-				</md-card-content>
-			</md-card>
-		</md-content>
-	</div>
+        <div layout="row" class="agents-overview-top">
+            <md-card flex="33">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Top 5 alerts</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-alerts'" id="Wazuh-App-Agents-Overview-Top-5-alerts"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex="33">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Top 5 groups</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-groups'" id="Wazuh-App-Agents-Overview-Top-5-groups"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex="33">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Top 5 PCI DSS Requirements</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements'" id="Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="start stretch" class="agents-overview-alerts">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Alert level evolution</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alert-level-evolution'" id="Wazuh-App-Agents-Overview-Alert-level-evolution"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex="60">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Alerts</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts'" id="Wazuh-App-Agents-Overview-Alerts"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" class="agents-overview-summary">
+            <md-card  flex="60">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Alerts summary</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts-summary'" id="Wazuh-App-Agents-Overview-Alerts-summary"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex="40">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Groups summary</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Groups-summary'" id="Wazuh-App-Agents-Overview-Groups-summary"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+    </div>
 </md-content>
