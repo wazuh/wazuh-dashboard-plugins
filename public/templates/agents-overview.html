@@ -23,7 +23,7 @@
     </div>
 
     <div ng-show='hideRing(7) && !loading' ng-if="tabView == 'panels'">
-        
+
         <div layout="row" class="agents-overview-top-metric-row">
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
@@ -109,7 +109,7 @@
 
     <!-- View: Panels -->
     <div ng-show='hideRing(7) && results' ng-if="tabView == 'panels' && !loading" class="wazuh-column">
-        
+
         <div layout="row" class="agents-overview-top">
             <md-card flex="33">
                 <md-card-content class="wazuh-column">
@@ -162,27 +162,3 @@
         </div>
     </div>
 </md-content>
-
-<style>
-    .agents-overview-no-results,
-    .agents-overview-top-metric-item {
-        text-align: center;
-    }
-    .agents-overview-discover {
-        background-color: white;
-    }
-    .agents-overview-top,
-    .agents-overview-alerts {
-        height: 230px;
-    }
-    .agents-overview-summary {
-        height: 540px;
-    }
-    .agents-overview-top-metric-row,
-    .agents-overview-second-row {
-        height: 100px;
-    }
-    .agents-overview-size-14 {
-        font-size: 14pt;
-    }
-</style>

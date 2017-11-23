@@ -6,28 +6,28 @@
     <!-- Local nav. -->
     <div ng-if="hideRing(17) && !loading" ng-controller="kibanaSearchbar">
         <kbn-top-nav name="overview_fim" config="topNavMenu">
-          <!-- Transcluded elements. -->
-          <div data-transclude-slots>
-            <!-- Title. -->
+            <!-- Transcluded elements. -->
+            <div data-transclude-slots>
+                <!-- Title. -->
 
-            <!-- Search. -->
-            <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-              <query-bar
-                query="state.query"
-                app-name="'wazuh'"
-                on-submit="updateQueryAndFetch($query)"
-              >
-              </query-bar>
+                <!-- Search. -->
+                <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+                    <query-bar
+                        query="state.query"
+                        app-name="'wazuh'"
+                        on-submit="updateQueryAndFetch($query)"
+                    >
+                    </query-bar>
+                </div>
             </div>
-          </div>
         </kbn-top-nav>
 
         <!-- Filters. -->
         <filter-bar
-          ng-show="showFilterBar()"
-          state="state"
-          index-patterns="indexPattern"
-          ng-if="state.query.language === 'lucene'"
+            ng-show="showFilterBar()"
+            state="state"
+            index-patterns="indexPattern"
+            ng-if="state.query.language === 'lucene'"
         ></filter-bar>
     </div>
 
@@ -176,29 +176,3 @@
         </div>
     </div>
 </md-content>
-
-<style>
-    .overview-fim-metrics-div{
-        height: 300px;
-    }
-    .overview-fim-no-results {
-        text-align: center;
-    }
-    .overview-fim-discover {
-        background-color: white
-    }
-    .overview-fim-last-file,
-    .overview-fim-most-file {
-        text-align: center;
-    }
-    .overview-fim-file-changes-div {
-        height: 213px;
-    }
-    .overview-fim-last-file-div,
-    .overview-fim-most-file-div {
-        height: 100px;
-    }
-    .overview-fim-events-summary {
-        height: 530px;
-    }
-</style>
