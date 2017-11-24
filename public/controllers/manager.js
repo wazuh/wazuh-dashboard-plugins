@@ -60,7 +60,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, Notifier,
     .then(agentInfo => {
         $scope.agentInfo = agentInfo.data.data;
         $scope.load = false;
-        $scope.$apply();
+        $scope.$digest();
     })
     .catch(error => notify.error(error.message));
 
