@@ -12,76 +12,80 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
         "id":   ""
     };
 
-    //Print Error
-    const printError = (error) => notify.error(error.message);
+    let tmpUrl  = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.name`;
+    let tmpUrl2 = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.id`;
 
-    const load = () => {
-        $scope.agents.nextPage('')
-        .then(() => {
-            // Retrieve os list
-            for(let agent of $scope.agents.items){
-                if('os' in agent && 'name' in agent.os){
-                    let exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name &&
-                                                     e.platform === agent.os.platform &&
-                                                     e.version === agent.os.version);
-                    if(!exists.length){
-                        $scope.osPlatforms.push({
-                            name:     agent.os.name,
-                            platform: agent.os.platform,
-                            version:  agent.os.version
-                        });
-                    }
+
+    // Retrieve os list
+    const retrieveList = () => {
+        for(let agent of $scope.agents.items){
+            if('os' in agent && 'name' in agent.os){
+                let exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name &&
+                                                 e.platform === agent.os.platform &&
+                                                 e.version === agent.os.version);
+                if(!exists.length){
+                    $scope.osPlatforms.push({
+                        name:     agent.os.name,
+                        platform: agent.os.platform,
+                        version:  agent.os.version
+                    });
                 }
             }
-            return apiReq.request('GET', '/agents/summary', { });
-        })
+        }
+    }
+
+
+    const load = () => {
+        Promise.all([
+            $scope.agents.nextPage(''),
+            apiReq.request('GET', '/agents/summary', { }),
+            genericReq.request('GET', tmpUrl),
+            apiReq.request('GET', '/agents', { sort:'-date_add', limit:1 })
+        ])
         .then(data => {
-            if(parseInt(data.data.data['Never connected']) > 0){
+
+            // Next page
+            retrieveList();
+
+            // Agents summary
+            if(parseInt(data[1].data.data['Never connected']) > 0){
                 $scope.osPlatforms.push({
                     name:     'Unknown',
                     platform: 'Unknown',
                     version:  'Unknown'
                 });
             }
-        });
+            $scope.agentsCountActive         = data[1].data.data.Active;
+            $scope.agentsCountDisconnected   = data[1].data.data.Disconnected;
+            $scope.agentsCountNeverConnected = data[1].data.data['Never connected'];
+            $scope.agentsCountTotal          = data[1].data.data.Total;
+            $scope.agentsCoverity            = (data[1].data.data.Active / data[1].data.data.Total) * 100;
 
-        // Get last agent !!!!!!!
-        let tmpUrl  = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.name`;
-        let tmpUrl2 = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.id`;
-
-        genericReq.request('GET', tmpUrl)
-        .then((data) => {
-            if (data.data.data === '') {
+            // tmpUrl y tmpUrl2
+            if (data[2].data.data === '') {
                 $scope.mostActiveAgent.name = $scope.cluster_info.manager;
                 $scope.mostActiveAgent.id   = '000';
-                return;
+            } else {
+                $scope.mostActiveAgent.name = data[2].data.data;
+                genericReq.request('GET', tmpUrl2)
+                .then(info => {
+                    if (info.data.data === '' && $scope.mostActiveAgent.name !== '') {
+                        $scope.mostActiveAgent.id = '000';
+                    } else {
+                        $scope.mostActiveAgent.id = info.data.data;
+                    }
+                    $scope.loading = false;
+                })
+                .catch(error => notify.error(error.message));
             }
-            $scope.mostActiveAgent.name = data.data.data;
-            genericReq.request('GET', tmpUrl2)
-            .then((data) => {
-                if (data.data.data === '' && $scope.mostActiveAgent.name !== '') {
-                    $scope.mostActiveAgent.id = '000';
-                } else {
-                    $scope.mostActiveAgent.id = data.data.data;
-                }
-                $scope.loading = false;
-            })
-            .catch((error) => printError(error));
-        })
-        .catch((error) => printError(error));
 
-        apiReq.request('GET', '/agents/summary', {})
-        .then(data => {
-            $scope.agentsCountActive         = data.data.data.Active;
-            $scope.agentsCountDisconnected   = data.data.data.Disconnected;
-            $scope.agentsCountNeverConnected = data.data.data['Never connected'];
-            $scope.agentsCountTotal          = data.data.data.Total;
-            $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
-            $scope.loading                   = false;
-            return apiReq.request('GET', '/agents', { sort:'-date_add', limit:1 });
+            // Last agent
+            $scope.lastAgent = data[3].data.data.items[0]
+
+            $scope.loading = false;
+            $scope.$digest();
         })
-        .then(data => $scope.lastAgent = data.data.data.items[0])
-        .catch((error) => printError(error));
+        .catch(error => notify.error(error.message));
     };
 
     //Load
