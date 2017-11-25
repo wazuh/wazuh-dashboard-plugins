@@ -3,7 +3,7 @@
     <div class='uil-ring-css' ng-show="!hideRing(15) && resultState === 'loading'"><div></div></div>
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready'" class="wazuh-column">
+    <div ng-show="resultState === 'ready' && tabView === 'panels'" class="wazuh-column">
 
         <div layout="row" layout-align="center stretch" class="overview-general-metric-row">
             <md-card flex>
