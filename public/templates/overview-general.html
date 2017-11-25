@@ -1,52 +1,9 @@
-<md-content flex layout="column" ng-show="tab == 'general'" ng-controller="overviewGeneralController" class="app-container wazuh-column" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'general'" class="app-container wazuh-column" layout-align="start">
 
-    <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(15)'><div></div></div>
-
-    <!-- Kibana search bar -->
-    <!-- Local nav. -->
-    <div ng-if="hideRing(15) && !loading" ng-controller="kibanaSearchbar">
-        <kbn-top-nav name="overview_general" config="topNavMenu">
-          <!-- Transcluded elements. -->
-          <div data-transclude-slots>
-            <!-- Title. -->
-
-            <!-- Search. -->
-            <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-              <query-bar
-                query="state.query"
-                app-name="'wazuh'"
-                on-submit="updateQueryAndFetch($query)"
-              >
-              </query-bar>
-            </div>
-          </div>
-        </kbn-top-nav>
-
-        <!-- Filters. -->
-        <filter-bar
-          ng-show="showFilterBar()"
-          state="state"
-          index-patterns="indexPattern"
-          ng-if="state.query.language === 'lucene'"
-        ></filter-bar>
-    </div>
-
-    <!-- No results message -->
-    <md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(15)">
-        <md-card flex layout="column">
-            <md-card-content class="overview-general-no-results">
-                No results for selected time interval
-            </md-card-content>
-        </md-card>
-    </md-content>
-
-    <!-- View: Discover -->
-    <md-content class="overview-general-discover" flex layout="column" layout-align="start space-around" ng-show="tabView == 'discover'">
-        <kbn-dis></kbn-dis>
-    </md-content>
+    <div class='uil-ring-css' ng-show="!hideRing(15) && resultState === 'loading'"><div></div></div>
 
     <!-- View: Panels -->
-    <div ng-show="hideRing(15) && results && !loading" ng-if="tabView == 'panels'" class="wazuh-column">
+    <div ng-show="resultState === 'ready'" class="wazuh-column">
 
         <div layout="row" layout-align="center stretch" class="overview-general-metric-row">
             <md-card flex>

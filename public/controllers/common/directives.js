@@ -22,7 +22,7 @@ app
 			`	<md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'overview' }" md-nav-href="#/overview" name="overview">Overview</md-nav-item>` +
 			`	<md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'manager' }" md-nav-href="#/manager" name="manager">Manager</md-nav-item>` +
 			`	<md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'agents' }" md-nav-href="#/agents" name="agents">Agents</md-nav-item>` +
-			`	<md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'discover' }" md-nav-href="#/discover" name="discover">Discover</md-nav-item>` +
+			`	<md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'discover' }" md-nav-href="#/wazuh-discover" name="discover">Discover</md-nav-item>` +
 			`	<md-nav-item style="color:white !important;" class="wazuhMenuNavBar_gear" md-nav-href="#/settings" name="settings"><i class="fa fa-cog ng-scope" aria-hidden="true" ></i></md-nav-item>` +
 			`</md-nav-bar>`
 		};

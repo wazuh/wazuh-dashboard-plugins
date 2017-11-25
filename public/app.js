@@ -16,7 +16,8 @@ var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial'])
 require('ui/autoload/all');
 require('ui/chrome');
 require('plugins/wazuh/kibana-integrations/kibanaVisualizationDirective.js');
-require('plugins/wazuh/kibana-integrations/kibanaSearchbarDirective.js');
+require('plugins/wazuh/kibana-integrations/kibanaFilterbarDirective.js');
+require('plugins/wazuh/kibana-integrations/kibanaDiscoverDirective.js');
 
 // Require services
 require('plugins/wazuh/services/theming.js');

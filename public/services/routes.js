@@ -89,7 +89,6 @@ const goToKibana = ($location, $window) => {
 };
 
 const getIp =  (Promise, courier, config, $location, Private) => {
-    console.log("Resolving my IP");
     const State = Private(StateProvider);
     const savedObjectsClient = Private(SavedObjectsClientProvider);
 
@@ -148,6 +147,7 @@ routes
         }
     })
     .when('/overview/', {
+        reloadOnSearch: false,
         template: require('plugins/wazuh/templates/overview.jade'),
         resolve: {
             "checkAPI": settingsWizard,

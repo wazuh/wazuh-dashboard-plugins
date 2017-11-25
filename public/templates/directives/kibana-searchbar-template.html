@@ -1,67 +1,24 @@
-<div ng-controller="kibanaSearchBar">
-  <kbn-top-nav name="discover" config="topNavMenu">
-    <!-- Transcluded elements. -->
-      </kbn-top-nav>
-<div data-transclude-slots>
-      <!-- Search. -->
-      <form
-        data-transclude-slot="bottomRow"
-        class="fullWidth"
-        role="form"
-        name="discoverSearch"
-        ng-submit="fetch()"
-      >
-        <div class="typeahead" kbn-typeahead="discover" on-select="fetch()">
-          <div class="kuiLocalSearch">
-            <div class="kuiLocalSearchAssistedInput">
-              <input
-                parse-query
-                input-focus
-                kbn-typeahead-input
-                ng-model="stateQuery"
-                placeholder="Search... (e.g. status:200 AND extension:PHP)"
-                aria-label="Search input"
-                type="text"
-                class="kuiLocalSearchInput kuiLocalSearchInput--lucene"
-                ng-class="{'kuiLocalSearchInput-isInvalid': discoverSearch.$invalid}"
-              >
-              <div class="kuiLocalSearchAssistedInput__assistance">
-                <p class="kuiText">
-                  <a
-                    class="kuiLink"
-                    ng-href="{{queryDocLinks.luceneQuerySyntax}}"
-                    target="_blank"
-                  >
-                    Uses lucene query syntax
-                  </a>
-                </p>
-              </div>
-            </div>
-            <button
-              type="submit"
-              aria-label="Search"
-              class="kuiLocalSearchButton"
-              ng-disabled="discoverSearch.$invalid"
-            >
-              <span class="kuiIcon fa-search" aria-hidden="true"></span>
-            </button>
-          </div>
-          <kbn-typeahead-items></kbn-typeahead-items>
+    <kbn-top-nav name="overview_general" config="topNavMenu">
+      <!-- Transcluded elements. -->
+      <div data-transclude-slots>
+        <!-- Title. -->
+
+        <!-- Search. -->
+        <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
+          <query-bar
+            query="state.query"
+            app-name="'wazuh'"
+            on-submit="updateQueryAndFetch($query)"
+          >
+          </query-bar>
         </div>
-      </form>
-    </div>
+      </div>
+    </kbn-top-nav>
 
-  <filter-bar state="$state" class="mainSearchBar"></filter-bar>
-	<div layout="row" layout-align="center stretch" id="pciRequirementBox" style="display: none;">
-		<md-card flex>
-			<md-card-content>
-				<span class="md-headline">
-					PCI DSS Requirement <span id="pciRequirementBox_ReqTitle"></span>
-					<span onClick="$('#pciRequirementBox').hide()" style="float: right"><i class="fa fa-times" aria-hidden="true"></i></span>
-				</span>
-				<p id="pciRequirementBox_ReqContent"></p>
-			</md-card-content>
-		</md-card>
-	</div>
-</div>
-
+    <!-- Filters. -->
+    <filter-bar
+      ng-show="showFilterBar()"
+      state="state"
+      index-patterns="indexPattern"
+      ng-if="state.query.language === 'lucene'"
+    ></filter-bar>

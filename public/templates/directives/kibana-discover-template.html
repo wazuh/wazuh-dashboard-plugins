@@ -1,12 +1,11 @@
-<discover-app class="app-container">
-
+<discover-app-w class="app-container">
   <!-- Local nav. -->
   <kbn-top-nav name="discover" config="topNavMenu">
     <!-- Transcluded elements. -->
     <div data-transclude-slots>
       <!-- Breadcrumbs. -->
       <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
-        <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb">
+        <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb" ng-show="tabView === 'discover'">
           <span ng-show="opts.savedSearch.id" class="kuiLocalBreadcrumb__emphasis">
             <span data-test-subj="discoverCurrentQuery" ng-bind="opts.savedSearch.lastSavedTitle"></span>
             <i id="reload_saved_search" tabindex="0" aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
@@ -30,13 +29,13 @@
 
   <main class="container-fluid">
     <div class="row">
-      <filter-bar
+      <filter-bar-w
         state="state"
         index-patterns="[indexPattern]"
         ng-if="state.query.language === 'lucene'"
-      ></filter-bar>
+      ></filter-bar-w>
     </div>
-    <div class="row">
+    <div class="row" ng-show="tabView === 'discover'">
       <div class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">
         <disc-field-chooser
           columns="state.columns"
@@ -150,4 +149,4 @@
       </div>
     </div>
   </main>
-</discover-app>
+</discover-app-w>
