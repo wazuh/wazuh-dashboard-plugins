@@ -1,46 +1,9 @@
-<md-content ng-if="tab == 'policy_monitoring' && _agent" id="agents-pm" ng-controller="pmController">
+<md-content ng-if="tab == 'policy_monitoring' && _agent">
 
-    <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(4)'><div></div></div>
-
-    <!-- Kibana search bar -->
-    <!-- Local nav. -->
-    <div ng-if="!loading" ng-controller="kibanaSearchbar">
-        <kbn-top-nav name="agents_pm" config="topNavMenu">
-            <!-- Transcluded elements. -->
-            <div data-transclude-slots>
-                <!-- Title. -->
-
-                <!-- Search. -->
-                <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-                    <query-bar query="state.query" app-name="'wazuh'" on-submit="updateQueryAndFetch($query)">
-                    </query-bar>
-                </div>
-            </div>
-        </kbn-top-nav>
-
-        <!-- Filters. -->
-        <filter-bar ng-show="showFilterBar()" state="state" index-patterns="indexPattern" ng-if="state.query.language === 'lucene'"></filter-bar>
-    </div>
-
-    <!-- No results message -->
-    <md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(4)">
-        <md-card flex layout="column">
-            <md-card-content class="agents-pm-no-results">
-                No results for selected time interval
-            </md-card-content>
-        </md-card>
-    </md-content>
-
-    <!-- View: Discover -->
-    <md-content class="agents-pm-discover" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover' && agentInfo.name" >
-        <kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-        dis-filter="rule.groups:rootcheck"
-        infinite-scroll="true">
-        </kbn-disfull>
-    </md-content>
+    <div class='uil-ring-css' ng-show="!hideRing(8) && resultState === 'loading'"><div></div></div>
 
     <!-- View: Panels -->
-    <div flex ng-show="hideRing(4) && results && !loading" ng-if="tabView == 'panels' && !load" layout="column">
+    <div ng-show="resultState === 'ready' && tabView === 'panels'" class="wazuh-column">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
         <div layout="row" class="agents-pm-top-row">

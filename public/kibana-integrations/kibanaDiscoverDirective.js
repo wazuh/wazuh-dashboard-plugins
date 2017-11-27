@@ -301,7 +301,6 @@ function discoverController(
     });
     $scope.$on('$destroy', () => stateMonitor.destroy());
 
-    console.log("thefiltersbeforethegoodone", queryFilter.getFilters());
     $scope.updateDataSource()
     .then(function () {
       $scope.$listen(timefilter, 'fetch', function () {
@@ -330,7 +329,10 @@ function discoverController(
           ////////////////////////////////////////////////////////////////////////////
           ////////////////////////////////////////////////////////////////////////////
           ////////////////////////////////////////////////////////////////////////////
-          console.log("updatng thefiltersinsiede",queryFilter.getFilters());
+          if ($rootScope.comeFromApplyAgent) {
+            loadFilters();
+            $rootScope.comeFromApplyAgent = false;
+          }
           $state.save();
         });
       });
@@ -760,7 +762,7 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   function loadFilters() {
-
+    if ($scope.tab) {
     let implicitFilter = [];
 
     implicitFilter.push(
@@ -879,7 +881,7 @@ function discoverController(
     }
 
     queryFilter.addFilters(implicitFilter);
-    console.log("initial loading of filtersssssss", implicitFilter);
+  }
   }
 
   // Getting the location from the url
@@ -901,7 +903,6 @@ function discoverController(
 
       $scope.tab = $location.search().tab;
 
-      console.log("route updating");
       loadFilters();
     }
   });

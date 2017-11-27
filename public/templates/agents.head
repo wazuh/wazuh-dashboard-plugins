@@ -69,7 +69,7 @@
 		</div>
 
 		<!-- View: Discover -->
-		<div ng-if="tab !== 'preview' && _agent && loadedFilter">
+		<div ng-if="tab !== 'preview' && _agent">
 	    	<kbn-dis></kbn-dis>
 	    </div>
 

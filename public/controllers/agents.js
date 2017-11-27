@@ -50,7 +50,6 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 
     // Switch subtab
     $scope.switchSubtab = (subtab) => {
-        $location.search('_a', null);
         $scope.tabView = subtab;
     };
 
@@ -68,14 +67,11 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
     });
 	$scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
     $scope.$watch('tab', () => {
-    	console.log("agents changing");
         $location.search('tab', $scope.tab);
         // Update the implicit filter
         if ($scope.tab !== 'preview') {
         	if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
         	else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
-
-        	$scope.loadedFilter = true;
         }
     });
 
@@ -92,8 +88,12 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 	$scope.extensionStatus = (extension) => appState.getExtensions().extensions[extension];
 
 	$scope.applyAgent = (agent) => {
-		console.log(agent);
+		$rootScope.comeFromApplyAgent = true;
 		$location.search('id', agent.id);
+        $location.search('_a', null);
+        $location.search('tabView', 'panels');
+        $scope.tabView = 'panels';
+
 		if (agent) {
 			$scope.loading = true;
 			$scope.tab = 'overview';
