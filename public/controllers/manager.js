@@ -30,68 +30,40 @@ app.controller('managerStatusController', function ($scope,$rootScope, Notifier,
     const notify = new Notifier({ location: 'Manager - Status' });
     $scope.load  = true;
 
-    //Print Error
-    const printError = (error) => notify.error(error.message);
-
     //Functions
     $scope.getDaemonStatusClass = (daemonStatus) => { 
         return (daemonStatus === 'running') ? 'status green' : 'status red';
     };
 
-    const load = () => {
-        apiReq
-        .request('GET', '/agents/summary', {})
-        .then((data) => {
-            $scope.agentsCountActive         = data.data.data.Active;
-            $scope.agentsCountDisconnected   = data.data.data.Disconnected;
-            $scope.agentsCountNeverConnected = data.data.data['Never connected'];
-            $scope.agentsCountTotal          = data.data.data.Total;
-            $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
-        })
-        .catch((error) => printError(error));
+    Promise.all([
+        apiReq.request('GET', '/agents/summary', {}),
+        apiReq.request('GET', '/manager/status', {}),
+        apiReq.request('GET', '/manager/info', {}),
+        apiReq.request('GET', '/rules', { offset: 0, limit: 1 }),
+        apiReq.request('GET', '/decoders', { offset: 0, limit: 1 })
+    ])
+    .then(data => {
+        $scope.agentsCountActive         = data[0].data.data.Active;
+        $scope.agentsCountDisconnected   = data[0].data.data.Disconnected;
+        $scope.agentsCountNeverConnected = data[0].data.data['Never connected'];
+        $scope.agentsCountTotal          = data[0].data.data.Total;
+        $scope.agentsCoverity            = (data[0].data.data.Active / data[0].data.data.Total) * 100;
 
-        apiReq
-        .request('GET', '/manager/status', {})
-        .then((data) => $scope.daemons = data.data.data)
-        .catch((error) => printError(error));
+        $scope.daemons       = data[1].data.data;
+        $scope.managerInfo   = data[2].data.data;
+        $scope.totalRules    = data[3].data.data.totalItems;
+        $scope.totalDecoders = data[4].data.data.totalItems;
 
-        apiReq
-        .request('GET', '/manager/info', {})
-        .then((data) => {
-            $scope.managerInfo = data.data.data;
-            return apiReq.request('GET', '/rules', {
-                offset: 0,
-                limit:  1
-            });
-        })
-        .then((data) => {
-            $scope.totalRules = data.data.data.totalItems;
-            return apiReq.request('GET', '/decoders', {
-                offset: 0,
-                limit:  1
-            });            
-        })
-        .then((data) => {
-            $scope.totalDecoders = data.data.data.totalItems;
-            $scope.load          = false;
-        })
-        .catch((error) => printError(error));
+        return apiReq.request('GET', '/agents', { limit: 1, sort: '-date_add' });
+    })
+    .then(lastAgent => apiReq.request('GET', `/agents/${lastAgent.data.data.items[0].id}`, {}))
+    .then(agentInfo => {
+        $scope.agentInfo = agentInfo.data.data;
+        $scope.load = false;
+        $scope.$digest();
+    })
+    .catch(error => notify.error(error.message));
 
-        apiReq.request('GET', '/agents', {
-            limit:  1,
-            sort:   '-date_add'
-        })
-        .then((data) => apiReq.request('GET', `/agents/${data.data.data.items[0].id}`, {}))
-        .then((data) => $scope.agentInfo = data.data.data)
-        .catch((error) => printError(error));
-    };
-
-    //Load
-    try {
-        load();
-    } catch (e) {
-        notify.error("Unexpected exception loading controller");
-    }
 });
 
 app.controller('managerConfigurationController', function ($scope,$rootScope, Notifier, apiReq) {
@@ -99,9 +71,6 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, No
     const notify   = new Notifier({ location: 'Manager - Configuration' });
     $scope.load    = true;
     $scope.isArray = angular.isArray;
-
-    //Print Error
-    const printError = error => notify.error(error.message);
 
     //Functions
     const load = () => {
@@ -111,7 +80,7 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, No
             $scope.managerConfiguration = data.data.data;
             $scope.load = false;
         })
-        .catch((error) => printError(error));
+        .catch(error => notify.error(error.message));
     };
 
     //Load
