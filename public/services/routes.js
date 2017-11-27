@@ -6,6 +6,7 @@ let routes = require('ui/routes');
 // Added dependencies (from Kibana module)
 import 'ui/pager';
 import 'ui/typeahead';
+import 'ui/doc_viewer';
 
 // Added from its index.js
 import 'plugins/kibana/discover/saved_searches/saved_searches';

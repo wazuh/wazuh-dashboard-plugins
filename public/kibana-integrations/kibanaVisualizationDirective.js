@@ -16,22 +16,24 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                 // Listen for changes
                 var updateSearchSource = $scope.$on('updateVis', function (event, query, filters) {
-                    if (query.query == '') {
-                        $scope.fullFilter = $scope.implicitFilter;
-                    }
-                    else {
-                        if ($scope.implicitFilter != '') {
-                            $scope.fullFilter = $scope.implicitFilter + ' AND ' + query.query;
+                    if ($scope.visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
+                        if (query.query == '') {
+                            $scope.fullFilter = $scope.implicitFilter;
                         }
                         else {
-                            $scope.fullFilter = query.query;
+                            if ($scope.implicitFilter != '') {
+                                $scope.fullFilter = $scope.implicitFilter + ' AND ' + query.query;
+                            }
+                            else {
+                                $scope.fullFilter = query.query;
+                            }
                         }
+                        $scope.savedObj.searchSource.set('query',  {
+                            language: 'lucene',
+                            query: $scope.fullFilter 
+                        });
+                        $scope.savedObj.searchSource.set('filter', filters);
                     }
-                    $scope.savedObj.searchSource.set('query',  {
-                        language: 'lucene',
-                        query: $scope.fullFilter 
-                    });
-                    $scope.savedObj.searchSource.set('filter', filters);
                 });
 
                 // Initializing the visualization

@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////       WAZUH             //////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 require('ui/modules').get('app/wazuh', []).directive('kbnDis', [function() {
     return {
         restrict: 'E',
@@ -5,6 +10,47 @@ require('ui/modules').get('app/wazuh', []).directive('kbnDis', [function() {
         template: require('../templates/directives/kibana-discover-template.html')
     }
 }]);
+
+// Added dependencies (from Kibana module)
+import 'ui/pager';
+import 'ui/typeahead';
+import 'ui/doc_viewer';
+import 'ui/render_directive';
+
+// Added from its index.js
+import 'plugins/kibana/discover/saved_searches/saved_searches';
+import 'plugins/kibana/discover/directives/no_results';
+import 'plugins/kibana/discover/directives/timechart';
+import 'ui/collapsible_sidebar';
+import 'plugins/kibana/discover/components/field_chooser/field_chooser';
+import 'plugins/kibana/discover/controllers/discover';
+import 'plugins/kibana/discover/styles/main.less';
+import 'ui/doc_table/components/table_row';
+
+// Research added (further checks needed)
+require('ui/doc_table/doc_table.js');
+require('ui/styles/sidebar.less');
+require('ui/styles/table.less');
+require('ui/doc_viewer/doc_viewer.js');
+require('ui/doc_title/doc_title.js');
+require('ui/style_compile/style_compile.js');
+require('ui/registry/doc_views.js');
+require('plugins/kbn_doc_views/kbn_doc_views.js');
+require('ui/tooltip/tooltip.js');
+import 'plugins/kibana/discover/components/field_chooser';
+import 'plugins/kibana/discover/components/field_chooser/field_chooser';
+import moment from 'moment';
+import rison from 'rison-node';
+import 'ui/pager_control';
+import 'ui/pager';
+import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
+import { FilterManagerProvider } from 'ui/filter_manager';
+import { documentationLinks } from 'ui/documentation_links/documentation_links';
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import _ from 'lodash';
 import angular from 'angular';
@@ -42,6 +88,7 @@ const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
   'kibana/index_patterns',
+  'kibana',
   'app/wazuh'
 ]);
 
@@ -89,6 +136,7 @@ function discoverController(
     return interval.val !== 'custom';
   };
 
+ /*
   $scope.topNavMenu = [{
     key: 'new',
     description: 'New Search',
@@ -110,6 +158,7 @@ function discoverController(
     template: require('plugins/kibana/discover/partials/share_search.html'),
     testId: 'discoverShareButton',
   }];
+  */
   $scope.timefilter = timefilter;
 
 
@@ -709,42 +758,10 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // Getting the location from the url
-  $scope.tabView = $location.search().tabView;
-  $scope.tab = $location.search().tab;
+  function loadFilters() {
 
-  var implicitFilter = [];
+    var implicitFilter = [];
 
-  implicitFilter.push(
-    {
-      "removable":false,
-      "meta":{
-        "index":$scope.indexPattern.id,
-        "negate":false,
-        "disabled":false,
-        "alias":null,
-        "type":"phrase",
-        "key":"cluster.name",
-        "value":appState.getClusterInfo().cluster,
-        "params":{
-          "query":appState.getClusterInfo().cluster,
-          "type":"phrase"}
-      },
-      "query":{
-        "match":{
-          "cluster.name":{
-            "query":appState.getClusterInfo().cluster,
-            "type":"phrase"}
-          }
-      },
-      "$state":{
-        "store":"appState"
-      }
-    }
-  );
-
-  // Build the full query using the implicit filter
-  if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
     implicitFilter.push(
       {
         "removable":false,
@@ -754,29 +771,68 @@ function discoverController(
           "disabled":false,
           "alias":null,
           "type":"phrase",
-          "key":"rule.groups",
-          "value":$rootScope.currentImplicitFilter,
+          "key":"cluster.name",
+          "value":appState.getClusterInfo().cluster,
           "params":{
-              "query":$rootScope.currentImplicitFilter,
-              "type":"phrase"
-          }
+            "query":appState.getClusterInfo().cluster,
+            "type":"phrase"}
         },
         "query":{
           "match":{
-            "rule.groups":{
-              "query":$rootScope.currentImplicitFilter,
-              "type":"phrase"
+            "cluster.name":{
+              "query":appState.getClusterInfo().cluster,
+              "type":"phrase"}
             }
-          }
         },
         "$state":{
           "store":"appState"
         }
       }
     );
+
+    // Build the full query using the implicit filter
+    if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
+      implicitFilter.push(
+        {
+          "removable":false,
+          "meta":{
+            "index":$scope.indexPattern.id,
+            "negate":false,
+            "disabled":false,
+            "alias":null,
+            "type":"phrase",
+            "key":"rule.groups",
+            "value":$rootScope.currentImplicitFilter,
+            "params":{
+                "query":$rootScope.currentImplicitFilter,
+                "type":"phrase"
+            }
+          },
+          "query":{
+            "match":{
+              "rule.groups":{
+                "query":$rootScope.currentImplicitFilter,
+                "type":"phrase"
+              }
+            }
+          },
+          "$state":{
+            "store":"appState"
+          }
+        }
+      );
+    }
+
+    queryFilter.addFilters(implicitFilter);
+
   }
 
-  queryFilter.addFilters(implicitFilter);
+  // Getting the location from the url
+  $scope.tabView = $location.search().tabView;
+  $scope.tab = $location.search().tab;
+
+  // Initial loading of filters
+  loadFilters();
 
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
@@ -790,70 +846,7 @@ function discoverController(
 
       $scope.tab = $location.search().tab;
 
-      implicitFilter = [];
-
-        implicitFilter.push(
-          {
-            "removable":false,
-            "meta":{
-              "index":$scope.indexPattern.id,
-              "negate":false,
-              "disabled":false,
-              "alias":null,
-              "type":"phrase",
-              "key":"cluster.name",
-              "value":appState.getClusterInfo().cluster,
-              "params":{
-                "query":appState.getClusterInfo().cluster,
-                "type":"phrase"}
-            },
-            "query":{
-              "match":{
-                "cluster.name":{
-                  "query":appState.getClusterInfo().cluster,
-                  "type":"phrase"}
-                }
-            },
-            "$state":{
-              "store":"appState"
-            }
-          }
-        );
-
-        // Build the full query using the implicit filter
-        if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
-          implicitFilter.push(
-            {
-              "removable":false,
-              "meta":{
-                "index":$scope.indexPattern.id,
-                "negate":false,
-                "disabled":false,
-                "alias":null,
-                "type":"phrase",
-                "key":"rule.groups",
-                "value":$rootScope.currentImplicitFilter,
-                "params":{
-                    "query":$rootScope.currentImplicitFilter,
-                    "type":"phrase"
-                }
-              },
-              "query":{
-                "match":{
-                  "rule.groups":{
-                    "query":$rootScope.currentImplicitFilter,
-                    "type":"phrase"
-                  }
-                }
-              },
-              "$state":{
-                "store":"appState"
-              }
-            }
-          );
-        }
-        
-        queryFilter.addFilters(implicitFilter);
+      loadFilters();
     }
   });
 

@@ -60,6 +60,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     $scope.switchTab = (tab) => {
         // Deleing app state traces in the url
         $location.search('_a', null);
+        $scope.tabView = 'panels';
     };
 
     // Watchers
