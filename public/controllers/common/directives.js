@@ -16,7 +16,7 @@ app
 		return{
 			template:
 			`<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">` +
-			`	<md-nav-item id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">` +
+			`	<md-nav-item class="wazuhMenuNav-logo" id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">` +
 			`		<img aria-hidden="true" kbn-src="/plugins/wazuh/img/logo_white.png" height="44" weight="252"></img>` +
 			`	</md-nav-item>` +
 			`	<md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'overview' }" md-nav-href="#/overview" name="overview">Overview</md-nav-item>` +
