@@ -1,5 +1,10 @@
 @import (reference) "~ui/styles/mixins.less";
 
+/* Disable the pointer when hovering a metric visualization */
+.metric rect {
+    cursor: default !important;
+}
+
 kbn-vis, visualize, visualization {
   display: flex;
   flex: 1 1 100%;
