@@ -192,6 +192,49 @@
                     </span>
                 </md-card-content>
             </md-card>
+            <md-card ng-if="managerConfiguration.cluster">
+                <md-card-title ng-click="setting.cluster = !setting.cluster">
+                    <md-card-title-text>
+                        <span class="md-headline">Cluster
+                            <i ng-class="(!setting.cluster) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content ng-show="setting.cluster">
+                        <span layout="row" layout-align="space-between center">
+                            <p>Name</p>
+                            <p>{{managerConfiguration.cluster.name}}</p>
+                        </span>
+                        <span layout="row" layout-align="space-between center">
+                            <p>Interval</p>
+                            <p>{{managerConfiguration.cluster.interval}}</p>
+                        </span>
+                        <span layout="row" layout-align="space-between center">
+                            <p>Node name</p>
+                            <p>{{managerConfiguration.cluster.node_name}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p>Bind address</p>
+                            <p>{{managerConfiguration.cluster.bind_addr}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="space-between center">
+                            <p>Node type</p>
+                            <p>{{managerConfiguration.cluster.node_type}}</p>
+                        </span>
+                        <span layout="row" layout-align="space-between center">
+                            <p>Nodes</p>
+                            <p>{{managerConfiguration.cluster.nodes}}</p>
+                        </span>
+                        <span layout="row" layout-align="space-between center">
+                            <p>Port</p>
+                            <p>{{managerConfiguration.cluster.port}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                </md-card-content>
+            </md-card>
         </div>
 
         <div flex layout="column">
