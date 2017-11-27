@@ -83,18 +83,19 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
         genericReq.request('GET', '/api/wazuh-api/apiEntries')
         .then((data) => {
 			$scope.apiEntries = data.data.length > 0 ? data.data : [];
-			angular.forEach($scope.apiEntries, (value, key) => {
-				if (value._source && value._source.active === 'true') {
+			let i = 0, len = $scope.apiEntries;
+			for(; i<len; i++){
+				if ($scope.apiEntries[i]._source && $scope.apiEntries[i]._source.active === 'true') {
 					$scope.currentDefault = key;
-					if (value._source.extensions) {
-						$scope.extensions = value._source.extensions;
+					if ($scope.apiEntries[i]._source.extensions) {
+						$scope.extensions = $scope.apiEntries[i]._source.extensions;
 					} else {
 						$scope.extensions.oscap = true;
 						$scope.extensions.audit = true;
 						$scope.extensions.pci   = true;
 					}
 				}
-			});
+			}
         })
         .catch(() => {
 			notify.error("Error getting API entries");
