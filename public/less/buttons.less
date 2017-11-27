@@ -59,22 +59,22 @@ button._md-no-style.md-button.md-ink-ripple {
     color: white !important;
 }
 
-.tabView button._md-nav-button.md-accent.md-button.md-ink-ripple.md-active.md-primary {
+.tabView button._md-nav-button.md-accent.md-button.md-ink-ripple.md-active.md-primary,
+.tabView button._md-nav-button.md-accent.md-button.md-ink-ripple.md-unselected:hover {
     background-color: rgb(228, 228, 228);
     color: black;
     border-radius: 0px;
 }
 
+// .md-button:not([disabled]):hover,
 .list-no-hover>.md-button:not([disabled]):hover,
 .list-no-hover>.md-button.buttonBlueLight.md-default-theme:not([disabled]):hover,
 .list-no-hover>.md-button.buttonBlueLight.md-raised.md-primary:not([disabled]):hover,
-.md-button:not([disabled]):hover,
 .list-no-hover>.md-button.buttonMenu.md-default-theme:not([disabled]):hover,
-.md-button:not([disabled]):hover,
-.list-no-hover>.md-button.md-default-theme:not([disabled]):hover,
-.md-button:not([disabled]):hover {
+.list-no-hover>.md-button.md-default-theme:not([disabled]):hover {
     background-color: transparent !important;
 }
+
 .md-button.buttonBlueLightSettings.md-raised.md-primary:not([disabled]):hover{
     background-color: #3caed2 !important;
     color: white !important;
@@ -83,4 +83,12 @@ button._md-no-style.md-button.md-ink-ripple {
 
 .md-button:not([disabled]):hover {
     background-color: #c2e4ef;
+}
+
+md-select-menu.md-default-theme md-content,
+md-select-menu md-content,
+.button-active {
+    background: #3caed2 !important;
+    color: white !important;
+    box-shadow: none !important;
 }
