@@ -13,9 +13,7 @@
 }
 
 .joinCardsRow {
-    margin: 8px;
-    margin-bottom: 5px;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 .manager-background {
@@ -25,4 +23,206 @@
 .wazuh-chip {
 	background-color: #3caed2 !important;
 	color: #ffffff !important;
+}
+
+.tab-content .row {
+    margin: 0px;
+}
+
+/* ------------------------------------------------------------------------ */
+/* -------------------------- Manager status ------------------------------ */
+/* ------------------------------------------------------------------------ */
+
+.statusBox {
+    padding: 0 6px;
+    margin: 6px 8px;
+    line-height: 36px;
+    min-height: 36px;
+    background: white;
+    white-space: nowrap;
+    min-width: 111px;
+    text-align: center;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 11px !important;
+    color: white;
+    text-transform: uppercase;
+}
+
+.statusBox.large {
+    min-width: 120px !important;
+}
+
+.statusBox.extraLarge {
+    min-width: 150px !important;
+}
+
+.status {
+    width: 3%;
+}
+
+.green {
+    background-color: rgb(49, 196, 113);
+}
+
+.red {
+    background-color: #da534f;
+}
+
+.statusBox.green {
+    background-color: rgb(49, 196, 113);
+}
+
+.statusBox.red {
+    background-color: #da534f;
+}
+
+.statusBox.orange {
+    background-color: orange;
+}
+
+.status.grey {
+    background-color: grey;
+}
+
+.status.round {
+    border-radius: 50%;
+    height: 15px;
+    width: 15px;
+}
+
+.status.rectangle {
+    width: 8px;
+    height: 20px;
+    float: right;
+}
+
+.right-text {
+    text-align: right;
+}
+
+/* ------------------------------------------------------------------------ */
+/* -------------------------- Manager Tab Styles -------------------------- */
+/* ------------------------------------------------------------------------ */
+
+.manager-status-daemons-item,
+.manager-status-statistics {
+    text-align: center;
+}
+
+.manager-status-item {
+    font-size: 19pt;
+}
+
+.manager-status-item-coverity {
+    font-size: 19pt;
+    text-align: center;
+}
+
+.manager-status-subtitle {
+    font-weight: bold;
+    min-width: 150px
+}
+
+.manager-configuration-p-bold {
+	font-weight: bold;
+}
+
+.manager-groups-no-scroll,
+.manager-configuration-no-overflow {
+	overflow: hidden;
+}
+
+.manager-log-buttonplay {
+    margin-top: 20px;
+    width: 180px;
+}
+
+.manager-log-top-row {
+    height: 70px;
+    padding-right: 8px;
+}
+
+.manager-log-buttonplay-i {
+    margin-top: 0px;
+    margin-right: 15px;
+    margin-bottom: 5px;
+}
+
+.manager-log-input-1 {
+    margin-right: 15px;
+    margin-left: 15px;
+    padding: 3px
+}
+
+.manager-log-input-2 {
+    margin-right: 0px;
+    margin-left: 20px;
+    padding: 3px;
+    margin-right: 10px;
+}
+
+.manager-log-filter-box {
+    height: 35px;
+    width:auto;
+    margin-right: 15px;
+    margin-left: 15px;
+    padding: 3px;
+}
+
+.manager-log-list {
+    overflow: auto;
+    height:400px;
+}
+
+/* ------------------------------------------------------------------------ */
+/* ----------------------- Manager Groups Tab Styles ---------------------- */
+/* ------------------------------------------------------------------------ */
+
+.manager-groups-main-div {
+    background-color: #e3e3e3;
+}
+
+.manager-groups-file-back {
+    background-color: #F7F7F7;
+}
+
+.manager-groups-left-col {
+    margin:10px;
+}
+
+.manager-groups-right-col {
+    width: auto;
+    margin: 10px;
+}
+
+.manager-groups-right-search-box {
+    width: 100%;
+    height: 35px;
+}
+
+.manager-groups-left-search-box {
+    height: 35px;
+    margin: 5px;
+}
+
+.manager-groups-left-panel {
+    background-color: #E4E4E4;
+    overflow: auto;
+    height: 400px;
+    box-shadow: 0 0px 0px rgba(10, 16, 20, .15), 0 0 0px rgba(10, 16, 20, .12) !important;
+    margin-left: 0px;
+    margin-right: 0px;
+    width: 100%;
+}
+
+.manager-groups-search-file {
+    width: 100%;
+    height: 35px;
+}
+
+.manager-groups-agents-card,
+.manager-groups-files-card {
+    overflow: hidden;
+    height: 400px;
 }

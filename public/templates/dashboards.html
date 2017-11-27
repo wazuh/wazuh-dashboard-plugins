@@ -1,8 +1,0 @@
-<script>
-$('iframe').load( function() {
-    $('iframe').contents().find("head")
-      .append($('<style type="text/css">.kuiLocalNav.ng-hide { display: block !important; } .kuiLocalNavRow .fullWidth { display: block !important; }</style>'));
-});
-</script>
-
-<iframe ng-controller="dashboardController" src="{{dashboardURL}}" iframe-set-dimensions-onload></iframe>

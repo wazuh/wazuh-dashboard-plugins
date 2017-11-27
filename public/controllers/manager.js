@@ -75,12 +75,8 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, No
     //Functions
     const load = () => {
         apiReq
-        .request('GET', '/manager/status', {})
-        .then((data) => {
-            $scope.daemons = data.data.data;
-            return apiReq.request('GET', '/manager/configuration', {});
-        })
-        .then((data) => {
+        .request('GET', '/manager/configuration', {})
+        .then(data => {
             $scope.managerConfiguration = data.data.data;
             $scope.load = false;
         })

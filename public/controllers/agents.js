@@ -95,6 +95,10 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 
 	// Check if there are any alert.
 	$scope.checkAlerts = (agent_id) => {
+		if($rootScope.comeFromGroupsTab) {
+			$scope.tab = 'overview';
+			delete $rootScope.comeFromGroupsTab;
+		}
 		let group   = null;
         if (tabFilters[$scope.tab].group === '')
             group = "*";

@@ -1,6 +1,7 @@
 <div flex ng-cloak ng-if="!loading && submenuNavItem == 'logs'" layout="column" ng-controller="managerLogController" class="manager-background">
-    <div layout="row" layout-align="start start" style="height: 70px;">
-        <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 15px;margin-left: 15px;padding: 3px;">
+
+    <div layout="row" layout-align="start start" class="manager-log-top-row">
+        <md-input-container class="md-whiteframe-z1 manager-log-input-1" flex="20">
             <md-select id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
                 aria-label="Logs category">
                 <md-option selected value="all">Choose daemon</md-option>
@@ -8,7 +9,7 @@
             </md-select>
         </md-input-container>
 
-        <md-input-container class="md-whiteframe-z1" flex="20" style="margin-right: 0px;margin-left: 20px;padding: 3px;margin-right: 10px;">
+        <md-input-container class="md-whiteframe-z1 manager-log-input-2" flex="20">
             <md-select id="levelBox" ng-model="type_log" ng-change="type_log == 'all' ? logs.removeFilter('type_log', true) : logs.addFilter('type_log', type_log)"
                 aria-label="Logs level">
                 <md-option selected value="all">Choose log level</md-option>
@@ -17,22 +18,20 @@
                 <md-option value="warning">Warning</md-option>
             </md-select>
         </md-input-container>
-
-        <div flex layout="row" layout-align="end end">
-            <span>
-                <md-button ng-if="!realtime" class="md-primary md-whiteframe-z1 buttonMenu" ng-click="playRealtime()" style="margin-top: 20px; width: 180px">
-                    <i class="fa fa-play" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i>
-                    Play realtime
-                </md-button>
-                <md-button style="margin-top: 20px; width: 180px" ng-if="realtime" class="md-primary md-whiteframe-z1 buttonMenu" ng-click="playRealtime()">
-                    <i class="fa fa-stop" aria-hidden="true" style="margin-top: 0px; margin-right: 15px; margin-bottom: 5px;"></i>
-                    Stop realtime
-                </md-button>
-            </span>
-        </div>
+        <span flex></span>
+        <md-button ng-if="!realtime" class="md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="playRealtime()">
+            <i class="fa fa-play manager-log-buttonplay-i" aria-hidden="true"></i>
+            Play realtime
+        </md-button>
+        <md-button ng-if="realtime" class="md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="playRealtime()">
+            <i class="fa fa-stop manager-log-buttonplay-i" aria-hidden="true"></i>
+            Stop realtime
+        </md-button>
     </div>
 
-    <input placeholder="Filter" type="text" ng-model="searchTerm" ng-change="logs.addFilter('search', searchTerm)" class="input-filter-box" style="height: 35px; width:auto; margin-right: 15px;margin-left: 15px;padding: 3px;">
+    <div layout="row">
+        <input flex placeholder="Filter" type="text" ng-model="searchTerm" ng-change="logs.addFilter('search', searchTerm)" class="input-filter-box manager-log-filter-box">
+    </div>
 
     <div flex layout="column" class="md-padding">
 
@@ -44,7 +43,7 @@
         </md-toolbar>
 
         <div layout="column" flex>
-            <div flex style="overflow: auto; height:400px;" id="groups-id" layout="column" when-scrolled="logs.nextPage('')">
+            <md-content flex class="manager-log-list" id="groups-id" when-scrolled="logs.nextPage('')">
                 <md-list>
                     <md-list-item ng-repeat="log in logs.items | filter : searchTerm" ng-mouseover="log.hovered=true" ng-mouseleave="log.hovered=false"
                         layout="row" class="groups-button">
@@ -55,7 +54,7 @@
                         <div flex layout="row" layout-align="end center"></div>
                     </md-list-item>
                 </md-list>
-            </div>
+            </md-content>
         </div>
     </div>
 </div>
