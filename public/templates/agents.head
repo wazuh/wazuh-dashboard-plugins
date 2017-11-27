@@ -1,10 +1,10 @@
 <div flex ng-controller="agentsController" layout="column">
     <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'agents'" style="height: 70px;">
 		<menu-top></menu-top>
-    </md-content> 
+    </md-content>
 
 	<div flex layout="column" id="content" style="{{(tabView != 'discover') ? 'background-color: #e4e4e4' : ''}}" >
-		<div layout="row" layout-align="space-between start" style="background-color: #f7f7f7"> 
+		<div layout="row" layout-align="space-between start" style="background-color: #f7f7f7">
 			<md-toolbar style="height: 50px;">
 				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
 					<div style="text-transform: none; font-size: 20px;" ng-if="_agent">
@@ -17,15 +17,15 @@
 							<span ng-show="_agent.status" ng-class="getAgentStatusClass(_agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(_agent.status)}}</span>
 						</div>
 					</div>
-					
-					<div ng-if="!_agent"> 
+
+					<div ng-if="!_agent">
 						<h2 class="wazuh-h2" style="text-transform: none; font-size: 20px;">
 							<i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents preview
 						</h2>
 					</div>
 
 					<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-						<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="searchTerm" md-items="agent in agentsAutoComplete.items" md-item-text="agent.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address"> 
+						<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="searchTerm" md-items="agent in agentsAutoComplete.items" md-item-text="agent.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address">
 							<md-item-template>
 								<span class="item-title">
 									<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agent.name}} ({{agent.id}}) </strong></span>
@@ -42,7 +42,7 @@
 				</div>
 			</md-toolbar>
 		</div>
-		
+
 		<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
 			<div ng-show="_agent" class="horizontalTabsBar" layout="column" layout-align="center start">
 				<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="tab"  ng-init="tab = 'preview'" nav-bar-aria-label="navigation submenu">
@@ -50,19 +50,19 @@
 					<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
 					<md-nav-item md-nav-click="switchTab('policy_monitoring');" name="policy_monitoring">Policy Monitoring</md-nav-item>
 					<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensionStatus('oscap')">SCAP</md-nav-item>
-					<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensionStatus('audit')">Audit</md-nav-item> 
-					<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensionStatus('pci')">PCI DSS</md-nav-item> 
+					<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensionStatus('audit')">Audit</md-nav-item>
+					<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensionStatus('pci')">PCI DSS</md-nav-item>
 				</md-nav-bar>
 			</div>
-			
+
 			<div ng-show="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
 				<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 					<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
 						<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
 					</md-nav-item>
 					<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-						<img style="width: 16px; margin-right: 6px;" src="/plugins/wazuh/img/discover.svg">Discover
+						<img style="width: 16px; margin-right: 6px;" kbn-src="/plugins/wazuh/img/discover.svg">Discover
 					</md-nav-item>
-				</md-nav-bar> 
+				</md-nav-bar>
 			</div>
 		</div>
