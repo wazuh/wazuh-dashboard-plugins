@@ -42,11 +42,11 @@
             </md-input-container>
         </div>
 
-        <md-chips class="manager-ruleset-decoders-md-chips" readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file')">
-            <md-chip ng-click="decoders.removeFilter('search', true)" ng-if="decoders.hasFilter('search')">
+        <md-chips readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file')">
+            <md-chip class="wazuh-chip" ng-click="decoders.removeFilter('search', true)" ng-if="decoders.hasFilter('search')">
                 <span class="bold">Search: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
             </md-chip>
-            <md-chip ng-click="decoders.removeFilter('file', true)" ng-if="decoders.hasFilter('file');">
+            <md-chip class="wazuh-chip" ng-click="decoders.removeFilter('file', true)" ng-if="decoders.hasFilter('file');">
                 <span class="bold">File: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
             </md-chip>
         </md-chips>
