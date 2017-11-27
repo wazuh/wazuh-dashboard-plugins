@@ -105,7 +105,7 @@
             </span>
         </md-toolbar>
 
-        <md-content flex layout="column" class="manager-ruleset-rules-col-300" when-scrolled="decoders.nextPage('')">
+        <md-content flex layout="column" class="manager-ruleset-rules-col-300" when-scrolled="rules.nextPage('')">
             <md-list ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class-odd="'odd'" ng-class-even="'even'"
                 class="agents-preview-table" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">
                 <md-list-item class="rules-item-list" ng-click="showDetails[rule.id] = !showDetails[rule.id]" ng-class="showDetails[rule.id] ? 'ruleset_rules_row_active' : ''">

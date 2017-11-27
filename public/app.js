@@ -11,6 +11,14 @@ var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial'])
     $httpProvider.useApplyAsync(true);
   }]);
 
+////////////////////////////////////////////////////////////////////
+// Require Kibana integrations
+require('ui/autoload/all');
+require('ui/chrome');
+require('plugins/wazuh/kibana-integrations/kibanaVisualizationDirective.js');
+require('plugins/wazuh/kibana-integrations/kibanaFilterbarDirective.js');
+require('plugins/wazuh/kibana-integrations/kibanaDiscoverDirective.js');
+
 // Require services
 require('plugins/wazuh/services/theming.js');
 require('plugins/wazuh/services/apiReq.js');
@@ -21,16 +29,6 @@ require('plugins/wazuh/services/testAPI.js');
 
 // Set up routes and views
 require('plugins/wazuh/services/routes.js');
-
-// Require Kibana integrations
-require('ui/autoload/all');
-require('ui/chrome');
-
-////////////////////////////////////////////////////////////////////
-require('plugins/wazuh/kibana-integrations/kibanaExternalImports.js');
-require('plugins/wazuh/kibana-integrations/kibanaVisualizationDirective.js');
-require('plugins/wazuh/kibana-integrations/kibanaDiscoverDirective.js');
-require('plugins/wazuh/kibana-integrations/kibanaSearchbarDirective.js');
 
 // Require controllers
 
