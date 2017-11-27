@@ -159,92 +159,100 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 
 	$scope.extensionStatus = (extension) => appState.getExtensions().extensions[extension];
 
-	$scope.applyAgent = (agent) => {
+	const calculateMinutes = (start,end) => {
+		let time    = new Date(start);
+		let endTime = new Date(end);
+		let minutes         = ((endTime - time) / 1000) / 60;
+		return minutes;
+	}
+
+	const validateRootCheck = () => {
+		$scope.agentInfo.rootcheck.duration = 'Unknown';
+		if ($scope.agentInfo.rootcheck.end && $scope.agentInfo.rootcheck.start) {
+			let minutes = calculateMinutes($scope.agentInfo.rootcheck.start, $scope.agentInfo.rootcheck.end);
+			$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);
+		} else {
+			if (!$scope.agentInfo.rootcheck.end) {
+				$scope.agentInfo.rootcheck.end = 'Unknown';
+			} 
+			if (!$scope.agentInfo.rootcheck.start){
+				$scope.agentInfo.rootcheck.start = 'Unknown';
+			}
+		}	
+	}
+
+	const validateSysCheck = () => {
+		$scope.agentInfo.syscheck.duration = 'Unknown';
+		if ($scope.agentInfo.syscheck.end && $scope.agentInfo.syscheck.start) {
+			let minutes  = calculateMinutes($scope.agentInfo.syscheck.start, $scope.agentInfo.syscheck.end);
+			$scope.agentInfo.syscheck.duration = window.Math.round(minutes);
+		} else {
+			if (!$scope.agentInfo.syscheck.end) {
+				$scope.agentInfo.syscheck.end = 'Unknown';
+			} 
+			if (!$scope.agentInfo.syscheck.start){
+				$scope.agentInfo.syscheck.start = 'Unknown';
+			}
+		}
+	}
+
+	$scope.applyAgent = agent => {
 		if (agent) {
 			$scope.loading        = true;
 			$scope.tab = 'overview';
-			$location.search("tab", 'overview');
+			$location.search('tab', 'overview');
 
-			$scope.agentInfo      = {};
-			// Get Agent Info
-			apiReq.request('GET', `/agents/${agent.id}`, {})
-			.then((data) => {
+			$scope.agentInfo = agent;
+			$rootScope.agent = $scope.agentInfo;
 
-				$scope.agentInfo = data.data.data;
-				$rootScope.agent = $scope.agentInfo;
-				if (typeof $scope.agentInfo.version === 'undefined') {
-					$scope.agentInfo.version = "Unknown";
-				}
-				if (typeof $scope.agentInfo.os === 'undefined') {
-					$scope.agentOs = "Unknown";
+			if (typeof $scope.agentInfo.version === 'undefined') {
+				$scope.agentInfo.version = 'Unknown';
+			}
+
+			$scope.agentOs = 'Unknown';
+			if (typeof $scope.agentInfo.os !== 'undefined' && typeof $scope.agentInfo.os.name !== 'undefined') {
+				$scope.agentOs = `${$scope.agentInfo.os.name} ${$scope.agentInfo.os.version}`;
+			} else if (typeof $scope.agentInfo.os !== 'undefined' && typeof $scope.agentInfo.os.uname !== 'undefined') {
+				$scope.agentOs = $scope.agentInfo.os.uname;
+			}
+
+			if (typeof $scope.agentInfo.lastKeepAlive === 'undefined') {
+				$scope.agentInfo.lastKeepAlive = 'Unknown';
+			}
+
+			$scope._agent = agent;
+			$scope.search = agent.name;
+			$location.search('id', $scope._agent.id);
+
+			// Update the implicit filter
+			if ($scope.tab !== 'preview') {
+				if (!tabFilters[$scope.tab].group) {
+					$rootScope.currentImplicitFilter = `agent.id : "${$scope._agent.id}"`;
 				} else {
-					if (typeof $scope.agentInfo.os.name !== 'undefined') {
-						$scope.agentOs = `${$scope.agentInfo.os.name} ${$scope.agentInfo.os.version}`;
-					} else {
-						if (typeof $scope.agentInfo.os.uname !== 'undefined') {
-							$scope.agentOs = $scope.agentInfo.os.uname;
-						} else {
-							$scope.agentOs = "Unknown";
-						}
-					}
+					$rootScope.currentImplicitFilter = `agent.id : "${$scope._agent.id}" rule.groups : "${tabFilters[$scope.tab].group}"`;
 				}
-
-				if (typeof $scope.agentInfo.lastKeepAlive === 'undefined') {
-					$scope.agentInfo.lastKeepAlive = "Unknown";
-				}
-
-				$scope._agent = data.data.data;
-				$scope.search = data.data.data.name;
-				$location.search('id', $scope._agent.id);
-
-	        	// Update the implicit filter
-		        if ($scope.tab !== 'preview') {
-		        	if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"';
-		        	else $rootScope.currentImplicitFilter = 'agent.id : "' + $scope._agent.id + '"' + ' rule.groups : "' + tabFilters[$scope.tab].group + '"';
-		        }
-
-				$scope.checkAlerts($scope._agent.id)
-				.then((data) => {
-					$scope.results = data;
-					$scope.loading = false;
-				});
-
-				apiReq.request('GET', `/syscheck/${agent.id}/last_scan`, {})
-				.then((data) => {
-					$scope.agentInfo.syscheck          = data.data.data;
-					$scope.agentInfo.syscheck.duration = "Unknown";
-					if (!$scope.agentInfo.syscheck.end && !$scope.agentInfo.syscheck.start) {
-						let syscheckTime    = new Date($scope.agentInfo.syscheck.start);
-						let syscheckEndTime = new Date($scope.agentInfo.syscheck.end);
-						let minutes         = ((syscheckEndTime - syscheckTime) / 1000) / 60;
-						$scope.agentInfo.syscheck.duration = window.Math.round(minutes);
-					} else if (!$scope.agentInfo.syscheck.end) {
-						$scope.agentInfo.syscheck.end = "Unknown";
-					} else {
-						$scope.agentInfo.syscheck.start = "Unknown";
-					}
-				})
-				.catch((err) => printError(err));
-
-				// Get rootcheck info
+			}
+			
+			Promise.all([
+				$scope.checkAlerts($scope._agent.id),
+				apiReq.request('GET', `/syscheck/${agent.id}/last_scan`, {}),
 				apiReq.request('GET', `/rootcheck/${agent.id}/last_scan`, {})
-				.then((data) => {
-					$scope.agentInfo.rootcheck          = data.data.data;
-					$scope.agentInfo.rootcheck.duration = "Unknown";
-					if ($scope.agentInfo.rootcheck.end && $scope.agentInfo.rootcheck.start) {
-						let rootcheckTime    = new Date($scope.agentInfo.rootcheck.start);
-						let rootcheckEndTime = new Date($scope.agentInfo.rootcheck.end);
-						let minutes          = ((rootcheckEndTime - rootcheckTime) / 1000) / 60;
-						$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);
-					} else if ($scope.agentInfo.rootcheck.end) {
-						$scope.agentInfo.rootcheck.end = "Unknown";
-					} else {
-						$scope.agentInfo.rootcheck.start = "Unknown";
-					}
-				})
-				.catch((err) => printError(err));
+			])
+			.then(data => {
+				// Checkalerts
+				$scope.results = data[0];
+
+				// Syscheck
+				$scope.agentInfo.syscheck = data[1].data.data;
+				validateSysCheck();		
+
+				// Rootcheck
+				$scope.agentInfo.rootcheck = data[2].data.data;
+				validateRootCheck();	
+
+				$scope.loading = false;
 			})
-			.catch((err) => printError(err));
+			.catch(error => notify.error(error.message));
 		}
 	};
 
