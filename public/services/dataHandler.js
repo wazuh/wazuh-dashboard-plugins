@@ -37,20 +37,25 @@ app.factory('DataHandler', function ($q, apiReq) {
                 if (filter.value !== '') requestData[filter.name] = filter.value;
             }
 
+            if(this.offset >= this.totalItems){
+                this.end = true;
+                this.busy = false;
+                return;
+            }
             let deferred = $q.defer();
             apiReq.request('GET', this.path, requestData)
             .then(data => {
                 if (data.data.data === 0){
                     deferred.resolve(false);
                 }
-                let totalItems = data.data.data.totalItems;
+                this.totalItems = data.data.data.totalItems;
                 let items      = data.data.data.items;
                 for (let i = 0,len = items.length; i < len; i++) {
                     this.items.push(items[i]);
                     this.items[i].selected = false;
                 }
                 this.offset += items.length;
-                (this.offset >= totalItems) ? this.end = true: this.busy = false;
+                (this.offset >= this.totalItems) ? this.end = true: this.busy = false;
                 if (data.data.data !== 0){
                     deferred.resolve(true);
                 }
@@ -61,12 +66,12 @@ app.factory('DataHandler', function ($q, apiReq) {
         }
 
         getFilter (filterName) {
-            let filtered = this.filters.filter((element) => element.name === filterName);
+            let filtered = this.filters.filter(element => element.name === filterName);
             return (filtered.length !== 0) ? filtered[0].value : null;           
         }
 
         hasFilter (filterName) {
-            let filtered = this.filters.filter((element) => element.name === filterName);
+            let filtered = this.filters.filter(element => element.name === filterName);
             return filtered.length !== 0;
         }
 
@@ -116,6 +121,7 @@ app.factory('DataHandler', function ($q, apiReq) {
             .then(data => {
                 this.items = [];
                 let items  = data.data.data.items;
+                this.totalItems = data.data.data.totalItems;
                 for (let i = 0,len = items.length; i < len; i++) {
                     this.items.push(items[i]);
                     this.items[i].selected = false;
