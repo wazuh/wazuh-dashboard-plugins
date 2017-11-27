@@ -25,6 +25,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.currentImplicitFilter = "";
     }
 
+    $scope.hideRing = (items) => {
+        return $(".vis-container").length >= items;
+    };
+
     // Object for matching nav items and Wazuh groups
     let tabFilters = {
         "general": {
@@ -43,16 +47,13 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
             "group": "audit"
         },
         "pci": {
-            "group": ""
+            "group": "pci_dss"
         }
-    };
-
-    $scope.hideRing = (items) => {
-        return $(".vis-container").length >= items;
     };
 
     // Switch subtab
     $scope.switchSubtab = (subtab) => {
+        $location.search('_a', null);
         $scope.tabView = subtab;
     };
 

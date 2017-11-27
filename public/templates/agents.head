@@ -1,4 +1,5 @@
 <div flex ng-controller="agentsController" layout="column">
+
     <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'agents'" style="height: 70px;">
 		<menu-top></menu-top>
     </md-content> 
@@ -66,3 +67,43 @@
 				</md-nav-bar> 
 			</div>
 		</div>
+
+		<!-- View: Discover -->
+		<div ng-if="tab !== 'preview' && _agent">
+	    	<kbn-dis></kbn-dis>
+	    </div>
+
+	    <!-- No results message -->
+	    <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels'">
+	        <md-card flex layout="column">
+	            <md-card-content class="overview-fim-no-results">
+	                No results for selected time interval
+	            </md-card-content>
+	        </md-card>
+	    </md-content>
+
+    <style>
+    .overview-fim-metrics-div{
+        height: 300px;
+    }
+    .overview-fim-no-results {
+        text-align: center;
+    }
+    .overview-fim-discover {
+        background-color: white
+    }
+    .overview-fim-last-file,
+    .overview-fim-most-file {
+        text-align: center;
+    }
+    .overview-fim-file-changes-div {
+        height: 213px;
+    }
+    .overview-fim-last-file-div,
+    .overview-fim-most-file-div {
+        height: 100px;
+    }
+    .overview-fim-events-summary {
+        height: 530px;
+    }
+</style>

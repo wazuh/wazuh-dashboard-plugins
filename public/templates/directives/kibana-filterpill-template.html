@@ -6,14 +6,14 @@
   ng-mouseleave="pill.deactivateActions()"
 >
 
-  <div class="filter-description" ng-class="{'filter-description-deactivated': pill.areActionsActivated}">
+  <div class="filter-description" ng-class="{'filter-description-deactivated': pill.areActionsActivated && pill.filter.meta.removable !== false}">
     <span ng-if="pill.filter.$state.store == 'globalState'"><i class="fa fa-fw fa-thumb-tack pinned"></i></span>
     <span ng-if="pill.filter.meta.alias">{{ pill.filter.meta.alias }}</span>
     <span ng-if="!pill.filter.meta.alias">{{ pill.filter.meta.key }}:</span>
     <span ng-if="!pill.filter.meta.alias">"{{ pill.filter.meta.value }}"</span>
   </div>
 
-  <div class="filter-actions" ng-show="pill.filter.removable !== false" ng-class="{'filter-actions-activated': pill.areActionsActivated}">
+  <div class="filter-actions" ng-show="pill.filter.meta.removable !== false" ng-class="{'filter-actions-activated': pill.areActionsActivated}">
     <button
       class="action filter-toggle"
       ng-click="pill.onToggleFilter(pill.filter)"
