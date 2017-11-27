@@ -1,47 +1,9 @@
-<md-content ng-if="tab == 'pci' && _agent" id="agents-pci" ng-controller="PCIController">
+<md-content ng-if="tab == 'pci' && _agent">
 
-    <div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(3)'><div></div></div>
-
-    <!-- Kibana search bar -->
-    <!-- Local nav. -->
-    <div ng-if="hideRing(3) && !loading" ng-controller="kibanaSearchbar">
-        <kbn-top-nav name="agents_fim" config="topNavMenu">
-            <!-- Transcluded elements. -->
-            <div data-transclude-slots>
-                <!-- Title. -->
-
-                <!-- Search. -->
-                <div ng-show="chrome.getVisible()" class="fullWidth" data-transclude-slot="bottomRow">
-                    <query-bar query="state.query" app-name="'wazuh'" on-submit="updateQueryAndFetch($query)">
-                    </query-bar>
-                </div>
-            </div>
-        </kbn-top-nav>
-
-        <!-- Filters. -->
-        <filter-bar ng-show="showFilterBar()" state="state" index-patterns="indexPattern" ng-if="state.query.language === 'lucene'"></filter-bar>
-    </div>
-
-    <!-- No results message -->
-    <md-content flex layout="row" layout-align="start start" ng-show="!results && !loading" ng-if="tabView == 'panels' && hideRing(3)">
-        <md-card flex layout="column">
-            <md-card-content class="agents-pci-no-results">
-                No results for selected time interval
-            </md-card-content>
-        </md-card>
-    </md-content>
-
-    <!-- View: Discover -->
-    <md-content class="agents-pci-discover" flex layout="column" layout-align="start space-around" ng-if="tabView == 'discover' && agentInfo.name">
-        <kbn-disfull table-height="1000px;" dis-a="(columns:!(_source),filters:!(),index:'wazuh-alerts-*',interval:auto,query:(query_string:(analyze_wildcard:!t,query:'*')),sort:!('@timestamp',desc))"
-        dis-filter="_exists_:rule.pci_dss "
-        infinite-scroll="true">
-        </kbn-disfull>
-    </md-content>
+    <div class='uil-ring-css' ng-show="!hideRing(8) && resultState === 'loading'"><div></div></div>
 
     <!-- View: Panels -->
-    <div flex ng-show="hideRing(3) && results && !loading" ng-if="tabView == 'panels' && !load" class="wazuh-column">
-
+    <div ng-show="resultState === 'ready' && tabView === 'panels'" class="wazuh-column">
         <div layout="row" layout-align="center stretch">
             <md-card flex>
                 <md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">

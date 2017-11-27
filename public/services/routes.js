@@ -138,7 +138,9 @@ routes
     .when('/agents/:id?/:tab?/:view?', {
         template: require('plugins/wazuh/templates/agents.jade'),
         resolve: {
-            "checkAPI": settingsWizard
+            "checkAPI": settingsWizard,
+            "ip": getIp,
+            "savedSearch": getSavedSearch
         }
     })
     .when('/manager/:tab?/', {

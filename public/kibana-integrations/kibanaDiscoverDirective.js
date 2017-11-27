@@ -329,7 +329,10 @@ function discoverController(
           ////////////////////////////////////////////////////////////////////////////
           ////////////////////////////////////////////////////////////////////////////
           ////////////////////////////////////////////////////////////////////////////
-
+          if ($rootScope.comeFromApplyAgent) {
+            loadFilters();
+            $rootScope.comeFromApplyAgent = false;
+          }
           $state.save();
         });
       });
@@ -759,13 +762,13 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   function loadFilters() {
-
-    var implicitFilter = [];
+    if ($scope.tab) {
+    let implicitFilter = [];
 
     implicitFilter.push(
       {
-        "removable":false,
         "meta":{
+          "removable":false,
           "index":$scope.indexPattern.id,
           "negate":false,
           "disabled":false,
@@ -790,31 +793,29 @@ function discoverController(
       }
     );
 
-    // Build the full query using the implicit filter
-    if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
+    // Check if we are in the agents page and add the proper agent filter
+    if ($rootScope.page === 'agents' && $location.search().id !== "" && $location.search().id !== null && angular.isUndefined($location.search().id) !== true) {
       implicitFilter.push(
         {
-          "removable":false,
           "meta":{
+            "removable":false,
             "index":$scope.indexPattern.id,
             "negate":false,
             "disabled":false,
             "alias":null,
             "type":"phrase",
-            "key":"rule.groups",
-            "value":$rootScope.currentImplicitFilter,
+            "key":"agent.id",
+            "value":$location.search().id,
             "params":{
-                "query":$rootScope.currentImplicitFilter,
-                "type":"phrase"
-            }
+              "query":$location.search().id,
+              "type":"phrase"}
           },
           "query":{
             "match":{
-              "rule.groups":{
-                "query":$rootScope.currentImplicitFilter,
-                "type":"phrase"
+              "agent.id":{
+                "query":$location.search().id,
+                "type":"phrase"}
               }
-            }
           },
           "$state":{
             "store":"appState"
@@ -823,8 +824,64 @@ function discoverController(
       );
     }
 
-    queryFilter.addFilters(implicitFilter);
+    // Build the full query using the implicit filter
+    if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
+      if ($rootScope.currentImplicitFilter === "pci_dss") {
+        implicitFilter.push(
+          {
+            "meta":{
+              "removable":false,
+              "index":$scope.indexPattern.id,
+              "negate":false,
+              "disabled":false,
+              "alias":null,
+              "type":"exists",
+              "key":"rule.pci_dss",
+              "value":"exists"
+            },
+            "exists":{
+              "field":"rule.pci_dss"
+            },
+            "$state":{
+              "store":"appState"
+            }
+          }
+        );
+      } else {
+        implicitFilter.push(
+          {
+            "meta":{
+              "removable":false,
+              "index":$scope.indexPattern.id,
+              "negate":false,
+              "disabled":false,
+              "alias":null,
+              "type":"phrase",
+              "key":"rule.groups",
+              "value":$rootScope.currentImplicitFilter,
+              "params":{
+                  "query":$rootScope.currentImplicitFilter,
+                  "type":"phrase"
+              }
+            },
+            "query":{
+              "match":{
+                "rule.groups":{
+                  "query":$rootScope.currentImplicitFilter,
+                  "type":"phrase"
+                }
+              }
+            },
+            "$state":{
+              "store":"appState"
+            }
+          }
+        );
+      }
+    }
 
+    queryFilter.addFilters(implicitFilter);
+  }
   }
 
   // Getting the location from the url
@@ -832,7 +889,7 @@ function discoverController(
   $scope.tab = $location.search().tab;
 
   // Initial loading of filters
-  loadFilters();
+ loadFilters(); 
 
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
