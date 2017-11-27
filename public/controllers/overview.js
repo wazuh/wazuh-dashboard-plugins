@@ -82,13 +82,13 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     
     genericReq
         .request('GET', '/api/wazuh-api/pci/all')
-        .then((data) => {
-            angular.forEach(data.data, (value, key) => {
+        .then(data => {
+            for(let key in data.data){
                 tabs.push({
                     "title":   key,
-                    "content": value
+                    "content": data.data[key]
                 });
-            });
+            }
         });
 
     $scope.tabs = tabs;

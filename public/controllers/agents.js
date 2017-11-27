@@ -206,12 +206,12 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 	let tabs = [];
 	genericReq.request('GET', '/api/wazuh-api/pci/all')
 		.then((data) => {
-			angular.forEach(data.data, (value, key) => {
+			for(let key in data.data){
 				tabs.push({
 					"title": key,
-					"content": value
+					"content": data.data[key]
 				});
-			});
+			}
 		});
 
 	$scope.tabs 		 = tabs;
