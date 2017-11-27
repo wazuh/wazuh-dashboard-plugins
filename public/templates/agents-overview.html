@@ -68,8 +68,8 @@
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.syscheck.end}}</div>
-                    <md-tooltip md-direction="bottom">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.syscheck.end || 'Unknown'}}</div>
+                    <md-tooltip ng-if="agentInfo.syscheck.start && agentInfo.syscheck.end" md-direction="bottom">
                         Start time: {{ agentInfo.syscheck.start }} <br>
                         End time: {{ agentInfo.syscheck.end }} <br>
                         Duration time: {{ agentInfo.syscheck.duration }} minutes
@@ -79,8 +79,8 @@
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.rootcheck.end}}</div>
-                    <md-tooltip md-direction="bottom">
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.rootcheck.end || 'Unknown'}}</div>
+                    <md-tooltip ng-if="agentInfo.rootcheck.start && agentInfo.rootcheck.end" md-direction="bottom">
                         Start time: {{ agentInfo.rootcheck.start }} <br>
                         End time: {{ agentInfo.rootcheck.end }} <br>
                         Duration time: {{ agentInfo.rootcheck.duration }} minutes
