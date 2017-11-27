@@ -721,6 +721,86 @@
                     </span>
                 </md-card-content>
             </md-card>
+            <md-card ng-if="managerConfiguration.auth">
+                <md-card-title ng-click="setting.auth = !setting.auth">
+                    <md-card-title-text>
+                        <span class="md-headline">Authd
+                            <i ng-class="(!setting.auth) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
+                                aria-hidden="true"></i>
+                        </span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content ng-show="setting.auth">
+                    <span layout="row" layout-align="space-between center">
+                        <p> Purge </p>
+                        <p class="right-text">{{managerConfiguration.auth.purge}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> Force insert </p>
+                        <p class="right-text">{{managerConfiguration.auth.force_insert}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> SSL verify host </p>
+                        <p class="right-text">{{managerConfiguration.auth.ssl_verify_host}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> Limit max agents </p>
+                        <p class="right-text">{{managerConfiguration.auth.limit_maxagents}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> Force time </p>
+                        <p class="right-text">{{managerConfiguration.auth.force_time}}</p>
+                    </span> 
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> SSL manager key </p>
+                        <p class="right-text">{{managerConfiguration.auth.ssl_manager_key}}</p>
+                    </span>  
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> Disabled </p>
+                        <p class="right-text">{{managerConfiguration.auth.disabled}}</p>
+                    </span>  
+                    <md-divider></md-divider>      
+                    <span layout="row" layout-align="space-between center">
+                        <p> SSL manager cert </p>
+                        <p class="right-text">{{managerConfiguration.auth.ssl_manager_cert}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> Use source ip </p>
+                        <p class="right-text">{{managerConfiguration.auth.use_source_ip}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> Use password </p>
+                        <p class="right-text">{{managerConfiguration.auth.use_password}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> Port </p>
+                        <p class="right-text">{{managerConfiguration.auth.port}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p> SSL auto negotiate </p>
+                        <p class="right-text">{{managerConfiguration.auth.ssl_auto_negotiate}}</p>
+                    </span>
+                    <md-divider></md-divider>
+                    <span layout="row" layout-align="space-between center">
+                        <p class="manager-configuration-p-bold"> Ciphers </p>
+                        <p class="right-text"></p>
+                    </span>
+                    <span>
+                        <p >{{managerConfiguration.auth.ciphers}}</p>
+                    </span>
+                </md-card-content>
+            </md-card>
         </div>
     </div>
 </md-content>
+    
