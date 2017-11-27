@@ -1,8 +1,8 @@
-<md-content flex layout="column" ng-if="!load && submenuNavItem == 'status'" ng-controller="managerStatusController"> 
+<md-content flex layout="column" ng-if="!load && submenuNavItem == 'status'" ng-controller="managerStatusController">
     <div class='uil-ring-css' ng-show="load"><div></div></div>
-    
+
     <div flex layout="column" ng-show="!load" layout-align="start stretch">
-        
+
         <div class="joinCardsRow" layout="row" layout-align="start stretch">
             <md-card flex ng-repeat="(k,v) in daemons">
                 <md-card-content class="manager-status-daemons-item">
@@ -87,7 +87,7 @@
                     </div>
                 </md-card-content>
             </md-card>
-            
+
             <md-card flex="50">
                 <md-card-content>
                     <h3 class="wazuh-h3">Last registered agent</h3>
@@ -123,28 +123,10 @@
                         <span layout="row">
                             <p class="manager-status-subtitle">Operating system</p>
                             <p class="right-text">{{agentInfo.os.name ? agentInfo.os.name + agentInfo.os.version : agentInfo.os.uname ? agentInfo.os.uname : '-'}}</p>
-                        </span>	
+                        </span>
                     </div>
                 </md-card-content>
             </md-card>
         </div>
     </div>
 </md-content>
-
-<style>
-    .manager-status-daemons-item,
-    .manager-status-statistics {
-        text-align: center;
-    }
-    .manager-status-item {
-        font-size: 19pt;
-    }
-    .manager-status-item-coverity {
-        font-size: 19pt;
-        text-align: center;
-    }
-    .manager-status-subtitle {
-        font-weight: bold; 
-        min-width: 150px
-    }
-</style>

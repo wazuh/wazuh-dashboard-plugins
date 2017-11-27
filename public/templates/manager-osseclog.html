@@ -1,5 +1,5 @@
 <div flex ng-cloak ng-if="!loading && submenuNavItem == 'logs'" layout="column" ng-controller="managerLogController" class="manager-background">
-    
+
     <div layout="row" layout-align="start start" class="manager-log-top-row">
         <md-input-container class="md-whiteframe-z1 manager-log-input-1" flex="20">
             <md-select id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
@@ -33,7 +33,6 @@
         <input flex placeholder="Filter" type="text" ng-model="searchTerm" ng-change="logs.addFilter('search', searchTerm)" class="input-filter-box manager-log-filter-box">
     </div>
 
-
     <div flex layout="column" class="md-padding">
 
         <md-toolbar flex layout="row" class="md-toolbar-tools">
@@ -59,41 +58,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .manager-log-buttonplay {
-        margin-top: 20px; 
-        width: 180px;
-    }
-    .manager-log-top-row {
-        height: 70px;
-        padding-right: 8px;
-    }
-    .manager-log-buttonplay-i {
-        margin-top: 0px; 
-        margin-right: 15px; 
-        margin-bottom: 5px;
-    }
-    .manager-log-input-1 {
-        margin-right: 15px;
-        margin-left: 15px;
-        padding: 3px
-    }
-    .manager-log-input-2 {
-        margin-right: 0px;
-        margin-left: 20px;
-        padding: 3px;
-        margin-right: 10px;
-    }
-    .manager-log-filter-box {
-        height: 35px; 
-        width:auto; 
-        margin-right: 15px;
-        margin-left: 15px;
-        padding: 3px;
-    }
-    .manager-log-list {
-        overflow: auto; 
-        height:400px;
-    }
-</style>

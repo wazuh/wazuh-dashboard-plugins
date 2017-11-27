@@ -1,3 +1,80 @@
+/* Common HTML styles */
+
+body {
+    min-width: 1250px;
+    width: 100%;
+}
+
+p {
+    margin-top: 4px !important;
+}
+
+body._md-toast-animating {
+    overflow-y: scroll !important;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    height: 120px;
+}
+
+/* Wazuh Header */
+
+.wazuh-h3 {
+    font-size: 18px !important;
+    font-weight: 400 !important;
+}
+
+.wazuh-h1 {
+    font-size: 24px !important;
+}
+
+/* Discover-Full Directive */
+
+.sidebar-container {
+    font-family: "Open Sans", Helvetica, Arial, sans-serif
+}
+
+/* Loading Ring styles */
+
+div.uil-ring-css {
+    transform: scale(0.6);
+    margin: auto;
+}
+
+.uil-ring-css {
+    background: none;
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.uil-ring-css>div {
+    position: absolute;
+    display: block;
+    width: 160px;
+    height: 160px;
+    top: 20px;
+    left: 20px;
+    border-radius: 80px;
+    box-shadow: 0 3px 0 0 #3caed2;
+    -webkit-transform-origin: 80px 81.5px;
+    transform-origin: 80px 81.5px;
+    -webkit-animation: uil-ring-anim 1.5s linear infinite;
+    animation: uil-ring-anim 1.5s linear infinite;
+}
+
+/* Navbar Directive */
+
+navbar {
+    padding: 0 0px 6px 7px;
+}
+
+.md-tab.md-active {
+    color: rgb(60, 174, 210) !important;
+}
+
 .headBar {
     background-color: #f7f7f7;
     min-width: 463px;
@@ -11,34 +88,8 @@
     background-color: rgb(228, 228, 228);
 }
 
-.tabView button._md-nav-button.md-accent.md-button.md-ink-ripple.md-active.md-primary {
-    background-color: rgb(228, 228, 228);
-    color: black;
-    border-radius: 0px;
-}
-
-.wazuh-h1 {
-    font-size: 24px !important;
-}
-
 .selectedItem {
     background-color: rgba(129, 200, 222, 0.7) !important
-}
-
-.list-no-hover>.md-button:not([disabled]):hover,
-.list-no-hover>.md-button.buttonBlueLight.md-default-theme:not([disabled]):hover,
-.list-no-hover>.md-button.buttonBlueLight.md-raised.md-primary:not([disabled]):hover,
-.md-button:not([disabled]):hover,
-.list-no-hover>.md-button.buttonMenu.md-default-theme:not([disabled]):hover,
-.md-button:not([disabled]):hover,
-.list-no-hover>.md-button.md-default-theme:not([disabled]):hover,
-.md-button:not([disabled]):hover {
-    background-color: transparent !important;
-}
-.md-button.buttonBlueLightSettings.md-raised.md-primary:not([disabled]):hover{
-    background-color: #3caed2 !important;
-    color: white !important;
-    box-shadow: none !important;
 }
 
 .json-beautifier {
@@ -58,4 +109,23 @@
 
 .json-string {
     color: olive;
+}
+
+/* Input filter box styles */
+
+.input-filter-box {
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
+    font-size: 14px;
+    padding: 0px 15px;
+    margin-top: 18px;
+    border: none;
+    height: 40px;
+    margin-right: 20px;
+}
+
+/* Progress Linear */
+
+md-progress-linear.md-default-theme ._md-bar,
+md-progress-linear ._md-bar {
+    background-color: #3caed2;
 }
