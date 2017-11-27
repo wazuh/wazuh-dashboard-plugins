@@ -125,6 +125,11 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 	}
 
 	$scope.applyAgent = agent => {
+		$rootScope.comeFromApplyAgent = true;
+		$location.search('id', agent.id);
+        $location.search('_a', null);
+        $location.search('tabView', 'panels');
+        $scope.tabView = 'panels';
 		if (agent) {
 			$scope.loading = true;
 			$scope.tab = 'overview';
@@ -162,20 +167,16 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 			}
 			
 			Promise.all([
-				$scope.checkAlerts($scope._agent.id),
 				apiReq.request('GET', `/syscheck/${agent.id}/last_scan`, {}),
 				apiReq.request('GET', `/rootcheck/${agent.id}/last_scan`, {})
 			])
 			.then(data => {
-				// Checkalerts
-				$scope.results = data[0];
-
 				// Syscheck
-				$scope.agentInfo.syscheck = data[1].data.data;
+				$scope.agentInfo.syscheck = data[0].data.data;
 				validateSysCheck();		
-
+				$scope.wazuhLoaded = true;
 				// Rootcheck
-				$scope.agentInfo.rootcheck = data[2].data.data;
+				$scope.agentInfo.rootcheck = data[1].data.data;
 				validateRootCheck();	
 
 				$scope.loading = false;

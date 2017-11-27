@@ -25,7 +25,7 @@
                 <md-tab-content flex layout fill>
                     <md-toolbar class="manager-groups-no-scroll" layout-fill>
                         <div flex layout="row" layout-fill>
-                            <md-card flex class="manager-groups-agents-card" layout-fill>
+                            <md-card flex class="manager-groups-files-card" layout-fill>
                                 <md-toolbar layout="row">
                                     <input flex="none" placeholder="Filter agents" type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)" class="input-filter-box manager-groups-right-search-box" />
                                 </md-toolbar>
@@ -60,7 +60,7 @@
                                 </md-toolbar>
                                 <md-content when-scrolled="groupAgents.nextPage('')">
                                     <md-list ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' class="agents-preview-table">
-                                        <md-list-item class="list-no-hover md-subhead" ng-click="showAgent(agent)">
+                                        <md-list-item class="md-subhead" ng-click="showAgent(agent)">
                                             <span flex="5">{{agent.id || 'Unknown'}}</span>
                                             <span flex="25">{{agent.name || 'Unknown'}}</span>
                                             <span flex="10">{{agent.ip || 'Unknown'}}</span>

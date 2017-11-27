@@ -115,8 +115,16 @@ const getIp =  (Promise, courier, config, $location, Private) => {
         const id = exists ? state.index : config.get('defaultIndex');
         state.destroy();
 
+        let onlyWazuhAlerts = [];
+
+        for (var i = 0; i < savedObjects.length; i++) {
+            if (savedObjects[i].attributes.title === 'wazuh-alerts-*') {
+                onlyWazuhAlerts.push(savedObjects[i]);
+            }
+        }
+
         return Promise.props({
-            list: savedObjects,
+            list: onlyWazuhAlerts,
             loaded: courier.indexPatterns.get(id),
             stateVal: state.index,
             stateValFound: specified && exists

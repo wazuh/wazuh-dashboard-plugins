@@ -53,7 +53,6 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     // Switch subtab
     $scope.switchSubtab = (subtab) => {
-        $location.search('_a', null);
         $scope.tabView = subtab;
     };
 

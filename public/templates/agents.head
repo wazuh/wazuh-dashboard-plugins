@@ -69,7 +69,7 @@
 		</div>
 
 		<!-- View: Discover -->
-		<div ng-if="tab !== 'preview' && _agent">
+		<div ng-if="tab !== 'preview' && wazuhLoaded">
 	    	<kbn-dis></kbn-dis>
 	    </div>
 
