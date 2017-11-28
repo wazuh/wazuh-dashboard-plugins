@@ -180,6 +180,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 				validateRootCheck();	
 
 				$scope.loading = false;
+				$scope.$digest();
 			})
 			.catch(error => notify.error(error.message));
 		}
