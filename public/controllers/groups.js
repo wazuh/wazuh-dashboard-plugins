@@ -32,9 +32,9 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         $scope.groupAgents.nextPage('');        
     };
 
-    $scope.showAgent = (agent) => {
-        $rootScope.comeFromGroups = agent;
-        $rootScope.comeFromGroupsTab = true;
+    $scope.showAgent = agent => {
+        $rootScope.globalAgent = agent;
+        $rootScope.comeFrom    = 'groups';
         $location.path('/agents');        
     };
 

@@ -150,6 +150,14 @@ routes
             "savedSearch": getSavedSearch
         }
     })
+    .when('/agents-preview', {
+        template: require('plugins/wazuh/templates/agents-prev.jade'),
+        resolve: {
+            "checkAPI": settingsWizard,
+            "ip": getIp,
+            "savedSearch": getSavedSearch
+        }
+    })
     .when('/manager/:tab?/', {
         template: require('plugins/wazuh/templates/manager.jade'),
         resolve: {

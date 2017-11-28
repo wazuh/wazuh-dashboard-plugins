@@ -88,7 +88,7 @@
 
     <md-content flex when-scrolled="agents.nextPage('')" class="agents-preview-agents-list">
         <md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="agents-preview-table">
-            <md-list-item ng-click="applyAgent(agent)" class="md-subhead agents-groups-preview">
+            <md-list-item ng-click="showAgent(agent)" class="md-subhead agents-groups-preview">
                 <span flex="5">{{agent.id || 'Unknown'}}</span>
                 <span flex="25">{{agent.name || 'Unknown'}}</span>
                 <span flex="10">{{agent.ip || 'Unknown'}}</span>
