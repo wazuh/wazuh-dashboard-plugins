@@ -1,6 +1,6 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsPreviewController', function ($scope, Notifier, genericReq, apiReq, appState, Agents) {
+app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier, genericReq, apiReq, appState, Agents, $location) {
     const notify       = new Notifier({ location: 'Agents - Preview' });
     $scope.loading     = true;
     $scope.agents      = Agents;
@@ -86,6 +86,12 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
             $scope.$digest();
         })
         .catch(error => notify.error(error.message));
+    };
+
+    $scope.showAgent = agent => {
+        $rootScope.globalAgent = agent;
+        $rootScope.comeFrom    = 'agentsPreview';
+        $location.path('/agents');        
     };
 
     //Load
