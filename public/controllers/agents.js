@@ -75,7 +75,7 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
         // Update the implicit filter
         if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
         else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
-        }
+        
     });
 
     // Agent data
