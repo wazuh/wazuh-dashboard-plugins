@@ -1,5 +1,3 @@
-import rison from 'rison-node';
-
 let app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq) {
@@ -58,7 +56,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     // Switch tab
     $scope.switchTab = (tab) => {
-        // Deleing app state traces in the url
+        // Deleting app state traces in the url
         $location.search('_a', null);
         $scope.tabView = 'panels';
     };
@@ -77,8 +75,8 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
     });
 
+    //PCI tab
     let tabs = [];
-    
     genericReq
         .request('GET', '/api/wazuh-api/pci/all')
         .then(data => {
