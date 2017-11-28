@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { getVisualizeLoader } from 'ui/visualize/loader';
+import 'ui/styles/theme.less'
 
 var app = require('ui/modules').get('apps/webinar_app', [])
     .directive('kbnVis', [function () {

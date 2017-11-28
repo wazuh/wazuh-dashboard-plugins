@@ -74,7 +74,7 @@
 	    </div>
 
 	    <!-- No results message -->
-	    <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels'">
+	    <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels' && tab !== 'preview'">
 	        <md-card flex layout="column">
 	            <md-card-content class="overview-fim-no-results">
 	                No results for selected time interval

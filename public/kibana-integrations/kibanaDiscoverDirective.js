@@ -765,6 +765,7 @@ function discoverController(
     if ($scope.tab) {
     let implicitFilter = [];
 
+    // The cluster filter
     implicitFilter.push(
       {
         "meta":{

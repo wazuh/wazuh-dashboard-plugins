@@ -158,13 +158,10 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 			$location.search('id', $scope._agent.id);
 
 			// Update the implicit filter
-			if ($scope.tab !== 'preview') {
-				if (!tabFilters[$scope.tab].group) {
-					$rootScope.currentImplicitFilter = `agent.id : "${$scope._agent.id}"`;
-				} else {
-					$rootScope.currentImplicitFilter = `agent.id : "${$scope._agent.id}" rule.groups : "${tabFilters[$scope.tab].group}"`;
-				}
-			}
+	        if ($scope.tab !== 'preview') {
+	        	if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
+	        	else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
+	        }
 			
 			Promise.all([
 				apiReq.request('GET', `/syscheck/${agent.id}/last_scan`, {}),
