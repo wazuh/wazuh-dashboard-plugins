@@ -37,7 +37,7 @@ app.factory('DataHandler', function ($q, apiReq) {
                 if (filter.value !== '') requestData[filter.name] = filter.value;
             }
 
-            if(this.offset >= this.totalItems){
+            if(this.offset !== 0 && this.offset >= this.totalItems){
                 this.end = true;
                 this.busy = false;
                 return;
@@ -46,17 +46,19 @@ app.factory('DataHandler', function ($q, apiReq) {
             apiReq.request('GET', this.path, requestData)
             .then(data => {
                 if (data.data.data === 0){
+                    this.busy = false;
                     deferred.resolve(false);
                 }
                 this.totalItems = data.data.data.totalItems;
-                let items      = data.data.data.items;
+                let items       = data.data.data.items;
                 for (let i = 0,len = items.length; i < len; i++) {
                     this.items.push(items[i]);
                     this.items[i].selected = false;
                 }
                 this.offset += items.length;
-                (this.offset >= this.totalItems) ? this.end = true: this.busy = false;
+                if (this.offset >= this.totalItems) this.end = true; 
                 if (data.data.data !== 0){
+                    this.busy = false;
                     deferred.resolve(true);
                 }
             })

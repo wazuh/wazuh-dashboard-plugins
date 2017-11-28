@@ -60,7 +60,7 @@
                                 </md-toolbar>
                                 <md-content when-scrolled="groupAgents.nextPage('')">
                                     <md-list ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' class="agents-preview-table">
-                                        <md-list-item class="md-subhead" ng-click="showAgent(agent)">
+                                        <md-list-item class="md-subhead agents-groups-preview" ng-click="showAgent(agent)">
                                             <span flex="5">{{agent.id || 'Unknown'}}</span>
                                             <span flex="25">{{agent.name || 'Unknown'}}</span>
                                             <span flex="10">{{agent.ip || 'Unknown'}}</span>
