@@ -2,7 +2,6 @@
 //////////////////////////////////////       WAZUH             //////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 require('ui/modules').get('app/wazuh', []).directive('kbnDis', [function() {
     return {
         restrict: 'E',
@@ -46,7 +45,6 @@ import 'ui/pager';
 import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
 import { FilterManagerProvider } from 'ui/filter_manager';
 import { documentationLinks } from 'ui/documentation_links/documentation_links';
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,6 +134,7 @@ function discoverController(
     return interval.val !== 'custom';
   };
 
+ // Commented because we don't want the menu in the discover (it actually doesn't work properly because a lack of dependencies)
  /*
   $scope.topNavMenu = [{
     key: 'new',
@@ -160,7 +159,6 @@ function discoverController(
   }];
   */
   $scope.timefilter = timefilter;
-
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
@@ -325,14 +323,17 @@ function discoverController(
           ////////////////////////////////////////////////////////////////////////////
           $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
           $rootScope.$broadcast('fetch');
+
+          console.log("Updating filterbar", queryFilter.getFilters());
+          if ($rootScope.comeFromApplyAgent) {
+            console.log("Applying from agent");
+            loadFilters();
+            $rootScope.comeFromApplyAgent = false;
+          }
           ////////////////////////////////////////////////////////////////////////////
           ////////////////////////////////////////////////////////////////////////////
           ////////////////////////////////////////////////////////////////////////////
 
-          if ($rootScope.comeFromApplyAgent) {
-            loadFilters();
-            $rootScope.comeFromApplyAgent = false;
-          }
           $state.save();
         });
       });
@@ -497,6 +498,9 @@ function discoverController(
     $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
     $rootScope.loadedVisualizations = 0;
     $rootScope.$broadcast('fetch');
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
 
     $state.query = migrateLegacyQuery(query);
     $scope.fetch();
@@ -763,39 +767,9 @@ function discoverController(
 
   function loadFilters() {
     if ($scope.tab) {
-    let implicitFilter = [];
+      let implicitFilter = [];
 
-    // The cluster filter
-    implicitFilter.push(
-      {
-        "meta":{
-          "removable":false,
-          "index":$scope.indexPattern.id,
-          "negate":false,
-          "disabled":false,
-          "alias":null,
-          "type":"phrase",
-          "key":"cluster.name",
-          "value":appState.getClusterInfo().cluster,
-          "params":{
-            "query":appState.getClusterInfo().cluster,
-            "type":"phrase"}
-        },
-        "query":{
-          "match":{
-            "cluster.name":{
-              "query":appState.getClusterInfo().cluster,
-              "type":"phrase"}
-            }
-        },
-        "$state":{
-          "store":"appState"
-        }
-      }
-    );
-
-    // Check if we are in the agents page and add the proper agent filter
-    if ($rootScope.page === 'agents' && $location.search().id !== "" && $location.search().id !== null && angular.isUndefined($location.search().id) !== true) {
+      // The cluster filter
       implicitFilter.push(
         {
           "meta":{
@@ -805,16 +779,16 @@ function discoverController(
             "disabled":false,
             "alias":null,
             "type":"phrase",
-            "key":"agent.id",
-            "value":$location.search().id,
+            "key":"cluster.name",
+            "value":appState.getClusterInfo().cluster,
             "params":{
-              "query":$location.search().id,
+              "query":appState.getClusterInfo().cluster,
               "type":"phrase"}
           },
           "query":{
             "match":{
-              "agent.id":{
-                "query":$location.search().id,
+              "cluster.name":{
+                "query":appState.getClusterInfo().cluster,
                 "type":"phrase"}
               }
           },
@@ -823,32 +797,9 @@ function discoverController(
           }
         }
       );
-    }
 
-    // Build the full query using the implicit filter
-    if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
-      if ($rootScope.currentImplicitFilter === "pci_dss") {
-        implicitFilter.push(
-          {
-            "meta":{
-              "removable":false,
-              "index":$scope.indexPattern.id,
-              "negate":false,
-              "disabled":false,
-              "alias":null,
-              "type":"exists",
-              "key":"rule.pci_dss",
-              "value":"exists"
-            },
-            "exists":{
-              "field":"rule.pci_dss"
-            },
-            "$state":{
-              "store":"appState"
-            }
-          }
-        );
-      } else {
+      // Check if we are in the agents page and add the proper agent filter
+      if ($rootScope.page === 'agents' && $location.search().id !== "" && $location.search().id !== null && angular.isUndefined($location.search().id) !== true) {
         implicitFilter.push(
           {
             "meta":{
@@ -858,20 +809,18 @@ function discoverController(
               "disabled":false,
               "alias":null,
               "type":"phrase",
-              "key":"rule.groups",
-              "value":$rootScope.currentImplicitFilter,
+              "key":"agent.id",
+              "value":$location.search().id,
               "params":{
-                  "query":$rootScope.currentImplicitFilter,
-                  "type":"phrase"
-              }
+                "query":$location.search().id,
+                "type":"phrase"}
             },
             "query":{
               "match":{
-                "rule.groups":{
-                  "query":$rootScope.currentImplicitFilter,
-                  "type":"phrase"
+                "agent.id":{
+                  "query":$location.search().id,
+                  "type":"phrase"}
                 }
-              }
             },
             "$state":{
               "store":"appState"
@@ -879,10 +828,66 @@ function discoverController(
           }
         );
       }
-    }
 
-    queryFilter.addFilters(implicitFilter);
-  }
+      // Build the full query using the implicit filter
+      if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
+        if ($rootScope.currentImplicitFilter === "pci_dss") {
+          implicitFilter.push(
+            {
+              "meta":{
+                "removable":false,
+                "index":$scope.indexPattern.id,
+                "negate":false,
+                "disabled":false,
+                "alias":null,
+                "type":"exists",
+                "key":"rule.pci_dss",
+                "value":"exists"
+              },
+              "exists":{
+                "field":"rule.pci_dss"
+              },
+              "$state":{
+                "store":"appState"
+              }
+            }
+          );
+        } else {
+          implicitFilter.push(
+            {
+              "meta":{
+                "removable":false,
+                "index":$scope.indexPattern.id,
+                "negate":false,
+                "disabled":false,
+                "alias":null,
+                "type":"phrase",
+                "key":"rule.groups",
+                "value":$rootScope.currentImplicitFilter,
+                "params":{
+                    "query":$rootScope.currentImplicitFilter,
+                    "type":"phrase"
+                }
+              },
+              "query":{
+                "match":{
+                  "rule.groups":{
+                    "query":$rootScope.currentImplicitFilter,
+                    "type":"phrase"
+                  }
+                }
+              },
+              "$state":{
+                "store":"appState"
+              }
+            }
+          );
+        }
+      }
+
+      console.log("These are the implicit filters", implicitFilter);
+      queryFilter.addFilters(implicitFilter);
+    }
   }
 
   // Getting the location from the url

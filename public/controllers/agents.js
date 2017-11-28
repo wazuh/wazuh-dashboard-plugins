@@ -1,25 +1,29 @@
-import rison from 'rison-node';
-// Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('agentsController', 
-function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
-	const notify              = new Notifier({ location: 'Agents' });
-	$rootScope.page           = 'agents';
+function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
+	$rootScope.page = 'agents';
+    $scope.extensions = appState.getExtensions().extensions;
 	$scope.agentsAutoComplete = AgentsAutoComplete;
+	const notify = new Notifier({ location: 'Agents' });
 
+    // Check the url hash and retriew the tabView information 
 	if ($location.search().tabView){
 		$scope.tabView = $location.search().tabView;
-	} else {
+	} else { // If tabView doesn't exist, default it to 'panels' view
 		$scope.tabView = "panels";
 		$location.search("tabView", "panels");
 	}
 
+    // Check the url hash and retrivew the tab information 
 	if ($location.search().tab){
 		$scope.tab = $location.search().tab;
-	} else {
-		$scope.tab = "preview";
-		$location.search("tab", "preview");
+	} else { // If tab doesn't exist, default it to 'general' view
+		$scope.tab = "general";
+		$location.search("tab", "general");
+
+        // Now we initialize the implicitFilter
+        $rootScope.currentImplicitFilter = "";
 	}
 
     $scope.hideRing = (items) => {
@@ -28,13 +32,13 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 
 	// Object for matching nav items and Wazuh groups
 	let tabFilters = {
-		"overview": {
+		"general": {
 			"group": ""
 		},
 		"fim": {
 			"group": "syscheck"
 		},
-		"policy_monitoring": {
+		"pm": {
 			"group": "rootcheck"
 		},
 		"oscap": {
@@ -54,7 +58,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
     };
 
 	$scope.switchTab = (tab) => {
-        // Deleing app state traces in the url
+        // Deleting app state traces in the url
         $location.search('_a', null);
         $scope.tabView = 'panels';
 	};
@@ -69,15 +73,12 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
     $scope.$watch('tab', () => {
         $location.search('tab', $scope.tab);
         // Update the implicit filter
-        if ($scope.tab !== 'preview') {
-        	if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
-        	else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
+        if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
+        else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
         }
     });
 
-	//Print Error
-	const printError = (error) => notify.error(error.message);
-
+    // Agent data
 	$scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "green" : "red";
 
 	$scope.formatAgentStatus = (agentStatus) => {
@@ -85,124 +86,70 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 		return (condition) ? "Never connected" : agentStatus;
 	};
 
-	$scope.extensionStatus = (extension) => appState.getExtensions().extensions[extension];
-
 	const calculateMinutes = (start,end) => {
 		let time    = new Date(start);
 		let endTime = new Date(end);
-		let minutes         = ((endTime - time) / 1000) / 60;
+		let minutes = ((endTime - time) / 1000) / 60;
 		return minutes;
 	}
 
 	const validateRootCheck = () => {
-		$scope.agentInfo.rootcheck.duration = 'Unknown';
-		if ($scope.agentInfo.rootcheck.end && $scope.agentInfo.rootcheck.start) {
-			let minutes = calculateMinutes($scope.agentInfo.rootcheck.start, $scope.agentInfo.rootcheck.end);
-			$scope.agentInfo.rootcheck.duration = window.Math.round(minutes);
+		$scope.agent.rootcheck.duration = 'Unknown';
+		if ($scope.agent.rootcheck.end && $scope.agent.rootcheck.start) {
+			let minutes = calculateMinutes($scope.agent.rootcheck.start, $scope.agent.rootcheck.end);
+			$scope.agent.rootcheck.duration = window.Math.round(minutes);
 		} else {
-			if (!$scope.agentInfo.rootcheck.end) {
-				$scope.agentInfo.rootcheck.end = 'Unknown';
+			if (!$scope.agent.rootcheck.end) {
+				$scope.agent.rootcheck.end = 'Unknown';
 			} 
-			if (!$scope.agentInfo.rootcheck.start){
-				$scope.agentInfo.rootcheck.start = 'Unknown';
+			if (!$scope.agent.rootcheck.start){
+				$scope.agent.rootcheck.start = 'Unknown';
 			}
 		}	
 	}
 
 	const validateSysCheck = () => {
-		$scope.agentInfo.syscheck.duration = 'Unknown';
-		if ($scope.agentInfo.syscheck.end && $scope.agentInfo.syscheck.start) {
-			let minutes  = calculateMinutes($scope.agentInfo.syscheck.start, $scope.agentInfo.syscheck.end);
-			$scope.agentInfo.syscheck.duration = window.Math.round(minutes);
+		$scope.agent.syscheck.duration = 'Unknown';
+		if ($scope.agent.syscheck.end && $scope.agent.syscheck.start) {
+			let minutes  = calculateMinutes($scope.agent.syscheck.start, $scope.agent.syscheck.end);
+			$scope.agent.syscheck.duration = window.Math.round(minutes);
 		} else {
-			if (!$scope.agentInfo.syscheck.end) {
-				$scope.agentInfo.syscheck.end = 'Unknown';
+			if (!$scope.agent.syscheck.end) {
+				$scope.agent.syscheck.end = 'Unknown';
 			} 
-			if (!$scope.agentInfo.syscheck.start){
-				$scope.agentInfo.syscheck.start = 'Unknown';
+			if (!$scope.agent.syscheck.start){
+				$scope.agent.syscheck.start = 'Unknown';
 			}
 		}
 	}
 
-	$scope.applyAgent = agent => {
-		$rootScope.comeFromApplyAgent = true;
-		$location.search('id', agent.id);
-        $location.search('_a', null);
-        $location.search('tabView', 'panels');
-        $scope.tabView = 'panels';
-		if (agent) {
-			$scope.loading = true;
-			$scope.tab = 'overview';
-			$location.search('tab', 'overview');
+	$scope.getAgent = () => {
+		$scope.agent = Object.assign($rootScope.globalAgent);
+		delete $rootScope.globalAgent;
 
-			$scope.agentInfo = agent;
-			$rootScope.agent = $scope.agentInfo;
+		$location.search('id', $scope.agent.id);
+		
+		Promise.all([
+			apiReq.request('GET', `/syscheck/${$scope.agent.id}/last_scan`, {}),
+			apiReq.request('GET', `/rootcheck/${$scope.agent.id}/last_scan`, {})
+		])
+		.then(data => {
+			// Syscheck
+			$scope.agent.syscheck = data[0].data.data;
+			validateSysCheck();		
+			// Rootcheck
+			$scope.agent.rootcheck = data[1].data.data;
+			validateRootCheck();	
 
-			if (typeof $scope.agentInfo.version === 'undefined') {
-				$scope.agentInfo.version = 'Unknown';
-			}
-
-			$scope.agentOs = 'Unknown';
-			if(typeof $scope.agentInfo.os !== 'undefined' && typeof $scope.agentInfo.os.platform !== 'undefined'){
-				$scope.agentOs = $scope.agentInfo.os.platform;
-			}
-
-			if (typeof $scope.agentInfo.lastKeepAlive === 'undefined') {
-				$scope.agentInfo.lastKeepAlive = 'Unknown';
-			}
-			$scope._agent = agent;
-			$scope.search = agent.name;
-			$location.search('id', $scope._agent.id);
-
-			// Update the implicit filter
-	        if ($scope.tab !== 'preview') {
-	        	if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
-	        	else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
-	        }
-			
-			Promise.all([
-				apiReq.request('GET', `/syscheck/${agent.id}/last_scan`, {}),
-				apiReq.request('GET', `/rootcheck/${agent.id}/last_scan`, {})
-			])
-			.then(data => {
-				// Syscheck
-				$scope.agentInfo.syscheck = data[0].data.data;
-				validateSysCheck();		
-				$scope.wazuhLoaded = true;
-				// Rootcheck
-				$scope.agentInfo.rootcheck = data[1].data.data;
-				validateRootCheck();	
-
-				$scope.loading = false;
-				$scope.$digest();
-			})
-			.catch(error => notify.error(error.message));
-		}
+			$scope.$digest();
+		})
+		.catch(error => notify.error(error.message));
 	};
-
-	// Copy agent from groups tab
-	if($rootScope.comeFromGroups){
-		let tmpAgent = Object.assign($rootScope.comeFromGroups);
-		delete $rootScope.comeFromGroups;
-		$scope.applyAgent(tmpAgent);
-	}
-
-	// Watch for timefilter changes
-	$scope.$on('$routeUpdate', () => {
-		// Check if tab is empty, then reset to preview
-		if (typeof $location.search().tab === 'undefined' && 
-			typeof $location.search().id === 'undefined') {
-
-			$scope.tab = "preview";
-			delete $scope._agent;
-			$scope.search = "";
-		}
-	});
 
 	//Load
 	try {
-		$scope.agentsAutoComplete.nextPage('')
-		.then(() => $scope.loading = false);
+		$scope.getAgent();
+		$scope.agentsAutoComplete.nextPage('');
 	} catch (e) {
 		notify.error('Unexpected exception loading controller');
 	}
@@ -210,8 +157,7 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 	//Destroy
 	$scope.$on("$destroy", () => $scope.agentsAutoComplete.reset());
 
-	$scope._fimEvent = 'all';
-
+	//PCI tab
 	let tabs = [];
 	genericReq.request('GET', '/api/wazuh-api/pci/all')
 		.then((data) => {
@@ -225,18 +171,4 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 
 	$scope.tabs 		 = tabs;
 	$scope.selectedIndex = 0;
-
-	$scope.addTab = (title, view) => {
-		view = view || title + " Content View";
-		tabs.push({
-			title:    title,
-			content:  view,
-			disabled: false
-		});
-	};
-
-	$scope.removeTab = (tab) => {
-		let index = tabs.indexOf(tab);
-		tabs.splice(index, 1);
-	};
 });

@@ -4,106 +4,79 @@
 		<menu-top></menu-top>
     </md-content>
 
-	<div flex layout="column" id="content" style="{{(tabView != 'discover') ? 'background-color: #e4e4e4' : ''}}" >
-		<div layout="row" layout-align="space-between start" style="background-color: #f7f7f7">
-			<md-toolbar style="height: 50px;">
-				<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-					<div style="text-transform: none; font-size: 20px;" ng-if="_agent">
-						<div style="float: left;margin-top: 3px;margin-right: 11px;">
-							<span> <i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i>
-							{{_agent.id}} - {{_agent.name}}</span><span ng-show="_agent.id == '000'">(Manager)</span>
-						</div>
-
-						<div style="float: left;margin-right: 11px;">
-							<span ng-show="_agent.status" ng-class="getAgentStatusClass(_agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(_agent.status)}}</span>
-						</div>
+	<div layout="row" layout-align="space-between start" style="background-color: #f7f7f7">
+		<md-toolbar style="height: 50px;">
+			<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+				<div style="text-transform: none; font-size: 20px;" ng-if="agent">
+					<div style="float: left;margin-top: 3px;margin-right: 11px;">
+						<span> <i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i>
+						{{agent.id}} - {{agent.name}}</span><span ng-show="agent.id === '000'">(Manager)</span>
 					</div>
 
-					<div ng-if="!_agent">
-						<h2 class="wazuh-h2" style="text-transform: none; font-size: 20px;">
-							<i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i> Agents preview
-						</h2>
+					<div style="float: left;margin-right: 11px;">
+						<span ng-show="agent.status" ng-class="getAgentStatusClass(agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(agent.status)}}</span>
 					</div>
-
-					<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-						<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="applyAgent(_swpagent)" md-search-text="searchTerm" md-items="agent in agentsAutoComplete.items" md-item-text="agent.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address">
-							<md-item-template>
-								<span class="item-title">
-									<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agent.name}} ({{agent.id}}) </strong></span>
-								</span>
-								<span class="item-metadata">
-									<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agent.ip}} ({{agent.status}}) </span>
-								</span>
-							</md-item-template>
-							<md-not-found>
-								No agents matching "{{searchTerm}}" were found.
-							</md-not-found>
-						</md-autocomplete>
-					</span>
 				</div>
-			</md-toolbar>
+
+				<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
+					<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="getAgent(_swpagent)" md-search-text="searchTerm" md-items="agent in agentsAutoComplete.items" md-item-text="agent.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address">
+						<md-item-template>
+							<span class="item-title">
+								<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agent.name}} ({{agent.id}}) </strong></span>
+							</span>
+							<span class="item-metadata">
+								<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agent.ip}} ({{agent.status}}) </span>
+							</span>
+						</md-item-template>
+						<md-not-found>
+							No agents matching "{{searchTerm}}" were found.
+						</md-not-found>
+					</md-autocomplete>
+				</span>
+			</div>
+		</md-toolbar>
+	</div>
+
+	<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
+		<div class="horizontalTabsBar" layout="column" layout-align="center start">
+			<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+				<md-nav-item md-nav-click="switchTab('general')" name="general">General</md-nav-item>
+				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
+				<md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy Monitoring</md-nav-item>
+				<md-nav-item ng-hide="agent.os.platform === 'windows'" md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensions.oscap">SCAP</md-nav-item>
+				<md-nav-item ng-hide="agent.os.platform === 'windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
+				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
+			</md-nav-bar>
 		</div>
 
-		<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
-			<div ng-show="_agent" class="horizontalTabsBar" layout="column" layout-align="center start">
-				<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="tab"  ng-init="tab = 'preview'" nav-bar-aria-label="navigation submenu">
-					<md-nav-item md-nav-click="switchTab('overview')" name="overview">Overview</md-nav-item>
-					<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
-					<md-nav-item md-nav-click="switchTab('policy_monitoring');" name="policy_monitoring">Policy Monitoring</md-nav-item>
-					<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensionStatus('oscap')">SCAP</md-nav-item>
-					<md-nav-item ng-hide="_agent.os.platform=='windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensionStatus('audit')">Audit</md-nav-item>
-					<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensionStatus('pci')">PCI DSS</md-nav-item>
-				</md-nav-bar>
-			</div>
-
-			<div ng-show="_agent" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
-				<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
-					<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-						<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
-					</md-nav-item>
-					<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-						<img style="width: 16px; margin-right: 6px;" kbn-src="/plugins/wazuh/img/discover.svg">Discover
-					</md-nav-item>
-				</md-nav-bar>
-			</div>
+		<div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
+			<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
+					<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
+				</md-nav-item>
+				<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
+					<img style="width: 16px; margin-right: 6px;" kbn-src="/plugins/wazuh/img/discover.svg">Discover
+				</md-nav-item>
+			</md-nav-bar>
 		</div>
+	</div>
 
-		<!-- View: Discover -->
-		<div ng-if="tab !== 'preview' && wazuhLoaded">
-	    	<kbn-dis></kbn-dis>
-	    </div>
+    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-	    <!-- No results message -->
-	    <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels' && tab !== 'preview'">
-	        <md-card flex layout="column">
-	            <md-card-content class="overview-fim-no-results">
-	                No results for selected time interval
-	            </md-card-content>
-	        </md-card>
-	    </md-content>
+	<!-- View: Discover -->
+    <kbn-dis></kbn-dis>
+
+    <!-- No results message -->
+    <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels'">
+        <md-card flex layout="column">
+            <md-card-content class="agents-head-no-results">
+                No results for selected time interval
+            </md-card-content>
+        </md-card>
+    </md-content>
 
     <style>
-    .overview-fim-metrics-div{
-        height: 300px;
-    }
-    .overview-fim-no-results {
+    .agents-head-no-results {
         text-align: center;
     }
-    .overview-fim-discover {
-        background-color: white
-    }
-    .overview-fim-last-file,
-    .overview-fim-most-file {
-        text-align: center;
-    }
-    .overview-fim-file-changes-div {
-        height: 213px;
-    }
-    .overview-fim-last-file-div,
-    .overview-fim-most-file-div {
-        height: 100px;
-    }
-    .overview-fim-events-summary {
-        height: 530px;
-    }
-</style>
+	</style>
