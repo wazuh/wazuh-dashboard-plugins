@@ -88,6 +88,12 @@ app.controller('agentsPreviewController', function ($scope, Notifier, genericReq
         .catch(error => notify.error(error.message));
     };
 
+    $scope.showAgent = agent => {
+        $rootScope.globalAgent = agent;
+        $rootScope.comeFrom    = 'agentspreview';
+        $location.path('/agents');        
+    };
+
     //Load
     try {
         load();
