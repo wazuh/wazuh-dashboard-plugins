@@ -143,16 +143,13 @@ function ($scope, $q, $routeParams, $route, $location, $rootScope, timefilter, N
 			}
 
 			$scope.agentOs = 'Unknown';
-			if (typeof $scope.agentInfo.os !== 'undefined' && typeof $scope.agentInfo.os.name !== 'undefined') {
-				$scope.agentOs = `${$scope.agentInfo.os.name} ${$scope.agentInfo.os.version}`;
-			} else if (typeof $scope.agentInfo.os !== 'undefined' && typeof $scope.agentInfo.os.uname !== 'undefined') {
-				$scope.agentOs = $scope.agentInfo.os.uname;
+			if(typeof $scope.agentInfo.os !== 'undefined' && typeof $scope.agentInfo.os.platform !== 'undefined'){
+				$scope.agentOs = $scope.agentInfo.os.platform;
 			}
 
 			if (typeof $scope.agentInfo.lastKeepAlive === 'undefined') {
 				$scope.agentInfo.lastKeepAlive = 'Unknown';
 			}
-
 			$scope._agent = agent;
 			$scope.search = agent.name;
 			$location.search('id', $scope._agent.id);
