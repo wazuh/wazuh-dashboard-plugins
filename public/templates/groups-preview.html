@@ -3,9 +3,9 @@
     <div flex="25" layout="column" class="manager-groups-left-col">
         <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
             class="input-filter-box manager-groups-left-search-box"/>
-        <md-card flex class="manager-groups-left-panel" when-scrolled="groups.nextPage('')">
-            <md-content layout="column" ng-init="selectedGroup = 0;">
-                <md-card flex ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-class="{selectedItem:($parent.selectedGroup == $index)}"
+        <md-card flex class="manager-groups-left-panel" >
+            <md-content layout="column" ng-init="selectedGroup = 0;" when-scrolled="groups.nextPage('')">
+                <md-card flex class="group-list-preview" ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-class="{selectedItem:($parent.selectedGroup == $index)}"
                     ng-click="$parent.loadGroup($index)">
                     <md-card-content>
                         <span class="md-headline">{{group.name}} ({{group.count}})</span>
