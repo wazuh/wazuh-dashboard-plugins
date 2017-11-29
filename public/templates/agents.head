@@ -19,13 +19,13 @@
 				</div>
 
 				<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
-					<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="getAgent(_swpagent)" md-search-text="searchTerm" md-items="agent in agentsAutoComplete.items" md-item-text="agent.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address">
+					<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="getAgent(_swpagent)" md-search-text="searchTerm" md-items="agentAutoComplete in agentsAutoComplete.items" md-item-text="agentAutoComplete.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address">
 						<md-item-template>
 							<span class="item-title">
-								<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agent.name}} ({{agent.id}}) </strong></span>
+								<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>
 							</span>
 							<span class="item-metadata">
-								<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agent.ip}} ({{agent.status}}) </span>
+								<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
 							</span>
 						</md-item-template>
 						<md-not-found>
