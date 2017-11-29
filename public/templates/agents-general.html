@@ -6,20 +6,20 @@
         <div layout="row" class="agents-overview-top-metric-row">
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.name}}</div>
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.name}}</div>
                     <div class="ng-binding">Name</div>
                 </md-card-content>
             </md-card>
             <md-card  flex="10">
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.ip}}</div>
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.ip}}</div>
                     <div class="ng-binding">IP Address</div>
                 </md-card-content>
             </md-card>
             <md-card flex="10">
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{ agentInfo.version | limitTo: 12 }}{{agentInfo.version.length > 12 ? '...' : ''}}</div>
-                    <md-tooltip md-direction="bottom">{{ agentInfo.version }}</md-tooltip>
+                    <div class="metric-value ng-binding agents-overview-size-14">{{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</div>
+                    <md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>
                     <div class="ng-binding">Version</div>
                 </md-card-content>
             </md-card>
@@ -33,36 +33,36 @@
         </div>
 
         <div layout="row" class="agents-overview-second-row">
-            <md-card flex ng-show="agentInfo.id != '000'">
+            <md-card flex ng-show="agent.id != '000'">
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.lastKeepAlive}}</div>
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.lastKeepAlive}}</div>
                     <div class="ng-binding">Last keep alive</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.dateAdd}}</div>
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.dateAdd}}</div>
                     <div class="ng-binding">Registration date</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.syscheck.end || 'Unknown'}}</div>
-                    <md-tooltip ng-if="agentInfo.syscheck.start && agentInfo.syscheck.end" md-direction="bottom">
-                        Start time: {{ agentInfo.syscheck.start }} <br>
-                        End time: {{ agentInfo.syscheck.end }} <br>
-                        Duration time: {{ agentInfo.syscheck.duration }} minutes
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.syscheck.end || 'Unknown'}}</div>
+                    <md-tooltip ng-if="agent.syscheck.start && agent.syscheck.end" md-direction="bottom">
+                        Start time: {{ agent.syscheck.start }} <br>
+                        End time: {{ agent.syscheck.end }} <br>
+                        Duration time: {{ agent.syscheck.duration }} minutes
                     </md-tooltip>
                     <div class="ng-binding">Last syscheck scan</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agentInfo.rootcheck.end || 'Unknown'}}</div>
-                    <md-tooltip ng-if="agentInfo.rootcheck.start && agentInfo.rootcheck.end" md-direction="bottom">
-                        Start time: {{ agentInfo.rootcheck.start }} <br>
-                        End time: {{ agentInfo.rootcheck.end }} <br>
-                        Duration time: {{ agentInfo.rootcheck.duration }} minutes
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.rootcheck.end || 'Unknown'}}</div>
+                    <md-tooltip ng-if="agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom">
+                        Start time: {{ agent.rootcheck.start }} <br>
+                        End time: {{ agent.rootcheck.end }} <br>
+                        Duration time: {{ agent.rootcheck.duration }} minutes
                     </md-tooltip>
                     <div class="ng-binding">Last rootcheck scan</div>
                 </md-card-content>

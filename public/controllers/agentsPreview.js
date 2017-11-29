@@ -15,7 +15,6 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
     let tmpUrl  = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.name`;
     let tmpUrl2 = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.id`;
 
-
     // Retrieve os list
     const retrieveList = () => {
         for(let agent of $scope.agents.items){
@@ -33,7 +32,6 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
             }
         }
     }
-
 
     const load = () => {
         Promise.all([

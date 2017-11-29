@@ -2,13 +2,13 @@
     
         <div layout="row" layout-align="space-between stretch">
             <md-card flex class="cardHover agents-preview-metrics-left">
-                <md-card-content class="agents-preview-metrics" ng-click="applyAgent(lastAgent)">
+                <md-card-content class="agents-preview-metrics" ng-click="showAgent(lastAgent)">
                     <div class="metric-value ng-binding agents-preview-metrics-item">{{lastAgent.name}}</div>
                     <div class="ng-binding">Last registered agent</div>
                 </md-card-content>
             </md-card>
             <md-card flex class="cardHover">
-                <md-card-content class="agents-preview-metrics" ng-click="applyAgent(mostActiveAgent)">
+                <md-card-content class="agents-preview-metrics" ng-click="showAgent(mostActiveAgent)">
                     <div class="metric-value ng-binding agents-preview-metrics-item">{{mostActiveAgent.name}}</div>
                     <div class="ng-binding">Higher activity</div>
                 </md-card-content>

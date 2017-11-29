@@ -324,9 +324,7 @@ function discoverController(
           $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
           $rootScope.$broadcast('fetch');
 
-          console.log("Updating filterbar", queryFilter.getFilters());
           if ($rootScope.comeFromApplyAgent) {
-            console.log("Applying from agent");
             loadFilters();
             $rootScope.comeFromApplyAgent = false;
           }
@@ -762,7 +760,7 @@ function discoverController(
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   function loadFilters() {
@@ -885,7 +883,6 @@ function discoverController(
         }
       }
 
-      console.log("These are the implicit filters", implicitFilter);
       queryFilter.addFilters(implicitFilter);
     }
   }
@@ -893,6 +890,7 @@ function discoverController(
   // Getting the location from the url
   $scope.tabView = $location.search().tabView;
   $scope.tab = $location.search().tab;
+  if ($rootScope.page === 'agents') $scope.agentId = $location.search().id;
 
   // Initial loading of filters
  loadFilters(); 
@@ -909,6 +907,13 @@ function discoverController(
 
       $scope.tab = $location.search().tab;
 
+      loadFilters();
+    }
+    if ($location.search().id !=  $scope.agentId) { // Changing filters
+
+      $scope.agentId = $location.search().id;
+
+      queryFilter.removeAll();
       loadFilters();
     }
   });

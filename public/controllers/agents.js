@@ -75,7 +75,6 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
         // Update the implicit filter
         if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
         else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
-        }
     });
 
     // Agent data
@@ -123,22 +122,36 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 		}
 	}
 
-	$scope.getAgent = () => {
-		$scope.agent = Object.assign($rootScope.globalAgent);
-		delete $rootScope.globalAgent;
+	$scope.getAgent = newAgentId => {
+		let id = null;
 
-		$location.search('id', $scope.agent.id);
-		
+		// There's already an id in the url, so let's use this one
+		if ($location.search().id) {
+			$scope.agent.id = $location.search().id;
+		}
+		else { // There's no id, let's fetch one
+			if (!newAgent) { // They didn't pass an agent id, it should be in the rootScope then
+				$scope.agent.id = $rootScope.globalAgent;
+				delete $rootScope.globalAgent;
+			} else { // They passed one, let's use it
+				$scope.agent.id = newAgentId;
+			}
+			$location.search('id', $scope.agent.id);
+		}
+
 		Promise.all([
+			apiReq.request('GET', `/agents/${$scope.agent.id}`, {}),
 			apiReq.request('GET', `/syscheck/${$scope.agent.id}/last_scan`, {}),
 			apiReq.request('GET', `/rootcheck/${$scope.agent.id}/last_scan`, {})
 		])
 		.then(data => {
+			// Agent
+			$scope.agent = data[0].data.data;
 			// Syscheck
-			$scope.agent.syscheck = data[0].data.data;
+			$scope.agent.syscheck = data[1].data.data;
 			validateSysCheck();		
 			// Rootcheck
-			$scope.agent.rootcheck = data[1].data.data;
+			$scope.agent.rootcheck = data[2].data.data;
 			validateRootCheck();	
 
 			$scope.$digest();
