@@ -33,7 +33,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                             }
 
                             visualization.searchSource
-                            .query({ language: 'lucene', query: $scope.fullFilter })
+                            .query({ language: 'lucene', query: fullFilter })
                             .set('filter', filters);
                         }
                     }

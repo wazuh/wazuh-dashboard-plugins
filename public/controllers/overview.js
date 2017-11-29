@@ -60,9 +60,6 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Watchers
 
     // We watch the resultState provided by the discover
-    $rootScope.$watch('resultState', () => {
-        $scope.resultState = $rootScope.resultState;
-    });
     $scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
     $scope.$watch('tab', () => {
         $location.search('tab', $scope.tab);
