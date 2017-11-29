@@ -1,8 +1,8 @@
-<md-content ng-if="tab === 'general'">
+<md-content flex layout="column" ng-if="tab === 'general'" class="app-container wazuh-column" layout-align="start">
 
-    <div class='uil-ring-css' ng-show="!hideRing(7) && resultState === 'loading'"><div></div></div>
+    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
 
-    <div ng-show="hideRing(7) && resultState !== 'none'">
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
         <div layout="row" class="agents-overview-top-metric-row">
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">

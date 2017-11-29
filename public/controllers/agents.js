@@ -26,10 +26,6 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
         $rootScope.currentImplicitFilter = "";
 	}
 
-    $scope.hideRing = (items) => {
-        return $(".vis-container").length >= items;
-    };
-
 	// Object for matching nav items and Wazuh groups
 	let tabFilters = {
 		"general": {
@@ -66,9 +62,6 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 	// Watchers
 
 	// We watch the resultState provided by the discover
-    $rootScope.$watch('resultState', () => {
-        $scope.resultState = $rootScope.resultState;
-    });
 	$scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
     $scope.$watch('tab', () => {
         $location.search('tab', $scope.tab);
@@ -148,7 +141,7 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 			// Agent
 			$scope.agent = data[0].data.data;
 
-			if ($scope.agent.os.name) {
+			if ($scope.agent.os) {
 				$scope.agentOS = $scope.agent.os.name + ' ' + $scope.agent.os.version;
 			}
 			else { $scope.agentOS = "Unkwnown" };
