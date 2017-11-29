@@ -89,7 +89,7 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
     };
 
     $scope.showAgent = agent => {
-        $rootScope.globalAgent = agent;
+        $rootScope.globalAgent = agent.id;
         $rootScope.comeFrom    = 'agentsPreview';
         $location.path('/agents');        
     };
