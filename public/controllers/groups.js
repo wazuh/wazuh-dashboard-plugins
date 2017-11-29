@@ -35,6 +35,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     $scope.showAgent = agent => {
         $rootScope.globalAgent = agent.id;
         $rootScope.comeFrom    = 'groups';
+        $location.search('tab', null);
         $location.path('/agents');        
     };
 

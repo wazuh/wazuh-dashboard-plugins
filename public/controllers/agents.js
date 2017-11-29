@@ -125,28 +125,34 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 	$scope.getAgent = newAgentId => {
 		let id = null;
 
-		// There's already an id in the url, so let's use this one
-		if ($location.search().id) {
-			$scope.agent.id = $location.search().id;
-		}
-		else { // There's no id, let's fetch one
-			if (!newAgent) { // They didn't pass an agent id, it should be in the rootScope then
-				$scope.agent.id = $rootScope.globalAgent;
+		// They passed an id
+		if (newAgentId) {
+			id = newAgentId;
+			$location.search('agent', id);
+		} else {
+			if ($location.search().agent) { // There's one in the url
+				id = $location.search().agent;
+			} else { // We pick the one in the rootScope
+				id = $rootScope.globalAgent;
+				$location.search('agent', id);
 				delete $rootScope.globalAgent;
-			} else { // They passed one, let's use it
-				$scope.agent.id = newAgentId;
 			}
-			$location.search('id', $scope.agent.id);
 		}
 
 		Promise.all([
-			apiReq.request('GET', `/agents/${$scope.agent.id}`, {}),
-			apiReq.request('GET', `/syscheck/${$scope.agent.id}/last_scan`, {}),
-			apiReq.request('GET', `/rootcheck/${$scope.agent.id}/last_scan`, {})
+			apiReq.request('GET', `/agents/${id}`, {}),
+			apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
+			apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
 		])
 		.then(data => {
 			// Agent
 			$scope.agent = data[0].data.data;
+
+			if ($scope.agent.os.name) {
+				$scope.agentOS = $scope.agent.os.name + ' ' + $scope.agent.os.version;
+			}
+			else { $scope.agentOS = "Unkwnown" };
+
 			// Syscheck
 			$scope.agent.syscheck = data[1].data.data;
 			validateSysCheck();		

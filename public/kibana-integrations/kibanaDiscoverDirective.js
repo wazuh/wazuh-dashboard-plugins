@@ -797,7 +797,7 @@ function discoverController(
       );
 
       // Check if we are in the agents page and add the proper agent filter
-      if ($rootScope.page === 'agents' && $location.search().id !== "" && $location.search().id !== null && angular.isUndefined($location.search().id) !== true) {
+      if ($rootScope.page === 'agents' && $location.search().agent !== "" && $location.search().agent !== null && angular.isUndefined($location.search().agent) !== true) {
         implicitFilter.push(
           {
             "meta":{
@@ -808,15 +808,15 @@ function discoverController(
               "alias":null,
               "type":"phrase",
               "key":"agent.id",
-              "value":$location.search().id,
+              "value":$location.search().agent,
               "params":{
-                "query":$location.search().id,
+                "query":$location.search().agent,
                 "type":"phrase"}
             },
             "query":{
               "match":{
                 "agent.id":{
-                  "query":$location.search().id,
+                  "query":$location.search().agent,
                   "type":"phrase"}
                 }
             },
@@ -890,7 +890,7 @@ function discoverController(
   // Getting the location from the url
   $scope.tabView = $location.search().tabView;
   $scope.tab = $location.search().tab;
-  if ($rootScope.page === 'agents') $scope.agentId = $location.search().id;
+  if ($rootScope.page === 'agents') $scope.agentId = $location.search().agent;
 
   // Initial loading of filters
  loadFilters(); 
@@ -909,9 +909,10 @@ function discoverController(
 
       loadFilters();
     }
-    if ($location.search().id !=  $scope.agentId) { // Changing filters
+    
+    if ($location.search().agent !=  $scope.agentId) { // Changing filters
 
-      $scope.agentId = $location.search().id;
+      $scope.agentId = $location.search().agent;
 
       queryFilter.removeAll();
       loadFilters();
