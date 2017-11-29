@@ -23,10 +23,6 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.currentImplicitFilter = "";
     }
 
-    $scope.hideRing = (items) => {
-        return $(".vis-container").length >= items;
-    };
-
     // Object for matching nav items and Wazuh groups
     let tabFilters = {
         "general": {

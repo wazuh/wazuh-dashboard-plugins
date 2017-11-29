@@ -1,6 +1,6 @@
 <md-content flex layout="column" ng-if="tab == 'fim'" class="app-container wazuh-column">
 
-    <div class='uil-ring-css' ng-show="!hideRing(17) && resultState === 'loading'"><div></div></div>
+    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
 
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'" class="wazuh-column">
