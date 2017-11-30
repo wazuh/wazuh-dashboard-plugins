@@ -59,33 +59,46 @@
         </md-toolbar>
 
         <md-content flex layout="column" class="manager-ruleset-decoders-300" when-scrolled="decoders.nextPage('')">
-	            <md-list class="agents-preview-table" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='decoder in decoders.items | orderBy : decoders.sortValue : decoders.sortDir' ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
-	                <md-list-item class="rules-item-list" ng-click="showDetails[decoder.name] = ! showDetails[decoder.name]" ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
+	            <md-list class="agents-preview-table" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='decoder in decoders.items | orderBy : decoders.sortValue : decoders.sortDir' ng-class="activeItem === decoder.name+decoder.file+decoder.position ? 'ruleset_rules_row_active' : ''">
+	                <md-list-item class="rules-item-list" ng-click="closeOther(decoder.name+decoder.file+decoder.position)" ng-class="activeItem === decoder.name+decoder.file+decoder.position ? 'ruleset_rules_row_active' : ''">
 	                    <span flex="20">{{decoder.name}}</span>
 	                    <span flex="20">{{decoder.details["program_name"]}}</span>
 	                    <span flex="40">{{ decoder.details["order"] | limitTo: 80 }}{{decoder.details["order"].length > 80 ? '...' : ''}}</span>
 	                    <md-button md-no-ink class="invisibleButton" flex="20" ng-if="$parent.typeFilter == 'all'" ng-click="decodersApplyFilter({type: 'file', value: decoder.file}); $event.stopPropagation();">{{decoder.file}}</md-button>
 	                    <span flex="20" ng-if="$parent.typeFilter != 'all'">{{decoder.file}}</span>
 	                </md-list-item>
-	                <md-list ng-show="showDetails[decoder.name]" ng-class="showDetails[decoder.name] ? 'ruleset_rules_row_active' : ''">
-	                    <md-list-item>
-	                        <span class="manager-ruleset-bold" flex="15">Full path</span>
-	                        <span flex="35">{{decoder.path}}</span>
-	                    </md-list-item>
-	                    <md-list-item>
-	                        <span class="manager-ruleset-bold" flex="15">Position</span>
-	                        <span flex="35">{{decoder.position}}</span>
-	                    </md-list-item>
-	                    <md-list-item ng-if="decoder.details.parent">
-	                        <span class="manager-ruleset-bold" flex="15">Parent</span>
-	                        <span flex="35">{{decoder.details.parent}}</span>
-	                    </md-list-item>
-	                    <md-list-item ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
-	                        <span class="manager-ruleset-bold" flex="15">{{detailk}}</span>
-	                        <span ng-if="(detailk !== 'regex') && (detailk !== 'order')" flex="35">{{detailv}}</span>
-	                        <span ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)" flex="35">{{colorRegex(detailv)}}</span>
-	                        <span ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)" flex="35">{{colorOrder(detailv)}}</span>
-	                    </md-list-item>
+
+                        <div layout="row" ng-if="activeItem === decoder.name+decoder.file+decoder.position" ng-class="activeItem === decoder.name+decoder.file+decoder.position ? 'ruleset_rules_row_active' : ''">
+                            <md-card flex>
+                                <md-card-content>
+                                    <div layout="column">
+                                        <span layout="row">
+                                            <p class="manager-status-subtitle">Full path</p>
+                                            <p class="right-text">{{decoder.path}}</p>
+                                        </span>
+                                        <span layout="row">
+                                            <p class="manager-status-subtitle">Position</p>
+                                            <p class="right-text">{{decoder.position}}</p>
+                                        </span>
+                                        <span layout="row">
+                                            <p class="manager-status-subtitle">Parent</p>
+                                            <p class="right-text">{{decoder.details.parent}}</p>
+                                        </span>
+                                    </div>
+                                </md-card-content>
+                            </md-card>
+                            <md-card flex>
+                                <md-card-content>
+                                        <div layout="column" ng-repeat="(detailk, detailv) in decoder.details" ng-if="detailk != 'parent'">
+                                            <span layout="row">
+                                                <p class="manager-status-subtitle">{{detailk}}</p>
+                                                <p class="right-text" ng-if="(detailk !== 'regex') && (detailk !== 'order')">{{detailv}}</p>
+                                                <p class="right-text" ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)">{{colorRegex(detailv)}}</p>
+                                                <p class="right-text" ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)">{{colorOrder(detailv)}}</p>
+                                            </span>
+                                        </div>
+                                   </md-card-content>
+                            </md-card>
 	                </md-list>
 	            </md-list>
 	        </md-content>
