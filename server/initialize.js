@@ -159,27 +159,24 @@ module.exports = (server, options) => {
 		server.log([blueWazuh, 'initialize', 'info'], 
 				'Setting Kibana default values: Index pattern, time picker and metaFields...');
 
-		// Call the internal API and wait for the response
-		let options = {
-			headers: {
-				'kbn-version': packageJSON.kibana.version
-			},
-			json: true
-		};
-
-		let body = {
-			"value": id
-		};
-
-		let requestUrl = `${server.info.uri}/api/kibana/settings/defaultIndex`;
-
-		needle('post', requestUrl, body, options)
-		.then((resp) => {
-			server.log([blueWazuh, 'initialize', 'info'], 
-					'Wazuh index-pattern successfully set to default.');
+		elasticRequest.callWithInternalUser('update', { 
+			index: '.kibana', 
+			type: 'doc', 
+			id: 'config:6.0.0', 
+			body: {
+				'doc': {
+				"type": 'config', 
+				"config": { 
+					"defaultIndex": id
+				} 
+			}
+			} 
 		})
-		.catch((error) => {
-			server.log([blueWazuh, 'error'], 'Could not default Wazuh index-pattern.');
+		.then((resp) => {
+			server.log([blueWazuh, 'initialize', 'info'], 'Successfully set to default index: ' + index_pattern);
+		})
+		.catch((err) => {
+			server.log([blueWazuh, 'initialize', 'error'], 'Could not default the index.');
 		});
 	};
 
@@ -187,30 +184,25 @@ module.exports = (server, options) => {
 	const createIndexPattern = () => {
 		server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${index_pattern}`);
 
-		// Call the internal API and wait for the response
-		let options = {
-			headers: {
-				'kbn-version': packageJSON.kibana.version
-			},
-			json: true
-		};
-
-		let body = {
-			attributes: {
-				title:         index_pattern,
-				timeFieldName: '@timestamp'
-			}
-		};
-
-		let requestUrl = `${server.info.uri}/api/saved_objects/index-pattern`;
-		needle('post', requestUrl, body, options)
+		elasticRequest.callWithInternalUser('create', { 
+			index: '.kibana', 
+			type: 'doc', 
+			id: 'index-pattern:f1175040-d5c5-11e7-8ef5-a5944cf52264', 
+			body: {
+				"type": 'index-pattern', 
+				"index-pattern": { 
+					"title": index_pattern, 
+					"timeFieldName": '@timestamp' 
+				} 
+			} 
+		})
 		.then((resp) => {
-			server.log([blueWazuh, 'initialize', 'info'], 'Successfully created index-pattern.');
+			server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
 			// Set the index-pattern as default in the Kibana configuration
-			setDefaultKibanaSettings(resp.body.id);
+			setDefaultKibanaSettings('f1175040-d5c5-11e7-8ef5-a5944cf52264');
 			// Import objects (dashboards and visualizations)
-			importObjects(resp.body.id);
-			importAppObjects(resp.body.id);
+			importObjects('f1175040-d5c5-11e7-8ef5-a5944cf52264');
+			importAppObjects('f1175040-d5c5-11e7-8ef5-a5944cf52264');
 		})
 		.catch((err) => {
 			server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
@@ -285,47 +277,23 @@ module.exports = (server, options) => {
 		});
 	};
 
-    // Check Kibana server status
-    const checkKibanaServer  = () => {
-        return new Promise(function (resolve, reject) {
-
-		let requestUrl = `${server.info.uri}/api/saved_objects/index-pattern`;
-		needle('get', requestUrl)
-		.then((resp) => {
-            if (resp.statusCode == "200")
-                resolve(resp)
-            else
-                reject(err)
-		})
-		.catch((err) => {
-            reject(err)
-		});
-        })
-    }
-
     // Check Elasticsearch Server status and .kibana index presence
     const checkElasticsearchServer  = () => {
         return new Promise(function (resolve, reject) {
-            elasticRequest
-            .callWithInternalUser('exists', {
-                index: ".kibana",
-                id:    packageJSON.kibana.version,
-                type:  "config"
+            elasticRequest.callWithInternalUser('indices.exists', {
+                index: ".kibana"
             })
             .then((data) => {
-                checkKibanaServer().then((data) => {
-                    if (data.statusCode == "200"){
-                        resolve(data)
-                    }else{
-                        reject(data)
-                    }
-                })
-                .catch((err) => {
-                    reject(err)
-                });
+            	if (data) {
+	            	server.plugins.elasticsearch.waitUntilReady().then((data) => {
+	                    resolve(data);
+	                });
+            	} else {
+            		reject(data);
+            	}
             })
             .catch((error) => {
-                reject(error)
+                reject(error);
             });
         })
     }

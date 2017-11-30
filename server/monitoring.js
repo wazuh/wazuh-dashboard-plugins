@@ -199,31 +199,25 @@ module.exports = (server, options) => {
 		server.log([blueWazuh, 'monitoring', 'info'], 
 					`Creating index pattern: ${index_pattern}`);
 
-		// Call the internal API and wait for the response
-		let options = {
-			headers: {
-				'kbn-version': packageJSON.kibana.version
-			},
-			json: true
-		};
-
-		let body = {
-			attributes: {
-				title:         index_pattern,
-				timeFieldName: '@timestamp'
-			}
-		};
-
-		let requestUrl = `${server.info.uri}/api/saved_objects/index-pattern`;
-		needle('post', requestUrl, body, options)
+		elasticRequest.callWithInternalUser('create', { 
+			index: '.kibana', 
+			type: 'doc', 
+			id: 'index-pattern:f1185040-d5c5-11e7-8ef5-a5944cf52264', 
+			body: {
+				"type": 'index-pattern', 
+				"index-pattern": { 
+					"title": index_pattern, 
+					"timeFieldName": '@timestamp' 
+				} 
+			} 
+		})
 		.then((resp) => {
-			server.log([blueWazuh, 'monitoring', 'info'], 'Successfully created index-pattern.');
-			// Import objects (dashboards and visualizations)
-			importAppObjects(resp.body.id);
+			server.log([blueWazuh, 'monitoring', 'info'], 'Created index pattern: ' + index_pattern);
+			importAppObjects('f1185040-d5c5-11e7-8ef5-a5944cf52264');
 		})
 		.catch((err) => {
 			server.log([blueWazuh, 'monitoring', 'error'], 'Error creating index-pattern.');
-		});
+		});;
 	};
 
 	// Creating wazuh-monitoring index
@@ -322,47 +316,23 @@ module.exports = (server, options) => {
 		});
 	};
 
-    // Check Kibana server status
-    const checkKibanaServer  = () => {
-        return new Promise(function (resolve, reject) {
-
-		let requestUrl = `${server.info.uri}/api/saved_objects/index-pattern`;
-		needle('get', requestUrl)
-		.then((resp) => {
-            if (resp.statusCode == "200")
-                resolve(resp)
-            else
-                reject(err)
-		})
-		.catch((err) => {
-            reject(err)
-		});
-        })
-    }
-
     // Check Elasticsearch Server status and .kibana index presence
     const checkElasticsearchServer  = () => {
         return new Promise(function (resolve, reject) {
-            elasticRequest
-            .callWithInternalUser('exists', {
-                index: ".kibana",
-                id:    packageJSON.kibana.version,
-                type:  "config"
+            elasticRequest.callWithInternalUser('indices.exists', {
+                index: ".kibana"
             })
             .then((data) => {
-                checkKibanaServer().then((data) => {
-                    if (data.statusCode == "200"){
-                        resolve(data)
-                    }else{
-                        reject(data)
-                    }
-                })
-                .catch((err) => {
-                    reject(err)
-                });
+            	if (data) {
+	            	server.plugins.elasticsearch.waitUntilReady().then((data) => {
+	                    resolve(data);
+	                });
+            	} else {
+            		reject(data);
+            	}
             })
             .catch((error) => {
-                reject(error)
+                reject(error);
             });
         })
     }
