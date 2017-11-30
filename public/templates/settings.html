@@ -32,6 +32,17 @@
 		</div>
 
 	</md-card>
+	<md-card layout-padding layout-align="start stretch" ng-if="apiIsDown">
+		<h1 class="wazuh-h1"><i class="fa fa-warning ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh RESTful API seems to be down</h1>
+		<p>Please, check if Wazuh RESTful API is running with one of the commands bellow:</p>
+		<md-list>
+			<md-list-item>For Systemd:</md-list-item>
+			<md-list-item><code>    $ systemctl status wazuh-api</code></md-list-item>
+			<md-list-item>For SysV Init:</md-list-item>
+			<md-list-item><code>    $ service wazuh-api status</code>			</md-list-item>
+		</md-list>
+
+	</md-card>
 
 	<md-card layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api'">
 
@@ -72,19 +83,19 @@
 		<form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="$parent.addManagerContainer || apiEntries.length == 0" style="margin-top: 30px; ">
 		  <md-input-container>
 			<label>Username</label>
-			<input placeholder="" type="text" ng-model="formData.user" aria-label="username" required></input>
+			<input placeholder="" type="text" ng-model="formData.user" aria-label="username" required/>
 		  </md-input-container>
 		  <md-input-container>
 			<label>Password</label>
-			<input placeholder="" type="password" ng-model="formData.password" aria-label="password" required></input>
+			<input placeholder="" type="password" ng-model="formData.password" aria-label="password" required/>
 		  </md-input-container>
 		  <md-input-container>
 			<label>URL</label>
-			<input placeholder="https://" ng-model="formData.url" type="url" aria-label="full url" required></input>
+			<input placeholder="https://" ng-model="formData.url" type="url" aria-label="full url" required/>
 		  </md-input-container>
 		  <md-input-container>
 			<label>Port</label>
-			<input placeholder="" ng-model="formData.port" type="text" aria-label="port" required></input>
+			<input placeholder="" ng-model="formData.port" type="text" aria-label="port" required/>
 		  </md-input-container>
 		  <div layout="row" layout-align="center center">
 			<p style="color: #ff9999">{{messageError}}</p>

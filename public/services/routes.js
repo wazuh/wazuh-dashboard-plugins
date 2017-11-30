@@ -49,15 +49,18 @@ import { QueryManagerProvider } from 'ui/query_manager';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 //Installation wizard
-const settingsWizard = ($location, $q, Notifier, testAPI, appState) => {
+const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState) => {
     const notify = new Notifier();
 
     let deferred = $q.defer();
     testAPI.check_stored()
-    .then((data) => {
-        if (data.data.error) {
+    .then(data => {
+        if (data.data.error || data.data.data.apiIsDown) {
             if (parseInt(data.data.error) === 2){
                 notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+            } else if(data.data.data.apiIsDown){
+                $rootScope.apiIsDown = true;
+                notify.error("Wazuh RESTful API seems to be down.");
             } else {
                 notify.error("Could not connect with Wazuh RESTful API.");
             }
