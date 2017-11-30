@@ -62,7 +62,7 @@ app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier
     $scope.decoders = Decoders;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
-
+    
     const colors = [
         '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6
         '#508642', '#CCA300', '#447EBC', '#C15C17', '#890F02', '#0A437C', '#6D1F62', '#584477', //2
@@ -92,6 +92,19 @@ app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier
         $scope.autoComplete = new Set($scope.autoComplete.map(e => JSON.stringify(e)));
         $scope.autoComplete = Array.from($scope.autoComplete).map(e => JSON.parse(e));
     };
+
+    let timesOpened = 0;
+    let lastName = false;
+    $scope.closeOther = name => {
+        if(name !== lastName){
+            lastName = name;
+            timesOpened = 0;
+        }
+        timesOpened++;
+        $scope.activeItem = (timesOpened <= 1) ? name : false;
+        if(timesOpened > 1) timesOpened = 0;
+        return true;
+    }
 
     $scope.colorRegex = (regex) => {
         regex = regex.toString();
