@@ -50,6 +50,19 @@ app.controller('rulesController', function ($scope,$rootScope, Notifier, Rules) 
         notify.error('Unexpected exception loading controller');
     }
 
+    let timesOpened = 0;
+    let lastName = false;
+    $scope.closeOther = name => {
+        if(name !== lastName){
+            lastName = name;
+            timesOpened = 0;
+        }
+        timesOpened++;
+        $scope.activeItem = (timesOpened <= 1) ? name : false;
+        if(timesOpened > 1) timesOpened = 0;
+        return true;
+    }
+
     //Destroy
     $scope.$on('$destroy', () => $scope.rules.reset());
 });
