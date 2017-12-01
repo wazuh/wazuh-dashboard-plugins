@@ -36,9 +36,15 @@
     <div flex layout="column" class="md-padding">
 
         <md-toolbar flex layout="row" class="md-toolbar-tools">
-            <span flex=10>Timestamp</span>
-            <span flex=10>Tag</span>
-            <span flex=10>Level</span>
+            <span flex=10 ng-click="logs.sort('timestamp')">Timestamp
+                <i class="fa" ng-class="logs.sortValue === 'timestamp' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+            </span>
+            <span flex=10 ng-click="logs.sort('tag')" >Tag
+                <i class="fa" ng-class="logs.sortValue === 'tag' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+            </span>
+            <span flex=10 ng-click="logs.sort('level')">Level
+                <i class="fa" ng-class="logs.sortValue === 'level' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+            </span>
             <span flex>Description</span>
         </md-toolbar>
 
