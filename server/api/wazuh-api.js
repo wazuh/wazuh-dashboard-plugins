@@ -26,8 +26,11 @@ module.exports = (server, options) => {
     }
 
     const checkStoredAPI = (req, reply) => {
+        
         // Get config from elasticsearch
         getConfig((wapi_config) => {
+
+
             if (wapi_config.error_code > 1) {
                 // Can not connect to elasticsearch
                 reply({
@@ -64,6 +67,18 @@ module.exports = (server, options) => {
                         'error':      7,
                         'message':    response.body
                     });
+                }
+            })
+            .catch(error => {
+                if(error.code === 'ECONNREFUSED'){
+                    wapi_config.password = "You shall not pass";
+                    wapi_config.apiIsDown = true;
+                    reply({
+                        'statusCode': 200,
+                        'data':       wapi_config
+                    });
+                } else {
+                    server.log([blueWazuh, 'wazuh-api', 'error'], error);
                 }
             });
         });
