@@ -1,6 +1,7 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq) {
+app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq,Notifier) {
+    const notify = new Notifier({ location: 'Overview' });
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
@@ -79,7 +80,8 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                     "content": data.data[key]
                 });
             }
-        });
+        })
+        .catch(error => notify.error(error.message));
 
     $scope.tabs = tabs;
     $scope.selectedIndex = 0;

@@ -96,7 +96,8 @@ app.factory('DataHandler', function ($q, apiReq) {
             apiReq.request('DELETE', this.path, {})
             .then(function (data) {
                 this.items.splice(index, 1);
-            }.bind(this));
+            }.bind(this))
+            .catch(console.error);
         }
 
         search () {
@@ -128,7 +129,8 @@ app.factory('DataHandler', function ($q, apiReq) {
                     this.items = this.items.filter(item => typeof item.os === 'undefined');
                 }
                 this.offset = items.length;
-            });
+            })
+            .catch(console.error);
         }
 
         sort(by) {

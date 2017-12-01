@@ -3,7 +3,8 @@ const beautifier = require('plugins/wazuh/utils/json-beautifier');
 
 // Groups preview controller
 app.controller('groupsPreviewController', 
-function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents) {
+function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents, Notifier) {
+    const notify = new Notifier({ location: 'Manager - Groups' });
     $scope.searchTerm      = '';
     $scope.searchTermAgent = '';
     $scope.searchTermFile  = '';
@@ -14,7 +15,8 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
 
     // Actual execution in the controller's initialization
     $scope.groups.nextPage('')
-    .then(() => $scope.loadGroup(0));
+    .then(() => $scope.loadGroup(0))
+    .catch(error => notify.error(error.message));
 
     $scope.load = false;
 
@@ -74,11 +76,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
             $scope.file = beautifier.prettyPrint(data.data.data);
             $scope.filename = filename;
         })
-        .catch(err => $scope.file = {
-            group: $scope.groups.items[$scope.selectedGroup].name,
-            file:  $scope.groupFiles.items[index].filename,
-            error: err.message || err
-        });
+        .catch(error => notify.error(error.message));
     };
 
     // Changing the view to overview a specific group

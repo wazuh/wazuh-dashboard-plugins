@@ -71,7 +71,8 @@ const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState) 
             appState.setExtensions(data.data.data.extensions);
             deferred.resolve();
         }
-    });
+    })
+    .catch(error => notify.error(error.message));
 
     return deferred.promise;
 };
