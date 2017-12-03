@@ -26,6 +26,7 @@ require('plugins/wazuh/services/genericReq.js');
 require('plugins/wazuh/services/dataHandler.js');
 require('plugins/wazuh/services/appState.js');
 require('plugins/wazuh/services/testAPI.js');
+require('plugins/wazuh/services/implicitFilters.js');
 
 // Set up routes and views
 require('plugins/wazuh/services/routes.js');

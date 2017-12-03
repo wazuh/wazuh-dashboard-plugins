@@ -8,7 +8,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
             scope: {
                 visID: '=visId',
             },
-            controller: function VisController($scope, savedVisualizations) {
+            controller: function VisController($scope, $rootScope, savedVisualizations, implicitFilters) {
 
                 var implicitFilter = '';
                 var visTitle = '';
@@ -45,6 +45,11 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                         implicitFilter = savedObj.searchSource.get('query')['query'];
                         visTitle = savedObj.vis.title;
                         visualization = savedObj;
+
+                        if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
+                            visualization.searchSource
+                            .set('filter', implicitFilters.loadFilters());
+                        }
 
                         loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, {})
                         .then(handler => {

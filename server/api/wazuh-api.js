@@ -29,8 +29,6 @@ module.exports = (server, options) => {
         
         // Get config from elasticsearch
         getConfig((wapi_config) => {
-
-
             if (wapi_config.error_code > 1) {
                 // Can not connect to elasticsearch
                 reply({
@@ -56,10 +54,60 @@ module.exports = (server, options) => {
             })
             .then((response) => {
                 if (parseInt(response.body.error) === 0 && response.body.data) {
-                    wapi_config.password = "You shall not pass";
-                    reply({
-                        'statusCode': 200,
-                        'data':       wapi_config
+                    needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/status`, {}, { // Checking the cluster status
+                        username:           wapi_config.user,
+                        password:           wapi_config.password,
+                        rejectUnauthorized: !wapi_config.insecure
+                    })
+                    .then((response) => {
+                        if (!response.body.error) {
+                            if (response.body.data.enabled === 'yes') { // If cluster mode is active
+                                needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/node`, {}, {
+                                    username:           wapi_config.user,
+                                    password:           wapi_config.password,
+                                    rejectUnauthorized: !wapi_config.insecure
+                                })
+                                .then((response) => {
+                                    if (!response.body.error) {
+                                        let managerName = wapi_config.cluster_info.manager;
+                                        delete wapi_config.cluster_info;
+                                        wapi_config.cluster_info = {};
+                                        wapi_config.cluster_info.status = 'enabled';
+                                        wapi_config.cluster_info.manager = managerName;
+                                        wapi_config.cluster_info.node = response.body.data.node;
+                                        wapi_config.cluster_info.cluster = response.body.data.cluster;
+                                        reply({
+                                            'statusCode': 200,
+                                            'data': wapi_config
+                                        });
+                                    } else if (response.body.error){
+                                        reply({
+                                            'statusCode': 500,
+                                            'error':      7,
+                                            'message':    response.body.message
+                                        }).code(500);
+                                    }
+                                });
+                            }
+                            else { // Cluster mode is not active
+                                let managerName = wapi_config.cluster_info.manager;
+                                delete wapi_config.cluster_info;
+                                wapi_config.cluster_info = {};
+                                wapi_config.cluster_info.status = 'disabled';
+                                wapi_config.cluster_info.cluster = 'Disabled';
+                                wapi_config.cluster_info.manager = managerName;
+                                reply({
+                                    'statusCode': 200,
+                                    'data': wapi_config
+                                });
+                            }
+                        } else {
+                            reply({
+                                'statusCode': 500,
+                                'error':      5,
+                                'message':    'Error occurred'
+                            }).code(500);
+                        }
                     });
                 } else {
                     reply({
@@ -142,24 +190,49 @@ module.exports = (server, options) => {
                 })
                 .then((response) => {
                     if (!response.body.error) {
-                        let managerName = response.body.data.name;
-                        needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
+                        var managerName = response.body.data.name;
+                        needle('get', `${req.payload.url}:${req.payload.port}/cluster/status`, {}, { // Checking the cluster status
                             username:           req.payload.user,
                             password:           req.payload.password,
                             rejectUnauthorized: !req.payload.insecure
                         })
                         .then((response) => {
                             if (!response.body.error) {
-                                reply({
-                                    "manager": managerName,
-                                    "node":    response.body.data.node,
-                                    "cluster": response.body.data.cluster
-                                });
-                            } else if (response.body.error){
+                                if (response.body.data.enabled === 'yes') { // If cluster mode is active
+                                    needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
+                                        username:           req.payload.user,
+                                        password:           req.payload.password,
+                                        rejectUnauthorized: !req.payload.insecure
+                                    })
+                                    .then((response) => {
+                                        if (!response.body.error) {
+                                            reply({
+                                                "manager": managerName,
+                                                "node":    response.body.data.node,
+                                                "cluster": response.body.data.cluster,
+                                                "status": 'enabled'
+                                            });
+                                        } else if (response.body.error){
+                                            reply({
+                                                'statusCode': 500,
+                                                'error':      7,
+                                                'message':    response.body.message
+                                            }).code(500);
+                                        }
+                                    });
+                                }
+                                else { // Cluster mode is not active
+                                    reply({
+                                        "manager": managerName,
+                                        "cluster": 'Disabled',
+                                        "status": 'disabled'
+                                    });
+                                }
+                            } else {
                                 reply({
                                     'statusCode': 500,
-                                    'error':      7,
-                                    'message':    response.body.message
+                                    'error':      5,
+                                    'message':    'Error occurred'
                                 }).code(500);
                             }
                         });

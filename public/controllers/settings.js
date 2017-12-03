@@ -6,7 +6,7 @@ import chrome from 'ui/chrome';
 let app = require('ui/modules')
 .get('app/wazuh', [])
 .controller('settingsController', 
-function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI, appState, genericReq) {
+function ($scope, $rootScope, $http, $routeParams, $route, $location, Notifier, testAPI, appState, genericReq, courier) {
 	$rootScope.page = "settings";
 
 	// Initialize
@@ -28,6 +28,9 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
 	$scope.addManagerContainer = false;
 	$scope.submenuNavItem      = "api";
 
+	// Getting the index pattern list into the scope
+	$scope.indexPatterns = $route.current.locals.ip
+	
 	if ($routeParams.tab){
 		$scope.submenuNavItem = $routeParams.tab;
     }
@@ -66,6 +69,7 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
         genericReq.request('PUT', tmpUrl)
         .then(() => {
 			appState.setClusterInfo($scope.apiEntries[index]._source.cluster);
+			appState.setCurrentPattern($scope.selectedIndexPattern);
 			$scope.apiEntries[$scope.currentDefault]._source.active = 'false';
 			$scope.apiEntries[index]._source.active = 'true';
 			$scope.currentDefault = index;
@@ -123,6 +127,7 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
 			tmpData.cluster_info = data.data;
 			if (activeStatus) {
 				appState.setClusterInfo(tmpData.cluster_info);
+				appState.setCurrentPattern($scope.selectedIndexPattern);
 			}
 
 			tmpData.extensions = {
@@ -215,6 +220,31 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
 		}
 	};
 
+	$scope.changeIndexPattern = (newIndexPattern) => {
+		genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${newIndexPattern}`)
+        .then((data) => {
+			appState.setCurrentPattern(newIndexPattern);
+
+			courier.indexPatterns.get(newIndexPattern)
+            .then((data) => {
+				let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+				let minimumCount = 0;
+				for (var i = 0; i < data.fields.length; i++) {
+					if (minimum.includes(data.fields[i].name)) {
+						minimumCount++;
+					}
+				}
+
+				if (minimumCount == minimum.length)
+					notify.info("Successfully changed the default index-pattern");
+				else notify.warning("The index-pattern was changed, but it is NOT compatible with Wazuh alerts");
+            });
+        })
+        .catch(() => {
+			notify.error("Error while changing the default index-pattern");
+		});
+	};
+
 	const printError = (error) => {
 		let text;
 		switch (error.data) {
@@ -257,6 +287,9 @@ function ($scope, $rootScope, $http, $routeParams, $location, Notifier, testAPI,
 			$scope.appInfo["app-version"]      = data.data.data["app-version"];
 			$scope.appInfo["installationDate"] = data.data.data["installationDate"];
 			$scope.appInfo["revision"]         = data.data.data["revision"];
+			$scope.appInfo["index-pattern"]    = data.data.data["index-pattern"];
+			$scope.selectedIndexPattern = data.data.data["index-pattern"];
+			$scope.load = false;
         })
         .catch(() => {
 			notify.error("Error when loading Wazuh setup info");

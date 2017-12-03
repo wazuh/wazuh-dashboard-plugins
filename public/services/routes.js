@@ -66,7 +66,7 @@ const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState) 
             }
             $location.path('/settings');
             deferred.reject();
-        } else {
+        } else { 
             appState.setClusterInfo(data.data.data.cluster_info);
             appState.setExtensions(data.data.data.extensions);
             deferred.resolve();
@@ -91,7 +91,50 @@ const goToKibana = ($location, $window) => {
     $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
 };
 
-const getIp =  (Promise, courier, config, $location, Private) => {
+const getIp =  (Promise, courier, config, $q, $location, Notifier, Private, appState, genericReq) => {
+    const State = Private(StateProvider);
+    const savedObjectsClient = Private(SavedObjectsClientProvider);
+
+    return savedObjectsClient.find({
+        type: 'index-pattern',
+        fields: ['title'],
+        perPage: 10000
+    })
+    .then(({ savedObjects }) => {
+
+        let onlyWazuhAlerts = [];
+        let currentPattern = '';
+
+        let deferred = $q.defer();
+
+        genericReq.request('GET', '/api/wazuh-elastic/setup')
+        .then((data) => {
+            currentPattern = data.data.data["index-pattern"];
+            appState.setCurrentPattern(currentPattern);
+
+            for (var i = 0; i < savedObjects.length; i++) {
+                if (savedObjects[i].id === currentPattern) {
+                    onlyWazuhAlerts.push(savedObjects[i]);
+                }
+            }
+
+            courier.indexPatterns.get(currentPattern)
+            .then((data) => {
+                deferred.resolve({
+                    list: onlyWazuhAlerts,
+                    loaded: data,
+                    stateVal: null,
+                    stateValFound: false    
+                });
+            });
+
+        });
+
+        return deferred.promise;
+    });
+};
+
+const getAllIp = (Promise, courier, config, $location, Private) => {
     const State = Private(StateProvider);
     const savedObjectsClient = Private(SavedObjectsClientProvider);
 
@@ -117,16 +160,8 @@ const getIp =  (Promise, courier, config, $location, Private) => {
         const id = exists ? state.index : config.get('defaultIndex');
         state.destroy();
 
-        let onlyWazuhAlerts = [];
-
-        for (var i = 0; i < savedObjects.length; i++) {
-            if (savedObjects[i].attributes.title === 'wazuh-alerts-*') {
-                onlyWazuhAlerts.push(savedObjects[i]);
-            }
-        }
-
         return Promise.props({
-            list: onlyWazuhAlerts,
+            list: savedObjects,
             loaded: courier.indexPatterns.get(id),
             stateVal: state.index,
             stateValFound: specified && exists
@@ -156,9 +191,7 @@ routes
     .when('/agents-preview', {
         template: require('plugins/wazuh/templates/agents-prev.jade'),
         resolve: {
-            "checkAPI": settingsWizard,
-            "ip": getIp,
-            "savedSearch": getSavedSearch
+            "checkAPI": settingsWizard
         }
     })
     .when('/manager/:tab?/', {
@@ -168,7 +201,6 @@ routes
         }
     })
     .when('/overview/', {
-        reloadOnSearch: false,
         template: require('plugins/wazuh/templates/overview.jade'),
         resolve: {
             "checkAPI": settingsWizard,
@@ -179,13 +211,15 @@ routes
     .when('/wazuh-discover/', {
         template: require('plugins/wazuh/templates/discover.jade'),
         resolve: {
-            "checkAPI": settingsWizard,
             "ip": getIp,
             "savedSearch": getSavedSearch
         }
     })
     .when('/settings/:tab?/', {
-        template: require('plugins/wazuh/templates/settings.html')
+        template: require('plugins/wazuh/templates/settings.html'),
+        resolve: {
+            "ip": getAllIp
+        }
     })
     .when('/visualize/create?', {
         redirectTo: function () {},
