@@ -36,16 +36,22 @@
     <div flex layout="column" class="md-padding">
 
         <md-toolbar flex layout="row" class="md-toolbar-tools">
-            <span flex=10>Timestamp</span>
-            <span flex=10>Tag</span>
-            <span flex=10>Level</span>
+            <span flex=10 ng-click="logs.sort('timestamp')">Timestamp
+                <i class="fa" ng-class="logs.sortValue === 'timestamp' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+            </span>
+            <span flex=10 ng-click="logs.sort('tag')" >Tag
+                <i class="fa" ng-class="logs.sortValue === 'tag' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+            </span>
+            <span flex=10 ng-click="logs.sort('level')">Level
+                <i class="fa" ng-class="logs.sortValue === 'level' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+            </span>
             <span flex>Description</span>
         </md-toolbar>
 
         <div layout="column" flex>
             <md-content flex class="manager-log-list" id="groups-id" when-scrolled="logs.nextPage('')">
                 <md-list>
-                    <md-list-item ng-repeat="log in logs.items | filter : searchTerm" ng-mouseover="log.hovered=true" ng-mouseleave="log.hovered=false"
+                    <md-list-item ng-repeat="log in logs.items | filter : searchTerm | orderBy : logs.sortValue : logs.sortDir" ng-mouseover="log.hovered=true" ng-mouseleave="log.hovered=false"
                         layout="row" class="groups-button">
                         <span flex=10>{{log.timestamp}}</span>
                         <span flex=10>{{log.tag}}</span>

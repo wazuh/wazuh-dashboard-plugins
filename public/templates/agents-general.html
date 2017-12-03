@@ -7,28 +7,28 @@
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
                     <div class="metric-value ng-binding agents-overview-size-14">{{agent.name}}</div>
-                    <md-tooltip md-direction="bottom">{{ agent.name }}</md-tooltip>
+                    <!--<md-tooltip md-direction="bottom">{{ agent.name }}</md-tooltip>-->
                     <div class="ng-binding">Name</div>
                 </md-card-content>
             </md-card>
             <md-card  flex="12">
                 <md-card-content class="agents-overview-top-metric-item">
                     <div class="metric-value ng-binding agents-overview-size-14">{{agent.ip}}</div>
-                    <md-tooltip md-direction="bottom">{{ agent.ip }}</md-tooltip>
+                    <!--<md-tooltip md-direction="bottom">{{ agent.ip }}</md-tooltip>-->
                     <div class="ng-binding">IP Address</div>
                 </md-card-content>
             </md-card>
             <md-card flex="12">
                 <md-card-content class="agents-overview-top-metric-item">
                     <div class="metric-value ng-binding agents-overview-size-14">{{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</div>
-                    <md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>
+                    <!--<md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>-->
                     <div class="ng-binding">Version</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
                     <div class="metric-value ng-binding legend-value-truncate agents-overview-size-14">{{ agentOS }}</div>
-                    <md-tooltip md-direction="bottom">{{ agentOS }}</md-tooltip>
+                    <!--<md-tooltip md-direction="bottom">{{ agentOS }}</md-tooltip>-->
                     <div class="ng-binding">OS</div>
                 </md-card-content>
             </md-card>
@@ -38,14 +38,14 @@
             <md-card flex ng-show="agent.id != '000'">
                 <md-card-content class="agents-overview-top-metric-item">
                     <div class="metric-value ng-binding agents-overview-size-14">{{agent.lastKeepAlive}}</div>
-                    <md-tooltip md-direction="bottom">{{ agent.lastKeepAlive }}</md-tooltip>
+                    <!--<md-tooltip md-direction="bottom">{{ agent.lastKeepAlive }}</md-tooltip>-->
                     <div class="ng-binding">Last keep alive</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
                     <div class="metric-value ng-binding agents-overview-size-14">{{agent.dateAdd}}</div>
-                    <md-tooltip md-direction="bottom">{{ agent.dateAdd }}</md-tooltip>
+                    <!--<md-tooltip md-direction="bottom">{{ agent.dateAdd }}</md-tooltip>-->
                     <div class="ng-binding">Registration date</div>
                 </md-card-content>
             </md-card>

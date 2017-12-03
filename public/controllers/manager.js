@@ -1,7 +1,8 @@
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope,$rootScope, $routeParams, $location,apiReq) {
+app.controller('managerController', function ($scope,$rootScope, $routeParams, $location,apiReq, Notifier) {
+    const notify = new Notifier({ location: 'Manager' });
     $scope.submenuNavItem  = 'status';
     $scope.submenuNavItem2 = 'rules';
 
@@ -9,7 +10,8 @@ app.controller('managerController', function ($scope,$rootScope, $routeParams, $
         $scope.submenuNavItem = $routeParams.tab;
     }
     apiReq.request('GET', `/agents/000`, {})
-    .then(data => $rootScope.agent = data.data.data);
+    .then(data => $rootScope.agent = data.data.data)
+    .catch(error => notify.error(error.message));
     // Watchers
     $scope.$watch('submenuNavItem', () => {
         if($scope.submenuNavItem === 'ruleset') {

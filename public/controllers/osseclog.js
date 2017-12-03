@@ -1,7 +1,8 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
 // Logs controller
-app.controller('managerLogController', function ($scope, Logs, apiReq) {
+app.controller('managerLogController', function ($scope, Logs, apiReq,Notifier) {
+    const notify = new Notifier({ location: 'Manager - Logs' });
     $scope.searchTerm  = '';
     $scope.loading     = true;
     $scope.logs        = Logs;
@@ -11,7 +12,8 @@ app.controller('managerLogController', function ($scope, Logs, apiReq) {
     .then(data => {
         $scope.summary = data.data.data;
         $scope.loading = false;
-    });
+    })
+    .catch(error => notify.error(error.message));
 
     // Resetting the factory configuration
     $scope.$on("$destroy", () => $scope.logs.reset());

@@ -45,7 +45,8 @@ app.controller('rulesController', function ($scope,$rootScope, Notifier, Rules) 
         .then(() => {
             $scope.loading = false;
             $scope.analizeRules('');
-        });
+        })
+        .catch(error => notify.error(error.message));
     } catch (e) {
         notify.error('Unexpected exception loading controller');
     }
@@ -145,7 +146,8 @@ app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier
         .then(() => {
             $scope.loading = false;
             $scope.analizeDecoders('');
-        });
+        })
+        .catch(error => notify.error(error.message));
     } catch (e) {
         notify.error('Unexpected exception loading controller');
     }

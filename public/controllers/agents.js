@@ -179,7 +179,8 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 					"content": data.data[key]
 				});
 			}
-		});
+		})
+		.catch(error => notify.error(error.message));
 
 	$scope.tabs 		 = tabs;
 	$scope.selectedIndex = 0;
