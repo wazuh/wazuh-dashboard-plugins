@@ -34,11 +34,11 @@
                                             <i class="fa" ng-class="groupAgents.sortValue === 'id' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                                                 aria-hidden="true"></i>
                                         </span>
-                                        <span flex="25" ng-click="groupAgents.sort('name')">Name
+                                        <span flex="20" ng-click="groupAgents.sort('name')">Name
                                             <i class="fa" ng-class="groupAgents.sortValue === 'name' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                                                 aria-hidden="true"></i>
                                         </span>
-                                        <span flex="10" ng-click="groupAgents.sort('ip')">IP
+                                        <span flex="15" ng-click="groupAgents.sort('ip')">IP
                                             <i class="fa" ng-class="groupAgents.sortValue === 'ip' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                                                 aria-hidden="true"></i>
                                         </span>
@@ -61,8 +61,8 @@
                                     <md-list ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' class="agents-preview-table">
                                         <md-list-item class="md-subhead agents-groups-preview" ng-click="showAgent(agent)">
                                             <span flex="5">{{agent.id || 'Unknown'}}</span>
-                                            <span flex="25">{{agent.name || 'Unknown'}}</span>
-                                            <span flex="10">{{agent.ip || 'Unknown'}}</span>
+                                            <span flex="20">{{agent.name || 'Unknown'}}</span>
+                                            <span flex="15">{{agent.ip || 'Unknown'}}</span>
                                             <span flex="15">{{agent.status || 'Unknown'}}</span>
                                             <span flex="15">{{agent.os.platform || 'Unknown'}}</span>
                                             <span flex="15">{{agent.os.version || 'Unknown'}}</span>
