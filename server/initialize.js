@@ -13,7 +13,6 @@ module.exports = (server, options) => {
 	// Elastic JS Client
 	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
-	let index_pattern = "wazuh-alerts-*";
 	let objects       = {};
 	let app_objects = {};
 	let packageJSON   = {};
@@ -25,31 +24,32 @@ module.exports = (server, options) => {
 		server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
 	}
 
+	let index_pattern = packageJSON.initialPattern;
+
 	// Save Wazuh App first set up for future executions
-	const saveConfiguration = (type) => {
+	const saveConfiguration = (id) => {
 		let configuration = {
 			"name":             "Wazuh App",
 			"app-version":      packageJSON.version,
 			"revision":         packageJSON.revision,
-			"installationDate": new Date().toISOString()
+			"installationDate": new Date().toISOString(),
+			"index-pattern": id
 		};
 
-		if (type === "install") {
-			elasticRequest
-			.callWithInternalUser('create', {
-				index: ".wazuh-version",
-				type:  'wazuh-version',
-				id:    1,
-				body:  configuration
-			})
-			.then(() => {
-				server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
-			})
-			.catch((error) => {
-				server.log([blueWazuh, 'initialize', 'error'], 
-							'Could not insert Wazuh configuration');
-			});
-		}
+		elasticRequest
+		.callWithInternalUser('create', {
+			index: ".wazuh-version",
+			type:  'wazuh-version',
+			id:    1,
+			body:  configuration
+		})
+		.then(() => {
+			server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
+		})
+		.catch((error) => {
+			server.log([blueWazuh, 'initialize', 'error'], 
+						'Could not insert Wazuh configuration');
+		});
 	};
 
 	// Importing Wazuh built-in visualizations and dashboards
@@ -106,6 +106,7 @@ module.exports = (server, options) => {
 
 	// Importing Wazuh app visualizations and dashboards
 	const importAppObjects = (id) => {
+		console.log("Importing objects");
 		server.log([blueWazuh, 'initialize', 'info'], 
 					'Importing Wazuh app visualizations...');
 
@@ -162,7 +163,7 @@ module.exports = (server, options) => {
 		elasticRequest.callWithInternalUser('update', { 
 			index: '.kibana', 
 			type: 'doc', 
-			id: 'config:6.0.0', 
+			id: `config:${packageJSON.kibana.version}`, 
 			body: {
 				'doc': {
 				"type": 'config', 
@@ -173,7 +174,7 @@ module.exports = (server, options) => {
 			} 
 		})
 		.then((resp) => {
-			server.log([blueWazuh, 'initialize', 'info'], 'Successfully set to default index: ' + index_pattern);
+			server.log([blueWazuh, 'initialize', 'info'], 'Successfully set to default index: ' + id);
 		})
 		.catch((err) => {
 			server.log([blueWazuh, 'initialize', 'error'], 'Could not default the index.');
@@ -203,6 +204,9 @@ module.exports = (server, options) => {
 			// Import objects (dashboards and visualizations)
 			importObjects('f1175040-d5c5-11e7-8ef5-a5944cf52264');
 			importAppObjects('f1175040-d5c5-11e7-8ef5-a5944cf52264');
+
+			// Save Setup Info
+			saveConfiguration('f1175040-d5c5-11e7-8ef5-a5944cf52264');
 		})
 		.catch((err) => {
 			server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
@@ -217,7 +221,7 @@ module.exports = (server, options) => {
 			.callWithInternalUser('search', {
 				index: '.kibana',
 				type:  'index-pattern',
-				q:     'title:"wazuh-alerts-*"'
+				q:     `title:"${index_pattern}"`
 			})
 			.then((data) => {
 				if (data.hits.total >= 1) {
@@ -231,8 +235,6 @@ module.exports = (server, options) => {
 				server.log([blueWazuh, 'initialize', 'error'], 'Could not reach elasticsearch.');
 			});
 		}
-		// Save Setup Info
-		saveConfiguration(type);
 	};
 
 	// Init function. Check for "wazuh-version" document existance.
@@ -310,4 +312,6 @@ module.exports = (server, options) => {
 
 	// Check Kibana index and if it is prepared, start the initialization of Wazuh App.
 	checkKibanaStatus();
+
+    module.exports = importAppObjects;
 };

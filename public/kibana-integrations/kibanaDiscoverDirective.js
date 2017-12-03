@@ -761,34 +761,65 @@ function discoverController(
     if ($scope.tab) {
       let implicitFilter = [];
 
-      // The cluster filter
-      implicitFilter.push(
-        {
-          "meta":{
-            "removable":false,
-            "index":$scope.indexPattern.id,
-            "negate":false,
-            "disabled":false,
-            "alias":null,
-            "type":"phrase",
-            "key":"cluster.name",
-            "value":appState.getClusterInfo().cluster,
-            "params":{
-              "query":appState.getClusterInfo().cluster,
-              "type":"phrase"}
-          },
-          "query":{
-            "match":{
-              "cluster.name":{
+      if (appState.getClusterInfo().status == 'enabled') {
+        // The cluster filter
+        implicitFilter.push(
+          {
+            "meta":{
+              "removable":false,
+              "index":$scope.indexPattern.id,
+              "negate":false,
+              "disabled":false,
+              "alias":null,
+              "type":"phrase",
+              "key":"cluster.name",
+              "value":appState.getClusterInfo().cluster,
+              "params":{
                 "query":appState.getClusterInfo().cluster,
                 "type":"phrase"}
-              }
-          },
-          "$state":{
-            "store":"appState"
+            },
+            "query":{
+              "match":{
+                "cluster.name":{
+                  "query":appState.getClusterInfo().cluster,
+                  "type":"phrase"}
+                }
+            },
+            "$state":{
+              "store":"appState"
+            }
           }
-        }
-      );
+        );
+      } else {
+        // Manager name filter
+        implicitFilter.push(
+          {
+            "meta":{
+              "removable":false,
+              "index":$scope.indexPattern.id,
+              "negate":false,
+              "disabled":false,
+              "alias":null,
+              "type":"phrase",
+              "key":"manager.name",
+              "value":appState.getClusterInfo().manager,
+              "params":{
+                "query":appState.getClusterInfo().manager,
+                "type":"phrase"}
+            },
+            "query":{
+              "match":{
+                "manager.name":{
+                  "query":appState.getClusterInfo().manager,
+                  "type":"phrase"}
+                }
+            },
+            "$state":{
+              "store":"appState"
+            }
+          }
+        );
+      }
 
       // Check if we are in the agents page and add the proper agent filter
       if ($rootScope.page === 'agents' && $location.search().agent !== "" && $location.search().agent !== null && angular.isUndefined($location.search().agent) !== true) {

@@ -8,6 +8,7 @@
 		<md-nav-bar flex style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
 			<md-nav-item md-nav-click="submenuNavItem = 'api'" name="api">API</md-nav-item>
 			<md-nav-item md-nav-click="submenuNavItem = 'extensions'" name="extensions">Extensions</md-nav-item>
+			<md-nav-item md-nav-click="submenuNavItem = 'pattern'" name="pattern">Pattern</md-nav-item>
 			<md-nav-item md-nav-click="submenuNavItem = 'about'" name="about">About</md-nav-item>
 		</md-nav-bar>
 	</md-content>
@@ -150,6 +151,21 @@
 				<md-switch flex ng-model="extensions.audit" aria-label="extensionsAudit" ng-change="toggleExtension('audit',extensions.audit)"></md-switch>
 			</span>
 		</div>
+
+	</md-card>
+
+	<md-card flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'pattern'">
+
+		<h1 class="wazuh-h1"><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh App: Index pattern selection</h1>
+
+		<p flex>Select the index pattern to be applied in the visualizations.</p>
+		<p flex><strong>Beware: the new index-pattern structure must be compatible with Wazuh alerts, otherwise the visualizations will load erroneous data, or no data at all.</strong></p>
+
+        <md-input-container flex="20" class="md-whiteframe-z1 manager-ruleset-decoders-selector" ng-if="load === false" style="background-color: #e2e2e2;">
+            <md-select ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
+                <md-option ng-repeat="indexPattern in indexPatterns.list" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</md-option>
+            </md-select>
+        </md-input-container>
 
 	</md-card>
 

@@ -1,3 +1,5 @@
+const importAppObjects = require('../initialize');
+
 module.exports = (server, options) => {
 
     // Elastic JS Client
@@ -45,60 +47,59 @@ module.exports = (server, options) => {
         });
     };
 
-    // Returns alerts count for fields/value array between timeGTE and timeLT
-    const alertsCount = (req, reply) => {
-
-        var payload = {
-            "size": 1,
-            "query": {
-                "bool": {
-                    "must": [],
-                    "filter": {
-                        "range": {
-                            "@timestamp": {}
+    // Updating Wazuh app visualizations and dashboards
+    const updateAppObjects = (req, reply) => {
+        elasticRequest.callWithInternalUser('deleteByQuery', { 
+            index: '.kibana', 
+            body: {
+                'query': {
+                    'bool': {
+                        'must': {
+                            'match': {
+                                "visualization.title": 'Wazuh App*'
+                            }
+                        },
+                        'must_not': {
+                            "match": {
+                                "visualization.title": 'Wazuh App Overview General Agents status'
+                            }
                         }
                     }
                 }
-            }
-        };
-
-        // Set up time interval, default to Last 15m
-        const timeGTE = req.payload.timeinterval.gte ? req.payload.timeinterval.gte : 'now-15m';
-        const timeLT  = req.payload.timeinterval.lt  ? req.payload.timeinterval.lt  : 'now';
-        payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
-
-        if (timeLT !== 'now'){
-            payload.query.bool.filter.range['@timestamp']['lte'] = timeLT;
-        } else {
-            payload.query.bool.filter.range['@timestamp']['lt'] = timeLT;
-        }
-
-        // Set up match for default cluster name
-        payload.query.bool.must.push({
-            'match': {
-                'cluster.name': req.payload.cluster
-            }
-        });
-
-        // Set up match for different pairs field/value
-        for(let item of req.payload.fields){
-            let obj = {};
-            obj[item.field] = item.value;
-            payload.query.bool.must.push({ 'match': obj });
-        }
-
-        fetchElastic(req, payload)
-        .then((data) => {
-            reply({
-                'statusCode': 200,
-                'data':       data.hits.total
+            } 
+        })
+        .then((resp) => {
+            // Update the pattern in the configuration
+            elasticRequest.callWithInternalUser('update', { 
+                index: '.wazuh-version', 
+                type: 'wazuh-version', 
+                id: '1', 
+                body: {
+                    'doc': {
+                        "index-pattern": req.params.pattern
+                    }
+                } 
+            })
+            .then((resp) => {
+                importAppObjects(req.params.pattern);
+                reply({
+                    'statusCode': 200,
+                    'data':       'Index pattern updated'
+                });
+            })
+            .catch((err) => {
+                reply({
+                    'statusCode': 500,
+                    'error':      9,
+                    'message':    'Could not update the pattern in the configuration'
+                }).code(500);
             });
         })
-        .catch((error) => {
+        .catch((err) => {
             reply({
                 'statusCode': 500,
                 'error':      9,
-                'message':    'Could not get data from elasticsearch'
+                'message':    'Could not delete visualizations'
             }).code(500);
         });
     };
@@ -137,12 +138,22 @@ module.exports = (server, options) => {
         payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
         payload.query.bool.filter.range['@timestamp']['lt']  = timeLT;
 
-        // Set up match for default cluster name
-        payload.query.bool.must.push({
-            "match": {
-                "cluster.name": req.params.cluster
-            }
-        });
+        if (req.params.mode === 'cluster') {
+            // Set up match for default cluster name
+            payload.query.bool.must.push({
+                "match": {
+                    "cluster.name": req.params.cluster
+                }
+            });
+        } else {
+            // Set up match for default cluster name
+            payload.query.bool.must.push({
+                "match": {
+                    "manager.name": req.params.cluster
+                }
+            });
+        }
+
         payload.aggs['2'].terms.field = req.params.field;
 
         fetchElastic(req, payload)
@@ -208,41 +219,8 @@ module.exports = (server, options) => {
      **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/top/{cluster}/{field}/{time?}',
+        path: '/api/wazuh-elastic/top/{mode}/{cluster}/{field}',
         handler: getFieldTop
-    });
-
-    /*
-     * GET /api/wazuh-elastic/top/{cluster}/{field}/{fieldFilter}/{fieldValue}/{time?}
-     * Returns the agent with most alerts
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/top/{cluster}/{field}/{fieldFilter}/{fieldValue}/{time?}',
-        handler: getFieldTop
-    });
-
-    /*
-     * GET /api/wazuh-elastic/top/{cluster}/{field}/{fieldFilter}/{fieldValue}/{fieldFilter}/{fieldValue}/{time?}
-     * Returns the agent with most alerts
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/top/{cluster}/{field}/{fieldFilter}/{fieldValue}/{fieldFilter2}/{fieldValue2}/{time?}',
-        handler: getFieldTop
-    });
-
-    /*
-     * /api/wazuh-elastic/alerts-count
-     * Returns alerts count for fields/value array between timeGTE and timeLT
-     * @params: fields[{field,value}], cluster, timeinterval{gte,lte}
-     **/
-    server.route({
-        method: 'POST',
-        path: '/api/wazuh-elastic/alerts-count/',
-        handler: alertsCount
     });
 
     /*
@@ -254,5 +232,16 @@ module.exports = (server, options) => {
         method: 'GET',
         path: '/api/wazuh-elastic/setup',
         handler: getSetupInfo
+    });
+
+    /*
+     * POST /api/wazuh-elastic/updatePattern
+     * Update the index pattern in the app visualizations
+     *
+     **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/updatePattern/{pattern}',
+        handler: updateAppObjects
     });
 };

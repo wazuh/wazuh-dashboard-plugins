@@ -19,6 +19,14 @@ require('ui/modules')
             if (cluster_info) {
                 $cookies.putObject('_clusterInfo', cluster_info);
             }
+        },
+        getCurrentPattern: () => {
+            return $cookies.getObject('_currentPattern');
+        },
+        setCurrentPattern: newPattern => {
+            if (newPattern) {
+                $cookies.putObject('_currentPattern', newPattern);
+            }
         }
     };
 });

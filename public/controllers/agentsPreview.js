@@ -12,8 +12,14 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
         "id":   ""
     };
 
-    let tmpUrl  = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.name`;
-    let tmpUrl2 = `/api/wazuh-elastic/top/${appState.getClusterInfo().cluster}/agent.id`;
+    let tmpUrl, tmpUrl2;
+    if (appState.getClusterInfo().status === 'enabled') {
+        tmpUrl  = `/api/wazuh-elastic/top/cluster/${appState.getClusterInfo().cluster}/agent.name`;
+        tmpUrl2 = `/api/wazuh-elastic/top/cluster/${appState.getClusterInfo().cluster}/agent.id`;
+    } else {
+        tmpUrl  = `/api/wazuh-elastic/top/manager/${appState.getClusterInfo().manager}/agent.name`;
+        tmpUrl2 = `/api/wazuh-elastic/top/manager/${appState.getClusterInfo().manager}/agent.id`;
+    }
 
     // Retrieve os list
     const retrieveList = () => {
