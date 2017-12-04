@@ -12,7 +12,7 @@
     "wazuh",
     "ossec"
   ],
-  "initialPattern" : "wazuh-alerts-*",
+  "initialPattern" : "wazuh-alerts-3.x-*",
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "repository": {
