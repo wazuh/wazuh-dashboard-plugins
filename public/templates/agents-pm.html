@@ -1,9 +1,9 @@
-<md-content flex layout="column" ng-if="tab === 'pm'" class="app-container wazuh-column" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'pm'" layout-align="start">
 
     <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'" class="wazuh-column">
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
         <div layout="row" class="agents-pm-top-row">

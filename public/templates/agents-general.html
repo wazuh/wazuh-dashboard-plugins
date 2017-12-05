@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="tab === 'general'" class="app-container wazuh-column" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'general'" layout-align="start">
 
     <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
 
@@ -75,7 +75,7 @@
     </div>
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'" class="wazuh-column">
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" class="agents-overview-top">
             <md-card flex="33">

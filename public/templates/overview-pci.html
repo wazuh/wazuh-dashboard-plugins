@@ -1,9 +1,9 @@
-<md-content flex layout="column" ng-if="tab == 'pci'" class="app-container wazuh-column" layout-align="start">
+<md-content flex layout="column" ng-if="tab == 'pci'" layout-align="start">
 
     <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'" class="wazuh-column">
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" layout-align="center stretch">
             <md-card flex>
@@ -26,7 +26,7 @@
                 </md-card-content>
             </md-card>
         </div>
-        
+
         <div layout="row" layout-align="center stretch" class="overview-pci-requirements-row">
             <md-card flex="70">
                 <md-card-content class="wazuh-column">
