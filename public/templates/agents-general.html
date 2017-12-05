@@ -2,7 +2,7 @@
 
     <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
 
-    <div ng-show="resultState !== 'ready' && tabView === 'panels'">
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
         <div layout="row" class="agents-overview-top-metric-row">
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
@@ -25,8 +25,8 @@
                     <div class="ng-binding">Version</div>
                 </md-card-content>
             </md-card>
-            <md-card ng-if="agent.group" flex="12" class="cardHover">
-                <md-card-content class="agents-overview-top-metric-item" ng-click="goGroups(agent)">
+            <md-card ng-if="agent.group" flex="12">
+                <md-card-content class="agents-overview-top-metric-item" >
                     <div class="metric-value ng-binding agents-overview-size-14" >{{ agent.group }}</div>
                     <!--<md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>-->
                     <div class="ng-binding">Group</div>
