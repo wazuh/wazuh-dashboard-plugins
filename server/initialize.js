@@ -161,7 +161,7 @@ module.exports = (server, options) => {
             server.log([blueWazuh, 'initialize', 'info'], 'Successfully set to default index: ' + id);
         })
         .catch((err) => {
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not default the index.');
+            server.log([blueWazuh, 'initialize', 'error'], 'Could not default the index.' + err);
         });
     };
 
