@@ -18,11 +18,18 @@
                     <div class="ng-binding">IP Address</div>
                 </md-card-content>
             </md-card>
-            <md-card flex="12">
+            <md-card ng-if="agent.version" flex="12">
                 <md-card-content class="agents-overview-top-metric-item">
                     <div class="metric-value ng-binding agents-overview-size-14">{{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</div>
                     <!--<md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>-->
                     <div class="ng-binding">Version</div>
+                </md-card-content>
+            </md-card>
+            <md-card ng-if="agent.group" flex="12">
+                <md-card-content class="agents-overview-top-metric-item" >
+                    <div class="metric-value ng-binding agents-overview-size-14" >{{ agent.group }}</div>
+                    <!--<md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>-->
+                    <div class="ng-binding">Group</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
@@ -37,7 +44,7 @@
         <div layout="row" class="agents-overview-second-row">
             <md-card flex ng-show="agent.id != '000'">
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.lastKeepAlive}}</div>
+                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.lastKeepAlive || 'Unknown' }}</div>
                     <!--<md-tooltip md-direction="bottom">{{ agent.lastKeepAlive }}</md-tooltip>-->
                     <div class="ng-binding">Last keep alive</div>
                 </md-card-content>
