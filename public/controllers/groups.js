@@ -13,10 +13,49 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     $scope.groupAgents     = GroupAgents;
     $scope.groupFiles      = GroupFiles;
 
-    // Actual execution in the controller's initialization
-    $scope.groups.nextPage('')
-    .then(() => $scope.loadGroup(0))
-    .catch(error => notify.error(error.message));
+    // Store a boolean variable to check if come from agents
+    const fromAgents = ('comeFrom' in $rootScope) && ('globalAgent' in $rootScope) && $rootScope.comeFrom === 'agents';
+
+    // If come from agents
+    if(fromAgents) {
+        let len = 0;
+        // Get ALL groups
+        apiReq.request('GET','/agents/groups/',{limit:99999})
+        .then(data => {
+            // Obtain an array with 0 or 1 element, in that case is our group
+            let filtered = data.data.data.items.filter(group => group.name === $rootScope.globalAgent.group);
+            // Store the array length, should be 0 or 1
+            len = filtered.length;
+            // If len is 1
+            if(len){
+                // First element is now our group $scope.groups.item is an array with only our group
+                $scope.groups.items = filtered;
+                // Load that our group
+                $scope.loadGroup(0);    
+            }
+            // Clean $rootScope
+            delete $rootScope.globalAgent;
+            delete $rootScope.comeFrom;
+            // Get more groups to fill the md-content with more items
+            return $scope.groups.nextPage('')
+           
+        })
+        .then(() => {
+            // If our group was not found  we need to call loadGroup after load some groups
+            if(!len) $scope.loadGroup(0);
+        })
+        .catch(error => notify.error(error.message));
+
+
+    // If not come from agents make as normal
+    } else {
+
+        // Actual execution in the controller's initialization
+        $scope.groups.nextPage('')
+        .then(() => $scope.loadGroup(0))
+        .catch(error => notify.error(error.message));
+
+    }
 
     $scope.load = false;
 
