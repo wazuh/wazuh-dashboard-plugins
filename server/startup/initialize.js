@@ -6,13 +6,13 @@ module.exports = function (server, options) {
 	const elasticsearch = require('elasticsearch');
 	const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 	//callWithInternalUser
-	
+
 	// External libraries
 	//const uiSettings = server.uiSettings();
 	const fs = require('fs');
 	const path = require('path');
 
-	// Colors for console logging 
+	// Colors for console logging
 	const colors = require('ansicolors');
 	const blueWazuh = colors.blue('wazuh');
 
@@ -37,7 +37,7 @@ module.exports = function (server, options) {
 
 	// Read config from package JSON
 	packageJSON = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
-	
+
 	// Today
 	var fDate = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
 	var todayIndex = index_prefix + fDate;
@@ -45,7 +45,7 @@ module.exports = function (server, options) {
 	// Save Wazuh App first set up for further updates
 	var saveSetupInfo = function (type) {
         var setup_info = {"name" : "Wazuh App", "app-version": packageJSON.version, "revision": packageJSON.revision, "installationDate": new Date().toISOString() };
-		
+
 		if(type == "install"){
 			elasticRequest.callWithInternalUser('create', { index: ".wazuh", type: 'wazuh-setup', id: 1, body: setup_info }).then(
 				function () {
@@ -54,7 +54,7 @@ module.exports = function (server, options) {
 					server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh set up info');
 				});
 		}
-		
+
 		if(type == "upgrade"){
 			elasticRequest.callWithInternalUser('update', { index: ".wazuh", type: 'wazuh-setup', id: 1, body: {doc: setup_info}}).then(
 				function () {
@@ -63,7 +63,7 @@ module.exports = function (server, options) {
 					server.log([blueWazuh, 'initialize', 'error'], 'Could not upgrade Wazuh set up info');
 				});
 		}
-		
+
 		if(type == "migration"){
 			elasticRequest.callWithInternalUser('create', { index: ".wazuh", type: 'wazuh-setup', id: 1, body: setup_info }).then(
 				function () {
@@ -71,14 +71,14 @@ module.exports = function (server, options) {
 				}, function (error) {
 					server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh set up info');
 				});
-			
+
 		}
     };
 
-	
+
 	// Insert sample alert
 	var insertSampleAlert = function () {
-		
+
 		try {
 			alert_sample = JSON.parse(fs.readFileSync(path.resolve(__dirname, ALERT_SAMPLE_FILE), 'utf8'));
 		} catch (e) {
@@ -86,11 +86,11 @@ module.exports = function (server, options) {
 			server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + ALERT_SAMPLE_FILE);
 			server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
 		};
-			
+
 		server.log([blueWazuh, 'initialize', 'info'], 'Inserting sample alert...');
 		elasticRequest.callWithInternalUser('create', { index: todayIndex, type: 'wazuh', id: 'alert_sample', body: alert_sample })
 			.then(function () {
-				server.log([blueWazuh, 'initialize', 'info'], 'Sample alert inserted');				
+				server.log([blueWazuh, 'initialize', 'info'], 'Sample alert inserted');
 			}, function (response) {
 				if (response.statusCode != '409') {
 					server.log([blueWazuh, 'initialize', 'error'], 'Could not insert the sample alert');
@@ -99,10 +99,10 @@ module.exports = function (server, options) {
 				}
 			});
 	}
-	
+
 	// Create index pattern
 	var createIndexPattern = function () {
-					
+
 		try {
 		  kibana_fields_data = JSON.parse(fs.readFileSync(path.resolve(__dirname, KIBANA_FIELDS_FILE), 'utf8'));
 		} catch (e) {
@@ -119,7 +119,7 @@ module.exports = function (server, options) {
 				setTimeout(function () {
 					console.log("setting up");
 					setDefaultKibanaSettings();
-				}, 2000)					
+				}, 2000)
 			}, function (response) {
 				if (response.statusCode != '409') {
 					server.log([blueWazuh, 'initialize', 'error'], 'Could not configure index pattern:' + index_pattern);
@@ -128,18 +128,18 @@ module.exports = function (server, options) {
 				}
 			});
     };
-	
+
 	// Setting default index pattern
 	var setDefaultKibanaSettings = function () {
         server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default values: Index pattern, time picker and metaFields...');
-			
-		elasticRequest.callWithInternalUser('update', { 
-        	index: '.kibana', 
-        	type: 'config', 
-        	id: '5.6.4', 
-        	body: { 
+
+		elasticRequest.callWithInternalUser('update', {
+        	index: '.kibana',
+        	type: 'config',
+        	id: '5.6.5', 
+        	body: {
         		doc: {
-        			'defaultIndex':'wazuh-alerts-*', 
+        			'defaultIndex':'wazuh-alerts-*',
         			'timepicker:timeDefaults':'{  \"from\": \"now-24h\",  \"to\": \"now\",  \"mode\": \"quick\"}',
         			'metaFields':['_source']
         		}
@@ -152,7 +152,7 @@ module.exports = function (server, options) {
                 server.log([blueWazuh, 'initialize', 'error'], data);
             });
     };
-	
+
 	var importConfigurationFromKibana = function () {
 		elasticRequest.callWithInternalUser('search',{ index: '.kibana', type: 'wazuh-configuration'})
 			.then(function (data) {
@@ -179,7 +179,7 @@ module.exports = function (server, options) {
 				server.log([blueWazuh, 'initialize', 'error'], 'wazuh-configuration documents could not be imported from .kibana index to .wazuh index.');
 			});
 	}
-	
+
 	// Configure Kibana status: Index pattern, default index pattern, default time, import dashboards.
 	var configureKibana = function (type) {
 
@@ -189,12 +189,12 @@ module.exports = function (server, options) {
 			// Create Index Pattern > Set it as default > Set default time
 			createIndexPattern();
 			// Import objects
-			importObjects();			
+			importObjects();
 		}
-		
+
 		if(type == "migration"){
 			importConfigurationFromKibana();
-			importObjects();			
+			importObjects();
 		}
 		// Save Setup Info
 		saveSetupInfo(type);
@@ -224,7 +224,7 @@ module.exports = function (server, options) {
 	var configure = function (type) {
 		loadTemplate(type);
 	}
-	
+
     var loadTemplate = function (type) {
 		try {
 			map_jsondata = JSON.parse(fs.readFileSync(path.resolve(__dirname, TEMPLATE_FILE), 'utf8'));
@@ -241,9 +241,9 @@ module.exports = function (server, options) {
 				server.log([blueWazuh, 'initialize', 'error'], 'Could not install template ' +  index_pattern);
 			});
     };
-	
+
     var importObjects = function () {
-		
+
 		server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...');
 		try {
 			objects = JSON.parse(fs.readFileSync(path.resolve(__dirname, OBJECTS_FILE), 'utf8'));
@@ -282,7 +282,7 @@ module.exports = function (server, options) {
 			}
 		);
 	}
-	
+
 	// Check Kibana index and if it is prepared, start the initialization of wazuh App.
 	checkKibanaIndex();
 
