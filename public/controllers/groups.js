@@ -13,6 +13,11 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     $scope.groupAgents     = GroupAgents;
     $scope.groupFiles      = GroupFiles;
 
+    const removeDuplicates = () => {
+        $scope.groups.items = $scope.groups.items.filter((elem, index, self) => self.findIndex(
+            (t) => {return (t.merged_sum === elem.merged_sum)}) === index);
+    };
+
     // Store a boolean variable to check if come from agents
     const fromAgents = ('comeFrom' in $rootScope) && ('globalAgent' in $rootScope) && $rootScope.comeFrom === 'agents';
 
@@ -42,7 +47,12 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         })
         .then(() => {
             // If our group was not found  we need to call loadGroup after load some groups
-            if(!len) $scope.loadGroup(0);
+            if(!len) {
+                $scope.loadGroup(0);
+            } else {
+                removeDuplicates();
+            }
+            $scope.load = false;
         })
         .catch(error => notify.error(error.message));
 
@@ -52,12 +62,14 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
 
         // Actual execution in the controller's initialization
         $scope.groups.nextPage('')
-        .then(() => $scope.loadGroup(0))
+        .then(() => {
+            $scope.loadGroup(0);
+            $scope.load = false;
+        })
         .catch(error => notify.error(error.message));
-
     }
 
-    $scope.load = false;
+    
 
     $scope.showFiles = (index) => {
         $scope.fileViewer = false;
@@ -130,7 +142,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         $scope.groupFiles.reset();
         $scope.groupAgents.reset();
     });
-    
+   
 
 });
 
