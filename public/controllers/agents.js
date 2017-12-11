@@ -90,6 +90,9 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 		if ($scope.agent.rootcheck.end && $scope.agent.rootcheck.start) {
 			let minutes = calculateMinutes($scope.agent.rootcheck.start, $scope.agent.rootcheck.end);
 			$scope.agent.rootcheck.duration = window.Math.round(minutes);
+			if($scope.agent.rootcheck.duration <= 0){
+				$scope.agent.rootcheck.inProgress = true;
+			}
 		} else {
 			if (!$scope.agent.rootcheck.end) {
 				$scope.agent.rootcheck.end = 'Unknown';
@@ -105,6 +108,9 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 		if ($scope.agent.syscheck.end && $scope.agent.syscheck.start) {
 			let minutes  = calculateMinutes($scope.agent.syscheck.start, $scope.agent.syscheck.end);
 			$scope.agent.syscheck.duration = window.Math.round(minutes);
+			if($scope.agent.syscheck.duration <= 0){
+				$scope.agent.syscheck.inProgress = true;
+			}
 		} else {
 			if (!$scope.agent.syscheck.end) {
 				$scope.agent.syscheck.end = 'Unknown';
