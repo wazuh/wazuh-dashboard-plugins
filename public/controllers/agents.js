@@ -213,17 +213,8 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 				// Get rootcheck info
 				DataFactory.getAndClean('get', '/rootcheck/' + agent.id + '/last_scan', {}).then(function (data) {
 					$scope.agentInfo.rootcheck = {
-						start   : data.data.start,
-						end     : data.data.end,
-						duration: null
+						start   : data.data.start
 					}
-					if($scope.agentInfo.rootcheck.start && $scope.agentInfo.rootcheck.end){
-						$scope.agentInfo.rootcheck.duration = ((new Date($scope.agentInfo.rootcheck.end) - new Date($scope.agentInfo.rootcheck.start))/1000)/60;
-						$scope.agentInfo.rootcheck.duration = Math.round($scope.agentInfo.rootcheck.duration * 100) / 100;
-					}	
-					if($scope.agentInfo.rootcheck.duration <= 0){
-						$scope.agentInfo.rootcheck.inProgress = true;
-					}				
 				}, printError);				
 				
 			}, printError);	
