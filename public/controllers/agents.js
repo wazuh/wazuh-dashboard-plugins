@@ -205,6 +205,9 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 						$scope.agentInfo.syscheck.duration = ((new Date($scope.agentInfo.syscheck.end) - new Date($scope.agentInfo.syscheck.start))/1000)/60;
 						$scope.agentInfo.syscheck.duration = Math.round($scope.agentInfo.syscheck.duration * 100) / 100;
 					}
+					if($scope.agentInfo.syscheck.duration <= 0){
+						$scope.agentInfo.syscheck.inProgress = true;
+					}	
 				}, printError);
 				
 				// Get rootcheck info
@@ -217,7 +220,10 @@ app.controller('agentsController', function ($scope, $q, DataFactory, Notifier, 
 					if($scope.agentInfo.rootcheck.start && $scope.agentInfo.rootcheck.end){
 						$scope.agentInfo.rootcheck.duration = ((new Date($scope.agentInfo.rootcheck.end) - new Date($scope.agentInfo.rootcheck.start))/1000)/60;
 						$scope.agentInfo.rootcheck.duration = Math.round($scope.agentInfo.rootcheck.duration * 100) / 100;
-					}					
+					}	
+					if($scope.agentInfo.rootcheck.duration <= 0){
+						$scope.agentInfo.rootcheck.inProgress = true;
+					}				
 				}, printError);				
 				
 			}, printError);	

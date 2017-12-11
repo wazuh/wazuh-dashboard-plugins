@@ -3,7 +3,7 @@
 	<!-- Kibana search bar -->
 	<kbn-searchbar class="wazuh-searchbar" ng-if="tabView == 'panels'"></kbn-searchbar>
 	<div class='uil-ring-css' ng-if="tabView == 'panels'" ng-show='!hideRing(7)'><div></div></div>
-	<div ng-if="tabView == 'panels'">
+	<div ng-show='hideRing(7) && results && !loading' ng-if="tabView == 'panels'">
 		<md-content class="no-legend" layout="row">
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
@@ -46,8 +46,9 @@
 			</md-card>
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.syscheck.end || 'Unknown' }}</div>
-					<md-tooltip md-direction="bottom">
+						<div class="metric-value ng-binding" style="font-size: 14pt;" ng-if="agentInfo.syscheck.inProgress">Scan in progress</div>
+					<div class="metric-value ng-binding" style="font-size: 14pt;" ng-if="!agentInfo.syscheck.inProgress">{{agentInfo.syscheck.end || 'Unknown' }}</div>
+					<md-tooltip md-direction="bottom" ng-if="!agentInfo.syscheck.inProgress">
 						Start time: {{ agentInfo.syscheck.start || 'Unknown' }} <br>
 						End time: {{ agentInfo.syscheck.end || 'Unknown'}} <br>
 						Duration time: {{ agentInfo.syscheck.duration + ' minutes' || 'Unknown'}}
@@ -57,8 +58,9 @@
 			</md-card>
 			<md-card flex layout="column">
 				<md-card-content style="text-align: center;">
-					<div class="metric-value ng-binding" style="font-size: 14pt;">{{agentInfo.rootcheck.end || 'Unknown'}}</div>
-					<md-tooltip md-direction="bottom">
+					<div class="metric-value ng-binding" style="font-size: 14pt;" ng-if="agentInfo.rootcheck.inProgress">Scan in progress</div>
+					<div class="metric-value ng-binding" style="font-size: 14pt;" ng-if="!agentInfo.rootcheck.inProgress">{{agentInfo.rootcheck.end || 'Unknown'}}</div>
+					<md-tooltip md-direction="bottom" ng-if="!agentInfo.rootcheck.inProgress">
 						Start time: {{ agentInfo.rootcheck.start || 'Unknown' }} <br>
 						End time: {{ agentInfo.rootcheck.end || 'Unknown' }} <br>
 						Duration time: {{ agentInfo.rootcheck.duration + ' minutes' || 'Unknown'}}
