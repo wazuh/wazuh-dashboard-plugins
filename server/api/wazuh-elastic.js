@@ -8,7 +8,7 @@ module.exports = (server, options) => {
     //Handlers
     const fetchElastic = (req, payload) => {
         return elasticRequest.callWithRequest(req, 'search', {
-            index: 'wazuh-alerts-*',
+            index: 'wazuh-alerts-3.x-*',
             type:  'wazuh',
             body:  payload
         });

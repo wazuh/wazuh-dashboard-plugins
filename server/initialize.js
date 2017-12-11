@@ -140,31 +140,6 @@ module.exports = (server, options) => {
         });
     };
 
-    // Setting default index pattern
-    const setDefaultKibanaSettings = (id) => {
-        server.log([blueWazuh, 'initialize', 'info'], 'Setting Kibana default values: Index pattern, time picker and metaFields...');
-
-        elasticRequest.callWithInternalUser('update', { 
-            index: '.kibana', 
-            type: 'doc', 
-            id: `config:${packageJSON.kibana.version}`, 
-            body: {
-                'doc': {
-                    "type": 'config', 
-                    "config": { 
-                        "defaultIndex": id
-                    } 
-                }
-            } 
-        })
-        .then((resp) => {
-            server.log([blueWazuh, 'initialize', 'info'], 'Successfully set to default index: ' + id);
-        })
-        .catch((err) => {
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not default the index.' + err);
-        });
-    };
-
     // Create index pattern TODO: remove hardcoded index-patterns ids
     const createIndexPattern = () => {
         server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${index_pattern}`);
@@ -183,8 +158,6 @@ module.exports = (server, options) => {
         })
         .then((resp) => {
             server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
-            // Set the index-pattern as default in the Kibana configuration
-            setDefaultKibanaSettings('f1175040-d5c5-11e7-8ef5-a5944cf52264');
             // Import objects (dashboards and visualizations)
             importObjects('f1175040-d5c5-11e7-8ef5-a5944cf52264');
             importAppObjects('f1175040-d5c5-11e7-8ef5-a5944cf52264');
