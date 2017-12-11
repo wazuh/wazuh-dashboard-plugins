@@ -229,6 +229,7 @@ function ($scope, $rootScope, $http, $routeParams, $route, $location, Notifier, 
             .then((data) => {
 				let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
 				let minimumCount = 0;
+
 				for (var i = 0; i < data.fields.length; i++) {
 					if (minimum.includes(data.fields[i].name)) {
 						minimumCount++;
@@ -238,6 +239,8 @@ function ($scope, $rootScope, $http, $routeParams, $route, $location, Notifier, 
 				if (minimumCount == minimum.length)
 					notify.info("Successfully changed the default index-pattern");
 				else notify.warning("The index-pattern was changed, but it is NOT compatible with Wazuh alerts");
+
+				$scope.selectedIndexPattern = newIndexPattern;
             });
         })
         .catch(() => {
