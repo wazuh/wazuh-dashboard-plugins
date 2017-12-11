@@ -59,6 +59,11 @@ app.factory('DataHandler', function ($q, apiReq) {
                 if (this.offset >= this.totalItems) this.end = true; 
                 if (data.data.data !== 0){
                     this.busy = false;
+                    if(this.path === '/agents/groups'){
+                        let filtered = this.items.filter((elem, index, self) => self.findIndex(
+                            (t) => {return (t.merged_sum === elem.merged_sum)}) === index);
+                        if(filtered.length !== this.items.length) this.items = filtered;
+                    }
                     deferred.resolve(true);
                 }
             })

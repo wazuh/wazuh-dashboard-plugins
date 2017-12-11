@@ -158,6 +158,13 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 		.catch(error => notify.error(error.message));
 	};
 
+	$scope.goGroups = agent => {
+		$rootScope.globalAgent = agent;
+		$rootScope.comeFrom    = 'agents';
+		$location.search('tab', 'groups');
+		$location.path('/manager');        
+	};
+
 	//Load
 	try {
 		$scope.getAgent();
