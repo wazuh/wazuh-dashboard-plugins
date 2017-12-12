@@ -10,4 +10,5 @@ require('plugins/wazuh/less/wazuh-navbar.less');
 require('plugins/wazuh/less/not-used.less');
 require('plugins/wazuh/less/buttons.less');
 require('plugins/wazuh/less/overview.less');
+require('plugins/wazuh/less/settings.less');
 import 'ui/styles/theme.less'
