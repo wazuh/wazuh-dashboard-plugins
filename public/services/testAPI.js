@@ -2,9 +2,9 @@ import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
 .service('testAPI', function ($q, $http) {
     return {
-        check_stored: () => {
+        check_stored: (data) => {
             let defered = $q.defer();
-            $http.get(chrome.addBasePath('/api/wazuh-api/checkAPI'))
+            $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data)
             .then((response) => {
                 if (response.error) {
                     defered.reject(response);

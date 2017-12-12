@@ -3,7 +3,7 @@ require('ui/modules').get('app/wazuh', [])
     return {
         loadFilters() {
               let implicitFilter = [];
-
+              
               if (appState.getClusterInfo().status == 'enabled') {
                 // The cluster filter
                 implicitFilter.push(

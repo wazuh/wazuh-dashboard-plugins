@@ -51,28 +51,44 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 //Installation wizard
 const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState) => {
     const notify = new Notifier();
-
     let deferred = $q.defer();
-    testAPI.check_stored()
+
+    // There's no cookie for current API
+    if (appState.getCurrentAPI() === null || appState.getCurrentAPI() === undefined) {
+        notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+        $location.path('/settings');
+        deferred.reject();
+    }
+
+    testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id)
     .then(data => {
         if (data.data.error || data.data.data.apiIsDown) {
             if (parseInt(data.data.error) === 2){
                 notify.warning("Wazuh App: Please set up Wazuh API credentials.");
             } else if(data.data.data.apiIsDown){
-                $rootScope.apiIsDown = true;
+                $rootScope.apiIsDown = "down";
                 notify.error("Wazuh RESTful API seems to be down.");
             } else {
                 notify.error("Could not connect with Wazuh RESTful API.");
+                appState.removeCurrentAPI();
             }
             $location.path('/settings');
             deferred.reject();
         } else { 
+            // Should change the currentAPI configuration depending on cluster
+            if (data.data.data.cluster_info.status === 'disabled')
+                appState.setCurrentAPI(JSON.stringify({name: data.data.data.cluster_info.manager, id: JSON.parse(appState.getCurrentAPI()).id }));
+            else 
+                appState.setCurrentAPI(JSON.stringify({name: data.data.data.cluster_info.cluster, id: JSON.parse(appState.getCurrentAPI()).id }));
+
             appState.setClusterInfo(data.data.data.cluster_info);
             appState.setExtensions(data.data.data.extensions);
             deferred.resolve();
         }
     })
-    .catch(error => notify.error(error.message));
+    .catch(error => {
+        notify.error(error.message);
+    });
 
     return deferred.promise;
 };
@@ -92,7 +108,7 @@ const goToKibana = ($location, $window) => {
     $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
 };
 
-const getIp =  (Promise, courier, config, $q, $location, Notifier, Private, appState, genericReq) => {
+const getIp = (Promise, courier, config, $q, $location, Notifier, Private, appState, genericReq) => {
     const State = Private(StateProvider);
     const savedObjectsClient = Private(SavedObjectsClientProvider);
 
@@ -110,8 +126,13 @@ const getIp =  (Promise, courier, config, $q, $location, Notifier, Private, appS
 
         genericReq.request('GET', '/api/wazuh-elastic/setup')
         .then((data) => {
-            currentPattern = data.data.data["index-pattern"];
-            appState.setCurrentPattern(currentPattern);
+
+            if (appState.getCurrentPattern() !== undefined && appState.getCurrentPattern() !== null) { // There's cookie for the pattern
+                currentPattern = appState.getCurrentPattern();
+            } else {
+                currentPattern = data.data.data["index-pattern"];
+                appState.setCurrentPattern(currentPattern);              
+            }
 
             for (var i = 0; i < savedObjects.length; i++) {
                 if (savedObjects[i].id === currentPattern) {

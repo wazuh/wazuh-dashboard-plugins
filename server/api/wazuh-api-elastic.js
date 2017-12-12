@@ -162,17 +162,12 @@ module.exports = (server, options) => {
     };
 
     const saveAPI = (req, reply) => {
-        if (!('user'     in req.payload) ||
-            !('password' in req.payload) ||
-            !('url'      in req.payload) ||
-            !('port'     in req.payload)) {
-
-                return reply({
+        if (!('user' in req.payload) || !('password' in req.payload) || !('url' in req.payload) || !('port' in req.payload)) {
+            return reply({
                 'statusCode': 400,
-                'error':      7,
-                'message':    'Missing data'
+                'error': 7,
+                'message': 'Missing data'
             }).code(400);
-
         }
 
         let settings = {
@@ -187,11 +182,10 @@ module.exports = (server, options) => {
             extensions:   req.payload.extensions
         };
 
-        elasticRequest
-        .callWithRequest(req, 'create', {
+        elasticRequest.callWithRequest(req, 'create', {
                 index:   '.wazuh',
                 type:    'wazuh-configuration',
-                id:      req.payload.id,
+                id:      new Date().getTime(),
                 body:    settings,
                 refresh: true
         })
@@ -212,8 +206,7 @@ module.exports = (server, options) => {
     };
 
     const updateAPIHostname = (req, reply) => {
-        elasticRequest
-        .callWithRequest(req, 'update', {
+        elasticRequest.callWithRequest(req, 'update', {
             index: '.wazuh',
             type:  'wazuh-configuration',
             id:    req.params.id,
