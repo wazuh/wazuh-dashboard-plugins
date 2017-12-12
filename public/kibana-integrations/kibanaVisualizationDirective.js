@@ -48,6 +48,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                         if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
                             visualization.searchSource
+                            .query({ language: 'lucene', query: implicitFilter })
                             .set('filter', implicitFilters.loadFilters());
                         }
 

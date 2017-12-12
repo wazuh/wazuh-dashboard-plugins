@@ -25,9 +25,7 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
     const retrieveList = () => {
         for(let agent of $scope.agents.items){
             if('os' in agent && 'name' in agent.os){
-                let exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name &&
-                                                 e.platform === agent.os.platform &&
-                                                 e.version === agent.os.version);
+                let exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
                 if(!exists.length){
                     $scope.osPlatforms.push({
                         name:     agent.os.name,

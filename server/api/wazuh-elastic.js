@@ -14,34 +14,26 @@ module.exports = (server, options) => {
         });
     };
 
-    const getConfig = (callback) => {
-        elasticRequest
-        .callWithInternalUser('search', {
+    const getConfig = (id, callback) => {
+        elasticRequest.callWithInternalUser('get', {
             index: '.wazuh',
             type:  'wazuh-configuration',
-            q:     'active:true'
+            id:     id
         })
         .then((data) => {
-                if (data.hits.total === 1) {
-                    callback({
-                        'user':         data.hits.hits[0]._source.api_user,
-                        'password':     Buffer.from(data.hits.hits[0]._source.api_password, 'base64').toString("ascii"),
-                        'url':          data.hits.hits[0]._source.url,
-                        'port':         data.hits.hits[0]._source.api_port,
-                        'insecure':     data.hits.hits[0]._source.insecure,
-                        'cluster_info': data.hits.hits[0]._source.cluster_info,
-                        'extensions':   data.hits.hits[0]._source.extensions
-                    });
-                } else {
-                    callback({
-                        'error':      'no credentials',
-                        'error_code': 1
-                    });
-                }
+            callback({
+                'user':         data._source.api_user,
+                'password':     Buffer.from(data._source.api_password, 'base64').toString("ascii"),
+                'url':          data._source.url,
+                'port':         data._source.api_port,
+                'insecure':     data._source.insecure,
+                'cluster_info': data._source.cluster_info,
+                'extensions':   data._source.extensions
+            });
         })
         .catch((error) => {
             callback({
-                'error':      'no elasticsearch',
+                'error': 'no elasticsearch',
                 'error_code': 2
             });
         });
@@ -70,29 +62,10 @@ module.exports = (server, options) => {
         })
         .then((resp) => {
             // Update the pattern in the configuration
-            elasticRequest.callWithInternalUser('update', { 
-                index: '.wazuh-version', 
-                type: 'wazuh-version', 
-                id: '1', 
-                body: {
-                    'doc': {
-                        "index-pattern": req.params.pattern
-                    }
-                } 
-            })
-            .then((resp) => {
-                importAppObjects(req.params.pattern);
-                reply({
-                    'statusCode': 200,
-                    'data':       'Index pattern updated'
-                });
-            })
-            .catch((err) => {
-                reply({
-                    'statusCode': 500,
-                    'error':      9,
-                    'message':    'Could not update the pattern in the configuration'
-                }).code(500);
+            importAppObjects(req.params.pattern);
+            reply({
+                'statusCode': 200,
+                'data':       'Index pattern updated'
             });
         })
         .catch((err) => {

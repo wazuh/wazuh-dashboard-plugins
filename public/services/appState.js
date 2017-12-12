@@ -1,6 +1,4 @@
-require('ui/modules')
-.get('app/wazuh', [])
-.service('appState', function ($cookies) {
+require('ui/modules').get('app/wazuh', []).service('appState', function ($cookies) {
     return {
         getExtensions: () => {
             return {
@@ -26,6 +24,17 @@ require('ui/modules')
         setCurrentPattern: newPattern => {
             if (newPattern) {
                 $cookies.putObject('_currentPattern', newPattern);
+            }
+        },
+        getCurrentAPI: () => {
+            return $cookies.getObject('API');
+        },
+        removeCurrentAPI: () => {
+            return $cookies.remove('API');
+        },
+        setCurrentAPI: API => {
+            if (API) {
+                $cookies.putObject('API', API);
             }
         }
     };

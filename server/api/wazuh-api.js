@@ -26,9 +26,9 @@ module.exports = (server, options) => {
     }
 
     const checkStoredAPI = (req, reply) => {
-        
+
         // Get config from elasticsearch
-        getConfig((wapi_config) => {
+        getConfig(req.payload, (wapi_config) => {
             if (wapi_config.error_code > 1) {
                 // Can not connect to elasticsearch
                 reply({
@@ -321,8 +321,8 @@ module.exports = (server, options) => {
         });
     };
 
-    const makeRequest = (method, path, data, reply) => {
-        getConfig((wapi_config) => {
+    const makeRequest = (method, path, data, id, reply) => {
+        getConfig(id, (wapi_config) => {
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
                 return reply({
@@ -381,12 +381,12 @@ module.exports = (server, options) => {
                 'message':    'Missing param: Path'
             }).code(400);
         } else {
-            makeRequest(req.payload.method, req.payload.path, req.payload.body, reply);
+            makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
         }
     };
 
     const getApiSettings = (req, reply) => {
-        getConfig((wapi_config) => {
+        getConfig(req.payload.id, (wapi_config) => {
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
                 return reply({
@@ -447,8 +447,8 @@ module.exports = (server, options) => {
      *
      **/
     server.route({
-        method:  'GET',
-        path:    '/api/wazuh-api/checkAPI',
+        method:  'POST',
+        path:    '/api/wazuh-api/checkStoredAPI',
         handler: checkStoredAPI
     });
 
