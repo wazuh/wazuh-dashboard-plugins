@@ -1,24 +1,24 @@
 <div flex ng-controller="agentsController" layout="column">
 
-    <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'agents'" style="height: 70px;">
+    <md-content class="wazuhMenuNavBar agents-prev-height-70" ng-init="menuNavItem = 'agents'">
 		<menu-top></menu-top>
     </md-content>
 
-	<div layout="row" layout-align="space-between start" style="background-color: #f7f7f7">
-		<md-toolbar style="height: 50px;">
+	<div layout="row" layout-align="space-between start" class="agents-color-f7">
+		<md-toolbar class="agents-height-50">
 			<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-				<div style="text-transform: none; font-size: 20px;" ng-if="agent">
-					<div style="float: left;margin-top: 3px;margin-right: 11px;">
-						<span> <i style="margin-right: 5px; " class="fa fa-desktop" aria-hidden="true"></i>
+				<div class="agents-head-1" ng-if="agent">
+					<div class="agents-head-2">
+						<span> <i class="fa fa-desktop agents-head-3" aria-hidden="true"></i>
 						{{agent.id}} - {{agent.name}}</span><span ng-show="agent.id === '000'">(Manager)</span>
 					</div>
 
-					<div style="float: left;margin-right: 11px;">
-						<span ng-show="agent.status" ng-class="getAgentStatusClass(agent.status)" style="width: 100%;padding: 4px;color: white;font-weight: normal;font-size: 12px;text-transform: uppercase;">{{formatAgentStatus(agent.status)}}</span>
+					<div class="agents-head-4">
+						<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)">{{formatAgentStatus(agent.status)}}</span>
 					</div>
 				</div>
 
-				<span layout="row" style="padding-left: 0px;" layout-align="space-between start" flex="40">
+				<span layout="row" class="agents-head-pad-left" layout-align="space-between start" flex="40">
 					<md-autocomplete id="agentsAutocomplete" flex md-no-cache="true" md-select-on-match="true" md-selected-item="_swpagent" md-selected-item-change="getAgent(_swpagent.id)" md-search-text="searchTerm" md-items="agentAutoComplete in agentsAutoComplete.items" md-item-text="agentAutoComplete.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" placeholder="Search by name, ID or IP address">
 						<md-item-template>
 							<span class="item-title">
@@ -39,7 +39,7 @@
 
 	<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
 		<div class="horizontalTabsBar" layout="column" layout-align="center start">
-			<md-nav-bar style="padding-right: 0px;" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+			<md-nav-bar class="agents-head-pad-right" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchTab('general')" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy Monitoring</md-nav-item>
@@ -50,12 +50,12 @@
 		</div>
 
 		<div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
-			<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+			<md-nav-bar layout-align="end end" class="agents-head-pad-right" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-					<i class="fa fa-th" aria-hidden="true" style="font-size: 13px;margin-right: 6px;"></i>Panels
+					<i class="fa fa-th agents-head-6" aria-hidden="true"></i>Panels
 				</md-nav-item>
 				<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-					<img style="width: 16px; margin-right: 6px;" kbn-src="/plugins/wazuh/img/discover.svg">Discover
+					<img class="agents-head-7" kbn-src="/plugins/wazuh/img/discover.svg">Discover
 				</md-nav-item>
 			</md-nav-bar>
 		</div>
