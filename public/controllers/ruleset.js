@@ -1,51 +1,59 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope,$rootScope, Notifier, Rules) {
+app.controller('rulesController', function ($scope,$q,$rootScope, Notifier, Rules,RulesAutoComplete) {
     $scope.setRulesTab = (tab) => $rootScope.globalsubmenuNavItem2 = tab;
     //Initialization
     const notify   = new Notifier({ location: 'Manager - Rules' });
     $scope.loading = true;
     $scope.rules   = Rules;
+    $scope.rulesAutoComplete   = RulesAutoComplete;
     $scope.setRulesTab('rules');
+    
+    $scope.analizeRules = search => {
+        let deferred = $q.defer();
+        
+        let promise;
+        $scope.rulesAutoComplete.filters = [];
 
-    $scope.analizeRules = (search) => {
-        $scope.autoComplete = [];
-        
-        if (search !== '') $scope.autoComplete.push({
-            name: search,
-            type: 'search'
-        });
-        
-        for(let element of $scope.rules.items){
-            for(let pci of element.pci){
-                $scope.autoComplete.push({
-                    name: pci,
-                    type: 'pci'
-                });
-            }
-            for(let group of element.groups){
-                $scope.autoComplete.push({
-                    name: group,
-                    type: 'group'
-                });
-            }
-            $scope.autoComplete.push({
-                name: element.file,
-                type: 'file'
-            });
+        if(search.startsWith('group:') && search.split('group:')[1].trim()) {
+            promise = $scope.rulesAutoComplete.addFilter('group',search.split('group:')[1].trim());
+        } else if(search.startsWith('level:') && search.split('level:')[1].trim()) {
+            promise = $scope.rulesAutoComplete.addFilter('level',search.split('level:')[1].trim());
+        } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
+            promise = $scope.rulesAutoComplete.addFilter('pci',search.split('pci:')[1].trim());
+        } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
+            promise = $scope.rulesAutoComplete.addFilter('file',search.split('file:')[1].trim());
+        } else {
+            promise = $scope.rulesAutoComplete.addFilter('search',search);
         }
 
-        $scope.autoComplete = new Set($scope.autoComplete.map(e => JSON.stringify(e)));
-        $scope.autoComplete = Array.from($scope.autoComplete).map(e => JSON.parse(e));
+        promise
+        .then(() => deferred.resolve($scope.rulesAutoComplete.items))
+        .catch(error => notify.error(error));
+
+        return deferred.promise;
+    }
+
+    $scope.checkEnter = search => {
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+        if(search.startsWith('group:') && search.split('group:')[1].trim()) {
+            $scope.rules.addFilter('group',search.split('group:')[1].trim());
+        } else if(search.startsWith('level:') && search.split('level:')[1].trim()) {
+            $scope.rules.addFilter('level',search.split('level:')[1].trim());
+        } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
+            $scope.rules.addFilter('pci',search.split('pci:')[1].trim());
+        } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
+            $scope.rules.addFilter('file',search.split('file:')[1].trim());
+        }
     };
+
 
     //Load
     try {
         $scope.rules.nextPage('')
-        .then(() => {
-            $scope.loading = false;
-            $scope.analizeRules('');
-        })
+        .then(() => $scope.rulesAutoComplete.nextPage(''))
+        .then(() => $scope.loading = false)
         .catch(error => notify.error(error.message));
     } catch (e) {
         notify.error('Unexpected exception loading controller');
@@ -68,15 +76,16 @@ app.controller('rulesController', function ($scope,$rootScope, Notifier, Rules) 
     $scope.$on('$destroy', () => $scope.rules.reset());
 });
 
-app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier, Decoders) {
+app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Notifier, Decoders,DecodersAutoComplete) {
     $scope.setRulesTab = (tab) => $rootScope.globalsubmenuNavItem2 = tab;
     //Initialization
     const notify    = new Notifier({ location: 'Manager - Decoders' });
     $scope.loading  = true;
     $scope.decoders = Decoders;
+    $scope.decodersAutoComplete = DecodersAutoComplete;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
-    
+
     const colors = [
         '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6
         '#508642', '#CCA300', '#447EBC', '#C15C17', '#890F02', '#0A437C', '#6D1F62', '#584477', //2
@@ -87,25 +96,6 @@ app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier
         '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7' //7
     ];
 
-    $scope.analizeDecoders = (search) => {
-        $scope.autoComplete = [];
-        if (search !== '') {
-            $scope.autoComplete.push({
-                name: search,
-                type: 'search'
-            });
-        }
-
-        for(let element of $scope.decoders.items){
-            $scope.autoComplete.push({
-                name: element.file,
-                type: 'file'
-            });
-        }
-
-        $scope.autoComplete = new Set($scope.autoComplete.map(e => JSON.stringify(e)));
-        $scope.autoComplete = Array.from($scope.autoComplete).map(e => JSON.parse(e));
-    };
 
     let timesOpened = 0;
     let lastName = false;
@@ -140,13 +130,43 @@ app.controller('decodersController', function ($scope,$rootScope, $sce, Notifier
         return $sce.trustAsHtml(coloredString);
     };
 
+
+    $scope.checkEnter = search => {
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+        if(search.startsWith('path:') && search.split('path:')[1].trim()) {
+            $scope.decoders.addFilter('path',search.split('path:')[1].trim());
+        } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
+            $scope.decoders.addFilter('file',search.split('file:')[1].trim());
+        }
+    };
+
+    $scope.analizeDecoders = search => {
+        let deferred = $q.defer();
+        
+        let promise;
+        $scope.decodersAutoComplete.filters = [];
+
+        if(search.startsWith('path:') && search.split('path:')[1].trim()) {
+            promise = $scope.decodersAutoComplete.addFilter('path',search.split('path:')[1].trim());
+        } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
+            promise = $scope.decodersAutoComplete.addFilter('file',search.split('file:')[1].trim());
+        } else {
+            promise = $scope.decodersAutoComplete.addFilter('search',search);
+        }
+
+        promise
+        .then(() => deferred.resolve($scope.decodersAutoComplete.items))
+        .catch(error => notify.error(error));
+
+        return deferred.promise;
+    }
+
     //Load
     try {
         $scope.decoders.nextPage('')
-        .then(() => {
-            $scope.loading = false;
-            $scope.analizeDecoders('');
-        })
+        .then(() => $scope.decodersAutoComplete.nextPage())
+        .then(() => $scope.loading = false)
         .catch(error => notify.error(error.message));
     } catch (e) {
         notify.error('Unexpected exception loading controller');
