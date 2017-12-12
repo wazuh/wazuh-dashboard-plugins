@@ -50,6 +50,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 | 5.6.3  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.3.zip  |
 | 5.6.4  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.4.zip  |
 | 5.6.5  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.5.zip  |
+| 6.0.0  | 3.0.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.0.zip  |
+| 6.0.1  | 3.0.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.1.zip  |
 
 ## Upgrade
 

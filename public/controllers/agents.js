@@ -1,7 +1,7 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('agentsController', 
-function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
+function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
 	$rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
 	$scope.agentsAutoComplete = AgentsAutoComplete;
@@ -88,8 +88,12 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 	const validateRootCheck = () => {
 		$scope.agent.rootcheck.duration = 'Unknown';
 		if ($scope.agent.rootcheck.end && $scope.agent.rootcheck.start) {
-			let minutes = calculateMinutes($scope.agent.rootcheck.start, $scope.agent.rootcheck.end);
-			$scope.agent.rootcheck.duration = window.Math.round(minutes);
+			$scope.agent.rootcheck.duration = ((new Date($scope.agent.rootcheck.end) - new Date($scope.agent.rootcheck.start))/1000)/60;
+			$scope.agent.rootcheck.duration = Math.round($scope.agent.rootcheck.duration * 100) / 100;
+
+			if($scope.agent.rootcheck.duration <= 0){
+				$scope.agent.rootcheck.inProgress = true;
+			}
 		} else {
 			if (!$scope.agent.rootcheck.end) {
 				$scope.agent.rootcheck.end = 'Unknown';
@@ -103,8 +107,11 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 	const validateSysCheck = () => {
 		$scope.agent.syscheck.duration = 'Unknown';
 		if ($scope.agent.syscheck.end && $scope.agent.syscheck.start) {
-			let minutes  = calculateMinutes($scope.agent.syscheck.start, $scope.agent.syscheck.end);
-			$scope.agent.syscheck.duration = window.Math.round(minutes);
+			$scope.agent.syscheck.duration = ((new Date($scope.agent.syscheck.end) - new Date($scope.agent.syscheck.start))/1000)/60;
+			$scope.agent.syscheck.duration = Math.round($scope.agent.syscheck.duration * 100) / 100;
+			if($scope.agent.syscheck.duration <= 0){
+				$scope.agent.syscheck.inProgress = true;
+			}
 		} else {
 			if (!$scope.agent.syscheck.end) {
 				$scope.agent.syscheck.end = 'Unknown';
@@ -164,6 +171,22 @@ function ($scope, $location, $rootScope, Notifier, appState, genericReq, apiReq,
 		$location.search('tab', 'groups');
 		$location.path('/manager');        
 	};
+
+
+    $scope.analizeAgents = search => {
+        let deferred = $q.defer();
+        
+        let promise;
+        $scope.agentsAutoComplete.filters = [];
+
+        promise = $scope.agentsAutoComplete.addFilter('search',search);
+       
+        promise
+        .then(() => deferred.resolve($scope.agentsAutoComplete.items))
+        .catch(error => notify.error(error));
+
+        return deferred.promise;
+    }
 
 	//Load
 	try {

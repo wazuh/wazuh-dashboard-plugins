@@ -58,22 +58,24 @@
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.syscheck.end || 'Unknown'}}</div>
-                    <md-tooltip ng-if="agent.syscheck.start && agent.syscheck.end" md-direction="bottom">
-                        Start time: {{ agent.syscheck.start }} <br>
-                        End time: {{ agent.syscheck.end }} <br>
-                        Duration time: {{ agent.syscheck.duration }} minutes
+                    <div class="metric-value ng-binding agents-overview-size-14" ng-if="agent.syscheck.inProgress">Scan in progress</div>
+                    <div ng-if="!agent.syscheck.inProgress" class="metric-value ng-binding agents-overview-size-14">{{agent.syscheck.end || 'Unknown'}}</div>
+                    <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom">
+                        Start time: {{ agent.syscheck.start || 'Unknown'}} <br>
+                        End time: {{ agent.syscheck.end || 'Unknown'}} <br>
+                        Duration time: {{ agent.syscheck.duration +' minutes' || 'Unknown'}}
                     </md-tooltip>
                     <div class="ng-binding">Last syscheck scan</div>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="agents-overview-top-metric-item">
-                    <div class="metric-value ng-binding agents-overview-size-14">{{agent.rootcheck.end || 'Unknown'}}</div>
-                    <md-tooltip ng-if="agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom">
-                        Start time: {{ agent.rootcheck.start }} <br>
-                        End time: {{ agent.rootcheck.end }} <br>
-                        Duration time: {{ agent.rootcheck.duration }} minutes
+                    <div class="metric-value ng-binding agents-overview-size-14" ng-if="agent.rootcheck.inProgress">Scan in progress</div>
+                    <div ng-if="!agent.rootcheck.inProgress" class="metric-value ng-binding agents-overview-size-14">{{agent.rootcheck.end || 'Unknown'}}</div>
+                    <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom">
+                        Start time: {{ agent.rootcheck.start || 'Unknown'}} <br>
+                        End time: {{ agent.rootcheck.end || 'Unknown'}} <br>
+                        Duration time: {{ agent.rootcheck.duration + ' minutes' || 'Unknown' }}
                     </md-tooltip>
                     <div class="ng-binding">Last rootcheck scan</div>
                 </md-card-content>

@@ -84,17 +84,20 @@ app.factory('DataHandler', function ($q, apiReq) {
 
         addFilter (filterName, value) {
             this.removeFilter(filterName, false);
+
             this.filters.push({
                 name:  filterName,
                 value: value
             });
-
-            this.search();
+            return this.search();
         }
 
         removeFilter (filterName, search) {
-            this.filters = this.filters.filter(filter => filterName !== filter.name);
+            if(search) this.filters = this.filters.filter(filter => filterName !== filter.name && filter.value !== search);
+            else       this.filters = this.filters.filter(filter => filterName !== filter.name);
+            
             if (search) this.search();
+
         }
 
         delete (name, index) {
@@ -106,6 +109,7 @@ app.factory('DataHandler', function ($q, apiReq) {
         }
 
         search () {
+            let deferred = $q.defer();
             let requestData;
             this.end       = false;
             this.busy      = false;
@@ -116,10 +120,12 @@ app.factory('DataHandler', function ($q, apiReq) {
                 limit:  this.initialBatch
             };
             let isUnknown = false;
+
             for(let filter of this.filters){
-                if (filter.value !== '' && filter.value !== 'Unknown') requestData[filter.name] = filter.value;
+                   if (filter.value !== '' && filter.value !== 'Unknown') requestData[filter.name] = filter.value;
                 if (filter.value === 'Unknown') isUnknown = true;
             }
+
 
             apiReq.request('GET', this.path, requestData)
             .then(data => {
@@ -134,8 +140,11 @@ app.factory('DataHandler', function ($q, apiReq) {
                     this.items = this.items.filter(item => typeof item.os === 'undefined');
                 }
                 this.offset = items.length;
+                deferred.resolve(true);
             })
             .catch(console.error);
+
+            return deferred.promise;
         }
 
         sort(by) {
