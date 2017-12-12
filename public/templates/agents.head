@@ -74,9 +74,3 @@
             </md-card-content>
         </md-card>
     </md-content>
-
-    <style>
-    .agents-head-no-results {
-        text-align: center;
-    }
-	</style>

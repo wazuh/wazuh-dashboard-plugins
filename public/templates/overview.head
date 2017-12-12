@@ -13,9 +13,9 @@
 				<md-nav-item md-nav-click="switchTab('oscap');" name="oscap" ng-show="extensions.oscap">SCAP</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
-			</md-nav-bar> 
+			</md-nav-bar>
 		</div>
-		
+
 		<div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
 			<md-nav-bar layout-align="end end" style="padding-right: 0px;" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
@@ -24,7 +24,7 @@
 				<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
 					<img style="width: 16px; margin-right: 6px;" kbn-src="/plugins/wazuh/img/discover.svg">Discover
 				</md-nav-item>
-			</md-nav-bar> 
+			</md-nav-bar>
 		</div>
 	</div>
 
@@ -41,9 +41,3 @@
             </md-card-content>
         </md-card>
     </md-content>
-
-    <style>
-    .overview-head-no-results {
-        text-align: center;
-    }
-    </style>
