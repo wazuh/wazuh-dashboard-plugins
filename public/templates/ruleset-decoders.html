@@ -14,10 +14,27 @@
     <div ng-show="!loading" flex layout="column" class="manager-ruleset-decoders-no-padding">
         <div id="content" layout="row" layout-align="start start" class="manager-ruleset-decoders-top-content">
             <span layout="row" class="manager-ruleset-decoders-top-span" flex layout-align="space-between center">
-                <md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="filter" md-selected-item-change="decoders.addFilter(filter.type, filter.name)" md-search-text="searchTerm" md-items="decoder in autoComplete | filter : searchTerm" md-item-text="decoder.name" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" md-search-text-change="analizeDecoders(searchTerm)" placeholder="Search file">
+                <md-autocomplete flex
+                id="Auto"  
+                md-input-id="autocomplete"
+                md-select-on-match="true" 
+                md-no-cache="noCache" 
+                md-selected-item="filter" 
+                md-selected-item-change="decoders.addFilter('search', filter.name)" 
+                md-search-text="searchTerm" 
+                md-items="decoder in analizeDecoders(searchTerm)" 
+                md-item-text="decoder.name +' '+ decoder.file" 
+                md-min-length="0" 
+                md-no-asterisk="false" 
+                md-menu-class="autocomplete-custom-agents-bar" 
+                md-search-text-change="analizeDecoders(searchTerm)" 
+                placeholder="Search..."
+                lazy-load-data="decodersAutoComplete.nextPage()"
+                md-autofocus=""
+                my-enter="checkEnter(searchTerm)">
                     <md-item-template>
                         <span class="item-title">
-                            <span><strong md-highlight-text="search" md-highlight-flags="i"> {{decoder.name}} </strong></span>
+                            <span><strong md-highlight-text="search" md-highlight-flags="i"> {{decoder.name}} {{decoder.file}}</strong></span>
                         </span>
                         <span class="item-metadata">
                             <span class="item-metastat"> {{decoder.type}} </span>
@@ -42,12 +59,15 @@
             </md-input-container>
         </div>
 
-        <md-chips readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file')">
-            <md-chip class="wazuh-chip" ng-click="decoders.removeFilter('search', true)" ng-if="decoders.hasFilter('search')">
-                <span class="bold">Search: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
+        <md-chips readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file') || decoders.hasFilter('path')">
+            <md-chip class="wazuh-chip" ng-click="decoders.removeFilter('search', true)" ng-if="decoders.hasFilter('search') && decoders.getFilter('search')">
+                <span class="bold">Search: {{decoders.getFilter('search')}} <i class="fa fa-times" aria-hidden="true"></i></span>
             </md-chip>
             <md-chip class="wazuh-chip" ng-click="decoders.removeFilter('file', true)" ng-if="decoders.hasFilter('file');">
-                <span class="bold">File: {{filter.name}} <i class="fa fa-times" aria-hidden="true"></i></span>
+                <span class="bold">File: {{decoders.getFilter('file')}} <i class="fa fa-times" aria-hidden="true"></i></span>
+            </md-chip>
+            <md-chip class="wazuh-chip" ng-click="decoders.removeFilter('path', true)" ng-if="decoders.hasFilter('path');">
+                <span class="bold">Path: {{decoders.getFilter('path')}} <i class="fa fa-times" aria-hidden="true"></i></span>
             </md-chip>
         </md-chips>
 

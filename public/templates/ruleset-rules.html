@@ -35,13 +35,27 @@
     <div ng-show="!loading" flex layout="column">
         <div id="content" layout="row" layout-align="start start" class="manager-ruleset-rules-button-bar">
             <span layout="row" class="manager-ruleset-rules-button-bar-span" flex layout-align="space-between center">
-                <md-autocomplete flex md-select-on-match="true" md-no-cache="true" md-selected-item="filter" md-selected-item-change="rules.addFilter(filter.type, filter.name)"
-                    md-search-text="searchTerm" md-items="rule in autoComplete | filter : searchTerm" md-item-text="rule.name" md-min-length="0"
-                    md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar" md-search-text-change="analizeRules(searchTerm)"
-                    placeholder="Search for rule file, group or PCI requirement">
+                <md-autocomplete flex 
+                id="Auto"
+                md-input-id="autocomplete"
+                md-select-on-match="true" 
+                md-no-cache="noCache" 
+                md-selected-item="filter" 
+                md-selected-item-change="rules.addFilter('search', filter.description)"
+                md-search-text="searchTerm" 
+                md-items="rule in analizeRules(searchTerm)" 
+                md-item-text="rule.file + ' - ' + rule.description" 
+                md-min-length="0"
+                md-no-asterisk="false" 
+                md-menu-class="autocomplete-custom-agents-bar" 
+                md-search-text-change="analizeRules(searchTerm)"
+                placeholder="Search..." 
+                lazy-load-data="rulesAutoComplete.nextPage()"
+                md-autofocus=""
+                my-enter="checkEnter(searchTerm)">
                     <md-item-template>
                         <span class="item-title">
-                            <strong md-highlight-text="search" md-highlight-flags="i"> {{rule.name}} </strong>
+                            <strong md-highlight-text="search" md-highlight-flags="i"> {{rule.file}} - {{rule.description}} </strong>
                         </span>
                         <span class="item-metadata">
                             <span class="item-metastat" ng-if="rule.type != 'pci'"> {{rule.type}} </span>
@@ -65,7 +79,7 @@
         </div>
 
         <md-chips readonly="true" ng-show="rules.hasFilter('level') || rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('group') || rules.hasFilter('pci')">
-            <md-chip class="wazuh-chip" ng-click="rules.removeFilter('search', true)" ng-if="rules.hasFilter('search')">
+            <md-chip class="wazuh-chip" ng-click="rules.removeFilter('search', true)" ng-if="rules.hasFilter('search') && rules.getFilter('search')">
                 <span class="bold">Search: {{rules.getFilter('search')}}
                     <i class="fa fa-times" aria-hidden="true"></i>
                 </span>
