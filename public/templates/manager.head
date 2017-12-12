@@ -1,11 +1,11 @@
 <div flex ng-controller="managerController" layout="column">
 
-    <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'manager';" style="height: 70px;">
+    <md-content class="wazuhMenuNavBar manager-head-height-70" ng-init="menuNavItem = 'manager';">
 		<menu-top></menu-top>
     </md-content>
 
 	<div class="headBar" layout="row"  layout-align="center start">
-        <md-nav-bar flex style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+        <md-nav-bar flex class="manager-head-pad-right" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-click="submenuNavItem = 'status'" name="status">Status</md-nav-item>
 			<md-nav-item md-nav-click="submenuNavItem = 'ruleset'" name="ruleset">Ruleset</md-nav-item>
 			<md-nav-item md-nav-click="submenuNavItem = 'configuration'" name="configuration">Configuration</md-nav-item>
