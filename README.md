@@ -1,8 +1,13 @@
-# Wazuh
+# Wazuh Kibana App
+
+[![Slack](https://img.shields.io/badge/slack-join-blue.svg)](https://goo.gl/forms/M2AoZC4b2R9A9Zy12)
+[![Email](https://img.shields.io/badge/email-join-blue.svg)](https://groups.google.com/forum/#!forum/wazuh)
+[![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
+[![Documentation](https://img.shields.io/badge/web-view-green.svg)](https://wazuh.com)
 
 Wazuh is a security detection, visibility, and compliance open source project. It was born as a fork of OSSEC HIDS, later was integrated with Elastic Stack and OpenSCAP evolving into a more comprehensive solution. You can read more in https://wazuh.com/
 
-## Wazuh - Kibana App Description
+## App Description
 
 Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app plugin.
 
@@ -22,34 +27,15 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 2.0 or superior
-- Wazuh RESTful API 2.0 or superior
-- Kibana 5.2.2 or superior
-- Elasticsearch 5 or superior
+- Wazuh HIDS 3.0.0 or superior
+- Wazuh RESTful API 3.0.0 or superior
+- Kibana 6.0.0 or superior
+- Elasticsearch 6.0.0 or superior
 
 ## Installation
 
 | Kibana version | Wazuh App version | Installation |
 | :---:         | :---:         |     :---      |
-| 5.2.2  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.2.2.zip  |
-| 5.3.0  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.3.0.zip  |
-| 5.3.1  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.3.1.zip  |
-| 5.4.0  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.4.0.zip  |
-| 5.4.1  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.4.1.zip  |
-| 5.4.2  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.4.2.zip  |
-| 5.4.3  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.4.3.zip  |
-| 5.5.0  | 2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.5.0.zip  |
-| 5.5.0  | 2.0.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0.1_5.5.0.zip  |
-| 5.5.1  | 2.0.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0.1_5.5.1.zip  |
-| 5.5.1  | 2.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.0_5.5.1.zip  |
-| 5.5.2  | 2.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.0_5.5.2.zip  |
-| 5.5.3  | 2.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.0_5.5.3.zip  |
-| 5.6.1  | 2.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.0_5.6.1.zip  |
-| 5.6.1  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.1.zip  |
-| 5.6.2  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.2.zip  |
-| 5.6.3  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.3.zip  |
-| 5.6.4  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.4.zip  |
-| 5.6.5  | 2.1.1  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.1.1_5.6.5.zip  |
 | 6.0.0  | 3.0.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.0.zip  |
 | 6.0.1  | 3.0.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.1.zip  |
 
@@ -61,7 +47,7 @@ Remove the App using kibana-plugin tool
 
 Install the App
 
-```/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-2.0_5.x.x.zip ```
+```/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.x_6.0.x.zip ```
 
 ## Contribute
 
@@ -78,7 +64,7 @@ If you want to contribute to our project please don't hesitate to send a pull re
 
 ## License and copyright
 
-Wazuh App Copyright (C) 2016 Wazuh Inc. (License GPLv2)
+Wazuh App Copyright (C) 2017 Wazuh Inc. (License GPLv2)
 
 ## References
 
