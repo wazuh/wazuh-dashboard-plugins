@@ -237,15 +237,32 @@ module.exports = (server, options) => {
         });
     };
 
+    const createKibanaIndex = () => {
+        return elasticRequest.callWithInternalUser('indices.create', {
+            index: '.kibana'
+        });
+    };
+
     // Check Elasticsearch Server status and .kibana index presence
     const checkElasticsearchServer  = () => {
         return new Promise(function (resolve, reject) {
             elasticRequest.callWithInternalUser('indices.exists', {
                 index: ".kibana"
             })
-            .then((data) => {
-                if (data) server.plugins.elasticsearch.waitUntilReady().then((data) => {  resolve(data); });
-                else reject(data);
+            .then((data) => { // The usual initialization
+                if (data) {
+                    server.plugins.elasticsearch.waitUntilReady().then((data) => {  resolve(data); });
+                }
+                else { // No .kibana index created...
+                    createKibanaIndex().then(() => {
+                        server.log([blueWazuh, 'initialize', 'info'], '.kibana index created.');
+                        server.plugins.elasticsearch.waitUntilReady().then((data) => {  resolve(data); });
+                    })
+                    .catch((error) => {
+                        server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .kibana.');
+                        reject(error);
+                    });
+                }
             })
             .catch((error) => {
                 reject(error);
