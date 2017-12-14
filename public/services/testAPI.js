@@ -4,7 +4,7 @@ require('ui/modules').get('app/wazuh', [])
     return {
         check_stored: (data) => {
             let defered = $q.defer();
-            $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data)
+            $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,{timeout: 4000})
             .then((response) => {
                 if (response.error) {
                     defered.reject(response);
@@ -12,8 +12,10 @@ require('ui/modules').get('app/wazuh', [])
                     defered.resolve(response);
                 }
             })
-            .catch((error) => {
-                if (error.error) {
+            .catch(error => {
+                if(error.status && error.status === -1){
+                    defered.reject({data: 'request_timeout_checkstored'});
+                } else if (error.error) {
                     defered.reject(error);
                 }
             });
@@ -21,7 +23,7 @@ require('ui/modules').get('app/wazuh', [])
         },
         check: (data) => {
             let defered = $q.defer();
-            $http.post(chrome.addBasePath("/api/wazuh-api/checkAPI"), data)
+            $http.post(chrome.addBasePath("/api/wazuh-api/checkAPI"), data, {timeout: 4000})
             .then((response) => {
                 if (response.error) {
                     defered.reject(response);
@@ -29,8 +31,10 @@ require('ui/modules').get('app/wazuh', [])
                     defered.resolve(response);
                 }
             })
-            .catch((error) => {
-                if (error.error) {
+            .catch(error => {
+                if(error.status && error.status === -1){
+                    defered.reject({data: 'request_timeout_checkapi'});
+                }else if (error.error) {
                     defered.reject(error);
                 }
             });
