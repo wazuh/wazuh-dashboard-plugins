@@ -1,5 +1,9 @@
-module.exports = (err) => {
-    if (parseInt(err.error) < 0) {
+module.exports = err => {
+
+    if(err.data && err.data === 'request_timeout_genericreq' && err.url){
+        err['html'] = `The request to ${err.url} took too long and was aborted.`;
+        err.message = `The request to ${err.url} took too long and was aborted.`;
+    } else if (parseInt(err.error) < 0) {
         err['html'] = `Unexpected error located on controller. Error: <b>${err.message} (code ${err.error})</b>.`;
         err.message = `Unexpected error located on controller. Error: ${err.message} (code ${err.error}).`;
     } else if (parseInt(err.error) === 1) {
