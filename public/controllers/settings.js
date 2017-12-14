@@ -273,6 +273,12 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             case 'not_running':
                 text = 'There are not services running in the given URL.';
                 break;
+            case 'request_timeout_checkstored':
+                text = 'The request to /api/wazuh-api/checkStoredAPI took too long and was aborted.';
+                break;
+            case 'request_timeout_checkapi':
+                text = 'The request to /api/wazuh-api/checkAPI took too long and was aborted.';
+                break;
             default:
                 text = `Unexpected error. ${error.message}`;
         }

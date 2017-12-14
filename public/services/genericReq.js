@@ -14,7 +14,7 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
             return defered.promise;
         }
 
-        let requestHeaders = { headers: { "Content-Type": 'application/json' } };
+        let requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: 4000 };
 
         let tmpUrl = chrome.addBasePath(url), tmp = null;
 
@@ -32,20 +32,22 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
         }
 
         tmp
-        .then((data) => {
+        .then(data => {
             if (data.error && data.error !== '0') {
                 defered.reject(data);
             } else {
                 defered.resolve(data);
             }
         })
-        .catch((error) => {
-            if (error.error && error.error !== '0') {
+        .catch(error => {
+            if(error.status && error.status === -1){
+                defered.reject({data: 'request_timeout_genericreq', url });
+            }else if (error.error && error.error !== '0') {
                 defered.reject(error);
             } else {
                 defered.reject({
-                    'error': -2,
-                    'message': 'Error doing a request to Kibana API.'
+                    error  : -2,
+                    message: 'Error doing a request to Kibana API.'
                 });
             }
         });

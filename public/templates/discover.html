@@ -8,7 +8,14 @@
         <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb">
           <span ng-show="opts.savedSearch.id" class="kuiLocalBreadcrumb__emphasis">
             <span data-test-subj="discoverCurrentQuery" ng-bind="opts.savedSearch.lastSavedTitle"></span>
-            <i id="reload_saved_search" tabindex="0" aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>&nbsp;
+            <span
+              id="reload_saved_search"
+              aria-label="Reload Saved Search"
+              tooltip="Reload Saved Search"
+              ng-click="resetQuery()"
+              kbn-accessible-click
+              class="kuiIcon fa-undo small"
+            ></span>&nbsp;
           </span>
           <span data-test-subj="discoverQueryHits" class="kuiLocalBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
           <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
@@ -75,7 +82,7 @@
               </span>
             </button>
 
-            <div class="discover-timechart" ng-if="opts.timefield">
+            <section aria-label="Histogram of found documents" class="discover-timechart" ng-if="opts.timefield">
               <header>
                 <center class="small">
                   <span tooltip="To change the time, click the clock icon in the navigation bar">{{timeRange.from | moment}} - {{timeRange.to | moment}}</span>
@@ -111,12 +118,12 @@
                  vis-data="visData"
                  show-spy-panel="true"
                  search-source="searchSource"
-                 class="kbn-dis-height-200"
+                 style="height: 200px"
                 >
               </visualization>
-            </div>
+            </section>
 
-            <div class="discover-table" fixed-scroll>
+            <section class="discover-table" fixed-scroll aria-label="Documents">
               <doc-table
                 hits="rows"
                 index-pattern="indexPattern"
@@ -143,7 +150,7 @@
                 your search, refine your search to see others.
                 <a kbn-accessible-click ng-click="scrollToTop()">Back to top.</a>
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </div>
