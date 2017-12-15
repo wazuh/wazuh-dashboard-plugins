@@ -7,14 +7,14 @@
     <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'agents' }" md-nav-href="#/agents-preview" name="agents">Agents</md-nav-item>
     <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'discover' }" md-nav-href="#/wazuh-discover" name="discover">Discover</md-nav-item>
     <div class="wazuhMenuNavBar_API" layout="row" ng-show="theresAPI">
-        <i class="fa fa-star" aria-hidden="true" style="color: #f39c12; font-size: 18px;"></i>
+        <i class="fa fa-star settings-template-1" aria-hidden="true"></i>
         <div layout layout-align="center center">{{ currentAPI }}</div>
         <md-tooltip md-direction="bottom">Selected API</md-tooltip>
     </div>
     <div class="wazuhMenuNavBar_API" layout="row" ng-show="!theresAPI">
         <div layout layout-align="center center">No API selected</div>
     </div>
-    <md-nav-item style="color:white !important;" class="wazuhMenuNavBar_gear" md-nav-href="#/settings" name="settings">
+    <md-nav-itemclass="wazuhMenuNavBar_gear directives-color-white" md-nav-href="#/settings" name="settings">
         <i class="fa fa-cog ng-scope" aria-hidden="true"></i>
     </md-nav-item>
 </md-nav-bar>
