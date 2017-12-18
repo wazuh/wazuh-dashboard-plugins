@@ -65,7 +65,7 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
 
             // tmpUrl y tmpUrl2
             if (data[2].data.data === '') {
-                $scope.mostActiveAgent.name = $scope.cluster_info.manager;
+                $scope.mostActiveAgent.name = appState.getClusterInfo().manager;
                 $scope.mostActiveAgent.id   = '000';
             } else {
                 $scope.mostActiveAgent.name = data[2].data.data;
