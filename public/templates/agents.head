@@ -1,11 +1,11 @@
 <div flex ng-controller="agentsController" layout="column">
 
-    <md-content class="wazuhMenuNavBar agents-prev-height-70" ng-init="menuNavItem = 'agents'">
+    <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'agents'">
 		<menu-top></menu-top>
     </md-content>
 
 	<div layout="row" layout-align="space-between start" class="agents-color-f7">
-		<md-toolbar class="agents-height-50">
+		<md-toolbar class="height-50">
 			<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
 				<div class="agents-head-1" ng-if="agent">
 					<div class="agents-head-2">
@@ -17,21 +17,21 @@
 						<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)">{{formatAgentStatus(agent.status)}}</span>
 					</div>
 				</div>
-        
-				<span layout="row" class="agents-head-pad-left" layout-align="space-between start" flex="40">
-					<md-autocomplete id="agentsAutocomplete" flex 
-					md-no-cache="true" 
-					md-select-on-match="true" 
-					md-selected-item="_swpagent" 
-					md-selected-item-change="getAgent(_swpagent.id)" 
-					md-search-text="searchTerm" 
-					md-items="agentAutoComplete in analizeAgents(searchTerm)" 
-					md-item-text="agentAutoComplete.name" 
-					md-min-length="0" 
-					md-no-asterisk="false" 
-					md-menu-class="autocomplete-custom-agents-bar" 
-					md-search-text-change="analizeAgents(searchTerm)" 
-					placeholder="Search by name, ID or IP address" 
+
+				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
+					<md-autocomplete id="agentsAutocomplete" flex
+					md-no-cache="true"
+					md-select-on-match="true"
+					md-selected-item="_swpagent"
+					md-selected-item-change="getAgent(_swpagent.id)"
+					md-search-text="searchTerm"
+					md-items="agentAutoComplete in analizeAgents(searchTerm)"
+					md-item-text="agentAutoComplete.name"
+					md-min-length="0"
+					md-no-asterisk="false"
+					md-menu-class="autocomplete-custom-agents-bar"
+					md-search-text-change="analizeAgents(searchTerm)"
+					placeholder="Search by name, ID or IP address"
 					lazy-load-data="agentsAutoComplete.nextPage('')">
 						<md-item-template>
 							<span class="item-title">
@@ -52,7 +52,7 @@
 
 	<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
 		<div class="horizontalTabsBar" layout="column" layout-align="center start">
-			<md-nav-bar class="agents-head-pad-right" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+			<md-nav-bar class="padding-right-0" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchTab('general')" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy Monitoring</md-nav-item>
@@ -63,7 +63,7 @@
 		</div>
 
 		<div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
-			<md-nav-bar layout-align="end end" class="agents-head-pad-right" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+			<md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
 					<i class="fa fa-th agents-head-6" aria-hidden="true"></i>Panels
 				</md-nav-item>

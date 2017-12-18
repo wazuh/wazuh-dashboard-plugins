@@ -1,6 +1,6 @@
 <div flex ng-controller="agentsPreviewController" layout="column">
 
-    <md-content class="wazuhMenuNavBar agents-prev-height-70" ng-init="menuNavItem = 'agents'">
+    <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'agents'">
         <menu-top></menu-top>
     </md-content>
 

@@ -4,7 +4,7 @@
 
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
-        <div layout="row" layout-align="center stretch" class="agents-audit-row-100">
+        <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="metric-headline md-headline">New files</span>
@@ -30,14 +30,14 @@
                 </md-card-content>
             </md-card>
             <md-card flex="50">
-                <md-card-content class="wazuh-column agents-audit-center">
+                <md-card-content class="wazuh-column text-center">
                     <div class="ng-binding">Latest alert</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-Audit-Latest-alert'" id="Wazuh-App-Agents-Audit-Latest-alert"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-audit-row-230">
+        <div layout="row" layout-align="center stretch" class="height-230">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Groups</span>
@@ -58,7 +58,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-audit-row-230">
+        <div layout="row" layout-align="center stretch" class="height-230">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts over time</span>
@@ -67,7 +67,7 @@
             </md-card>
         </div>
 
-        <div class="agents-audit-row-448" layout="row" layout-align="center stretch">
+        <div class="height-448" layout="row" layout-align="center stretch">
             <div flex="20" layout="column" layout-align="center stretch">
                 <md-card flex>
                     <md-card-content class="wazuh-column">
@@ -109,7 +109,7 @@
             </div>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-audit-row-530">
+        <div layout="row" layout-align="center stretch" class="height-530">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Last alerts</span>
