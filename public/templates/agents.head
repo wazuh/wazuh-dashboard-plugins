@@ -4,7 +4,7 @@
 		<menu-top></menu-top>
     </md-content>
 
-	<div layout="row" layout-align="space-between start" class="agents-color-f7">
+	<div layout="row" layout-align="space-between start" class="background-f7">
 		<md-toolbar class="height-50">
 			<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
 				<div class="agents-head-1" ng-if="agent">
