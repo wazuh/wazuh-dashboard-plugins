@@ -1,11 +1,11 @@
 <md-content flex ng-controller="settingsController" layout="column">
 
-    <md-content class="wazuhMenuNavBar" ng-init="menuNavItem = 'settings'" style="height: 70px;">
+    <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'settings'">
         <menu-top></menu-top>
     </md-content>
 
     <md-content class="headBar" layout="row"  layout-align="center start">
-        <md-nav-bar flex style="padding-right: 0px;" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+        <md-nav-bar flex class="padding-right-0" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-click="submenuNavItem = 'api'" name="api">API</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'extensions'" name="extensions">Extensions</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'pattern'" name="pattern">Pattern</md-nav-item>
@@ -34,7 +34,7 @@
 
     </md-card>
     <md-card layout-padding layout-align="start stretch" ng-if="apiIsDown === 'down'">
-        <h1 class="wazuh-h1"><i class="fa fa-warning ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh RESTful API seems to be down</h1>
+        <h1 class="wazuh-h1"><i class="fa fa-warning ng-scope font-size-25" aria-hidden="true"></i> Wazuh RESTful API seems to be down</h1>
         <p>Please, check if Wazuh RESTful API is running with one of the commands bellow:</p>
         <md-list>
             <md-list-item>For Systemd:</md-list-item>
@@ -45,23 +45,21 @@
         <p>If the API is <code>active (running)</code> please check its configuration below.</p>
     </md-card>
     <md-card layout-padding layout-align="start stretch" ng-if="apiEntries.length != 0 && currentDefault === undefined">
-        <h1 class="wazuh-h1"><i class="fa fa-warning ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Please select an API from the list as default</h1>
-        <p>The Wazuh app needs an API connection for it to work. Please click the API's star (<i class="fa fa-star" aria-hidden="true" style="font-size: 18px;"></i>) icon of your choice to select that one.</p>
+        <h1 class="wazuh-h1"><i class="fa fa-warning ng-scope font-size-25" aria-hidden="true"></i> Please select an API from the list as default</h1>
+        <p>The Wazuh app needs an API connection for it to work. Please click the API's star (<i class="fa fa-star font-size-18" aria-hidden="true"></i>) icon of your choice to select that one.</p>
     </md-card>
 
     <md-card layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api'">
 
-        <h1 class="wazuh-h1"><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh App: API configuration</h1>
+        <h1 class="wazuh-h1"><i class="fa fa-cog ng-scope font-size-25" aria-hidden="true"></i> Wazuh App: API configuration</h1>
 
         <span layout="row" layout-align="start start">
-            <p flex="15" style="font-weight: bold;">Cluster</p>
-            <p flex="20" style="font-weight: bold;">Manager</p>
-            <p flex="15" style="font-weight: bold;">API URL</p>
-            <p flex="15" style="font-weight: bold;">API Port</p>
-            <p flex="15" style="font-weight: bold;">User</p>
-            <p flex="20" style="font-weight: bold;">Actions</p>
-
-
+            <p flex="15" class="text-bold">Cluster</p>
+            <p flex="20" class="text-bold">Manager</p>
+            <p flex="15" class="text-bold">API URL</p>
+            <p flex="15" class="text-bold">API Port</p>
+            <p flex="15" class="text-bold">User</p>
+            <p flex="20" class="text-bold">Actions</p>
         </span>
 
         <div ng-repeat="entry in apiEntries">
@@ -72,9 +70,9 @@
                 <p flex="15" >{{entry._source.api_port}}</p>
                 <p flex="15" >{{entry._source.api_user}}</p>
                 <p flex="20" >
-                    <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star" aria-hidden="true" style="font-size: 18px;"></i>
-                    <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash" aria-hidden="true" style="margin-left: 7px;font-size: 18px;"></i>
-                    <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh" aria-hidden="true" style="margin-left: 7px;font-size: 18px;"></i>
+                    <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18" aria-hidden="true"></i>
+                    <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2" aria-hidden="true"></i>
+                    <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2" aria-hidden="true"></i>
                 </p>
             </span>
 
@@ -82,10 +80,10 @@
         </div>
 
         <div layout="row" layout-align="center center">
-            <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 15px;"></i> Add new API</md-button>
+            <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle font-size-15" aria-hidden="true"></i> Add new API</md-button>
         </div>
 
-        <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="$parent.addManagerContainer || apiEntries.length == 0" style="margin-top: 30px; ">
+        <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="$parent.addManagerContainer || apiEntries.length == 0" class="margin-top-30">
           <md-input-container>
             <label>Username</label>
             <input placeholder="" type="text" ng-model="formData.user" aria-label="username" required/>
@@ -103,7 +101,7 @@
             <input placeholder="" ng-model="formData.port" type="text" aria-label="port" required/>
           </md-input-container>
           <div layout="row" layout-align="center center">
-            <p style="color: #ff9999">{{messageError}}</p>
+            <p class="color-f9">{{messageError}}</p>
           </div>
           <div layout="row" layout-align="center center">
             <md-button flex="15" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 13px; margin-right: 5px; "></i>SAVE</md-button>
@@ -114,12 +112,12 @@
 
     <md-card flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'extensions'">
 
-        <h1 class="wazuh-h1"><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh App: Extensions</h1>
+        <h1 class="wazuh-h1"><i class="fa fa-cog ng-scope font-size-25" aria-hidden="true"></i> Wazuh App: Extensions</h1>
 
         <p flex>Enable or disable extensions according to your needs. The extension includes: Panels and Discover, for Overview / Agents tabs.</p>
 
         <div>
-            <span layout="row" layout-align="space-between center" style="font-weight: bold">
+            <span layout="row" layout-align="space-between center" class="text-bold">
                 PCI DSS
             </span>
             <span>
@@ -132,7 +130,7 @@
         </div>
 
         <div>
-            <span layout="row" layout-align="space-between center" style="font-weight: bold">
+            <span layout="row" layout-align="space-between center" class="text-bold">
                 OpenSCAP
             </span>
             <span>
@@ -145,7 +143,7 @@
         </div>
 
         <div>
-            <span layout="row" layout-align="space-between center" style="font-weight: bold">
+            <span layout="row" layout-align="space-between center" class="text-bold">
                 Audit
             </span>
             <span>
@@ -160,12 +158,12 @@
 
     <md-card flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'pattern'">
 
-        <h1 class="wazuh-h1"><i class="fa fa-cog ng-scope" aria-hidden="true" style="font-size: 25px;"></i> Wazuh App: Index pattern selection</h1>
+        <h1 class="wazuh-h1"><i class="fa fa-cog ng-scope font-size-25" aria-hidden="true"></i> Wazuh App: Index pattern selection</h1>
 
         <p flex>Select the index pattern to run search and analytics against:</p>
         <p flex><strong>Beware: the new index-pattern structure must be compatible with Wazuh alerts, otherwise the visualizations will load erroneous data, or no data at all.</strong></p>
 
-        <md-input-container flex="20" class="md-whiteframe-z1 manager-ruleset-decoders-selector settings-background-e2" ng-if="load === false">
+        <md-input-container flex="20" class="md-whiteframe-z1 manager-ruleset-decoders-selector background-e2" ng-if="load === false">
             <md-select ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
                 <md-option ng-repeat="indexPattern in indexPatterns.list" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</md-option>
             </md-select>
@@ -194,7 +192,7 @@
 
 
         <md-card layout-align="start stretch">
-            <md-card-content style="width: 500px;">
+            <md-card-content class="width-500">
                 <h1 class="wazuh-h1">Version</h1>
                 <span layout="row" layout-align="space-between center">
                     <p>App version</p>

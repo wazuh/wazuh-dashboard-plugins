@@ -82,7 +82,7 @@
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels'">
         <md-card flex layout="column">
-            <md-card-content class="agents-head-no-results">
+            <md-card-content class="text-center">
                 No results for selected time interval
             </md-card-content>
         </md-card>
