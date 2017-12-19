@@ -203,7 +203,7 @@ const getSavedSearch = (courier, savedSearches, $route) => {
 routes.enable();
 routes
     .when('/agents/:id?/:tab?/:view?', {
-        template: require('plugins/wazuh/templates/agents.jade'),
+        template: require('plugins/wazuh/templates/agents/agents.jade'),
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
@@ -211,19 +211,19 @@ routes
         }
     })
     .when('/agents-preview', {
-        template: require('plugins/wazuh/templates/agents-prev.jade'),
+        template: require('plugins/wazuh/templates/agents-prev/agents-prev.jade'),
         resolve: {
             "checkAPI": settingsWizard
         }
     })
     .when('/manager/:tab?/', {
-        template: require('plugins/wazuh/templates/manager.jade'),
+        template: require('plugins/wazuh/templates/manager/manager.jade'),
         resolve: {
             "checkAPI": settingsWizard
         }
     })
     .when('/overview/', {
-        template: require('plugins/wazuh/templates/overview.jade'),
+        template: require('plugins/wazuh/templates/overview/overview.jade'),
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
@@ -231,14 +231,14 @@ routes
         }
     })
     .when('/wazuh-discover/', {
-        template: require('plugins/wazuh/templates/discover.jade'),
+        template: require('plugins/wazuh/templates/discover/discover.jade'),
         resolve: {
             "ip": getIp,
             "savedSearch": getSavedSearch
         }
     })
     .when('/settings/:tab?/', {
-        template: require('plugins/wazuh/templates/settings.html'),
+        template: require('plugins/wazuh/templates/settings/settings.html'),
         resolve: {
             "ip": getAllIp
         }
