@@ -6,6 +6,7 @@ const blueWazuh = colors.blue('wazuh');
 
 const OBJECTS_FILE = './integration_files/objects_file.json';
 const APP_OBJECTS_FILE = './integration_files/app_objects_file_alerts.json';
+const KIBANA_TEMPLATE = './integration_files/kibana_template.json';
 
 module.exports = (server, options) => {
     // Elastic JS Client
@@ -13,6 +14,7 @@ module.exports = (server, options) => {
 
     let objects = {};
     let app_objects = {};
+    let kibana_template = {};
     let packageJSON = {};
 
     // Read config from package JSON
@@ -237,45 +239,65 @@ module.exports = (server, options) => {
         });
     };
 
-    const createKibanaIndex = () => {
-        return elasticRequest.callWithInternalUser('indices.create', {
-            index: '.kibana'
+    const createKibanaTemplate = () => {
+        server.log([blueWazuh, 'initialize', 'info'], 'Creating template for .kibana.');
+    	
+    	try {
+            kibana_template = require(KIBANA_TEMPLATE);
+        } catch (e) {
+            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the kibana template.');
+            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_TEMPLATE);
+            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+        }
+
+    	return elasticRequest.callWithInternalUser('indices.putTemplate', 
+    	{
+    		name: 'wazuh-kibana',
+            order: 0,
+            create: true,
+            body:  kibana_template
         });
     };
 
-    // Check Elasticsearch Server status and .kibana index presence
-    const checkElasticsearchServer  = () => {
-        return new Promise(function (resolve, reject) {
-            elasticRequest.callWithInternalUser('indices.exists', {
-                index: ".kibana"
-            })
-            .then((data) => { // The usual initialization
-                if (data) {
-                    server.plugins.elasticsearch.waitUntilReady().then((data) => {  resolve(data); });
-                }
-                else { // No .kibana index created...
-                    createKibanaIndex().then(() => {
-                        server.log([blueWazuh, 'initialize', 'info'], '.kibana index created.');
-                        server.plugins.elasticsearch.waitUntilReady().then((data) => {  resolve(data); });
-                    })
-                    .catch((error) => {
-                        server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .kibana.');
-                        reject(error);
-                    });
-                }
-            })
-            .catch((error) => {
-                reject(error);
-            });
+    // Does .kibana index exist?
+    const checkKibanaStatus  = () => {
+        elasticRequest.callWithInternalUser('indices.exists', {
+            index: ".kibana"
         })
+        .then((data) => { 
+            if (data) { // It exists, initialize!
+                init();
+            }
+            else { // No .kibana index created...
+		        server.log([blueWazuh, 'initialize', 'info'], "Didn't find .kibana index...");
+            	createKibanaTemplate()
+            	.then((data) => {
+		        	server.log([blueWazuh, 'initialize', 'info'], 'Successfully created template .kibana.');
+
+			        elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
+			        .then((data) => {
+		        		server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
+			        	init();
+			        })
+			        .catch((error) => {
+		        		server.log([blueWazuh, 'initialize', 'error'], 'Error creating .kibana index due to ' + error);
+			        });
+		        }).catch((error) => {
+		        	server.log([blueWazuh, 'initialize', 'error'], 'Error creating template for .kibana due to ' + error);
+		        });
+		    }
+        })
+        .catch((error) => {
+		    server.log([blueWazuh, 'initialize', 'error'], 'Could not check .kibana index due to ' + error);
+        });
     };
 
-    // Wait until Kibana server is ready
-    const checkKibanaStatus = () => {
-        checkElasticsearchServer().then((data) => { init() })
+    // Wait until Elasticsearch js is ready
+    const checkStatus = () => {
+        server.plugins.elasticsearch.waitUntilReady().then((data) => { checkKibanaStatus() })
         .catch((error) => {
-            server.log([blueWazuh, 'initialize', 'info'], 'Waiting for Kibana and Elasticsearch servers to be ready...');
-            setTimeout(() => checkKibanaStatus(), 3000);
+            server.log([blueWazuh, 'initialize', 'info'], 'Waiting for Elasticsearch servers to be ready...');
+            setTimeout(() => checkStatus(), 3000);
         });
     };
 
@@ -470,7 +492,7 @@ module.exports = (server, options) => {
     };
 
     // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
-    checkKibanaStatus();
+    checkStatus();
 
     module.exports = importAppObjects;
 };
