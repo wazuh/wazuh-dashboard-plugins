@@ -5,7 +5,7 @@
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
 
-        <div layout="row" layout-align="center stretch" class="overview-general-metric-row">
+        <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Metric-alerts'" id="Wazuh-App-Overview-General-Metric-alerts"></kbn-vis>
@@ -28,7 +28,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="start stretch" class="overview-general-alerts">
+        <div layout="row" layout-align="start stretch" class="height-230">
             <md-card flex="40">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alert level evolution</span>
@@ -43,7 +43,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="space-between stretch" class="overview-general-top-agents">
+        <div layout="row" layout-align="space-between stretch" class="height-270">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Top 5 agents</span>
@@ -64,34 +64,34 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="overview-general-metric-row">
+        <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex>
-                <md-card-content class="wazuh-column overview-general-top-source">
+                <md-card-content class="wazuh-column text-center">
                     <div class="ng-binding">Top source user</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-source-user'" id="Wazuh-App-Overview-General-Top-source-user"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex>
-                <md-card-content class="wazuh-column overview-general-top-source">
+                <md-card-content class="wazuh-column text-center">
                     <div class="ng-binding">Top source ip</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-source-IP'" id="Wazuh-App-Overview-General-Top-source-IP"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex>
-                <md-card-content class="wazuh-column overview-general-top-source">
+                <md-card-content class="wazuh-column text-center">
                     <div class="ng-binding">Top group</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-group'" id="Wazuh-App-Overview-General-Top-group"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex>
-                <md-card-content class="wazuh-column overview-general-top-source">
+                <md-card-content class="wazuh-column text-center">
                     <div class="ng-binding">Top PCI DSS requirement</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-PCI-DSS-requirement'" id="Wazuh-App-Overview-General-Top-PCI-DSS-requirement"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="overview-general-summary">
+        <div layout="row" layout-align="center stretch" class="height-530">
             <md-card flex="60">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>

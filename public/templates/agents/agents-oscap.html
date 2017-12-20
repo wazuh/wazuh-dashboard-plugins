@@ -4,7 +4,7 @@
 
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
-        <div layout="row" layout-align="center stretch" class="agents-oscap-row-100">
+        <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex="20">
                 <md-card-content class="wazuh-column">
                     <kbn-vis class="metric" vis-id="'Wazuh-App-Agents-OSCAP-Higher-score-metric'" id="Wazuh-App-Agents-OSCAP-Higher-score-metric"></kbn-vis>
@@ -16,20 +16,20 @@
                 </md-card-content>
             </md-card>
             <md-card flex="20">
-                <md-card-content class="wazuh-column agents-oscap-item-center">
+                <md-card-content class="wazuh-column text-center">
                     <div class="ng-binding">Last score</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-OSCAP-Last-score'" id="Wazuh-App-Agents-OSCAP-Last-score"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="40">
-                <md-card-content class="wazuh-column agents-oscap-item-center">
+                <md-card-content class="wazuh-column text-center">
                     <div class="ng-binding">Last scan profile</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-OSCAP-Last-scan-profile'" id="Wazuh-App-Agents-OSCAP-Last-scan-profile"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-oscap-row-230">
+        <div layout="row" layout-align="center stretch" class="height-230">
             <md-card flex="25">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Scans</span>
@@ -57,7 +57,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="start stretch" class="agents-oscap-row-230">
+        <div layout="row" layout-align="start stretch" class="height-230">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Daily scans evolution</span>
@@ -66,7 +66,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-oscap-row-250">
+        <div layout="row" layout-align="center stretch" class="height-250">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Top 10 - Alerts</span>
@@ -85,16 +85,16 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-oscap-row-100">
+        <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex>
-                <md-card-content class="wazuh-column agents-oscap-item-center">
+                <md-card-content class="wazuh-column text-center">
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-OSCAP-Top-alert'" id="Wazuh-App-Agents-OSCAP-Top-alert"></kbn-vis>
                     <div class="ng-binding">Top alert</div>
                 </md-card-content>
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-oscap-row-540">
+        <div layout="row" layout-align="center stretch" class="height-540">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Last alerts</span>
