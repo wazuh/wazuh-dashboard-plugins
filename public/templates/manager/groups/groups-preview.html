@@ -22,9 +22,9 @@
 
         <md-tabs class="headBar" layout-fill flex>
             <md-tab label="Agents">
-                <md-tab-content flex layout fill class="manager-groups-no-scroll">
+                <md-tab-content flex layout fill class="overflow-hidden">
                         <div flex layout="row" layout-fill>
-                            <md-card flex class="manager-groups-files-card" layout-fill>
+                            <md-card flex class="overflow-hidden height-400" layout-fill>
                                 <md-toolbar layout="row">
                                     <input flex="none" placeholder="Filter agents" type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)" class="input-filter-box manager-groups-right-search-box" />
                                 </md-toolbar>
@@ -79,10 +79,10 @@
             </md-tab>
 
             <md-tab label="Files">
-                <md-tab-content flex layout fill class="manager-groups-no-scroll">
+                <md-tab-content flex layout fill class="overflow-hidden">
 
                     <div flex layout="row" layout-fill>
-                        <md-card flex class="manager-groups-files-card" layout-fill ng-show="!fileViewer">
+                        <md-card flex class="overflow-hidden height-400" layout-fill ng-show="!fileViewer">
                             <md-toolbar layout="row">
                                 <input flex="none" placeholder="Filter files" type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
                                     class="input-filter-box manager-groups-search-file" />

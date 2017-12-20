@@ -1,12 +1,12 @@
 <div flex ng-controller="overviewController" layout="column">
 
-    <md-content class="wazuhMenuNavBar overview-height-70" ng-init="menuNavItem = 'overview'">
+    <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'overview'">
 		<menu-top></menu-top>
     </md-content>
 
 	<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
 		<div class="horizontalTabsBar" layout="column" layout-align="center start">
-			<md-nav-bar class="overview-pad-right" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+			<md-nav-bar class="padding-right-0" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchTab('general');" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File integrity</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy monitoring</md-nav-item>
@@ -17,7 +17,7 @@
 		</div>
 
 		<div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
-			<md-nav-bar layout-align="end end" class="overview-pad-right" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+			<md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
 					<i class="fa fa-th overview-head-1" aria-hidden="true"></i>Panels
 				</md-nav-item>
@@ -36,7 +36,7 @@
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels'">
         <md-card flex layout="column">
-            <md-card-content class="overview-head-no-results">
+            <md-card-content class="text-center">
                 No results for selected time interval
             </md-card-content>
         </md-card>

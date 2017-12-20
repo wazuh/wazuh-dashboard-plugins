@@ -8,25 +8,25 @@
     <div ng-show="!loading" layout="row" layout-align="start stretch" layout-align="center start" class="manager-ruleset-rules-top-row">
         <md-card flex>
             <md-card-content class="wazuh-column">
-                <span class="md-headline-small">Top 24h - Rule ID</span>
+                <span class="md-headline">Top 24h - Rule ID</span>
                 <kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Rule-ID'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-Rule-ID"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex>
             <md-card-content class="wazuh-column">
-                <span class="md-headline-small">Top 24h - Groups</span>
+                <span class="md-headline">Top 24h - Groups</span>
                 <kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Groups'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-Groups"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex>
             <md-card-content class="wazuh-column">
-                <span class="md-headline-small">Top 24h - PCI DSS requirements</span>
+                <span class="md-headline">Top 24h - PCI DSS requirements</span>
                 <kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-PCI-DSS-requirements'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-PCI-DSS-requirements"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex>
             <md-card-content class="wazuh-column">
-                <span class="md-headline-small">Top 24h - Level</span>
+                <span class="md-headline">Top 24h - Level</span>
                 <kbn-vis vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Level'" id="Wazuh-App-Manager-Ruleset-Rules-Top-24h-Level"></kbn-vis>
             </md-card-content>
         </md-card>
@@ -35,21 +35,21 @@
     <div ng-show="!loading" flex layout="column">
         <div id="content" layout="row" layout-align="start start" class="manager-ruleset-rules-button-bar">
             <span layout="row" class="manager-ruleset-rules-button-bar-span" flex layout-align="space-between center">
-                <md-autocomplete flex 
+                <md-autocomplete flex
                 id="Auto"
                 md-input-id="autocomplete"
-                md-select-on-match="true" 
-                md-no-cache="noCache" 
-                md-selected-item="filter" 
+                md-select-on-match="true"
+                md-no-cache="noCache"
+                md-selected-item="filter"
                 md-selected-item-change="rules.addFilter('search', filter.description)"
-                md-search-text="searchTerm" 
-                md-items="rule in analizeRules(searchTerm)" 
-                md-item-text="rule.file + ' - ' + rule.description" 
+                md-search-text="searchTerm"
+                md-items="rule in analizeRules(searchTerm)"
+                md-item-text="rule.file + ' - ' + rule.description"
                 md-min-length="0"
-                md-no-asterisk="false" 
-                md-menu-class="autocomplete-custom-agents-bar" 
+                md-no-asterisk="false"
+                md-menu-class="autocomplete-custom-agents-bar"
                 md-search-text-change="analizeRules(searchTerm)"
-                placeholder="Search..." 
+                placeholder="Search..."
                 lazy-load-data="rulesAutoComplete.nextPage()"
                 md-autofocus=""
                 my-enter="checkEnter(searchTerm)">
@@ -124,7 +124,7 @@
             </span>
         </md-toolbar>
 
-        <md-content flex layout="column" class="manager-ruleset-rules-col-300" when-scrolled="rules.nextPage('')">
+        <md-content flex layout="column" class="height-300" when-scrolled="rules.nextPage('')">
             <md-list ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class-odd="'odd'" ng-class-even="'even'"
                 class="agents-preview-table" ng-class="activeItem === rule.id ? 'ruleset_rules_row_active' : ''">
                 <md-list-item class="rules-item-list" ng-click="closeOther(rule.id)" ng-class="activeItem === rule.id ? 'ruleset_rules_row_active' : ''">
@@ -191,7 +191,7 @@
                             <span ng-repeat="(detailk, detailv) in rule.details">
                                 <span layout="row" layout-align="space-between center">
                                     <p>{{detailk}}</p>
-                                    <p class="right-text">{{detailv}}</p>
+                                    <p class="text-right">{{detailv}}</p>
                                 </span>
                                 <md-divider ng-if="!$last"></md-divider>
                             </span>

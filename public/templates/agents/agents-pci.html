@@ -8,7 +8,7 @@
             <md-card flex>
                 <md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">
                     <md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                        <div flex  class="md-padding agents-pci-discover">
+                        <div flex  class="md-padding background-white">
                             <h1 class="md-display-2 wazuh-h1 agents-pci-h1">PCI DSS Requirement: {{tab.title}}</h1>
                             <div ng-bind-html="tab.content"></div>
                         </div>
@@ -17,7 +17,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-pci-row-225">
+        <div layout="row" layout-align="center stretch" class="height-225">
             <md-card flex="70">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Requirements</span>
@@ -32,7 +32,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="agents-pci-row-540">
+        <div layout="row" layout-align="center stretch" class="height-540">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Last alerts</span>

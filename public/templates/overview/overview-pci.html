@@ -9,7 +9,7 @@
             <md-card flex>
                 <md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">
                     <md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                        <div class="md-padding overview-pci-tabs-row">
+                        <div class="md-padding background-white">
                             <h1 class="md-display-2 wazuh-h1 overview-pci-tabs-item" >PCI DSS Requirement: {{tab.title}}</h1>
                             <div ng-bind-html="tab.content"></div>
                         </div>
@@ -18,7 +18,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="overview-pci-last-alerts">
+        <div layout="row" layout-align="center stretch" class="height-530">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Last alerts</span>
@@ -27,7 +27,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="overview-pci-requirements-row">
+        <div layout="row" layout-align="center stretch" class="height-255">
             <md-card flex="70">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Requirements</span>
@@ -42,7 +42,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="overview-pci-agents-row">
+        <div layout="row" layout-align="center stretch" class="height-255">
             <md-card flex="30">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Agents</span>
@@ -57,7 +57,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="overview-pci-last-alerts">
+        <div layout="row" layout-align="center stretch" class="height-530">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Last alerts</span>
