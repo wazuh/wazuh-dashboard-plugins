@@ -53,46 +53,61 @@ const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState, 
     const notify = new Notifier();
     let deferred = $q.defer();
 
+    const checkResponse = data => {
+        if (parseInt(data.data.error) === 2){
+            notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+        } else if(data.data.data.apiIsDown){
+            $rootScope.apiIsDown = "down";
+            notify.error('Wazuh RESTful API seems to be down.');
+        } else {
+            notify.error('Could not connect with Wazuh RESTful API.');
+            appState.removeCurrentAPI();
+        }
+        $location.path('/settings');
+        deferred.reject();
+    }
+
+    const changeCurrentApi = data => {
+        // Should change the currentAPI configuration depending on cluster
+        if (data.data.data.cluster_info.status === 'disabled'){
+            appState.setCurrentAPI(JSON.stringify({
+                name: data.data.data.cluster_info.manager, 
+                id: JSON.parse(appState.getCurrentAPI()).id 
+            }));
+        } else {
+            appState.setCurrentAPI(JSON.stringify({
+                name: data.data.data.cluster_info.cluster, 
+                id: JSON.parse(appState.getCurrentAPI()).id 
+            }));
+        }
+
+        appState.setClusterInfo(data.data.data.cluster_info);
+        appState.setExtensions(data.data.data.extensions);
+        deferred.resolve();
+    }
+
+    const callCheckStored = () => {
+        testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id)
+        .then(data => {
+            if (data.data.error || data.data.data.apiIsDown) {
+                checkResponse(data);
+            } else { 
+                changeCurrentApi(data);
+            }
+        })
+        .catch(error => notify.error(error.message));
+    }
+
     // There's no cookie for current API
-    if (appState.getCurrentAPI() === null || appState.getCurrentAPI() === undefined) {
+    if (!appState.getCurrentAPI()) {
         genericReq.request('GET', '/api/wazuh-api/apiEntries')
         .then((data) => {
             if (data.data.length > 0) {
                 var apiEntries = data.data;
                 appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
-
-
-                testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id)
-                .then(data => {
-                    if (data.data.error || data.data.data.apiIsDown) {
-                        if (parseInt(data.data.error) === 2){
-                            notify.warning("Wazuh App: Please set up Wazuh API credentials.");
-                        } else if(data.data.data.apiIsDown){
-                            $rootScope.apiIsDown = "down";
-                            notify.error("Wazuh RESTful API seems to be down.");
-                        } else {
-                            notify.error("Could not connect with Wazuh RESTful API.");
-                            appState.removeCurrentAPI();
-                        }
-                        $location.path('/settings');
-                        deferred.reject();
-                    } else { 
-                        // Should change the currentAPI configuration depending on cluster
-                        if (data.data.data.cluster_info.status === 'disabled')
-                            appState.setCurrentAPI(JSON.stringify({name: data.data.data.cluster_info.manager, id: JSON.parse(appState.getCurrentAPI()).id }));
-                        else 
-                            appState.setCurrentAPI(JSON.stringify({name: data.data.data.cluster_info.cluster, id: JSON.parse(appState.getCurrentAPI()).id }));
-
-                        appState.setClusterInfo(data.data.data.cluster_info);
-                        appState.setExtensions(data.data.data.extensions);
-                        deferred.resolve();
-                    }
-                })
-                .catch(error => {
-                    notify.error(error.message);
-                });
-                
+                callCheckStored();
             } else {
+                notify.warning("Wazuh App: Please set up Wazuh API credentials.");
                 $location.path('/settings');
                 deferred.reject(); 
             }
@@ -103,35 +118,7 @@ const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState, 
             deferred.reject(); 
         });
     } else {
-        testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id)
-        .then(data => {
-            if (data.data.error || data.data.data.apiIsDown) {
-                if (parseInt(data.data.error) === 2){
-                    notify.warning("Wazuh App: Please set up Wazuh API credentials.");
-                } else if(data.data.data.apiIsDown){
-                    $rootScope.apiIsDown = "down";
-                    notify.error("Wazuh RESTful API seems to be down.");
-                } else {
-                    notify.error("Could not connect with Wazuh RESTful API.");
-                    appState.removeCurrentAPI();
-                }
-                $location.path('/settings');
-                deferred.reject();
-            } else { 
-                // Should change the currentAPI configuration depending on cluster
-                if (data.data.data.cluster_info.status === 'disabled')
-                    appState.setCurrentAPI(JSON.stringify({name: data.data.data.cluster_info.manager, id: JSON.parse(appState.getCurrentAPI()).id }));
-                else 
-                    appState.setCurrentAPI(JSON.stringify({name: data.data.data.cluster_info.cluster, id: JSON.parse(appState.getCurrentAPI()).id }));
-
-                appState.setClusterInfo(data.data.data.cluster_info);
-                appState.setExtensions(data.data.data.extensions);
-                deferred.resolve();
-            }
-        })
-        .catch(error => {
-            notify.error(error.message);
-        });
+        callCheckStored();
     }
     return deferred.promise;
 };

@@ -193,7 +193,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                 else notify.error("Some error ocurred, could not save data in elasticsearch.");
             });
         })
-        .catch((error) => printError(error));
+        .catch(error => printError(error));
     };
 
     // Check manager connectivity
@@ -309,6 +309,9 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                 break;
             case 'request_timeout_checkapi':
                 text = 'The request to /api/wazuh-api/checkAPI took too long and was aborted.';
+                break;
+            case 'wrong_credentials':
+                text = 'Wrong Wazuh API credentials, please check them and try again';
                 break;
             default:
                 text = `Unexpected error. ${error.message}`;
