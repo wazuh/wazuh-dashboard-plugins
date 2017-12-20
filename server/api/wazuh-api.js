@@ -132,46 +132,35 @@ module.exports = (server, options) => {
         });
     };
 
+
+    const genericErrorBuilder = (status,code,message) => {
+        return {
+            statusCode: status,
+            error:      code,
+            message:    message || 'Error ocurred'
+        };
+    }
+
     const checkAPI = (req, reply) => {
         
         if (!('user' in req.payload)) {
-            return reply({
-                'statusCode': 400,
-                'error':      3,
-                'message':    'Missing param: API USER'
-            });
+            return reply(genericErrorBuilder(400,3,'Missing param: API USER'));
         } 
 
         if (!('password' in req.payload)) {
-            return reply({
-                'statusCode': 400,
-                'error':      4,
-                'message':    'Missing param: API PASSWORD'
-            });
+            return reply(genericErrorBuilder(400,4,'Missing param: API PASSWORD'));
         } 
         
         if (!('url' in req.payload)) {
-            return reply({
-                'statusCode': 400,
-                'error':      5,
-                'message':    'Missing param: API URL'
-            });
+            return reply(genericErrorBuilder(400,5,'Missing param: API URL'));
         } 
         
         if (!('port' in req.payload)) {
-            return reply({
-                'statusCode': 400,
-                'error':      6,
-                'message':    'Missing param: API PORT'
-            });
+            return reply(genericErrorBuilder(400,6,'Missing param: API PORT'));
         } 
         
         if (!(req.payload.url.includes('https://')) && !(req.payload.url.includes('http://'))) {
-            return reply({
-                'statusCode': 200,
-                'error':      '1',
-                'data':       'protocol_error'
-            });
+            return reply(genericErrorBuilder(200,1,'protocol_error'));
         } 
 
         req.payload.password = Buffer.from(req.payload.password, 'base64').toString("ascii");
@@ -181,14 +170,20 @@ module.exports = (server, options) => {
             password:           req.payload.password,
             rejectUnauthorized: !req.payload.insecure
         })
-        .then((response) => {
+        .then(response => {
+
+            // Check wrong credentials
+            if(parseInt(response.statusCode) === 401){
+                return reply(genericErrorBuilder(500,10401,'wrong_credentials')).code(500);
+            }
+
             if (parseInt(response.body.error) === 0 && response.body.data) {
                 needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
                     username:           req.payload.user,
                     password:           req.payload.password,
                     rejectUnauthorized: !req.payload.insecure
                 })
-                .then((response) => {
+                .then(response => {
                     if (!response.body.error) {
                         var managerName = response.body.data.name;
                         needle('get', `${req.payload.url}:${req.payload.port}/cluster/status`, {}, { // Checking the cluster status
@@ -196,7 +191,7 @@ module.exports = (server, options) => {
                             password:           req.payload.password,
                             rejectUnauthorized: !req.payload.insecure
                         })
-                        .then((response) => {
+                        .then(response => {
                             if (!response.body.error) {
                                 if (response.body.data.enabled === 'yes') { // If cluster mode is active
                                     needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
@@ -204,7 +199,7 @@ module.exports = (server, options) => {
                                         password:           req.payload.password,
                                         rejectUnauthorized: !req.payload.insecure
                                     })
-                                    .then((response) => {
+                                    .then(response => {
                                         if (!response.body.error) {
                                             reply({
                                                 "manager": managerName,
@@ -212,58 +207,34 @@ module.exports = (server, options) => {
                                                 "cluster": response.body.data.cluster,
                                                 "status": 'enabled'
                                             });
-                                        } else if (response.body.error){
-                                            reply({
-                                                'statusCode': 500,
-                                                'error':      7,
-                                                'message':    response.body.message
-                                            }).code(500);
+                                        } else {
+                                            return reply(genericErrorBuilder(500,7,response.body.message)).code(500);
                                         }
-                                    });
+                                    })
+                                    .catch(error => reply(genericErrorBuilder(500,5,error.message || error)).code(500)); 
                                 }
                                 else { // Cluster mode is not active
-                                    reply({
-                                        "manager": managerName,
-                                        "cluster": 'Disabled',
-                                        "status": 'disabled'
+                                    return reply({
+                                        manager: managerName,
+                                        cluster: 'Disabled',
+                                        status : 'disabled'
                                     });
                                 }
                             } else {
-                                reply({
-                                    'statusCode': 500,
-                                    'error':      5,
-                                    'message':    'Error occurred'
-                                }).code(500);
+                                return reply(genericErrorBuilder(500,5,response.body.message)).code(500);
                             }
-                        });
-                    } else if (response.body.error){
-                        reply({
-                            'statusCode': 500,
-                            'error':      5,
-                            'message':    response.body.message
-                        }).code(500);
+                        })
+                        .catch(error => reply(genericErrorBuilder(500,5,error.message || error)).code(500)); 
                     } else {
-                        reply({
-                            'statusCode': 500,
-                            'error':      5,
-                            'message':    'Error occurred'
-                        }).code(500);
+                        return reply(genericErrorBuilder(500,5,response.body.message)).code(500);
                     }
-                });
-            } else if (response.body.error){
-                reply({
-                    'statusCode': 500,
-                    'error':      5,
-                    'message':    response.body.message
-                }).code(500);
+                })
+                .catch(error => reply(genericErrorBuilder(500,5,error.message || error)).code(500)); 
             } else {
-                reply({
-                    'statusCode': 500,
-                    'error':      5,
-                    'message':    'Error occurred'
-                }).code(500);
+                return reply(genericErrorBuilder(500,5,response.body.message)).code(500);
             }
-        });        
+        })
+        .catch(error => reply(genericErrorBuilder(500,5,error.message || error)).code(500));        
     };
 
     const getPciRequirement = (req, reply) => {
