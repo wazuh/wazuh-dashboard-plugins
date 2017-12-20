@@ -1,0 +1,132 @@
+<div flex ng-cloak layout="row" ng-controller="groupsPreviewController" layout-fill class="manager-groups-main-div" ng-if="groupsMenu == 'preview'">
+
+    <div flex="25" layout="column" class="manager-groups-left-col">
+        <input flex="none" placeholder="Filter groups" type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
+            class="input-filter-box manager-groups-left-search-box"/>
+        <md-card flex class="manager-groups-left-panel" >
+            <md-content layout="column" ng-init="selectedGroup = 0;" when-scrolled="groups.nextPage('')">
+                <md-card flex class="group-list-preview" ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-class="{selectedItem:($parent.selectedGroup == $index)}"
+                    ng-click="$parent.loadGroup($index)">
+                    <md-card-content>
+                        <span class="md-headline">{{group.name}} ({{group.count}})</span>
+                    </md-card-content>
+                </md-card>
+            </md-content>
+            <md-content>
+                <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groups.busy && !groups.end"></md-progress-linear>
+            </md-content>
+        </md-card>
+    </div>
+
+    <div flex="75" layout="column" class="manager-groups-right-col">
+
+        <md-tabs class="headBar" layout-fill flex>
+            <md-tab label="Agents">
+                <md-tab-content flex layout fill class="overflow-hidden">
+                        <div flex layout="row" layout-fill>
+                            <md-card flex class="overflow-hidden height-400" layout-fill>
+                                <md-toolbar layout="row">
+                                    <input flex="none" placeholder="Filter agents" type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)" class="input-filter-box manager-groups-right-search-box" />
+                                </md-toolbar>
+                                <md-toolbar layout="row">
+                                    <div class="md-toolbar-tools">
+                                        <span flex="5" ng-click="groupAgents.sort('id')">ID
+                                            <i class="fa" ng-class="groupAgents.sortValue === 'id' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                                                aria-hidden="true"></i>
+                                        </span>
+                                        <span flex="20" ng-click="groupAgents.sort('name')">Name
+                                            <i class="fa" ng-class="groupAgents.sortValue === 'name' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                                                aria-hidden="true"></i>
+                                        </span>
+                                        <span flex="15" ng-click="groupAgents.sort('ip')">IP
+                                            <i class="fa" ng-class="groupAgents.sortValue === 'ip' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                                                aria-hidden="true"></i>
+                                        </span>
+                                        <span flex="15" ng-click="groupAgents.sort('status')">Status
+                                            <i class="fa" ng-class="groupAgents.sortValue === 'status' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                                                aria-hidden="true"></i>
+                                        </span>
+                                        <span flex="15" ng-click="groupAgents.sort('os.platform')">OS platform
+                                            <i class="fa" ng-class="groupAgents.sortValue === 'os' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                                                aria-hidden="true"></i>
+                                        </span>
+                                        <span flex="15" ng-click="groupAgents.sort('os.version')">OS version
+                                            <i class="fa" ng-class="groupAgents.sortValue === 'os' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                                                aria-hidden="true"></i>
+                                        </span>
+                                        <span flex="15">Agent version</span>
+                                    </div>
+                                </md-toolbar>
+                                <md-content when-scrolled="groupAgents.nextPage('')">
+                                    <md-list ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' class="agents-preview-table">
+                                        <md-list-item class="md-subhead agents-groups-preview" ng-click="showAgent(agent)">
+                                            <span flex="5">{{agent.id || 'Unknown'}}</span>
+                                            <span flex="20">{{agent.name || 'Unknown'}}</span>
+                                            <span flex="15">{{agent.ip || 'Unknown'}}</span>
+                                            <span flex="15">{{agent.status || 'Unknown'}}</span>
+                                            <span flex="15">{{agent.os.platform || 'Unknown'}}</span>
+                                            <span flex="15">{{agent.os.version || 'Unknown'}}</span>
+                                            <span flex="15">{{agent.version || 'Unknown'}}</span>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-content>
+                                <md-content>
+                                    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groupAgents.busy && !groupAgents.end"></md-progress-linear>
+                                </md-content>
+                            </md-card>
+                        </div>
+                </md-tab-content>
+            </md-tab>
+
+            <md-tab label="Files">
+                <md-tab-content flex layout fill class="overflow-hidden">
+
+                    <div flex layout="row" layout-fill>
+                        <md-card flex class="overflow-hidden height-400" layout-fill ng-show="!fileViewer">
+                            <md-toolbar layout="row">
+                                <input flex="none" placeholder="Filter files" type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
+                                    class="input-filter-box manager-groups-search-file" />
+                            </md-toolbar>
+                            <md-toolbar layout="row">
+                                <div class="md-toolbar-tools">
+                                    <span flex="30" ng-click="groupFiles.sort('filename')">File
+                                        <i class="fa" ng-class="groupFiles.sortValue === 'filename' ? (groupFiles.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                                            aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                            </md-toolbar>
+                            <md-content when-scrolled="files.nextPage('')">
+                                <md-list ng-repeat="file in groupFiles.items | orderBy : groupFiles.sortValue : groupFiles.sortDir" class="agents-preview-table"
+                                    ng-init="fileViewer=false">
+                                    <md-list-item class="md-subhead">
+                                        <span flex="30" ng-click="$parent.showFile($index);">{{file.filename}}</span>
+                                    </md-list-item>
+                                </md-list>
+                            </md-content>
+                            <md-content>
+                                <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="files.busy && !files.end"></md-progress-linear>
+                            </md-content>
+                        </md-card>
+                        <md-sidenav flex="100" layout-fill md-is-open="fileViewer" md-disable-backdrop="true" class="md-whiteframe-z1  md-sidenav manager-groups-file-back">
+
+                            <md-toolbar layout="row" class="manager-groups-file-back">
+                                <div class="md-toolbar-tools">
+                                    <h4 flex md-trucante>{{filename}}</h4>
+                                    <md-button class="md-fab md-mini md-primary " ng-click="fileViewer=false">
+                                        <i class="fa fa-close" aria-hidden="true"></i>
+                                    </md-button>
+                                </div>
+                            </md-toolbar>
+
+                            <md-content layout="row" flex class="manager-groups-file-back">
+                                <pre flex layout-fill class="json-beautifier"><code dynamic="file"></code></pre>
+                            </md-content>
+
+                        </md-sidenav>
+                    </div>
+
+                </md-tab-content>
+            </md-tab>
+        </md-tabs>
+    </div>
+</div>

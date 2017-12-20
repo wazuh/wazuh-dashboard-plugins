@@ -1,0 +1,69 @@
+<md-content flex layout="column" ng-if="tab == 'pci'" layout-align="start">
+
+    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
+
+    <!-- View: Panels -->
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+
+        <div layout="row" layout-align="center stretch">
+            <md-card flex>
+                <md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">
+                    <md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
+                        <div class="md-padding background-white">
+                            <h1 class="md-display-2 wazuh-h1 overview-pci-tabs-item" >PCI DSS Requirement: {{tab.title}}</h1>
+                            <div ng-bind-html="tab.content"></div>
+                        </div>
+                    </md-tab>
+                </md-tabs>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-530">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Last alerts</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Requirements-heatmap'" id="Wazuh-App-Overview-PCI-DSS-Requirements-heatmap"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-255">
+            <md-card flex="70">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Requirements</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-requirements'" id="Wazuh-App-Overview-PCI-DSS-requirements"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex="30">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Groups</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Groups'" id="Wazuh-App-Overview-PCI-DSS-Groups"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-255">
+            <md-card flex="30">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Agents</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Agents'" id="Wazuh-App-Overview-PCI-DSS-Agents"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex="70">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Requirements by agent</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-PCI-DSS-Requirements-by-agent'" id="Wazuh-App-Overview-PCI-DSS-Requirements-by-agent"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-530">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Last alerts</span>
+                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-PCI-DSS-Last-alerts'" id="Wazuh-App-Overview-PCI-DSS-Last-alerts"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+    </div>
+</md-content>

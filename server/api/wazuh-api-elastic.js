@@ -170,6 +170,33 @@ module.exports = (server, options) => {
             }).code(400);
         }
 
+        const userRegEx  = new RegExp(/^[a-zA-Z0-9]{3,100}$/);
+        const passRegEx  = new RegExp(/^.{3,100}$/); 
+        const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/); 
+        const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/); 
+        const portRegEx  = new RegExp(/^[0-9]{2,5}$/); 
+
+        // Validate user
+        if(!userRegEx.test(req.payload.user)){
+            return reply({ statusCode: 400, error: 10001, message: 'Invalid user field' }).code(400);
+        }
+
+        // Validate password
+        if(!passRegEx.test(req.payload.password)){
+            return reply({ statusCode: 400, error: 10002, message: 'Invalid password field' }).code(400);
+        }
+
+        // Validate url
+        if(!urlRegEx.test(req.payload.url) && !urlRegExIP.test(req.payload.url)){
+            return reply({ statusCode: 400, error: 10003, message: 'Invalid url field' }).code(400);
+        }
+
+        // Validate port
+        const validatePort = parseInt(req.payload.port);
+        if(!portRegEx.test(req.payload.port) || validatePort <= 0 || validatePort >= 99999) {
+            return reply({ statusCode: 400, error: 10004, message: 'Invalid port field' }).code(400);
+        }
+
         let settings = {
             api_user:     req.payload.user,
             api_password: req.payload.password,

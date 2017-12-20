@@ -1,0 +1,121 @@
+<md-content flex layout="column" ng-if="tab === 'audit'" layout-align="start">
+
+    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
+
+    <!-- View: Panels -->
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+        <div layout="row" layout-align="center stretch" class="height-120">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="metric-headline md-headline">New files</span>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Agents-Audit-New-files-metric'" id="Wazuh-App-Agents-Audit-New-files-metric"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="metric-headline md-headline">Read files</span>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Agents-Audit-Read-files-metric'" id="Wazuh-App-Agents-Audit-Read-files-metric"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="metric-headline md-headline">Modified files</span>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Agents-Audit-Modified-files-metric'" id="Wazuh-App-Agents-Audit-Modified-files-metric"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="metric-headline md-headline">Removed files</span>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Agents-Audit-Removed-files-metric'" id="Wazuh-App-Agents-Audit-Removed-files-metric"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex="50">
+                <md-card-content class="wazuh-column text-center">
+                    <div class="ng-binding">Latest alert</div>
+                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-Audit-Latest-alert'" id="Wazuh-App-Agents-Audit-Latest-alert"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-230">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Groups</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Groups'" id="Wazuh-App-Agents-Audit-Groups"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Directories</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Directories'" id="Wazuh-App-Agents-Audit-Directories"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Files</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Files'" id="Wazuh-App-Agents-Audit-Files"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-230">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Alerts over time</span>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Alerts-over-time'" id="Wazuh-App-Agents-Audit-Alerts-over-time"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div class="height-448" layout="row" layout-align="center stretch">
+            <div flex="20" layout="column" layout-align="center stretch">
+                <md-card flex>
+                    <md-card-content class="wazuh-column">
+                        <span class="md-headline">File read access</span>
+                        <kbn-vis vis-id="'Wazuh-App-Agents-Audit-File-read-access'" id="Wazuh-App-Agents-Audit-File-read-access"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+
+                <md-card flex>
+                    <md-card-content class="wazuh-column">
+                        <span class="md-headline">File write access</span>
+                        <kbn-vis vis-id="'Wazuh-App-Agents-Audit-File-write-access'" id="Wazuh-App-Agents-Audit-File-write-access"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
+
+            <div flex="60" layout="column" layout-align="center stretch">
+                <md-card flex>
+                    <md-card-content class="wazuh-column">
+                        <span class="md-headline">Commands</span>
+                        <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Commands'" id="Wazuh-App-Agents-Audit-Commands"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
+
+            <div flex="20" layout="column" layout-align="center stretch">
+                <md-card flex>
+                    <md-card-content class="wazuh-column">
+                        <span class="md-headline">Created files</span>
+                        <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Created-files'" id="Wazuh-App-Agents-Audit-Created-files"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex>
+                    <md-card-content class="wazuh-column">
+                        <span class="md-headline">Removed files</span>
+                        <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Removed-files'" id="Wazuh-App-Agents-Audit-Removed-files"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-530">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Last alerts</span>
+                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Agents-Audit-Last-alerts'" id="Wazuh-App-Agents-Audit-Last-alerts"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+    </div>
+</md-content>

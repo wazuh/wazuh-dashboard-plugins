@@ -74,8 +74,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 	$scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "green" : "red";
 
 	$scope.formatAgentStatus = (agentStatus) => {
-		let condition = (agentStatus !== "Active" || agentStatus === "Disconnected");
-		return (condition) ? "Never connected" : agentStatus;
+		return ['Active','Disconnected'].includes(agentStatus) ? agentStatus : 'Never connected';
 	};
 
 	const calculateMinutes = (start,end) => {
