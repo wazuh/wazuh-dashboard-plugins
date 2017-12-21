@@ -28,8 +28,10 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
         } else {
             const platform = filter.split(' - ')[0];
             const version  = filter.split(' - ')[1];
-            $scope.agents.addFilter('os.platform', platform);
-            $scope.agents.addFilter('os.version', version);
+            $scope.agents.addMultipleFilters([
+                { name:  'os.platform', value: platform },
+                { name:  'os.version', value: version }
+            ]);
         }
     }
 
