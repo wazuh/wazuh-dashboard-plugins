@@ -53,10 +53,10 @@
             </md-input-container>
 
             <md-input-container flex="20" class="md-block md-whiteframe-z1">
-                <md-select id="eventBox" ng-model="osPlatform" ng-change="agents.addFilter('os.platform', osPlatform)" aria-label="Filter by operative system">
+                <md-select id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
                     <md-option value="all">All OS platforms</md-option>
-                    <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}}">
-                        {{platform.name}}
+                    <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
+                        {{platform.name}} {{platform.version}}
                     </md-option>
                 </md-select>
             </md-input-container>
@@ -93,7 +93,7 @@
                     <span flex="25">{{agent.name || 'Unknown'}}</span>
                     <span flex="10">{{agent.ip || 'Unknown'}}</span>
                     <span flex="15">{{agent.status || 'Unknown'}}</span>
-                    <span flex="15">{{agent.os.platform || 'Unknown'}}</span>
+                    <span flex="15">{{agent.os.name || 'Unknown'}}</span>
                     <span flex="15">{{agent.os.version || 'Unknown'}}</span>
                     <span flex="15">{{agent.version || 'Unknown'}}</span>
                 </md-list-item>
