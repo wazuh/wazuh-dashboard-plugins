@@ -8,6 +8,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
     // Initialize
     const notify = new Notifier({ location: 'Settings' });
+    var currentApiEntryIndex;
     $scope.formData          = {};
     $scope.formData.user     = "";
     $scope.formData.password = "";
@@ -26,7 +27,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
     // Getting the index pattern list into the scope
     $scope.indexPatterns = $route.current.locals.ip
-    
+
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
@@ -56,6 +57,15 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         });
     };
 
+    // Get current API index
+    $scope.getCurrentAPIIndex = () => {
+        for(var i = 0; i < $scope.apiEntries.length; i += 1) {
+            if($scope.apiEntries[i]._id === $scope.currentDefault) {
+                currentApiEntryIndex = i;
+            }
+        }
+    }
+
     // Set default API
     $scope.setDefault = (item) => {
         let index = $scope.apiEntries.indexOf(item);
@@ -65,7 +75,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             appState.setClusterInfo($scope.apiEntries[index]._source.cluster_info);
             if ($scope.apiEntries[index]._source.cluster_info.status == 'disabled')
                 appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[index]._source.cluster_info.manager, id: $scope.apiEntries[index]._id }));
-            else 
+            else
                 appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[index]._source.cluster_info.cluster, id: $scope.apiEntries[index]._id }));
 
             $scope.$emit('updateAPI', {});
@@ -73,6 +83,14 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
             $scope.extensions = $scope.apiEntries[index]._source.extensions;
             notify.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`);
+
+            $scope.getCurrentAPIIndex();
+
+            $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
+            $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
+            $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
+
+            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
         })
         .catch((error) => {
             notify.error("Could not set that manager API as default due to " + error);
@@ -84,9 +102,16 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         genericReq.request('GET', '/api/wazuh-api/apiEntries')
         .then((data) => {
             $scope.apiEntries = data.data.length > 0 ? data.data : [];
-            if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) 
+            if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null)
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
 
+            $scope.getCurrentAPIIndex();
+
+            $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
+            $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
+            $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
+
+            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
         })
         .catch(() => {
             notify.error("Error getting API entries");
@@ -107,10 +132,10 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         };
 
         const userRegEx  = new RegExp(/^[a-zA-Z0-9]{3,100}$/);
-        const passRegEx  = new RegExp(/^.{3,100}$/); 
-        const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/); 
-        const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/); 
-        const portRegEx  = new RegExp(/^[0-9]{2,5}$/); 
+        const passRegEx  = new RegExp(/^.{3,100}$/);
+        const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/);
+        const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
+        const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
         // Validate user
         if(!userRegEx.test($scope.formData.user)){
@@ -175,7 +200,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
                     if ($scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.status == 'disabled')
                         appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.manager, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
-                    else 
+                    else
                         appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.cluster, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
 
                     $scope.$emit('updateAPI', {});
@@ -219,7 +244,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
             if (tmpData.cluster_info.status == 'disabled')
                 appState.setCurrentAPI(JSON.stringify({name: tmpData.cluster_info.manager, id: $scope.apiEntries[index]._id }));
-            else 
+            else
                 appState.setCurrentAPI(JSON.stringify({name: tmpData.cluster_info.cluster, id: $scope.apiEntries[index]._id }));
 
             $scope.$emit('updateAPI', {});
@@ -240,11 +265,13 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     // Toggle extension
     $scope.toggleExtension = (extension, state) => {
         if (['oscap','audit','pci'].includes(extension)) {
-            genericReq.request('PUT', `/api/wazuh-api/extension/toggle/${$scope.apiEntries[$scope.currentDefault]._id}/${extension}/${state}`)
+            genericReq.request('PUT', `/api/wazuh-api/extension/toggle/${$scope.apiEntries[currentApiEntryIndex]._id}/${extension}/${state}`)
             .then(() => {})
             .catch(() => {
                 notify.error("Invalid request when toggle extension state.");
             });
+
+            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
         }
     };
 
@@ -283,11 +310,11 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                 text = 'Could not connect with elasticsearch in order to retrieve the credentials.';
                 break;
             case 'no_credentials':
-                text = 'Valid credentials not found in elasticsearch. It seems the credentials ' + 
+                text = 'Valid credentials not found in elasticsearch. It seems the credentials ' +
                        'were not saved.';
                 break;
             case 'protocol_error':
-                text = 'Invalid protocol in the API url. Please, specify <b>http://</b> or ' + 
+                text = 'Invalid protocol in the API url. Please, specify <b>http://</b> or ' +
                        '<b>https://</b>.';
                 break;
             case 'unauthorized':
@@ -297,8 +324,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                 text = 'The given URL does not contain a valid Wazuh RESTful API installation.';
                 break;
             case 'self_signed':
-                text = 'The request to Wazuh RESTful API was blocked, because it is using a ' + 
-                       'selfsigned SSL certificate. Please, enable <b>"Accept selfsigned SSL"</b> ' + 
+                text = 'The request to Wazuh RESTful API was blocked, because it is using a ' +
+                       'selfsigned SSL certificate. Please, enable <b>"Accept selfsigned SSL"</b> ' +
                        'option if you want to connect anyway.';
                 break;
             case 'not_running':
