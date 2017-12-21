@@ -70,31 +70,30 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     $scope.setDefault = (item) => {
         let index = $scope.apiEntries.indexOf(item);
 
-        genericReq.request('PUT', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`)
-        .then(() => {
-            appState.setClusterInfo($scope.apiEntries[index]._source.cluster_info);
-            if ($scope.apiEntries[index]._source.cluster_info.status == 'disabled')
-                appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[index]._source.cluster_info.manager, id: $scope.apiEntries[index]._id }));
-            else
-                appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[index]._source.cluster_info.cluster, id: $scope.apiEntries[index]._id }));
+        appState.setClusterInfo($scope.apiEntries[index]._source.cluster_info);
 
-            $scope.$emit('updateAPI', {});
+        if ($scope.apiEntries[index]._source.cluster_info.status == 'disabled')
+            appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[index]._source.cluster_info.manager, id: $scope.apiEntries[index]._id }));
+        else
+            appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[index]._source.cluster_info.cluster, id: $scope.apiEntries[index]._id }));
 
-            $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
-            $scope.extensions = $scope.apiEntries[index]._source.extensions;
-            notify.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`);
+        $scope.$emit('updateAPI', {});
 
-            $scope.getCurrentAPIIndex();
+        $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
+        $scope.extensions = $scope.apiEntries[index]._source.extensions;
 
-            $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
-            $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
-            $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
+        notify.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`);
 
-            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
-        })
-        .catch((error) => {
-            notify.error("Could not set that manager API as default due to " + error);
-        });
+        $scope.getCurrentAPIIndex();
+
+        console.log($scope.apiEntries[index]);
+
+        $scope.extensions.oscap = $scope.apiEntries[index]._source.extensions.oscap;
+        $scope.extensions.audit = $scope.apiEntries[index]._source.extensions.audit;
+        $scope.extensions.pci = $scope.apiEntries[index]._source.extensions.pci;
+
+        appState.setExtensions($scope.apiEntries[index]._source.extensions);
+
     };
 
     // Get settings function
@@ -183,7 +182,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                         active:       tmpData.active,
                         url:          tmpData.url,
                         api_user:     tmpData.user,
-                        api_port:     tmpData.port
+                        api_port:     tmpData.port,
+                        extensions:   tmpData.extensions
                     }
                 };
                 $scope.apiEntries.push(newEntry);
