@@ -53,9 +53,9 @@
             </md-input-container>
 
             <md-input-container flex="20" class="md-block md-whiteframe-z1">
-                <md-select id="eventBox" ng-model="osPlatform" ng-change="agents.addFilter('os.platform', osPlatform)" aria-label="Filter by operative system">
+                <md-select id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
                     <md-option value="all">All OS platforms</md-option>
-                    <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}}">
+                    <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
                         {{platform.name}} {{platform.version}}
                     </md-option>
                 </md-select>

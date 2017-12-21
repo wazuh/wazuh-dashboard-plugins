@@ -21,6 +21,13 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
         tmpUrl2 = `/api/wazuh-elastic/top/manager/${appState.getClusterInfo().manager}/agent.id`;
     }
 
+    $scope.applyFilters = filter => {
+        const platform = filter.split(' - ')[0];
+        const version  = filter.split(' - ')[1];
+        $scope.agents.addFilter('os.platform', platform);
+        $scope.agents.addFilter('os.version', version);
+    }
+
     // Retrieve os list
     const retrieveList = agents => {
         for(let agent of agents){
