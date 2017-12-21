@@ -22,8 +22,9 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
     }
 
     // Retrieve os list
-    const retrieveList = () => {
-        for(let agent of $scope.agents.items){
+    const retrieveList = agents => {
+        for(let agent of agents){
+
             if('os' in agent && 'name' in agent.os){
                 let exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
                 if(!exists.length){
@@ -42,12 +43,11 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
             $scope.agents.nextPage(''),
             apiReq.request('GET', '/agents/summary', { }),
             genericReq.request('GET', tmpUrl),
-            apiReq.request('GET', '/agents', { sort:'-date_add', limit:1 })
+            apiReq.request('GET', '/agents', { sort:'-date_add', limit:9999999 })
         ])
         .then(data => {
 
-            // Next page
-            retrieveList();
+
 
             // Agents summary
             if(parseInt(data[1].data.data['Never connected']) > 0){
@@ -82,7 +82,9 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
             }
 
             // Last agent
-            $scope.lastAgent = data[3].data.data.items[0]
+            $scope.lastAgent = data[3].data.data.items[0];
+
+            retrieveList(data[3].data.data.items);
 
             $scope.loading = false;
             $scope.$digest();
