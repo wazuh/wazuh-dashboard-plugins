@@ -162,18 +162,18 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                     }
                 };
                 $scope.apiEntries.push(newEntry);
+
                 notify.info('Wazuh API successfully added');
                 $scope.addManagerContainer = false;
                 $scope.formData.user       = "";
                 $scope.formData.password   = "";
                 $scope.formData.url        = "";
                 $scope.formData.port       = "";
-                // Fetch agents on demand
 
                 // Setting current API as default if no one is in the cookies
-                if (appState.getCurrentAPI() === undefined || appState.getCurrentAPI() === null) { // No cookie
+                if (!appState.getCurrentAPI()) { // No cookie
 
-                    if ($scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.status == 'disabled')
+                    if ($scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.status === 'disabled')
                         appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.manager, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
                     else 
                         appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.cluster, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
@@ -200,16 +200,13 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     $scope.checkManager = (item) => {
         let index = $scope.apiEntries.indexOf(item);
 
-        var tmpData = {
-            'user':     $scope.apiEntries[index]._source.api_user,
-            'password': $scope.apiEntries[index]._source.api_password,
-            'url':      $scope.apiEntries[index]._source.url,
-            'port':     $scope.apiEntries[index]._source.api_port,
-            'insecure': "true"
-        };
-        testAPI.check(tmpData)
-        .then((data) => {
-            tmpData.cluster_info = data.data;
+
+        testAPI.check_stored(item._id)
+        .then(data => {
+
+            let tmpData = {};
+
+            tmpData.cluster_info = data.data.data.cluster_info;
 
             let tmpUrl = `/api/wazuh-api/updateApiHostname/${$scope.apiEntries[index]._id}`;
             genericReq.request('PUT', tmpUrl , { "cluster_info": tmpData.cluster_info })
@@ -226,9 +223,10 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
 
             $rootScope.apiIsDown = null;
+
             notify.info("Connection success");
         })
-        .catch((error) => printError(error));
+        .catch(error => printError(error));
     };
 
     // Process form
