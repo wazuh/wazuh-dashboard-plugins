@@ -22,10 +22,15 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
     }
 
     $scope.applyFilters = filter => {
-        const platform = filter.split(' - ')[0];
-        const version  = filter.split(' - ')[1];
-        $scope.agents.addFilter('os.platform', platform);
-        $scope.agents.addFilter('os.version', version);
+        $scope.agents.filters = [];
+        if(filter.includes('Unknown')){
+            $scope.agents.addFilter('status','Never connected');
+        } else {
+            const platform = filter.split(' - ')[0];
+            const version  = filter.split(' - ')[1];
+            $scope.agents.addFilter('os.platform', platform);
+            $scope.agents.addFilter('os.version', version);
+        }
     }
 
     // Retrieve os list
@@ -61,7 +66,7 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
                 $scope.osPlatforms.push({
                     name:     'Unknown',
                     platform: 'Unknown',
-                    version:  'Unknown'
+                    version:  ''
                 });
             }
             $scope.agentsCountActive         = data[1].data.data.Active;
