@@ -92,7 +92,16 @@ module.exports = (server, options) => {
     const loadCredentials = (apiEntries) => {
         if (typeof apiEntries === 'undefined' || !('hits' in apiEntries)) return;
 
-        for(let element of apiEntries.hits) {
+        const filteredApis = apiEntries.hits.filter((element, index, self) =>
+            index === self.findIndex((t) => (
+                t._source.api_user === element._source.api_user && 
+                t._source.api_password === element._source.api_password &&
+                t._source.url === element._source.url && 
+                t._source.api_port === element._source.api_port
+            ))
+        );
+
+        for(let element of filteredApis) {
             let apiEntry = {
                 'user':     element._source.api_user,
                 'password': Buffer.from(element._source.api_password, 'base64').toString("ascii"),
@@ -114,8 +123,8 @@ module.exports = (server, options) => {
             index: '.wazuh',
             type: 'wazuh-configuration'
         })
-        .then((data) => {
-            if (data.hits.total === 1) {
+        .then(data => {
+            if (data.hits.total > 0) {
                 callback(data.hits);
             } else {
                 callback({
