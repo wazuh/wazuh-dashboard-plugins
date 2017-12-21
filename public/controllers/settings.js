@@ -313,6 +313,12 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             case 'wrong_credentials':
                 text = 'Wrong Wazuh API credentials, please check them and try again';
                 break;
+            case 'invalid_url':
+                text = 'Wrong Wazuh API url, please check it and try again';
+                break;
+            case 'invalid_port':
+                text = 'Wrong Wazuh API port, please check it and try again';
+                break;
             default:
                 text = `Unexpected error. ${error.message}`;
         }
