@@ -472,13 +472,17 @@ module.exports = (server, options) => {
         elasticRequest.callWithInternalUser('indices.delete', { index: ".wazuh" })
         .then((data) => {
             let configuration = {
-              "source": {
-                "index": ".old-wazuh",
-                "type": "wazuh-configuration"
-              },
-              "dest": {
-                "index": ".wazuh"
-              }
+                "source": {
+                    "index": ".old-wazuh",
+                    "type": "wazuh-configuration"
+                },
+                    "dest": {
+                    "index": ".wazuh"
+                },
+                "script": {
+                    "source": "ctx._id = new Date().getTime()",
+                    "lang": "painless"
+                }
             };
 
             server.log([blueWazuh, 'reindex', 'info'], 'Reindexing into the new .wazuh');
