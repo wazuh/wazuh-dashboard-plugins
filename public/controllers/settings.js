@@ -86,8 +86,6 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
         $scope.getCurrentAPIIndex();
 
-        console.log($scope.apiEntries[index]);
-
         $scope.extensions.oscap = $scope.apiEntries[index]._source.extensions.oscap;
         $scope.extensions.audit = $scope.apiEntries[index]._source.extensions.audit;
         $scope.extensions.pci = $scope.apiEntries[index]._source.extensions.pci;
@@ -225,13 +223,21 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     $scope.checkManager = (item) => {
         let index = $scope.apiEntries.indexOf(item);
 
+        let tmpData = {
+            'user':         $scope.apiEntries[index]._source.api_user,
+            'password':     $scope.apiEntries[index]._source.api_password,
+            'url':          $scope.apiEntries[index]._source.url,
+            'port':         $scope.apiEntries[index]._source.api_port,
+            'cluster_info': {},
+            'insecure':     'true',
+            'id':           $scope.apiEntries[index]._id
+        };
 
-        testAPI.check_stored(item._id)
+        testAPI.check(tmpData)
         .then(data => {
-
             let tmpData = {};
 
-            tmpData.cluster_info = data.data.data.cluster_info;
+            tmpData.cluster_info = data.data;
 
             let tmpUrl = `/api/wazuh-api/updateApiHostname/${$scope.apiEntries[index]._id}`;
             genericReq.request('PUT', tmpUrl , { "cluster_info": tmpData.cluster_info })
@@ -239,7 +245,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                 $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
             });
 
-            if (tmpData.cluster_info.status == 'disabled')
+            if (tmpData.cluster_info.status === 'disabled')
                 appState.setCurrentAPI(JSON.stringify({name: tmpData.cluster_info.manager, id: $scope.apiEntries[index]._id }));
             else
                 appState.setCurrentAPI(JSON.stringify({name: tmpData.cluster_info.cluster, id: $scope.apiEntries[index]._id }));
