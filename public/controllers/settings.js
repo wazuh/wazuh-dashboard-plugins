@@ -64,6 +64,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`)
         .then(() => {
             $scope.apiEntries.splice(index, 1);
+            $rootScope.apiIsDown = null;            
         })
         .catch(() => {
             notify.error("Could not remove manager");
@@ -455,4 +456,6 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     // Loading data
     $scope.getSettings();
     $scope.getAppInfo();
+
+    
 });

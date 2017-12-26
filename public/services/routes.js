@@ -92,6 +92,7 @@ const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState, 
             if (data.data.error || data.data.data.apiIsDown) {
                 checkResponse(data);
             } else { 
+                $rootScope.apiIsDown = null; 
                 changeCurrentApi(data);
             }
         })
