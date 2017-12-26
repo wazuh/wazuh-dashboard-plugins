@@ -7,6 +7,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
             restrict: 'E',
             scope: {
                 visID: '=visId',
+                specificTimeRange: '=specificTimeRange'
             },
             controller: function VisController($scope, $rootScope, savedVisualizations, implicitFilters) {
 
@@ -52,7 +53,16 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                             .set('filter', implicitFilters.loadFilters());
                         }
 
-                        loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, {})
+                        let params = {};
+
+                        if ($scope.specificTimeRange == true) {
+                            const timeRange = {
+                                min: 'now-1d/d',
+                                max: 'now'
+                            };
+                            params = {timeRange: timeRange}
+                        }
+                        loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, params)
                         .then(handler => {
 
                             // We bind the renderComplete event to watch for proper loading screen
