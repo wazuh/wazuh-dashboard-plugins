@@ -32,6 +32,12 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         port    : null
     };
 
+    const userRegEx  = new RegExp(/^[a-zA-Z0-9]{3,100}$/);
+    const passRegEx  = new RegExp(/^.{3,100}$/);
+    const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/);
+    const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
+    const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
+
     // Getting the index pattern list into the scope
     $scope.indexPatterns = $route.current.locals.ip
 
@@ -127,8 +133,39 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         });
     };
 
+    const validator = formName => {
+        // Validate user
+        if(!userRegEx.test($scope[formName].user)){
+            return 'Invalid user field';
+        }
+
+        // Validate password
+        if(!passRegEx.test($scope[formName].password)){
+            return 'Invalid password field';
+        }
+
+        // Validate url
+        if(!urlRegEx.test($scope[formName].url) && !urlRegExIP.test($scope[formName].url)){
+            return 'Invalid url field';
+        }
+
+        // Validate port
+        const validatePort = parseInt($scope[formName].port);
+        if(!portRegEx.test($scope[formName].port) || validatePort <= 0 || validatePort >= 99999) {
+            return 'Invalid port field';
+        }
+
+        return false;
+    }
+
+
     // Save settings function
     $scope.saveSettings = () => {
+        const invalid = validator('formData');
+        if(invalid) {
+            $scope.messageError = invalid;
+            return notify.error(invalid);
+        }
 
         let tmpData = {
             'user':         $scope.formData.user,
@@ -139,37 +176,6 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             'insecure':     'true',
             'id':           $scope.apiEntries.length
         };
-
-        const userRegEx  = new RegExp(/^[a-zA-Z0-9]{3,100}$/);
-        const passRegEx  = new RegExp(/^.{3,100}$/);
-        const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/);
-        const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
-        const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
-
-        // Validate user
-        if(!userRegEx.test($scope.formData.user)){
-            $scope.messageError = 'Invalid user field';
-            return notify.error('Invalid user field');
-        }
-
-        // Validate password
-        if(!passRegEx.test($scope.formData.password)){
-            $scope.messageError = 'Invalid password field';
-            return notify.error('Invalid password field');
-        }
-
-        // Validate url
-        if(!urlRegEx.test($scope.formData.url) && !urlRegExIP.test($scope.formData.url)){
-            $scope.messageError = 'Invalid url field';
-            return notify.error('Invalid url field');
-        }
-
-        // Validate port
-        const validatePort = parseInt($scope.formData.port);
-        if(!portRegEx.test($scope.formData.port) || validatePort <= 0 || validatePort >= 99999) {
-            $scope.messageError = 'Invalid port field';
-            return notify.error('Invalid port field');
-        }
 
         testAPI.check(tmpData)
         .then((data) => {
@@ -241,6 +247,13 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     // Update settings function
     $scope.updateSettings = item => {
         $scope.messageErrorUpdate = '';
+
+        const invalid = validator('formUpdate');
+        if(invalid) {
+            $scope.messageErrorUpdate = invalid;
+            return notify.error(invalid);
+        }
+        
         const index = $scope.apiEntries.indexOf(item);
 
         const tmpData = {
