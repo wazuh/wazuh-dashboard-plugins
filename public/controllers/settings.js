@@ -125,9 +125,6 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
 
             appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
-
-
-            
         })
         .catch((error) => {
             notify.error("Error getting API entries " +error );
@@ -229,6 +226,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                 .catch(() => {
                     notify.error("Error fetching agents");
                 });
+
+                $scope.getSettings();
             })
             .catch((error, status) => {
                 if (status === '400') notify.error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
@@ -294,7 +293,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     // Check manager connectivity
     $scope.checkManager = (item) => {
         let index = $scope.apiEntries.indexOf(item);
-
+        
         let tmpData = {
             'user':         $scope.apiEntries[index]._source.api_user,
             'password':     $scope.apiEntries[index]._source.api_password,
