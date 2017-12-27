@@ -53,6 +53,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     // Switch tab
     $scope.switchTab = (tab) => {
+		if($scope.tab === tab) return;
         // Deleting app state traces in the url
         $location.search('_a', null);
         $scope.tabView = 'panels';
