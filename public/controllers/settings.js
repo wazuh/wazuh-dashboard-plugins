@@ -8,11 +8,12 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
     // Initialize
     const notify = new Notifier({ location: 'Settings' });
-    var currentApiEntryIndex;
-    $scope.formData          = {};
-    $scope.formData.user     = "";
-    $scope.formData.password = "";
-    $scope.formData.url      = "";
+    let currentApiEntryIndex;
+    $scope.formData = {
+        user    : '',
+        password: '',
+        url     : ''
+    };
     $scope.accept_ssl        = true;
     $scope.editConfiguration = true;
     $scope.menuNavItem       = 'settings';
@@ -166,13 +167,13 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         }
 
         let tmpData = {
-            'user':         $scope.formData.user,
-            'password':     base64.encode($scope.formData.password),
-            'url':          $scope.formData.url,
-            'port':         $scope.formData.port,
-            'cluster_info': {},
-            'insecure':     'true',
-            'id':           $scope.apiEntries.length
+            user:         $scope.formData.user,
+            password:     base64.encode($scope.formData.password),
+            url:          $scope.formData.url,
+            port:         $scope.formData.port,
+            cluster_info: {},
+            insecure:     'true',
+            id:           $scope.apiEntries.length
         };
 
         testAPI.check(tmpData)
@@ -423,8 +424,15 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             case 'invalid_port':
                 text = 'Wrong Wazuh API port, please check it and try again';
                 break;
+            case 'socket_hang_up':
+                if(error.https){
+                    text = 'Wrong Wazuh API protocol, please check try again with http instead https';
+                } else {
+                    text = 'Could not connect with Wazuh API, please check url and port and try again'
+                }
+                break;
             default:
-                text = `Unexpected error. ${error.message}`;
+                text = `Unexpected error. ${error.message || ''}`;
         }
         notify.error(text);
         if(!updating) $scope.messageError       = text;
