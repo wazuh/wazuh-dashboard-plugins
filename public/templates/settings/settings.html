@@ -73,13 +73,40 @@
                     <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18" aria-hidden="true"></i>
                     <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2" aria-hidden="true"></i>
                     <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2" aria-hidden="true"></i>
+                    <i ng-click="showEditForm[entry._id] = !showEditForm[entry._id]" tooltip="Edit" class="fa fa-pencil settings-template-2" aria-hidden="true"></i>
                 </p>
+            </span>
+            <span layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id]">
+                <form flex ng-submit="updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
+                    <md-input-container>
+                      <label>Username</label>
+                      <input placeholder="" ng-init="formUpdate.user=entry._source.api_user" type="text" ng-model="formUpdate.user" aria-label="username" required/>
+                    </md-input-container>
+                    <md-input-container>
+                      <label>Password</label>
+                      <input placeholder="" type="password" ng-model="formUpdate.password" aria-label="password" required/>
+                    </md-input-container>
+                    <md-input-container>
+                      <label>URL</label>
+                      <input placeholder="https://" ng-init="formUpdate.url=entry._source.url" ng-model="formUpdate.url" type="url" aria-label="full url" required/>
+                    </md-input-container>
+                    <md-input-container>
+                      <label>Port</label>
+                      <input placeholder="" ng-init="formUpdate.port=entry._source.api_port" ng-model="formUpdate.port" type="text" aria-label="port" required/>
+                    </md-input-container>
+                    <div layout="row" layout-align="center center" ng-if="messageError">
+                      <p class="color-f9">{{messageErrorUpdate}}</p>
+                    </div>
+                    <div layout="row" layout-align="center center">
+                      <md-button flex="15" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle settings-template-3" aria-hidden="true"></i>UPDATE</md-button>
+                    </div>
+                </form>
             </span>
 
             <md-divider></md-divider>
         </div>
 
-        <div layout="row" layout-align="center center">
+        <div layout="row" ng-show="!isUpdating()" layout-align="center center">
             <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle font-size-15" aria-hidden="true"></i> Add new API</md-button>
         </div>
 

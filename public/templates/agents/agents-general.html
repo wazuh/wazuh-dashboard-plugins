@@ -3,7 +3,7 @@
     <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
 
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
-        <div layout="row" class="height-120">
+        <div layout="row" class="height-100">
             <md-card flex>
                 <md-card-content class="text-center">
                     <div class="metric-value ng-binding font-size-14-pt">{{agent.name}}</div>
@@ -41,7 +41,7 @@
             </md-card>
         </div>
 
-        <div layout="row" class="height-120">
+        <div layout="row" class="height-100">
             <md-card flex ng-show="agent.id != '000'">
                 <md-card-content class="text-center">
                     <div class="metric-value ng-binding font-size-14-pt">{{agent.lastKeepAlive || 'Unknown' }}</div>

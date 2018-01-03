@@ -146,10 +146,11 @@ module.exports = (server, options) => {
     const createIndexPattern = () => {
         server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${index_pattern}`);
 
+        let patternId = 'index-pattern:' + index_pattern;
         elasticRequest.callWithInternalUser('create', { 
             index: '.kibana', 
             type: 'doc', 
-            id: 'index-pattern:f1175040-d5c5-11e7-8ef5-a5944cf52264', 
+            id: patternId, 
             body: {
                 "type": 'index-pattern', 
                 "index-pattern": { 
@@ -161,11 +162,11 @@ module.exports = (server, options) => {
         .then((resp) => {
             server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
             // Import objects (dashboards and visualizations)
-            importObjects('f1175040-d5c5-11e7-8ef5-a5944cf52264');
-            importAppObjects('f1175040-d5c5-11e7-8ef5-a5944cf52264');
+            importObjects(index_pattern);
+            importAppObjects(index_pattern);
 
             // Save Setup Info
-            saveConfiguration('f1175040-d5c5-11e7-8ef5-a5944cf52264');
+            saveConfiguration(index_pattern);
         })
         .catch((err) => {
             server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
@@ -250,9 +251,9 @@ module.exports = (server, options) => {
             server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
         }
 
-    	return elasticRequest.callWithInternalUser('indices.putTemplate', 
-    	{
-    		name: 'wazuh-kibana',
+        return elasticRequest.callWithInternalUser('indices.putTemplate', 
+        {
+            name: 'wazuh-kibana',
             order: 0,
             create: true,
             body:  kibana_template
@@ -270,21 +271,40 @@ module.exports = (server, options) => {
             }
             else { // No .kibana index created...
 		        server.log([blueWazuh, 'initialize', 'info'], "Didn't find .kibana index...");
-            	createKibanaTemplate()
-            	.then((data) => {
-		        	server.log([blueWazuh, 'initialize', 'info'], 'Successfully created template .kibana.');
 
-			        elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
-			        .then((data) => {
-		        		server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
-			        	init();
-			        })
-			        .catch((error) => {
-		        		server.log([blueWazuh, 'initialize', 'error'], 'Error creating .kibana index due to ' + error);
-			        });
-		        }).catch((error) => {
-		        	server.log([blueWazuh, 'initialize', 'error'], 'Error creating template for .kibana due to ' + error);
-		        });
+                elasticRequest.callWithInternalUser('indices.getTemplate', 
+                {
+                    name: 'wazuh-kibana'
+                })
+                .then((data) => {
+                    server.log([blueWazuh, 'initialize', 'info'], 'No need to create the .kibana template, already exists.');
+
+                    elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
+                    .then((data) => {
+                        server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
+                        init();
+                    })
+                    .catch((error) => {
+                        server.log([blueWazuh, 'initialize', 'error'], 'Error creating .kibana index due to ' + error);
+                    });
+                })
+                .catch((error) => {
+                    createKibanaTemplate()
+                    .then((data) => {
+                        server.log([blueWazuh, 'initialize', 'info'], 'Successfully created template .kibana.');
+
+                        elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
+                        .then((data) => {
+                            server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
+                            init();
+                        })
+                        .catch((error) => {
+                            server.log([blueWazuh, 'initialize', 'error'], 'Error creating .kibana index due to ' + error);
+                        });
+                    }).catch((error) => {
+                        server.log([blueWazuh, 'initialize', 'error'], 'Error creating template for .kibana due to ' + error);
+                    });
+                });
 		    }
         })
         .catch((error) => {
@@ -453,13 +473,17 @@ module.exports = (server, options) => {
         elasticRequest.callWithInternalUser('indices.delete', { index: ".wazuh" })
         .then((data) => {
             let configuration = {
-              "source": {
-                "index": ".old-wazuh",
-                "type": "wazuh-configuration"
-              },
-              "dest": {
-                "index": ".wazuh"
-              }
+                "source": {
+                    "index": ".old-wazuh",
+                    "type": "wazuh-configuration"
+                },
+                    "dest": {
+                    "index": ".wazuh"
+                },
+                "script": {
+                    "source": "ctx._id = new Date().getTime()",
+                    "lang": "painless"
+                }
             };
 
             server.log([blueWazuh, 'reindex', 'info'], 'Reindexing into the new .wazuh');

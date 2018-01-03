@@ -92,6 +92,14 @@ app.factory('DataHandler', function ($q, apiReq) {
             return this.search();
         }
 
+        ///////////////////////////////////////////////////////////////
+        // Only used by agents preview, don't use for any thing more //
+        ///////////////////////////////////////////////////////////////
+        addMultipleFilters (arrayOfFilters) {
+            this.filters = [...arrayOfFilters];
+            return this.search();
+        }
+
         removeFilter (filterName, search) {
             if(search) this.filters = this.filters.filter(filter => filterName !== filter.name && filter.value !== search);
             else       this.filters = this.filters.filter(filter => filterName !== filter.name);

@@ -53,10 +53,11 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         $scope.tabView = subtab;
     };
 
-	$scope.switchTab = (tab) => {
+	$scope.switchTab = (tab) => {	
+		if($scope.tab === tab) return;
         // Deleting app state traces in the url
         $location.search('_a', null);
-        $scope.tabView = 'panels';
+		$scope.tabView = 'panels';
 	};
 
 	// Watchers
@@ -64,7 +65,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 	// We watch the resultState provided by the discover
 	$scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
     $scope.$watch('tab', () => {
-        $location.search('tab', $scope.tab);
+		$location.search('tab', $scope.tab);
         // Update the implicit filter
         if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
         else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;

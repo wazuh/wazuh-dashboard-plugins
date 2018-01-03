@@ -92,7 +92,16 @@ module.exports = (server, options) => {
     const loadCredentials = (apiEntries) => {
         if (typeof apiEntries === 'undefined' || !('hits' in apiEntries)) return;
 
-        for(let element of apiEntries.hits) {
+        const filteredApis = apiEntries.hits.filter((element, index, self) =>
+            index === self.findIndex((t) => (
+                t._source.api_user === element._source.api_user && 
+                t._source.api_password === element._source.api_password &&
+                t._source.url === element._source.url && 
+                t._source.api_port === element._source.api_port
+            ))
+        );
+
+        for(let element of filteredApis) {
             let apiEntry = {
                 'user':     element._source.api_user,
                 'password': Buffer.from(element._source.api_password, 'base64').toString("ascii"),
@@ -114,8 +123,8 @@ module.exports = (server, options) => {
             index: '.wazuh',
             type: 'wazuh-configuration'
         })
-        .then((data) => {
-            if (data.hits.total === 1) {
+        .then(data => {
+            if (data.hits.total > 0) {
                 callback(data.hits);
             } else {
                 callback({
@@ -185,10 +194,11 @@ module.exports = (server, options) => {
     const configureKibana = () => {
         server.log([blueWazuh, 'monitoring', 'info'], `Creating index pattern: ${index_pattern}`);
 
-        elasticRequest.callWithInternalUser('create', { 
+        let patternId = 'index-pattern:' + index_pattern;
+            elasticRequest.callWithInternalUser('create', { 
             index: '.kibana', 
             type: 'doc', 
-            id: 'index-pattern:f1185040-d5c5-11e7-8ef5-a5944cf52264', 
+            id: patternId, 
             body: {
                 "type": 'index-pattern', 
                 "index-pattern": { 
@@ -199,7 +209,7 @@ module.exports = (server, options) => {
         })
         .then((resp) => {
             server.log([blueWazuh, 'monitoring', 'info'], 'Created index pattern: ' + index_pattern);
-            importAppObjects('f1185040-d5c5-11e7-8ef5-a5944cf52264');
+            importAppObjects(index_pattern);
         })
         .catch((error) => {
             server.log([blueWazuh, 'monitoring', 'error'], 'Error creating index-pattern due to ' + error);
@@ -266,10 +276,11 @@ module.exports = (server, options) => {
         server.log([blueWazuh, 'monitoring', 'info'], 'Creating today index...');
         saveStatus();
 
+        let patternId = 'index-pattern:' + index_pattern;
         elasticRequest.callWithInternalUser('get', {
             index: '.kibana',
             type:  'doc',
-            id: 'index-pattern:f1185040-d5c5-11e7-8ef5-a5944cf52264'
+            id: patternId
         })
         .then((data) => {
             server.log([blueWazuh, 'monitoring', 'info'], 'Skipping index-pattern creation. Already exists.');
