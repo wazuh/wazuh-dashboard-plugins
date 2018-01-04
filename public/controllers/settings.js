@@ -174,7 +174,6 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             cluster_info: {},
             insecure:     'true',
             id:           (Array.isArray($scope.apiEntries)) ? $scope.apiEntries.length : 0,
-            cluster_info: null,
             extensions:   { oscap: true, audit: true, pci: true }
         };
 
@@ -298,8 +297,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             port:         $scope.apiEntries[index]._source.api_port,
             cluster_info: {},
             insecure:     'true',
-            id:           $scope.apiEntries[index]._id,
-            cluster_info: null
+            id:           $scope.apiEntries[index]._id
         };
 
         testAPI
