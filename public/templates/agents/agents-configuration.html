@@ -1,0 +1,242 @@
+<md-content flex layout="column" ng-if="tab === 'configuration'" layout-align="start" ng-controller="agentConfigurationController">
+
+    <!-- <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div> -->
+
+    <!-- View: Panels -->
+    <div layout="row" layout-align="start stretch">
+        <md-card flex>
+            <md-content class="md-padding background-white">
+                <h1 class="md-headline">Group Configuration</h1>
+                <h1 class="md-title">Current group: <span class="agents-head-5 blue">{{groupName}}</span></h1>
+            </md-content>
+            <md-tabs md-dynamic-height md-border-bottom>
+
+                <md-tab label="File Integrity">
+                    <md-content ng-if="!groupConfiguration.config.syscheck" class="md-padding background-white">
+                        <h1 class="md-title text-center">No FIM Configuration Available</h1>
+                        <p class="text-center">There's no FIM group configuration applying for this agent.</p>
+                    </md-content>
+                    <md-content ng-if="groupConfiguration.config.syscheck" class="md-padding background-white">
+                        <span layout="row" layout-align="start">
+                            <p>File Integrity disabled:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.syscheck.disabled}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Frequency:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.syscheck.frequency}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Scan on start:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.syscheck.scan_on_start}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Skip NFS:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.syscheck.scan_time}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Monitoring directories:</p>
+                            <p class="text-bold"></p>
+                        </span>
+                        <span ng-repeat="item in groupConfiguration.config.syscheck.directories|orderBy">
+                            <p>{{item}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>No diff:</p>
+                            <p class="text-bold"></p>
+                        </span>
+                        <span ng-repeat="item in groupConfiguration.config.syscheck.nodiff|orderBy">
+                            <p>{{item}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Ignoring:</p>
+                            <p class="text-bold"></p>
+                        </span>
+                        <span ng-repeat="item in groupConfiguration.config.syscheck.ignore|orderBy">
+                            <p>{{item}}</p>
+                        </span>
+                    </md-content>
+                </md-tab>
+
+                <md-tab label="Policy Monitoring">
+                    <md-content ng-if="!groupConfiguration.config.rootcheck" class="md-padding background-white">
+                        <h1 class="md-title text-center">No PM Configuration Available</h1>
+                        <p class="text-center">There's no PM group configuration applying for this agent.</p>
+                    </md-content>
+                    <md-content ng-if="groupConfiguration.config.rootcheck" class="md-padding background-white">
+                        <span layout="row" layout-align="start">
+                            <p>Policy Monitoring disabled:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.disabled}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Check UNIX Audit:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_unixaudit}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Check PIDs:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_pids}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Skip NFS:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.skip_nfs}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Check IF:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_if}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Check SYS:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_sys}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Check DEV:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_dev}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Check Ports:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_ports}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Check Trojans:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_trojans}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Check Files:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_files}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Frequency:</p>
+                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.frequency}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Rootkit Trojans:</p>
+                            <p class="text-bold"></p>
+                        </span>
+                        <span ng-repeat="item in groupConfiguration.config.rootcheck.rootkit_trojans|orderBy">
+                            <p>{{item}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Rootkit Files:</p>
+                            <p class="text-bold"></p>
+                        </span>
+                        <span ng-repeat="item in groupConfiguration.config.rootcheck.rootkit_files|orderBy">
+                            <p>{{item}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>System Audit Files:</p>
+                            <p class="text-bold"></p>
+                        </span>
+                        <span ng-repeat="item in groupConfiguration.config.rootcheck.system_audit|orderBy">
+                            <p>{{item}}</p>
+                        </span>
+                    </md-content>
+                </md-tab>
+
+                <md-tab label="Active Response">
+                    <md-content ng-if="!groupConfiguration.config['active-response']" class="md-padding background-white">
+                        <h1 class="md-title text-center">No Active Response Configuration Available</h1>
+                        <p class="text-center">There's no Active Response group configuration applying for this agent.</p>
+                    </md-content>
+                    <md-content ng-if="groupConfiguration.config['active-response']" class="md-padding background-white">
+                        <span ng-repeat="item in groupConfiguration.config['active-response']|orderBy">
+                            <span layout="row" layout-align="start">
+                                <p>Active Response disabled:</p>
+                                <p class="text-bold"> {{item.disabled}}</p>
+                            </span>
+                            <md-divider></md-divider>
+                            <span layout="row" layout-align="start">
+                                <p>Certificate Storage:</p>
+                                <p class="text-bold"> {{item.ca_store}}</p>
+                            </span>
+                        </span>
+                    </md-content>
+                </md-tab>
+
+                <md-tab label="OpenSCAP">
+                    <md-content ng-if="!groupConfiguration.config['open-scap']" class="md-padding background-white">
+                        <h1 class="md-title text-center">No OpenSCAP Configuration Available</h1>
+                        <p class="text-center">There's no OpenSCAP group configuration applying for this agent.</p>
+                    </md-content>
+                    <md-content ng-if="groupConfiguration.config['open-scap']" class="md-padding background-white">
+                        <span layout="row" layout-align="start">
+                            <p>OpenSCAP disabled:</p>
+                            <p class="text-bold"> {{groupConfiguration.config['open-scap'].disabled}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Interval:</p>
+                            <p class="text-bold"> {{groupConfiguration.config['open-scap'].interval}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Scan on start:</p>
+                            <p class="text-bold"> {{groupConfiguration.config['open-scap'].scan-on-start}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>CIS-CAT Path:</p>
+                            <p class="text-bold"> {{groupConfiguration.config['open-scap'].ciscat_path}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Java Path:</p>
+                            <p class="text-bold"> {{groupConfiguration.config['open-scap'].java_path}}</p>
+                        </span>
+                        <md-divider></md-divider>
+                        <span layout="row" layout-align="start">
+                            <p>Timeout:</p>
+                            <p class="text-bold"> {{groupConfiguration.config['open-scap'].timeout}}</p>
+                        </span>
+                    </md-content>
+                </md-tab>
+
+                <md-tab label="Log Collector">
+                    <md-content ng-if="!groupConfiguration.config['localfile']" class="md-padding background-white">
+                        <h1 class="md-title text-center">No Log Collector Configuration Available</h1>
+                        <p class="text-center">There's no Log Collector group configuration applying for this agent.</p>
+                    </md-content>
+                    <md-content ng-if="groupConfiguration.config['localfile']" class="md-padding background-white">
+                        <span ng-repeat="item in groupConfiguration.config['localfile']|orderBy">
+                            <span layout="row" layout-align="start">
+                                <p>Log Format:</p>
+                                <p class="text-bold"> {{item.log_format}}</p>
+                            </span>
+                            <span layout="row" layout-align="start">
+                                <p>Location:</p>
+                                <p class="text-bold"> {{item.location}}</p>
+                            </span>
+                            <span layout="row" layout-align="start">
+                                <p>Frequency:</p>
+                                <p class="text-bold"> {{item.frequency}}</p>
+                            </span>
+                            <span layout="row" layout-align="start">
+                                <p>Command:</p>
+                                <p class="text-bold"> {{item.command}}</p>
+                            </span>
+                            <md-divider></md-divider>
+                        </span>
+                    </md-content>
+                </md-tab>
+
+            </md-tabs>
+        </md-card>
+    </div>
+</md-content>
