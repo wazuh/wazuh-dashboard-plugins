@@ -56,7 +56,7 @@ const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState, 
     const checkResponse = data => {
         if (parseInt(data.data.error) === 2){
             notify.warning("Wazuh App: Please set up Wazuh API credentials.");
-        } else if(data.data.data.apiIsDown){
+        } else if(data.data.data && data.data.data.apiIsDown){
             $rootScope.apiIsDown = "down";
             notify.error('Wazuh RESTful API seems to be down.');
         } else {
