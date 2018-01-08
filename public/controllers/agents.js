@@ -54,11 +54,8 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
     };
 
 	$scope.switchTab = (tab) => {
-		console.log("La funcion ha recibido de argumento: " + tab);
-		console.log("Estamos en la pestaña: " + $scope.tab);
 		if($scope.tab === tab) return;
         // Deleting app state traces in the url
-		console.log("Ahora la nueva tab es: " + $scope.tab);
         $location.search('_a', null);
 		$scope.tabView = 'panels';
 	};
@@ -142,9 +139,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 			}
 		}
 
-		console.log("Estoy en getAgent y he pasado el if, vamos a ver si podemos cambiar de pestaña.");
 		if (id === '000' && $scope.tab === 'configuration') {
-			console.log("Estoy dentro del if creado por mi");
 			$scope.tab = 'general';
 			$scope.switchTab('general');
 		}
