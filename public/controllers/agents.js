@@ -1,13 +1,13 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', 
+app.controller('agentsController',
 function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
 	$rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
 	$scope.agentsAutoComplete = AgentsAutoComplete;
 	const notify = new Notifier({ location: 'Agents' });
 
-    // Check the url hash and retriew the tabView information 
+    // Check the url hash and retriew the tabView information
 	if ($location.search().tabView){
 		$scope.tabView = $location.search().tabView;
 	} else { // If tabView doesn't exist, default it to 'panels' view
@@ -15,7 +15,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 		$location.search("tabView", "panels");
 	}
 
-    // Check the url hash and retrivew the tab information 
+    // Check the url hash and retrivew the tab information
 	if ($location.search().tab){
 		$scope.tab = $location.search().tab;
 	} else { // If tab doesn't exist, default it to 'general' view
@@ -53,9 +53,12 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         $scope.tabView = subtab;
     };
 
-	$scope.switchTab = (tab) => {	
+	$scope.switchTab = (tab) => {
+		console.log("La funcion ha recibido de argumento: " + tab);
+		console.log("Estamos en la pestaña: " + $scope.tab);
 		if($scope.tab === tab) return;
         // Deleting app state traces in the url
+		console.log("Ahora la nueva tab es: " + $scope.tab);
         $location.search('_a', null);
 		$scope.tabView = 'panels';
 	};
@@ -97,11 +100,11 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 		} else {
 			if (!$scope.agent.rootcheck.end) {
 				$scope.agent.rootcheck.end = 'Unknown';
-			} 
+			}
 			if (!$scope.agent.rootcheck.start){
 				$scope.agent.rootcheck.start = 'Unknown';
 			}
-		}	
+		}
 	}
 
 	const validateSysCheck = () => {
@@ -115,7 +118,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 		} else {
 			if (!$scope.agent.syscheck.end) {
 				$scope.agent.syscheck.end = 'Unknown';
-			} 
+			}
 			if (!$scope.agent.syscheck.start){
 				$scope.agent.syscheck.start = 'Unknown';
 			}
@@ -139,6 +142,13 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 			}
 		}
 
+		console.log("Estoy en getAgent y he pasado el if, vamos a ver si podemos cambiar de pestaña.");
+		if (id === '000' && $scope.tab === 'configuration') {
+			console.log("Estoy dentro del if creado por mi");
+			$scope.tab = 'general';
+			$scope.switchTab('general');
+		}
+
 		Promise.all([
 			apiReq.request('GET', `/agents/${id}`, {}),
 			apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
@@ -155,10 +165,10 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 
 			// Syscheck
 			$scope.agent.syscheck = data[1].data.data;
-			validateSysCheck();		
+			validateSysCheck();
 			// Rootcheck
 			$scope.agent.rootcheck = data[2].data.data;
-			validateRootCheck();	
+			validateRootCheck();
 
 			$scope.$digest();
 		})
@@ -169,18 +179,18 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 		$rootScope.globalAgent = agent;
 		$rootScope.comeFrom    = 'agents';
 		$location.search('tab', 'groups');
-		$location.path('/manager');        
+		$location.path('/manager');
 	};
 
 
     $scope.analizeAgents = search => {
         let deferred = $q.defer();
-        
+
         let promise;
         $scope.agentsAutoComplete.filters = [];
 
         promise = $scope.agentsAutoComplete.addFilter('search',search);
-       
+
         promise
         .then(() => deferred.resolve($scope.agentsAutoComplete.items))
         .catch(error => notify.error(error));
