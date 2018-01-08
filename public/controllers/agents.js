@@ -55,6 +55,10 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 
 	$scope.switchTab = (tab) => {	
 		if($scope.tab === tab) return;
+		for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
         // Deleting app state traces in the url
         $location.search('_a', null);
 		$scope.tabView = 'panels';
@@ -197,7 +201,13 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 	}
 
 	//Destroy
-	$scope.$on("$destroy", () => $scope.agentsAutoComplete.reset());
+	$scope.$on("$destroy", () => {
+		$scope.agentsAutoComplete.reset();
+		for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
+	});
 
 	//PCI tab
 	let tabs = [];
