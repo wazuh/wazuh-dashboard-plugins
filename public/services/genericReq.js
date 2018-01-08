@@ -45,10 +45,7 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
             }else if (error.error && error.error !== '0') {
                 defered.reject(error);
             } else {
-                defered.reject({
-                    error  : -2,
-                    message: 'Error doing a request to Kibana API.'
-                });
+                defered.reject(error);
             }
         });
 
@@ -69,7 +66,7 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
 
             _request(method, path, payload)
             .then((data) => defered.resolve(data))
-            .catch((error) => defered.reject(prepError(error)));
+            .catch(error => defered.reject(prepError(error)));
 
             return defered.promise;
         }
