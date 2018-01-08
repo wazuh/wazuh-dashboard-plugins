@@ -53,11 +53,23 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     // Switch tab
     $scope.switchTab = (tab) => {
-		if($scope.tab === tab) return;
+        if($scope.tab === tab) return;
+
+        for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
         // Deleting app state traces in the url
         $location.search('_a', null);
         $scope.tabView = 'panels';
     };
+
+    $scope.$on('$destroy',() => {
+        for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
+    });
 
     // Watchers
 
