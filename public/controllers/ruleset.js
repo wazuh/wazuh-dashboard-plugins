@@ -73,7 +73,13 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Notifier, Rule
     }
 
     //Destroy
-    $scope.$on('$destroy', () => $scope.rules.reset());
+    $scope.$on('$destroy', () => {
+        $scope.rules.reset();
+        for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
+    });
 });
 
 app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Notifier, Decoders,DecodersAutoComplete) {
@@ -173,5 +179,11 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Noti
     }
 
     //Destroy
-    $scope.$on("$destroy", () => $scope.decoders.reset());
+    $scope.$on("$destroy", () => {
+        $scope.decoders.reset();
+        for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
+    });
 });
