@@ -19,14 +19,14 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 let visHandler     = null;
 
                 // Listen for changes
-                var updateSearchSource = $scope.$on('updateVis', function (event, query, filters) {
-                    if (rendered === true) {
+                $scope.$on('updateVis', function (event, query, filters) {
+                    if (rendered) {
                         if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
-                            if (query.query == '') {
+                            if (query.query === '') {
                                 fullFilter = implicitFilter;
                             }
                             else {
-                                if (implicitFilter != '') {
+                                if (implicitFilter !== '') {
                                     fullFilter = implicitFilter + ' AND ' + query.query;
                                 }
                                 else {
@@ -40,9 +40,6 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                         }
                     }
                 });
-
-                //Destroy
-
 
                 // Initializing the visualization
                 const loader = ownLoader.getVisualizeLoader();
@@ -60,7 +57,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                     let params = {};
 
-                    if ($scope.specificTimeRange == true) {
+                    if ($scope.specificTimeRange) {
                         const timeRange = {
                             min: 'now-1d/d',
                             max: 'now'
