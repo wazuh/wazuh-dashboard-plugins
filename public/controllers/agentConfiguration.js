@@ -1,7 +1,7 @@
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentConfigurationController', function($scope, $rootScope, Notifier, apiReq) {
+app.controller('agentConfigurationController', function($scope, $rootScope, $location, Notifier, apiReq) {
     //Initialization
     const notify   = new Notifier({ location: 'Agent - Configuration' });
     $scope.load    = true;
@@ -18,6 +18,10 @@ app.controller('agentConfigurationController', function($scope, $rootScope, Noti
         })
         .catch(error => notify.error(error.message));
     };
+
+    $scope.showGroups = () => {
+        $location.path('manager/groups');
+    }
 
     //Load
     try {
