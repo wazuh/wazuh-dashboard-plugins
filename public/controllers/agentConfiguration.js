@@ -28,9 +28,12 @@ app.controller('agentConfigurationController', function($scope, $rootScope, $loc
         .request('GET', `/agents/${id}`, {});
 	};
 
-    $scope.showGroups = () => {
-        $location.path('manager/groups');
-    }
+    $scope.goGroup = () => {
+		$rootScope.globalAgent = $scope.agent;
+		$rootScope.comeFrom    = 'agents';
+		$location.search('tab', 'groups');
+		$location.path('/manager');
+	};
 
     //Load
     try {
