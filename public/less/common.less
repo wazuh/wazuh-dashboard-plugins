@@ -19,6 +19,13 @@ pre {
     height: 120px;
 }
 
+.percentage {
+    font-size: 20px;
+    text-align: center;
+    position: relative;
+    margin-top: -24px;
+    color: #00445a;
+}
 /* Wazuh Header */
 
 .wazuh-h3 {
@@ -129,6 +136,22 @@ md-progress-linear ._md-bar {
     background-color: #3caed2;
 }
 
+md-progress-linear {
+  height: 20px !important;
+}
+
+md-progress-linear .md-container {
+    height: 20px !important;
+}
+
+md-progress-linear .md-container .md-bar {
+      height: 20px !important;
+}
+md-progress-linear .md-container .md-dashed:before {
+      height: 20px !important;
+    }
+
+
 /* Manager Groups Agents/Files tabs fix */
 .md-tab.md-active {
     color: rgb(60, 174, 210) !important;
@@ -224,5 +247,5 @@ md-progress-linear ._md-bar {
 }
 
 .display-none {
-	display: none;
+    display: none;
 }
