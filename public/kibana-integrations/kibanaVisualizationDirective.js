@@ -9,7 +9,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, savedVisualizations, implicitFilters) {
+            controller: function VisController($scope, $rootScope, $location, savedVisualizations, implicitFilters) {
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
                 let implicitFilter = '';
                 let visTitle       = '';
@@ -41,6 +41,20 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                     }
                 });
 
+                var renderComplete = function() {
+                    rendered = true;
+                        $rootScope.loadedVisualizations.push(true);
+                    console.log("Render complete for", visTitle, "with", $rootScope.loadedVisualizations);
+
+                        $rootScope.loadingStatus = `Rendering visualizations... ${Math.round((100 * $rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100) / 100} %`;
+                        if ($rootScope.loadedVisualizations.length >= $rootScope.tabVisualizations[$location.search().tab]) {
+                            $rootScope.rendered = true;
+                            // Forcing a digest cycle
+                            $rootScope.$digest();
+                        }
+                        else $rootScope.rendered = false;
+                };
+
                 // Initializing the visualization
                 const loader = ownLoader.getVisualizeLoader();
 
@@ -64,11 +78,16 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                         };
                         params = {timeRange: timeRange}
                     }
-                    visHandler = loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, params); 
-                    $rootScope.ownHandlers.push(visHandler);
-                    visHandler.whenFirstRenderComplete().then(() => { 
-                        rendered = true;
+
+                    $("#"+$scope.visID).on('renderStart', () => {
+                        $rootScope.loadingStatus = "Fetching data...";
                     });
+
+                    visHandler = loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, params); 
+                    
+                    $rootScope.ownHandlers.push(visHandler);
+
+                    visHandler.addRenderCompleteListener(renderComplete);
                 });
      
             }
