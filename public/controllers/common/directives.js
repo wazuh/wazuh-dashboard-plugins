@@ -1,4 +1,5 @@
 import menuTemplate from '../../templates/directives/menu-top.html'
+import healthCheckTemplate from '../../templates/directives/health-check.html'
 const app = require('ui/modules').get('app/wazuh', []);
 app.directive('dynamic', function($compile) {
         return {
@@ -48,5 +49,24 @@ app.directive('dynamic', function($compile) {
                 });
             },
             template: menuTemplate
+        };
+    })
+    .directive('healthCheck', function () {
+        return {
+            controller: function filterPillController($scope, $rootScope, genericReq, appState) {
+                $rootScope.$watch('healthCheck', () => {
+                    // Check API connection
+                    // Check index-pattern existence
+                    // Check template
+                    genericReq.request('GET', `/api/wazuh-elastic/template/${appState.getCurrentPattern()}`)
+                    .then((data) => {
+                        console.log("wiiii", data);
+                    });
+                    $scope.APIStatus ="Checking API connection...";
+                    $scope.indexStatus ="Checking index-pattern...";
+                    $scope.templateStatus ="Checking template...";
+                });
+            },
+            template: healthCheckTemplate
         };
     });

@@ -77,6 +77,20 @@ module.exports = (server, options) => {
         });
     };
 
+    const getTemplate = (req, reply) => {
+        elasticRequest.callWithInternalUser('cat.templates', {})
+        .then((data) => {
+            console.log("data catting templates", req.params.pattern);
+            console.log("data catting templates", data);
+            if (data.includes(req.params.pattern)) {
+                console.log("Yay!, it's in here");
+            }
+        })
+        .catch((error) => {
+            console.log("Error catting templates", error);
+        }); 
+    };
+
     const getFieldTop = (req, reply) => {
 
         // Top field payload
@@ -184,6 +198,17 @@ module.exports = (server, options) => {
     module.exports = getConfig;
 
     //Server routes
+
+    /*
+     * GET /api/wazuh-elastic/template/{pattern}
+     * Returns whether a correct template is being applied for the index-pattern
+     *
+     **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/template/{pattern}',
+        handler: getTemplate
+    });
 
     /*
      * GET /api/wazuh-elastic/top/{cluster}/{field}/{time?}
