@@ -43,16 +43,15 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                 var renderComplete = function() {
                     rendered = true;
-                        $rootScope.loadedVisualizations.push(true);
-                    console.log("Render complete for", visTitle, "with", $rootScope.loadedVisualizations);
+                    $rootScope.loadedVisualizations.push(true);
 
-                        $rootScope.loadingStatus = `Rendering visualizations... ${Math.round((100 * $rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100) / 100} %`;
-                        if ($rootScope.loadedVisualizations.length >= $rootScope.tabVisualizations[$location.search().tab]) {
-                            $rootScope.rendered = true;
-                            // Forcing a digest cycle
-                            $rootScope.$digest();
-                        }
-                        else $rootScope.rendered = false;
+                    $rootScope.loadingStatus = `Rendering visualizations... ${Math.round((100 * $rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100) / 100} %`;
+                    if ($rootScope.loadedVisualizations.length >= $rootScope.tabVisualizations[$location.search().tab]) {
+                        $rootScope.rendered = true;
+                        // Forcing a digest cycle
+                        $rootScope.$digest();
+                    }
+                    else $rootScope.rendered = false;
                 };
 
                 // Initializing the visualization
