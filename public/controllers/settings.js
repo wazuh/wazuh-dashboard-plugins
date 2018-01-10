@@ -413,7 +413,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                 }
                 break;
             default:
-                text = `Unexpected error. ${error.message || ''}`;
+                text = `Unexpected error. ${(error.data && error.data.message) ? error.data.message : (error.message || error)}`;
         }
         notify.error(text);
         if(!updating) $scope.messageError       = text;
