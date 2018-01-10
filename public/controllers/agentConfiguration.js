@@ -24,9 +24,16 @@ app.controller('agentConfigurationController', function($scope, $rootScope, $loc
 			}
 		}
 
-		return apiReq
-        .request('GET', `/agents/${id}`, {});
+		return apiReq.request('GET', `/agents/${id}`, {});
 	};
+
+    const getGroupSums = () => {
+        return apiReq.request('GET', `/agents/groups`, {});
+    }
+
+    const getAgentSums = (groupName) => {
+        return apiReq.request('GET', `/agents/groups/${groupName}`, {});
+    }
 
     $scope.goGroup = () => {
 		$rootScope.globalAgent = $scope.agent;
@@ -47,7 +54,28 @@ app.controller('agentConfigurationController', function($scope, $rootScope, $loc
 		})
         .then(data => {
             $scope.groupConfiguration = data.data.data.items[0];
-            $scope.load = false;
+        })
+        .then(data => {
+            getGroupSums()
+            .then(dataGroupSums => {
+                $scope.groupMergedSum = dataGroupSums.data.data.items.find(item => item.name === $scope.groupName).merged_sum;
+            })
+            .catch(error => notify.error(error.message));
+        })
+        .then(data => {
+            getAgentSums($scope.groupName)
+            .then(dataAgentSums => {
+                $scope.agentMergedSum = dataAgentSums.data.data.items.find(item => item.id === $scope.agent.id).merged_sum;
+
+                if ($scope.agentMergedSum === $scope.groupMergedSum) {
+                    $scope.isSynchronized = true;
+                } else {
+                    $scope.isSynchronized = false;
+                }
+
+                $scope.load = false;
+            })
+            .catch(error => notify.error(error.message));
         })
         .catch(error => notify.error(error.message));
 
