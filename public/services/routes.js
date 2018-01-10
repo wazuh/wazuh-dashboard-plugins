@@ -49,7 +49,7 @@ import { QueryManagerProvider } from 'ui/query_manager';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 //Installation wizard
-const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState, genericReq) => {
+const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, appState, genericReq) => {
     const notify = new Notifier();
     let deferred = $q.defer();
 
@@ -97,6 +97,11 @@ const settingsWizard = ($rootScope, $location, $q, Notifier, testAPI, appState, 
             }
         })
         .catch(error => notify.error(error.message));
+    }
+
+    if ($window.sessionStorage.length == 1) { // New session, execute health check
+        $rootScope.healthCheck = true;
+        sessionStorage.setItem('healthCheck', 'executed');
     }
 
     // There's no cookie for current API

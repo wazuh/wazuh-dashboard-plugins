@@ -1,43 +1,47 @@
 <div flex ng-controller="overviewController" layout="column">
 
-    <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'overview'">
-		<menu-top></menu-top>
-    </md-content>
+    <div flex ng-show="!healthCheck">
+        <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'overview'">
+    		<menu-top></menu-top>
+        </md-content>
 
-	<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
-		<div class="horizontalTabsBar" layout="column" layout-align="center start">
-			<md-nav-bar class="padding-right-0" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
-				<md-nav-item md-nav-click="switchTab('general');" name="general">General</md-nav-item>
-				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File integrity</md-nav-item>
-				<md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy monitoring</md-nav-item>
-				<md-nav-item md-nav-click="switchTab('oscap');" name="oscap" ng-show="extensions.oscap">SCAP</md-nav-item>
-				<md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
-				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
-			</md-nav-bar>
-		</div>
+    	<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
+    		<div class="horizontalTabsBar" layout="column" layout-align="center start">
+    			<md-nav-bar class="padding-right-0" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+    				<md-nav-item md-nav-click="switchTab('general');" name="general">General</md-nav-item>
+    				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File integrity</md-nav-item>
+    				<md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy monitoring</md-nav-item>
+    				<md-nav-item md-nav-click="switchTab('oscap');" name="oscap" ng-show="extensions.oscap">SCAP</md-nav-item>
+    				<md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
+    				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
+    			</md-nav-bar>
+    		</div>
 
-		<div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
-			<md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
-				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-					<i class="fa fa-th overview-head-1" aria-hidden="true"></i>Panels
-				</md-nav-item>
-				<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-					<img class="overview-head-2" kbn-src="/plugins/wazuh/img/discover.svg">Discover
-				</md-nav-item>
-			</md-nav-bar>
-		</div>
-	</div>
+    		<div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
+    			<md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+    				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
+    					<i class="fa fa-th overview-head-1" aria-hidden="true"></i>Panels
+    				</md-nav-item>
+    				<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
+    					<img class="overview-head-2" kbn-src="/plugins/wazuh/img/discover.svg">Discover
+    				</md-nav-item>
+    			</md-nav-bar>
+    		</div>
+    	</div>
 
-    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
+        <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
-    <!-- View: Discover -->
-    <kbn-dis></kbn-dis>
+        <!-- View: Discover -->
+        <kbn-dis></kbn-dis>
 
-    <!-- No results message -->
-    <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels'">
-        <md-card flex layout="column">
-            <md-card-content class="text-center">
-                No results for selected time interval
-            </md-card-content>
-        </md-card>
-    </md-content>
+        <!-- No results message -->
+        <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels'">
+            <md-card flex layout="column">
+                <md-card-content class="text-center">
+                    No results for selected time interval
+                </md-card-content>
+            </md-card>
+        </md-content>
+    </div>
+
+    <health-check flex layout-align="center center" ng-show="healthCheck"><health-check>
