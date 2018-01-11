@@ -55,6 +55,9 @@ require('plugins/wazuh/controllers/agentConfiguration.js');
 // Settings
 require('plugins/wazuh/controllers/settings.js');
 
+// Health check
+require('plugins/wazuh/controllers/healthCheck.js');
+
 //Bootstrap and font awesome
 require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');
 require('plugins/wazuh/../node_modules/bootstrap/dist/js/bootstrap.min.js');
