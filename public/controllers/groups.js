@@ -63,7 +63,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         .catch(error => notify.error(error.message));
     }
 
-    
+    $scope.toggle = () => $scope.lookingGroup=true;
 
     $scope.showFiles = (index) => {
         $scope.fileViewer = false;
@@ -105,13 +105,20 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         $scope.groups.items[index] = true;
     };
 
+
+    $scope.goBackToAgents = () => {
+        $scope.file     = false;
+        $scope.filename = false;
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
     $scope.showFile = (index) => {
         if($scope.filename) $scope.filename = '';
         let filename = $scope.groupFiles.items[index].filename;
         if(filename === '../ar.conf') filename = 'ar.conf';
    
         $scope.fileViewer = true;
-        $scope.file = 'Loading...';
+
         let tmpName = `/agents/groups/${$scope.groups.items[$scope.selectedGroup].name}`+
                       `/files/${filename}`;
    
