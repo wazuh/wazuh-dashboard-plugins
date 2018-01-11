@@ -6,61 +6,103 @@
     <div layout="row" layout-align="start stretch">
         <md-card flex>
             <md-content class="md-padding background-white">
-                <h1 class="md-title">Current group: <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}</span></h1>
+                <h1 class="md-title">Current group: <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="right">Click to go to the group details</md-tooltip></span></h1>
                 <p ng-show="!load" class="md-body-1">The group configuration is <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></p>
             </md-content>
             <md-tabs md-dynamic-height md-border-bottom>
 
                 <md-tab label="File Integrity">
-                    <md-content ng-if="!groupConfiguration.config.syscheck" class="md-padding background-white">
+                    <md-content ng-show="!groupConfiguration.config.syscheck" class="md-padding background-white">
                         <h1 class="md-title text-center">No FIM Configuration Available</h1>
                         <p class="text-center">There's no FIM group configuration applying for this agent.</p>
                     </md-content>
-                    <md-content ng-if="groupConfiguration.config.syscheck" class="md-padding background-white">
-                        <span layout="row" layout-align="start">
-                            <p>File Integrity disabled:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.syscheck.disabled}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Frequency:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.syscheck.frequency}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Scan on start:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.syscheck.scan_on_start}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Skip NFS:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.syscheck.scan_time}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Monitoring directories:</p>
-                            <p class="text-bold"></p>
-                        </span>
-                        <span ng-repeat="item in groupConfiguration.config.syscheck.directories|orderBy">
-                            <p>{{item}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>No diff:</p>
-                            <p class="text-bold"></p>
-                        </span>
-                        <span ng-repeat="item in groupConfiguration.config.syscheck.nodiff|orderBy">
-                            <p>{{item}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Ignoring:</p>
-                            <p class="text-bold"></p>
-                        </span>
-                        <span ng-repeat="item in groupConfiguration.config.syscheck.ignore|orderBy">
-                            <p>{{item}}</p>
-                        </span>
-                    </md-content>
+                    <div ng-show="groupConfiguration.config.syscheck" layout="row" layout-align="space-around" class="md-padding background-f7">
+
+                        <md-card flex="20">
+                            <md-card-content class="wazuh-column">
+                                <span class="md-headline">Main Settings</span>
+                                <md-list class="md-dense">
+                                    <md-list-item ng-if="groupConfiguration.config.syscheck.disabled">
+                                        <p><span class="text-bold">Disabled:</span> {{groupConfiguration.config.syscheck.disabled}}</p>
+                                    </md-list-item>
+                                    <md-list-item ng-if="groupConfiguration.config.syscheck.frequency">
+                                        <p><span class="text-bold">Frequency:</span> {{groupConfiguration.config.syscheck.frequency}}</p>
+                                    </md-list-item>
+                                    <md-list-item ng-if="groupConfiguration.config.syscheck.alert_new_files">
+                                        <p><span class="text-bold">Alert New Files:</span> {{groupConfiguration.config.syscheck.alert_new_files}}</p>
+                                    </md-list-item>
+                                    <md-list-item ng-if="groupConfiguration.config.syscheck.skip_nfs">
+                                        <p><span class="text-bold">Skip NFS:</span> {{groupConfiguration.config.syscheck.skip_nfs}}</p>
+                                    </md-list-item>
+                                    <md-list-item ng-if="groupConfiguration.config.syscheck.scan_on_start">
+                                        <p><span class="text-bold">Scan on Start:</span> {{groupConfiguration.config.syscheck.scan_on_start}}</p>
+                                    </md-list-item>
+                                    <md-list-item ng-if="groupConfiguration.config.syscheck.scan_time">
+                                        <p><span class="text-bold">Scan Time:</span> {{groupConfiguration.config.syscheck.scan_time}}</p>
+                                    </md-list-item>
+                                    <md-list-item ng-if="groupConfiguration.config.syscheck.scan_day">
+                                        <p><span class="text-bold">Scan Day:</span> {{groupConfiguration.config.syscheck.scan_day}}</p>
+                                    </md-list-item>
+                                    <md-list-item ng-if="groupConfiguration.config.syscheck.auto_ignore">
+                                        <p><span class="text-bold">Auto Ignore:</span> {{groupConfiguration.config.syscheck.auto_ignore}}</p>
+                                    </md-list-item>
+                                </md-list>
+                            </md-card-content>
+                        </md-card>
+
+                        <md-card flex="auto">
+                            <md-card-content class="wazuh-column">
+                                <span class="md-headline">Monitored files</span>
+                                <md-list class="md-dense">
+                                    <md-list-item ng-repeat="item in groupConfiguration.config.syscheck.directories|orderBy">
+                                        <div class="md-list-item-text" layout="column">
+                                            <p ng-if="item.path"><span class="text-bold">Path:</span> {{item.path}}</p>
+                                            <p ng-if="item.check_all"><span class="text-bold">Check All:</span> {{item.check_all}}</p>
+                                            <p ng-if="item.realtime"><span class="text-bold">Realtime:</span> {{item.realtime}}</p>
+                                            <p ng-if="item.report_changes"><span class="text-bold">Report Changes:</span> {{item.report_changes}}</p>
+                                        </div>
+                                        <md-divider ng-if="!$last"></md-divider>
+                                    </md-list-item>
+                                </md-list>
+                            </md-card-content>
+                        </md-card>
+
+                        <div flex="auto" layout="column">
+
+                            <md-card flex="auto">
+                                <md-card-content class="wazuh-column">
+                                    <span class="md-headline">Ignored files</span>
+                                    <md-list class="md-dense">
+                                        <md-list-item ng-repeat="item in groupConfiguration.config.syscheck.ignore|orderBy">
+                                            <div class="md-list-item-text" layout="column">
+                                                <p ng-if="!item.type"><span class="text-bold">File:</span> {{item}}</p>
+                                                <p ng-if="item.type"><span class="text-bold">File:</span> {{item.item}}</p>
+                                                <p ng-if="item.type"><span class="text-bold">Type:</span> {{item.type}}</p>
+                                            </div>
+                                            <md-divider ng-if="!$last"></md-divider>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+
+                            <md-card flex="auto">
+                                <md-card-content class="wazuh-column">
+                                    <span class="md-headline">No diff</span>
+                                    <md-list class="md-dense">
+                                        <md-list-item ng-repeat="item in groupConfiguration.config.syscheck.nodiff|orderBy">
+                                            <div class="md-list-item-text" layout="column">
+                                                <p ng-if="!item.type"><span class="text-bold">File:</span> {{item}}</p>
+                                                <p ng-if="item.type"><span class="text-bold">File:</span> {{item.item}}</p>
+                                                <p ng-if="item.type"><span class="text-bold">Type:</span> {{item.type}}</p>
+                                            </div>
+                                            <md-divider ng-if="!$last"></md-divider>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+
+                        </div>
+                    </div>
                 </md-tab>
 
                 <md-tab label="Policy Monitoring">
