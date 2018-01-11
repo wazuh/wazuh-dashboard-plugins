@@ -1,6 +1,6 @@
 <div flex ng-controller="overviewController" layout="column">
 
-    <div flex ng-show="!healthCheck">
+    <div flex>
         <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'overview'">
     		<menu-top></menu-top>
         </md-content>
@@ -43,5 +43,3 @@
             </md-card>
         </md-content>
     </div>
-
-    <health-check flex layout-align="center center" ng-show="healthCheck"><health-check>

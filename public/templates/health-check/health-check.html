@@ -1,0 +1,18 @@
+<div flex layout="column" ng-controller="healthCheck" layout-align="center center">
+    <div ng-show="errors.length == 0" class='uil-ring-css'><div></div></div>
+    <img ng-show="errors.length == 0" class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_blue.png" height="85" weight="252"></img>
+    <img ng-show="errors.length > 0" class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_fail.png" height="250" weight="252"></img>
+
+    <div class="checks">
+        <div>&nbsp; {{APIStatus}}<i ng-class="{'fa-spinner': !APIDone, 'fa-check': APIDone == 1, 'fa-times': APIDone == 2, 'fa-spin': !APIDone}" class="fa fa-fw" aria-hidden="true"></i></div>
+        <div>&nbsp; {{indexStatus}}<i ng-class="{'fa-spinner': !indexDone, 'fa-check': indexDone == 1, 'fa-times': indexDone == 2, 'fa-spin': !indexDone}" class="fa fa-fw" aria-hidden="true"></i></div>
+        <div>&nbsp; {{templateStatus}}<i ng-class="{'fa-spinner': !templateDone, 'fa-check': templateDone == 1, 'fa-times': templateDone == 2, 'fa-spin': !templateDone}" class="fa fa-fw" aria-hidden="true"></i></div>
+        <div class="health-check-error" ng-show="errors.length > 0">
+            <div class="error-notify">Ups, something went wrong...</div>
+            <div ng-repeat='error in errors'>
+                <div>&nbsp; {{error}}</i></div>
+            </div>
+        </div>
+    </div>
+</div>
+

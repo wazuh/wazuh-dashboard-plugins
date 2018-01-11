@@ -48,6 +48,16 @@ import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
 import { QueryManagerProvider } from 'ui/query_manager';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
+const healthCheck = ($window, $rootScope) => {
+    // Do we need a healthCheck?
+    if (!$window.sessionStorage.getItem('healthCheck')) { // New session, execute health check
+        $window.sessionStorage.setItem('healthCheck', 'executed');
+        return true;
+    } else {
+        return false;
+    }
+};
+
 //Installation wizard
 const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, appState, genericReq) => {
     const notify = new Notifier();
@@ -99,33 +109,34 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
         .catch(error => notify.error(error.message));
     }
 
-    if ($window.sessionStorage.length == 1) { // New session, execute health check
-        $rootScope.healthCheck = true;
-        sessionStorage.setItem('healthCheck', 'executed');
-    }
-
-    // There's no cookie for current API
-    if (!appState.getCurrentAPI()) {
-        genericReq.request('GET', '/api/wazuh-api/apiEntries')
-        .then((data) => {
-            if (data.data.length > 0) {
-                var apiEntries = data.data;
-                appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
-                callCheckStored();
-            } else {
-                notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+    if (!$location.path().includes("/health-check") && healthCheck($window, $rootScope)) {
+        $location.path('/health-check');
+        deferred.reject();
+    } else {
+        // There's no cookie for current API
+        if (!appState.getCurrentAPI()) {
+            genericReq.request('GET', '/api/wazuh-api/apiEntries')
+            .then((data) => {
+                if (data.data.length > 0) {
+                    var apiEntries = data.data;
+                    appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
+                    callCheckStored();
+                } else {
+                    notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+                    $location.path('/settings');
+                    deferred.reject(); 
+                }
+            })
+            .catch((error) => {
+                notify.error("Error getting API entries due to " + error);
                 $location.path('/settings');
                 deferred.reject(); 
-            }
-        })
-        .catch((error) => {
-            notify.error("Error getting API entries due to " + error);
-            $location.path('/settings');
-            deferred.reject(); 
-        });
-    } else {
-        callCheckStored();
+            });
+        } else {
+            callCheckStored();
+        }
     }
+
     return deferred.promise;
 };
 
@@ -144,100 +155,134 @@ const goToKibana = ($location, $window) => {
     $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
 };
 
-const getIp = (Promise, courier, config, $q, $location, Notifier, Private, appState, genericReq) => {
-    const State = Private(StateProvider);
-    const savedObjectsClient = Private(SavedObjectsClientProvider);
+const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Notifier, Private, appState, genericReq) => {
 
-    return savedObjectsClient.find({
-        type: 'index-pattern',
-        fields: ['title'],
-        perPage: 10000
-    })
-    .then(({ savedObjects }) => {
-
-        let onlyWazuhAlerts = [];
-        let currentPattern = '';
-
+    if (healthCheck($window, $rootScope)) {
         let deferred = $q.defer();
+        $location.path('/health-check');
+        deferred.reject();
+        return deferred.promise;
+    } else {
+        const State = Private(StateProvider);
+        const savedObjectsClient = Private(SavedObjectsClientProvider);
 
-        genericReq.request('GET', '/api/wazuh-elastic/setup')
-        .then((data) => {
+        return savedObjectsClient.find({
+            type: 'index-pattern',
+            fields: ['title'],
+            perPage: 10000
+        })
+        .then(({ savedObjects }) => {
 
-            if (appState.getCurrentPattern() !== undefined && appState.getCurrentPattern() !== null) { // There's cookie for the pattern
-                currentPattern = appState.getCurrentPattern();
-            } else {
-                currentPattern = data.data.data["index-pattern"];
-                appState.setCurrentPattern(currentPattern);              
-            }
+            let onlyWazuhAlerts = [];
+            let currentPattern = '';
 
-            for (var i = 0; i < savedObjects.length; i++) {
-                if (savedObjects[i].id === currentPattern) {
-                    onlyWazuhAlerts.push(savedObjects[i]);
-                }
-            }
+            let deferred = $q.defer();
 
-            courier.indexPatterns.get(currentPattern)
+            genericReq.request('GET', '/api/wazuh-elastic/setup')
             .then((data) => {
-                deferred.resolve({
-                    list: onlyWazuhAlerts,
-                    loaded: data,
-                    stateVal: null,
-                    stateValFound: false    
+
+                if (appState.getCurrentPattern() !== undefined && appState.getCurrentPattern() !== null) { // There's cookie for the pattern
+                    currentPattern = appState.getCurrentPattern();
+                } else {
+                    currentPattern = data.data.data["index-pattern"];
+                    appState.setCurrentPattern(currentPattern);              
+                }
+
+                for (var i = 0; i < savedObjects.length; i++) {
+                    if (savedObjects[i].id === currentPattern) {
+                        onlyWazuhAlerts.push(savedObjects[i]);
+                    }
+                }
+
+                if (onlyWazuhAlerts.length == 0) { // There's now selected ip
+                    deferred.resolve("No ip");
+                    return deferred.promise;
+                }
+
+                courier.indexPatterns.get(currentPattern)
+                .then((data) => {
+                    deferred.resolve({
+                        list: onlyWazuhAlerts,
+                        loaded: data,
+                        stateVal: null,
+                        stateValFound: false    
+                    });
                 });
+
             });
 
+            return deferred.promise;
         });
+    }
+};
 
+const getAllIp = (Promise, $q, $window, $rootScope, courier, config, $location, Private) => {
+
+    if (healthCheck($window, $rootScope)) {
+        let deferred = $q.defer();
+        $location.path('/health-check');
+        deferred.reject();
         return deferred.promise;
-    });
-};
+    } else {
+        const State = Private(StateProvider);
+        const savedObjectsClient = Private(SavedObjectsClientProvider);
 
-const getAllIp = (Promise, courier, config, $location, Private) => {
-    const State = Private(StateProvider);
-    const savedObjectsClient = Private(SavedObjectsClientProvider);
+        return savedObjectsClient.find({
+            type: 'index-pattern',
+            fields: ['title'],
+            perPage: 10000
+        })
+        .then(({ savedObjects }) => {
+            /**
+             *  In making the indexPattern modifiable it was placed in appState. Unfortunately,
+             *  the load order of AppState conflicts with the load order of many other things
+             *  so in order to get the name of the index we should use, and to switch to the
+             *  default if necessary, we parse the appState with a temporary State object and
+             *  then destroy it immediatly after we're done
+             *
+             *  @type {State}
+             */
+            const state = new State('_a', {});
 
-    return savedObjectsClient.find({
-        type: 'index-pattern',
-        fields: ['title'],
-        perPage: 10000
-    })
-    .then(({ savedObjects }) => {
-        /**
-         *  In making the indexPattern modifiable it was placed in appState. Unfortunately,
-         *  the load order of AppState conflicts with the load order of many other things
-         *  so in order to get the name of the index we should use, and to switch to the
-         *  default if necessary, we parse the appState with a temporary State object and
-         *  then destroy it immediatly after we're done
-         *
-         *  @type {State}
-         */
-        const state = new State('_a', {});
+            const specified = !!state.index;
+            const exists = _.findIndex(savedObjects, o => o.id === state.index) > -1;
+            const id = exists ? state.index : config.get('defaultIndex');
+            state.destroy();
 
-        const specified = !!state.index;
-        const exists = _.findIndex(savedObjects, o => o.id === state.index) > -1;
-        const id = exists ? state.index : config.get('defaultIndex');
-        state.destroy();
-
-        return Promise.props({
-            list: savedObjects,
-            loaded: courier.indexPatterns.get(id),
-            stateVal: state.index,
-            stateValFound: specified && exists
+            return Promise.props({
+                list: savedObjects,
+                loaded: courier.indexPatterns.get(id),
+                stateVal: state.index,
+                stateValFound: specified && exists
+            });
         });
-    });
+    }
 };
 
-const getSavedSearch = (courier, savedSearches, $route) => {
-    return savedSearches.get($route.current.params.id)
-    .catch(courier.redirectWhenMissing({
-        'search': '/discover',
-        'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
-    }));
+const getSavedSearch = (courier, $q, $window, $rootScope, savedSearches, $route) => {
+    if (healthCheck($window, $rootScope)) {
+        let deferred = $q.defer();
+        $location.path('/health-check');
+        deferred.reject();
+        return deferred.promise;
+    } else {
+        return savedSearches.get($route.current.params.id)
+        .catch(courier.redirectWhenMissing({
+            'search': '/discover',
+            'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
+        }));
+    }
 };
 
 //Routes
 routes.enable();
 routes
+    .when('/health-check', {
+        template: require('plugins/wazuh/templates/health-check/health-check.html'),
+        resolve: {
+            "checkAPI": settingsWizard
+        }
+    })
     .when('/agents/:id?/:tab?/:view?', {
         template: require('plugins/wazuh/templates/agents/agents.jade'),
         resolve: {
