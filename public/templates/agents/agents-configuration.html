@@ -103,6 +103,19 @@
 
                         </div>
                     </div>
+
+                    <div ng-show="groupConfiguration.config.syscheck" layout="row" class="md-padding background-f7">
+                        <md-card flex ng-init="showRaw=false">
+                            <md-card-content>
+                                <span class="md-headline">Original configuration</span>
+                                <div flex><a ng-click="showRaw = !showRaw"><i class="fa fa-eye"></i> Show in JSON format</a></div>
+                                <div flex ng-show="showRaw">
+                                    <pre flex class="json-beautifier"><code dynamic="rawJSON"></code></pre>
+                                </div>
+                            </md-card-content>
+                        </md-card>
+                    </div>
+
                 </md-tab>
 
                 <md-tab label="Policy Monitoring">

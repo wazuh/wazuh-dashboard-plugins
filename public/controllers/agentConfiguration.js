@@ -1,5 +1,6 @@
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
+const beautifier = require('plugins/wazuh/utils/json-beautifier');
 
 app.controller('agentConfigurationController', function($scope, $rootScope, $location, Notifier, apiReq) {
     //Initialization
@@ -54,6 +55,7 @@ app.controller('agentConfigurationController', function($scope, $rootScope, $loc
 		})
         .then(data => {
             $scope.groupConfiguration = data.data.data.items[0];
+            $scope.rawJSON = beautifier.prettyPrint($scope.groupConfiguration);
         })
         .then(data => {
             getGroupSums()
