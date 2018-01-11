@@ -12,7 +12,7 @@
             <md-tabs md-dynamic-height md-border-bottom>
 
                 <md-tab label="File Integrity">
-                    <md-content ng-show="!groupConfiguration.config.syscheck" class="md-padding background-white">
+                    <md-content ng-show="!groupConfiguration.config.syscheck" class="md-padding background-f7">
                         <h1 class="md-title text-center">No FIM Configuration Available</h1>
                         <p class="text-center">There's no FIM group configuration applying for this agent.</p>
                     </md-content>
@@ -106,11 +106,11 @@
                 </md-tab>
 
                 <md-tab label="Policy Monitoring">
-                    <md-content ng-if="!groupConfiguration.config.rootcheck" class="md-padding background-white">
+                    <md-content ng-if="!groupConfiguration.config.rootcheck" class="md-padding background-f7">
                         <h1 class="md-title text-center">No PM Configuration Available</h1>
                         <p class="text-center">There's no PM group configuration applying for this agent.</p>
                     </md-content>
-                    <md-content ng-if="groupConfiguration.config.rootcheck" class="md-padding background-white">
+                    <md-content ng-if="groupConfiguration.config.rootcheck" class="md-padding background-f7">
                         <span layout="row" layout-align="start">
                             <p>Policy Monitoring disabled:</p>
                             <p class="text-bold"> {{groupConfiguration.config.rootcheck.disabled}}</p>
@@ -193,11 +193,11 @@
                 </md-tab>
 
                 <md-tab label="Active Response">
-                    <md-content ng-if="!groupConfiguration.config['active-response']" class="md-padding background-white">
+                    <md-content ng-if="!groupConfiguration.config['active-response']" class="md-padding background-f7">
                         <h1 class="md-title text-center">No Active Response Configuration Available</h1>
                         <p class="text-center">There's no Active Response group configuration applying for this agent.</p>
                     </md-content>
-                    <md-content ng-if="groupConfiguration.config['active-response']" class="md-padding background-white">
+                    <md-content ng-if="groupConfiguration.config['active-response']" class="md-padding background-f7">
                         <span ng-repeat="item in groupConfiguration.config['active-response']|orderBy">
                             <span layout="row" layout-align="start">
                                 <p>Active Response disabled:</p>
@@ -213,11 +213,11 @@
                 </md-tab>
 
                 <md-tab label="OpenSCAP">
-                    <md-content ng-if="!groupConfiguration.config['open-scap']" class="md-padding background-white">
+                    <md-content ng-if="!groupConfiguration.config['open-scap']" class="md-padding background-f7">
                         <h1 class="md-title text-center">No OpenSCAP Configuration Available</h1>
                         <p class="text-center">There's no OpenSCAP group configuration applying for this agent.</p>
                     </md-content>
-                    <md-content ng-if="groupConfiguration.config['open-scap']" class="md-padding background-white">
+                    <md-content ng-if="groupConfiguration.config['open-scap']" class="md-padding background-f7">
                         <span layout="row" layout-align="start">
                             <p>OpenSCAP disabled:</p>
                             <p class="text-bold"> {{groupConfiguration.config['open-scap'].disabled}}</p>
@@ -251,11 +251,11 @@
                 </md-tab>
 
                 <md-tab label="Log Collector">
-                    <md-content ng-if="!groupConfiguration.config['localfile']" class="md-padding background-white">
+                    <md-content ng-if="!groupConfiguration.config['localfile']" class="md-padding background-f7">
                         <h1 class="md-title text-center">No Log Collector Configuration Available</h1>
                         <p class="text-center">There's no Log Collector group configuration applying for this agent.</p>
                     </md-content>
-                    <md-content ng-if="groupConfiguration.config['localfile']" class="md-padding background-white">
+                    <md-content ng-if="groupConfiguration.config['localfile']" class="md-padding background-f7">
                         <span ng-repeat="item in groupConfiguration.config['localfile']|orderBy">
                             <span layout="row" layout-align="start">
                                 <p>Log Format:</p>
