@@ -50,6 +50,7 @@ require('plugins/wazuh/controllers/groups.js');
 // Agents
 require('plugins/wazuh/controllers/agents.js');
 require('plugins/wazuh/controllers/agentsPreview.js');
+require('plugins/wazuh/controllers/agentConfiguration.js');
 
 // Settings
 require('plugins/wazuh/controllers/settings.js');

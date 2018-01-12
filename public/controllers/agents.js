@@ -1,6 +1,6 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsController', 
+app.controller('agentsController',
 function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
     $rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
@@ -195,12 +195,12 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 
     $scope.analizeAgents = search => {
         let deferred = $q.defer();
-        
+
         let promise;
         $scope.agentsAutoComplete.filters = [];
 
         promise = $scope.agentsAutoComplete.addFilter('search',search);
-       
+
         promise
         .then(() => deferred.resolve($scope.agentsAutoComplete.items))
         .catch(error => notify.error(error));
