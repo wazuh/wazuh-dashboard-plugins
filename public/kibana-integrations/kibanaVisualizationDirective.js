@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { getVisualizeLoader } from 'ui/visualize/loader';
+const ownLoader = require('./loader/loader-import');
 
 var app = require('ui/modules').get('apps/webinar_app', [])
     .directive('kbnVis', [function () {
@@ -9,23 +9,24 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, savedVisualizations, implicitFilters) {
-
-                var implicitFilter = '';
-                var visTitle = '';
-                var fullFilter = '';
-                var rendered = false;
-                var visualization = null;
+            controller: function VisController($scope, $rootScope, $location, savedVisualizations, implicitFilters) {
+                if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
+                let implicitFilter = '';
+                let visTitle       = '';
+                let fullFilter     = '';
+                let rendered       = false;
+                let visualization  = null;
+                let visHandler     = null;
 
                 // Listen for changes
-                var updateSearchSource = $scope.$on('updateVis', function (event, query, filters) {
-                    if (rendered === true) {
+                $scope.$on('updateVis', function (event, query, filters) {
+                    if (rendered) {
                         if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
-                            if (query.query == '') {
+                            if (query.query === '') {
                                 fullFilter = implicitFilter;
                             }
                             else {
-                                if (implicitFilter != '') {
+                                if (implicitFilter !== '') {
                                     fullFilter = implicitFilter + ' AND ' + query.query;
                                 }
                                 else {
@@ -40,41 +41,54 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                     }
                 });
 
+                var renderComplete = function() {
+                    rendered = true;
+                    $rootScope.loadedVisualizations.push(true);
+
+                    $rootScope.loadingStatus = `Rendering visualizations... ${Math.round((100 * $rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100) / 100} %`;
+                    if ($rootScope.loadedVisualizations.length >= $rootScope.tabVisualizations[$location.search().tab]) {
+                        $rootScope.rendered = true;
+                        // Forcing a digest cycle
+                        $rootScope.$digest();
+                    }
+                    else $rootScope.rendered = false;
+                };
+
                 // Initializing the visualization
-                getVisualizeLoader().then(loader => {
-                    savedVisualizations.get($scope.visID).then(savedObj => {
-                        implicitFilter = savedObj.searchSource.get('query')['query'];
-                        visTitle = savedObj.vis.title;
-                        visualization = savedObj;
+                const loader = ownLoader.getVisualizeLoader();
 
-                        if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
-                            visualization.searchSource
-                            .query({ language: 'lucene', query: implicitFilter })
-                            .set('filter', implicitFilters.loadFilters());
-                        }
+                savedVisualizations.get($scope.visID).then(savedObj => {
+                    implicitFilter = savedObj.searchSource.get('query')['query'];
+                    visTitle = savedObj.vis.title;
+                    visualization = savedObj;
 
-                        let params = {};
+                    if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
+                        visualization.searchSource
+                        .query({ language: 'lucene', query: implicitFilter })
+                        .set('filter', implicitFilters.loadFilters());
+                    }
 
-                        if ($scope.specificTimeRange == true) {
-                            const timeRange = {
-                                min: 'now-1d/d',
-                                max: 'now'
-                            };
-                            params = {timeRange: timeRange}
-                        }
-                        loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, params)
-                        .then(handler => {
+                    let params = {};
 
-                            // We bind the renderComplete event to watch for proper loading screen
-                            /*$("#"+$scope.visID).on('renderComplete', () => { 
-                                $rootScope.loadedVisualizations--;
-                                console.log("Finished updating", visTitle, $rootScope.loadedVisualizations);
-                            });*/
+                    if ($scope.specificTimeRange) {
+                        const timeRange = {
+                            min: 'now-1d/d',
+                            max: 'now'
+                        };
+                        params = {timeRange: timeRange}
+                    }
 
-                            rendered = true;
-                        });
+                    $("#"+$scope.visID).on('renderStart', () => {
+                        $rootScope.loadingStatus = "Fetching data...";
                     });
+
+                    visHandler = loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, params); 
+                    
+                    $rootScope.ownHandlers.push(visHandler);
+
+                    visHandler.addRenderCompleteListener(renderComplete);
                 });
+     
             }
         }
     }]);

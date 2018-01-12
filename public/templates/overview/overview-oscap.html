@@ -1,6 +1,7 @@
 <md-content flex layout="column" ng-if="tab == 'oscap'" layout-align="start">
 
-    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
+    <div class="wazuh-loading"><md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="resultState !== 'none' && tabView === 'panels' && !rendered"></md-progress-linear></div>
+    <div layout="row" layout-align="center center" class="percentage" ng-show="resultState !== 'none' && tabView === 'panels' && !rendered">{{loadingStatus}}</div>
 
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
