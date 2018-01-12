@@ -11,7 +11,7 @@
                     <h1 class="md-title">Current group: <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="right">Click to go to the group details</md-tooltip></span></h1>
                     <p ng-show="!load" class="md-body-1">The group configuration is <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></p>
                 </div>
-                <div flex=15>
+                <div flex=20>
                     <md-switch ng-model="toggleRAW">Toggle RAW Content</md-switch>
                 </div>
             </md-content>
@@ -116,66 +116,181 @@
                 </md-tab>
 
                 <md-tab label="Policy Monitoring">
+
                     <md-content ng-if="!groupConfiguration.config.rootcheck" class="md-padding background-f7">
                         <h1 class="md-title text-center">No PM Configuration Available</h1>
                         <p class="text-center">There's no PM group configuration applying for this agent.</p>
                     </md-content>
-                    <md-content ng-if="groupConfiguration.config.rootcheck" class="md-padding background-f7">
-                        <span layout="row" layout-align="start">
-                            <p>Policy Monitoring disabled:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.disabled}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Check UNIX Audit:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_unixaudit}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Check PIDs:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_pids}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Skip NFS:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.skip_nfs}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Check IF:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_if}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Check SYS:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_sys}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Check DEV:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_dev}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Check Ports:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_ports}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Check Trojans:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_trojans}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Check Files:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.check_files}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                        <span layout="row" layout-align="start">
-                            <p>Frequency:</p>
-                            <p class="text-bold"> {{groupConfiguration.config.rootcheck.frequency}}</p>
-                        </span>
-                        <md-divider></md-divider>
+
+                    <div ng-show="groupConfiguration.config.rootcheck" layout="row" layout-align="space-around" class="md-padding background-f7 agent-conf-panel">
+
+                        <div flex="45" layout="column">
+
+                            <div flex="auto" layout="row">
+
+                                <div flex="auto" layout="column">
+
+                                    <md-card flex="auto">
+                                        <md-card-content class="wazuh-column">
+                                            <span class="md-headline">Main Settings</span>
+                                            <md-list class="md-dense">
+                                                <md-list-item ng-if="groupConfiguration.config.rootcheck.disabled">
+                                                    <p><span class="text-bold">Disabled:</span> {{groupConfiguration.config.rootcheck.disabled}}</p>
+                                                </md-list-item>
+                                                <md-list-item ng-if="groupConfiguration.config.rootcheck.base_directory">
+                                                    <p><span class="text-bold">Base directory:</span> {{groupConfiguration.config.rootcheck.base_directory}}</p>
+                                                </md-list-item>
+                                                <md-list-item ng-if="groupConfiguration.config.rootcheck.frequency">
+                                                    <p><span class="text-bold">Frequency:</span> {{groupConfiguration.config.rootcheck.frequency}}</p>
+                                                </md-list-item>
+                                                <md-list-item ng-if="groupConfiguration.config.rootcheck.scanall">
+                                                    <p><span class="text-bold">Scan All Files:</span> {{groupConfiguration.config.rootcheck.scanall}}</p>
+                                                </md-list-item>
+                                                <md-list-item ng-if="groupConfiguration.config.rootcheck.skip_nfs">
+                                                    <p><span class="text-bold">Skip NFS:</span> {{groupConfiguration.config.rootcheck.skip_nfs}}</p>
+                                                </md-list-item>
+                                            </md-list>
+                                        </md-card-content>
+                                    </md-card>
+
+                                    <md-card flex="auto">
+                                        <md-card-content class="wazuh-column">
+                                            <span class="md-headline">Windows Settings</span>
+                                            <md-list class="md-dense">
+                                                <md-list-item ng-if="groupConfiguration.config.rootcheck.check_winaudit">
+                                                    <p><span class="text-bold">Check Windows Audit:</span> {{groupConfiguration.config.rootcheck.check_winaudit}}</p>
+                                                </md-list-item>
+                                                <md-list-item ng-if="groupConfiguration.config.rootcheck.check_winapps">
+                                                    <p><span class="text-bold">Check Windows Apps:</span> {{groupConfiguration.config.rootcheck.check_winapps}}</p>
+                                                </md-list-item>
+                                                <md-list-item ng-if="groupConfiguration.config.rootcheck.check_winmalware">
+                                                    <p><span class="text-bold">Check Windows Malware:</span> {{groupConfiguration.config.rootcheck.check_winmalware}}</p>
+                                                </md-list-item>
+                                            </md-list>
+                                        </md-card-content>
+                                    </md-card>
+
+                                </div>
+
+                                <md-card flex="auto">
+                                    <md-card-content class="wazuh-column">
+                                        <span class="md-headline">Checks</span>
+                                        <md-list class="md-dense">
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_unixaudit">
+                                                <p><span class="text-bold">Check UNIX Audit:</span> {{groupConfiguration.config.rootcheck.check_unixaudit}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_dev">
+                                                <p><span class="text-bold">Check DEV:</span> {{groupConfiguration.config.rootcheck.check_dev}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_files">
+                                                <p><span class="text-bold">Check Files:</span> {{groupConfiguration.config.rootcheck.check_files}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_if">
+                                                <p><span class="text-bold">Check IF:</span> {{groupConfiguration.config.rootcheck.check_if}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_pids">
+                                                <p><span class="text-bold">Check PIDs:</span> {{groupConfiguration.config.rootcheck.check_pids}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_policy">
+                                                <p><span class="text-bold">Check Policy:</span> {{groupConfiguration.config.rootcheck.check_policy}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_ports">
+                                                <p><span class="text-bold">Check Ports:</span> {{groupConfiguration.config.rootcheck.check_ports}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_sys">
+                                                <p><span class="text-bold">Check SYS:</span> {{groupConfiguration.config.rootcheck.check_sys}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_trojans">
+                                                <p><span class="text-bold">Check Trojans:</span> {{groupConfiguration.config.rootcheck.check_trojans}}</p>
+                                            </md-list-item>
+                                            <md-list-item ng-if="groupConfiguration.config.rootcheck.check_unixaudit">
+                                                <p><span class="text-bold">Check UNIX Audit:</span> {{groupConfiguration.config.rootcheck.check_unixaudit}}</p>
+                                            </md-list-item>
+                                        </md-list>
+                                    </md-card-content>
+                                </md-card>
+
+                            </div>
+
+                            <md-card flex="auto">
+                                <md-card-content class="wazuh-column">
+                                    <span class="md-headline">Rootkit</span>
+                                    <md-list class="md-dense">
+                                        <md-list-item ng-if="groupConfiguration.config.rootcheck.rootkit_trojans">
+                                            <p><span class="text-bold">Trojans Path:</span> {{groupConfiguration.config.rootcheck.rootkit_trojans[0]}}</p>
+                                        </md-list-item>
+                                        <md-list-item ng-if="groupConfiguration.config.rootcheck.rootkit_files">
+                                            <p><span class="text-bold">Files Path:</span> {{groupConfiguration.config.rootcheck.rootkit_files[0]}}</p>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+
+                        </div>
+
+                        <div flex="auto" layout="column">
+
+                            <md-card flex="auto">
+                                <md-card-content class="wazuh-column">
+                                    <span class="md-headline">System Audit Files</span>
+                                    <md-list class="md-dense">
+                                        <md-list-item ng-repeat="item in groupConfiguration.config.rootcheck.system_audit|orderBy">
+                                            <div class="md-list-item-text" layout="column">
+                                                <p><span class="text-bold">File:</span> {{item}}</p>
+                                            </div>
+                                            <md-divider ng-if="!$last"></md-divider>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+
+                            <md-card flex="auto">
+                                <md-card-content class="wazuh-column">
+                                    <span class="md-headline">Windows Audit Files</span>
+                                    <md-list class="md-dense">
+                                        <md-list-item ng-repeat="item in groupConfiguration.config.rootcheck.windows_audit|orderBy">
+                                            <div class="md-list-item-text" layout="column">
+                                                <p><span class="text-bold">File:</span> {{item}}</p>
+                                            </div>
+                                            <md-divider ng-if="!$last"></md-divider>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+
+                            <md-card flex="auto">
+                                <md-card-content class="wazuh-column">
+                                    <span class="md-headline">Windows Apps Files</span>
+                                    <md-list class="md-dense">
+                                        <md-list-item ng-repeat="item in groupConfiguration.config.rootcheck.windows_apps|orderBy">
+                                            <div class="md-list-item-text" layout="column">
+                                                <p><span class="text-bold">File:</span> {{item}}</p>
+                                            </div>
+                                            <md-divider ng-if="!$last"></md-divider>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+
+                            <md-card flex="auto">
+                                <md-card-content class="wazuh-column">
+                                    <span class="md-headline">Windows Malware Files</span>
+                                    <md-list class="md-dense">
+                                        <md-list-item ng-repeat="item in groupConfiguration.config.rootcheck.windows_malware|orderBy">
+                                            <div class="md-list-item-text" layout="column">
+                                                <p><span class="text-bold">File:</span> {{item}}</p>
+                                            </div>
+                                            <md-divider ng-if="!$last"></md-divider>
+                                        </md-list-item>
+                                    </md-list>
+                                </md-card-content>
+                            </md-card>
+
+                        </div>
+
+                    </div>
+
+                    <!-- <md-content ng-if="groupConfiguration.config.rootcheck" class="md-padding background-f7">
                         <span layout="row" layout-align="start">
                             <p>Rootkit Trojans:</p>
                             <p class="text-bold"></p>
@@ -199,7 +314,7 @@
                         <span ng-repeat="item in groupConfiguration.config.rootcheck.system_audit|orderBy">
                             <p>{{item}}</p>
                         </span>
-                    </md-content>
+                    </md-content> -->
                 </md-tab>
 
                 <md-tab label="Active Response">
