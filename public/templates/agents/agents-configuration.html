@@ -11,7 +11,7 @@
                     <h1 class="md-title">Current group: <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="right">Click to go to the group details</md-tooltip></span></h1>
                     <p ng-show="!load" class="md-body-1">The group configuration is <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></p>
                 </div>
-                <div flex=20>
+                <div flex=15>
                     <md-switch ng-model="toggleRAW">Toggle RAW Content</md-switch>
                 </div>
             </md-content>
@@ -292,7 +292,38 @@
 
                 </md-tab>
 
-                <md-tab label="Active Response">
+                <md-tab label="Log Collection">
+
+                    <md-content ng-if="!groupConfiguration.config['localfile']" class="md-padding background-f7">
+                        <h1 class="md-title text-center">No Log Collection Configuration Available</h1>
+                        <p class="text-center">There's no Log Collection group configuration applying for this agent.</p>
+                    </md-content>
+
+                    <div ng-show="groupConfiguration.config['localfile']" layout="row" layout-align="space-around" class="md-padding background-f7 agent-conf-panel">
+                        <md-card flex="auto">
+                            <md-card-content class="wazuh-column">
+                                <span class="md-headline">Log Files</span>
+                                <md-list class="md-dense">
+                                    <md-list-item ng-repeat="item in groupConfiguration.config['localfile']|orderBy">
+                                        <div class="md-list-item-text" layout="column">
+                                            <p ng-if="item.type"><span class="text-bold">Location:</span> {{item.location}}</p>
+                                            <p ng-if="item.type"><span class="text-bold">Format:</span> {{item.format}}</p>
+                                            <p ng-if="item.type"><span class="text-bold">Query:</span> {{item.query}}</p>
+                                            <p ng-if="item.type"><span class="text-bold">Command:</span> {{item.command}}</p>
+                                            <p ng-if="item.type"><span class="text-bold">Alias:</span> {{item.alias}}</p>
+                                            <p ng-if="item.type"><span class="text-bold">Only Future Events:</span> {{item.only-future-events}}</p>
+                                            <p ng-if="item.type"><span class="text-bold">Label:</span> {{item.label}}</p>
+                                        </div>
+                                        <md-divider ng-if="!$last"></md-divider>
+                                    </md-list-item>
+                                </md-list>
+                            </md-card-content>
+                        </md-card>
+                    </div>
+
+                </md-tab>
+
+                <!-- <md-tab label="Active Response">
                     <md-content ng-if="!groupConfiguration.config['active-response']" class="md-padding background-f7">
                         <h1 class="md-title text-center">No Active Response Configuration Available</h1>
                         <p class="text-center">There's no Active Response group configuration applying for this agent.</p>
@@ -348,35 +379,7 @@
                             <p class="text-bold"> {{groupConfiguration.config['open-scap'].timeout}}</p>
                         </span>
                     </md-content>
-                </md-tab>
-
-                <md-tab label="Log Collector">
-                    <md-content ng-if="!groupConfiguration.config['localfile']" class="md-padding background-f7">
-                        <h1 class="md-title text-center">No Log Collector Configuration Available</h1>
-                        <p class="text-center">There's no Log Collector group configuration applying for this agent.</p>
-                    </md-content>
-                    <md-content ng-if="groupConfiguration.config['localfile']" class="md-padding background-f7">
-                        <span ng-repeat="item in groupConfiguration.config['localfile']|orderBy">
-                            <span layout="row" layout-align="start">
-                                <p>Log Format:</p>
-                                <p class="text-bold"> {{item.log_format}}</p>
-                            </span>
-                            <span layout="row" layout-align="start">
-                                <p>Location:</p>
-                                <p class="text-bold"> {{item.location}}</p>
-                            </span>
-                            <span layout="row" layout-align="start">
-                                <p>Frequency:</p>
-                                <p class="text-bold"> {{item.frequency}}</p>
-                            </span>
-                            <span layout="row" layout-align="start">
-                                <p>Command:</p>
-                                <p class="text-bold"> {{item.command}}</p>
-                            </span>
-                            <md-divider></md-divider>
-                        </span>
-                    </md-content>
-                </md-tab>
+                </md-tab> -->
 
             </md-tabs>
         </md-card>
