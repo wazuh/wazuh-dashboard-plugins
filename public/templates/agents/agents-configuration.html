@@ -307,7 +307,8 @@
                                     <md-list-item ng-repeat="item in groupConfiguration.config['localfile']|orderBy">
                                         <div class="md-list-item-text" layout="column">
                                             <p ng-if="item.location"><span class="text-bold">Location:</span> {{item.location}}</p>
-                                            <p ng-if="item.format"><span class="text-bold">Format:</span> {{item.format}}</p>
+                                            <p ng-if="item.log_format"><span class="text-bold">Log Format:</span> {{item.log_format}}</p>
+                                            <p ng-if="item.frequency"><span class="text-bold">Frequency:</span> {{item.frequency}}</p>
                                             <p ng-if="item.query"><span class="text-bold">Query:</span> {{item.query}}</p>
                                             <p ng-if="item.command"><span class="text-bold">Command:</span> {{item.command}}</p>
                                             <p ng-if="item.alias"><span class="text-bold">Alias:</span> {{item.alias}}</p>
