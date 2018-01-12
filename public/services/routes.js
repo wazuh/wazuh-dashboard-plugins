@@ -73,6 +73,7 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
             notify.error('Could not connect with Wazuh RESTful API.');
             appState.removeCurrentAPI();
         }
+        $rootScope.comeFromWizard = true;
         $location.path('/settings');
         deferred.reject();
     }
@@ -123,12 +124,14 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
                     callCheckStored();
                 } else {
                     notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+                    $rootScope.comeFromWizard = true;
                     $location.path('/settings');
                     deferred.reject(); 
                 }
             })
             .catch((error) => {
                 notify.error("Error getting API entries due to " + error);
+                $rootScope.comeFromWizard = true;
                 $location.path('/settings');
                 deferred.reject(); 
             });

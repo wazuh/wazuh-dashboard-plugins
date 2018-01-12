@@ -6,6 +6,11 @@ import chrome from 'ui/chrome';
 let app = require('ui/modules').get('app/wazuh', []).controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, Notifier, testAPI, appState, genericReq, courier) {
     $rootScope.page = "settings";
 
+    if ($rootScope.comeFromWizard) {
+        sessionStorage.removeItem('healthCheck');
+        $rootScope.comeFromWizard = false;
+    }
+
     // Initialize
     const notify = new Notifier({ location: 'Settings' });
     let currentApiEntryIndex;
