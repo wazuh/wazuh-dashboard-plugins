@@ -3,20 +3,29 @@
     <!-- <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div> -->
 
     <!-- View: Panels -->
-    <div layout="row" layout-align="start stretch">
-        <md-card flex>
-            <md-content class="md-padding background-white">
-                <h1 class="md-title">Current group: <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="right">Click to go to the group details</md-tooltip></span></h1>
-                <p ng-show="!load" class="md-body-1">The group configuration is <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></p>
+    <div layout="column" layout-align="start stretch">
+        <md-card id="agent-conf-conf-card" flex>
+
+            <md-content layout="row" layout-align="space-between start" class="md-padding background-white">
+                <div flex=85>
+                    <h1 class="md-title">Current group: <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="right">Click to go to the group details</md-tooltip></span></h1>
+                    <p ng-show="!load" class="md-body-1">The group configuration is <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></p>
+                </div>
+                <div flex=15>
+                    <md-switch ng-model="toggleRAW">Toggle RAW Content</md-switch>
+                </div>
             </md-content>
+
             <md-tabs md-dynamic-height md-border-bottom>
 
                 <md-tab label="File Integrity">
+
                     <md-content ng-show="!groupConfiguration.config.syscheck" class="md-padding background-f7">
                         <h1 class="md-title text-center">No FIM Configuration Available</h1>
                         <p class="text-center">There's no FIM group configuration applying for this agent.</p>
                     </md-content>
-                    <div ng-show="groupConfiguration.config.syscheck" layout="row" layout-align="space-around" class="md-padding background-f7">
+
+                    <div ng-show="groupConfiguration.config.syscheck" layout="row" layout-align="space-around" class="md-padding background-f7 agent-conf-panel">
 
                         <md-card flex="20">
                             <md-card-content class="wazuh-column">
@@ -102,18 +111,6 @@
                             </md-card>
 
                         </div>
-                    </div>
-
-                    <div ng-show="groupConfiguration.config.syscheck" layout="row" class="md-padding background-f7">
-                        <md-card flex ng-init="showRaw=false">
-                            <md-card-content>
-                                <span class="md-headline">Original configuration</span>
-                                <div flex><a ng-click="showRaw = !showRaw"><i class="fa fa-eye"></i> Show in JSON format</a></div>
-                                <div flex ng-show="showRaw">
-                                    <pre flex class="json-beautifier"><code dynamic="rawJSON"></code></pre>
-                                </div>
-                            </md-card-content>
-                        </md-card>
                     </div>
 
                 </md-tab>
@@ -292,6 +289,21 @@
                 </md-tab>
 
             </md-tabs>
+        </md-card>
+
+        <md-card id="agent-conf-raw-card" flex>
+
+            <md-content id="agent-conf-raw-panel" ng-show="toggleRAW" layout="row" class="md-padding background-f7">
+                <md-card flex ng-init="showRaw=false">
+                    <md-card-content>
+                        <span class="md-headline">RAW Content</span>
+                        <div flex>
+                            <pre flex class="json-beautifier"><code dynamic="rawJSON"></code></pre>
+                        </div>
+                    </md-card-content>
+                </md-card>
+            </md-content>
+
         </md-card>
     </div>
 </md-content>
