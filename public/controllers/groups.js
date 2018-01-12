@@ -109,6 +109,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
 
 
     $scope.goBackToAgents = () => {
+        $scope.groupsSelectedTab = 'agents';
         $scope.file     = false;
         $scope.filename = false;
         if(!$scope.$$phase) $scope.$digest();
@@ -154,6 +155,12 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     });
    
 
+    $scope.$watch('lookingGroup',value => {
+        if(!value){
+            $scope.file     = false;
+            $scope.filename = false;
+        }
+    });
 });
 
 app.controller('groupsController', function ($scope) {
