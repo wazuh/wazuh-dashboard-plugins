@@ -1,9 +1,12 @@
 <div flex layout="column" ng-controller="healthCheck" layout-align="center center">
-    <div ng-show="errors.length == 0" class='uil-ring-css'><div></div></div>
-    <img ng-show="errors.length == 0" class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_blue.png" height="85" weight="252"></img>
-    <img ng-show="errors.length > 0" class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_fail.png" height="250" weight="252"></img>
+    <div flex="25>"></div>
+    <div flex="25" class="present-logo">
+        <div flex ng-show="errors.length == 0" class='uil-ring-css'><div></div></div>
+        <div flex ng-show="errors.length == 0"><img  class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_blue.png"></img></div>
+        <div flex ng-show="errors.length > 0"><img  class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_fail.png"></img></div>
+    </div>
 
-    <div class="checks">
+    <div flex="25" class="checks">
         <div>&nbsp; {{APIStatus}}<i ng-class="{'fa-spinner': !APIDone, 'fa-check': APIDone == 1, 'fa-times': APIDone == 2, 'fa-spin': !APIDone}" class="fa fa-fw" aria-hidden="true"></i></div>
         <div>&nbsp; {{indexStatus}}<i ng-class="{'fa-spinner': !indexDone, 'fa-check': indexDone == 1, 'fa-times': indexDone == 2, 'fa-spin': !indexDone}" class="fa fa-fw" aria-hidden="true"></i></div>
         <div>&nbsp; {{templateStatus}}<i ng-class="{'fa-spinner': !templateDone, 'fa-check': templateDone == 1, 'fa-times': templateDone == 2, 'fa-spin': !templateDone}" class="fa fa-fw" aria-hidden="true"></i></div>
@@ -14,5 +17,7 @@
             </div>
         </div>
     </div>
-</div>
 
+    <div flex="25>"></div>
+
+</div>
