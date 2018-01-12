@@ -80,6 +80,10 @@
 	<!-- View: Discover -->
     <kbn-dis ng-show="tab != 'configuration'"></kbn-dis>
 
+    <div class="wazuh-loading">
+        <div layout="row" layout-align="center center" class="percentage" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">{{loadingStatus}}<i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
+    </div>
+    
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="tab != 'configuration' && resultState === 'none' && tabView === 'panels'">
         <md-card flex layout="column">
