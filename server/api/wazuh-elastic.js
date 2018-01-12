@@ -80,18 +80,26 @@ module.exports = (server, options) => {
     const getTemplate = (req, reply) => {
         elasticRequest.callWithInternalUser('cat.templates', {})
         .then((data) => {
-            if (data.includes(req.params.pattern)) {
+            if (req.params.pattern == "wazuh-alerts-3.x-*" && data.includes("wazuh-alerts-3.*")) {
                 reply({
                     'statusCode': 200,
                     'status': true,
                     'data': `Template found for ${req.params.pattern}`
-                });
+                });   
             } else {
-                reply({
-                    'statusCode': 200,
-                    'status': false,
-                    'data': `No template found for ${req.params.pattern}`
-                });               
+                if (data.includes(req.params.pattern)) {
+                    reply({
+                        'statusCode': 200,
+                        'status': true,
+                        'data': `Template found for ${req.params.pattern}`
+                    });
+                } else {
+                    reply({
+                        'statusCode': 200,
+                        'status': false,
+                        'data': `No template found for ${req.params.pattern}`
+                    });               
+                }
             }
         })
         .catch((error) => {
