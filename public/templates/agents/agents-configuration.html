@@ -306,13 +306,13 @@
                                 <md-list class="md-dense">
                                     <md-list-item ng-repeat="item in groupConfiguration.config['localfile']|orderBy">
                                         <div class="md-list-item-text" layout="column">
-                                            <p ng-if="item.type"><span class="text-bold">Location:</span> {{item.location}}</p>
-                                            <p ng-if="item.type"><span class="text-bold">Format:</span> {{item.format}}</p>
-                                            <p ng-if="item.type"><span class="text-bold">Query:</span> {{item.query}}</p>
-                                            <p ng-if="item.type"><span class="text-bold">Command:</span> {{item.command}}</p>
-                                            <p ng-if="item.type"><span class="text-bold">Alias:</span> {{item.alias}}</p>
-                                            <p ng-if="item.type"><span class="text-bold">Only Future Events:</span> {{item.only-future-events}}</p>
-                                            <p ng-if="item.type"><span class="text-bold">Label:</span> {{item.label}}</p>
+                                            <p ng-if="item.location"><span class="text-bold">Location:</span> {{item.location}}</p>
+                                            <p ng-if="item.format"><span class="text-bold">Format:</span> {{item.format}}</p>
+                                            <p ng-if="item.query"><span class="text-bold">Query:</span> {{item.query}}</p>
+                                            <p ng-if="item.command"><span class="text-bold">Command:</span> {{item.command}}</p>
+                                            <p ng-if="item.alias"><span class="text-bold">Alias:</span> {{item.alias}}</p>
+                                            <p ng-if="item.only-future-events"><span class="text-bold">Only Future Events:</span> {{item.only-future-events}}</p>
+                                            <p ng-if="item.label"><span class="text-bold">Label:</span> {{item.label}}</p>
                                         </div>
                                         <md-divider ng-if="!$last"></md-divider>
                                     </md-list-item>
