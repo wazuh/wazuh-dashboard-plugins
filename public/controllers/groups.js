@@ -32,7 +32,8 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
                 // First element is now our group $scope.groups.item is an array with only our group
                 $scope.groups.items = filtered;
                 // Load that our group
-                $scope.loadGroup(0);    
+                $scope.loadGroup(0);
+                $scope.lookingGroup=true    
             }
             // Clean $rootScope
             delete $rootScope.globalAgent;
@@ -45,6 +46,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
             // If our group was not found  we need to call loadGroup after load some groups
             if(!len) {
                 $scope.loadGroup(0);
+                $scope.lookingGroup=true
             }
             $scope.load = false;
         })
@@ -107,6 +109,13 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
 
 
     $scope.goBackToAgents = () => {
+        $scope.file     = false;
+        $scope.filename = false;
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
+    $scope.goBackFiles = () => {
+        $scope.groupsSelectedTab = 'files';
         $scope.file     = false;
         $scope.filename = false;
         if(!$scope.$$phase) $scope.$digest();
