@@ -33,8 +33,9 @@
     <!-- View: Discover -->
     <kbn-dis></kbn-dis>
 
-    <div class="wazuh-loading">
-        <div layout="row" layout-align="center center" class="percentage" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">{{loadingStatus}}<i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
+    <div class="wazuh-loading" layout="column" layout-aling="center center" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+        <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
+        <div class="percentage">{{loadingStatus}}</div>
     </div>
 
     <!-- No results message -->
@@ -45,3 +46,4 @@
             </md-card-content>
         </md-card>
     </md-content>
+    
