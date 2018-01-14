@@ -1,55 +1,11 @@
 // Require routes
 let routes = require('ui/routes');
 
-// Don't know why, but all these dependencies must be here...
-
-// Added dependencies (from Kibana module)
-import 'ui/pager';
-import 'ui/typeahead';
-import 'ui/doc_viewer';
-
-// Added from its index.js
-import 'plugins/kibana/discover/saved_searches/saved_searches';
-import 'plugins/kibana/discover/directives/no_results';
-import 'plugins/kibana/discover/directives/timechart';
-import 'ui/collapsible_sidebar';
-import 'plugins/kibana/discover/components/field_chooser/field_chooser';
-import 'plugins/kibana/discover/controllers/discover';
-import 'ui/doc_table/components/table_row';
-import _ from 'lodash';
-import angular from 'angular';
-import { getSort } from 'ui/doc_table/lib/get_sort';
-import * as columnActions from 'ui/doc_table/actions/columns';
-import dateMath from '@elastic/datemath';
-import 'ui/doc_table';
-import 'ui/visualize';
-import 'ui/notify';
-import 'ui/fixed_scroll';
-import 'ui/directives/validate_json';
-import 'ui/filters/moment';
-import 'ui/courier';
-import 'ui/index_patterns';
-import 'ui/state_management/app_state';
-import 'ui/timefilter';
-import 'ui/share';
-import 'ui/query_bar';
-import { VisProvider } from 'ui/vis';
-import { BasicResponseHandlerProvider } from 'ui/vis/response_handlers/basic';
-import { DocTitleProvider } from 'ui/doc_title';
-import PluginsKibanaDiscoverHitSortFnProvider from 'plugins/kibana/discover/_hit_sort_fn';
-import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
-import { AggTypesBucketsIntervalOptionsProvider } from 'ui/agg_types/buckets/_interval_options';
-import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
-import uiRoutes from 'ui/routes';
-import { uiModules } from 'ui/modules';
-import indexTemplate from 'plugins/kibana/discover/index.html';
+// Kibana dependencies to load index-patterns and saved searches
 import { StateProvider } from 'ui/state_management/state';
-import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
-import { QueryManagerProvider } from 'ui/query_manager';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 const healthCheck = ($window, $rootScope) => {
-    // Do we need a healthCheck?
     if (!$window.sessionStorage.getItem('healthCheck')) { // New session, execute health check
         $window.sessionStorage.setItem('healthCheck', 'executed');
         return true;
@@ -184,7 +140,7 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Not
             genericReq.request('GET', '/api/wazuh-elastic/setup')
             .then((data) => {
 
-                if (appState.getCurrentPattern() !== undefined && appState.getCurrentPattern() !== null) { // There's cookie for the pattern
+                if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
                     currentPattern = data.data.data["index-pattern"];
