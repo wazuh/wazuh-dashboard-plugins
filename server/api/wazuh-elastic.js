@@ -87,18 +87,24 @@ module.exports = (server, options) => {
                     'data': `Template found for ${req.params.pattern}`
                 });   
             } else {
-                if (data.includes(req.params.pattern)) {
-                    reply({
-                        'statusCode': 200,
-                        'status': true,
-                        'data': `Template found for ${req.params.pattern}`
-                    });
-                } else {
+                var array = data.match(/[^\s]+/g);
+                var found = false;
+                for (let i = 1; i < array.length; i++) {
+                    if (array[i] == `[${req.params.pattern}]` && array[i-1] == `wazuh`) {
+                        var found = true;
+                        reply({
+                            'statusCode': 200,
+                            'status': true,
+                            'data': `Template found for ${req.params.pattern}`
+                        });    
+                    }
+                }
+                if (!found) {
                     reply({
                         'statusCode': 200,
                         'status': false,
                         'data': `No template found for ${req.params.pattern}`
-                    });               
+                    });      
                 }
             }
         })
