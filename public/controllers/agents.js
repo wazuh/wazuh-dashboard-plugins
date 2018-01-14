@@ -26,9 +26,11 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         $rootScope.currentImplicitFilter = "";
     }
 
-    $rootScope.loadedVisualizations = [];
-    $rootScope.rendered = false;
-    $rootScope.loadingStatus = "Fetching data...";
+    if ($scope.tab != 'configuration') {
+        $rootScope.loadedVisualizations = [];
+        $rootScope.rendered = false;
+        $rootScope.loadingStatus = "Fetching data...";
+    }
 
     $rootScope.tabVisualizations = {
         "general": 7,
@@ -36,7 +38,8 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         "pm": 4,
         "oscap": 13,
         "audit": 15,
-        "pci": 3
+        "pci": 3,
+        "configuration": 0
     };
     
     // Object for matching nav items and Wazuh groups
