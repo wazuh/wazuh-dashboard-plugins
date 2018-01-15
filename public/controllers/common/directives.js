@@ -36,14 +36,21 @@ app.directive('dynamic', function($compile) {
                     $scope.theresAPI = false;
                 }
 
-                $scope.$on('updateAPI', () => {
-                    if(appState.getCurrentAPI()) 
-                    {
-                        $scope.theresAPI = true;
-                        $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+                if(appState.getCurrentPattern()) {
+                    $scope.theresPattern = true;
+                    $scope.currentPattern = appState.getCurrentPattern();
+                }
+                else {
+                    $scope.theresPattern = false;
+                }
+
+                $scope.$on('updatePattern', () => {
+                    if(appState.getCurrentPattern()) {
+                        $scope.theresPattern = true;
+                        $scope.currentPattern = appState.getCurrentPattern();
                     }
                     else {
-                        $scope.theresAPI = false;
+                        $scope.theresPattern = false;
                     }
                 });
             },

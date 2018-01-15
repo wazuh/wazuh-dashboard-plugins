@@ -70,7 +70,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`)
         .then(() => {
             $scope.apiEntries.splice(index, 1);
-            $rootScope.apiIsDown = null;            
+            $rootScope.apiIsDown = null;
         })
         .catch(() => {
             notify.error("Could not remove manager");
@@ -118,8 +118,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     $scope.getSettings = () => {
         genericReq.request('GET', '/api/wazuh-api/apiEntries')
         .then((data) => {
-            for(const entry of data.data) $scope.showEditForm[entry._id] = false;  
-         
+            for(const entry of data.data) $scope.showEditForm[entry._id] = false;
+
             $scope.apiEntries = data.data.length > 0 ? data.data : [];
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null)
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
@@ -254,7 +254,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             $scope.messageErrorUpdate = invalid;
             return notify.error(invalid);
         }
-        
+
         const index = $scope.apiEntries.indexOf(item);
 
         const tmpData = {
@@ -294,7 +294,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     // Check manager connectivity
     $scope.checkManager = item => {
         const index = $scope.apiEntries.indexOf(item);
-        
+
         const tmpData = {
             user:         $scope.apiEntries[index]._source.api_user,
             password:     $scope.apiEntries[index]._source.api_password,
@@ -343,6 +343,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${newIndexPattern}`)
         .then((data) => {
             appState.setCurrentPattern(newIndexPattern);
+
+            $scope.$emit('updatePattern', {});
 
             courier.indexPatterns.get(newIndexPattern)
             .then((data) => {
@@ -450,5 +452,5 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     $scope.getSettings();
     $scope.getAppInfo();
 
-    
+
 });
