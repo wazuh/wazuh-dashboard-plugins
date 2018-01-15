@@ -45,6 +45,8 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Notifier, Rule
             $scope.rules.addFilter('pci',search.split('pci:')[1].trim());
         } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
             $scope.rules.addFilter('file',search.split('file:')[1].trim());
+        } else {
+            $scope.rules.addFilter('search',search.trim());
         }
     };
 
@@ -144,6 +146,8 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Noti
             $scope.decoders.addFilter('path',search.split('path:')[1].trim());
         } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
             $scope.decoders.addFilter('file',search.split('file:')[1].trim());
+        } else {
+            $scope.decoders.addFilter('search',search.trim());
         }
     };
 
