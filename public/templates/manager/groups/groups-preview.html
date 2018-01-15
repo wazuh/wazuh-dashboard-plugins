@@ -3,112 +3,87 @@
         <div flex layout="row" ng-init="lookingGroup=false">
             <md-card flex>
                 <span class="own-breadcrumb md-headline">
-                    <a ng-click="lookingGroup=false">
+                    <a class="a-groups" ng-click="lookingGroup=false">
                         <i class="fa fa-server"></i> {{ currentAPI }} ></a>
-                    <a ng-click="lookingGroup=false"> groups ></a>
-                    <a ng-if="lookingGroup" ng-click="goBackToAgents()"> {{ groups.items[selectedGroup].name }}</a>
+                    <a class="a-groups" ng-click="lookingGroup=false"> groups ></a>
+                    <a class="a-groups" ng-if="lookingGroup" ng-click="goBackToAgents()"> {{ groups.items[selectedGroup].name }}</a>
                 </span>
                 <!-- Selecting a group -->
-                <md-card-content ng-if="!lookingGroup">
-                    <div layout="row">
-                        <button class="searchButtonCluster">
-                            <i class="fa fa-search"></i>
-                        </button>
-                        <input flex id="query" placeholder="Filter groups..." type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)" class="searchBarCluster" />
+                <md-card-content ng-if="!lookingGroup" class="groupsFixPadding md-card-content-groups">
+                    <div layout="row" class="topPaddingSearch">
+                        <input flex id="query" placeholder="Filter groups..." type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)" class="searchBarCluster input-filter-box agents-preview-search-box" />
                     </div>
-                    <div layout="row">
-                        <div flex="25">
-                            <h4>Name</h4>
-                        </div>
-                        <div flex>
-                            <h4>Agents</h4>
-                        </div>
-                    </div>
+                    <md-toolbar layout="row" class="md-toolbar-tools-groups" >
+                        <span ng-click="groups.sort('name')" flex>Name <i class="fa" ng-class="groups.sortValue === 'name' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                        <span ng-click="groups.sort('count')" flex>Agents <i class="fa" ng-class="groups.sortValue === 'count' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                        <span ng-click="groups.sort('merged_sum')" flex>Merged sum <i class="fa" ng-class="groups.sortValue === 'merged_sum' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i></span>
+                    </md-toolbar>
                     <md-divider></md-divider>
                 </md-card-content>
-                <div flex layout="column" class="md-padding" ng-if="!lookingGroup">
-                    <div flex class="clusterScrollable" when-scrolled="groups.nextPage('')">
-                        <div layout="row" ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-click="$parent.loadGroup($index); toggle();">
-                            <div flex="25">
+                <div flex layout="column" class="md-padding groupsFixPadding" ng-if="!lookingGroup">
+                    <div flex class="ownNavBarCluster clusterScrollable" when-scrolled="groups.nextPage('')">
+                        <div layout="row" ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-click="$parent.loadGroup($index); toggle();" class="md-subhead agents-groups-preview agents-preview-table groupsFixPadding">
+                            <div flex>
                                 <span class="md-headline">{{group.name}}</span>
                             </div>
                             <div flex>
                                 <span class="md-headline">{{group.count}}</span>
                             </div>
-                            <div flex layout="row" layout-align="end center"></div>
+                            <div flex>
+                                <span class="md-headline">{{group.merged_sum}}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <!-- Looking a group -->
-                <md-card-content ng-if="lookingGroup">
-                    <md-nav-bar md-selected-nav-item="groupsSelectedTab">
+                <md-card-content ng-if="lookingGroup" class="groupsFixPadding md-card-content-groups">
+                    <md-nav-bar md-selected-nav-item="groupsSelectedTab" class="groupsButtonNav">
                         <md-nav-item md-nav-click="goBackToAgents()" name="agents">
                             <i class="fa fa-tv"></i> Agents
                         </md-nav-item>
                         <md-nav-item md-nav-click="goBackFiles()" name="files">
-                            <i class="fa fa-file"></i> Content
+                            <i class="fa fa-file-o"></i> Content
                         </md-nav-item>
                     </md-nav-bar>
 
-                    <div layout="row" class="ownNavBarCluster topPaddingSearch" ng-show="groupsSelectedTab==='agents'">
-                        <button class="searchButtonCluster">
-                            <i class="fa fa-search"></i>
-                        </button>
-                        <input flex id="query" placeholder="Filter agents..." type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)" class="searchBarCluster" />
+                    <div layout="row" class="topPaddingSearch" ng-show="groupsSelectedTab==='agents'">
+                        <input flex id="query" placeholder="Filter agents..." type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)" class="searchBarCluster input-filter-box agents-preview-search-box" />
                     </div>
-                    <div class="ownNavBarCluster" layout="row" ng-show="groupsSelectedTab==='agents'">
-                        <div flex>
-                            <h4>
-                                ID <i class="fa faSize13" ng-class="groupAgents.sortValue === 'id' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" ng-click="groupAgents.sort('id')" aria-hidden="true"></i>
-                            </h4>
-                        </div>
-                        <div flex>
-                            <h4>
-                                Name <i class="fa faSize13" ng-class="groupAgents.sortValue === 'name' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" ng-click="groupAgents.sort('name')" aria-hidden="true"></i>
-                            </h4>
-                        </div>
-                        <div flex>
-                            <h4>
-                                IP <i class="fa faSize13" ng-class="groupAgents.sortValue === 'ip' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" ng-click="groupAgents.sort('ip')" aria-hidden="true"></i>
-                            </h4>
-                        </div>
-                        <div flex>
-                            <h4>
-                                OS platform <i class="fa faSize13" ng-class="groupAgents.sortValue === 'os' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" ng-click="groupAgents.sort('os.platform')" aria-hidden="true"></i>
-                            </h4>
-                        </div>
-                        <div flex>
-                            <h4>
-                                OS version <i class="fa faSize13" ng-class="groupAgents.sortValue === 'os' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" ng-click="groupAgents.sort('os.version')" aria-hidden="true"></i>
-                            </h4>
-                        </div>
-                        <div flex>
-                            <h4>
-                                Agent version
-                            </h4>
-                        </div>
-                    </div>
+                    <md-toolbar layout="row" class="md-toolbar-tools-groups" ng-show="groupsSelectedTab==='agents'">
+                        <span flex ng-click="groupAgents.sort('id')">ID
+                            <i class="fa" ng-class="groupAgents.sortValue === 'id' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                        </span>
+                        <span flex ng-click="groupAgents.sort('name')">Name
+                            <i class="fa" ng-class="groupAgents.sortValue === 'name' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                        </span>
+                        <span flex ng-click="groupAgents.sort('ip')">IP
+                            <i class="fa" ng-class="groupAgents.sortValue === 'ip' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                        </span>
+                        <span flex ng-click="groupAgents.sort('os.platform')">OS platform
+                            <i class="fa" ng-class="groupAgents.sortValue === 'os' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                        </span>
+                        <span flex ng-click="groupAgents.sort('os.version')">OS version
+                            <i class="fa" ng-class="groupAgents.sortValue === 'os' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                        </span>
+                        <span flex ng-click="groupAgents.sort('version')">Agent version
+                            <i class="fa" ng-class="groupAgents.sortValue === 'version' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
+                        </span>
+                    </md-toolbar>
                     <md-divider ng-show="groupsSelectedTab==='agents'"></md-divider>
-                    <div layout="row" class="ownNavBarCluster topPaddingSearch" ng-show="groupsSelectedTab==='files' && !file">
-                        <button class="searchButtonCluster">
-                            <i class="fa fa-search"></i>
-                        </button>
-                        <input flex id="query" placeholder="Filter files..." type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)" class="searchBarCluster" />
+                    <div layout="row" class="topPaddingSearch" ng-show="groupsSelectedTab==='files' && !file">
+                        <input flex id="query" placeholder="Filter files..." type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)" class="searchBarCluster input-filter-box agents-preview-search-box" />
                     </div>
-                    <div layout="row" class="ownNavBarCluster" ng-show="groupsSelectedTab==='files' && !file">
-                        <div flex>
-                            <h4>
-                                File <i class="fa faSize13" ng-class="groupFiles.sortValue === 'filename' ? (groupFiles.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true" ng-click="groupFiles.sort('filename')"></i>
-                            </h4>
-                        </div>
-                    </div>
+                    <md-toolbar layout="row" class="md-toolbar-tools-groups" ng-show="groupsSelectedTab==='files' && !file">
+                        <span flex ng-click="groupFiles.sort('filename')">File <i class="fa" ng-class="groupFiles.sortValue === 'filename' ? (groupFiles.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true" ></i></span>
+                        <span flex>Hash</span>
+                    </md-toolbar>
                     <md-divider ng-show="groupsSelectedTab==='files' && !file"></md-divider>
 
 
                 </md-card-content>
-                <div flex layout="column" class="md-padding" ng-if="lookingGroup">
+                <div flex layout="column" class="md-padding groupsFixPadding" ng-if="lookingGroup">
                     <div flex ng-if="groupsSelectedTab==='agents'" class="ownNavBarCluster clusterScrollable" when-scrolled="groupAgents.nextPage()">
-                        <div layout="row" ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' ng-click="showAgent(agent)">
+                        <div layout="row" ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' ng-click="showAgent(agent)" class="md-subhead agents-groups-preview agents-preview-table groupsFixPadding">
                             <div flex>
                                 <span class="md-headline">{{agent.id || 'Unknown'}}</span>
                             </div>
@@ -130,19 +105,23 @@
                         </div>
                     </div>
                     <div flex ng-if="groupsSelectedTab==='files' && !file" class="ownNavBarCluster clusterScrollable" when-scrolled="groupFiles.nextPage()">
-                        <div layout="row" ng-repeat="file in groupFiles.items | orderBy : groupFiles.sortValue : groupFiles.sortDir" ng-click="$parent.showFile($index);">
+                        <div layout="row" ng-repeat="file in groupFiles.items | orderBy : groupFiles.sortValue : groupFiles.sortDir" ng-click="$parent.showFile($index);" class="md-subhead agents-groups-preview agents-preview-table groupsFixPadding">
                             <div flex>
                                 <span class="md-headline">{{file.filename || 'Unknown'}}</span>
                             </div>
+                            <div flex>
+                                <span class="md-headline">{{file.hash || 'Unknown'}}</span>
+                            </div>
                         </div>
                     </div>
-                    <div flex ng-if="groupsSelectedTab==='files' && file">
+                    <div flex layout="column" ng-if="groupsSelectedTab==='files' && file">
                         <div layout="row" class="ownNavBarCluster">
-                            <h5>
-                                {{ filename }}
-                            </h5>
+                            <h5 flex>{{ filename }} </h5>
+                            <md-button class="md-mini " ng-click="goBackFiles()">
+                                <i class="fa fa-close" aria-hidden="true"></i>
+                            </md-button>
                         </div>
-                        <div layout="row" class="ownNavBarCluster">
+                        <div flex layout="column" class="ownNavBarCluster">
                             <pre flex class="json-beautifier jsonbeauty2"><code dynamic="file"></code></pre>
                         </div>
                     </div>
