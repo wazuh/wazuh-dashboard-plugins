@@ -8,10 +8,9 @@
 
             <md-content layout="row" layout-align="space-between start" class="md-padding background-white">
                 <div flex=85>
-                    <h1 class="md-title">Current group: <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="right">Click to go to the group details</md-tooltip></span></h1>
-                    <p ng-show="!load" class="md-body-1">The group configuration is <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></p>
+                    <h1 ng-show="!load" class="md-title">Current group: <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="bottom">Click to go to the group details</md-tooltip></span>  -  Configuration status: <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></h1>
                 </div>
-                <div flex=15>
+                <div flex=10>
                     <md-switch ng-model="toggleRAW">View JSON</md-switch>
                 </div>
             </md-content>
