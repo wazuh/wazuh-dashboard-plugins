@@ -1,4 +1,5 @@
-let app = require('ui/modules').get('app/wazuh', []);
+const   app      = require('ui/modules').get('app/wazuh', []);
+const beautifier = require('plugins/wazuh/utils/json-beautifier');
 
 app.controller('agentsController',
 function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
@@ -67,9 +68,12 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
     };
 
     $scope.switchTab = (tab) => {
+
         if($scope.tab === tab) return;
-        for(let h of $rootScope.ownHandlers){
-            h._scope.$destroy();
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
         }
         $rootScope.ownHandlers = [];
 
@@ -86,9 +90,14 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
     $scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
     $scope.$watch('tab', () => {
         $location.search('tab', $scope.tab);
+
         // Update the implicit filter
-        if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
-        else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
+        if (typeof tabFilters[$scope.tab] !== 'undefined' && tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
+        else $rootScope.currentImplicitFilter = (typeof tabFilters[$scope.tab] !== 'undefined') ? tabFilters[$scope.tab].group : '';
+
+        if($scope.tab === 'configuration'){
+            firstLoad();
+        }
     });
 
     // Agent data
@@ -143,6 +152,9 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
     }
 
     $scope.getAgent = newAgentId => {
+        if($scope.tab === 'configuration'){
+            return $scope.getAgentConfig(newAgentId);
+        }
         let id = null;
 
         // They passed an id
@@ -215,7 +227,9 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 
     //Load
     try {
-        $scope.getAgent();
+        if($scope.tab !== 'configuration'){
+            $scope.getAgent();
+        }
         $scope.agentsAutoComplete.nextPage('');
     } catch (e) {
         notify.error('Unexpected exception loading controller');
@@ -245,4 +259,85 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 
     $scope.tabs          = tabs;
     $scope.selectedIndex = 0;
+
+
+    /** Agent configuration */
+    $scope.isArray = angular.isArray;
+
+    const getAgent = newAgentId => {
+
+		// They passed an id
+		if (newAgentId) {
+            $location.search('agent', newAgentId);
+		} 
+		
+	};
+
+    $scope.getAgentConfig = newAgentId => {
+        getAgent(newAgentId);
+        firstLoad();
+    }
+
+    $scope.goGroup = () => {
+		$rootScope.globalAgent = $scope.agent;
+		$rootScope.comeFrom    = 'agents';
+		$location.search('tab', 'groups');
+		$location.path('/manager');
+    };
+    
+    const firstLoad = async () => {
+        try{
+            $scope.configurationError = false;
+            $scope.load = true;
+            let id;
+            if ($location.search().agent) { // There's one in the url
+				id = $location.search().agent;
+			} else { // We pick the one in the rootScope
+				id = $rootScope.globalAgent;
+				$location.search('agent', id);
+				delete $rootScope.globalAgent;
+			}
+            let data         = await apiReq.request('GET', `/agents/${id}`, {});
+            $scope.agent     = data.data.data;
+            $scope.groupName = $scope.agent.group;
+
+            if(!$scope.groupName){
+                
+                $scope.configurationError = true;
+                $scope.load = false;
+                if($scope.agent.id === '000'){
+                    $scope.configurationError = false;
+                    $scope.tab = 'general';
+                    $scope.switchTab('general');
+                }
+                if(!$scope.$$phase) $scope.$digest();
+                return;
+            }
+
+            data                      = await apiReq.request('GET', `/agents/groups/${$scope.groupName}/configuration`, {});
+            $scope.groupConfiguration = data.data.data.items[0];
+            $scope.rawJSON            = beautifier.prettyPrint($scope.groupConfiguration);
+
+            data = await Promise.all([
+                apiReq.request('GET', `/agents/groups?search=${$scope.groupName}`, {}),
+                apiReq.request('GET', `/agents/groups/${$scope.groupName}`, {})
+            ]);
+
+            
+            let filtered          = data[0].data.data.items.filter(item => item.name === $scope.groupName);
+            $scope.groupMergedSum = (filtered.length) ? filtered[0].merged_sum : 'Unknown';
+
+            filtered              = data[1].data.data.items.filter(item => item.id === $scope.agent.id);
+            $scope.agentMergedSum = (filtered.length) ? filtered[0].merged_sum : 'Unknown';
+            $scope.isSynchronized = (($scope.agentMergedSum === $scope.groupMergedSum) && !([$scope.agentMergedSum,$scope.groupMergedSum].includes('Unknown')) ) ? true : false;
+
+            $scope.load = false;
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch (error){
+            notify.error(error.message);
+        }
+    }
+    /** End of agent configuration */
+    
 });
