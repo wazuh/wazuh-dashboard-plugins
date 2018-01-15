@@ -7,7 +7,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
     $scope.agentsAutoComplete = AgentsAutoComplete;
     const notify = new Notifier({ location: 'Agents' });
 
-    // Check the url hash and retriew the tabView information 
+    // Check the url hash and retriew the tabView information
     if ($location.search().tabView){
         $scope.tabView = $location.search().tabView;
     } else { // If tabView doesn't exist, default it to 'panels' view
@@ -15,7 +15,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         $location.search("tabView", "panels");
     }
 
-    // Check the url hash and retrivew the tab information 
+    // Check the url hash and retrivew the tab information
     if ($location.search().tab){
         $scope.tab = $location.search().tab;
     } else { // If tab doesn't exist, default it to 'general' view
@@ -38,7 +38,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         "audit": 15,
         "pci": 3
     };
-    
+
     // Object for matching nav items and Wazuh groups
     let tabFilters = {
         "general": {
@@ -66,7 +66,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         $scope.tabView = subtab;
     };
 
-    $scope.switchTab = (tab) => {   
+    $scope.switchTab = (tab) => {
         if($scope.tab === tab) return;
         for(let h of $rootScope.ownHandlers){
             h._scope.$destroy();
@@ -117,11 +117,11 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         } else {
             if (!$scope.agent.rootcheck.end) {
                 $scope.agent.rootcheck.end = 'Unknown';
-            } 
+            }
             if (!$scope.agent.rootcheck.start){
                 $scope.agent.rootcheck.start = 'Unknown';
             }
-        }   
+        }
     }
 
     const validateSysCheck = () => {
@@ -135,7 +135,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         } else {
             if (!$scope.agent.syscheck.end) {
                 $scope.agent.syscheck.end = 'Unknown';
-            } 
+            }
             if (!$scope.agent.syscheck.start){
                 $scope.agent.syscheck.start = 'Unknown';
             }
@@ -159,6 +159,11 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
             }
         }
 
+        if (id === '000' && $scope.tab === 'configuration') {
+            $scope.tab = 'general';
+            $scope.switchTab('general');
+        }
+
         Promise.all([
             apiReq.request('GET', `/agents/${id}`, {}),
             apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
@@ -175,10 +180,10 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 
             // Syscheck
             $scope.agent.syscheck = data[1].data.data;
-            validateSysCheck();     
+            validateSysCheck();
             // Rootcheck
             $scope.agent.rootcheck = data[2].data.data;
-            validateRootCheck();    
+            validateRootCheck();
 
             $scope.$digest();
         })
@@ -189,7 +194,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         $rootScope.globalAgent = agent;
         $rootScope.comeFrom    = 'agents';
         $location.search('tab', 'groups');
-        $location.path('/manager');        
+        $location.path('/manager');
     };
 
 
@@ -224,7 +229,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         }
         $rootScope.ownHandlers = [];
     });
-    
+
     //PCI tab
     let tabs = [];
     genericReq.request('GET', '/api/wazuh-api/pci/all')
