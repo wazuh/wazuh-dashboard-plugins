@@ -6,12 +6,10 @@
     <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'manager' }" md-nav-href="#/manager" name="manager"><i class="fa fa-server"></i> Manager</md-nav-item>
     <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'agents' }" md-nav-href="#/agents-preview" name="agents"><i class="fa fa-tv"></i> Agents</md-nav-item>
     <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'discover' }" md-nav-href="#/wazuh-discover" name="discover"><i class="fa fa-compass"></i> Discover</md-nav-item>
-    <div class="wazuhMenuNavBar_API" layout="row" ng-show="theresAPI">
-        <div layout layout-align="center center"><i class="fa fa-star fa-fw settings-template-1" aria-hidden="true"></i>{{ currentAPI }}<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
-        <div ng-show="theresPattern" layout layout-align="center center">&nbsp;&ndash;&nbsp;{{ currentPattern }}<md-tooltip md-direction="bottom">Selected Index Pattern</md-tooltip></div>
-    </div>
-    <div class="wazuhMenuNavBar_API" layout="row" ng-show="!theresAPI">
-        <div layout layout-align="center center">No API selected</div>
+    <div class="wazuhMenuNavBar_API" layout="row" ng-show="theresAPI || theresPattern">
+        <div ng-show="theresAPI" layout layout-align="center center"><i class="fa fa-star fa-fw settings-template-1" aria-hidden="true"></i>{{ currentAPI }}<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
+        <div ng-show="!theresAPI" layout layout-align="center center"><i class="fa fa-star fa-fw settings-template-1" aria-hidden="true"></i>No API selected<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
+        <div ng-show="theresPattern" layout layout-align="center center">&nbsp;&ndash;&nbsp;{{ currentPattern }}<md-tooltip md-direction="bottom">Selected index-pattern</md-tooltip></div>
     </div>
     <md-nav-item class="wazuhMenuNavBar_gear directives-color-white" md-nav-href="#/settings" name="settings">
         <i class="fa fa-cog ng-scope" aria-hidden="true"></i>

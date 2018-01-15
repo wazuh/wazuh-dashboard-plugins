@@ -36,6 +36,7 @@ app.directive('dynamic', function($compile) {
                     $scope.theresAPI = false;
                 }
 
+
                 if(appState.getCurrentPattern()) {
                     $scope.theresPattern = true;
                     $scope.currentPattern = appState.getCurrentPattern();
@@ -43,6 +44,17 @@ app.directive('dynamic', function($compile) {
                 else {
                     $scope.theresPattern = false;
                 }
+
+                $scope.$on('updateAPI', () => {
+                    if(appState.getCurrentAPI()) 
+                    {
+                        $scope.theresAPI = true;
+                        $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+                    }
+                    else {
+                        $scope.theresAPI = false;
+                    }
+                });
 
                 $scope.$on('updatePattern', () => {
                     if(appState.getCurrentPattern()) {
