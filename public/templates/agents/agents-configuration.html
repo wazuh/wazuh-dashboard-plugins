@@ -12,7 +12,7 @@
                     <p ng-show="!load" class="md-body-1">The group configuration is <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></p>
                 </div>
                 <div flex=15>
-                    <md-switch ng-model="toggleRAW">Toggle RAW Content</md-switch>
+                    <md-switch ng-model="toggleRAW">View JSON</md-switch>
                 </div>
             </md-content>
 
@@ -21,7 +21,7 @@
                 <md-tab label="File Integrity">
 
                     <md-content ng-show="!groupConfiguration.config.syscheck" class="md-padding background-f7">
-                        <h1 class="md-title text-center">No FIM Configuration Available</h1>
+                        <h1 class="md-title text-center">No FIM configuration available</h1>
                         <p class="text-center">There's no FIM group configuration used for this agent.</p>
                     </md-content>
 
@@ -118,7 +118,7 @@
                 <md-tab label="Policy Monitoring">
 
                     <md-content ng-if="!groupConfiguration.config.rootcheck" class="md-padding background-f7">
-                        <h1 class="md-title text-center">No PM Configuration Available</h1>
+                        <h1 class="md-title text-center">No PM configuration available</h1>
                         <p class="text-center">There's no PM group configuration used for this agent.</p>
                     </md-content>
 
@@ -295,7 +295,7 @@
                 <md-tab label="Log Collection">
 
                     <md-content ng-if="!groupConfiguration.config['localfile']" class="md-padding background-f7">
-                        <h1 class="md-title text-center">No Log Collection Configuration Available</h1>
+                        <h1 class="md-title text-center">No Log Collection configuration available</h1>
                         <p class="text-center">There's no Log Collection group configuration used for this agent.</p>
                     </md-content>
 
@@ -326,7 +326,7 @@
 
                 <!-- <md-tab label="Active Response">
                     <md-content ng-if="!groupConfiguration.config['active-response']" class="md-padding background-f7">
-                        <h1 class="md-title text-center">No Active Response Configuration Available</h1>
+                        <h1 class="md-title text-center">No Active Response configuration available</h1>
                         <p class="text-center">There's no Active Response group configuration used for this agent.</p>
                     </md-content>
                     <md-content ng-if="groupConfiguration.config['active-response']" class="md-padding background-f7">
@@ -346,7 +346,7 @@
 
                 <md-tab label="OpenSCAP">
                     <md-content ng-if="!groupConfiguration.config['open-scap']" class="md-padding background-f7">
-                        <h1 class="md-title text-center">No OpenSCAP Configuration Available</h1>
+                        <h1 class="md-title text-center">No OpenSCAP configuration available</h1>
                         <p class="text-center">There's no OpenSCAP group configuration used for this agent.</p>
                     </md-content>
                     <md-content ng-if="groupConfiguration.config['open-scap']" class="md-padding background-f7">
