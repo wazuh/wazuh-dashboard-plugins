@@ -1,14 +1,12 @@
 <div flex layout="column" ng-controller="healthCheck" layout-align="center center">
     <div class="present-logo">
         <div ng-show="errors.length == 0" class='uil-ring-css'><div></div></div>
-        <div ng-show="errors.length == 0"><img class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_blue.png"></img></div>
+        <div ng-show="errors.length == 0"><img class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_blue.svg"></img></div>
         <div ng-show="errors.length > 0"><img class="loading-logo-fail" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_fail.png"></img></div>
     </div>
 
     <div ng-class="{'checks': errors.length == 0, 'checks-fail': errors.length > 0}">
-        <div>&nbsp; {{APIStatus}}<i ng-class="{'fa-spinner': !APIDone, 'fa-check': APIDone == 1, 'fa-times': APIDone == 2, 'fa-spin': !APIDone}" class="fa fa-fw" aria-hidden="true"></i></div>
-        <div>&nbsp; {{indexStatus}}<i ng-class="{'fa-spinner': !indexDone, 'fa-check': indexDone == 1, 'fa-times': indexDone == 2, 'fa-spin': !indexDone}" class="fa fa-fw" aria-hidden="true"></i></div>
-        <div>&nbsp; {{templateStatus}}<i ng-class="{'fa-spinner': !templateDone, 'fa-check': templateDone == 1, 'fa-times': templateDone == 2, 'fa-spin': !templateDone}" class="fa fa-fw" aria-hidden="true"></i></div>
+        <div>&nbsp; Performing checks...({{processedChecks}}/{{totalChecks}})<i ng-class="{'fa-spinner': processedChecks != totalChecks, 'fa-check': errors.length == 0, 'fa-times': errors.length > 0, 'fa-spin': processedChecks != totalChecks}" class="fa fa-fw" aria-hidden="true"></i></div>
         <div class="health-check-error" ng-show="errors.length > 0">
             <div class="error-notify">Ups, something went wrong...</div>
             <div ng-repeat='error in errors'>
