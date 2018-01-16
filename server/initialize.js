@@ -178,8 +178,8 @@ module.exports = (server, options) => {
         if (type === "install") {
             elasticRequest .callWithInternalUser('search', {
                 index: '.kibana',
-                type:  'index-pattern',
-                q:     `title:"${index_pattern}"`
+                type:  'doc',
+                q:     `index-pattern.title:"${index_pattern}"`
             })
             .then((data) => {
                 if (data.hits.total >= 1) server.log([blueWazuh, 'initialize', 'info'], 'Skipping index-pattern creation. Already exists.');
@@ -251,6 +251,46 @@ module.exports = (server, options) => {
             })
             .catch((error) => {
                 server.log([blueWazuh, 'reindex', 'error'], 'Could not update version information due to ' + error);
+            });
+
+            // We search for the currently applied pattern in the visualizations
+            elasticRequest .callWithInternalUser('search', {
+                index: '.kibana',
+                type:  'doc',
+                q:     `visualization.title:"Wazuh App Overview General Metric alerts"`
+            })
+            .then((data) => {
+                
+                elasticRequest.callWithInternalUser('deleteByQuery', { 
+                    index: '.kibana', 
+                    body: {
+                        'query': {
+                            'bool': {
+                                'must': {
+                                    'match': {
+                                        "visualization.title": 'Wazuh App*'
+                                    }
+                                },
+                                'must_not': {
+                                    "match": {
+                                        "visualization.title": 'Wazuh App Overview General Agents status'
+                                    }
+                                }
+                            }
+                        }
+                    } 
+                })
+                .then((response) => {
+                    // Update the visualizations
+                    importAppObjects(JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index);
+                })
+                .catch((error) => {
+                    server.log([blueWazuh, 'initialize', 'error'], 'Could not update visualizations due to ' + error);
+                });
+                
+            })
+            .catch((error) => {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not get a sample for the pattern due to ' + error);
             });
         })
         .catch((error) => {
