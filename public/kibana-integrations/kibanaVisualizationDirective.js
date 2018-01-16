@@ -34,6 +34,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                 }
                             }
 
+                            console.log("updating inside", filters);
                             visualization.searchSource
                             .query({ language: 'lucene', query: fullFilter })
                             .set('filter', filters);

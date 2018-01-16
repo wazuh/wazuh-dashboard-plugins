@@ -317,6 +317,7 @@ function discoverController(
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
+            console.log("updating", queryFilter.getFilters());
             $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
             $rootScope.$broadcast('fetch');
             if($location.search().tab != 'configuration') {
@@ -919,9 +920,8 @@ function discoverController(
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
     if ($location.search().tabView !=  $scope.tabView) { // No need to change the filters
-      if ($scope.tabView !== "discover") { // Should do this the first time, to avoid the squeezing of the visualization
+        console.log("change");
         $scope.updateQueryAndFetch($state.query);
-      }
       $scope.tabView = $location.search().tabView;
     }
     if ($location.search().tab !=  $scope.tab) { // Changing filters
