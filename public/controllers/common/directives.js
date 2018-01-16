@@ -27,7 +27,9 @@ app.directive('dynamic', function($compile) {
 	})
     .directive('menuTop',function(){
         return {
-            controller: function ($scope, appState) {
+            controller: function ($scope, appState, courier, Notifier) {
+                const notify = new Notifier();
+
                 if(appState.getCurrentAPI()) {
                     $scope.theresAPI = true;
                     $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
@@ -36,14 +38,15 @@ app.directive('dynamic', function($compile) {
                     $scope.theresAPI = false;
                 }
 
-
-                if(appState.getCurrentPattern()) {
+                courier.indexPatterns.get(appState.getCurrentPattern())
+                .then((data) => {
                     $scope.theresPattern = true;
-                    $scope.currentPattern = appState.getCurrentPattern();
-                }
-                else {
+                    $scope.currentPattern = data.title;
+                })
+                .catch((error) => {
+                    notify.error("Error getting patterns from Kibana...");
                     $scope.theresPattern = false;
-                }
+                });
 
                 $scope.$on('updateAPI', () => {
                     if(appState.getCurrentAPI()) 
@@ -57,15 +60,18 @@ app.directive('dynamic', function($compile) {
                 });
 
                 $scope.$on('updatePattern', () => {
-                    if(appState.getCurrentPattern()) {
+                    courier.indexPatterns.get(appState.getCurrentPattern())
+                    .then((data) => {
                         $scope.theresPattern = true;
-                        $scope.currentPattern = appState.getCurrentPattern();
-                    }
-                    else {
+                        $scope.currentPattern = data.title;
+                    })
+                    .catch((error) => {
+                        notify.error("Error getting patterns from Kibana...");
                         $scope.theresPattern = false;
-                    }
+                    });
                 });
             },
             template: menuTemplate
         };
     });
+

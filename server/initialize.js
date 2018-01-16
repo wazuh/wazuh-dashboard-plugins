@@ -232,7 +232,26 @@ module.exports = (server, options) => {
             id: "1"
         })
         .then((data) => {
-            server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-version document already exists. Nothing to be done.');
+            server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-version document already exists. Updating version information.');
+
+            // We filled data for the API, let's insert it now
+            elasticRequest.callWithInternalUser('update', { 
+                index: '.wazuh-version', 
+                type: 'wazuh-version',
+                id: 1,
+                body: {
+                    'doc': {
+                        "app-version": packageJSON.version,
+                        "revision": packageJSON.revision
+                    }
+                } 
+            })
+            .then((response) => {
+                server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated version information');
+            })
+            .catch((error) => {
+                server.log([blueWazuh, 'reindex', 'error'], 'Could not update version information due to ' + error);
+            });
         })
         .catch((error) => {
             server.log([blueWazuh, 'initialize', 'info'], 'Wazuh-version document does not exist. Initializating configuration...');
