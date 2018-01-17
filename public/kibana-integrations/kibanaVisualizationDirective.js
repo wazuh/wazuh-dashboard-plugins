@@ -48,7 +48,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                     if ($rootScope.loadedVisualizations.length >= $rootScope.tabVisualizations[$location.search().tab]) {
                         if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
                         // Forcing a digest cycle
-                        $rootScope.$digest();
+                        if(!$rootScope.$$phase) $rootScope.$digest();
                     }
                     else if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = false;
                 };
