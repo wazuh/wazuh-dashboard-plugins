@@ -1,9 +1,20 @@
 require('ui/modules').get('app/wazuh', []).service('appState', function ($cookies, $window) {
     return {
         getExtensions: () => {
-            return {
+            const data = {
                 extensions: $cookies.getObject('extensions')
             };
+
+            if(typeof data.extensions === 'undefined'){
+                return {
+                    extensions : {
+                        audit: true,
+                        pci  : true,
+                        oscap: true
+                    }
+                }
+            }
+            return data;
         },
         setExtensions: extensions => {
             var exp = new Date();
