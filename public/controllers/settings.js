@@ -19,18 +19,14 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         password: '',
         url     : ''
     };
-    $scope.accept_ssl        = true;
-    $scope.editConfiguration = true;
-    $scope.menuNavItem       = 'settings';
-    $scope.load              = true;
-    $scope.extensions = {
-        oscap: true,
-        audit: true,
-        pci:   true
-    };
+    $scope.accept_ssl          = true;
+    $scope.editConfiguration   = true;
+    $scope.menuNavItem         = 'settings';
+    $scope.load                = true;
+    $scope.extensions          = appState.getExtensions().extensions;
     $scope.addManagerContainer = false;
     $scope.submenuNavItem      = "api";
-    $scope.showEditForm = {};
+    $scope.showEditForm        = {};
     $scope.formUpdate = {
         user    : null,
         password: null,
@@ -327,15 +323,17 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     };
 
     // Toggle extension
-    $scope.toggleExtension = (extension, state) => {
-        if (['oscap','audit','pci'].includes(extension)) {
-            genericReq.request('PUT', `/api/wazuh-api/extension/toggle/${$scope.apiEntries[currentApiEntryIndex]._id}/${extension}/${state}`)
-            .then(() => {})
-            .catch(() => {
-                notify.error("Invalid request when toggle extension state.");
-            });
-
-            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
+    $scope.toggleExtension = async (extension, state) => {
+        try{
+            if (['oscap','audit','pci'].includes(extension)) {
+                await genericReq.request('PUT', `/api/wazuh-api/extension/toggle/${$scope.apiEntries[currentApiEntryIndex]._id}/${extension}/${state}`);
+                $scope.apiEntries[currentApiEntryIndex]._source.extensions[extension] = state;
+                appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
+                if(!$scope.$$phase) $scope.$digest();
+            }
+            return;
+        } catch (error){
+            notify.error("Invalid request when toggle extension state.");
         }
     };
 
