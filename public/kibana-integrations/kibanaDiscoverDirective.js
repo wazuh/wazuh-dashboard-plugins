@@ -919,7 +919,9 @@ function discoverController(
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
     if ($location.search().tabView !=  $scope.tabView) { // No need to change the filters
+      if ($scope.tabView !== "discover") { // Should do this the first time, to avoid the squeezing of the visualization
         $scope.updateQueryAndFetch($state.query);
+      }
       $scope.tabView = $location.search().tabView;
     }
     if ($location.search().tab !=  $scope.tab) { // Changing filters
