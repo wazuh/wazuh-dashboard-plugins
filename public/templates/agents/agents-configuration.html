@@ -243,8 +243,7 @@
                     <md-card flex>
                         <div layout="row" class="md-padding">
                             <div flex>
-                                <h4>
-                                    <i class="fa fa-check"></i> Checks</h4>
+                                <h4><i class="fa fa-check"></i> Checks</h4>
                                 <md-divider></md-divider>
                                 <p ng-if="groupConfiguration.config.rootcheck.check_unixaudit">
                                     Check UNIX Audit
@@ -289,6 +288,33 @@
                             </div>
                         </div>
                     </md-card>
+                    <md-card flex>
+                        <div layout="row" class="md-padding">
+                            <div flex>
+                                <h4><i class="fa fa-shield"></i> Rootkit</h4>
+                                <md-divider></md-divider>
+                                <p ng-if="groupConfiguration.config.rootcheck.rootkit_trojans">
+                                        Trojans Path
+                                    <span class="md-secondary pull-right">{{groupConfiguration.config.rootcheck.rootkit_trojans[0]}}</span>
+                                </p>
+                                <p ng-if="groupConfiguration.config.rootcheck.rootkit_files">
+                                        Files Path
+                                    <span class="md-secondary pull-right">{{groupConfiguration.config.rootcheck.rootkit_files[0]}}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </md-card>
+                    <md-card flex>
+                        <div layout="row" class="md-padding">
+                            <div flex>
+                                <h4><i class="fa fa-file-o"></i> System Audit Files</h4>
+                                <md-divider></md-divider>
+                                <p ng-if="item in groupConfiguration.config.rootcheck.system_audit">
+                                {{item}}
+                                </p>
+                            </div>
+                        </div>
+                    </md-card>
                 </div>
                 <!-- End PM -->
 
@@ -314,48 +340,7 @@
 
 
 <!--
-                <md-tab flex label="Policy Monitoring">
 
-                    <md-content ng-if="!groupConfiguration.config.rootcheck" class="md-padding background-f7">
-                        <h1 class="md-title text-center">No PM configuration available</h1>
-                        <p class="text-center">There's no PM group configuration used for this agent.</p>
-                    </md-content>
-
-                    <div ng-show="groupConfiguration.config.rootcheck" layout="row" layout-align="space-around" class="md-padding background-f7 agent-conf-panel">
-
-                        <div flex="45" layout="column">
-
-                            <div flex="auto" layout="row">
-
-                                <div flex="auto" layout="column">
-
-
-
-
-
-                                </div>
-
-   
-
-                            </div>
-
-                            <md-card flex="auto">
-                                <md-card-content class="wazuh-column">
-                                    <span class="md-headline">Rootkit</span>
-                                    <md-list class="md-dense">
-                                        <md-list-item ng-if="groupConfiguration.config.rootcheck.rootkit_trojans">
-                                            <p>
-                                                <span class="text-bold">Trojans Path:</span> {{groupConfiguration.config.rootcheck.rootkit_trojans[0]}}</p>
-                                        </md-list-item>
-                                        <md-list-item ng-if="groupConfiguration.config.rootcheck.rootkit_files">
-                                            <p>
-                                                <span class="text-bold">Files Path:</span> {{groupConfiguration.config.rootcheck.rootkit_files[0]}}</p>
-                                        </md-list-item>
-                                    </md-list>
-                                </md-card-content>
-                            </md-card>
-
-                        </div>
 
                         <div flex="auto" layout="column">
 
