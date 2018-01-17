@@ -52,31 +52,32 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                     rendered = true;
 
                     if (pendingUpdates.length != 0) {
+                        if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
+                            realPendingUpdates = implicitFilters.loadFilters();
 
-                        realPendingUpdates = implicitFilters.loadFilters();
-
-                        for (let i = 0; i < pendingUpdates.length; i++) {
-                            for (let j = 0; j < implicitFilters.loadFilters().length; j++) {
-                                if (JSON.stringify(pendingUpdates[i].query) === JSON.stringify(implicitFilters.loadFilters()[j].query)) {
-                                    realPending = false;
+                            for (let i = 0; i < pendingUpdates.length; i++) {
+                                for (let j = 0; j < implicitFilters.loadFilters().length; j++) {
+                                    if (JSON.stringify(pendingUpdates[i].query) === JSON.stringify(implicitFilters.loadFilters()[j].query)) {
+                                        realPending = false;
+                                    }
                                 }
+
+                                // There was a real pending update?
+                                if (realPending) {
+                                    realPendingUpdates.push(pendingUpdates[i]) 
+                                }
+                                realPending = true;
                             }
 
-                            // There was a real pending update?
-                            if (realPending) {
-                                realPendingUpdates.push(pendingUpdates[i]) 
+                            //
+                            pendingUpdates = [];
+                            if (realPendingUpdates.length != 0 && JSON.stringify(realPendingUpdates) !== JSON.stringify(implicitFilters.loadFilters())) {
+                                visualization.searchSource
+                                .query({ language: 'lucene', query: implicitFilter })
+                                .set('filter', realPendingUpdates);
+                                $rootScope.$broadcast('fetch');
+                                realPendingUpdates = [];
                             }
-                            realPending = true;
-                        }
-
-                        //
-                        pendingUpdates = [];
-                        if (realPendingUpdates.length != 0) {
-                            visualization.searchSource
-                            .query({ language: 'lucene', query: implicitFilter })
-                            .set('filter', realPendingUpdates);
-                            $rootScope.$broadcast('fetch');
-                            realPendingUpdates = [];
                         }
                     }
 
