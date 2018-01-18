@@ -266,7 +266,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 
     /** Agent configuration */
     $scope.switchConfigTab = selected => {
-        console.log(selected);
+
     };
 
     $scope.isArray = angular.isArray;

@@ -31,15 +31,16 @@
     </div>
 </md-content>
 
-<!--jesus-->
 <md-content flex layout="column" ng-if="tab === 'configuration' && !configurationError" layout-align="start">
     <div flex layout="column" layout-align="start stretch" ng-init="showRaw=false">
         <div flex layout="row">
             <md-card flex>
                 <div layout="row" class="md-padding">
                     <h1 flex="90" ng-show="!load" class="md-title">Current group:
-                        <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="bottom">Click to go to the group details</md-tooltip> </span>
-                        
+                        <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}
+                            <md-tooltip md-direction="bottom">Click to go to the group details</md-tooltip>
+                        </span>
+
                         &nbsp;- Configuration status:
                         <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span>
                     </h1>
@@ -55,6 +56,9 @@
                         </md-nav-item>
                         <md-nav-item md-nav-click="switchConfigTab('log')" name="log">
                             Log Collection
+                        </md-nav-item>
+                        <md-nav-item md-nav-click="switchConfigTab('scap')" name="scap">
+                            OpenSCAP
                         </md-nav-item>
                     </md-nav-bar>
                 </md-card-content>
@@ -76,6 +80,18 @@
                     <div flex>
                         <h1 class="md-title text-center">No Log Collection configuration available</h1>
                         <p class="text-center">There's no Log Collection group configuration used for this agent.</p>
+                    </div>
+                </div>
+                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="!groupConfiguration.config['active-response'] && configTab==='response'">
+                    <div flex>
+                        <h1 class="md-title text-center">No Active Response configuration available</h1>
+                        <p class="text-center">There's no Active Response group configuration used for this agent.</p>
+                    </div>
+                </div>
+                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="!groupConfiguration.config['open-scap'] && configTab==='response'">
+                    <div flex>
+                        <h1 class="md-title text-center">No OpenSCAP configuration available</h1>
+                        <p class="text-center">There's no OpenSCAP group configuration used for this agent.</p>
                     </div>
                 </div>
                 <!-- End no config -->
@@ -124,31 +140,31 @@
                         </div>
                     </md-card>
                     <md-card flex>
-                            <div layout="row" class="md-padding">
-                                <div flex>
-                                    <h4>
-                                        <i class="fa fa-clone"></i> No diff</h4>
-                                    <md-divider></md-divider>
-                                    <div ng-repeat="item in groupConfiguration.config.syscheck.nodiff">
-                                        <p ng-if="!item.type">
-                                            File
-                                            <span class="md-secondary pull-right">{{item}}</span>
-                                        </p>
-                                        <p ng-if="item.type">
-                                            File
-                                            <span class="md-secondary pull-right">{{item.item}}</span>
-                                        </p>
-                                        <p ng-if="item.type">
-                                            Type
-                                            <span class="md-secondary pull-right">{{item.type}}</span>
-                                        </p>
-                                        <md-divider ng-if="!$last"></md-divider>
-                                    </div>
+                        <div layout="row" class="md-padding">
+                            <div flex>
+                                <h4>
+                                    <i class="fa fa-clone"></i> No diff</h4>
+                                <md-divider></md-divider>
+                                <div ng-repeat="item in groupConfiguration.config.syscheck.nodiff">
+                                    <p ng-if="!item.type">
+                                        File
+                                        <span class="md-secondary pull-right">{{item}}</span>
+                                    </p>
+                                    <p ng-if="item.type">
+                                        File
+                                        <span class="md-secondary pull-right">{{item.item}}</span>
+                                    </p>
+                                    <p ng-if="item.type">
+                                        Type
+                                        <span class="md-secondary pull-right">{{item.type}}</span>
+                                    </p>
+                                    <md-divider ng-if="!$last"></md-divider>
                                 </div>
                             </div>
-                        </md-card>
                         </div>
-                        <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config.syscheck && configTab==='fim' && !toggleRAW">
+                    </md-card>
+                </div>
+                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config.syscheck && configTab==='fim' && !toggleRAW">
                     <md-card flex>
                         <div layout="row" class="md-padding">
                             <div flex>
@@ -387,24 +403,15 @@
                                 <h4>
                                     <i class="fa fa-reorder"></i> Log Files</h4>
                                 <md-divider></md-divider>
-                                <!--<md-toolbar layout="row" class="md-toolbar-tools-groups">
-                                        <span flex>Location </span>
-                                        <span flex>Log Format</span>
-                                        <span flex>Frequency</span>
-                                        <span flex>Query</span>
-                                        <span flex>Command</span>
-                                        <span flex>Alias</span>
-                                        <span flex>Label</span>
-                                </md-toolbar>-->
                                 <div layout="column" ng-repeat="item in groupConfiguration.config['localfile']" class="md-subhead agents-groups-preview  groupsFixPadding">
-                                        <div layout="row">
+                                    <div layout="row">
                                         <span flex ng-if="item.location" class="md-headline">{{item.location}}</span>
                                         <span flex ng-if="item.log_format" class="md-headline">{{item.log_format}}</span>
-                                           <span flex ng-if="item.frequency" class="md-headline">{{item.frequency}}</span>
-                                                  <span flex ng-if="item.query" class="md-headline">{{item.query}}</span>
+                                        <span flex ng-if="item.frequency" class="md-headline">{{item.frequency}}</span>
+                                        <span flex ng-if="item.query" class="md-headline">{{item.query}}</span>
                                         <span flex ng-if="item.command" class="md-headline">{{item.command}}</span>
-                                              <span flex ng-if="item.alias" class="md-headline">{{item.alias}}</span>
-    
+                                        <span flex ng-if="item.alias" class="md-headline">{{item.alias}}</span>
+
                                         <span flex ng-if="item.label" class="md-headline">{{item.label}}</span>
                                     </div>
                                     <md-divider ng-if="!$last"></md-divider>
@@ -415,6 +422,82 @@
                 </div>
                 <!-- End Log -->
 
+                <!-- OpenScap -->
+                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config['open-scap'] && configTab==='scap' && !toggleRAW">
+                    <md-card flex="40">
+                        <div layout="row" class="md-padding">
+                            <div flex>
+                                <h4>
+                                    <i class="fa fa-tasks"></i> Main Settings
+                                </h4>
+                                <md-divider></md-divider>
+                                <p ng-if="groupConfiguration.config['open-scap'].disabled">
+                                    OpenSCAP disabled
+                                    <span class="md-secondary pull-right">{{groupConfiguration.config['open-scap'].disabled}}</span>
+                                </p>
+                                <p ng-if="groupConfiguration.config['open-scap'].interval">
+                                    Interval
+                                    <span class="md-secondary pull-right">{{groupConfiguration.config['open-scap'].interval}}</span>
+                                </p>
+                                <p ng-if="groupConfiguration.config['open-scap']['scan-on-start']">
+                                    Scan on start
+                                    <span class="md-secondary pull-right">{{groupConfiguration.config['open-scap']['scan-on-start']}}</span>
+                                </p>
+                                <p ng-if="groupConfiguration.config['open-scap'].ciscat_path">
+                                    CIS-CAT Path
+                                    <span class="md-secondary pull-right">{{groupConfiguration.config['open-scap'].ciscat_path}}</span>
+                                </p>
+                                <p ng-if="groupConfiguration.config['open-scap'].java_path">
+                                    Java Path
+                                    <span class="md-secondary pull-right">{{groupConfiguration.config['open-scap'].java_path}}</span>
+                                </p>
+                                <p ng-if="groupConfiguration.config['open-scap'].timeout">
+                                    Timeout
+                                    <span class="md-secondary pull-right">{{groupConfiguration.config['open-scap'].timeout}}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </md-card>
+                    <md-card flex="40">
+                        <div layout="row" class="md-padding">
+                            <div flex>
+                                <h4>
+                                    <i class="fa fa-reorder"></i> Content
+                                </h4>
+                                <md-divider></md-divider>
+                                <div ng-repeat="item in groupConfiguration.config['open-scap'].content">
+                                    <p ng-if="item.path">
+                                        Path
+                                        <span class="md-secondary pull-right">{{item.path}}</span>
+                                    </p>
+                                    <p ng-if="item.type">
+                                        Type
+                                        <span class="md-secondary pull-right">{{item.type}}</span>
+                                    </p>
+                                    <md-divider ng-if="!$last"></md-divider>
+                                </div>
+                            </div>
+                        </div>
+                    </md-card>
+                </div>
+                <!-- End OpenScap -->
+
+                <!-- Active Response -->
+                <!--<div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config['active-response'] && configTab==='response' && !toggleRAW">
+                    <md-card flex="50">
+                        <div layout="row" class="md-padding">
+                            <div flex>
+                                <h4>
+                                    <i class="fa fa-tasks"></i> Main Settings
+                                </h4>
+                                <md-divider></md-divider>
+
+                            </div>
+                        </div>
+                    </md-card>
+                </div>-->
+                <!-- End Active Response -->
+
                 <!-- JSON -->
                 <div layout="row" flex class="md-padding height-300 ownNavBarCluster topPaddingSearchNoBottom" ng-show="toggleRAW">
                     <pre flex layout-fill class="json-beautifier"><code dynamic="rawJSON"></code></pre>
@@ -424,67 +507,3 @@
         </div>
     </div>
 </md-content>
-
-<!--end jesus-->
-
-
-<!--
-    
-    <md-tab label="Active Response">
-        <md-content ng-if="!groupConfiguration.config['active-response']" class="md-padding background-f7">
-            <h1 class="md-title text-center">No Active Response configuration available</h1>
-            <p class="text-center">There's no Active Response group configuration used for this agent.</p>
-        </md-content>
-        <md-content ng-if="groupConfiguration.config['active-response']" class="md-padding background-f7">
-            <span ng-repeat="item in groupConfiguration.config['active-response']|orderBy">
-                <span layout="row" layout-align="start">
-                    <p>Active Response disabled:</p>
-                    <p class="text-bold"> {{item.disabled}}</p>
-                </span>
-                <md-divider></md-divider>
-                <span layout="row" layout-align="start">
-                    <p>Certificate Storage:</p>
-                    <p class="text-bold"> {{item.ca_store}}</p>
-                </span>
-            </span>
-        </md-content>
-    </md-tab>
-
-    <md-tab label="OpenSCAP">
-        <md-content ng-if="!groupConfiguration.config['open-scap']" class="md-padding background-f7">
-            <h1 class="md-title text-center">No OpenSCAP configuration available</h1>
-            <p class="text-center">There's no OpenSCAP group configuration used for this agent.</p>
-        </md-content>
-        <md-content ng-if="groupConfiguration.config['open-scap']" class="md-padding background-f7">
-            <span layout="row" layout-align="start">
-                <p>OpenSCAP disabled:</p>
-                <p class="text-bold"> {{groupConfiguration.config['open-scap'].disabled}}</p>
-            </span>
-            <md-divider></md-divider>
-            <span layout="row" layout-align="start">
-                <p>Interval:</p>
-                <p class="text-bold"> {{groupConfiguration.config['open-scap'].interval}}</p>
-            </span>
-            <md-divider></md-divider>
-            <span layout="row" layout-align="start">
-                <p>Scan on start:</p>
-                <p class="text-bold"> {{groupConfiguration.config['open-scap'].scan-on-start}}</p>
-            </span>
-            <md-divider></md-divider>
-            <span layout="row" layout-align="start">
-                <p>CIS-CAT Path:</p>
-                <p class="text-bold"> {{groupConfiguration.config['open-scap'].ciscat_path}}</p>
-            </span>
-            <md-divider></md-divider>
-            <span layout="row" layout-align="start">
-                <p>Java Path:</p>
-                <p class="text-bold"> {{groupConfiguration.config['open-scap'].java_path}}</p>
-            </span>
-            <md-divider></md-divider>
-            <span layout="row" layout-align="start">
-                <p>Timeout:</p>
-                <p class="text-bold"> {{groupConfiguration.config['open-scap'].timeout}}</p>
-            </span>
-        </md-content>
-    </md-tab> 
--->
