@@ -137,14 +137,15 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Not
 
             let deferred = $q.defer();
 
-            genericReq.request('GET', '/api/wazuh-elastic/setup')
+            genericReq.request('GET', '/api/wazuh-elastic/current-pattern')
             .then((data) => {
 
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
-                    currentPattern = data.data.data["index-pattern"];
-                    appState.setCurrentPattern(currentPattern);              
+                    console.log("This is the current pattern", data);
+                    currentPattern = data.data.data;
+                    appState.setCurrentPattern(data.data.data);       
                 }
 
                 for (var i = 0; i < savedObjects.length; i++) {
