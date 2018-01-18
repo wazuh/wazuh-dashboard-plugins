@@ -247,10 +247,10 @@ module.exports = (server, options) => {
                 } 
             })
             .then((response) => {
-                server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated version information');
+                server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated version information');
             })
             .catch((error) => {
-                server.log([blueWazuh, 'reindex', 'error'], 'Could not update version information due to ' + error);
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not update version information due to ' + error);
             });
 
             // We search for the currently applied pattern in the visualizations

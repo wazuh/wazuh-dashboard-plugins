@@ -87,11 +87,18 @@ module.exports = (server, options) => {
                     'data': `Template found for ${req.params.pattern}`
                 });   
             } else {
-                var array = data.match(/[^\s]+/g);
-                var found = false;
+                let lastChar = req.params.pattern[req.params.pattern.length -1];
+                let array = data.match(/[^\s]+/g);
+                let found = false;
+
+                let pattern = req.params.pattern;
+                if (lastChar === '*') { // Remove last character if it is a '*'
+                    pattern = pattern.slice(0, -1);
+                }
+
                 for (let i = 1; i < array.length; i++) {
-                    if (array[i] == `[${req.params.pattern}]` && array[i-1] == `wazuh`) {
-                        var found = true;
+                    if (array[i].includes(pattern) && array[i-1] == `wazuh`) {
+                        found = true;
                         reply({
                             'statusCode': 200,
                             'status': true,
