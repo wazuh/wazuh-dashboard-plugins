@@ -13,12 +13,67 @@ body._md-toast-animating {
     overflow-y: scroll !important;
 }
 
+/* Health check */
+
+.error-notify {
+    font-size: 20px;
+    color: black;
+    padding-bottom: 5px;
+}
+
+.loading-logo-fail {
+    width: 85px;
+    text-align: center;    
+}
+
+.loading-logo {
+    position:relative ;
+    top: -157px;  
+    width: 85px;
+    text-align: center;    
+}
+
+.present-logo {
+    text-align: center;    
+}
+
+.checks {
+    text-align: center;  
+    position: relative;
+    top: -100px;  
+}
+
+.checks-fail {
+    text-align: center;  
+    position: relative;
+    top: 10px;  
+}
+
+.healthCheck {
+    padding-top: 200px;    
+    background-color: #F5F5F5;
+}
+
+.health-check-error {
+    padding-top: 40px;
+    color: red;
+    text-align: center;
+}
+
 pre {
     white-space: pre-wrap;
     word-wrap: break-word;
-    height: 120px;
+    height: 200px;
 }
 
+.percentage {
+    font-size: 18px;
+    text-align: center;
+    position: relative;
+    height: 25px;
+    color: #666666;
+    background-color: #e4e4e4 !important;
+}
 /* Wazuh Header */
 
 .wazuh-h3 {
@@ -39,7 +94,7 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select {
 /* Loading Ring styles */
 
 div.uil-ring-css {
-    transform: scale(0.6);
+    transform: scale(0.8);
     margin: auto;
 }
 
@@ -129,6 +184,22 @@ md-progress-linear ._md-bar {
     background-color: #3caed2;
 }
 
+.wazuh-loading md-progress-linear {
+  height: 20px !important;
+}
+
+.wazuh-loading md-progress-linear .md-container {
+    height: 20px !important;
+}
+
+.wazuh-loading md-progress-linear .md-container .md-bar {
+      height: 20px !important;
+}
+.wazuh-loading md-progress-linear .md-container .md-dashed:before {
+      height: 20px !important;
+    }
+
+
 /* Manager Groups Agents/Files tabs fix */
 .md-tab.md-active {
     color: rgb(60, 174, 210) !important;
@@ -148,7 +219,7 @@ md-progress-linear ._md-bar {
 }
 
 .text-bold {
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 .font-size-14-pt {
@@ -225,4 +296,20 @@ md-progress-linear ._md-bar {
 
 .display-none {
 	display: none;
+}
+
+.agent-conf-panel {
+    padding-bottom: 0 !important;
+}
+
+#agent-conf-raw-panel {
+    padding-top: 0 !important;
+}
+
+#agent-conf-conf-card {
+    margin-bottom: 0 !important;
+}
+
+#agent-conf-raw-card {
+    margin-top: 0 !important;
 }

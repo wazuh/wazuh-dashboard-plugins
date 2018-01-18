@@ -1,7 +1,5 @@
 <md-content flex layout="column" ng-if="tab === 'general'" layout-align="start">
 
-    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
-
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
         <div layout="row" class="height-100">
             <md-card flex>
@@ -122,7 +120,7 @@
             </md-card>
         </div>
 
-        <div layout="row" class="height-540">
+        <div layout="row" class="height-550">
             <md-card  flex="60">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>

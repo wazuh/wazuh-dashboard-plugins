@@ -1,7 +1,5 @@
 <md-content flex layout="column" ng-if="tab == 'pci'" layout-align="start">
 
-    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
-
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
 
@@ -57,10 +55,10 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="height-530">
+        <div layout="row" layout-align="center stretch" class="height-550">
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Last alerts</span>
+                    <span class="md-headline">Alerts summary</span>
                     <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-PCI-DSS-Last-alerts'" id="Wazuh-App-Overview-PCI-DSS-Last-alerts"></kbn-vis>
                 </md-card-content>
             </md-card>

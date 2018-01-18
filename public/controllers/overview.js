@@ -1,6 +1,6 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq,Notifier) {
+app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, Notifier) {
     const notify = new Notifier({ location: 'Overview' });
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
@@ -24,7 +24,21 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.currentImplicitFilter = "";
     }
 
-    // Object for matching nav items and Wazuh groups
+    $rootScope.loadedVisualizations = [];
+    $rootScope.rendered = false;
+    $rootScope.loadingStatus = "Fetching data...";
+
+    // This object represents the number of visualizations per tab; used to show a progress bar
+    $rootScope.tabVisualizations = {
+        "general": 15,
+        "fim": 17,
+        "pm": 5,
+        "oscap": 14,
+        "audit": 16,
+        "pci": 6
+    };
+
+    // Object for matching nav items and rules groups
     let tabFilters = {
         "general": {
             "group": ""
@@ -53,10 +67,18 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     // Switch tab
     $scope.switchTab = (tab) => {
-		if($scope.tab === tab) return;
+        if($scope.tab === tab) return;
+
+        for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
+
         // Deleting app state traces in the url
         $location.search('_a', null);
         $scope.tabView = 'panels';
+
+        $rootScope.loadedVisualizations = [];
     };
 
     // Watchers
@@ -68,6 +90,13 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         // Update the implicit filter
         if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
         else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
+    });
+    
+    $scope.$on('$destroy',() => {
+        for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
     });
 
     //PCI tab

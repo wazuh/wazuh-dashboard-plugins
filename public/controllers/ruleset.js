@@ -45,6 +45,8 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Notifier, Rule
             $scope.rules.addFilter('pci',search.split('pci:')[1].trim());
         } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
             $scope.rules.addFilter('file',search.split('file:')[1].trim());
+        } else {
+            $scope.rules.addFilter('search',search.trim());
         }
     };
 
@@ -73,7 +75,13 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Notifier, Rule
     }
 
     //Destroy
-    $scope.$on('$destroy', () => $scope.rules.reset());
+    $scope.$on('$destroy', () => {
+        $scope.rules.reset();
+        for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
+    });
 });
 
 app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Notifier, Decoders,DecodersAutoComplete) {
@@ -138,6 +146,8 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Noti
             $scope.decoders.addFilter('path',search.split('path:')[1].trim());
         } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
             $scope.decoders.addFilter('file',search.split('file:')[1].trim());
+        } else {
+            $scope.decoders.addFilter('search',search.trim());
         }
     };
 
@@ -173,5 +183,11 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Noti
     }
 
     //Destroy
-    $scope.$on("$destroy", () => $scope.decoders.reset());
+    $scope.$on("$destroy", () => {
+        $scope.decoders.reset();
+        for(let h of $rootScope.ownHandlers){
+            h._scope.$destroy();
+        }
+        $rootScope.ownHandlers = [];
+    });
 });

@@ -32,7 +32,8 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
                 // First element is now our group $scope.groups.item is an array with only our group
                 $scope.groups.items = filtered;
                 // Load that our group
-                $scope.loadGroup(0);    
+                $scope.loadGroup(0);
+                $scope.lookingGroup=true    
             }
             // Clean $rootScope
             delete $rootScope.globalAgent;
@@ -45,6 +46,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
             // If our group was not found  we need to call loadGroup after load some groups
             if(!len) {
                 $scope.loadGroup(0);
+                $scope.lookingGroup=true
             }
             $scope.load = false;
         })
@@ -63,7 +65,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         .catch(error => notify.error(error.message));
     }
 
-    
+    $scope.toggle = () => $scope.lookingGroup=true;
 
     $scope.showFiles = (index) => {
         $scope.fileViewer = false;
@@ -105,13 +107,28 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         $scope.groups.items[index] = true;
     };
 
+
+    $scope.goBackToAgents = () => {
+        $scope.groupsSelectedTab = 'agents';
+        $scope.file     = false;
+        $scope.filename = false;
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
+    $scope.goBackFiles = () => {
+        $scope.groupsSelectedTab = 'files';
+        $scope.file     = false;
+        $scope.filename = false;
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
     $scope.showFile = (index) => {
         if($scope.filename) $scope.filename = '';
         let filename = $scope.groupFiles.items[index].filename;
         if(filename === '../ar.conf') filename = 'ar.conf';
    
         $scope.fileViewer = true;
-        $scope.file = 'Loading...';
+
         let tmpName = `/agents/groups/${$scope.groups.items[$scope.selectedGroup].name}`+
                       `/files/${filename}`;
    
@@ -138,6 +155,12 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     });
    
 
+    $scope.$watch('lookingGroup',value => {
+        if(!value){
+            $scope.file     = false;
+            $scope.filename = false;
+        }
+    });
 });
 
 app.controller('groupsController', function ($scope) {

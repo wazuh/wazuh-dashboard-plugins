@@ -10,7 +10,7 @@
 				<div class="agents-head-1" ng-if="agent">
 					<div class="agents-head-2">
 						<span> <i class="fa fa-desktop agents-head-3" aria-hidden="true"></i>
-						{{agent.id}} - {{agent.name}}</span><span ng-show="agent.id === '000'">(Manager)</span>
+						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
 					</div>
 
 					<div class="agents-head-4">
@@ -56,13 +56,14 @@
 				<md-nav-item md-nav-click="switchTab('general')" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy Monitoring</md-nav-item>
-				<md-nav-item ng-hide="agent.os.platform === 'windows'" md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensions.oscap">SCAP</md-nav-item>
-				<md-nav-item ng-hide="agent.os.platform === 'windows'" md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
+				<md-nav-item md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensions.oscap && agent.os.platform !== 'windows'">SCAP</md-nav-item>
+				<md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit && agent.os.platform !== 'windows'">Audit</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
+                <md-nav-item md-nav-click="switchTab('configuration');" name="configuration" ng-show="agent.id != '000'">Configuration</md-nav-item>
 			</md-nav-bar>
 		</div>
 
-		<div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
+		<div ng-show="tab != 'configuration'" class="horizontalTabsBar tabView" layout="column" layout-align="end end">
 			<md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
 					<i class="fa fa-th agents-head-6" aria-hidden="true"></i>Panels
@@ -77,10 +78,15 @@
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
 	<!-- View: Discover -->
-    <kbn-dis></kbn-dis>
+    <kbn-dis ng-show="tab != 'configuration'"></kbn-dis>
 
+    <div class="wazuh-loading" layout="column" layout-aling="center center" ng-show="resultState === 'ready' && tabView === 'panels' && tab !== 'configuration' && !rendered">
+        <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
+        <div class="percentage">{{loadingStatus}}</div>
+    </div>
+    
     <!-- No results message -->
-    <md-content flex layout="row" layout-align="start start" ng-show="resultState === 'none' && tabView === 'panels'">
+    <md-content flex layout="row" layout-align="start start" ng-show="tab != 'configuration' && resultState !== 'ready' && tabView === 'panels'">
         <md-card flex layout="column">
             <md-card-content class="text-center">
                 No results for selected time interval

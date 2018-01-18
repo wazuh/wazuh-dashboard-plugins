@@ -1,11 +1,9 @@
 <md-content flex layout="column" ng-if="tab == 'audit'" layout-align="space-around">
 
-    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
-
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
 
-        <div layout="row" layout-align="center stretch" class="height-120">
+        <div layout="row" layout-align="center stretch" class="height-125">
             <md-card flex="10">
                 <md-card-content class="wazuh-column">
                     <span class="metric-headline md-headline">New files</span>
@@ -115,10 +113,10 @@
             </div>
         </div>
 
-        <div flex layout="row" class="height-530">
+        <div flex layout="row" class="height-550">
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Last alerts</span>
+                    <span class="md-headline">Alerts summary</span>
                     <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-Audit-Last-alerts'" id="Wazuh-App-Overview-Audit-Last-alerts"></kbn-vis>
                 </md-card-content>
             </md-card>

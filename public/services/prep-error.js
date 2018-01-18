@@ -29,6 +29,8 @@ module.exports = err => {
     } else if (parseInt(err.error) === 7) {
         err['html'] = `Unexpected error filtering the data. Error <b>${err.message}</b>.`;
         err.message = `Unexpected error filtering the data. Error ${err.message}.`;
+    } else if(err.message) {
+        err['html'] = err.message;
     } else {
         err['html'] = "Unexpected error. Please, report this error.";
         err.message = "Unexpected error. Please, report this error.";

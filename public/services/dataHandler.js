@@ -67,7 +67,7 @@ app.factory('DataHandler', function ($q, apiReq) {
                     deferred.resolve(true);
                 }
             })
-            .catch(console.error);
+            .catch(err => this.busy = false);
 
             return deferred.promise;
         }

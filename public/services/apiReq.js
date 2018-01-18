@@ -30,16 +30,7 @@ require('ui/modules').get('app/wazuh', []).service('apiReq', function ($q, $http
                     defered.resolve(data);
                 }
             })
-            .catch((error) => {
-                if (error.error) {
-                    defered.reject(error);
-                } else {
-                    defered.reject({
-                        error:   -2,
-                        message: 'Error doing a request to Kibana API.'
-                    });
-                }
-            });
+            .catch(error => defered.reject(error));
 
             return defered.promise;
         }

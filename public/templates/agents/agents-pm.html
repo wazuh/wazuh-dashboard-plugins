@@ -1,7 +1,5 @@
 <md-content flex layout="column" ng-if="tab === 'pm'" layout-align="start">
 
-    <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div>
-
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
@@ -27,7 +25,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="space-between stretch" class="height-540">
+        <div layout="row" layout-align="space-between stretch" class="height-550">
             <md-card flex="100">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>
