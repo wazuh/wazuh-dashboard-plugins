@@ -269,9 +269,42 @@ module.exports = (server, options) => {
         });
     };
 
+    const getCurrentlyAppliedPattern = (req, reply) => {
+        // We search for the currently applied pattern in the visualizations
+        elasticRequest .callWithInternalUser('search', {
+            index: '.kibana',
+            type:  'doc',
+            q:     `visualization.title:"Wazuh App Overview General Metric alerts"`
+        })
+        .then((data) => {
+            reply({
+                'statusCode': 200,
+                'data':       JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index
+            });
+        })
+        .catch((error) => {
+            reply({
+                'statusCode': 500,
+                'error':      10000,
+                'message':    error
+            }).code(500);
+        });
+    };
+
     module.exports = getConfig;
 
     //Server routes
+
+    /*
+     * GET /api/wazuh-elastic/current-pattern
+     * Returns the currently applied pattern
+     *
+     **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/current-pattern',
+        handler: getCurrentlyAppliedPattern
+    });
 
     /*
      * GET /api/wazuh-elastic/template/{pattern}
@@ -286,7 +319,7 @@ module.exports = (server, options) => {
 
     /*
      * GET /api/wazuh-elastic/pattern/{pattern}
-     * Returns whether a the pattern exists or not
+     * Returns whether the pattern exists or not
      *
      **/
     server.route({
@@ -294,6 +327,8 @@ module.exports = (server, options) => {
         path: '/api/wazuh-elastic/pattern/{pattern}',
         handler: checkPattern
     });
+
+
 
     /*
      * GET /api/wazuh-elastic/top/{cluster}/{field}/{time?}
