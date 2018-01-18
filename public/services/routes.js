@@ -143,7 +143,6 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Not
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
-                    console.log("This is the current pattern", data);
                     currentPattern = data.data.data;
                     appState.setCurrentPattern(data.data.data);       
                 }
