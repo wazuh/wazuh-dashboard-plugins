@@ -34,7 +34,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         port    : null
     };
 
-    const userRegEx  = new RegExp(/^[a-zA-Z0-9]{3,100}$/);
+    const userRegEx  = new RegExp(/^.{3,100}$/);
     const passRegEx  = new RegExp(/^.{3,100}$/);
     const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/);
     const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
