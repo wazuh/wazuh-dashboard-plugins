@@ -12,8 +12,8 @@ md-toolbar {
         background-color: #f7f7f7;
 
         // Overriding Angular Material default height
-        min-height: 50px;
-        height: 50px;
+        min-height: 48px;
+        height: 48px;
     }
 }
 
@@ -25,10 +25,17 @@ md-list {
         &.even {
             background-color: #fafafa;
         }
-        &-item {
-            // Overriding Angular Material default height
-            min-height: 40px;
-            height: 40px;
+    }
+}
+
+md-list-item {
+    &.wazuh-list-item {
+        // Overriding Angular Material default height
+        min-height: 44px;
+        height: 44px;
+
+        &:hover {
+            background-color: rgb(0,121,165);
         }
     }
 }
