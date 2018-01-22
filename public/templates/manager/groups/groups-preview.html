@@ -23,7 +23,7 @@
                 </span>-->
                 <!-- Selecting a group -->
                 <md-card-content ng-if="!lookingGroup" class="groupsFixPadding md-card-content-groups">
-                    <md-toolbar layout="row" class="md-toolbar-tools-groups">
+                    <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools">
                         <div flex="20">
                             <span ng-click="groups.sort('name')">Name
                                 <i class="fa" ng-class="groups.sortValue === 'name' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
@@ -54,7 +54,7 @@
                 <div flex layout="column" class="md-padding groupsFixPadding" ng-if="!lookingGroup">
                     <div flex class=" clusterScrollable" when-scrolled="groups.nextPage('')">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-click="$parent.loadGroup($index); toggle();"
-                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groups-table groupsFixPadding">
                             <div flex="20">
                                 <span class="md-headline">{{group.name}}</span>
                             </div>
@@ -92,7 +92,7 @@
                         <input flex id="query" placeholder="Filter agents..." type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)"
                             class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
                     </div>-->
-                    <md-toolbar layout="row" class="md-toolbar-tools-groups" ng-show="groupsSelectedTab==='agents'">
+                    <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools" ng-show="groupsSelectedTab==='agents'">
                         <div flex>
                             <span ng-click="groupAgents.sort('id')">ID
                                 <i class="fa" ng-class="groupAgents.sortValue === 'id' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
@@ -138,7 +138,7 @@
                         <input flex id="query" placeholder="Filter files..." type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
                             class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
                     </div>-->
-                    <md-toolbar layout="row" class="md-toolbar-tools-groups" ng-show="groupsSelectedTab==='files' && !file">
+                    <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools" ng-show="groupsSelectedTab==='files' && !file">
                         <div flex="30">
                             <span ng-click="groupFiles.sort('filename')">File
                                 <i class="fa" ng-class="groupFiles.sortValue === 'filename' ? (groupFiles.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
@@ -156,7 +156,7 @@
                 <div flex layout="column" class="md-padding groupsFixPadding" ng-if="lookingGroup">
                     <div flex ng-if="groupsSelectedTab==='agents'" class="clusterScrollable" when-scrolled="groupAgents.nextPage()">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' ng-click="showAgent(agent)"
-                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groups-table groupsFixPadding">
                             <div flex>
                                 <span class="md-headline">{{agent.id || 'Unknown'}}</span>
                             </div>
@@ -179,7 +179,7 @@
                     </div>
                     <div flex ng-if="groupsSelectedTab==='files' && !file" class="clusterScrollable" when-scrolled="groupFiles.nextPage()">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="file in groupFiles.items | orderBy : groupFiles.sortValue : groupFiles.sortDir" ng-click="$parent.showFile($index);"
-                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groups-table groupsFixPadding">
                             <div flex="30">
                                 <span class="md-headline">{{file.filename || 'Unknown'}}</span>
                             </div>
