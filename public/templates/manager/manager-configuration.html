@@ -3,46 +3,73 @@
         <div></div>
     </div>
     <div flex layout="column" layout-align="start stretch">
-        <div layout="row">
+        <div layout="row" flex>
             <md-card flex>
                 <md-card-content>
                     <div layout="row">
-                        <div layout="column" flex="15">
+                        <div layout="column" flex="15" ng-init="selectedItem='global'">
                             <!-- Selecting a configuration -->
-                            <md-input-container ng-init="selectedItem='global'">
-                                <md-select ng-model="selectedItem">
-                                    <md-option ng-if="managerConfiguration.global" ng-value="'global'">
-                                        Global
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.email_alerts" ng-value="'email_alerts'">
-                                        E-mail alerts
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.remote" ng-value="'remote'">
-                                        Remote
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.cluster" ng-value="'cluster'">
-                                        Cluster
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.auth" ng-value="'auth'">
-                                        Auth
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.command" ng-value="'command'">
-                                        Command
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.syscheck" ng-value="'syscheck'">
-                                        Syscheck
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.rootcheck" ng-value="'rootcheck'">
-                                        Rootcheck
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.ruleset" ng-value="'ruleset'">
-                                        Ruleset
-                                    </md-option>
-                                    <md-option ng-if="managerConfiguration.logcollector" ng-value="'logcollector'">
-                                        Logcollector
-                                    </md-option>
-                                </md-select>
-                            </md-input-container>
+                            <div flex layout="row" class="md-padding ">
+                                <div flex>
+                                    <h4>
+                                        <i class="fa fa-reorder"></i> Section
+                                    </h4>
+                                    <md-divider></md-divider>
+
+                                    <p ng-if="managerConfiguration.global">
+                                        <a ng-class="selectedItem === 'global' ? 'underline-config' : ''" ng-click="switchItem('global')">
+                                            Global
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration.email_alerts">
+                                        <a ng-class="selectedItem === 'email_alerts' ? 'underline-config' : ''" ng-click="switchItem('email_alerts')">
+                                            E-mail alerts
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration.remote">
+                                        <a ng-class="selectedItem === 'remote' ? 'underline-config' : ''" ng-click="switchItem('remote')">
+                                            Remote
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration.cluster">
+                                        <a ng-class="selectedItem === 'cluster' ? 'underline-config' : ''" ng-click="switchItem('cluster')">
+                                            Cluster
+                                        </a>
+
+                                    </p>
+                                    <p ng-if="managerConfiguration.auth">
+                                        <a ng-class="selectedItem === 'auth' ? 'underline-config' : ''" ng-click="switchItem('auth')">
+                                            Auth
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration.command">
+                                        <a ng-class="selectedItem === 'command' ? 'underline-config' : ''" ng-click="switchItem('command')">
+                                            Command
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration.syscheck">
+                                        <a ng-class="selectedItem === 'syscheck' ? 'underline-config' : ''" ng-click="switchItem('syscheck')">
+                                            Syscheck
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration.rootcheck">
+                                        <a ng-class="selectedItem === 'rootcheck' ? 'underline-config' : ''" ng-click="switchItem('rootcheck')">
+                                            Rootcheck
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration.ruleset">
+                                        <a ng-class="selectedItem === 'ruleset' ? 'underline-config' : ''" ng-click="switchItem('ruleset')">
+                                            Ruleset
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration.logcollector">
+                                        <a ng-class="selectedItem === 'logcollector' ? 'underline-config' : ''" ng-click="switchItem('logcollector')">
+                                            Logcollector
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+
                         </div>
 
                         <!-- Global -->
@@ -260,30 +287,32 @@
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_time}}</span>
                                     </p>
                                     <p>
-                                            Scan day
+                                        Scan day
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_day}}</span>
                                     </p>
                                     <p>
-                                            Auto ignore
+                                        Auto ignore
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.auto_ignore}}</span>
                                     </p>
                                     <p>
-                                            Alert new files
+                                        Alert new files
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.alert_new_files}}</span>
                                     </p>
                                     <p>
-                                            Scan on start
+                                        Scan on start
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_on_start}}</span>
                                     </p>
                                     <p>
-                                            No diff
+                                        No diff
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.nodiff}}</span>
                                     </p>
                                     <p>
-                                            Skip NFS
+                                        Skip NFS
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.skip_nfs}}</span>
                                     </p>
-                                    <h4><i class="fa fa-folder-o"></i> Monitoring directories</h4>
+                                    <br>
+                                    <h4>
+                                        <i class="fa fa-folder-o"></i> Monitoring directories</h4>
                                     <md-divider></md-divider>
                                     <div ng-repeat="item in managerConfiguration.syscheck.directories">
                                         <p>
@@ -308,41 +337,43 @@
                                         <i class="fa fa-check"></i> Rootcheck</h4>
                                     <md-divider></md-divider>
                                     <p>
-                                            Rootcheck disabled
+                                        Rootcheck disabled
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.disabled}}</span>
                                     </p>
                                     <p>
-                                            Rootkit files
+                                        Rootkit files
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.rootkit_files}}</span>
                                     </p>
                                     <p>
-                                            Rootkit trojans
+                                        Rootkit trojans
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.rootkit_trojans}}</span>
                                     </p>
                                     <p>
-                                            Base directory
+                                        Base directory
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.base_directory}}</span>
                                     </p>
                                     <p>
-                                            Scan all
+                                        Scan all
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.scanall}}</span>
                                     </p>
                                     <p>
-                                            Frequency
+                                        Frequency
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.frequency}}</span>
                                     </p>
                                     <p>
-                                            Skip NFS
+                                        Skip NFS
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.skip_nfs}}</span>
                                     </p>
-                                    <h4><i class="fa fa-file-o"></i> System audit files</h4>
+                                    <br>
+                                    <h4>
+                                        <i class="fa fa-file-o"></i> System audit files</h4>
                                     <md-divider></md-divider>
                                     <div ng-repeat="item in managerConfiguration.rootcheck.system_audit">
                                         <p>
                                             File
                                             <span class="md-secondary pull-right">{{item}}</span>
                                         </p>
-                                     </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -360,51 +391,51 @@
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.purge}}</span>
                                     </p>
                                     <p>
-                                            Force insert
+                                        Force insert
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.force_insert}}</span>
                                     </p>
                                     <p>
-                                            SSL verify host
+                                        SSL verify host
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_verify_host}}</span>
                                     </p>
                                     <p>
-                                            Limit max agents
+                                        Limit max agents
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.limit_maxagents}}</span>
                                     </p>
                                     <p>
-                                            Force time
+                                        Force time
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.force_time}}</span>
                                     </p>
                                     <p>
-                                            SSL manager key
+                                        SSL manager key
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_manager_key}}</span>
                                     </p>
                                     <p>
-                                            Disabled
+                                        Disabled
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.disabled}}</span>
                                     </p>
                                     <p>
-                                            SSL manager cert
+                                        SSL manager cert
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_manager_cert}}</span>
                                     </p>
                                     <p>
-                                            Use source ip
+                                        Use source ip
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.use_source_ip}}</span>
                                     </p>
                                     <p>
-                                            Use password
+                                        Use password
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.use_password}}</span>
                                     </p>
                                     <p>
-                                            Port
+                                        Port
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.port}}</span>
                                     </p>
                                     <p>
-                                            SSL auto negotiate
+                                        SSL auto negotiate
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_auto_negotiate}}</span>
                                     </p>
                                     <p>
-                                            Ciphers
+                                        Ciphers
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.ciphers}}</span>
                                     </p>
                                 </div>
@@ -449,15 +480,56 @@
                                         <md-divider ng-if="!$last"></md-divider>
                                     </div>
                                 </div>
-                                <div flex></div>
+                                <div flex>
+                                </div>
                             </div>
                         </div>
-                        <!-- End auth -->
+                        <!-- End logcollector -->
+
+                        <!-- Command -->
+                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='command'">
+                            <div flex layout="row" class="md-padding">
+                                <div flex="60">
+                                    <h4>
+                                        <i class="fa fa-terminal"></i> Command
+                                    </h4>
+                                    <md-divider></md-divider>
+                                    <div ng-repeat="item in managerConfiguration.command|orderBy:'name'">
+
+                                        <p>
+                                            Name
+                                            <span class="md-secondary pull-right"> {{ item.name }} </span>
+
+                                        </p>
+                                        <p ng-if="item.expect">
+                                            Expect
+                                            <span class="md-secondary pull-right">{{ item.expect }}
+                                            </span>
+                                        </p>
+                                        <p ng-if="item.executable">
+                                            Executable
+                                            <span class="md-secondary pull-right">{{ item.executable }}
+                                            </span>
+                                        </p>
+                                        <p ng-if="item.timeout_allowed">
+                                            Timeout allowed
+                                            <span class="md-secondary pull-right">{{ item.timeout_allowed}}
+                                            </span>
+                                        </p>
+                                        <md-divider ng-if="!$last"></md-divider>
+                                    </div>
+                                </div>
+                                <div flex>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End logcollector -->
 
 
-                        
                     </div>
+
                 </md-card-content>
+
             </md-card>
         </div>
     </div>
