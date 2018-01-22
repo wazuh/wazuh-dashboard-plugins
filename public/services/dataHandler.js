@@ -16,7 +16,10 @@ app.factory('DataHandler', function ($q, apiReq) {
         }
 
         nextPage () {
-            if (this.busy) return;
+            if (this.busy || this.end) {
+                deferred.resolve(true);
+                return;
+            }
             this.busy = true;
             let requestData;
 
@@ -40,6 +43,7 @@ app.factory('DataHandler', function ($q, apiReq) {
             if(this.offset !== 0 && this.offset >= this.totalItems){
                 this.end = true;
                 this.busy = false;
+                deferred.resolve(true);
                 return;
             }
             let deferred = $q.defer();
