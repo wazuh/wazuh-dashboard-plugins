@@ -67,11 +67,11 @@
                                             Logcollector
                                         </a>
                                     </p>
-                                    <p ng-if="managerConfiguration['open-scap']">
+                                    <!--<p ng-if="managerConfiguration['open-scap']">
                                         <a ng-class="selectedItem === 'open-scap' ? 'underline-config' : ''" ng-click="switchItem('open-scap')">
                                             OpenSCAP
                                         </a>
-                                    </p>
+                                    </p>-->
                                     <p ng-if="managerConfiguration['active-response'].length > 0">
                                         <a ng-class="selectedItem === 'active-response' ? 'underline-config' : ''" ng-click="switchItem('active-response')">
                                             Active response
@@ -604,7 +604,7 @@
                         <!-- End ruleset -->
 
                         <!-- Wodle -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='open-scap'">
+                        <!--<div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='open-scap'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -660,7 +660,7 @@
                                 </div>
                                 <div flex></div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- End wodle -->
 
                         <!-- Active response -->
