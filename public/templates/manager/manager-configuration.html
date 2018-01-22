@@ -67,6 +67,17 @@
                                             Logcollector
                                         </a>
                                     </p>
+                                    <p ng-if="managerConfiguration['open-scap']">
+                                        <a ng-class="selectedItem === 'open-scap' ? 'underline-config' : ''" ng-click="switchItem('open-scap')">
+                                            OpenSCAP
+                                        </a>
+                                    </p>
+                                    <p ng-if="managerConfiguration['active-response'].length > 0">
+                                        <a ng-class="selectedItem === 'active-response' ? 'underline-config' : ''" ng-click="switchItem('active-response')">
+                                            Active response
+                                        </a>
+                                    </p>
+                                    
                                 </div>
                             </div>
 
@@ -525,306 +536,174 @@
                         </div>
                         <!-- End logcollector -->
 
+                        <!-- Ruleset -->
+                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='ruleset'">
+                            <div flex layout="row" class="md-padding">
+                                <div flex="60">
+                                    <h4>
+                                        <i class="fa fa-dot-circle-o"></i> Ruleset
+                                    </h4>
+                                    <md-divider></md-divider>
+                                    <h4 ng-if="managerConfiguration.ruleset.decoder_dir">Decoder directories</h4>
+                                    <div ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ item }}
+                                            </span></p>
+                                    </div>
+                                    <h4 ng-if="managerConfiguration.ruleset.decoder_exclude">Decoder excludes</h4>
+                                    <div ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ item }}
+                                            </span></p>
+                                    </div>
+                                    <h4 ng-if="managerConfiguration.ruleset.decoder">Decoder files</h4>
+                                    <div ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ item }}
+                                            </span></p>
+                                    </div>
+                                    <h4 ng-if="managerConfiguration.ruleset.rule_dir">Rules directories</h4>
+                                    <div ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ item }}
+                                            </span></p>
+                                    </div>
+                                    <h4 ng-if="managerConfiguration.ruleset.include">Rules files</h4>
+                                    <div ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ item }}
+                                            </span></p>
+                                    </div>
+                                    <h4 ng-if="managerConfiguration.ruleset.rule_exclude">Rule excludes</h4>
+                                    <div ng-if="isArray(managerConfiguration.ruleset.rule_exclude)" ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ item }}
+                                            </span></p>
+                                    </div>
+                                    <div ng-if="!isArray(managerConfiguration.ruleset.rule_exclude)">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ managerConfiguration.ruleset.rule_exclude }}
+                                            </span></p>
+                                    </div>
+                                    <h4 ng-if="managerConfiguration.ruleset.list">CDB lists</h4>
+                                    <div ng-if="isArray(managerConfiguration.ruleset.list)" ng-repeat="item in managerConfiguration.ruleset.list|orderBy">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ item }}
+                                            </span></p>
+                                    </div>
+                                    <div ng-if="!isArray(managerConfiguration.ruleset.list)">
+                                        <p>Path
+                                            <span class="md-secondary pull-right">{{ managerConfiguration.ruleset.list }}
+                                            </span></p>
+                                    </div>
+                                </div>
+                                <div flex>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End ruleset -->
+
+                        <!-- Wodle -->
+                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='open-scap'">
+                            <div flex layout="row" class="md-padding">
+                                <div flex="60">
+                                    <h4>
+                                        <i class="fa fa-dot-circle-o"></i> OpenSCAP
+                                    </h4>
+                                    <md-divider></md-divider>
+                                    <p ng-if="managerConfiguration['open-scap'].disabled">
+                                        Disabled
+                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].disabled}}</span>
+                                    </p>
+                                    <p ng-if="managerConfiguration['open-scap'].timeout">
+                                        Timeout
+                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].timeout}}</span>
+                                    </p>
+                                    <p ng-if="managerConfiguration['open-scap'].interval">
+                                        Interval
+                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].interval}}</span>
+                                    </p>
+                                    <p ng-if="managerConfiguration['open-scap']['scan-on-start']">
+                                        Scan on start
+                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap']['scan-on-start']}}</span>
+                                    </p>
+                                    <h4 ng-if="managerConfiguration['open-scap'].content">Content</h4>
+                                    <div ng-if="!isArray(managerConfiguration['open-scap'].content)">
+                                        <p>Policy
+                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.path}}
+                                            </span></p>
+                                        <p>Type
+                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.type}}
+                                            </span></p>
+                                        <p>Policy
+                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.path}}
+                                            </span></p>
+                                        <p ng-if="!isArray(managerConfiguration['open-scap'].content.profile)">
+                                            Profile <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.profile.$t}}</span>
+                                        </p>
+                                    </div>
+                                    <div ng-if="isArray(managerConfiguration['open-scap'].content)" ng-repeat="item in managerConfiguration['open-scap'].content track by $index">
+                                        <p>Policy
+                                            <span class="md-secondary pull-right">{{item.path}}
+                                            </span></p>
+                                        <p>Type
+                                            <span class="md-secondary pull-right">{{item.type}}
+                                            </span></p>
+                                        <p>Policy
+                                            <span class="md-secondary pull-right">{{item.path}}
+                                            </span></p>
+                                        <p ng-if="!isArray(item.profile)">
+                                            Profile <span class="md-secondary pull-right">{{item.profile.$t}}</span>
+                                        </p>
+                                        <md-divider ng-if="!$last"></md-divider>
+                                    </div>
+                                </div>
+                                <div flex></div>
+                            </div>
+                        </div>
+                        <!-- End wodle -->
+
+                        <!-- Active response -->
+                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='active-response'">
+                            <div flex layout="row" class="md-padding">
+                                <div flex="60">
+                                    <h4>
+                                        <i class="fa fa-random"></i> Active response
+                                    </h4>
+                                    <md-divider></md-divider>
+                                    <div ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
+                                        <p ng-if="item.command">Command
+                                            <span class="md-secondary pull-right">{{item.command}}
+                                            </span></p>
+                                        <p ng-if="item.location">Location
+                                            <span class="md-secondary pull-right">{{item.location}}
+                                            </span></p>
+                                        <p ng-if="item.agent_id">Agent ID(s)
+                                            <span class="md-secondary pull-right">{{item.agent_id}}
+                                            </span></p>
+                                        <p ng-if="item.level">
+                                            Level <span class="md-secondary pull-right">{{item.level}}</span>
+                                        </p>
+                                        <p ng-if="item.timeout">
+                                            Timeout <span class="md-secondary pull-right">{{item.timeout}}</span>
+                                        </p>
+                                        <p ng-if="item.rules_id">
+                                            Rules ID(s) <span class="md-secondary pull-right">{{item.rules_id}}</span>
+                                        </p>
+                                        <p ng-if="item.repeated_offenders">
+                                            Repeated offenders <span class="md-secondary pull-right">{{item.repeated_offenders}}</span>
+                                        </p>
+                                        <md-divider ng-if="!$last"></md-divider>
+                                    </div>
+                                </div>
+                                <div flex></div>
+                            </div>
+                        </div>
+                        <!-- End active response -->
 
                     </div>
-
                 </md-card-content>
-
             </md-card>
         </div>
     </div>
 </md-content>
-
-<!--
-
-            <md-card ng-if="managerConfiguration.wodle && managerConfiguration.wodle.name == 'open-scap'">
-                <md-card-title ng-click="setting.wodle = !setting.wodle">
-                    <md-card-title-text>
-                        <span class="md-headline">OpenSCAP
-                            <i ng-class="(!setting.wodle) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
-                                aria-hidden="true"></i>
-                        </span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content ng-show="setting.wodle">
-                    <span ng-if="managerConfiguration.wodle.disabled">
-                        <span layout="row" layout-align="space-between center">
-                            <p>Disabled</p>
-                            <p>{{managerConfiguration.wodle.disabled}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.wodle.timeout">
-                        <span layout="row" layout-align="space-between center">
-                            <p>Timeout</p>
-                            <p>{{managerConfiguration.wodle.timeout}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.wodle.interval">
-                        <span layout="row" layout-align="space-between center">
-                            <p>Interval</p>
-                            <p>{{managerConfiguration.wodle.interval}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.wodle.scan-on-start">
-                        <span layout="row" layout-align="space-between center">
-                            <p>Scan on start</p>
-                            <p>{{managerConfiguration.wodle.scan-on-start}}</p>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-                    <span ng-if="managerConfiguration.wodle.content">
-                        <span layout="row" layout-align="space-between center">
-                            <p class="text-bold">Content</p>
-                            <p class="text-right"></p>
-                        </span>
-                        <span ng-if="!isArray(managerConfiguration.wodle.content)">
-                            <span layout="row" layout-align="space-between center">
-                                <p>Policy</p>
-                                <p>{{managerConfiguration.wodle.content.path}}</p>
-                            </span>
-                            <span layout="row" layout-align="space-between center">
-                                <p>Type</p>
-                                <p>{{managerConfiguration.wodle.content.type}}</p>
-                            </span>
-                            <span layout="row" layout-align="space-between center">
-                                <p class="text-bold">Profiles</p>
-                                <p class="text-right"></p>
-                            </span>
-                            <span ng-if="isArray(managerConfiguration.wodle.content.profile)">
-                                <p ng-repeat="item in managerConfiguration.wodle.content.profile track by $index"> {{ item.$t }} </p>
-                            </span>
-                            <span ng-if="!isArray(managerConfiguration.wodle.content.profile)" layout="row" layout-align="space-between center">
-                                <p>{{managerConfiguration.wodle.content.profile.$t}}</p>
-                            </span>
-                            <md-divider></md-divider>
-                        </span>
-
-                        <span ng-if="isArray(managerConfiguration.wodle.content)" ng-repeat="item in managerConfiguration.wodle.content track by $index">
-                            <span layout="row" layout-align="space-between center">
-                                <p>Policy</p>
-                                <p>{{item.path}}</p>
-                            </span>
-                            <span layout="row" layout-align="space-between center">
-                                <p>Type</p>
-                                <p>{{item.type}}</p>
-                            </span>
-                            <span layout="row" layout-align="space-between center">
-                                <p class="text-bold">Profiles</p>
-                                <p class="text-right"></p>
-                            </span>
-                            <span ng-if="isArray(item.profile)">
-                                <p ng-repeat="item2 in item.profile track by $index"> {{ item2.$t }} </p>
-                            </span>
-                            <span ng-if="!isArray(item.profile)" layout="row" layout-align="space-between center">
-                                <p>{{item.profile.$t}}</p>
-                            </span>
-                            <md-divider></md-divider>
-                        </span>
-                    </span>
-                </md-card-content>
-            </md-card>
-        </div>
-        <div flex layout="column" ng-if="managerConfiguration.ruleset">
-            <md-card>
-                <md-card-title ng-click="setting.ruleset = !setting.ruleset">
-                    <md-card-title-text>
-                        <span class="md-headline">Ruleset
-                            <i ng-class="(!setting.ruleset) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
-                                aria-hidden="true"></i>
-                        </span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content ng-show="setting.ruleset">
-                    <span ng-if="managerConfiguration.ruleset.decoder_dir">
-                        <span layout="row" layout-align="space-between center">
-                            <p class="text-bold"> Decoder directories</p>
-                            <p class="text-right"></p>
-                        </span>
-                        <span ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
-                            <p> {{ item }} </p>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-
-                    <span ng-if="managerConfiguration.ruleset.decoder_exclude">
-                        <span layout="row" layout-align="space-between center">
-                            <p class="text-bold">Decoder excludes</p>
-                            <p class="text-right"></p>
-                        </span>
-                        <span ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
-                            <p> {{ item }} </p>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-
-                    <span ng-if="managerConfiguration.ruleset.decoder">
-                        <span layout="row" layout-align="space-between center">
-                            <p class="text-bold">Decoders files</p>
-                        </span>
-                        <span ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
-                            <p> {{ item }} </p>
-                        </span>
-                    </span>
-
-                    <span ng-if="managerConfiguration.ruleset.rule_dir">
-                        <span layout="row" layout-align="space-between center">
-                            <p class="text-bold">Rules directories</p>
-                        </span>
-                        <span ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
-                            <p> {{ item }} </p>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-
-                    <span ng-if="managerConfiguration.ruleset.include">
-                        <span layout="row" layout-align="space-between center">
-                            <p class="text-bold">Rules files</p>
-                        </span>
-                        <span ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
-                            <p> {{ item }} </p>
-                        </span>
-                    </span>
-
-                    <span ng-if="managerConfiguration.ruleset.rule_exclude">
-                        <span layout="row" layout-align="space-between center">
-                            <p class="text-bold">Rule excludes</p>
-                            <p class="text-right"></p>
-                        </span>
-
-                        <span ng-if="isArray(managerConfiguration.ruleset.rule_exclude)">
-                            <p ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index"> {{ item }} </p>
-                        </span>
-
-                        <span ng-if="!isArray(managerConfiguration.ruleset.rule_exclude)">
-                            <p> {{ managerConfiguration.ruleset.rule_exclude }} </p>
-                        </span>
-
-                        <md-divider></md-divider>
-                    </span>
-
-                    <span ng-if="managerConfiguration.ruleset.list">
-                        <span layout="row" layout-align="space-between center">
-                            <p class="text-bold">CDB lists</p>
-                            <p class="text-right"></p>
-                        </span>
-
-                        <span ng-if="isArray(managerConfiguration.ruleset.list)">
-                            <p ng-repeat="item in managerConfiguration.ruleset.list|orderBy"> {{ item }} </p>
-                        </span>
-
-                        <span ng-if="!isArray(managerConfiguration.ruleset.list)">
-                            <p> {{ managerConfiguration.ruleset.list }} </p>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-
-                </md-card-content>
-            </md-card>
-            <md-card ng-if="managerConfiguration['active-response'].length > 0">
-                <md-card-title ng-click="setting.activeResponse = !setting.activeResponse">
-                    <md-card-title-text>
-                        <span class="md-headline">Active response
-                            <i ng-class="(!setting.activeResponse) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
-                                aria-hidden="true"></i>
-                        </span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content ng-show="setting.activeResponse">
-                    <span ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
-                        <span ng-if="item.command">
-                            <span layout="row" layout-align="space-between center">
-                                <p class="text-bold"> {{ item.command }} </p>
-                                <p class="text-right"></p>
-                            </span>
-                            <span ng-if="item.location">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Location </p>
-                                    <p class="text-right">{{ item.location }}</p>
-                                </span>
-                            </span>
-                            <span ng-if="item.agent_id">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Agent ID(s) </p>
-                                    <p class="text-right">{{ item.agent_id }}</p>
-                                </span>
-                            </span>
-                            <span ng-if="item.level">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Level </p>
-                                    <p class="text-right">{{ item.level }}</p>
-                                </span>
-                            </span>
-                            <span ng-if="item.timeout">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Timeout </p>
-                                    <p class="text-right">{{ item.timeout }}</p>
-                                </span>
-                            </span>
-                            <span ng-if="item.rules_group" ng-repeat="group in item.rules_group.split(',');">
-                                <span layout="row" layout-align="space-between center">
-                                    <p ng-show="$first"> Rules group </p>
-                                    <p ng-show="!$first"></p>
-                                    <p class="text-right">{{ group }}</p>
-                                </span>
-                            </span>
-                            <span ng-if="item.rules_id">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Rules ID(s) </p>
-                                    <p class="text-right">{{ item.rules_id }}</p>
-                                </span>
-                            </span>
-                            <span ng-if="item.repeated_offenders">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Repeated offenders </p>
-                                    <p class="text-right">{{ item.repeated_offenders }}</p>
-                                </span>
-                            </span>
-                            <md-divider></md-divider>
-                        </span>
-                    </span>
-                </md-card-content>
-            </md-card>
-            <md-card>
-                <md-card-title ng-click="setting.commands = !setting.commands">
-                    <md-card-title-text>
-                        <span class="md-headline">Commands
-                            <i ng-class="(!setting.commands) ? 'fa-caret-right' : 'fa-caret-down'" class="fa managerConfigurationArrow"
-                                aria-hidden="true"></i>
-                        </span>
-                    </md-card-title-text>
-                </md-card-title>
-                <md-card-content ng-show="setting.commands">
-                    <span ng-repeat="item in managerConfiguration.command|orderBy:'name'">
-                        <span ng-if="item.name">
-                            <span layout="row" layout-align="space-between center">
-                                <p class="text-bold"> {{ item.name }} </p>
-                                <p class="text-right"></p>
-                            </span>
-                            <span ng-if="item.expect">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Expect </p>
-                                    <p class="text-right">{{ item.expect }}</p>
-                                </span>
-                            </span>
-                            <span ng-if="item.executable">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Executable </p>
-                                    <p class="text-right">{{ item.executable }}</p>
-                                </span>
-                            </span>
-                            <span ng-if="item.timeout_allowed">
-                                <span layout="row" layout-align="space-between center">
-                                    <p> Timeout allowed </p>
-                                    <p class="text-right">{{ item.timeout_allowed}}</p>
-                                </span>
-                            </span>
-                        </span>
-                        <md-divider></md-divider>
-                    </span>
-                </md-card-content>
-            </md-card>
-
--->
