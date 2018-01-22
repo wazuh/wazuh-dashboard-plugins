@@ -62,7 +62,7 @@
             </md-input-container>
         </div>
 
-        <md-toolbar layout="row" class="md-toolbar-tools">
+        <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools">
             <span flex="5" ng-click="agents.sort('id')">ID
                 <i class="fa" ng-class="agents.sortValue === 'id' ? (agents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
             </span>
@@ -87,8 +87,8 @@
         </md-toolbar>
 
         <md-content flex when-scrolled="agents.nextPage('')" class="height-300">
-            <md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="agents-preview-table">
-                <md-list-item ng-click="showAgent(agent)" class="md-subhead agents-groups-preview">
+            <md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'">
+                <md-list-item ng-click="showAgent(agent)" class="wazuh-list-item">
                     <span flex="5">{{agent.id || 'Unknown'}}</span>
                     <span flex="25">{{agent.name || 'Unknown'}}</span>
                     <span flex="10">{{agent.ip || 'Unknown'}}</span>
