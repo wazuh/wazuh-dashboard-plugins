@@ -125,9 +125,8 @@
         </md-toolbar>
 
         <md-content flex layout="column" class="height-300" when-scrolled="rules.nextPage('')">
-            <md-list ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class-odd="'odd'" ng-class-even="'even'"
-                class="wazuh-list agents-groups-preview agents-preview-table" ng-class="activeItem === rule.id ? 'ruleset_rules_row_active' : ''">
-                <md-list-item class="wazuh-list-item rules-item-list" ng-click="closeOther(rule.id)" ng-class="activeItem === rule.id ? 'ruleset_rules_row_active' : ''">
+            <md-list class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class="activeItem === rule.id ? 'active' : ''">
+                <md-list-item class="wazuh-list-item" ng-click="closeOther(rule.id)" ng-class="activeItem === rule.id ? 'active' : ''">
                     <span flex="5">{{rule.id}}</span>
                     <span flex="15">{{rule.file}}</span>
                     <span flex="35">{{rule.description}}</span>

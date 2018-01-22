@@ -1,8 +1,13 @@
-/* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
-/* --------------------- Wazuh stylesheet for tables ---------------------- */
-/* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
+/* -------------------------------------------------------------------------- */
+/* ---------------------- Wazuh stylesheet for tables ----------------------- */
+/* -------------------------------------------------------------------------- */
+
+// Style for text who applies filters when hovering
+.listHover {
+    &:hover {
+        font-weight: bold;
+    }
+}
 
 md-toolbar {
     &.wazuh-toolbar {
@@ -17,11 +22,22 @@ md-toolbar {
     }
 }
 
+md-list,
+md-list-item {
+    &.active {
+        background-color: rgb(0,121,165);
+        color: white !important;
+    }
+}
+
 md-list {
     &.wazuh-list {
+        // Style for odd items on the list
         &.odd {
             background-color: white;
         }
+
+        // Style for even items on the list
         &.even {
             background-color: #fafafa;
         }
@@ -34,8 +50,15 @@ md-list-item {
         min-height: 44px;
         height: 44px;
 
+        // Style when hovering a list item
         &:hover {
             background-color: rgb(0,121,165);
+            color: white !important;
+        }
+
+        // Fixing transparent text when hover on list item
+        & button.md-no-style.md-button.md-ink-ripple{
+            opacity: 0;
         }
     }
 }
@@ -43,18 +66,3 @@ md-list-item {
 /* ------------------------------------------------------------------------ */
 /* ------------------------------ Old styles ------------------------------ */
 /* ------------------------------------------------------------------------ */
-
-// .md-toolbar-tools {
-//     font-size: 15px !important;
-//     font-weight: bold !important;
-//     padding: 16px !important;
-// }
-//
-// .md-toolbar-tools-groups {
-//     font-size: 15px !important;
-//     font-weight: bold !important;
-//     padding: 16px !important;
-//     min-height: 0px !important;
-//     height: 30px !important;
-//     padding-top: 4px !important;
-// }

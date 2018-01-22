@@ -71,7 +71,7 @@
             </md-chip>
         </md-chips>
 
-        <md-toolbar layout="row" class="md-toolbar-tools md-toolbar-tools-groups">
+        <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools">
             <span flex="20" ng-click="decoders.sort('name')">Name
                 <i class="fa" ng-class="decoders.sortValue === 'name' ? (decoders.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                     aria-hidden="true"></i>
@@ -85,14 +85,16 @@
         </md-toolbar>
 
         <md-content flex layout="column" class="height-300" when-scrolled="decoders.nextPage('')">
-            <md-list class="agents-preview-table" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='decoder in decoders.items | orderBy : decoders.sortValue : decoders.sortDir'
-                ng-class="activeItem === decoder.name+decoder.file+decoder.position ? 'ruleset_rules_row_active' : ''">
-                <md-list-item class="rules-item-list" ng-click="closeOther(decoder.name+decoder.file+decoder.position)" ng-class="activeItem === decoder.name+decoder.file+decoder.position ? 'ruleset_rules_row_active' : ''">
+            <md-list class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='decoder in decoders.items | orderBy : decoders.sortValue : decoders.sortDir'
+                ng-class="activeItem === decoder.name+decoder.file+decoder.position ? 'active' : ''">
+                <md-list-item class="wazuh-list-item" ng-click="closeOther(decoder.name+decoder.file+decoder.position)" ng-class="activeItem === decoder.name+decoder.file+decoder.position ? 'active' : ''">
                     <span flex="20">{{decoder.name}}</span>
                     <span flex="20">{{decoder.details["program_name"]}}</span>
                     <span flex="40">{{ decoder.details["order"] | limitTo: 80 }}{{decoder.details["order"].length > 80 ? '...' : ''}}</span>
-                    <md-button md-no-ink class="invisibleButton" flex="20" ng-if="$parent.typeFilter == 'all'" ng-click="decodersApplyFilter({type: 'file', value: decoder.file}); $event.stopPropagation();">{{decoder.file}}</md-button>
-                    <span flex="20" ng-if="$parent.typeFilter != 'all'">{{decoder.file}}</span>
+                    <span flex="20">{{decoder.file}}</span>
+                    <!-- <span flex="20" ng-if="$parent.typeFilter != 'all'">{{decoder.file}}</span> -->
+                    <!-- <md-button md-no-ink class="invisibleButton" flex="20" ng-if="$parent.typeFilte r == 'all'" ng-click="decodersApplyFilter({type: 'file', value: decoder.file}); $event.stopPropagation();">{{decoder.file}}</md-button> -->
+
                 </md-list-item>
                 <div layout="row" ng-if="activeItem === decoder.name+decoder.file+decoder.position" class="ruleset_card_info manager-ruleset-rules-card-info">
                     <md-card flex>
