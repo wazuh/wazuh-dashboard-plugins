@@ -67,12 +67,14 @@ app.controller('managerStatusController', function ($scope,$rootScope, Notifier,
     .catch(error => notify.error(error.message));
 
 });
+
 const beautifier = require('plugins/wazuh/utils/json-beautifier');
 app.controller('managerConfigurationController', function ($scope,$rootScope, Notifier, apiReq) {
     //Initialization
     const notify   = new Notifier({ location: 'Manager - Configuration' });
     $scope.load    = true;
-    
+    $scope.isArray = angular.isArray;
+
     $scope.switchItem = item => {
         $scope.selectedItem = item;
         if(!$scope.$$phase) $scope.$digest();
@@ -93,10 +95,6 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, No
         }
     };
 
-    //Load
-    try {
-        load();
-    } catch (e) {
-        notify.error("Unexpected exception loading controller");
-    }
+    load();
+
 });
