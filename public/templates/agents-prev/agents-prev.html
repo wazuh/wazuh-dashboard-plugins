@@ -87,7 +87,7 @@
         </md-toolbar>
 
         <md-content flex when-scrolled="agents.nextPage('')" class="height-300">
-            <md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="wazuh-list">
+            <md-list ng-repeat='agent in agents.items | orderBy : agents.sortValue : agents.sortDir' class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'">
                 <md-list-item ng-click="showAgent(agent)" class="wazuh-list-item">
                     <span flex="5">{{agent.id || 'Unknown'}}</span>
                     <span flex="25">{{agent.name || 'Unknown'}}</span>
