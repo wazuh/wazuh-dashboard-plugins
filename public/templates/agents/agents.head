@@ -21,7 +21,7 @@
 				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
 					<md-autocomplete id="agentsAutocomplete" flex
 					md-no-cache="true"
-					md-select-on-match="true"
+					md-select-on-match="false"
 					md-selected-item="_swpagent"
 					md-selected-item-change="getAgent(_swpagent.id)"
 					md-search-text="searchTerm"
