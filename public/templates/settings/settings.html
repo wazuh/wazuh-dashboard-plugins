@@ -44,7 +44,7 @@
         </md-list>
         <p>If the API is <code>active (running)</code> please check its configuration below.</p>
     </md-card>
-    <md-card layout-padding layout-align="start stretch" ng-if="apiEntries.length != 0 && currentDefault === undefined">
+    <md-card layout-padding layout-align="start stretch" ng-if="!currentAPI">
         <h1 class="wazuh-h1"><i class="fa fa-warning ng-scope font-size-25" aria-hidden="true"></i> Please select an API from the list as default</h1>
         <p>The Wazuh app needs an API connection for it to work. Please click the API's star (<i class="fa fa-star font-size-18" aria-hidden="true"></i>) icon of your choice to select that one.</p>
     </md-card>
@@ -110,7 +110,7 @@
             <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle font-size-15" aria-hidden="true"></i> Add new API</md-button>
         </div>
 
-        <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-show="$parent.addManagerContainer || apiEntries.length == 0" class="margin-top-30">
+        <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-if="!currentAPI || $parent.addManagerContainer" class="margin-top-30">
           <md-input-container>
             <label>Username</label>
             <input placeholder="" type="text" ng-model="formData.user" aria-label="username" required/>
