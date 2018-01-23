@@ -220,7 +220,7 @@
 
         <md-input-container flex="20" class="md-whiteframe-z1 manager-ruleset-decoders-selector background-e2" ng-if="load === false">
             <md-select ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
-                <md-option ng-repeat="indexPattern in indexPatterns.list" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</md-option>
+                <md-option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</md-option>
             </md-select>
         </md-input-container>
 
