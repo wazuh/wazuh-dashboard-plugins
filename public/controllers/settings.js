@@ -40,8 +40,27 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
-    // Getting the index pattern list into the scope
-    $scope.indexPatterns = $route.current.locals.ip
+    $scope.indexPatterns = [];  
+
+    // Getting the index pattern list into the scope, but selecting only "valid" ones
+    for (let i = 0; i < $route.current.locals.ip.list.length; i ++) {
+        courier.indexPatterns.get($route.current.locals.ip.list[i].id)
+        .then((data) => {
+            let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+            let minimumCount = 0;
+
+            for (let j = 0; j < data.fields.length; j++) {
+                if (minimum.includes(data.fields[j].name)) {
+                    minimumCount++;
+                }
+            }
+
+            if (minimumCount == minimum.length) {
+                $scope.indexPatterns.push($route.current.locals.ip.list[i]);
+            }
+
+        });
+    }
 
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
@@ -344,23 +363,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
             $scope.$emit('updatePattern', {});
 
-            courier.indexPatterns.get(newIndexPattern)
-            .then((data) => {
-                let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
-                let minimumCount = 0;
-
-                for (var i = 0; i < data.fields.length; i++) {
-                    if (minimum.includes(data.fields[i].name)) {
-                        minimumCount++;
-                    }
-                }
-
-                if (minimumCount == minimum.length)
-                    notify.info("Successfully changed the default index-pattern");
-                else notify.warning("The index-pattern was changed, but it is NOT compatible with Wazuh alerts");
-
-                $scope.selectedIndexPattern = newIndexPattern;
-            });
+            notify.info("Successfully changed the default index-pattern");
+            $scope.selectedIndexPattern = newIndexPattern;
         })
         .catch(() => {
             notify.error("Error while changing the default index-pattern");
