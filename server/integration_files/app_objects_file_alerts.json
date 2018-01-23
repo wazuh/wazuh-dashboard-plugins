@@ -1970,7 +1970,7 @@
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON": 
+				"searchSourceJSON":
 					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"_exists_:rule.pci_dss\",\"language\":\"lucene\"}}"
 			}
 	    },
@@ -2004,6 +2004,20 @@
 			"kibanaSavedObjectMeta": {
 				"searchSourceJSON":
 					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"_exists_:rule.pci_dss\",\"language\":\"lucene\"}}"
+			}
+		},
+		"_type": "visualization"
+	},
+	{
+		"_id": "Wazuh-App-Overview-AWS-Alerts-summary",
+		"_source": {
+			"title": "Wazuh App Overview AWS Alerts summary",
+			"visState": "{\"title\":\"Wazuh App Overview AWS Alerts summary\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"agent.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agent\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"@timestamp\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Date\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule.description\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Description\"}}]}",
+			"uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":3,\"direction\":\"desc\"}}},\"spy\":{\"mode\":{\"name\":null,\"fill\":false}}}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon\",\"language\":\"lucene\"}}"
 			}
 		},
 		"_type": "visualization"
