@@ -62,6 +62,12 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         },
         "pci": {
             "group": "pci_dss"
+        },
+        "aws": {
+            "group": "amazon"
+        },
+        "virustotal": {
+            "group": "virustotal"
         }
     };
 
@@ -276,8 +282,8 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 		// They passed an id
 		if (newAgentId) {
             $location.search('agent', newAgentId);
-		} 
-		
+		}
+
 	};
 
     $scope.getAgentConfig = newAgentId => {
@@ -291,7 +297,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
 		$location.search('tab', 'groups');
 		$location.path('/manager');
     };
-    
+
     const firstLoad = async () => {
         try{
             $scope.configurationError = false;
@@ -309,7 +315,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
             $scope.groupName = $scope.agent.group;
 
             if(!$scope.groupName){
-                
+
                 $scope.configurationError = true;
                 $scope.load = false;
                 if($scope.agent.id === '000'){
@@ -330,7 +336,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
                 apiReq.request('GET', `/agents/groups/${$scope.groupName}`, {})
             ]);
 
-            
+
             let filtered          = data[0].data.data.items.filter(item => item.name === $scope.groupName);
             $scope.groupMergedSum = (filtered.length) ? filtered[0].merged_sum : 'Unknown';
 
@@ -346,5 +352,5 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         }
     }
     /** End of agent configuration */
-    
+
 });

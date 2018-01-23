@@ -5,7 +5,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
-    // Check the url hash and retriew the tabView information 
+    // Check the url hash and retriew the tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
     } else { // If tabView doesn't exist, default it to 'panels' view
@@ -13,7 +13,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $location.search('tabView', 'panels');
     }
 
-    // Check the url hash and retrivew the tab information 
+    // Check the url hash and retrivew the tab information
     if ($location.search().tab) {
         $scope.tab = $location.search().tab;
     } else { // If tab doesn't exist, default it to 'general' view
@@ -57,6 +57,12 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         },
         "pci": {
             "group": "pci_dss"
+        },
+        "aws": {
+            "group": "amazon"
+        },
+        "virustotal": {
+            "group": "virustotal"
         }
     };
 
@@ -91,7 +97,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
         else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
     });
-    
+
     $scope.$on('$destroy',() => {
         for(let h of $rootScope.ownHandlers){
             h._scope.$destroy();
