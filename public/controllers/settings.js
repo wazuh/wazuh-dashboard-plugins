@@ -105,6 +105,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         $scope.extensions.oscap = $scope.apiEntries[index]._source.extensions.oscap;
         $scope.extensions.audit = $scope.apiEntries[index]._source.extensions.audit;
         $scope.extensions.pci = $scope.apiEntries[index]._source.extensions.pci;
+        $scope.extensions.aws = $scope.apiEntries[index]._source.extensions.aws;
+        $scope.extensions.virustotal = $scope.apiEntries[index]._source.extensions.virustotal;
 
         appState.setExtensions($scope.apiEntries[index]._source.extensions);
 
@@ -125,6 +127,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
             $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
             $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
+            $scope.extensions.aws = $scope.apiEntries[currentApiEntryIndex]._source.extensions.aws;
+            $scope.extensions.virustotal = $scope.apiEntries[currentApiEntryIndex]._source.extensions.virustotal;
 
             appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
         })
@@ -175,7 +179,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             cluster_info: {},
             insecure:     'true',
             id:           (Array.isArray($scope.apiEntries)) ? $scope.apiEntries.length : 0,
-            extensions:   { oscap: true, audit: true, pci: true }
+            extensions:   { oscap: true, audit: true, pci: true, aws: true, virustotal: true }
         };
 
         testAPI.check(tmpData)
