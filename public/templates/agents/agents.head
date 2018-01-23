@@ -60,6 +60,7 @@
 				<md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit && agent.os.platform !== 'windows'">Audit</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('aws');" name="aws" ng-show="extensions.aws">AWS</md-nav-item>
+                <md-nav-item md-nav-click="switchTab('virustotal');" name="virustotal" ng-show="extensions.virustotal">Virustotal</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('configuration');" name="configuration" ng-show="agent.id != '000'">Configuration</md-nav-item>
 			</md-nav-bar>
 		</div>

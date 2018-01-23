@@ -196,6 +196,18 @@
             <md-divider></md-divider>
         </div>
 
+        <div>
+            <span layout="row" layout-align="space-between center" class="text-bold">
+                Virustotal
+            </span>
+            <span>
+                Wazuh integration with Virustotal.
+            </span>
+            <span layout="row" layout-align="space-between center">
+                <md-switch flex ng-model="extensions.virustotal" aria-label="extensionsVirustotal" ng-change="toggleExtension('virustotal',extensions.virustotal)"></md-switch>
+            </span>
+        </div>
+
     </md-card>
 
     <md-card flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'pattern'">
