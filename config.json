@@ -1,0 +1,16 @@
+{
+    "pattern": "wazuh-alerts-3.x-*",
+    "checks" : {
+        "pattern" : true,
+        "template": true,
+        "api"     : true,
+        "setup"   : true
+    },
+    "extensions": {
+        "audit"     : true,
+        "pci"       : true,
+        "oscap"     : true,
+        "aws"       : false,
+        "virustotal": false
+    }
+}
