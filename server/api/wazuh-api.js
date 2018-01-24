@@ -410,6 +410,20 @@ module.exports = (server, options) => {
         }
     };
 
+    const getConfigurationFile = (req,reply) => {
+        try{
+            const configFile = require('../../config.json');
+            return reply({
+                statusCode: 200,
+                error:      0,
+                data:       configFile
+            });
+        } catch (error) {
+            return reply(genericErrorBuilder(500,6,error.message || error)).code(500)
+        }
+
+    }
+
     //Server routes
 
     /*
@@ -488,5 +502,11 @@ module.exports = (server, options) => {
         method:  'GET',
         path:    '/api/wazuh-api/fetchAgents',
         handler: fetchAgents
+    });
+
+    server.route({
+        method:  'GET',
+        path:    '/api/wazuh-api/configuration',
+        handler: getConfigurationFile
     });
 };
