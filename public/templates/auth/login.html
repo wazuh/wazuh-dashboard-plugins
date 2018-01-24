@@ -1,0 +1,13 @@
+<md-content flex ng-controller="loginController" layout="column">
+    <md-input-container class="md-block">
+        <label>Password</label>
+        <input required type="password" name="passwordField" ng-model="passwordField"  minlength="1" maxlength="100" />
+        <md-button type="submit" class="buttonBlueLightSettings md-raised md-primary">
+            <i class="fa fa-plus-circle settings-template-3" aria-hidden="true"></i> Submit
+        </md-button>
+    
+        <div role="alert" ng-show="errorFromRequest">
+          {{ errorFromRequest }}
+        </div>
+      </md-input-container>
+</md-content>

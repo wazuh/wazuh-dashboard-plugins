@@ -22,3 +22,7 @@ extensions:
   oscap     : true
   aws       : false
   virustotal: false
+
+login:
+  enabled : true
+  password: changeme
