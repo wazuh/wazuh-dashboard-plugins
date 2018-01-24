@@ -175,7 +175,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             cluster_info: {},
             insecure:     'true',
             id:           (Array.isArray($scope.apiEntries)) ? $scope.apiEntries.length : 0,
-            extensions:   { oscap: true, audit: true, pci: true }
+            extensions:   appState.getExtensions()
         };
 
         testAPI.check(tmpData)
