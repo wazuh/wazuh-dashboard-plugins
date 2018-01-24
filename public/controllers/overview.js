@@ -36,7 +36,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         "oscap": 14,
         "audit": 16,
         "pci": 6,
-        "aws": 100,
+        "aws": 8,
         "virustotal": 7
     };
 
