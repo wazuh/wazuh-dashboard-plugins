@@ -41,7 +41,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         "audit": 15,
         "pci": 3,
         "aws": 100,
-        "virustotal": 100,
+        "virustotal": 6,
         "configuration": 0
     };
 
