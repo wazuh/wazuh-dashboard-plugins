@@ -88,7 +88,8 @@ app.controller('healthCheck', function ($scope, genericReq, apiReq, appState, te
     const load = async () => {
         try {
             const configuration = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-            if('checks' in configuration.data.data){
+            
+            if('data' in configuration.data && 'checks' in configuration.data.data){
                 checks.pattern  = configuration.data.data.checks.pattern;
                 checks.template = configuration.data.data.checks.template;
                 checks.api      = configuration.data.data.checks.api;
