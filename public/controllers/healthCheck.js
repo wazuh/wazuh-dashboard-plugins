@@ -95,9 +95,7 @@ app.controller('healthCheck', function ($scope, genericReq, apiReq, appState, te
                 checks.setup    = configuration.data.data.checks.setup;
             }
             for(let key in checks) $scope.totalChecks += (checks[key]) ? 1 : 0;
-            if('extensions' in configuration.data.data){
-                appState.setExtensions(configuration.data.data.extensions)
-            }
+
             await Promise.all([ checkPatterns(), checkApiConnection() ]);
             if(!$scope.$$phase) $scope.$digest();
             return;
