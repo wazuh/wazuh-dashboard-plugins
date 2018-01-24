@@ -4,27 +4,28 @@ const needle = require('needle');
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
-const OBJECTS_FILE = './integration_files/objects_file.json';
+const OBJECTS_FILE     = './integration_files/objects_file.json';
 const APP_OBJECTS_FILE = './integration_files/app_objects_file_alerts.json';
-const KIBANA_TEMPLATE = './integration_files/kibana_template.json';
+const KIBANA_TEMPLATE  = './integration_files/kibana_template.json';
 
 module.exports = (server, options) => {
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
-    let objects = {};
-    let app_objects = {};
+    let objects         = {};
+    let app_objects     = {};
     let kibana_template = {};
-    let packageJSON = {};
-
+    let packageJSON     = {};
+    let pattern         = null;
     // Read config from package JSON
     try {
+        pattern     = require('../config.json').pattern;
         packageJSON = require('../package.json');
     } catch (e) {
         server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
     }
 
-    let index_pattern = packageJSON.initialPattern;
+    let index_pattern = pattern || "wazuh-alerts-3.x-*";
 
     // Save Wazuh App first set up for future executions
     const saveConfiguration = (id) => {
