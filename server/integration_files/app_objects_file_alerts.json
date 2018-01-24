@@ -2118,7 +2118,7 @@
 				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon AND rule.description: *Login?Success*\",\"language\":\"lucene\"}}"
 			}
 		},
-		"_type": "visualization",
+		"_type": "visualization"
 	},
 	{
 		"_id": "Wazuh-App-Overview-AWS-Agent-alerts-summary",
