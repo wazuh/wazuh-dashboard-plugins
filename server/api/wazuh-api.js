@@ -11,6 +11,9 @@ const getPath             = require('../../util/get-path');
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
+const fs   = require('fs');
+const yml  = require('js-yaml');
+const path = require('path');
 const pciRequirementsFile = '../integration_files/pci_requirements.json';
 
 module.exports = (server, options) => {
@@ -412,7 +415,7 @@ module.exports = (server, options) => {
 
     const getConfigurationFile = (req,reply) => {
         try{
-            const configFile = require('../../config.json');
+            const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../') + 'config.yml', {encoding: 'utf-8'}));
             return reply({
                 statusCode: 200,
                 error:      0,
