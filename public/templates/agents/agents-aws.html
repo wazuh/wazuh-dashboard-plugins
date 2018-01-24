@@ -1,3 +1,61 @@
 <md-content flex layout="column" ng-if="tab === 'aws'" layout-align="start">
 
+    <!-- View: Panels -->
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+
+        <div layout="row" layout-align="center stretch" class="height-120">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Run-instances'" id="Wazuh-App-Overview-AWS-Metric-Run-instances"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Terminate-instances'" id="Wazuh-App-Overview-AWS-Metric-Terminate-instances"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Create-tags'" id="Wazuh-App-Overview-AWS-Metric-Create-tags"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-120">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Security-groups-over-time'" id="Wazuh-App-Overview-AWS-Security-groups-over-time"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Success-login-Top-5-countries'" id="Wazuh-App-Overview-AWS-Success-login-Top-5-countries"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-120">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Authorize-security'" id="Wazuh-App-Overview-AWS-Metric-Authorize-security"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Revoke-security'" id="Wazuh-App-Overview-AWS-Metric-Revoke-security"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" class="height-550">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Alerts summary</span>
+                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-AWS-Agent-alerts-summary'" id="Wazuh-App-Overview-AWS-Agent-alerts-summary"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+    </div>
+
 </md-content>
