@@ -11,6 +11,9 @@ const getPath             = require('../../util/get-path');
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
+const fs   = require('fs');
+const yml  = require('js-yaml');
+const path = require('path');
 const pciRequirementsFile = '../integration_files/pci_requirements.json';
 
 module.exports = (server, options) => {
@@ -410,6 +413,20 @@ module.exports = (server, options) => {
         }
     };
 
+    const getConfigurationFile = (req,reply) => {
+        try{
+            const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../') + 'config.yml', {encoding: 'utf-8'}));
+            return reply({
+                statusCode: 200,
+                error:      0,
+                data:       configFile
+            });
+        } catch (error) {
+            return reply(genericErrorBuilder(500,6,error.message || error)).code(500)
+        }
+
+    }
+
     //Server routes
 
     /*
@@ -488,5 +505,11 @@ module.exports = (server, options) => {
         method:  'GET',
         path:    '/api/wazuh-api/fetchAgents',
         handler: fetchAgents
+    });
+
+    server.route({
+        method:  'GET',
+        path:    '/api/wazuh-api/configuration',
+        handler: getConfigurationFile
     });
 };

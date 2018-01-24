@@ -12,7 +12,7 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
                         pci       : true,
                         oscap     : true,
                         aws       : true,
-                        virustotal: true
+                        virustotal: false
                     }
                 }
             }

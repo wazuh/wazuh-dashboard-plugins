@@ -12,7 +12,6 @@
     "wazuh",
     "ossec"
   ],
-  "initialPattern" : "wazuh-alerts-3.x-*",
   "author": "Wazuh, Inc",
   "license": "GPL-2.0",
   "repository": {
@@ -32,6 +31,7 @@
     "ansicolors": "^0.3.2",
     "bootstrap": "3.3.6",
     "install": "^0.10.1",
+    "js-yaml": "3.10.0",
     "lodash": "3.10.1",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2"
