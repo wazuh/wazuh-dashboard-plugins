@@ -37,7 +37,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         "audit": 16,
         "pci": 6,
         "aws": 100,
-        "virustotal": 100
+        "virustotal": 7
     };
 
     // Object for matching nav items and rules groups
