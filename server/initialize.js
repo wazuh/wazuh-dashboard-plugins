@@ -7,7 +7,9 @@ const blueWazuh = colors.blue('wazuh');
 const OBJECTS_FILE     = './integration_files/objects_file.json';
 const APP_OBJECTS_FILE = './integration_files/app_objects_file_alerts.json';
 const KIBANA_TEMPLATE  = './integration_files/kibana_template.json';
-
+const fs  = require('fs');
+const yml = require('js-yaml');
+const path = require('path');
 module.exports = (server, options) => {
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
@@ -19,7 +21,7 @@ module.exports = (server, options) => {
     let pattern         = null;
     // Read config from package JSON
     try {
-        pattern     = require('../config.json').pattern;
+        pattern     = yml.load(fs.readFileSync(fs.readFileSync(path.join(__dirname,'../') + 'config.yml', {encoding: 'utf-8'}))).pattern;
         packageJSON = require('../package.json');
     } catch (e) {
         server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
