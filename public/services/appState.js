@@ -8,9 +8,11 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
             if(typeof data.extensions === 'undefined'){
                 return {
                     extensions : {
-                        audit: true,
-                        pci  : true,
-                        oscap: true
+                        audit     : true,
+                        pci       : true,
+                        oscap     : true,
+                        aws       : true,
+                        virustotal: false
                     }
                 }
             }

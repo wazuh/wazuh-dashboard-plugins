@@ -1,0 +1,47 @@
+<md-content flex layout="column" ng-if="tab === 'virustotal'" layout-align="start">
+    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+        <div layout="row" class="height-120">
+
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total-Malicious'" id="Wazuh-App-Overview-Virustotal-Total-Malicious"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total-Positives'" id="Wazuh-App-Overview-Virustotal-Total-Positives"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total'" id="Wazuh-App-Overview-Virustotal-Total"></kbn-vis>
+                </md-card-content>
+            </md-card>
+
+
+        </div>
+        <div layout="row" class="height-250">
+            <md-card flex="33">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Last scanned files</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Last-Files-Pie'" id="Wazuh-App-Overview-Virustotal-Last-Files-Pie"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Malicious files alerts Evolution</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Malicious-Evolution'" id="Wazuh-App-Overview-Virustotal-Malicious-Evolution"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+        <div layout="row" class="height-550">
+            <md-card flex>
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Last files</span>
+                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-Virustotal-Files-Table'" id="Wazuh-App-Overview-Virustotal-Files-Table"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+    </div>
+</md-content>

@@ -105,6 +105,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
         $scope.extensions.oscap = $scope.apiEntries[index]._source.extensions.oscap;
         $scope.extensions.audit = $scope.apiEntries[index]._source.extensions.audit;
         $scope.extensions.pci = $scope.apiEntries[index]._source.extensions.pci;
+        $scope.extensions.aws = $scope.apiEntries[index]._source.extensions.aws;
+        $scope.extensions.virustotal = $scope.apiEntries[index]._source.extensions.virustotal;
 
         appState.setExtensions($scope.apiEntries[index]._source.extensions);
 
@@ -125,6 +127,8 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
             $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
             $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
+            $scope.extensions.aws = $scope.apiEntries[currentApiEntryIndex]._source.extensions.aws;
+            $scope.extensions.virustotal = $scope.apiEntries[currentApiEntryIndex]._source.extensions.virustotal;
 
             appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
         })
@@ -325,7 +329,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     // Toggle extension
     $scope.toggleExtension = async (extension, state) => {
         try{
-            if (['oscap','audit','pci'].includes(extension)) {
+            if (['oscap','audit','pci','aws','virustotal'].includes(extension)) {
                 await genericReq.request('PUT', `/api/wazuh-api/extension/toggle/${$scope.apiEntries[currentApiEntryIndex]._id}/${extension}/${state}`);
                 $scope.apiEntries[currentApiEntryIndex]._source.extensions[extension] = state;
                 appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
