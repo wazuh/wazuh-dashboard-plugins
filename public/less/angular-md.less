@@ -102,3 +102,26 @@ md-input-container.md-default-theme ._md-placeholder,
 md-input-container ._md-placeholder {
     font-size: 16px;
 }
+
+/* Overriding the colour for the navbar */
+
+.md-button.md-accent {
+    color: rgb(0,121,165);
+}
+
+md-nav-bar md-nav-ink-bar {
+    color: rgb(0,121,165);
+    background: rgb(0,121,165);
+}
+
+/* ------------------------------------------------------------------------ */
+/* ------------------------ Override for md-switch ------------------------ */
+/* ------------------------------------------------------------------------ */
+
+md-switch.md-checked .md-bar {
+    background-color: rgba(0,121,165,0.5); /* set selected bar color */
+}
+
+md-switch.md-checked .md-thumb {
+    background-color: rgb(0,121,165); /* selected switch color */
+}
