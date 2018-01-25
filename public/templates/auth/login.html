@@ -1,13 +1,30 @@
-<md-content flex ng-controller="loginController" layout="column">
-    <md-input-container class="md-block">
-        <label>Password</label>
-        <input required type="password" name="passwordField" ng-model="passwordField"  minlength="1" maxlength="100" />
-        <md-button type="submit" class="buttonBlueLightSettings md-raised md-primary">
-            <i class="fa fa-plus-circle settings-template-3" aria-hidden="true"></i> Submit
-        </md-button>
-    
-        <div role="alert" ng-show="errorFromRequest">
-          {{ errorFromRequest }}
+<md-content ng-cloak flex ng-controller="loginController" layout="column">
+    <div flex layout="column">
+
+        <div flex layout="row"></div>
+        <div flex class="height-250" layout="row">
+            <span flex></span>
+            <md-card flex="30">
+                <md-card-title>
+                    <h3>
+                        <i class="fa fa-lock" aria-hidden="true"></i> Login required</h3>
+                </md-card-title>
+                <md-card-content>
+                    <md-input-container class="md-block">
+                        <label>Password</label>
+                        <input required type="password" name="passwordField" ng-model="passwordField" minlength="1" maxlength="100" />
+                        <md-button ng-click="submit(passwordField)" class="buttonBlueLightSettings md-raised md-primary pull-right">
+                            <i class="fa fa-check settings-template-3" aria-hidden="true"></i> Submit
+                        </md-button>
+
+                        <div role="alert" ng-show="errorFromRequest">
+                            {{ errorFromRequest }}
+                        </div>
+                    </md-input-container>
+                </md-card-content>
+            </md-card>
+            <span flex></span>
         </div>
-      </md-input-container>
+        <div flex layout="row"></div>
+    </div>
 </md-content>
