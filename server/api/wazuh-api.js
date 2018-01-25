@@ -449,7 +449,7 @@ module.exports = (server, options) => {
             const code = (new Date()-1) + 'wazuhapp';
             sessions[code] = {
                 created: new Date(),
-                exp    : 3600,
+                exp    : 86400,
                 origin : req.info.remoteAddress
             }
             return reply({
