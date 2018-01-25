@@ -1,11 +1,15 @@
 import chrome from 'ui/chrome';
 require('ui/modules').get('app/wazuh', [])
-.service('testAPI', function ($q, $http) {
+.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
     return {
         check_stored: data => {
+            const headers = {headers:{ "Content-Type": 'application/json' },timeout: 4000};
+            console.log(appState.getUserCode())
+            if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
             let defered = $q.defer();
+            console.log(data);
             $http
-            .post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,{timeout: 4000})
+            .post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers)
             .then(response => {
                 if (response.error) {
                     defered.reject(response);
@@ -14,7 +18,11 @@ require('ui/modules').get('app/wazuh', [])
                 }
             })
             .catch(error => {
-                if(error.status && error.status === -1){
+                if(error.status && error.status === 401){
+                    appState.removeUserCode();
+                    defered.reject(error);
+                    $location.path('/login');
+                } else if(error.status && error.status === -1){
                     defered.reject({data: 'request_timeout_checkstored'});
                 } else {
                     defered.reject(error);
@@ -23,10 +31,12 @@ require('ui/modules').get('app/wazuh', [])
             return defered.promise;
         },
         check: data => {
+            const headers = {headers:{ "Content-Type": 'application/json' },timeout: 4000};
+            if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
             let defered = $q.defer();
             const url = chrome.addBasePath("/api/wazuh-api/checkAPI");
             $http
-            .post(url, data, {timeout: 4000})
+            .post(url, data, headers)
             .then(response => {
                 if (response.error) {
                     defered.reject(response);
@@ -35,7 +45,11 @@ require('ui/modules').get('app/wazuh', [])
                 }
             })
             .catch(error => {
-                if(error.data && error.data.message && error.data.message.includes('ENOTFOUND')) {   
+                if(error.status && error.status === 401){
+                    appState.removeUserCode();
+                    defered.reject(error);
+                    $location.path('/login');
+                } else if(error.data && error.data.message && error.data.message.includes('ENOTFOUND')) {   
                     defered.reject({data: 'invalid_url'}); 
                 } else if(error.data && error.data.message && error.data.message.includes('ECONNREFUSED')) {   
                     defered.reject({data: 'invalid_port'}); 
