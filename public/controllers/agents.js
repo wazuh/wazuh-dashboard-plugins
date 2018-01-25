@@ -40,7 +40,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         "oscap": 13,
         "audit": 15,
         "pci": 3,
-        "aws": 8,
+        "aws": 11,
         "virustotal": 6,
         "configuration": 0
     };
