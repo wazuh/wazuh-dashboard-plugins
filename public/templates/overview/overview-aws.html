@@ -19,17 +19,41 @@
                     <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Create-tags'" id="Wazuh-App-Overview-AWS-Metric-Create-tags"></kbn-vis>
                 </md-card-content>
             </md-card>
-        </div>
-
-        <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Authorize-security'" id="Wazuh-App-Overview-AWS-Metric-Authorize-security"></kbn-vis>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Most-active-user'" id="Wazuh-App-Overview-AWS-Most-active-user"></kbn-vis>
                 </md-card-content>
             </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-270">
+            <div flex layout="column">
+                <md-card flex>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Authorize-security'" id="Wazuh-App-Overview-AWS-Metric-Authorize-security"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Revoke-security'" id="Wazuh-App-Overview-AWS-Metric-Revoke-security"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
+            <div flex layout="column">
+                <md-card flex>
+                    <md-card-content class="wazuh-column">
+                        <span class="md-headline">Security groups over time</span>
+                        <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Security-groups-over-time'" id="Wazuh-App-Overview-AWS-Security-groups-over-time"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-270">
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Revoke-security'" id="Wazuh-App-Overview-AWS-Metric-Revoke-security"></kbn-vis>
+                    <span class="md-headline">Events over time</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Events-over-time'" id="Wazuh-App-Overview-AWS-Events-over-time"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
@@ -37,8 +61,8 @@
         <div layout="row" layout-align="center stretch" class="height-270">
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Security groups over time</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Security-groups-over-time'" id="Wazuh-App-Overview-AWS-Security-groups-over-time"></kbn-vis>
+                    <span class="md-headline">Event sources over time</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Event-sources-over-time'" id="Wazuh-App-Overview-AWS-Event-sources-over-time"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex>
