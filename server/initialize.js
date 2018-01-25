@@ -11,6 +11,9 @@ const fs  = require('fs');
 const yml = require('js-yaml');
 const path = require('path');
 module.exports = (server, options) => {
+
+
+
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
@@ -21,10 +24,27 @@ module.exports = (server, options) => {
     let pattern         = null;
     // Read config from package JSON
     try {
-        pattern     = yml.load(fs.readFileSync(fs.readFileSync(path.join(__dirname,'../') + 'config.yml', {encoding: 'utf-8'}))).pattern;
+        const configurationFile = yml.load(fs.readFileSync('plugins/wazuh/config.yml', {encoding: 'utf-8'}));
+        global.loginEnabled = configurationFile.login.enabled;
+        pattern     = configurationFile.pattern;
         packageJSON = require('../package.json');
     } catch (e) {
-        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
+        server.log([blueWazuh, 'initialize', 'error'], 'Something went wrong.' + e.message);
+    }
+
+    if(typeof global.sessions === 'undefined') {
+        global.sessions = { };
+    }
+    global.protectedRoute = req => {
+        if(typeof loginEnabled !== 'undefined' && !loginEnabled) return true;
+        const session = (req.headers && req.headers.code) ? sessions[req.headers.code] : null;
+        if(!session) return false;
+        const timeElapsed = (new Date() - session.created) / 1000;
+        if((timeElapsed >= session.exp) || (req.info.remoteAddress !== session.origin)){
+            delete sessions[req.payload.code];
+            return false;
+        }
+        return true;
     }
 
     let index_pattern = pattern || "wazuh-alerts-3.x-*";
