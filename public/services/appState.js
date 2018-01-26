@@ -57,6 +57,15 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
             if (API) {
                 $cookies.putObject('API', API, { 'expires': exp});
             }
+        },
+        setUserCode: code => {
+            $cookies.putObject('userCode', code);
+        },
+        getUserCode: () => {
+            return $cookies.getObject('userCode');
+        },
+        removeUserCode: () => {
+            return $cookies.remove('userCode');
         }
     };
 });

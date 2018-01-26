@@ -301,11 +301,14 @@ routes
             "checkAPI": goToKibana
         }
     })
+    .when('/login', {
+        template: require('plugins/wazuh/templates/auth/login.html')
+    })
     .when('/', {
-        redirectTo: '/overview/',
+        redirectTo: '/overview/'
     })
     .when('', {
-        redirectTo: '/overview/',
+        redirectTo: '/overview/'
     })
     .otherwise({
         redirectTo: '/overview/'
