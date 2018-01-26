@@ -62,7 +62,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, Notifier,
     .then(agentInfo => {
         $scope.agentInfo = agentInfo.data.data;
         $scope.load = false;
-        $scope.$digest();
+        if(!$scope.$$phase) $scope.$digest();
     })
     .catch(error => notify.error(error.message));
 
@@ -88,7 +88,6 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, No
             $scope.managerConfiguration = data.data.data;
             $scope.raw = beautifier.prettyPrint(data.data.data);
             $scope.load                 = false;
-            console.log($scope.managerConfiguration)
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {

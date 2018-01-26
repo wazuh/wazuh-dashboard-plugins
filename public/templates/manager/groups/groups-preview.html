@@ -36,7 +36,7 @@
                                     aria-hidden="true"></i>
                             </span>
                         </div>
-                        <div flex ng-if="groups[0] && 'files_count' in groups[0].files_count">
+                        <div flex ng-if="groups[0] && groups[0].files_count">
                             <span ng-click="groups.sort('files_count')">Files
                                 <i class="fa" ng-class="groups.sortValue === 'files_count' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                                     aria-hidden="true"></i>
@@ -61,7 +61,7 @@
                             <div flex="15">
                                 <span class="md-headline">{{group.count}}</span>
                             </div>
-                            <div flex="15" ng-if="groups[0] && 'files_count' in groups[0].files_count">
+                            <div flex="15" ng-if="groups[0] && groups[0].files_count">
                                 <span class="md-headline">{{group.files_count}}</span>
                             </div>
                             <div flex>

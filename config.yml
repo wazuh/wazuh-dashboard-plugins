@@ -9,16 +9,16 @@ pattern: wazuh-alerts-3.x-*
 # Values must to be true or false.
 checks:
   pattern : true
-  template: false
+  template: true
   api     : true
-  setup   : false
+  setup   : true
 
 # Defines which extensions should be activated when you add a new API entry.
 # You can change them after Wazuh App starts.
 # Values must to be true or false.
 extensions:
-  audit     : false
-  pci       : false
+  audit     : true
+  pci       : true
   oscap     : true
   aws       : false
   virustotal: false

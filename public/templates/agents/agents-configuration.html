@@ -37,11 +37,8 @@
             <md-card flex>
                 <div layout="row" class="md-padding">
                     <h1 flex="90" ng-show="!load" class="md-title">Current group:
-                        <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}
-                            <md-tooltip md-direction="bottom">Click to go to the group details</md-tooltip>
-                        </span>
-
-                        &nbsp;- Configuration status:
+                        <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="bottom">Click to go to the group details</md-tooltip></span>
+                        &nbsp;&ndash;&nbsp;Configuration status:
                         <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span>
                     </h1>
                     <md-switch flex="10" ng-model="toggleRAW">View JSON</md-switch>

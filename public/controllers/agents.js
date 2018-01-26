@@ -208,7 +208,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
             $scope.agent.rootcheck = data[2].data.data;
             validateRootCheck();
 
-            $scope.$digest();
+            if(!$scope.$$phase) $scope.$digest();
         })
         .catch(error => notify.error(error.message));
     };
