@@ -2273,5 +2273,19 @@
 			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"NOT data.virustotal.malicious: 0\",\"language\":\"lucene\"}}"
 		  }
 		}
+	  },
+	  {
+		"_id": "Wazuh-App-Overview-Virustotal-Positives-Heatmap",
+		"_type": "visualization",
+		"_source": {
+		  "title": "Wazuh App Overview Virustotal Positives Heatmap",
+		  "visState": "{\"title\":\"Wazuh App Overview Virustotal Positives Heatmap\",\"type\":\"heatmap\",\"params\":{\"type\":\"heatmap\",\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":7,\"colorSchema\":\"Blues\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"linear\",\"defaultYExtents\":false},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Positives\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"data.virustotal.source.agent.name\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agent\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"group\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{},\"customLabel\":\"Date\"}}]}",
+		  "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 7\":\"rgb(247,251,255)\",\"7 - 13\":\"rgb(219,233,246)\",\"13 - 20\":\"rgb(187,214,235)\",\"20 - 26\":\"rgb(137,190,220)\",\"26 - 33\":\"rgb(83,158,205)\",\"33 - 39\":\"rgb(42,123,186)\",\"39 - 45\":\"rgb(11,85,159)\"},\"legendOpen\":true}}",
+		  "description": "",
+		  "version": 1,
+		  "kibanaSavedObjectMeta": {
+			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"_exists_:data.virustotal AND NOT data.virustotal.positives: 0\",\"language\":\"lucene\"}}"
+		  }
+		}
 	  }
 ]
