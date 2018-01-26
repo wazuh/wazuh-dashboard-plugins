@@ -3,7 +3,7 @@
     <!-- View: Panels -->
     <div ng-show="resultState === 'ready' && tabView === 'panels'">
 
-        <div layout="row" layout-align="center stretch" class="height-270">
+        <div layout="row" layout-align="center stretch" class="height-300">
             <div flex layout="column">
                 <md-card flex>
                     <md-card-content class="wazuh-column">
@@ -15,8 +15,7 @@
             <div flex="25" layout="column">
                 <md-card flex>
                     <md-card-content class="wazuh-column text-center">
-                        <div class="ng-binding">Successful logins</div>
-                        <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-AWS-Metric-Successful-logins'" id="Wazuh-App-Overview-AWS-Metric-Successful-logins"></kbn-vis>
+                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Successful-logins'" id="Wazuh-App-Overview-AWS-Metric-Successful-logins"></kbn-vis>
                     </md-card-content>
                 </md-card>
                 <md-card flex>
