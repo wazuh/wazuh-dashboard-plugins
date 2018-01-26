@@ -7,7 +7,7 @@ app.controller('loginController', function ($scope, $rootScope, $location, appSt
         .then(data => {
             appState.setUserCode(data.data.code);
             $location.path('/overview');
-            if($scope.$$phase) $scope.$digest();
+            if(!$scope.$$phase) $scope.$digest();
         })
         .catch (error => {
             $scope.errorFromRequest = 'Wrong password, try again'
