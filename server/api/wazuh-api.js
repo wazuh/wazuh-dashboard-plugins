@@ -449,8 +449,7 @@ module.exports = (server, options) => {
             const code = (new Date()-1) + 'wazuhapp';
             sessions[code] = {
                 created: new Date(),
-                exp    : 86400,
-                origin : req.info.remoteAddress
+                exp    : 86400
             }
             return reply({
                 statusCode: 200,

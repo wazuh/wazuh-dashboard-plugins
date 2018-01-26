@@ -40,7 +40,7 @@ module.exports = (server, options) => {
         const session = (req.headers && req.headers.code) ? sessions[req.headers.code] : null;
         if(!session) return false;
         const timeElapsed = (new Date() - session.created) / 1000;
-        if((timeElapsed >= session.exp) || (req.info.remoteAddress !== session.origin)){
+        if(timeElapsed >= session.exp){
             delete sessions[req.payload.code];
             return false;
         }
