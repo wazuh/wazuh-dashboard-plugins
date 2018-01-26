@@ -423,7 +423,7 @@ module.exports = (server, options) => {
         try{
 
             //if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
-            const configFile = yml.load(fs.readFileSync('plugins/wazuh/config.yml', {encoding: 'utf-8'}));
+            const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
             if(configFile.login){
                 delete configFile.login.password;
             }
@@ -439,7 +439,7 @@ module.exports = (server, options) => {
 
     const login = (req,reply) => {
         try{
-            const configFile = yml.load(fs.readFileSync('plugins/wazuh/config.yml', {encoding: 'utf-8'}));
+            const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
 
             if(!req.payload.password) {
                 return reply(genericErrorBuilder(401,7,'Please give me a password.')).code(401)

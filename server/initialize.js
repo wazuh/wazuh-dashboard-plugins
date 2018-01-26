@@ -24,7 +24,7 @@ module.exports = (server, options) => {
     let pattern         = null;
     // Read config from package JSON
     try {
-        const configurationFile = yml.load(fs.readFileSync('plugins/wazuh/config.yml', {encoding: 'utf-8'}));
+        const configurationFile = yml.load(fs.readFileSync(path.join(__dirname,'../config.yml'), {encoding: 'utf-8'}));
         global.loginEnabled = configurationFile.login.enabled;
         pattern     = configurationFile.pattern;
         packageJSON = require('../package.json');

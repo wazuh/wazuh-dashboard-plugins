@@ -11,7 +11,7 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
                         audit     : true,
                         pci       : true,
                         oscap     : true,
-                        aws       : true,
+                        aws       : false,
                         virustotal: false
                     }
                 }
