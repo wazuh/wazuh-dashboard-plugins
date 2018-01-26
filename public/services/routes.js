@@ -19,6 +19,11 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
     const notify = new Notifier();
     let deferred = $q.defer();
 
+    // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
+    if (!$location.path().includes("/health-check")) {
+        $rootScope.previousLocation = $location.path();
+    }
+
     const checkResponse = data => {
         if (parseInt(data.data.error) === 2){
             notify.warning("Wazuh App: Please set up Wazuh API credentials.");
@@ -273,6 +278,7 @@ routes
     .when('/wazuh-discover/', {
         template: require('plugins/wazuh/templates/discover/discover.jade'),
         resolve: {
+            "checkAPI": settingsWizard,
             "ip": getIp,
             "savedSearch": getSavedSearch
         }
@@ -280,6 +286,7 @@ routes
     .when('/settings/:tab?/', {
         template: require('plugins/wazuh/templates/settings/settings.html'),
         resolve: {
+            "checkAPI": settingsWizard,
             "ip": getAllIp
         }
     })

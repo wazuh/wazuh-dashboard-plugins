@@ -1,6 +1,6 @@
 const app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('healthCheck', function ($scope, genericReq, apiReq, appState, testAPI, Notifier, $timeout, $location, courier) {
+app.controller('healthCheck', function ($scope, $rootScope, genericReq, apiReq, appState, testAPI, Notifier, $timeout, $location, courier) {
     const checks = {
         api     : true,
         pattern : true,
@@ -77,7 +77,7 @@ app.controller('healthCheck', function ($scope, genericReq, apiReq, appState, te
         }
     }
 
-    const timer = () =>  $location.path("/overview");
+    const timer = () =>  $location.path($rootScope.previousLocation);
         
     $scope.$watch('processedChecks', () => {
         if ($scope.processedChecks === $scope.totalChecks && $scope.errors.length === 0) {
