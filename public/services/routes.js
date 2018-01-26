@@ -35,7 +35,7 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
             appState.removeCurrentAPI();
         }
         $rootScope.comeFromWizard = true;
-        $location.path('/settings');
+        if(!$location.path().includes("/settings")) $location.path('/settings');
         deferred.reject();
     }
 
@@ -86,14 +86,14 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
                 } else {
                     notify.warning("Wazuh App: Please set up Wazuh API credentials.");
                     $rootScope.comeFromWizard = true;
-                    $location.path('/settings');
+                    if(!$location.path().includes("/settings")) $location.path('/settings');
                     deferred.reject(); 
                 }
             })
             .catch((error) => {
                 notify.error("Error getting API entries due to " + error);
                 $rootScope.comeFromWizard = true;
-                $location.path('/settings');
+                if(!$location.path().includes("/settings")) $location.path('/settings');
                 deferred.reject(); 
             });
         } else {
@@ -286,7 +286,6 @@ routes
     .when('/settings/:tab?/', {
         template: require('plugins/wazuh/templates/settings/settings.html'),
         resolve: {
-            "checkAPI": settingsWizard,
             "ip": getAllIp
         }
     })
