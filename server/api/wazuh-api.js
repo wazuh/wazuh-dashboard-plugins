@@ -176,6 +176,9 @@ module.exports = (server, options) => {
             rejectUnauthorized: !req.payload.insecure
         })
         .then(response => {
+            if((response.body && response.body.data) && !(response.body.data.includes(packageInfo.version))){
+                return reply(genericErrorBuilder(500,7,`Wrong Wazuh API version, expected: ${packageInfo.version}, found: ${response.body.data}`)).code(500);
+            }
 
             // Check wrong credentials
             if(parseInt(response.statusCode) === 401){
