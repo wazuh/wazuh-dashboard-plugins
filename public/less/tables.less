@@ -1,0 +1,77 @@
+/* -------------------------------------------------------------------------- */
+/* ---------------------- Wazuh stylesheet for tables ----------------------- */
+/* -------------------------------------------------------------------------- */
+
+// Style for text who applies filters when hovering
+.listHover {
+    &:hover {
+        font-weight: bold;
+    }
+}
+
+md-toolbar {
+    &.wazuh-toolbar {
+        // Basic style
+        font-size: 16px;
+        font-weight: bold;
+        background-color: #f7f7f7;
+
+        // Overriding Angular Material default height
+        min-height: 48px;
+        height: 48px;
+    }
+}
+
+md-list,
+md-list-item {
+    &.active {
+        background-color: rgb(0,121,165);
+        color: white !important;
+    }
+}
+
+md-list {
+    &.wazuh-list {
+        // Style for odd items on the list
+        &.odd {
+            background-color: white;
+        }
+
+        // Style for even items on the list
+        &.even {
+            background-color: #fafafa;
+        }
+    }
+}
+
+md-list-item {
+    &.wazuh-list-item {
+        // Overriding Angular Material default height
+        min-height: 44px;
+        height: 44px;
+
+        // Style when hovering a list item
+        &:hover {
+            background-color: rgb(0,121,165);
+            color: white !important;
+        }
+
+        // Fixing transparent text when hover on list item
+        & button.md-no-style.md-button.md-ink-ripple{
+            opacity: 0;
+        }
+    }
+}
+
+.no-height-limit {
+    height: auto !important;
+}
+
+.groups-table:hover {
+    background-color: rgb(0,121,165);
+    color: white !important;
+}
+
+/* ------------------------------------------------------------------------ */
+/* ------------------------------ Old styles ------------------------------ */
+/* ------------------------------------------------------------------------ */

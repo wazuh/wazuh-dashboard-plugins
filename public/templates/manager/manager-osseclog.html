@@ -23,7 +23,7 @@
             <i class="fa fa-play manager-log-buttonplay-i" aria-hidden="true"></i>
             Play realtime
         </md-button>
-        <md-button ng-if="realtime" class="buttonPlayRealTime md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="playRealtime()">
+        <md-button ng-if="realtime" class="buttonPlayRealTime md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="stopRealtime()">
             <i class="fa fa-stop manager-log-buttonplay-i" aria-hidden="true"></i>
             Stop realtime
         </md-button>
@@ -35,36 +35,56 @@
 
     <div flex layout="column" class="md-padding">
 
-        <md-toolbar flex layout="row" class="md-toolbar-tools">
-            <span flex=10 ng-click="logs.sort('timestamp')">Timestamp
+        <!-- Standard -->
+        <md-toolbar ng-if="!realtime" layout="row" class="wazuh-toolbar md-toolbar-tools">
+            <span flex="15" ng-click="logs.sort('timestamp')">Timestamp
                 <i class="fa" ng-class="logs.sortValue === 'timestamp' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
             </span>
-            <span flex=10 ng-click="logs.sort('tag')" >Tag
+            <span flex="10" ng-click="logs.sort('tag')" >Tag
                 <i class="fa" ng-class="logs.sortValue === 'tag' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
             </span>
-            <span flex=10 ng-click="logs.sort('level')">Level
+            <span flex="10" ng-click="logs.sort('level')">Level
                 <i class="fa" ng-class="logs.sortValue === 'level' ? (logs.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
             </span>
             <span flex>Description</span>
         </md-toolbar>
 
-        <div layout="column" flex>
-            <md-content flex class="manager-log-list" id="groups-id" when-scrolled="logs.nextPage('')">
-                <md-list>
-                    <md-list-item ng-repeat="log in logs.items | filter : searchTerm | orderBy : logs.sortValue : logs.sortDir" ng-mouseover="log.hovered=true" ng-mouseleave="log.hovered=false"
-                        layout="row" class="groups-button">
-                        <span flex=10>{{log.timestamp}}</span>
-                        <span flex=10>{{log.tag}}</span>
-                        <span flex=10>{{log.level}}</span>
-                        <span flex>{{log.description}}</span>
-                        <div flex layout="row" layout-align="end center"></div>
-                    </md-list-item>
-                </md-list>
-            </md-content>
-            <md-divider></md-divider>
-            <md-content>
-                <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="logs.busy"></md-progress-linear>
-            </md-content>
-        </div>
+        <!-- Realtime -->
+        <md-toolbar ng-if="realtime" layout="row" class="wazuh-toolbar md-toolbar-tools">
+            <span flex="15">Timestamp</span>
+            <span flex="10">Tag</span>
+            <span flex="10">Level</span>
+            <span flex>Description</span>
+        </md-toolbar>
+
+        <!-- Standard -->
+        <md-content ng-if="!realtime" flex layout="column" class="height-300" id="groups-id" when-scrolled="logs.nextPage('')">
+            <md-list class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="log in logs.items | filter : searchTerm | orderBy : logs.sortValue : logs.sortDir">
+                <md-list-item class="wazuh-list-item no-height-limit" layout="row">
+                    <span flex="15">{{log.timestamp}}</span>
+                    <span flex="10">{{log.tag}}</span>
+                    <span flex="10">{{log.level}}</span>
+                    <span flex>{{log.description}}</span>
+                    <div flex layout="row" layout-align="end center"></div>
+                </md-list-item>
+            </md-list>
+        </md-content>
+
+        <!-- Realtime -->
+        <md-content flex ng-if="realtime" layout="column" class="height-300" id="groups-id">
+            <md-list class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="log in realLogs | filter : searchTerm">
+                <md-list-item class="wazuh-list-item no-height-limit" layout="row">
+                    <span flex="15">{{log.timestamp}}</span>
+                    <span flex="10">{{log.tag}}</span>
+                    <span flex="10">{{log.level}}</span>
+                    <span flex>{{log.description}}</span>
+                    <div flex layout="row" layout-align="end center"></div>
+                </md-list-item>
+            </md-list>
+        </md-content>
+        <md-divider></md-divider>
+        <md-content>
+            <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="logs.busy"></md-progress-linear>
+        </md-content>
     </div>
 </div>

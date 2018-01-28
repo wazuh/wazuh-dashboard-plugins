@@ -4,27 +4,50 @@ const needle = require('needle');
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
-const OBJECTS_FILE = './integration_files/objects_file.json';
+const OBJECTS_FILE     = './integration_files/objects_file.json';
 const APP_OBJECTS_FILE = './integration_files/app_objects_file_alerts.json';
-const KIBANA_TEMPLATE = './integration_files/kibana_template.json';
-
+const KIBANA_TEMPLATE  = './integration_files/kibana_template.json';
+const fs  = require('fs');
+const yml = require('js-yaml');
+const path = require('path');
 module.exports = (server, options) => {
+
+
+
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
-    let objects = {};
-    let app_objects = {};
+    let objects         = {};
+    let app_objects     = {};
     let kibana_template = {};
-    let packageJSON = {};
-
+    let packageJSON     = {};
+    let pattern         = null;
     // Read config from package JSON
     try {
+        const configurationFile = yml.load(fs.readFileSync(path.join(__dirname,'../config.yml'), {encoding: 'utf-8'}));
+        global.loginEnabled = configurationFile.login.enabled;
+        pattern     = configurationFile.pattern;
         packageJSON = require('../package.json');
     } catch (e) {
-        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
+        server.log([blueWazuh, 'initialize', 'error'], 'Something went wrong.' + e.message);
     }
 
-    let index_pattern = packageJSON.initialPattern;
+    if(typeof global.sessions === 'undefined') {
+        global.sessions = { };
+    }
+    global.protectedRoute = req => {
+        if(typeof loginEnabled !== 'undefined' && !loginEnabled) return true;
+        const session = (req.headers && req.headers.code) ? sessions[req.headers.code] : null;
+        if(!session) return false;
+        const timeElapsed = (new Date() - session.created) / 1000;
+        if(timeElapsed >= session.exp){
+            delete sessions[req.payload.code];
+            return false;
+        }
+        return true;
+    }
+
+    let index_pattern = pattern || "wazuh-alerts-3.x-*";
 
     // Save Wazuh App first set up for future executions
     const saveConfiguration = (id) => {
@@ -247,10 +270,10 @@ module.exports = (server, options) => {
                 } 
             })
             .then((response) => {
-                server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated version information');
+                server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated version information');
             })
             .catch((error) => {
-                server.log([blueWazuh, 'reindex', 'error'], 'Could not update version information due to ' + error);
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not update version information due to ' + error);
             });
 
             // We search for the currently applied pattern in the visualizations

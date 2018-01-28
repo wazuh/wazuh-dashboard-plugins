@@ -101,7 +101,7 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
             retrieveList(data[3].data.data.items);
 
             $scope.loading = false;
-            $scope.$digest();
+            if(!$scope.$$phase) $scope.$digest();
         })
         .catch(error => notify.error(error.message));
     };

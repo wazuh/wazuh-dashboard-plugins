@@ -122,6 +122,11 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         if(!$scope.$$phase) $scope.$digest();
     }
 
+    $scope.goBackGroups = () => {
+        $scope.lookingGroup = false;
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
     $scope.showFile = (index) => {
         if($scope.filename) $scope.filename = '';
         let filename = $scope.groupFiles.items[index].filename;

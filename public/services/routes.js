@@ -19,6 +19,11 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
     const notify = new Notifier();
     let deferred = $q.defer();
 
+    // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
+    if (!$location.path().includes("/health-check")) {
+        $rootScope.previousLocation = $location.path();
+    }
+
     const checkResponse = data => {
         if (parseInt(data.data.error) === 2){
             notify.warning("Wazuh App: Please set up Wazuh API credentials.");
@@ -30,7 +35,7 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
             appState.removeCurrentAPI();
         }
         $rootScope.comeFromWizard = true;
-        $location.path('/settings');
+        if(!$location.path().includes("/settings")) $location.path('/settings');
         deferred.reject();
     }
 
@@ -81,14 +86,14 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
                 } else {
                     notify.warning("Wazuh App: Please set up Wazuh API credentials.");
                     $rootScope.comeFromWizard = true;
-                    $location.path('/settings');
+                    if(!$location.path().includes("/settings")) $location.path('/settings');
                     deferred.reject(); 
                 }
             })
             .catch((error) => {
                 notify.error("Error getting API entries due to " + error);
                 $rootScope.comeFromWizard = true;
-                $location.path('/settings');
+                if(!$location.path().includes("/settings")) $location.path('/settings');
                 deferred.reject(); 
             });
         } else {
@@ -137,14 +142,14 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Not
 
             let deferred = $q.defer();
 
-            genericReq.request('GET', '/api/wazuh-elastic/setup')
+            genericReq.request('GET', '/api/wazuh-elastic/current-pattern')
             .then((data) => {
 
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
-                    currentPattern = data.data.data["index-pattern"];
-                    appState.setCurrentPattern(currentPattern);              
+                    currentPattern = data.data.data;
+                    appState.setCurrentPattern(data.data.data);       
                 }
 
                 for (var i = 0; i < savedObjects.length; i++) {
@@ -273,6 +278,7 @@ routes
     .when('/wazuh-discover/', {
         template: require('plugins/wazuh/templates/discover/discover.jade'),
         resolve: {
+            "checkAPI": settingsWizard,
             "ip": getIp,
             "savedSearch": getSavedSearch
         }
@@ -301,11 +307,14 @@ routes
             "checkAPI": goToKibana
         }
     })
+    .when('/login', {
+        template: require('plugins/wazuh/templates/auth/login.html')
+    })
     .when('/', {
-        redirectTo: '/overview/',
+        redirectTo: '/overview/'
     })
     .when('', {
-        redirectTo: '/overview/',
+        redirectTo: '/overview/'
     })
     .otherwise({
         redirectTo: '/overview/'

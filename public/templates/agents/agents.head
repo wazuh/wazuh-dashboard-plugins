@@ -21,7 +21,7 @@
 				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
 					<md-autocomplete id="agentsAutocomplete" flex
 					md-no-cache="true"
-					md-select-on-match="true"
+					md-select-on-match="false"
 					md-selected-item="_swpagent"
 					md-selected-item-change="getAgent(_swpagent.id)"
 					md-search-text="searchTerm"
@@ -59,6 +59,8 @@
 				<md-nav-item md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensions.oscap && agent.os.platform !== 'windows'">SCAP</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit && agent.os.platform !== 'windows'">Audit</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
+                <md-nav-item md-nav-click="switchTab('aws');" name="aws" ng-show="extensions.aws">AWS</md-nav-item>
+                <md-nav-item md-nav-click="switchTab('virustotal');" name="virustotal" ng-show="extensions.virustotal">VirusTotal</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('configuration');" name="configuration" ng-show="agent.id != '000'">Configuration</md-nav-item>
 			</md-nav-bar>
 		</div>
@@ -84,7 +86,7 @@
         <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
-    
+
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="tab != 'configuration' && resultState !== 'ready' && tabView === 'panels'">
         <md-card flex layout="column">

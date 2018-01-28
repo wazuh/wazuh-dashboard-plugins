@@ -36,7 +36,7 @@ md-card-content .ng-binding {
 }
 
 md-input-container>md-select {
-    background: #3caed2;
+    background: rgb(0,121,165);
     border-radius: 3px;
     color: white;
     padding: 3px;
@@ -93,7 +93,7 @@ md-input-container.md-input-invalid label {
 
 md-input-container.md-default-theme label.md-required:after,
 md-input-container label.md-required:after {
-    color: #3caed2 !important;
+    color: rgb(0,121,165) !important;
 }
 
 md-input-container.md-default-theme label,
@@ -101,4 +101,27 @@ md-input-container label,
 md-input-container.md-default-theme ._md-placeholder,
 md-input-container ._md-placeholder {
     font-size: 16px;
+}
+
+/* Overriding the colour for the navbar */
+
+.md-button.md-accent {
+    color: rgb(0,121,165);
+}
+
+md-nav-bar md-nav-ink-bar {
+    color: rgb(0,121,165);
+    background: rgb(0,121,165);
+}
+
+/* ------------------------------------------------------------------------ */
+/* ------------------------ Override for md-switch ------------------------ */
+/* ------------------------------------------------------------------------ */
+
+md-switch.md-checked .md-bar {
+    background-color: rgba(0,121,165,0.5); /* set selected bar color */
+}
+
+md-switch.md-checked .md-thumb {
+    background-color: rgb(0,121,165); /* selected switch color */
 }

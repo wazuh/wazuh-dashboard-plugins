@@ -1,0 +1,31 @@
+---
+# Wazuh App configuration file 
+# https://github.com/wazuh/wazuh-kibana-app
+
+# Default index pattern to use.
+pattern: wazuh-alerts-3.x-*
+
+# Defines which checks must to be consider by the healthcheck step once the Wazuh App starts.
+# Values must to be true or false.
+checks:
+  pattern : true
+  template: true
+  api     : true
+  setup   : true
+
+# Defines which extensions should be activated when you add a new API entry.
+# You can change them after Wazuh App starts.
+# Values must to be true or false.
+extensions:
+  audit     : true
+  pci       : true
+  oscap     : true
+  aws       : false
+  virustotal: false
+
+# Defines if authentication is enabled or not.
+# Field enabled could be true or false, it means login is enabled/disabled
+# Field password is the password used to authenticate on the Wazuh App
+login:
+  enabled : false
+  password: changeme
