@@ -73,6 +73,10 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         $location.search('tab', $scope.submenuNavItem);
     });
 
+    $scope.$watch('apiEntries',() => {
+        if(!$scope.$$phase) $scope.$digest();
+    })
+
     // Remove API entry
     $scope.removeManager = async item => {
         try {
@@ -144,7 +148,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.apiEntries = data.data.length > 0 ? data.data : [];
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null)
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
-
+            if(!$scope.$$phase) $scope.$digest();
             getCurrentAPIIndex();
             if(!currentApiEntryIndex) return;
             $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
@@ -154,7 +158,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.extensions.virustotal = $scope.apiEntries[currentApiEntryIndex]._source.extensions.virustotal;
 
             appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
-
+            
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
