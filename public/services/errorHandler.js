@@ -16,10 +16,18 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
 
     const isUnauthorized = error => (error.status && error.status === 401);
     const isNotFound     = error => (error.status && error.status === 404);
-    const isHttps        = error => (typeof error.https !== 'undefined');
+    const isHttps        = error => (typeof error.https !== 'undefined' && error.https);
     const isBadRequest   = error => (error.status && error.status === 400);
     
-    const handle = (error,isWarning) => {
+    const info = (message,location) => {
+        if(typeof message === 'string') {
+            message = location ? location + '. ' + message : message;
+            notify.info(message);
+        }
+        return;
+    }
+
+    const handle = (error,location,isWarning) => {
         const message = extractMessage(error);
         if(isUnauthorized(error)){
             appState.removeUserCode();
@@ -70,7 +78,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 text = 'Wrong Wazuh API port, please check it and try again';
                 break;
             case 'socket_hang_up':
-                if(error.https){
+                if(isHttps(error)){
                     text = 'Wrong Wazuh API protocol, please check it and try again with http instead https';
                 } else {
                     text = 'Could not connect with Wazuh API, please check url and port and try again'
@@ -79,10 +87,9 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
             default:
                 text = isWarning ? `Warning. ${message}` : `Error. ${message}`;
         }
-
+        text = location ? location + '. ' + text : text;
         if(isWarning) notify.warning(text);
         else          notify.error(text);
-
         return text;
     }
 
