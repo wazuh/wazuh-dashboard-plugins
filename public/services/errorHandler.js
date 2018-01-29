@@ -77,7 +77,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 }
                 break;
             default:
-                text = `Unexpected error. ${error || ''}`;
+                text = `Error. ${error || ''}`;
         }
 
         if(isWarning) notify.warning(text);
