@@ -15,8 +15,7 @@ const healthCheck = ($window, $rootScope) => {
 };
 
 //Installation wizard
-const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, appState, genericReq, errorHandler) => {
-    const notify = new Notifier();
+const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler) => {
     let deferred = $q.defer();
 
     // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
@@ -26,12 +25,12 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
 
     const checkResponse = data => {
         if (parseInt(data.data.error) === 2){
-            errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.',true);
+            errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
         } else if(data.data.data && data.data.data.apiIsDown){
             $rootScope.apiIsDown = "down";
-            errorHandler.handle('Wazuh RESTful API seems to be down.');
+            errorHandler.handle('Wazuh RESTful API seems to be down.','Routes');
         } else {
-            errorHandler.handle('Could not connect with Wazuh RESTful API.');
+            errorHandler.handle('Could not connect with Wazuh RESTful API.','Routes');
             appState.removeCurrentAPI();
         }
         $rootScope.comeFromWizard = true;
@@ -69,7 +68,7 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
                 changeCurrentApi(data);
             }
         })
-        .catch(error => errorHandler.handle(error));
+        .catch(error => errorHandler.handle(error,'Routes'));
     }
 
     if (!$location.path().includes("/health-check") && healthCheck($window, $rootScope)) {
@@ -85,14 +84,14 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
                     appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
                     callCheckStored();
                 } else {
-                    errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.',true);
+                    errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
                     $rootScope.comeFromWizard = true;
                     if(!$location.path().includes("/settings")) $location.path('/settings');
                     deferred.reject(); 
                 }
             })
             .catch(error => {
-                errorHandler.handle(error);
+                errorHandler.handle(error,'Routes');
                 $rootScope.comeFromWizard = true;
                 if(!$location.path().includes("/settings")) $location.path('/settings');
                 deferred.reject(); 
@@ -120,7 +119,7 @@ const goToKibana = ($location, $window) => {
     $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
 };
 
-const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Notifier, Private, appState, genericReq) => {
+const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq) => {
 
     if (healthCheck($window, $rootScope)) {
         let deferred = $q.defer();
