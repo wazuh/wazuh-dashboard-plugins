@@ -36,6 +36,7 @@ require('plugins/wazuh/kibana-integrations/kibanaFilterbarDirective.js');
 require('plugins/wazuh/kibana-integrations/kibanaDiscoverDirective.js');
 
 // Require services
+require('plugins/wazuh/services/errorHandler.js');
 require('plugins/wazuh/services/theming.js');
 require('plugins/wazuh/services/apiReq.js');
 require('plugins/wazuh/services/genericReq.js');
