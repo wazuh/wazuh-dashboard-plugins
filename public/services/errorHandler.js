@@ -95,6 +95,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
     }
 
     return {
-        handle: handle
+        handle: handle,
+        info: info
     }
 });
