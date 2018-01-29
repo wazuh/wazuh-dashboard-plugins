@@ -74,7 +74,7 @@ app.directive('dynamic', function($compile) {
                     courier.indexPatterns.get(appState.getCurrentPattern())
                     .then((data) => {
                         $scope.theresPattern = true;
-                        $scope.currentPattern = data.title;
+                        $scope.currentSelectedPattern = appState.getCurrentPattern();
                     })
                     .catch((error) => {
                         notify.error("Error getting patterns from Kibana...");
