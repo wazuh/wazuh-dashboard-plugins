@@ -16,6 +16,7 @@ app.factory('DataHandler', function ($q, apiReq) {
         }
 
         nextPage () {
+            let deferred = $q.defer();
             if (this.busy || this.end) {
                 deferred.resolve(true);
                 return;
@@ -46,7 +47,6 @@ app.factory('DataHandler', function ($q, apiReq) {
                 deferred.resolve(true);
                 return;
             }
-            let deferred = $q.defer();
             apiReq.request('GET', this.path, requestData)
             .then(data => {
                 if (data.data.data === 0){

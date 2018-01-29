@@ -1,6 +1,7 @@
 import chrome from 'ui/chrome';
 
-require('ui/modules').get('app/wazuh', []).service('apiReq', function ($q, $http, genericReq, appState, $location, $rootScope) {
+const app = require('ui/modules').get('app/wazuh', []);
+app.service('apiReq', function ($q, $http, genericReq, appState, $location, $rootScope) {
     return {
         request: (method, path, body) => {
             let defered = $q.defer();
@@ -23,21 +24,14 @@ require('ui/modules').get('app/wazuh', []).service('apiReq', function ($q, $http
             let requestData = { method, path, body, id };
 
             genericReq.request('POST', '/api/wazuh-api/request', requestData)
-            .then((data) => {
+            .then(data => {
                 if (data.error) {
                     defered.reject(data);
                 } else {
                     defered.resolve(data);
                 }
             })
-            .catch(error => {
-                if(error.status && error.status === 401){
-                    appState.removeUserCode();
-                    defered.reject(error);
-                    $location.path('/login');
-                }
-                defered.reject(error);
-            });
+            .catch(error => defered.reject(error));
 
             return defered.promise;
         }

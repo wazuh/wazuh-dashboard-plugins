@@ -1,7 +1,7 @@
 const prepError = require('plugins/wazuh/services/prep-error');
 import chrome from 'ui/chrome';
 
-require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $http, $location, $rootScope, appState) {
+require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $http, $location, $rootScope, appState,errorHandler) {
 
     const _request = (method, url, payload = null) => {
         let defered = $q.defer();
@@ -25,8 +25,8 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
         
         if(!tmp) {
             defered.reject({
-                'error': -2,
-                'message': 'Error doing a request to Kibana API.'
+                error: -2,
+                message: `Error doing a request to ${tmpUrl}, method: ${method}.`
             });
             return defered.promise;
         }
@@ -40,11 +40,7 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
             }
         })
         .catch(error => {
-            if(error.status && error.status === 401){
-                appState.removeUserCode();
-                defered.reject(error);
-                $location.path('/login');
-            } else if(error.status && error.status === -1){
+            if(error.status && error.status === -1){
                 defered.reject({data: 'request_timeout_genericreq', url });
             }else {
                 defered.reject(error);
@@ -70,9 +66,7 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
             .then((data) => defered.resolve(data))
             .catch(error => {
                 if(error.status && error.status === 401){
-                    appState.removeUserCode();
                     defered.reject(error);
-                    $location.path('/login');
                 } else { 
                     defered.reject(prepError(error));
                 }
