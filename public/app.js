@@ -55,6 +55,9 @@ require('plugins/wazuh/controllers/common/factories.js');
 require('plugins/wazuh/controllers/common/filters.js');
 require('plugins/wazuh/controllers/common/directives.js');
 
+// Blank Screen
+require('plugins/wazuh/controllers/blankScreenController.js');
+
 // Login
 require('plugins/wazuh/controllers/login.js');
 

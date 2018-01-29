@@ -8,6 +8,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         if(error.errorData && error.errorData.message) return error.errorData.message;
         if(error.data && typeof error.data === 'string') return error.data;
         if(error.data && error.data.message) return error.data.message;
+        if(error.data && error.data.data && typeof error.data.data === 'string') return error.data.data;
         if(error.message) return error.message;
         if(typeof error === 'string') return error;
         if(typeof error === 'object') return JSON.stringify(error);
@@ -38,7 +39,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         let text;
         switch (message) {
             case 'no_elasticsearch':
-                text = 'Could not connect with elasticsearch in order to retrieve the credentials.';
+                text = `Could not connect with elasticsearch, maybe it's down.`;
                 break;
             case 'no_credentials':
                 text = 'Valid credentials not found in elasticsearch. It seems the credentials ' +
