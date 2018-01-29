@@ -77,7 +77,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 }
                 break;
             default:
-                text = `Error. ${message}`;
+                text = isWarning ? `Warning. ${message}` : `Error. ${message}`;
         }
 
         if(isWarning) notify.warning(text);
