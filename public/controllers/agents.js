@@ -57,6 +57,9 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         "pm": {
             "group": "rootcheck"
         },
+        "vuls": {
+            "group": "vuls"
+        },
         "oscap": {
             "group": "oscap"
         },

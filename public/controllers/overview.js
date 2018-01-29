@@ -52,6 +52,9 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         "pm": {
             "group": "rootcheck"
         },
+        "vuls": {
+            "group": "vuls"
+        },
         "oscap": {
             "group": "oscap"
         },
