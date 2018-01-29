@@ -15,8 +15,7 @@ const healthCheck = ($window, $rootScope) => {
 };
 
 //Installation wizard
-const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, appState, genericReq) => {
-    const notify = new Notifier();
+const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler) => {
     let deferred = $q.defer();
 
     // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
@@ -25,17 +24,26 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
     }
 
     const checkResponse = data => {
+        let fromElastic = false;
         if (parseInt(data.data.error) === 2){
-            notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+            errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
         } else if(data.data.data && data.data.data.apiIsDown){
             $rootScope.apiIsDown = "down";
-            notify.error('Wazuh RESTful API seems to be down.');
+            errorHandler.handle('Wazuh RESTful API seems to be down.','Routes');
         } else {
-            notify.error('Could not connect with Wazuh RESTful API.');
+            fromElastic = true;
+            $rootScope.blankScreenError = errorHandler.handle(data,'Routes');
             appState.removeCurrentAPI();
         }
-        $rootScope.comeFromWizard = true;
-        if(!$location.path().includes("/settings")) $location.path('/settings');
+
+        if(!fromElastic){
+            $rootScope.comeFromWizard = true;
+            if(!$rootScope.$$phase) $rootScope.$digest();
+            if(!$location.path().includes("/settings")) $location.path('/settings');
+        } else {
+            $location.path('/blank-screen');
+        }
+
         deferred.reject();
     }
 
@@ -68,7 +76,7 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
                 changeCurrentApi(data);
             }
         })
-        .catch(error => notify.error(error.message));
+        .catch(error => errorHandler.handle(error,'Routes'));
     }
 
     if (!$location.path().includes("/health-check") && healthCheck($window, $rootScope)) {
@@ -78,20 +86,20 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
         // There's no cookie for current API
         if (!appState.getCurrentAPI()) {
             genericReq.request('GET', '/api/wazuh-api/apiEntries')
-            .then((data) => {
+            .then(data => {
                 if (data.data.length > 0) {
-                    var apiEntries = data.data;
+                    const apiEntries = data.data;
                     appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
                     callCheckStored();
                 } else {
-                    notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+                    errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
                     $rootScope.comeFromWizard = true;
                     if(!$location.path().includes("/settings")) $location.path('/settings');
                     deferred.reject(); 
                 }
             })
-            .catch((error) => {
-                notify.error("Error getting API entries due to " + error);
+            .catch(error => {
+                errorHandler.handle(error,'Routes');
                 $rootScope.comeFromWizard = true;
                 if(!$location.path().includes("/settings")) $location.path('/settings');
                 deferred.reject(); 
@@ -119,31 +127,26 @@ const goToKibana = ($location, $window) => {
     $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
 };
 
-const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Notifier, Private, appState, genericReq) => {
-
+const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq) => {
+    let deferred = $q.defer();
     if (healthCheck($window, $rootScope)) {
-        let deferred = $q.defer();
-        $location.path('/health-check');
         deferred.reject();
-        return deferred.promise;
+        $location.path('/health-check');
     } else {
         const State = Private(StateProvider);
         const savedObjectsClient = Private(SavedObjectsClientProvider);
-
-        return savedObjectsClient.find({
-            type: 'index-pattern',
-            fields: ['title'],
+        
+        savedObjectsClient.find({
+            type   : 'index-pattern',
+            fields : ['title'],
             perPage: 10000
         })
         .then(({ savedObjects }) => {
 
-            let onlyWazuhAlerts = [];
             let currentPattern = '';
 
-            let deferred = $q.defer();
-
             genericReq.request('GET', '/api/wazuh-elastic/current-pattern')
-            .then((data) => {
+            .then(data => {
 
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
@@ -152,32 +155,43 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Not
                     appState.setCurrentPattern(data.data.data);       
                 }
 
-                for (var i = 0; i < savedObjects.length; i++) {
-                    if (savedObjects[i].id === currentPattern) {
-                        onlyWazuhAlerts.push(savedObjects[i]);
-                    }
-                }
+                const onlyWazuhAlerts = savedObjects.filter(element => element.id === currentPattern);
 
-                if (onlyWazuhAlerts.length == 0) { // There's now selected ip
-                    deferred.resolve("No ip");
-                    return deferred.promise;
+                if (onlyWazuhAlerts.length === 0) { // There's now selected ip
+                    deferred.resolve('No ip');
+                    return;
                 }
 
                 courier.indexPatterns.get(currentPattern)
-                .then((data) => {
+                .then(data => {
                     deferred.resolve({
-                        list: onlyWazuhAlerts,
-                        loaded: data,
-                        stateVal: null,
-                        stateValFound: false    
+                        list         : onlyWazuhAlerts,
+                        loaded       : data,
+                        stateVal     : null,
+                        stateValFound: false
                     });
+                })
+                .catch(error => {
+                    deferred.reject(error);
+                    $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch');  
+                    $location.path('/blank-screen');
                 });
 
-            });
-
-            return deferred.promise;
+            })  
+            .catch(error => {
+                deferred.reject(error);
+                $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch');  
+                $location.path('/blank-screen');
+            });          
+        })
+        .catch(error => {
+            deferred.reject(error);
+            $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch');  
+            $location.path('/blank-screen');
         });
     }
+    return deferred.promise;
+    
 };
 
 const getAllIp = (Promise, $q, $window, $rootScope, courier, config, $location, Private) => {
@@ -309,6 +323,9 @@ routes
     })
     .when('/login', {
         template: require('plugins/wazuh/templates/auth/login.html')
+    })
+    .when('/blank-screen', {
+        template: require('plugins/wazuh/templates/error-handler/blank-screen.html')
     })
     .when('/', {
         redirectTo: '/overview/'
