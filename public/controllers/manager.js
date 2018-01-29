@@ -12,7 +12,7 @@ app.controller('managerController', function ($scope,$rootScope, $routeParams, $
     apiReq.request('GET', `/agents/000`, {})
     .then(data => $rootScope.agent = data.data.data)
     .catch(error => {
-        errorHandler.handle(error);
+        errorHandler.handle(error,'Manager');
         if(!$rootScope.$$phase) $rootScope.$digest();
     });
 
@@ -66,7 +66,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
         if(!$scope.$$phase) $scope.$digest();
     })
     .catch(error => {
-        errorHandler.handle(error); 
+        errorHandler.handle(error,'Manager'); 
         if(!$rootScope.$$phase) $rootScope.$digest();
     });
 
@@ -94,7 +94,7 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, er
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Manager');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };

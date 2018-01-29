@@ -194,7 +194,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Agents');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
@@ -215,7 +215,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
             if(!$scope.$$phase) $scope.$digest();
             return $scope.agentsAutoComplete.items;
         } catch (error) {
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Agents');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
 
@@ -228,7 +228,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         }
         $scope.agentsAutoComplete.nextPage('');
     } catch (e) {
-        errorHandler.handle('Unexpected exception loading controller');
+        errorHandler.handle('Unexpected exception loading controller','Agents');
         if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
@@ -255,7 +255,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
             }
         })
         .catch(error => {
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Agents');
             if(!$rootScope.$$phase) $rootScope.$digest();
         });
 
@@ -341,7 +341,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error){
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Agents');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }

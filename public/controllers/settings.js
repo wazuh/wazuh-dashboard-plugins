@@ -5,7 +5,7 @@ import chrome from 'ui/chrome';
 // Require App
 const app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, courier, Notifier, errorHandler) {
+app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, courier, errorHandler) {
     $rootScope.page = "settings";
 
     if ($rootScope.comeFromWizard) {
@@ -14,7 +14,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     }
 
     // Initialize
-    const notify = new Notifier({ location: 'Settings' });
+
     let currentApiEntryIndex;
     $scope.formData = {
         user    : '',
@@ -83,7 +83,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             let index = $scope.apiEntries.indexOf(item);
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
                 if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
-                    errorHandler.handle('Please remove another API.',true);
+                    errorHandler.handle('Please remove another API.','Settings',true);
                     if(!$rootScope.$$phase) $rootScope.$digest();
                     return;
                 }
@@ -94,7 +94,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(!$scope.$$phase) $scope.$digest();
             return;            
         } catch(error) {
-            errorHandler.handle('Could not remove manager');
+            errorHandler.handle('Could not remove manager','Settings');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
@@ -125,7 +125,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
         $scope.extensions     = $scope.apiEntries[index]._source.extensions;
 
-        notify.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`);
+        errorHandler.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`,'Settings');
 
         getCurrentAPIIndex();
 
@@ -162,7 +162,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle('Error getting API entries');
+            errorHandler.handle('Error getting API entries','Settings');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
@@ -200,7 +200,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             if(invalid) {
                 $scope.messageError = invalid;
-                errorHandler.handle(invalid);
+                errorHandler.handle(invalid,'Settings');
                 if(!$rootScope.$$phase) $rootScope.$digest();
                 return;
             }
@@ -242,7 +242,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             $scope.apiEntries.push(newEntry);
 
-            notify.info('Wazuh API successfully added');
+            errorHandler.info('Wazuh API successfully added','Settings');
             $scope.addManagerContainer = false;
             $scope.formData.user       = "";
             $scope.formData.password   = "";
@@ -291,7 +291,9 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             const invalid = validator('formUpdate');
             if(invalid) {
                 $scope.messageErrorUpdate = invalid;
-                return notify.error(invalid);
+                errorHandler.handle(invalid,'Settings');
+                if(!$rootScope.$$phase) $rootScope.$digest();
+                return;
             }
     
             const index = $scope.apiEntries.indexOf(item);
@@ -322,7 +324,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             $scope.showEditForm[$scope.apiEntries[index]._id] = false;
 
-            notify.info('Connection success');
+            errorHandler.info('Connection success','Settings');
 
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -355,7 +357,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
             $rootScope.apiIsDown = null;
             
-            notify.info("Connection success");
+            errorHandler.info('Connection success','Settings');
             
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -381,7 +383,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             }
             return;
         } catch (error){
-            errorHandler.handle('Invalid request when toggle extension state.');
+            errorHandler.handle('Invalid request when toggle extension state.','Settings');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
@@ -396,13 +398,13 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle('Error while changing the default index-pattern');
+            errorHandler.handle('Error while changing the default index-pattern','Settings');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
     const printError = (error,updating) => {
-        const text = errorHandler.handle(error);
+        const text = errorHandler.handle(error,'Settings');
         if(!updating) $scope.messageError       = text;
         else          $scope.messageErrorUpdate = text;
         if(!$rootScope.$$phase) $rootScope.$digest();
@@ -426,7 +428,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle('Error when loading Wazuh setup info');
+            errorHandler.handle('Error when loading Wazuh setup info','Settings');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
