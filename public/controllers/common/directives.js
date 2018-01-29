@@ -44,7 +44,7 @@ app.directive('dynamic', function($compile) {
                     $scope.currentPattern = data.title;
                 })
                 .catch((error) => {
-                    notify.error("Error getting patterns from Kibana...");
+                    notify.error("Pattern applied to visualizations does NOT exist...");
                     $scope.theresPattern = false;
                 });
 

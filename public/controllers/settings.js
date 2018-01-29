@@ -445,13 +445,15 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             $scope.appInfo["app-version"]      = data.data.data["app-version"];
             $scope.appInfo["installationDate"] = data.data.data["installationDate"];
             $scope.appInfo["revision"]         = data.data.data["revision"];
-            $scope.appInfo["index-pattern"]    = data.data.data["index-pattern"];
             $scope.load = false;
 
             if (appState.getCurrentPattern() !== undefined && appState.getCurrentPattern() !== null) { // There's a pattern in the cookies
                 $scope.selectedIndexPattern = appState.getCurrentPattern();
             } else { // There's no pattern in the cookies, pick the one in the settings
-                $scope.selectedIndexPattern = data.data.data["index-pattern"];
+                genericReq.request('GET', '/api/wazuh-api/configuration', {})
+                .then(config => {
+                    $scope.selectedIndexPattern = config.data.data["pattern"];
+                });
             }
         })
         .catch(() => {

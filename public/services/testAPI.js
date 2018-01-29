@@ -4,10 +4,8 @@ require('ui/modules').get('app/wazuh', [])
     return {
         check_stored: data => {
             const headers = {headers:{ "Content-Type": 'application/json' },timeout: 4000};
-            console.log(appState.getUserCode())
             if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
             let defered = $q.defer();
-            console.log(data);
             $http
             .post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers)
             .then(response => {

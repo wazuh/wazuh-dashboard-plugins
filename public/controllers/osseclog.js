@@ -17,7 +17,7 @@ app.controller('managerLogController', function ($scope, Logs, apiReq,Notifier) 
             return;
         } catch (error) {
             if(error.data && error.data.errorData && error.data.errorData.error === 1000){
-                console.log(error.data.errorData.message);
+                //console.log(error.data.errorData.message);
             } else {
                 notify.error(error.message);
             }
