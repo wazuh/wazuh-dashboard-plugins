@@ -15,7 +15,7 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Logs');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
@@ -41,7 +41,7 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Logs');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }

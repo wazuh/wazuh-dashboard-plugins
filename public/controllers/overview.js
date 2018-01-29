@@ -103,7 +103,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
             }
         })
         .catch(error => {
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Overview');
             if(!$rootScope.$$phase) $rootScope.$digest();
         });
 

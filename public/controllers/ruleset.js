@@ -28,7 +28,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
             if(!$scope.$$phase) $scope.$digest();
             return $scope.rulesAutoComplete.items;
         } catch (error){
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Ruleset');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
@@ -60,7 +60,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle('Unexpected exception loading controller');
+            errorHandler.handle('Unexpected exception loading controller','Ruleset');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
@@ -175,7 +175,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
             if(!$scope.$$phase) $scope.$digest();
             return $scope.decodersAutoComplete.items;
         } catch (error){
-            errorHandler.handle(error);
+            errorHandler.handle(error,'Ruleset');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
@@ -190,7 +190,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle('Unexpected exception loading controller');
+            errorHandler.handle('Unexpected exception loading controller','Ruleset');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
