@@ -38,6 +38,7 @@ require('ui/modules').get('app/wazuh', [])
 
                 notify.info("Successfully changed the default index-pattern");
                 newPattern = selectedPattern;
+                $route.reload();
             })
             .catch(() => {
                 notify.error("Error while changing the default index-pattern");
