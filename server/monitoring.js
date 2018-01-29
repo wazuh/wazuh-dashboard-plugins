@@ -20,7 +20,7 @@ module.exports = (server, options) => {
     let fDate         = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
     let todayIndex    = index_prefix + fDate;
     let packageJSON   = {};
-    let app_objects = {};
+    let app_objects   = {};
     
     // Read Wazuh App package file
     try {
@@ -297,7 +297,7 @@ module.exports = (server, options) => {
                 server.log([blueWazuh, 'monitoring', 'info'], "Successfully deleted old wazuh-monitoring pattern.");
             })
             .catch((error) => {
-                server.log([blueWazuh, 'monitoring', 'error'], "Didn't find old wazuh-monitoring pattern. Skipping deletion.");
+                server.log([blueWazuh, 'monitoring', 'info'], "Didn't find old wazuh-monitoring pattern. Skipping deletion.");
             });
             configureKibana();
         });
