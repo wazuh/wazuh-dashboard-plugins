@@ -1,17 +1,18 @@
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope,$rootScope, $routeParams, $location,apiReq, Notifier) {
-    const notify = new Notifier({ location: 'Manager' });
+app.controller('managerController', function ($scope,$rootScope, $routeParams, $location,apiReq, errorHandler) {
     $scope.submenuNavItem  = 'status';
     $scope.submenuNavItem2 = 'rules';
 
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
+    
     apiReq.request('GET', `/agents/000`, {})
     .then(data => $rootScope.agent = data.data.data)
-    .catch(error => notify.error(error.message));
+    .catch(error => errorHandler.handle(error));
+
     // Watchers
     $scope.$watch('submenuNavItem', () => {
         if($scope.submenuNavItem === 'ruleset') {
@@ -27,15 +28,12 @@ app.controller('managerController', function ($scope,$rootScope, $routeParams, $
     $scope.setRulesTab = (tab) => $scope.submenuNavItem2 = tab;
 });
 
-app.controller('managerStatusController', function ($scope,$rootScope, Notifier, apiReq) {
+app.controller('managerStatusController', function ($scope,$rootScope, errorHandler, apiReq) {
     //Initialization
-    const notify = new Notifier({ location: 'Manager - Status' });
     $scope.load  = true;
 
     //Functions
-    $scope.getDaemonStatusClass = (daemonStatus) => { 
-        return (daemonStatus === 'running') ? 'status green' : 'status red';
-    };
+    $scope.getDaemonStatusClass = daemonStatus => (daemonStatus === 'running') ? 'status green' : 'status red';
 
     Promise.all([
         apiReq.request('GET', '/agents/summary', {}),
@@ -64,14 +62,13 @@ app.controller('managerStatusController', function ($scope,$rootScope, Notifier,
         $scope.load = false;
         if(!$scope.$$phase) $scope.$digest();
     })
-    .catch(error => notify.error(error.message));
+    .catch(error => errorHandler.handle(error));
 
 });
 
 const beautifier = require('plugins/wazuh/utils/json-beautifier');
-app.controller('managerConfigurationController', function ($scope,$rootScope, Notifier, apiReq) {
+app.controller('managerConfigurationController', function ($scope,$rootScope, errorHandler, apiReq) {
     //Initialization
-    const notify   = new Notifier({ location: 'Manager - Configuration' });
     $scope.load    = true;
     $scope.isArray = angular.isArray;
 
@@ -91,7 +88,8 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, No
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            notify.error(error.message)
+            errorHandler.handle(error);
+            if(!$scope.$$phase) $scope.$digest();
         }
     };
 

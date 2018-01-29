@@ -1,37 +1,36 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope,$q,$rootScope, Notifier, Rules,RulesAutoComplete) {
+app.controller('rulesController', function ($scope,$q,$rootScope, Rules,RulesAutoComplete, errorHandler) {
     $scope.setRulesTab = (tab) => $rootScope.globalsubmenuNavItem2 = tab;
+    
     //Initialization
-    const notify   = new Notifier({ location: 'Manager - Rules' });
     $scope.loading = true;
     $scope.rules   = Rules;
-    $scope.rulesAutoComplete   = RulesAutoComplete;
+    $scope.rulesAutoComplete = RulesAutoComplete;
     $scope.setRulesTab('rules');
+    $rootScope.tabVisualizations = { ruleset: 4 };
+    $scope.analizeRules = async search => {
+        try {
+            $scope.rulesAutoComplete.filters = [];
     
-    $scope.analizeRules = search => {
-        let deferred = $q.defer();
-        
-        let promise;
-        $scope.rulesAutoComplete.filters = [];
-
-        if(search.startsWith('group:') && search.split('group:')[1].trim()) {
-            promise = $scope.rulesAutoComplete.addFilter('group',search.split('group:')[1].trim());
-        } else if(search.startsWith('level:') && search.split('level:')[1].trim()) {
-            promise = $scope.rulesAutoComplete.addFilter('level',search.split('level:')[1].trim());
-        } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
-            promise = $scope.rulesAutoComplete.addFilter('pci',search.split('pci:')[1].trim());
-        } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
-            promise = $scope.rulesAutoComplete.addFilter('file',search.split('file:')[1].trim());
-        } else {
-            promise = $scope.rulesAutoComplete.addFilter('search',search);
+            if(search.startsWith('group:') && search.split('group:')[1].trim()) {
+                await $scope.rulesAutoComplete.addFilter('group',search.split('group:')[1].trim());
+            } else if(search.startsWith('level:') && search.split('level:')[1].trim()) {
+                await $scope.rulesAutoComplete.addFilter('level',search.split('level:')[1].trim());
+            } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
+                await $scope.rulesAutoComplete.addFilter('pci',search.split('pci:')[1].trim());
+            } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
+                await $scope.rulesAutoComplete.addFilter('file',search.split('file:')[1].trim());
+            } else {
+                await $scope.rulesAutoComplete.addFilter('search',search);
+            }
+    
+            if(!$scope.$$phase) $scope.$digest();
+            return $scope.rulesAutoComplete.items;
+        } catch (error){
+            errorHandler.handle(error);
+            if(!$scope.$$phase) $scope.$digest();
         }
-
-        promise
-        .then(() => deferred.resolve($scope.rulesAutoComplete.items))
-        .catch(error => notify.error(error));
-
-        return deferred.promise;
     }
 
     $scope.checkEnter = search => {
@@ -51,15 +50,23 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Notifier, Rule
     };
 
 
-    //Load
-    try {
-        $scope.rules.nextPage('')
-        .then(() => $scope.rulesAutoComplete.nextPage(''))
-        .then(() => $scope.loading = false)
-        .catch(error => notify.error(error.message));
-    } catch (e) {
-        notify.error('Unexpected exception loading controller');
+    const load = async () => {
+        try {
+            await Promise.all([
+                $scope.rules.nextPage(),
+                $scope.rulesAutoComplete.nextPage()
+            ]);
+            $scope.loading = false;
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch (error) {
+            errorHandler.handle('Unexpected exception loading controller');
+            if(!$scope.$$phase) $scope.$digest();
+        }
     }
+
+    //Load
+    load();
 
     let timesOpened = 0;
     let lastName = false;
@@ -77,23 +84,25 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Notifier, Rule
     //Destroy
     $scope.$on('$destroy', () => {
         $scope.rules.reset();
-        for(let h of $rootScope.ownHandlers){
-            h._scope.$destroy();
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
         }
         $rootScope.ownHandlers = [];
     });
 });
 
-app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Notifier, Decoders,DecodersAutoComplete) {
-    $scope.setRulesTab = (tab) => $rootScope.globalsubmenuNavItem2 = tab;
+app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Decoders,DecodersAutoComplete, errorHandler) {
+    $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
+    
     //Initialization
-    const notify    = new Notifier({ location: 'Manager - Decoders' });
     $scope.loading  = true;
     $scope.decoders = Decoders;
     $scope.decodersAutoComplete = DecodersAutoComplete;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
-
+    $rootScope.tabVisualizations = { ruleset: 1 };
     const colors = [
         '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6
         '#508642', '#CCA300', '#447EBC', '#C15C17', '#890F02', '#0A437C', '#6D1F62', '#584477', //2
@@ -118,7 +127,7 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Noti
         return true;
     }
 
-    $scope.colorRegex = (regex) => {
+    $scope.colorRegex = regex => {
         regex = regex.toString();
         let valuesArray   = regex.match(/\(((?!<\/span>).)*?\)(?!<\/span>)/gmi);
         let coloredString = regex;
@@ -128,7 +137,7 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Noti
         return $sce.trustAsHtml(coloredString);
     };
 
-    $scope.colorOrder = (order) => {
+    $scope.colorOrder = order => {
         order = order.toString();
         let valuesArray   = order.split(',');
         let coloredString = order;
@@ -151,42 +160,51 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Noti
         }
     };
 
-    $scope.analizeDecoders = search => {
-        let deferred = $q.defer();
-        
-        let promise;
-        $scope.decodersAutoComplete.filters = [];
-
-        if(search.startsWith('path:') && search.split('path:')[1].trim()) {
-            promise = $scope.decodersAutoComplete.addFilter('path',search.split('path:')[1].trim());
-        } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
-            promise = $scope.decodersAutoComplete.addFilter('file',search.split('file:')[1].trim());
-        } else {
-            promise = $scope.decodersAutoComplete.addFilter('search',search);
+    $scope.analizeDecoders = async search => {
+        try {
+            $scope.decodersAutoComplete.filters = [];
+    
+            if(search.startsWith('path:') && search.split('path:')[1].trim()) {
+                await $scope.decodersAutoComplete.addFilter('path',search.split('path:')[1].trim());
+            } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
+                await $scope.decodersAutoComplete.addFilter('file',search.split('file:')[1].trim());
+            } else {
+                await $scope.decodersAutoComplete.addFilter('search',search);
+            }
+    
+            if(!$scope.$$phase) $scope.$digest();
+            return $scope.decodersAutoComplete.items;
+        } catch (error){
+            errorHandler.handle(error);
+            if(!$scope.$$phase) $scope.$digest();
         }
+    }
 
-        promise
-        .then(() => deferred.resolve($scope.decodersAutoComplete.items))
-        .catch(error => notify.error(error));
-
-        return deferred.promise;
+    const load = async () => {
+        try {
+            await Promise.all([
+                $scope.decoders.nextPage(),
+                $scope.decodersAutoComplete.nextPage()
+            ]);
+            $scope.loading = false;
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch (error) {
+            errorHandler.handle('Unexpected exception loading controller');
+            if(!$scope.$$phase) $scope.$digest();
+        }
     }
 
     //Load
-    try {
-        $scope.decoders.nextPage('')
-        .then(() => $scope.decodersAutoComplete.nextPage())
-        .then(() => $scope.loading = false)
-        .catch(error => notify.error(error.message));
-    } catch (e) {
-        notify.error('Unexpected exception loading controller');
-    }
+    load();
 
     //Destroy
     $scope.$on("$destroy", () => {
         $scope.decoders.reset();
-        for(let h of $rootScope.ownHandlers){
-            h._scope.$destroy();
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
         }
         $rootScope.ownHandlers = [];
     });
