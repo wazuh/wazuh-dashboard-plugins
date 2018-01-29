@@ -125,3 +125,20 @@ md-switch.md-checked .md-bar {
 md-switch.md-checked .md-thumb {
     background-color: rgb(0,121,165); /* selected switch color */
 }
+
+/* ------------------------------------------------------------------------ */
+/* ----------------------- Wazuh class for md-select ---------------------- */
+/* ------------------------------------------------------------------------ */
+
+md-select {
+    &.wazuh-select {
+        margin-top: 0;
+        margin-bottom: 0;
+        color: white;
+    }
+}
+
+md-select.wazuh-select:focus,
+md-select.wazuh-select > md-select-value {
+    color: white !important;
+}

@@ -42,11 +42,11 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
-    $scope.indexPatterns = [];  
+    $scope.indexPatterns = [];
 
     // Getting the index pattern list into the scope, but selecting only "valid" ones
-    for (let i = 0; i < $route.current.locals.ip.list.length; i ++) {
-        courier.indexPatterns.get($route.current.locals.ip.list[i].id)
+    for (let i = 0; i < $route.current.locals.ips.list.length; i ++) {
+        courier.indexPatterns.get($route.current.locals.ips.list[i].id)
         .then((data) => {
             let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
             let minimumCount = 0;
@@ -58,7 +58,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             }
 
             if (minimumCount == minimum.length) {
-                $scope.indexPatterns.push($route.current.locals.ip.list[i]);
+                $scope.indexPatterns.push($route.current.locals.ips.list[i]);
             }
 
         });

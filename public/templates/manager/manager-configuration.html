@@ -77,10 +77,8 @@
                                             Active response
                                         </a>
                                     </p>
-                                    
                                 </div>
                             </div>
-
                         </div>
 
                         <!-- Global -->
@@ -97,6 +95,11 @@
                                     <p ng-if="managerConfiguration.global.logall">
                                         Log all
                                         <span class="md-secondary pull-right">{{managerConfiguration.global.logall}}
+                                        </span>
+                                    </p>
+                                    <p ng-if="managerConfiguration.global.logall">
+                                        Log all in JSON
+                                        <span class="md-secondary pull-right">{{managerConfiguration.global.logall_json}}
                                         </span>
                                     </p>
                                     <p ng-if="managerConfiguration.global.white_list">

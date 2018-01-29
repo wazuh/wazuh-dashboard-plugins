@@ -51,13 +51,13 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
         // Should change the currentAPI configuration depending on cluster
         if (data.data.data.cluster_info.status === 'disabled'){
             appState.setCurrentAPI(JSON.stringify({
-                name: data.data.data.cluster_info.manager, 
-                id: JSON.parse(appState.getCurrentAPI()).id 
+                name: data.data.data.cluster_info.manager,
+                id: JSON.parse(appState.getCurrentAPI()).id
             }));
         } else {
             appState.setCurrentAPI(JSON.stringify({
-                name: data.data.data.cluster_info.cluster, 
-                id: JSON.parse(appState.getCurrentAPI()).id 
+                name: data.data.data.cluster_info.cluster,
+                id: JSON.parse(appState.getCurrentAPI()).id
             }));
         }
 
@@ -71,8 +71,8 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
         .then(data => {
             if (data.data.error || data.data.data.apiIsDown) {
                 checkResponse(data);
-            } else { 
-                $rootScope.apiIsDown = null; 
+            } else {
+                $rootScope.apiIsDown = null;
                 changeCurrentApi(data);
             }
         })
@@ -95,14 +95,14 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
                     errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
                     $rootScope.comeFromWizard = true;
                     if(!$location.path().includes("/settings")) $location.path('/settings');
-                    deferred.reject(); 
+                    deferred.reject();
                 }
             })
             .catch(error => {
                 errorHandler.handle(error,'Routes');
                 $rootScope.comeFromWizard = true;
                 if(!$location.path().includes("/settings")) $location.path('/settings');
-                deferred.reject(); 
+                deferred.reject();
             });
         } else {
             callCheckStored();
@@ -152,7 +152,7 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
                     currentPattern = appState.getCurrentPattern();
                 } else {
                     currentPattern = data.data.data;
-                    appState.setCurrentPattern(data.data.data);       
+                    appState.setCurrentPattern(data.data.data);
                 }
 
                 const onlyWazuhAlerts = savedObjects.filter(element => element.id === currentPattern);
@@ -266,18 +266,21 @@ routes
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
+            "ips": getAllIp,
             "savedSearch": getSavedSearch
         }
     })
     .when('/agents-preview', {
         template: require('plugins/wazuh/templates/agents-prev/agents-prev.jade'),
         resolve: {
+            "ips": getAllIp,
             "checkAPI": settingsWizard
         }
     })
     .when('/manager/:tab?/', {
         template: require('plugins/wazuh/templates/manager/manager.jade'),
         resolve: {
+            "ips": getAllIp,
             "checkAPI": settingsWizard
         }
     })
@@ -286,6 +289,7 @@ routes
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
+            "ips": getAllIp,
             "savedSearch": getSavedSearch
         }
     })
@@ -294,13 +298,14 @@ routes
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
+            "ips": getAllIp,
             "savedSearch": getSavedSearch
         }
     })
     .when('/settings/:tab?/', {
         template: require('plugins/wazuh/templates/settings/settings.html'),
         resolve: {
-            "ip": getAllIp
+            "ips": getAllIp
         }
     })
     .when('/visualize/create?', {
