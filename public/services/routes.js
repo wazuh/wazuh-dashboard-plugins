@@ -35,6 +35,7 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
             appState.removeCurrentAPI();
         }
         $rootScope.comeFromWizard = true;
+        if(!$rootScope.$$phase) $rootScope.$digest();
         if(!$location.path().includes("/settings")) $location.path('/settings');
         deferred.reject();
     }

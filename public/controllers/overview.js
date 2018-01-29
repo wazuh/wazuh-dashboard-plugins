@@ -102,7 +102,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                 });
             }
         })
-        .catch(error => errorHandler.handle(error));
+        .catch(error => {
+            errorHandler.handle(error);
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        });
 
     $scope.tabs = tabs;
     $scope.selectedIndex = 0;

@@ -1,7 +1,7 @@
 const app = require('ui/modules').get('app/wazuh', []);
 
 // Logs controller
-app.controller('managerLogController', function ($scope, Logs, apiReq,errorHandler) {
+app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq,errorHandler) {
     $scope.searchTerm  = '';
     $scope.loading     = true;
     $scope.logs        = Logs;
@@ -16,7 +16,7 @@ app.controller('managerLogController', function ($scope, Logs, apiReq,errorHandl
             return;
         } catch (error) {
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
@@ -42,7 +42,7 @@ app.controller('managerLogController', function ($scope, Logs, apiReq,errorHandl
             return;
         } catch (error) {
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
 

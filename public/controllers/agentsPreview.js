@@ -99,7 +99,7 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, genericRe
             return;
         } catch (error) {
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 

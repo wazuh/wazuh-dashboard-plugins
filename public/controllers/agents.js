@@ -195,7 +195,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
             return;
         } catch (error) {
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
@@ -216,7 +216,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
             return $scope.agentsAutoComplete.items;
         } catch (error) {
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
 
     }
@@ -229,7 +229,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         $scope.agentsAutoComplete.nextPage('');
     } catch (e) {
         errorHandler.handle('Unexpected exception loading controller');
-        if(!$scope.$$phase) $scope.$digest();
+        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     //Destroy
@@ -254,7 +254,10 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
                 });
             }
         })
-        .catch(error => errorHandler.handle(error));
+        .catch(error => {
+            errorHandler.handle(error);
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        });
 
     $scope.tabs          = tabs;
     $scope.selectedIndex = 0;
@@ -339,7 +342,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
             return;
         } catch (error){
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
     /** End of agent configuration */
