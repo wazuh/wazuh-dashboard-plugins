@@ -34,9 +34,6 @@ require('ui/modules').get('app/wazuh', [])
             .then((data) => {
                 appState.setCurrentPattern(selectedPattern);
 
-                //$scope.$emit('updatePattern', {});
-
-                notify.info("Successfully changed the default index-pattern");
                 newPattern = selectedPattern;
                 $window.location.reload();
             })
