@@ -1,5 +1,5 @@
 require('ui/modules').get('app/wazuh', [])
-.service('patternHandler', function ($route, genericReq, courier, appState, Notifier) {
+.service('patternHandler', function ($route, $window, genericReq, courier, appState, Notifier) {
     return {
         getPatternList: () => {
             let patternList = [];
@@ -38,7 +38,7 @@ require('ui/modules').get('app/wazuh', [])
 
                 notify.info("Successfully changed the default index-pattern");
                 newPattern = selectedPattern;
-                $route.reload();
+                $window.location.reload();
             })
             .catch(() => {
                 notify.error("Error while changing the default index-pattern");
