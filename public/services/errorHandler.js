@@ -4,11 +4,11 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
     const notify = new Notifier();
     
     const extractMessage = error => {
+        if(error.data && error.data.errorData && error.data.errorData.message) return error.data.errorData.message;
+        if(error.errorData && error.errorData.message) return error.errorData.message;
         if(error.data && typeof error.data === 'string') return error.data;
         if(error.data && error.data.message) return error.data.message;
         if(error.message) return error.message;
-        if(error.data && error.data.errorData && error.data.errorData.message) return error.data.errorData.message;
-        if(error.errorData && error.errorData.message) return error.errorData.message;
         if(typeof error === 'string') return error;
         if(typeof error === 'object') return JSON.stringify(error);
         return error || 'Unexpected error';
@@ -77,7 +77,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 }
                 break;
             default:
-                text = `Error. ${error || ''}`;
+                text = `Error. ${message}`;
         }
 
         if(isWarning) notify.warning(text);
