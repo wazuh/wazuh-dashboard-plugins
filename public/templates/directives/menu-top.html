@@ -14,7 +14,7 @@
             <md-select ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" placeholder="Index pattern" class="wazuh-select md-no-underline" aria-label="Select index pattern">
                 <md-option ng-repeat="pattern in patternList" value="{{ pattern.id }}">{{ pattern.attributes.title }}</md-option>
             </md-select>
-            <md-tooltip md-direction="bottom">Selected index-pattern</md-tooltip>
+            <md-tooltip md-direction="bottom">Selected index pattern</md-tooltip>
         </div>
     </div>
     <md-nav-item class="wazuhMenuNavBar_gear directives-color-white" md-nav-href="#/settings" name="settings">
