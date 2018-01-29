@@ -3,7 +3,9 @@ let base64 = require('plugins/wazuh/utils/base64.js');
 import chrome from 'ui/chrome';
 
 // Require App
-let app = require('ui/modules').get('app/wazuh', []).controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, Notifier, testAPI, appState, genericReq, courier) {
+const app = require('ui/modules').get('app/wazuh', []);
+
+app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, courier, Notifier, errorHandler) {
     $rootScope.page = "settings";
 
     if ($rootScope.comeFromWizard) {
@@ -72,29 +74,30 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     });
 
     // Remove API entry
-    $scope.removeManager = (item) => {
-        let index = $scope.apiEntries.indexOf(item);
-
-        if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
-            if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
-                notify.warning("Please remove another API.");
-                return;
+    $scope.removeManager = async item => {
+        try {
+            let index = $scope.apiEntries.indexOf(item);
+            if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
+                if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
+                    errorHandler.handle('Please remove another API.',true);
+                    if(!$scope.$$phase) $scope.$digest();
+                    return;
+                }
             }
-        }
-
-        genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`)
-        .then(() => {
+            await genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`);
             $scope.apiEntries.splice(index, 1);
             $rootScope.apiIsDown = null;
-        })
-        .catch(() => {
-            notify.error("Could not remove manager");
-        });
+            if(!$scope.$$phase) $scope.$digest();
+            return;            
+        } catch(error) {
+            errorHandler.handle('Could not remove manager');
+            if(!$scope.$$phase) $scope.$digest();
+        }
     };
 
     // Get current API index
-    $scope.getCurrentAPIIndex = () => {
-        for(var i = 0; i < $scope.apiEntries.length; i += 1) {
+    const getCurrentAPIIndex = () => {
+        for(let i = 0, len = $scope.apiEntries.length; i < len; i += 1) {
             if($scope.apiEntries[i]._id === $scope.currentDefault) {
                 currentApiEntryIndex = i;
             }
@@ -107,24 +110,25 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
         appState.setClusterInfo($scope.apiEntries[index]._source.cluster_info);
 
-        if ($scope.apiEntries[index]._source.cluster_info.status == 'disabled')
+        if ($scope.apiEntries[index]._source.cluster_info.status == 'disabled'){
             appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[index]._source.cluster_info.manager, id: $scope.apiEntries[index]._id }));
-        else
+        } else {
             appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[index]._source.cluster_info.cluster, id: $scope.apiEntries[index]._id }));
+        }
 
         $scope.$emit('updateAPI', {});
 
         $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
-        $scope.extensions = $scope.apiEntries[index]._source.extensions;
+        $scope.extensions     = $scope.apiEntries[index]._source.extensions;
 
         notify.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`);
 
-        $scope.getCurrentAPIIndex();
+        getCurrentAPIIndex();
 
-        $scope.extensions.oscap = $scope.apiEntries[index]._source.extensions.oscap;
-        $scope.extensions.audit = $scope.apiEntries[index]._source.extensions.audit;
-        $scope.extensions.pci = $scope.apiEntries[index]._source.extensions.pci;
-        $scope.extensions.aws = $scope.apiEntries[index]._source.extensions.aws;
+        $scope.extensions.oscap      = $scope.apiEntries[index]._source.extensions.oscap;
+        $scope.extensions.audit      = $scope.apiEntries[index]._source.extensions.audit;
+        $scope.extensions.pci        = $scope.apiEntries[index]._source.extensions.pci;
+        $scope.extensions.aws        = $scope.apiEntries[index]._source.extensions.aws;
         $scope.extensions.virustotal = $scope.apiEntries[index]._source.extensions.virustotal;
 
         appState.setExtensions($scope.apiEntries[index]._source.extensions);
@@ -132,16 +136,16 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     };
 
     // Get settings function
-    $scope.getSettings = () => {
-        genericReq.request('GET', '/api/wazuh-api/apiEntries')
-        .then((data) => {
+    const getSettings = async () => {
+        try {
+            const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
             for(const entry of data.data) $scope.showEditForm[entry._id] = false;
 
             $scope.apiEntries = data.data.length > 0 ? data.data : [];
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null)
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
 
-            $scope.getCurrentAPIIndex();
+            getCurrentAPIIndex();
             if(!currentApiEntryIndex) return;
             $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
             $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
@@ -150,10 +154,13 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             $scope.extensions.virustotal = $scope.apiEntries[currentApiEntryIndex]._source.extensions.virustotal;
 
             appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
-        })
-        .catch((error) => {
-            notify.error("Error getting API entries " +error );
-        });
+
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch (error) {
+            errorHandler.handle('Error getting API entries');
+            if(!$scope.$$phase) $scope.$digest();
+        }
     };
 
     const validator = formName => {
@@ -183,83 +190,86 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
 
     // Save settings function
-    $scope.saveSettings = () => {
-        const invalid = validator('formData');
-        if(invalid) {
-            $scope.messageError = invalid;
-            return notify.error(invalid);
+    const saveSettings = async () => {
+        try {
+            const invalid = validator('formData');
+
+            if(invalid) {
+                $scope.messageError = invalid;
+                errorHandler.handle(invalid);
+                if(!$scope.$$phase) $scope.$digest();
+                return;
+            }
+    
+            const tmpData = {
+                user        : $scope.formData.user,
+                password    : base64.encode($scope.formData.password),
+                url         : $scope.formData.url,
+                port        : $scope.formData.port,
+                cluster_info: {},
+                insecure    : 'true',
+                id          : (Array.isArray($scope.apiEntries)) ? $scope.apiEntries.length: 0,
+                extensions  : appState.getExtensions()
+            };
+    
+            const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+            
+            if(config.data && config.data.data && config.data.data.extensions) tmpData.extensions = config.data.data.extensions;
+            
+            const checkData = await testAPI.check(tmpData)
+
+            // API Check correct. Get Cluster info
+            tmpData.cluster_info = checkData.data;
+
+            // Insert new API entry
+            const data = await genericReq.request('PUT', '/api/wazuh-api/settings', tmpData);
+
+            const newEntry = {
+                _id: data.data.response._id,
+                _source: {
+                    cluster_info: tmpData.cluster_info,
+                    active      : tmpData.active,
+                    url         : tmpData.url,
+                    api_user    : tmpData.user,
+                    api_port    : tmpData.port,
+                    extensions  : tmpData.extensions
+                }
+            };
+
+            $scope.apiEntries.push(newEntry);
+
+            notify.info('Wazuh API successfully added');
+            $scope.addManagerContainer = false;
+            $scope.formData.user       = "";
+            $scope.formData.password   = "";
+            $scope.formData.url        = "";
+            $scope.formData.port       = "";
+
+            // Setting current API as default if no one is in the cookies
+            if (!appState.getCurrentAPI()) { // No cookie
+                if ($scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.status === 'disabled') {
+                    appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.manager, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
+                } else {
+                    appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.cluster, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
+                }
+                $scope.$emit('updateAPI', {});
+                $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
+            }
+
+            await Promise.all([
+                genericReq.request('GET', '/api/wazuh-api/fetchAgents'),
+                getSettings()
+            ]);
+        
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+ 
+        } catch(error) {
+            if(error.status === 400){
+                error.message = 'Please, fill all the fields in order to connect with Wazuh RESTful API.'
+            }
+            printError(error);
         }
-
-        const tmpData = {
-            user:         $scope.formData.user,
-            password:     base64.encode($scope.formData.password),
-            url:          $scope.formData.url,
-            port:         $scope.formData.port,
-            cluster_info: {},
-            insecure:     'true',
-            id:           (Array.isArray($scope.apiEntries)) ? $scope.apiEntries.length : 0,
-            extensions:   appState.getExtensions()
-        };
-
-        genericReq.request('GET', '/api/wazuh-api/configuration', {})
-        .then(config => {
-            if('extensions' in config.data.data) tmpData.extensions = config.data.data.extensions;
-            testAPI.check(tmpData)
-            .then(data => {
-                // API Check correct. Get Cluster info
-                tmpData.cluster_info = data.data;
-    
-                // Insert new API entry
-                genericReq.request('PUT', '/api/wazuh-api/settings', tmpData)
-                .then((data) => {
-                    const newEntry = {
-                        _id: data.data.response._id,
-                        _source: {
-                            cluster_info: tmpData.cluster_info,
-                            active:       tmpData.active,
-                            url:          tmpData.url,
-                            api_user:     tmpData.user,
-                            api_port:     tmpData.port,
-                            extensions:   tmpData.extensions
-                        }
-                    };
-                    $scope.apiEntries.push(newEntry);
-    
-                    notify.info('Wazuh API successfully added');
-                    $scope.addManagerContainer = false;
-                    $scope.formData.user       = "";
-                    $scope.formData.password   = "";
-                    $scope.formData.url        = "";
-                    $scope.formData.port       = "";
-    
-                    // Setting current API as default if no one is in the cookies
-                    if (!appState.getCurrentAPI()) { // No cookie
-    
-                        if ($scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.status === 'disabled')
-                            appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.manager, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
-                        else
-                            appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.cluster, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
-    
-                        $scope.$emit('updateAPI', {});
-                        $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
-                    }
-    
-                    genericReq.request('GET', '/api/wazuh-api/fetchAgents')
-                    .then(() => {})
-                    .catch(() => {
-                        notify.error("Error fetching agents");
-                    });
-    
-                    $scope.getSettings();
-                })
-                .catch((error, status) => {
-                    if (status === '400') notify.error("Please, fill all the fields in order to connect with Wazuh RESTful API.");
-                    else notify.error("Some error ocurred, could not save data in elasticsearch.");
-                });
-            })
-            .catch(error => printError(error));
-        })
-        .catch(error => printError(error));
     };
 
     $scope.isUpdating = () => {
@@ -270,34 +280,32 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     };
 
     // Update settings function
-    $scope.updateSettings = item => {
-        $scope.messageErrorUpdate = '';
+    $scope.updateSettings = async item => {
+        try {
+            $scope.messageErrorUpdate = '';
 
-        const invalid = validator('formUpdate');
-        if(invalid) {
-            $scope.messageErrorUpdate = invalid;
-            return notify.error(invalid);
-        }
-
-        const index = $scope.apiEntries.indexOf(item);
-
-        const tmpData = {
-            user:         $scope.formUpdate.user,
-            password:     base64.encode($scope.formUpdate.password),
-            url:          $scope.formUpdate.url,
-            port:         $scope.formUpdate.port,
-            cluster_info: {},
-            insecure:     'true',
-            id:           $scope.apiEntries[index]._id,
-            extensions:   $scope.apiEntries[index]._source.extensions
-        };
-
-        testAPI.check(tmpData)
-        .then(data => {
+            const invalid = validator('formUpdate');
+            if(invalid) {
+                $scope.messageErrorUpdate = invalid;
+                return notify.error(invalid);
+            }
+    
+            const index = $scope.apiEntries.indexOf(item);
+    
+            const tmpData = {
+                user:         $scope.formUpdate.user,
+                password:     base64.encode($scope.formUpdate.password),
+                url:          $scope.formUpdate.url,
+                port:         $scope.formUpdate.port,
+                cluster_info: {},
+                insecure:     'true',
+                id:           $scope.apiEntries[index]._id,
+                extensions:   $scope.apiEntries[index]._source.extensions
+            };
+    
+            const data = await testAPI.check(tmpData);
             tmpData.cluster_info = data.data;
-            return genericReq.request('PUT', '/api/wazuh-api/update-settings' , tmpData);
-        })
-        .then(() => {
+            await genericReq.request('PUT', '/api/wazuh-api/update-settings' , tmpData);
             $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
 
             $rootScope.apiIsDown  = null;
@@ -310,44 +318,52 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
 
             $scope.showEditForm[$scope.apiEntries[index]._id] = false;
 
-            notify.info("Connection success");
-        })
-        .catch(error => printError(error,true));
+            notify.info('Connection success');
+
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch (error) {
+            printError(error,true);
+        }
     };
 
     // Check manager connectivity
-    $scope.checkManager = item => {
-        const index = $scope.apiEntries.indexOf(item);
+    $scope.checkManager = async item => {
+        try {
+            const index = $scope.apiEntries.indexOf(item);
 
-        const tmpData = {
-            user:         $scope.apiEntries[index]._source.api_user,
-            password:     $scope.apiEntries[index]._source.api_password,
-            url:          $scope.apiEntries[index]._source.url,
-            port:         $scope.apiEntries[index]._source.api_port,
-            cluster_info: {},
-            insecure:     'true',
-            id:           $scope.apiEntries[index]._id
-        };
+            const tmpData = {
+                user        : $scope.apiEntries[index]._source.api_user,
+                password    : $scope.apiEntries[index]._source.api_password,
+                url         : $scope.apiEntries[index]._source.url,
+                port        : $scope.apiEntries[index]._source.api_port,
+                cluster_info: {},
+                insecure    : 'true',
+                id          : $scope.apiEntries[index]._id
+            };
 
-        testAPI
-        .check(tmpData)
-        .then(data => {
+            const data = await testAPI.check(tmpData);
             tmpData.cluster_info = data.data;
-            const tmpUrl       = `/api/wazuh-api/updateApiHostname/${$scope.apiEntries[index]._id}`;
-            return genericReq.request('PUT', tmpUrl , { cluster_info: tmpData.cluster_info })
-        })
-        .then(() => {
+            
+            const tmpUrl = `/api/wazuh-api/updateApiHostname/${$scope.apiEntries[index]._id}`;
+            await genericReq.request('PUT', tmpUrl , { cluster_info: tmpData.cluster_info });
+            
             $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
             $rootScope.apiIsDown = null;
+            
             notify.info("Connection success");
-        })
-        .catch(error => printError(error));
+            
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch(error) {
+            printError(error);
+        }
     };
 
     // Process form
     $scope.processForm = () => {
         $scope.messageError = "";
-        $scope.saveSettings();
+        saveSettings();
     };
 
     // Toggle extension
@@ -361,86 +377,36 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             }
             return;
         } catch (error){
-            notify.error("Invalid request when toggle extension state.");
+            errorHandler.handle('Invalid request when toggle extension state.');
+            if(!$scope.$$phase) $scope.$digest();
         }
     };
 
-    $scope.changeIndexPattern = (newIndexPattern) => {
-        genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${newIndexPattern}`)
-        .then((data) => {
+    $scope.changeIndexPattern = async newIndexPattern => {
+        try {
+            const data = await genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${newIndexPattern}`);
             appState.setCurrentPattern(newIndexPattern);
-
             $scope.$emit('updatePattern', {});
-
-            notify.info("Successfully changed the default index-pattern");
+            notify.info('Successfully changed the default index-pattern');
             $scope.selectedIndexPattern = newIndexPattern;
-        })
-        .catch(() => {
-            notify.error("Error while changing the default index-pattern");
-        });
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch (error) {
+            errorHandler.handle('Error while changing the default index-pattern');
+            if(!$scope.$$phase) $scope.$digest();
+        }
     };
 
     const printError = (error,updating) => {
-        let text;
-        switch (error.data) {
-            case 'no_elasticsearch':
-                text = 'Could not connect with elasticsearch in order to retrieve the credentials.';
-                break;
-            case 'no_credentials':
-                text = 'Valid credentials not found in elasticsearch. It seems the credentials ' +
-                       'were not saved.';
-                break;
-            case 'protocol_error':
-                text = 'Invalid protocol in the API url. Please, specify <b>http://</b> or ' +
-                       '<b>https://</b>.';
-                break;
-            case 'unauthorized':
-                text = 'Credentials were found, but they are not valid.';
-                break;
-            case 'bad_url':
-                text = 'The given URL does not contain a valid Wazuh RESTful API installation.';
-                break;
-            case 'self_signed':
-                text = 'The request to Wazuh RESTful API was blocked, because it is using a ' +
-                       'selfsigned SSL certificate. Please, enable <b>"Accept selfsigned SSL"</b> ' +
-                       'option if you want to connect anyway.';
-                break;
-            case 'not_running':
-                text = 'There are not services running in the given URL.';
-                break;
-            case 'request_timeout_checkstored':
-                text = 'The request to /api/wazuh-api/checkStoredAPI took too long and was aborted.';
-                break;
-            case 'request_timeout_checkapi':
-                text = 'The request to /api/wazuh-api/checkAPI took too long and was aborted.';
-                break;
-            case 'wrong_credentials':
-                text = 'Wrong Wazuh API credentials, please check them and try again';
-                break;
-            case 'invalid_url':
-                text = 'Wrong Wazuh API url, please check it and try again';
-                break;
-            case 'invalid_port':
-                text = 'Wrong Wazuh API port, please check it and try again';
-                break;
-            case 'socket_hang_up':
-                if(error.https){
-                    text = 'Wrong Wazuh API protocol, please check try again with http instead https';
-                } else {
-                    text = 'Could not connect with Wazuh API, please check url and port and try again'
-                }
-                break;
-            default:
-                text = `Unexpected error. ${error.message || ''}`;
-        }
-        notify.error(text);
+        const text = errorHandler.handle(error);
         if(!updating) $scope.messageError       = text;
         else          $scope.messageErrorUpdate = text;
+        if(!$scope.$$phase) $scope.$digest();
     };
 
-    $scope.getAppInfo = () => {
-        genericReq.request('GET', '/api/wazuh-elastic/setup')
-        .then((data) => {
+    const getAppInfo = async () => {
+        try {
+            const data = await genericReq.request('GET', '/api/wazuh-elastic/setup');
             $scope.appInfo = {};
             $scope.appInfo["app-version"]      = data.data.data["app-version"];
             $scope.appInfo["installationDate"] = data.data.data["installationDate"];
@@ -453,15 +419,15 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             } else { // There's no pattern in the cookies, pick the one in the settings
                 $scope.selectedIndexPattern = data.data.data["index-pattern"];
             }
-        })
-        .catch(() => {
-            notify.error("Error when loading Wazuh setup info");
-        });
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch (error) {
+            errorHandler.handle('Error when loading Wazuh setup info');
+            if(!$scope.$$phase) $scope.$digest();
+        }
     };
 
     // Loading data
-    $scope.getSettings();
-    $scope.getAppInfo();
-
-
+    getSettings();
+    getAppInfo();
 });
