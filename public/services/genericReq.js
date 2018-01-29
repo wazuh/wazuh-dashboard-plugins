@@ -25,8 +25,8 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
         
         if(!tmp) {
             defered.reject({
-                'error': -2,
-                'message': 'Error doing a request to Kibana API.'
+                error: -2,
+                message: `Error doing a request to ${tmpUrl}, method: ${method}.`
             });
             return defered.promise;
         }
