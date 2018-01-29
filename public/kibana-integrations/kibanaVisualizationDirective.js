@@ -81,6 +81,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                         }
                     }
 
+                    if(typeof $rootScope.loadedVisualizations === 'undefined') $rootScope.loadedVisualizations = [];
                     $rootScope.loadedVisualizations.push(true);
                     $rootScope.loadingStatus = `Rendering visualizations... ${Math.round((100 * $rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100) / 100} %`;
                     if ($rootScope.loadedVisualizations.length >= $rootScope.tabVisualizations[$location.search().tab]) {

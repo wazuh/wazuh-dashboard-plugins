@@ -1,15 +1,15 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier, genericReq, apiReq, appState, Agents, $location) {
-    const notify       = new Notifier({ location: 'Agents - Preview' });
+app.controller('agentsPreviewController', function ($scope,$rootScope, genericReq, apiReq, appState, Agents, $location, errorHandler) {
     $scope.loading     = true;
     $scope.agents      = Agents;
     $scope.status      = 'all';
     $scope.osPlatform  = 'all';
     $scope.osPlatforms = [];
+
     $scope.mostActiveAgent = {
-        "name": "",
-        "id":   ""
+        name: '',
+        id  : ''
     };
 
     let tmpUrl, tmpUrl2;
@@ -52,16 +52,14 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
         }
     }
 
-    const load = () => {
-        Promise.all([
-            $scope.agents.nextPage(''),
-            apiReq.request('GET', '/agents/summary', { }),
-            genericReq.request('GET', tmpUrl),
-            apiReq.request('GET', '/agents', { sort:'-date_add', limit:9999999 })
-        ])
-        .then(data => {
-
-
+    const load = async () => {
+        try{
+            const data = await Promise.all([
+                $scope.agents.nextPage(),
+                apiReq.request('GET', '/agents/summary', { }),
+                genericReq.request('GET', tmpUrl),
+                apiReq.request('GET', '/agents', { sort:'-date_add', limit:9999999 })
+            ]);
 
             // Agents summary
             if(parseInt(data[1].data.data['Never connected']) > 0){
@@ -83,16 +81,12 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
                 $scope.mostActiveAgent.id   = '000';
             } else {
                 $scope.mostActiveAgent.name = data[2].data.data;
-                genericReq.request('GET', tmpUrl2)
-                .then(info => {
-                    if (info.data.data === '' && $scope.mostActiveAgent.name !== '') {
-                        $scope.mostActiveAgent.id = '000';
-                    } else {
-                        $scope.mostActiveAgent.id = info.data.data;
-                    }
-                    $scope.loading = false;
-                })
-                .catch(error => notify.error(error.message));
+                const info = await genericReq.request('GET', tmpUrl2);
+                if (info.data.data === '' && $scope.mostActiveAgent.name !== '') {
+                    $scope.mostActiveAgent.id = '000';
+                } else {
+                    $scope.mostActiveAgent.id = info.data.data;
+                }
             }
 
             // Last agent
@@ -102,8 +96,11 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
 
             $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
-        })
-        .catch(error => notify.error(error.message));
+            return;
+        } catch (error) {
+            errorHandler.handle(error,'Agents Preview');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
     };
 
     $scope.showAgent = agent => {
@@ -113,12 +110,8 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, Notifier,
     };
 
     //Load
-    try {
-        load();
-    } catch (e) {
-        notify.error("Unexpected exception loading controller");
-    }
-
+    load();
+   
     //Destroy
     $scope.$on("$destroy", () => $scope.agents.reset());
 });
