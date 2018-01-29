@@ -30,14 +30,7 @@ require('ui/modules').get('app/wazuh', []).service('apiReq', function ($q, $http
                     defered.resolve(data);
                 }
             })
-            .catch(error => {
-                if(error.status && error.status === 401){
-                    appState.removeUserCode();
-                    defered.reject(error);
-                    $location.path('/login');
-                }
-                defered.reject(error);
-            });
+            .catch(error => defered.reject(error));
 
             return defered.promise;
         }

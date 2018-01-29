@@ -15,7 +15,7 @@ const healthCheck = ($window, $rootScope) => {
 };
 
 //Installation wizard
-const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, appState, genericReq) => {
+const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, appState, genericReq, errorHandler) => {
     const notify = new Notifier();
     let deferred = $q.defer();
 
@@ -26,12 +26,12 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
 
     const checkResponse = data => {
         if (parseInt(data.data.error) === 2){
-            notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+            errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.',true);
         } else if(data.data.data && data.data.data.apiIsDown){
             $rootScope.apiIsDown = "down";
-            notify.error('Wazuh RESTful API seems to be down.');
+            errorHandler.handle('Wazuh RESTful API seems to be down.');
         } else {
-            notify.error('Could not connect with Wazuh RESTful API.');
+            errorHandler.handle('Could not connect with Wazuh RESTful API.');
             appState.removeCurrentAPI();
         }
         $rootScope.comeFromWizard = true;
@@ -68,7 +68,7 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
                 changeCurrentApi(data);
             }
         })
-        .catch(error => notify.error(error.message));
+        .catch(error => errorHandler.handle(error));
     }
 
     if (!$location.path().includes("/health-check") && healthCheck($window, $rootScope)) {
@@ -78,20 +78,20 @@ const settingsWizard = ($rootScope, $location, $q, $window, Notifier, testAPI, a
         // There's no cookie for current API
         if (!appState.getCurrentAPI()) {
             genericReq.request('GET', '/api/wazuh-api/apiEntries')
-            .then((data) => {
+            .then(data => {
                 if (data.data.length > 0) {
-                    var apiEntries = data.data;
+                    const apiEntries = data.data;
                     appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
                     callCheckStored();
                 } else {
-                    notify.warning("Wazuh App: Please set up Wazuh API credentials.");
+                    errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.',true);
                     $rootScope.comeFromWizard = true;
                     if(!$location.path().includes("/settings")) $location.path('/settings');
                     deferred.reject(); 
                 }
             })
-            .catch((error) => {
-                notify.error("Error getting API entries due to " + error);
+            .catch(error => {
+                errorHandler.handle(error);
                 $rootScope.comeFromWizard = true;
                 if(!$location.path().includes("/settings")) $location.path('/settings');
                 deferred.reject(); 
