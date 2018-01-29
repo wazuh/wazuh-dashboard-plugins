@@ -273,15 +273,15 @@ routes
     .when('/agents-preview', {
         template: require('plugins/wazuh/templates/agents-prev/agents-prev.jade'),
         resolve: {
-            "ips": getAllIp,
-            "checkAPI": settingsWizard
+            "checkAPI": settingsWizard,
+            "ips": getAllIp
         }
     })
     .when('/manager/:tab?/', {
         template: require('plugins/wazuh/templates/manager/manager.jade'),
         resolve: {
-            "ips": getAllIp,
-            "checkAPI": settingsWizard
+            "checkAPI": settingsWizard,
+            "ips": getAllIp
         }
     })
     .when('/overview/', {
