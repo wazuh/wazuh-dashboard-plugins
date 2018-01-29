@@ -40,11 +40,11 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
-    $scope.indexPatterns = [];  
+    $scope.indexPatterns = [];
 
     // Getting the index pattern list into the scope, but selecting only "valid" ones
-    for (let i = 0; i < $route.current.locals.ip.list.length; i ++) {
-        courier.indexPatterns.get($route.current.locals.ip.list[i].id)
+    for (let i = 0; i < $route.current.locals.ips.list.length; i ++) {
+        courier.indexPatterns.get($route.current.locals.ips.list[i].id)
         .then((data) => {
             let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
             let minimumCount = 0;
@@ -56,7 +56,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             }
 
             if (minimumCount == minimum.length) {
-                $scope.indexPatterns.push($route.current.locals.ip.list[i]);
+                $scope.indexPatterns.push($route.current.locals.ips.list[i]);
             }
 
         });
@@ -208,7 +208,7 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
             .then(data => {
                 // API Check correct. Get Cluster info
                 tmpData.cluster_info = data.data;
-    
+
                 // Insert new API entry
                 genericReq.request('PUT', '/api/wazuh-api/settings', tmpData)
                 .then((data) => {
@@ -224,32 +224,32 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
                         }
                     };
                     $scope.apiEntries.push(newEntry);
-    
+
                     notify.info('Wazuh API successfully added');
                     $scope.addManagerContainer = false;
                     $scope.formData.user       = "";
                     $scope.formData.password   = "";
                     $scope.formData.url        = "";
                     $scope.formData.port       = "";
-    
+
                     // Setting current API as default if no one is in the cookies
                     if (!appState.getCurrentAPI()) { // No cookie
-    
+
                         if ($scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.status === 'disabled')
                             appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.manager, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
                         else
                             appState.setCurrentAPI(JSON.stringify({name: $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info.cluster, id: $scope.apiEntries[$scope.apiEntries.length - 1]._id }));
-    
+
                         $scope.$emit('updateAPI', {});
                         $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
                     }
-    
+
                     genericReq.request('GET', '/api/wazuh-api/fetchAgents')
                     .then(() => {})
                     .catch(() => {
                         notify.error("Error fetching agents");
                     });
-    
+
                     $scope.getSettings();
                 })
                 .catch((error, status) => {
@@ -462,6 +462,4 @@ let app = require('ui/modules').get('app/wazuh', []).controller('settingsControl
     // Loading data
     $scope.getSettings();
     $scope.getAppInfo();
-
-
 });

@@ -43,6 +43,7 @@ require('plugins/wazuh/services/dataHandler.js');
 require('plugins/wazuh/services/appState.js');
 require('plugins/wazuh/services/testAPI.js');
 require('plugins/wazuh/services/implicitFilters.js');
+require('plugins/wazuh/services/patternHandler.js');
 
 // Set up routes and views
 require('plugins/wazuh/services/routes.js');
@@ -75,5 +76,3 @@ require('plugins/wazuh/controllers/settings.js');
 
 // Health check
 require('plugins/wazuh/controllers/healthCheck.js');
-
-
