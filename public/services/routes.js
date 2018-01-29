@@ -196,7 +196,7 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
 
 const getAllIp = (Promise, $q, $window, $rootScope, courier, config, $location, Private) => {
 
-    if (healthCheck($window, $rootScope) && !$location.path().includes('/settings')) {
+    if (healthCheck($window, $rootScope) && !$location.path().includes("/settings")) {
         let deferred = $q.defer();
         $location.path('/health-check');
         deferred.reject();
