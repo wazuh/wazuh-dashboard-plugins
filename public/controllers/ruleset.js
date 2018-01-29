@@ -1,7 +1,7 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope,$q,$rootScope, Rules,RulesAutoComplete, errorHandler) {
-    $scope.setRulesTab = (tab) => $rootScope.globalsubmenuNavItem2 = tab;
+app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoComplete, errorHandler) {
+    $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
     
     //Initialization
     $scope.loading = true;
@@ -29,7 +29,7 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Rules,RulesAut
             return $scope.rulesAutoComplete.items;
         } catch (error){
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
 
@@ -61,7 +61,7 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Rules,RulesAut
             return;
         } catch (error) {
             errorHandler.handle('Unexpected exception loading controller');
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
 
@@ -93,7 +93,7 @@ app.controller('rulesController', function ($scope,$q,$rootScope, Rules,RulesAut
     });
 });
 
-app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Decoders,DecodersAutoComplete, errorHandler) {
+app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders,DecodersAutoComplete, errorHandler) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
     
     //Initialization
@@ -176,7 +176,7 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Deco
             return $scope.decodersAutoComplete.items;
         } catch (error){
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
 
@@ -191,7 +191,7 @@ app.controller('decodersController', function ($scope,$q, $rootScope, $sce, Deco
             return;
         } catch (error) {
             errorHandler.handle('Unexpected exception loading controller');
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
 

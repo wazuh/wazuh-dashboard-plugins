@@ -11,7 +11,10 @@ app.controller('managerController', function ($scope,$rootScope, $routeParams, $
     
     apiReq.request('GET', `/agents/000`, {})
     .then(data => $rootScope.agent = data.data.data)
-    .catch(error => errorHandler.handle(error));
+    .catch(error => {
+        errorHandler.handle(error);
+        if(!$rootScope.$$phase) $rootScope.$digest();
+    });
 
     // Watchers
     $scope.$watch('submenuNavItem', () => {
@@ -62,7 +65,10 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
         $scope.load = false;
         if(!$scope.$$phase) $scope.$digest();
     })
-    .catch(error => errorHandler.handle(error));
+    .catch(error => {
+        errorHandler.handle(error); 
+        if(!$rootScope.$$phase) $rootScope.$digest();
+    });
 
 });
 
@@ -89,7 +95,7 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, er
             return;
         } catch (error) {
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 

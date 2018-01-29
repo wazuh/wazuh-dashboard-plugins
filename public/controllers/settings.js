@@ -80,7 +80,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
                 if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
                     errorHandler.handle('Please remove another API.',true);
-                    if(!$scope.$$phase) $scope.$digest();
+                    if(!$rootScope.$$phase) $rootScope.$digest();
                     return;
                 }
             }
@@ -91,7 +91,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;            
         } catch(error) {
             errorHandler.handle('Could not remove manager');
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
@@ -159,7 +159,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;
         } catch (error) {
             errorHandler.handle('Error getting API entries');
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
@@ -197,7 +197,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(invalid) {
                 $scope.messageError = invalid;
                 errorHandler.handle(invalid);
-                if(!$scope.$$phase) $scope.$digest();
+                if(!$rootScope.$$phase) $rootScope.$digest();
                 return;
             }
     
@@ -378,7 +378,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;
         } catch (error){
             errorHandler.handle('Invalid request when toggle extension state.');
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
@@ -393,7 +393,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;
         } catch (error) {
             errorHandler.handle('Error while changing the default index-pattern');
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
@@ -401,7 +401,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         const text = errorHandler.handle(error);
         if(!updating) $scope.messageError       = text;
         else          $scope.messageErrorUpdate = text;
-        if(!$scope.$$phase) $scope.$digest();
+        if(!$rootScope.$$phase) $rootScope.$digest();
     };
 
     const getAppInfo = async () => {
@@ -423,7 +423,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;
         } catch (error) {
             errorHandler.handle('Error when loading Wazuh setup info');
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 

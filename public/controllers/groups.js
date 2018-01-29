@@ -60,7 +60,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
             return;
         } catch (error) {
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
 
@@ -149,7 +149,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
             return;
         } catch (error) {
             errorHandler.handle(error);
-            if(!$scope.$$phase) $scope.$digest();
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
