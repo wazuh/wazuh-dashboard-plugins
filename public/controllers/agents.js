@@ -37,6 +37,7 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         "general": 7,
         "fim": 8,
         "pm": 4,
+        "vuls": 100,
         "oscap": 13,
         "audit": 15,
         "pci": 3,
