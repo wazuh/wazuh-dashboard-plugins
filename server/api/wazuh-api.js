@@ -424,13 +424,13 @@ module.exports = (server, options) => {
 
             //if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
-            if(configFile['login.password']){
+            if(configFile && configFile['login.password']){
                 delete configFile['login.password'];
             }
             return reply({
                 statusCode: 200,
                 error:      0,
-                data:       configFile
+                data:       configFile || {}
             });
         } catch (error) {
             return reply(genericErrorBuilder(500,6,error.message || error)).code(500)
@@ -440,7 +440,9 @@ module.exports = (server, options) => {
     const login = (req,reply) => {
         try{
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
-
+            if(!configFile){
+                throw Error('Configuration file not found');
+            }
             if(!req.payload.password) {
                 return reply(genericErrorBuilder(401,7,'Please give me a password.')).code(401)
             } else if(req.payload.password !== configFile['login.password']){
