@@ -13,8 +13,7 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
             });
             return defered.promise;
         }
-
-        let requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: 4000 };
+        let requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: $rootScope.userTimeout || 8000 };
 
         let tmpUrl = chrome.addBasePath(url), tmp = null;
         if(appState.getUserCode()) requestHeaders.headers.code = appState.getUserCode();
