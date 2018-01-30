@@ -36,7 +36,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         general      : 7,
         fim          : 8,
         pm           : 4,
-        vuls         : 6,
+        vuls         : 7,
         oscap        : 13,
         audit        : 15,
         pci          : 3,

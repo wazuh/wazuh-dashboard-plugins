@@ -32,7 +32,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         general   : 15,
         fim       : 17,
         pm        : 5,
-        vuls      : 6,
+        vuls      : 8,
         oscap     : 14,
         audit     : 16,
         pci       : 6,
