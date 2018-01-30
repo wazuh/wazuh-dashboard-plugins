@@ -24,8 +24,10 @@ module.exports = (server, options) => {
     // Read config from package.json and config.yml
     try {
         const configurationFile = yml.load(fs.readFileSync(path.join(__dirname,'../config.yml'), {encoding: 'utf-8'}));
-        global.loginEnabled = configurationFile.login.enabled;
-        pattern     = configurationFile.pattern;
+
+        global.loginEnabled = typeof configurationFile['login.enabled'] !== 'undefined' ? configurationFile['login.enabled'] : false;
+        pattern             = typeof configurationFile.pattern          !== 'undefined' ? configurationFile.pattern          : 'wazuh-alerts-3.x-*';
+        
         packageJSON = require('../package.json');
     } catch (e) {
         server.log([blueWazuh, 'initialize', 'error'], 'Something went wrong while reading the configuration.' + e.message);
