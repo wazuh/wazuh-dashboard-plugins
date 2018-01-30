@@ -1,31 +1,48 @@
 ---
-# Wazuh App configuration file 
-# https://github.com/wazuh/wazuh-kibana-app
-
+# ======================== Wazuh App Configuration =========================
+#
+# Please consult the documentation for further information on configuration options:
+#     https://documentation.wazuh.com/current/installation-guide/index.html   
+#
+# Also you could check our repository:
+#     https://github.com/wazuh/wazuh-kibana-app
+#
+#--------------------- Index pattern --------------------------------------------
+#
 # Default index pattern to use.
-pattern: wazuh-alerts-3.x-*
-
-# Defines which checks must to be consider by the healthcheck step once the Wazuh App starts.
-# Values must to be true or false.
-checks:
-  pattern : true
-  template: true
-  api     : true
-  setup   : true
-
+#pattern: wazuh-alerts-3.x-*
+#
+#--------------------- Checks ---------------------------------------------------
+#
+# Defines which checks must to be consider by the healthcheck 
+# step once the Wazuh App starts. Values must to be true or false.
+#checks.pattern : true
+#checks.template: true
+#checks.api     : true
+#checks.setup   : true
+#
+#--------------------- Extensions -----------------------------------------------
+#
 # Defines which extensions should be activated when you add a new API entry.
 # You can change them after Wazuh App starts.
 # Values must to be true or false.
-extensions:
-  audit     : true
-  pci       : true
-  oscap     : true
-  aws       : false
-  virustotal: false
-
+#extensions.audit     : true
+#extensions.pci       : true
+#extensions.oscap     : true
+#extensions.aws       : false
+#extensions.virustotal: false
+#
+#--------------------- Basic Authentication -------------------------------------
+#
 # Defines if authentication is enabled or not.
 # Field enabled could be true or false, it means login is enabled/disabled
 # Field password is the password used to authenticate on the Wazuh App
-login:
-  enabled : false
-  password: changeme
+#login.enabled : false
+#login.password: changeme
+#
+#--------------------- Timeout --------------------------------------------------
+#
+# Defines maximum timeout to be used on the Wazuh App requests.
+# Default value is 8000. It will be ignored if it is bellow 1500.
+# It means milliseconds before we consider a request as failed.
+#timeout: 4000
