@@ -424,8 +424,8 @@ module.exports = (server, options) => {
 
             //if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
-            if(configFile.login){
-                delete configFile.login.password;
+            if(configFile['login.password']){
+                delete configFile['login.password'];
             }
             return reply({
                 statusCode: 200,
@@ -443,7 +443,7 @@ module.exports = (server, options) => {
 
             if(!req.payload.password) {
                 return reply(genericErrorBuilder(401,7,'Please give me a password.')).code(401)
-            } else if(req.payload.password !== configFile.login.password){
+            } else if(req.payload.password !== configFile['login.password']){
                 return reply(genericErrorBuilder(401,7,'Wrong password, please try again.')).code(401)
             }
             const code = (new Date()-1) + 'wazuhapp';

@@ -213,7 +213,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 cluster_info: {},
                 insecure    : 'true',
                 id          : (Array.isArray($scope.apiEntries)) ? $scope.apiEntries.length: 0,
-                extensions  : appState.getExtensions()
+                extensions  : appState.getExtensions().extensions
             };
     
             const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
