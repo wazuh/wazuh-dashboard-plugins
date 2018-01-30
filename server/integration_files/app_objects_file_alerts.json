@@ -2331,6 +2331,20 @@
 		}
 	},
 	{
+		"_id": "Wazuh-App-Overview-VULS-Metric-Critical-severity",
+		"_type": "visualization",
+		"_source": {
+			"title": "Wazuh App Overview VULS Metric Critical severity",
+			"visState": "{\"title\":\"Wazuh App Overview VULS Metric Critical severity\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":20}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Critical severity alerts\"}}]}",
+			"uiStateJSON": "{}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector AND data.vulnerability.severity: Critical\",\"language\":\"lucene\"}}"
+			}
+		}
+	},
+	{
 		"_id": "Wazuh-App-Overview-VULS-Metric-High-severity",
 		"_type": "visualization",
 		"_source": {
