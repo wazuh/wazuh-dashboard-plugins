@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="tab === 'oscap'" layout-align="start">
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex="20">
                 <md-card-content class="wazuh-column">

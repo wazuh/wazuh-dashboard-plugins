@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="tab == 'fim'">
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" class="height-360">
             <div flex="15" layout="column">

@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="tab === 'virustotal'" layout-align="start">
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row" class="height-120">
 
             <md-card flex>

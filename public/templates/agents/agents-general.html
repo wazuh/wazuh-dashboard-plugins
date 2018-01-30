@@ -1,6 +1,6 @@
 <md-content flex layout="column" ng-if="tab === 'general'" layout-align="start">
 
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row" class="height-100">
             <md-card flex>
                 <md-card-content class="text-center">

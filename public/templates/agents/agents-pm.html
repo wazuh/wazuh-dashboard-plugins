@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="tab === 'pm'" layout-align="start">
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
         <div layout="row" class="height-240">
