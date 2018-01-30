@@ -2298,7 +2298,7 @@
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON": "{\"index\":\"wazuh-alerts-3.x-*\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector\",\"language\":\"lucene\"}}"
+				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector\",\"language\":\"lucene\"}}"
 			}
 		}
 	},
