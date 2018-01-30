@@ -6,7 +6,7 @@
     </div>
 
     <div ng-class="{'checks': errors.length == 0, 'checks-fail': errors.length > 0}">
-        <div>&nbsp; Performing checks...({{processedChecks}}/{{totalChecks}})<i ng-class="{'fa-spinner': processedChecks != totalChecks, 'fa-spin': processedChecks != totalChecks}" class="fa fa-fw" aria-hidden="true"></i></div>
+        <div ng-if="!zeroChecks">&nbsp; Performing checks...({{processedChecks}}/{{totalChecks}})<i ng-class="{'fa-spinner': processedChecks != totalChecks && !checksDone, 'fa-spin': processedChecks != totalChecks && !checksDone}" class="fa fa-fw" aria-hidden="true"></i></div>
         <div class="health-check-error" ng-show="errors.length > 0">
             <div class="error-notify">Ups, something went wrong...</div>
             <div ng-repeat='error in errors'>
