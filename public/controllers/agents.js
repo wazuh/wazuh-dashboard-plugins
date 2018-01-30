@@ -36,6 +36,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         general      : 7,
         fim          : 8,
         pm           : 4,
+        vuls         : 7,
         oscap        : 13,
         audit        : 15,
         pci          : 3,
@@ -49,6 +50,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         general   : { group: '' },
         fim       : { group: 'syscheck' },
         pm        : { group: 'rootcheck' },
+        vuls      : { group: 'vulnerability-detector' },
         oscap     : { group: 'oscap' },
         audit     : { group: 'audit' },
         pci       : { group: 'pci_dss' },
@@ -149,7 +151,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
                 return $scope.getAgentConfig(newAgentId);
             }
             let id = null;
-    
+
             // They passed an id
             if (newAgentId) {
                 id = newAgentId;
@@ -163,12 +165,12 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
                     delete $rootScope.globalAgent;
                 }
             }
-    
+
             if (id === '000' && $scope.tab === 'configuration') {
                 $scope.tab = 'general';
                 $scope.switchTab('general');
             }
-    
+
             const data = await Promise.all([
                 apiReq.request('GET', `/agents/${id}`, {}),
                 apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
@@ -211,7 +213,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         try {
             $scope.agentsAutoComplete.filters = [];
             await $scope.agentsAutoComplete.addFilter('search',search);
-    
+
             if(!$scope.$$phase) $scope.$digest();
             return $scope.agentsAutoComplete.items;
         } catch (error) {
