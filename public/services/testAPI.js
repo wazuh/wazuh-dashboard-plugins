@@ -4,7 +4,7 @@ const app = require('ui/modules').get('app/wazuh', []);
 app.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
     return {
         check_stored: data => {
-            const headers = {headers:{ "Content-Type": 'application/json' },timeout: 4000};
+            const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
             if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
             let defered = $q.defer();
             $http
@@ -26,7 +26,7 @@ app.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
             return defered.promise;
         },
         check: data => {
-            const headers = {headers:{ "Content-Type": 'application/json' },timeout: 4000};
+            const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
             if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
             let defered = $q.defer();
             const url = chrome.addBasePath("/api/wazuh-api/checkAPI");
