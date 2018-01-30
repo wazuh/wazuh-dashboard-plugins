@@ -83,13 +83,21 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
     const load = async () => {
         try {
             const configuration = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-            
-            if('data' in configuration.data && 'checks' in configuration.data.data) {
-                checks.pattern  = configuration.data.data.checks.pattern;
-                checks.template = configuration.data.data.checks.template;
-                checks.api      = configuration.data.data.checks.api;
-                checks.setup    = configuration.data.data.checks.setup;
+            if('data' in configuration.data &&
+               'timeout' in configuration.data.data && 
+               Number.isInteger(configuration.data.data.timeout) && 
+               configuration.data.data.timeout >= 1500
+            ) {
+                $rootScope.userTimeout = configuration.data.data.timeout;   
             }
+
+            if('data' in configuration.data) {
+                checks.pattern  = typeof configuration.data.data['checks.pattern']  !== 'undefined' ? configuration.data.data['checks.pattern']  : true;
+                checks.template = typeof configuration.data.data['checks.template'] !== 'undefined' ? configuration.data.data['checks.template'] : true;
+                checks.api      = typeof configuration.data.data['checks.api']      !== 'undefined' ? configuration.data.data['checks.api']      : true;
+                checks.setup    = typeof configuration.data.data['checks.setup']    !== 'undefined' ? configuration.data.data['checks.setup']    : true;
+            }
+
             for(let key in checks) $scope.totalChecks += (checks[key]) ? 1 : 0;
 
             if ($scope.totalChecks == 0) $scope.zeroChecks = true;
