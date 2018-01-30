@@ -218,7 +218,13 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     
             const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
             
-            if(config.data && config.data.data && config.data.data.extensions) tmpData.extensions = config.data.data.extensions;
+            if(config.data && config.data.data) {
+                tmpData.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
+                tmpData.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
+                tmpData.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
+                tmpData.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
+                tmpData.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
+            }
             
             const checkData = await testAPI.check(tmpData)
 
@@ -418,14 +424,18 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.appInfo["installationDate"] = data.data.data["installationDate"];
             $scope.appInfo["revision"]         = data.data.data["revision"];
             $scope.load = false;
-
+            const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
             if (appState.getCurrentPattern() !== undefined && appState.getCurrentPattern() !== null) { // There's a pattern in the cookies
                 $scope.selectedIndexPattern = appState.getCurrentPattern();
             } else { // There's no pattern in the cookies, pick the one in the settings
-                genericReq.request('GET', '/api/wazuh-api/configuration', {})
-                .then(config => {
-                    $scope.selectedIndexPattern = config.data.data["pattern"];
-                });
+               $scope.selectedIndexPattern = config.data.data["pattern"];
+            }
+            if(config.data && config.data.data) {
+                $scope.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
+                $scope.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
+                $scope.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
+                $scope.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
+                $scope.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
             }
             if(!$scope.$$phase) $scope.$digest();
             return;
