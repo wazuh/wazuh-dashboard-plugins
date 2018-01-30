@@ -27,10 +27,19 @@
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-270">
-            <md-card flex="60">
+            <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts severity over time</span>
                     <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-severity-over-time'" id="Wazuh-App-Overview-VULS-Alerts-severity-over-time"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-270">
+            <md-card flex="60">
+                <md-card-content class="wazuh-column">
+                    <span class="md-headline">Top Agents severity</span>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Top-Agents-severity'" id="Wazuh-App-Overview-VULS-Top-Agents-severity"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="40">
