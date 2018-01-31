@@ -1,47 +1,42 @@
 require('ui/modules').get('app/wazuh', [])
-.service('patternHandler', function ($route, $window, genericReq, courier, appState, Notifier) {
+.service('patternHandler', function ($rootScope, $route, $window, genericReq, courier, appState, errorHandler) {
     return {
-        getPatternList: () => {
-            let patternList = [];
+        getPatternList: async () => {
+            try {
+                let patternList = [];
 
-            // Getting the index pattern list into the array,
-            // but selecting only "valid" ones
-            for (let i = 0; i < $route.current.locals.ips.list.length; i ++) {
-                courier.indexPatterns.get($route.current.locals.ips.list[i].id)
-                .then((data) => {
+                // Getting the index pattern list into the array,
+                // but selecting only "valid" ones
+                const len = $route.current.locals.ips.list.length;
+                let data;
+                for (let i = 0; i < len; i ++) {
+                    data = await courier.indexPatterns.get($route.current.locals.ips.list[i].id)
+                    
                     let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
                     let minimumCount = 0;
+                    data.fields.filter(element => minimumCount += (minimum.includes(element.name)) ? 1 : 0);
 
-                    for (let j = 0; j < data.fields.length; j++) {
-                        if (minimum.includes(data.fields[j].name)) {
-                            minimumCount++;
-                        }
-                    }
-
-                    if (minimumCount == minimum.length) {
+                    if (minimumCount === minimum.length) {
                         patternList.push($route.current.locals.ips.list[i]);
                     }
-                });
+                }
+    
+                return patternList;
+            } catch (error) {
+                errorHandler.handle(error,'Pattern Handler (getPatternList)');
+                if(!$rootScope.$$phase) $rootScope.$digest();
+            }
+        },
+        changePattern: async selectedPattern => {
+            try {
+                const data = await genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${selectedPattern}`);
+                appState.setCurrentPattern(selectedPattern);
+                return appState.getCurrentPattern();
+            } catch (error) {
+                errorHandler.handle(error,'Pattern Handler (changePattern)');
+                if(!$rootScope.$$phase) $rootScope.$digest();
             }
 
-            return patternList;
-        },
-        changePattern: (selectedPattern) => {
-            const notify = new Notifier({ location: 'Settings' });
-            let newPattern = null;
-
-            genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${selectedPattern}`)
-            .then((data) => {
-                appState.setCurrentPattern(selectedPattern);
-
-                newPattern = selectedPattern;
-                $window.location.reload();
-            })
-            .catch(() => {
-                notify.error("Error while changing the default index-pattern");
-            });
-
-            return newPattern;
         }
     };
 });
