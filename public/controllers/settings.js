@@ -430,7 +430,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             } else { // There's no pattern in the cookies, pick the one in the settings
                $scope.selectedIndexPattern = config.data.data["pattern"];
             }
-            if(config.data && config.data.data) {
+            if(config.data && config.data.data && !appState.getCurrentPattern()) {
                 $scope.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
                 $scope.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
                 $scope.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
