@@ -86,12 +86,13 @@ app.directive('dynamic', function($compile) {
 
                 $scope.$on('updatePattern', () => {
                     courier.indexPatterns.get(appState.getCurrentPattern())
-                    .then((data) => {
+                    .then(data => {
                         $scope.theresPattern = true;
                         $scope.currentSelectedPattern = appState.getCurrentPattern();
                     })
-                    .catch((error) => {
-                        notify.error("Error getting patterns from Kibana...");
+                    .catch(error => {
+                        errorHandler.handle(error,'Directives - Menu');
+                        if(!$rootScope.$$phase) $rootScope.$digest();
                         $scope.theresPattern = false;
                     });
                 });
