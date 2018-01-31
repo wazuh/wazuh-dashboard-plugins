@@ -27,8 +27,7 @@ app.directive('dynamic', function($compile) {
 	})
     .directive('menuTop',function(){
         return {
-            controller: function ($scope, appState, patternHandler, courier, Notifier) {
-                const notify = new Notifier();
+            controller: function ($scope, $rootScope, appState, patternHandler, courier, errorHandler) {
 
                 if(appState.getCurrentAPI()) {
                     $scope.theresAPI = true;
@@ -38,26 +37,41 @@ app.directive('dynamic', function($compile) {
                     $scope.theresAPI = false;
                 }
 
-                // Getting the list of index patterns
-                if(patternHandler.getPatternList()) {
-                    $scope.patternList = patternHandler.getPatternList();
-                    $scope.currentSelectedPattern = appState.getCurrentPattern();
+                const load = async () => {
+                    try {
+                        const data = await courier.indexPatterns.get(appState.getCurrentPattern());
+                        $scope.theresPattern = true;
+                        $scope.currentPattern = data.title;
+
+                        const list = await patternHandler.getPatternList();
+
+                        // Getting the list of index patterns
+                        if(list) {
+                            $scope.patternList = list;
+                            $scope.currentSelectedPattern = appState.getCurrentPattern();
+                        }
+                        if(!$scope.$$phase) $scope.$digest();
+                        return;
+                    } catch (error) {
+                        errorHandler.handle(error,'Directives - Menu');
+                        $scope.theresPattern = false;
+                        if(!$rootScope.$$phase) $rootScope.$digest();
+                    }
                 }
+
+                load();
 
                 // Function to change the current index pattern on the app
-                $scope.changePattern = (selectedPattern) => {
-                    $scope.currentSelectedPattern = patternHandler.changePattern(selectedPattern);
+                $scope.changePattern = async selectedPattern => {
+                    try{
+                        $scope.currentSelectedPattern = await patternHandler.changePattern(selectedPattern);
+                        if(!$scope.$$phase) $scope.$digest();
+                        return;
+                    }catch(error){
+                        errorHandler.handle(error,'Directives - Menu');
+                        if(!$rootScope.$$phase) $rootScope.$digest();
+                    }                    
                 }
-
-                courier.indexPatterns.get(appState.getCurrentPattern())
-                .then((data) => {
-                    $scope.theresPattern = true;
-                    $scope.currentPattern = data.title;
-                })
-                .catch((error) => {
-                    notify.error("Pattern applied to visualizations does NOT exist...");
-                    $scope.theresPattern = false;
-                });
 
                 $scope.$on('updateAPI', () => {
                     if(appState.getCurrentAPI())
