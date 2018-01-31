@@ -17,6 +17,8 @@ require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $
 
         let tmpUrl = chrome.addBasePath(url), tmp = null;
         if(appState.getUserCode()) requestHeaders.headers.code = appState.getUserCode();
+        const id = JSON.parse(appState.getCurrentAPI()).id;
+        if(id) requestHeaders.headers.id = id;
         if (method === "GET")    tmp = $http.get(tmpUrl, requestHeaders);
         if (method === "PUT")    tmp = $http.put(tmpUrl, payload, requestHeaders);
         if (method === "POST")   tmp = $http.post(tmpUrl, payload, requestHeaders);
