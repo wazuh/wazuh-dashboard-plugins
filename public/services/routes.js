@@ -127,7 +127,7 @@ const goToKibana = ($location, $window) => {
     $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
 };
 
-const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq) => {
+const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler) => {
     let deferred = $q.defer();
     if (healthCheck($window, $rootScope)) {
         deferred.reject();
