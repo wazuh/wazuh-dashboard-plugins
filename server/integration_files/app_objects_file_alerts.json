@@ -285,35 +285,31 @@
 	},
 	{
 		"_id": "Wazuh-App-Overview-FIM-Top-user-owners",
+		"_type": "visualization",
 		"_source": {
 			"title": "Wazuh App Overview FIM Top user owners",
-			"visState":
-				"{\"params\": {\"isDonut\": true, \"shareYAxis\": true, \"addTooltip\": true, \"addLegend\": true}, \"listeners\": {}, \"type\": \"pie\", \"aggs\": [{\"type\": \"count\", \"enabled\": true, \"id\": \"1\", \"params\": {}, \"schema\": \"metric\"}, {\"type\": \"terms\", \"enabled\": true, \"id\": \"3\", \"params\": {\"orderBy\": \"1\", \"field\": \"syscheck.uname_after\", \"order\": \"desc\", \"size\": 5}, \"schema\": \"segment\"}], \"title\": \"Wazuh App Overview FIM Top user owners\"}",
+			"visState": "{\"title\":\"Wazuh App Overview FIM Top user owners\",\"type\":\"pie\",\"params\":{\"isDonut\":true,\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"legendPosition\":\"right\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"syscheck.uname_after\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
 			"uiStateJSON": "{}",
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Ownership was\\\"\",\"language\":\"lucene\"}}"
+				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\"\",\"language\":\"lucene\"}}"
 			}
-		},
-		"_type": "visualization"
+		}
 	},
 	{
 		"_id": "Wazuh-App-Overview-FIM-Top-group-owners",
+		"_type": "visualization",
 		"_source": {
 			"title": "Wazuh App Overview FIM Top group owners",
-			"visState":
-				"{\"params\": {\"isDonut\": true, \"shareYAxis\": true, \"addTooltip\": true, \"addLegend\": true}, \"listeners\": {}, \"type\": \"pie\", \"aggs\": [{\"type\": \"count\", \"enabled\": true, \"id\": \"1\", \"params\": {}, \"schema\": \"metric\"}, {\"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"params\": {\"orderBy\": \"1\", \"field\": \"syscheck.gname_after\", \"order\": \"desc\", \"size\": 5}, \"schema\": \"segment\"}], \"title\": \"Wazuh App Overview FIM Top group owners\"}",
+			"visState": "{\"title\":\"Wazuh App Overview FIM Top group owners\",\"type\":\"pie\",\"params\":{\"isDonut\":true,\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"legendPosition\":\"right\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"syscheck.gname_after\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
 			"uiStateJSON": "{}",
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Group ownership was\\\"\",\"language\":\"lucene\"}}"
+				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\"\",\"language\":\"lucene\"}}"
 			}
-		},
-		"_type": "visualization"
+		}
 	},
 	{
 		"_id": "Wazuh-App-Overview-FIM-Last-file-modified",
