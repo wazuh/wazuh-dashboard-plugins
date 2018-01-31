@@ -2149,20 +2149,6 @@
 		"_type": "visualization"
 	},
 	{
-		"_id": "Wazuh-App-Overview-AWS-Agent-alerts-summary",
-		"_source": {
-			"title": "Wazuh App Overview AWS Agent alerts summary",
-			"visState": "{\"title\":\"Wazuh App Overview AWS Agent alerts summary\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"agent.name\",\"size\":500,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agent\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"GeoLocation.country_name\",\"size\":500,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Country\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule.description\",\"size\":999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Description\"}}]}",
-			"uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":3,\"direction\":\"desc\"}}},\"spy\":{\"mode\":{\"name\":null,\"fill\":false}}}",
-			"description": "",
-			"version": 1,
-			"kibanaSavedObjectMeta": {
-				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon\",\"language\":\"lucene\"}}"
-			}
-		},
-		"_type": "visualization"
-	},
-	{
 		"_id": "Wazuh-App-Overview-Virustotal-Last-Files-Pie",
 		"_type": "visualization",
 		"_source": {
