@@ -278,7 +278,8 @@ module.exports = (server, options) => {
                             return reply({ statusCode: 400, error: '9998', data: 'An error occurred trying to parse PCI DSS requirements' });
                         }
                         
-                    });
+                    })
+                    .catch(error => reply({ statusCode: 400, error: '9997', data: 'An error occurred trying to obtain PCI DSS requirements from Wazuh API' }));
                 });
             } else {
                 if (typeof pciRequirements[req.params.requirement] !== 'undefined'){
