@@ -27,7 +27,7 @@ app.directive('dynamic', function($compile) {
 	})
     .directive('menuTop',function(){
         return {
-            controller: function ($scope, $rootScope, appState, patternHandler, courier, errorHandler) {
+            controller: function ($scope,$window, $rootScope, appState, patternHandler, courier, errorHandler) {
 
                 if(appState.getCurrentAPI()) {
                     $scope.theresAPI = true;
@@ -66,6 +66,7 @@ app.directive('dynamic', function($compile) {
                     try{
                         $scope.currentSelectedPattern = await patternHandler.changePattern(selectedPattern);
                         if(!$scope.$$phase) $scope.$digest();
+                        $window.location.reload();
                         return;
                     }catch(error){
                         errorHandler.handle(error,'Directives - Menu');
