@@ -40,7 +40,6 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         oscap        : 13,
         audit        : 15,
         pci          : 3,
-        aws          : 10,
         virustotal   : 6,
         configuration: 0
     };
@@ -54,7 +53,6 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         oscap     : { group: 'oscap' },
         audit     : { group: 'audit' },
         pci       : { group: 'pci_dss' },
-        aws       : { group: 'amazon' },
         virustotal: { group: 'virustotal' }
     };
 
