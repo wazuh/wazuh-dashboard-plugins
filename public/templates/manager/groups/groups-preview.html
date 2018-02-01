@@ -2,16 +2,42 @@
     <div flex layout="column" layout-align="start stretch" ng-init="groupsSelectedTab='agents'">
         <div flex layout="column" ng-init="lookingGroup=false">
             <div layout="row" class="topMarginSearchBottom margin-8" ng-show="groupsSelectedTab==='agents' && lookingGroup">
-                    <input flex id="query" placeholder="Filter agents..." type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)"
+                    <input flex id="query" placeholder="Search agents..." type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)"
                             class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
             </div>
             <div layout="row" class="topMarginSearchBottom margin-8" ng-show="groupsSelectedTab==='files' && !file && lookingGroup">
-                <input flex id="query" placeholder="Filter files..." type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
+                <input flex id="query" placeholder="Search files..." type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
                         class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
             </div>
-            <div layout="row" class="topMarginSearchBottom margin-8" ng-show="!lookingGroup">
-                    <input flex id="query" placeholder="Filter groups..." type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
+            <div layout="row" class="topMarginSearchBottom margin-8" ng-if="!lookingGroup">
+                    <input flex="75" id="query" placeholder="Search groups..." type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
                         class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
+                    <md-autocomplete id="agentsAutocomplete" flex="25" class="height-35-groups no-border-radius groups-autocomplete-margin"
+                        md-no-cache="true"
+                        md-select-on-match="false"
+                        md-search-text="searchAutocompleteTerm"
+                        md-items="agentAutoComplete in analizeAgents(searchAutocompleteTerm)"
+                        md-item-text="agentAutoComplete.name"
+                        md-min-length="0"
+                        md-no-asterisk="false"
+                        md-menu-class="autocomplete-custom-groups-bar"
+                        md-search-text-change="analizeAgents(searchAutocompleteTerm)"
+                        placeholder="Search groups by agent..."
+                        lazy-load-data="agentsAutoComplete.nextPage()">
+                            <md-item-template class="height-35-groups no-border-radius">
+                                <div layout="row">
+                                    <a flex ng-click="showAgent(agentAutoComplete)" class="padding-left-20">
+                                        <i class="fa fa-tv"></i> {{agentAutoComplete.name}} ({{agentAutoComplete.id}})
+                                    </a>
+                                    <a flex ng-click="$parent.loadGroup(agentAutoComplete.id,true); toggle();">
+                                        <i class="fa fa-users"></i> See group
+                                    </a>
+                                </div>
+                               </md-item-template>
+                            <md-not-found class="height-35-groups no-border-radius ">
+                                <span class="padding-left-20">No agents matching "{{searchAutocompleteTerm}}" were found. </span>
+                            </md-not-found>
+                    </md-autocomplete>
             </div>
             <div flex layout="row">
             <md-card flex ng-class="!lookingGroup ? 'mdCardNone' : ''">
@@ -85,7 +111,7 @@
                         </md-button>
                     </div>
                     <div layout="row" class="topMarginSearchTop" ng-show="groupsSelectedTab==='agents'">
-                        <h4>{{ groups.items[selectedGroup].name }}</h4>
+                        <h4>{{ selectedGroupFromName || groups.items[selectedGroup].name }}</h4>
                     </div>
                     <!--<div layout="row" class="topMarginSearchBottom" ng-show="groupsSelectedTab==='agents'">
                         <input flex id="query" placeholder="Filter agents..." type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)"
@@ -130,7 +156,7 @@
                         </div>
                     </md-toolbar>
                     <div layout="row" class="topMarginSearchTop" ng-show="groupsSelectedTab==='files' && !file">
-                        <h4>{{ groups.items[selectedGroup].name }}</h4>
+                        <h4>{{ selectedGroupFromName || groups.items[selectedGroup].name }}</h4>
                     </div>
                     <!--<div layout="row" class="topMarginSearchBottom" ng-show="groupsSelectedTab==='files' && !file">
                         <input flex id="query" placeholder="Filter files..." type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
@@ -187,7 +213,7 @@
                     </div>
                     <div flex layout="column" ng-if="groupsSelectedTab==='files' && file">
                         <div layout="row" class="topMarginSearchBottom ownNavBarCluster groupsHeader">
-                            <h4>{{ groups.items[selectedGroup].name }} / {{ filename }}</h4>
+                            <h4>{{ selectedGroupFromName || groups.items[selectedGroup].name }} > {{ filename }}</h4>
                         </div>
                         <div flex layout="column" class="ownNavBarCluster">
                             <pre flex class="json-beautifier jsonbeauty2"><code dynamic="file"></code></pre>

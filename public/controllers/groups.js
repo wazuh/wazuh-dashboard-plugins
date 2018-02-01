@@ -3,7 +3,7 @@ const beautifier = require('plugins/wazuh/utils/json-beautifier');
 
 // Groups preview controller
 app.controller('groupsPreviewController', 
-function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler) {
+function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler, AgentsAutoComplete) {
     $scope.searchTerm      = '';
     $scope.searchTermAgent = '';
     $scope.searchTermFile  = '';
@@ -11,6 +11,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     $scope.groups          = Groups;
     $scope.groupAgents     = GroupAgents;
     $scope.groupFiles      = GroupFiles;
+    $scope.agentsAutoComplete = AgentsAutoComplete;
 
     // Store a boolean variable to check if come from agents
     const fromAgents = ('comeFrom' in $rootScope) && ('globalAgent' in $rootScope) && $rootScope.comeFrom === 'agents';
@@ -68,35 +69,68 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
 
     $scope.toggle = () => $scope.lookingGroup=true;
 
-    $scope.showFiles = index => {
+    $scope.showFiles = (index,isName) => {
         $scope.fileViewer = false;
         $scope.groupFiles.reset();
-        $scope.groupFiles.path = `/agents/groups/${$scope.groups.items[index].name}/files`;
-        $scope.groupFiles.nextPage('');
+        $scope.groupFiles.path = `/agents/groups/${isName ? $scope.selectedGroupFromName : $scope.groups.items[index].name}/files`;
+        $scope.groupFiles.nextPage();
     };
 
-    $scope.showAgents = index => {
+    $scope.showAgents = (index,isName) => {
         $scope.fileViewer = false;
         $scope.groupAgents.reset();
-        $scope.groupAgents.path = `/agents/groups/${$scope.groups.items[index].name}`;
-        $scope.groupAgents.nextPage('');        
+        $scope.groupAgents.path = `/agents/groups/${isName ? $scope.selectedGroupFromName : $scope.groups.items[index].name}`;
+        $scope.groupAgents.nextPage();        
     };
 
     $scope.showAgent = agent => {
+        if(!agent || !agent.id) return;
         $rootScope.globalAgent = agent.id;
         $rootScope.comeFrom    = 'groups';
         $location.search('tab', null);
         $location.path('/agents');        
     };
 
-    $scope.loadGroup = index => {
-        $scope.fileViewer = false;
-        $scope.groupAgents.reset();
-        $scope.groupFiles.reset();
-        $scope.selectedGroup = index;
-        $scope.showFiles(index);
-        $scope.showAgents(index);
+    $scope.loadGroup = async (index,isAgent) => {
+        try {
+            $scope.fileViewer = false;
+            $scope.groupAgents.reset();
+            $scope.groupFiles.reset();
+
+            if(isAgent) {
+                $scope.selectedGroup = null;
+                const data = await apiReq.request('GET', `/agents/${index}`, {});
+                if(data && data.data && data.data.data && data.data.data.group) {
+                    $scope.selectedGroupFromName = data.data.data.group;
+                } else {
+                    throw Error('An error occurred obtaining group from agent');
+                }
+            } else {
+                $scope.selectedGroupFromName = null;
+                $scope.selectedGroup         = index;
+            }
+            $scope.showFiles(index,isAgent);
+            $scope.showAgents(index,isAgent);
+            if(!$scope.$$phase) $scope.$digest();
+            return;
+        } catch (error) {
+            errorHandler.handle(error,'Groups');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
     };
+
+    $scope.analizeAgents = async search => {
+        try {
+            $scope.agentsAutoComplete.filters = [];
+            await $scope.agentsAutoComplete.addFilter('search',search);
+            $scope.agentsAutoComplete.items = $scope.agentsAutoComplete.items.filter(item => item.id !== '000');
+            if(!$scope.$$phase) $scope.$digest();
+            return $scope.agentsAutoComplete.items;
+        } catch (error) {
+            errorHandler.handle(error,'Agents');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
 
     // Select specific group
     $scope.checkSelected = index => {
@@ -117,6 +151,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     }
 
     $scope.goBackFiles = () => {
+        $scope.searchAutocompleteTerm = '';
         $scope.groupsSelectedTab = 'files';
         $scope.file     = false;
         $scope.filename = false;
@@ -124,6 +159,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     }
 
     $scope.goBackGroups = () => {
+        $scope.searchAutocompleteTerm = '';
         $scope.lookingGroup = false;
         if(!$scope.$$phase) $scope.$digest();
     }
