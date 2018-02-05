@@ -389,7 +389,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             }
             return;
         } catch (error){
-            errorHandler.handle('Invalid request when toggle extension state.','Settings');
+            const msg = appState.getCurrentAPI() ? 'Invalid request when toggling extensions.' : 'Can not save extension state: no Wazuh API detected';
+            errorHandler.handle(msg,'Settings');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
