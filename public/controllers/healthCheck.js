@@ -1,6 +1,6 @@
 const app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location, Notifier, courier, genericReq, apiReq, appState, testAPI) {
+app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location, Notifier, courier, genericReq, apiReq, appState, testAPI,errorHandler) {
     const checks = {
         api     : true,
         pattern : true,
@@ -13,7 +13,8 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
     $scope.processedChecks = 0;
     $scope.totalChecks     = 0;
 
-    const errorHandler = error => {
+    const handleError = error => {
+        errorHandler(error,'Health Check');
         $scope.errors.push(error);
     };
 
@@ -42,7 +43,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
 
             return;
         } catch (error) {
-            errorHandler(error);
+            handleError(error);
         }
     }
 
@@ -50,7 +51,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
         try {
             if(checks.api) {
                 const data = await testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id);
-                
+                console.log(data)
                 if (data.data.error || data.data.data.apiIsDown) {
                     $scope.errors.push("Error connecting to the API.");
                 } else { 
@@ -74,7 +75,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
 
             return;
         } catch(error) {
-            errorHandler(error);
+            handleError(error);
         }
     }
 
@@ -113,7 +114,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            notify.error('Unexpected error occurred' + error.message);
+            errorHandler(error,'Health Check');
         }
     }
 
