@@ -51,7 +51,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
         try {
             if(checks.api) {
                 const data = await testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id);
-                console.log(data)
+
                 if (data.data.error || data.data.data.apiIsDown) {
                     $scope.errors.push("Error connecting to the API.");
                 } else { 
