@@ -19,6 +19,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
     const isNotFound     = error => (error.status && error.status === 404);
     const isHttps        = error => (typeof error.https !== 'undefined' && error.https);
     const isBadRequest   = error => (error.status && error.status === 400);
+    const isAPIUnauthorized = error => (error && error.data && parseInt(error.data.statusCode) === 500 && parseInt(error.data.error) === 7 && error.data.message === '401 Unauthorized');
     
     const info = (message,location) => {
         if(typeof message === 'string') {
@@ -29,6 +30,10 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
     }
 
     const handle = (error,location,isWarning) => {
+        if(isAPIUnauthorized(error)){
+            $location.path('/settings');
+            return;
+        }
         const message = extractMessage(error);
         let goSettings = false;
         if(isUnauthorized(error)){

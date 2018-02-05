@@ -41,7 +41,12 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
             if(!$rootScope.$$phase) $rootScope.$digest();
             if(!$location.path().includes("/settings")) $location.path('/settings');
         } else {
-            $location.path('/blank-screen');
+            if(data && data.data && parseInt(data.data.statusCode) === 500 && parseInt(data.data.error) === 7 && data.data.message === '401 Unauthorized'){
+                errorHandler.handle('Wrong Wazuh API credentials, please add a new API and/or modify the existing one.','Routes');
+                $location.path('/settings');
+            } else {
+                $location.path('/blank-screen');
+            }
         }
 
         deferred.reject();
