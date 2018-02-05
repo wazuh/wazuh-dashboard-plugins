@@ -927,7 +927,7 @@ function discoverController(
     if ($location.search().tab !=  $scope.tab) { // Changing filters
 
       $scope.tab = $location.search().tab;
-
+      queryFilter.removeAll();
       loadFilters();
     }
     
