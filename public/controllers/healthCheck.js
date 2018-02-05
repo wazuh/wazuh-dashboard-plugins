@@ -14,7 +14,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
     $scope.totalChecks     = 0;
 
     const handleError = error => {
-        errorHandler(error,'Health Check');
+        errorHandler.handle(error,'Health Check');
         $scope.errors.push(error);
     };
 
@@ -114,7 +114,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler(error,'Health Check');
+            errorHandler.handle(error,'Health Check');
         }
     }
 
