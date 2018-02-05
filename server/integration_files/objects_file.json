@@ -1336,7 +1336,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"Integrity checksum changed\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND syscheck.event:\\\"modified\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 10 Changed",
       "uiStateJSON": "{}",
@@ -1364,7 +1364,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"added\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND syscheck.event: (added OR readded)\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 10 Added",
       "uiStateJSON": "{}",
@@ -1490,7 +1490,7 @@
     "_source": {
       "description": "",
       "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND full_log:\\\"was deleted\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
+        "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"query\":{\"query_string\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND syscheck.event:\\\"deleted\\\"\",\"analyze_wildcard\":true}},\"filter\":[]}"
       },
       "title": "FIM Top 10 Deleted",
       "uiStateJSON": "{}",
