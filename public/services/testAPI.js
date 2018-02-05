@@ -18,6 +18,7 @@ app.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
             })
             .catch(error => {
                 if(error.status && error.status === -1){
+                    $rootScope.apiIsDown = true;
                     defered.reject({data: 'request_timeout_checkstored'});
                 } else {
                     defered.reject(error);
