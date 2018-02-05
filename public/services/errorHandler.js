@@ -30,6 +30,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
 
     const handle = (error,location,isWarning) => {
         const message = extractMessage(error);
+        let goSettings = false;
         if(isUnauthorized(error)){
             appState.removeUserCode();
             $location.path('/login');
@@ -65,6 +66,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 break;
             case 'request_timeout_checkstored':
                 text = 'The request to /api/wazuh-api/checkStoredAPI took too long and was aborted.';
+                goSettings = true;
                 break;
             case 'request_timeout_checkapi':
                 text = 'The request to /api/wazuh-api/checkAPI took too long and was aborted.';
@@ -91,6 +93,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         text = location ? location + '. ' + text : text;
         if(isWarning) notify.warning(text);
         else          notify.error(text);
+        if(goSettings) $location.path('/settings');
         return text;
     }
 
