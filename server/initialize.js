@@ -156,7 +156,8 @@ module.exports = (server, options) => {
                 "type": 'index-pattern', 
                 "index-pattern": { 
                     "title": index_pattern, 
-                    "timeFieldName": '@timestamp' 
+                    "timeFieldName": '@timestamp',
+		     "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
                 } 
             } 
         })
