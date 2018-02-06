@@ -49,5 +49,11 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
     initialize();
 
     // Resetting the factory configuration
-    $scope.$on("$destroy", () => $scope.logs.reset());
+    $scope.$on("$destroy", () => {
+        if($scope.realtime) {
+            $scope.realtime = false;
+            clearInterval(intervalId);
+        }
+        $scope.logs.reset();
+    });
 });
