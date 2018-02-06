@@ -47,6 +47,7 @@ import { documentationLinks } from 'ui/documentation_links/documentation_links';
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 import _ from 'lodash';
 import angular from 'angular';
 import { getSort } from 'ui/doc_table/lib/get_sort';
@@ -154,8 +155,9 @@ function discoverController(
     template: require('plugins/kibana/discover/partials/share_search.html'),
     testId: 'discoverShareButton',
   }];
-*/  
+  */
   $scope.timefilter = timefilter;
+
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
@@ -341,7 +343,13 @@ function discoverController(
         $scope.$listen(queryFilter, 'fetch', $scope.fetch);
 
         $scope.$watch('opts.timefield', function (timefield) {
-          timefilter.enabled = !!timefield;
+          if (!!timefield) {
+            timefilter.enableAutoRefreshSelector();
+            timefilter.enableTimeRangeSelector();
+          } else {
+            timefilter.disableAutoRefreshSelector();
+            timefilter.disableTimeRangeSelector();
+          }
         });
 
         $scope.$watch('state.interval', function () {
@@ -408,7 +416,7 @@ function discoverController(
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
-
+              
               prev = current;
             };
           }()));
@@ -623,7 +631,7 @@ function discoverController(
     
     $scope.timeRange = {
       from: dateMath.parse(timefilter.time.from),
-      to: dateMath.parse(timefilter.time.to, true)
+      to: dateMath.parse(timefilter.time.to, { roundUp: true })
     };
   };
 
@@ -749,7 +757,7 @@ function discoverController(
     return loaded;
   }
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
