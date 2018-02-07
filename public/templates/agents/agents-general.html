@@ -24,7 +24,7 @@
                 </md-card-content>
             </md-card>
             <md-card ng-if="agent.group" flex="12">
-                <md-card-content class="text-center" ng-click="goGroups(agent)">
+                <md-card-content class="text-center cursor-pointer" ng-click="goGroups(agent)">
                     <div class="metric-value ng-binding font-size-14-pt" >{{ agent.group }}</div>
                     <!--<md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>-->
                     <div class="ng-binding">Group</div>

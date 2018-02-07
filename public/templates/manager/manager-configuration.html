@@ -296,11 +296,11 @@
                                         Frequency
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.frequency}}</span>
                                     </p>
-                                    <p>
+                                    <p ng-if="managerConfiguration.syscheck.scan_time">
                                         Scan time
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_time}}</span>
                                     </p>
-                                    <p>
+                                    <p ng-if="managerConfiguration.syscheck.scan_day">
                                         Scan day
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_day}}</span>
                                     </p>
@@ -362,11 +362,11 @@
                                         Rootkit trojans
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.rootkit_trojans}}</span>
                                     </p>
-                                    <p>
+                                    <p ng-if="managerConfiguration.rootcheck.base_directory">
                                         Base directory
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.base_directory}}</span>
                                     </p>
-                                    <p>
+                                    <p ng-if="managerConfiguration.rootcheck.scanall">
                                         Scan all
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.scanall}}</span>
                                     </p>

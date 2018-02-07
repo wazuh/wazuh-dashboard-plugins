@@ -68,10 +68,10 @@
                 <p flex="15" >{{entry._source.api_port}}</p>
                 <p flex="15" >{{entry._source.api_user}}</p>
                 <p flex="20" >
-                    <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18" aria-hidden="true"></i>
-                    <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2" aria-hidden="true"></i>
-                    <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2" aria-hidden="true"></i>
-                    <i ng-click="showEditForm[entry._id] = !showEditForm[entry._id]" tooltip="Edit" class="fa fa-pencil settings-template-2" aria-hidden="true"></i>
+                    <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
+                    <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2 cursor-pointer" aria-hidden="true"></i>
+                    <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2 cursor-pointer" aria-hidden="true"></i>
+                    <i ng-click="showEditForm[entry._id] = !showEditForm[entry._id]" tooltip="Edit" class="fa fa-pencil settings-template-2 cursor-pointer" aria-hidden="true"></i>
                 </p>
             </span>
             <span layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id]">

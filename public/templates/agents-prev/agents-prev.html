@@ -2,13 +2,13 @@
 
         <div layout="row" layout-align="space-between stretch">
             <md-card flex class="cardHover margin-left-0">
-                <md-card-content class="text-center" ng-click="showAgent(lastAgent)">
+                <md-card-content class="text-center cursor-pointer" ng-click="showAgent(lastAgent)">
                     <div class="metric-value ng-binding font-size-16-pt">{{lastAgent.name}}</div>
                     <div class="ng-binding">Last registered agent</div>
                 </md-card-content>
             </md-card>
             <md-card flex class="cardHover">
-                <md-card-content class="text-center" ng-click="showAgent(mostActiveAgent)">
+                <md-card-content class="text-center cursor-pointer" ng-click="showAgent(mostActiveAgent)">
                     <div class="metric-value ng-binding font-size-16-pt">{{mostActiveAgent.name}}</div>
                     <div class="ng-binding">Higher activity</div>
                 </md-card-content>
