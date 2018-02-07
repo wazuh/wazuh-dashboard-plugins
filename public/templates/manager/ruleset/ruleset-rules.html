@@ -152,8 +152,8 @@
                                     <md-divider></md-divider>
                                     <p>{{rule.description}}</p>
                                     <p>Id <span class="md-secondary pull-right">{{rule.id}}</span></p>
-                                    <p>Level <span class="md-secondary pull-right listHover" ng-click="rules.addFilter('level', rule.level); $event.stopPropagation();">{{rule.level}}</span></p>
-                                    <p>File <span class="md-secondary pull-right listHover" ng-click="rules.addFilter('file', rule.file); $event.stopPropagation();">{{rule.file}}</span></p>
+                                    <p>Level <span class="md-secondary pull-right listHover cursor-pointer" ng-click="rules.addFilter('level', rule.level); $event.stopPropagation();">{{rule.level}}</span></p>
+                                    <p>File <span class="md-secondary pull-right listHover cursor-pointer" ng-click="rules.addFilter('file', rule.file); $event.stopPropagation();">{{rule.file}}</span></p>
                                 </div>
                             </div>
                         </div>
@@ -164,14 +164,14 @@
                                 <div flex>
                                     <h4><i class="fa fa-reorder"></i> Groups</h4>
                                     <md-divider></md-divider>
-                                    <p ng-repeat="group in rule.groups"><span class="md-secondary listHover" ng-click="rules.addFilter('group', group)">{{group}}</span><br></p>
+                                    <p ng-repeat="group in rule.groups"><span class="md-secondary listHover cursor-pointer" ng-click="rules.addFilter('group', group)">{{group}}</span><br></p>
                                </div>
                             </div>
                             <div layout="row" ng-if="rule.pci.length > 0">
                                 <div flex>
                                     <h4><i class="fa fa-shield"></i> PCI DSS</h4>
                                     <md-divider></md-divider>
-                                    <p ng-repeat="pci in rule.pci"><span class="md-secondary listHover" ng-click="rules.addFilter('pci', pci)">{{pci}}</span><br></p>
+                                    <p ng-repeat="pci in rule.pci"><span class="md-secondary listHover cursor-pointer" ng-click="rules.addFilter('pci', pci)">{{pci}}</span><br></p>
                                 </div>
                             </div>
                         </div>
