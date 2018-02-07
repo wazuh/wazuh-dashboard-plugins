@@ -53,7 +53,7 @@
                 <div flex layout="column" class="md-padding groupsFixPadding" ng-if="!lookingGroup">
                     <div flex class=" clusterScrollable" when-scrolled="groups.nextPage('')">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-click="$parent.loadGroup($index); toggle();"
-                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
                             <div flex="20">
                                 <span>{{group.name}}</span>
                             </div>
@@ -153,7 +153,7 @@
                 <div flex layout="column" class="md-padding groupsFixPadding" ng-if="lookingGroup">
                     <div flex ng-if="groupsSelectedTab==='agents'" class="clusterScrollable" when-scrolled="groupAgents.nextPage()">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' ng-click="showAgent(agent)"
-                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
                             <div flex>
                                 <span>{{agent.id || 'Unknown'}}</span>
                             </div>
@@ -176,7 +176,7 @@
                     </div>
                     <div flex ng-if="groupsSelectedTab==='files' && !file" class="clusterScrollable" when-scrolled="groupFiles.nextPage()">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="file in groupFiles.items | orderBy : groupFiles.sortValue : groupFiles.sortDir" ng-click="$parent.showFile($index);"
-                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
                             <div flex="30">
                                 <span>{{file.filename || 'Unknown'}}</span>
                             </div>
