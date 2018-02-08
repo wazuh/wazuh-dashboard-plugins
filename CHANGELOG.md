@@ -13,6 +13,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 - Several CSS bugfixes for better compatibility with Kibana 6.2.0.
 - Some variables changed for adapting new Wazuh API requests.
+- Better error handling for some Elastic-related messages.
+
+### Removed
+- Removed the `travis.yml` file.
 
 ## [v3.1.0]
 ### Added
