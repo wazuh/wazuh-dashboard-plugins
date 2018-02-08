@@ -1,5 +1,5 @@
 # Change Log
-All notable changes to the Wazuh App project will be documented in this file.
+All notable changes to the Wazuh app project will be documented in this file.
 
 ## [v3.2.0]
 ### Added
