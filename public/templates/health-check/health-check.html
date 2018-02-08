@@ -9,8 +9,10 @@
         <div ng-if="!zeroChecks">&nbsp; Performing checks...({{processedChecks}}/{{totalChecks}})<i ng-class="{'fa-spinner': processedChecks != totalChecks && !checksDone, 'fa-spin': processedChecks != totalChecks && !checksDone}" class="fa fa-fw" aria-hidden="true"></i></div>
         <div class="health-check-error" ng-show="errors.length > 0">
             <div class="error-notify">Ups, something went wrong...</div>
-            <div ng-repeat='error in errors'>
-                <div>&nbsp; {{error}}</i></div>
+            <div>
+                <ul>
+                    <li ng-repeat='error in errors'>{{error}}</li>
+                </ul>
             </div>
         </div>
     </div>

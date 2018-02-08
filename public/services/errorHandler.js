@@ -9,7 +9,8 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         if(error.data && typeof error.data === 'string') return error.data;
         if(error.data && error.data.message) return error.data.message;
         if(error.data && error.data.data && typeof error.data.data === 'string') return error.data.data;
-        if(error.message) return error.message;
+        if(typeof error.message === 'string') return error.message;
+        if(error.message && error.message.msg) return error.message.msg;
         if(typeof error === 'string') return error;
         if(typeof error === 'object') return JSON.stringify(error);
         return error || 'Unexpected error';
@@ -29,7 +30,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         return;
     }
 
-    const handle = (error,location,isWarning) => {
+    const handle = (error,location,isWarning,silent) => {
         if(isAPIUnauthorized(error)){
             $location.path('/settings');
             return;
@@ -96,8 +97,10 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 text = isWarning ? `Warning. ${message}` : `Error. ${message}`;
         }
         text = location ? location + '. ' + text : text;
-        if(isWarning) notify.warning(text);
-        else          notify.error(text);
+        if(!silent){
+            if(isWarning) notify.warning(text);
+            else          notify.error(text);
+        }
         if(goSettings) $location.path('/settings');
         return text;
     }
