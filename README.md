@@ -69,7 +69,7 @@ If you want to contribute to our project please don't hesitate to send a pull re
 
 ## License and copyright
 
-Wazuh App Copyright (C) 2017 Wazuh Inc. (License GPLv2)
+Wazuh App Copyright (C) 2018 Wazuh Inc. (License GPLv2)
 
 ## References
 
