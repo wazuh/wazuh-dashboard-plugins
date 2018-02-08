@@ -15,7 +15,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
 
     const handleError = error => {
         errorHandler.handle(error,'Health Check');
-        $scope.errors.push(error);
+        $scope.errors.push(errorHandler.handle(error,'Health Check',false,true));
     };
 
     const checkPatterns = async () => {
