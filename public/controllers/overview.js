@@ -1,7 +1,6 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, Notifier) {
-    const notify = new Notifier({ location: 'Overview' });
+app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler) {
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
@@ -25,56 +24,40 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     }
 
     $rootScope.loadedVisualizations = [];
-    $rootScope.rendered = false;
-    $rootScope.loadingStatus = "Fetching data...";
+    $rootScope.rendered             = false;
+    $rootScope.loadingStatus        = "Fetching data...";
 
     // This object represents the number of visualizations per tab; used to show a progress bar
     $rootScope.tabVisualizations = {
-        "general": 15,
-        "fim": 17,
-        "pm": 5,
-        "oscap": 14,
-        "audit": 16,
-        "pci": 6,
-        "aws": 10,
-        "virustotal": 7
+        general   : 15,
+        fim       : 17,
+        pm        : 5,
+        vuls      : 8,
+        oscap     : 14,
+        audit     : 16,
+        pci       : 6,
+        aws       : 10,
+        virustotal: 7
     };
 
     // Object for matching nav items and rules groups
-    let tabFilters = {
-        "general": {
-            "group": ""
-        },
-        "fim": {
-            "group": "syscheck"
-        },
-        "pm": {
-            "group": "rootcheck"
-        },
-        "oscap": {
-            "group": "oscap"
-        },
-        "audit": {
-            "group": "audit"
-        },
-        "pci": {
-            "group": "pci_dss"
-        },
-        "aws": {
-            "group": "amazon"
-        },
-        "virustotal": {
-            "group": "virustotal"
-        }
+    const tabFilters = {
+        general   : { group: '' },
+        fim       : { group: 'syscheck' },
+        pm        : { group: 'rootcheck' },
+        vuls      : { group: 'vulnerability-detector' },
+        oscap     : { group: 'oscap' },
+        audit     : { group: 'audit' },
+        pci       : { group: 'pci_dss' },
+        aws       : { group: 'amazon' },
+        virustotal: { group: 'virustotal' }
     };
 
     // Switch subtab
-    $scope.switchSubtab = (subtab) => {
-        $scope.tabView = subtab;
-    };
+    $scope.switchSubtab = subtab => $scope.tabView = subtab;
 
     // Switch tab
-    $scope.switchTab = (tab) => {
+    $scope.switchTab = tab => {
         if($scope.tab === tab) return;
 
         for(let h of $rootScope.ownHandlers){
@@ -101,8 +84,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     });
 
     $scope.$on('$destroy',() => {
-        for(let h of $rootScope.ownHandlers){
-            h._scope.$destroy();
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
         }
         $rootScope.ownHandlers = [];
     });
@@ -119,7 +104,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                 });
             }
         })
-        .catch(error => notify.error(error.message));
+        .catch(error => {
+            errorHandler.handle(error,'Overview');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        });
 
     $scope.tabs = tabs;
     $scope.selectedIndex = 0;

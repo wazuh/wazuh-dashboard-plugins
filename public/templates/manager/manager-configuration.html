@@ -77,10 +77,8 @@
                                             Active response
                                         </a>
                                     </p>
-                                    
                                 </div>
                             </div>
-
                         </div>
 
                         <!-- Global -->
@@ -92,11 +90,16 @@
                                     <md-divider></md-divider>
                                     <p ng-if="managerConfiguration.global.white_list">
                                         JSON output
-                                        <span class="md-secondary pull-right">{{managerConfiguration.global.jsonout_output}}</span>
+                                        <span ng-class="managerConfiguration.global.jsonout_output === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.global.jsonout_output}}</span>
                                     </p>
                                     <p ng-if="managerConfiguration.global.logall">
                                         Log all
-                                        <span class="md-secondary pull-right">{{managerConfiguration.global.logall}}
+                                        <span ng-class="managerConfiguration.global.logall === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.global.logall}}
+                                        </span>
+                                    </p>
+                                    <p ng-if="managerConfiguration.global.logall">
+                                        Log all in JSON
+                                        <span ng-class="managerConfiguration.global.logall_json === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.global.logall_json}}
                                         </span>
                                     </p>
                                     <p ng-if="managerConfiguration.global.white_list">
@@ -121,7 +124,7 @@
                                     </p>
                                     <p ng-if="managerConfiguration.global.email_notification">
                                         E-mail notifications
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.email_notification }}
+                                        <span ng-class="managerConfiguration.global.email_notification === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{ managerConfiguration.global.email_notification }}
                                         </span>
                                     </p>
                                     <p ng-if="managerConfiguration.global.email_alert_level">
@@ -281,37 +284,37 @@
                         <!-- Syscheck -->
                         <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='syscheck'">
                             <div flex layout="row" class="md-padding">
-                                <div flex="60">
+                                <div ng-class="managerConfiguration.syscheck.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
                                         <i class="fa fa-shield"></i> Syscheck</h4>
                                     <md-divider></md-divider>
                                     <p>
                                         Syscheck disabled
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.disabled}}</span>
+                                        <span ng-class="managerConfiguration.syscheck.disabled === 'yes' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.disabled}}</span>
                                     </p>
                                     <p>
                                         Frequency
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.frequency}}</span>
                                     </p>
-                                    <p>
+                                    <p ng-if="managerConfiguration.syscheck.scan_time">
                                         Scan time
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_time}}</span>
                                     </p>
-                                    <p>
+                                    <p ng-if="managerConfiguration.syscheck.scan_day">
                                         Scan day
                                         <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_day}}</span>
                                     </p>
                                     <p>
                                         Auto ignore
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.auto_ignore}}</span>
+                                        <span ng-class="managerConfiguration.syscheck.auto_ignore === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.auto_ignore}}</span>
                                     </p>
                                     <p>
                                         Alert new files
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.alert_new_files}}</span>
+                                        <span ng-class="managerConfiguration.syscheck.alert_new_files === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.alert_new_files}}</span>
                                     </p>
                                     <p>
                                         Scan on start
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_on_start}}</span>
+                                        <span ng-class="managerConfiguration.syscheck.scan_on_start === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_on_start}}</span>
                                     </p>
                                     <p>
                                         No diff
@@ -319,7 +322,7 @@
                                     </p>
                                     <p>
                                         Skip NFS
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.skip_nfs}}</span>
+                                        <span ng-class="managerConfiguration.syscheck.skip_nfs === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.skip_nfs}}</span>
                                     </p>
                                     <br>
                                     <h4>
@@ -332,7 +335,7 @@
                                         </p>
                                         <p>
                                             Check all
-                                            <span class="md-secondary pull-right">{{item.check_all}}</span>
+                                            <span ng-class="item.check_all === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{item.check_all}}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -343,13 +346,13 @@
                         <!-- Rootcheck -->
                         <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='rootcheck'">
                             <div flex layout="row" class="md-padding">
-                                <div flex="60">
+                                <div ng-class="managerConfiguration.rootcheck.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
                                         <i class="fa fa-check"></i> Rootcheck</h4>
                                     <md-divider></md-divider>
                                     <p>
                                         Rootcheck disabled
-                                        <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.disabled}}</span>
+                                        <span ng-class="managerConfiguration.rootcheck.disabled === 'yes' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.rootcheck.disabled}}</span>
                                     </p>
                                     <p>
                                         Rootkit files
@@ -359,11 +362,11 @@
                                         Rootkit trojans
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.rootkit_trojans}}</span>
                                     </p>
-                                    <p>
+                                    <p ng-if="managerConfiguration.rootcheck.base_directory">
                                         Base directory
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.base_directory}}</span>
                                     </p>
-                                    <p>
+                                    <p ng-if="managerConfiguration.rootcheck.scanall">
                                         Scan all
                                         <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.scanall}}</span>
                                     </p>
@@ -373,7 +376,7 @@
                                     </p>
                                     <p>
                                         Skip NFS
-                                        <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.skip_nfs}}</span>
+                                        <span ng-class="managerConfiguration.rootcheck.skip_nfs === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.rootcheck.skip_nfs}}</span>
                                     </p>
                                     <br>
                                     <h4>
@@ -393,25 +396,29 @@
                         <!-- Auth -->
                         <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='auth'">
                             <div flex layout="row" class="md-padding">
-                                <div flex="60">
+                                <div ng-class="managerConfiguration.auth.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
                                         <i class="fa fa-user"></i> Auth</h4>
                                     <md-divider></md-divider>
                                     <p>
+                                        Disabled
+                                        <span ng-class="managerConfiguration.auth.disabled === 'yes' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.disabled}}</span>
+                                    </p>
+                                    <p>
                                         Purge
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.purge}}</span>
+                                        <span ng-class="managerConfiguration.auth.purge === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.purge}}</span>
                                     </p>
                                     <p>
                                         Force insert
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.force_insert}}</span>
+                                        <span ng-class="managerConfiguration.auth.force_insert === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.force_insert}}</span>
                                     </p>
                                     <p>
                                         SSL verify host
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_verify_host}}</span>
+                                        <span ng-class="managerConfiguration.auth.ssl_verify_host === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.ssl_verify_host}}</span>
                                     </p>
                                     <p>
                                         Limit max agents
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.limit_maxagents}}</span>
+                                        <span ng-class="managerConfiguration.auth.limit_maxagents === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.limit_maxagents}}</span>
                                     </p>
                                     <p>
                                         Force time
@@ -422,20 +429,16 @@
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_manager_key}}</span>
                                     </p>
                                     <p>
-                                        Disabled
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.disabled}}</span>
-                                    </p>
-                                    <p>
                                         SSL manager cert
                                         <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_manager_cert}}</span>
                                     </p>
                                     <p>
                                         Use source ip
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.use_source_ip}}</span>
+                                        <span ng-class="managerConfiguration.auth.use_source_ip === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.use_source_ip}}</span>
                                     </p>
                                     <p>
                                         Use password
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.use_password}}</span>
+                                        <span ng-class="managerConfiguration.auth.use_password === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.use_password}}</span>
                                     </p>
                                     <p>
                                         Port
@@ -443,7 +446,7 @@
                                     </p>
                                     <p>
                                         SSL auto negotiate
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_auto_negotiate}}</span>
+                                        <span ng-class="managerConfiguration.auth.ssl_auto_negotiate === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.ssl_auto_negotiate}}</span>
                                     </p>
                                     <p>
                                         Ciphers
@@ -524,7 +527,7 @@
                                         </p>
                                         <p ng-if="item.timeout_allowed">
                                             Timeout allowed
-                                            <span class="md-secondary pull-right">{{ item.timeout_allowed}}
+                                            <span ng-class="item.timeout_allowed === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{ item.timeout_allowed}}
                                             </span>
                                         </p>
                                         <md-divider ng-if="!$last"></md-divider>

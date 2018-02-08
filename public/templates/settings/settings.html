@@ -35,7 +35,7 @@
         </div>
 
     </md-card>
-    <md-card layout-padding layout-align="start stretch" ng-if="apiIsDown === 'down'">
+    <md-card layout-padding layout-align="start stretch" ng-if="apiIsDown">
         <h1 class="wazuh-h1"><i class="fa fa-warning ng-scope font-size-25" aria-hidden="true"></i> Wazuh RESTful API seems to be down</h1>
         <p>Please, check if Wazuh RESTful API is running with one of the commands below:</p>
         <md-list>
@@ -45,10 +45,6 @@
             <md-list-item><code>    $ service wazuh-api status</code></md-list-item>
         </md-list>
         <p>If the API is <code>active (running)</code> please check its configuration below.</p>
-    </md-card>
-    <md-card layout-padding layout-align="start stretch" ng-if="!currentAPI">
-        <h1 class="wazuh-h1"><i class="fa fa-warning ng-scope font-size-25" aria-hidden="true"></i> Please select an API from the list as default</h1>
-        <p>The Wazuh app needs an API connection for it to work. Please click the API's star (<i class="fa fa-star font-size-18" aria-hidden="true"></i>) icon of your choice to select that one.</p>
     </md-card>
 
     <md-card layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api'">
@@ -72,10 +68,10 @@
                 <p flex="15" >{{entry._source.api_port}}</p>
                 <p flex="15" >{{entry._source.api_user}}</p>
                 <p flex="20" >
-                    <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18" aria-hidden="true"></i>
-                    <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2" aria-hidden="true"></i>
-                    <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2" aria-hidden="true"></i>
-                    <i ng-click="showEditForm[entry._id] = !showEditForm[entry._id]" tooltip="Edit" class="fa fa-pencil settings-template-2" aria-hidden="true"></i>
+                    <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
+                    <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2 cursor-pointer" aria-hidden="true"></i>
+                    <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2 cursor-pointer" aria-hidden="true"></i>
+                    <i ng-click="showEditForm[entry._id] = !showEditForm[entry._id]" tooltip="Edit" class="fa fa-pencil settings-template-2 cursor-pointer" aria-hidden="true"></i>
                 </p>
             </span>
             <span layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id]">
@@ -217,6 +213,7 @@
 
         <p flex>Select the index pattern to run search and analytics against:</p>
         <p flex><strong>Beware: the new index-pattern structure must be compatible with Wazuh alerts, otherwise the visualizations will load erroneous data, or no data at all.</strong></p>
+        <p flex><strong>Warning: modifying the index-pattern will change it to ALL of the users.</strong></p>
 
         <md-input-container flex="20" class="md-whiteframe-z1 manager-ruleset-decoders-selector background-e2" ng-if="load === false">
             <md-select ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">

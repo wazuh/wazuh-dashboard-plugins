@@ -1,8 +1,7 @@
 const app = require('ui/modules').get('app/wazuh', []);
 
 // Logs controller
-app.controller('managerLogController', function ($scope, Logs, apiReq,Notifier) {
-    const notify = new Notifier({ location: 'Manager - Logs' });
+app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq,errorHandler) {
     $scope.searchTerm  = '';
     $scope.loading     = true;
     $scope.logs        = Logs;
@@ -16,11 +15,8 @@ app.controller('managerLogController', function ($scope, Logs, apiReq,Notifier) 
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            if(error.data && error.data.errorData && error.data.errorData.error === 1000){
-                console.log(error.data.errorData.message);
-            } else {
-                notify.error(error.message);
-            }
+            errorHandler.handle(error,'Logs');
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
 
@@ -45,12 +41,19 @@ app.controller('managerLogController', function ($scope, Logs, apiReq,Notifier) 
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            notify.error(error.message)
+            errorHandler.handle(error,'Logs');
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
 
     initialize();
 
     // Resetting the factory configuration
-    $scope.$on("$destroy", () => $scope.logs.reset());
+    $scope.$on("$destroy", () => {
+        if($scope.realtime) {
+            $scope.realtime = false;
+            clearInterval(intervalId);
+        }
+        $scope.logs.reset();
+    });
 });

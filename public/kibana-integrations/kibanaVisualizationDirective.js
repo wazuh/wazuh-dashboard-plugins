@@ -81,9 +81,12 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                         }
                     }
 
+                    if(typeof $rootScope.loadedVisualizations === 'undefined') $rootScope.loadedVisualizations = [];
                     $rootScope.loadedVisualizations.push(true);
-                    $rootScope.loadingStatus = `Rendering visualizations... ${Math.round((100 * $rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100) / 100} %`;
-                    if ($rootScope.loadedVisualizations.length >= $rootScope.tabVisualizations[$location.search().tab]) {
+                    let currentCompleted = Math.round(($rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100);
+                    $rootScope.loadingStatus = `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`;
+
+                    if (currentCompleted >= 100) {
                         if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
                         // Forcing a digest cycle
                         if(!$rootScope.$$phase) $rootScope.$digest();
@@ -109,8 +112,8 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                     if ($scope.specificTimeRange) {
                         const timeRange = {
-                            min: 'now-1d/d',
-                            max: 'now'
+                            from: 'now-1d/d',
+                            to: 'now'
                         };
                         params = {timeRange: timeRange}
                     }

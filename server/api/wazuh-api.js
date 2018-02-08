@@ -243,32 +243,60 @@ module.exports = (server, options) => {
     };
 
     const getPciRequirement = (req, reply) => {
-        if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
-        let pciRequirements = {};
-        let pci_description = '';
-
         try {
-            pciRequirements = require(pciRequirementsFile);
-        } catch (e) {
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the mapping file.');
-            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + pciRequirementsFile);
-            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-        }
+            
+            if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
+            const pciRequirements = require(pciRequirementsFile);
+            let pci_description = '';
 
-        if (req.params.requirement === 'all') {
-            return reply(pciRequirements);
-        }
-
-        if (typeof pciRequirements[req.params.requirement] !== 'undefined'){
-            pci_description = pciRequirements[req.params.requirement];
-        }
+            if (req.params.requirement === 'all') {
+                if(!req.headers.id) {
+                    return reply(pciRequirements);
+                }
+                getConfig(req.headers.id, wapi_config => {
+                    if (wapi_config.error_code > 1) {
+                        // Can not connect to elasticsearch
+                        return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
+                    } else if (wapi_config.error_code > 0) {
+                        // Credentials not found
+                        return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
+                     }
         
-        reply({
-            pci: {
-                requirement: req.params.requirement,
-                description: pci_description
+                    needle('get', `${wapi_config.url}:${wapi_config.port}/rules/pci`, {}, {
+                        username:           wapi_config.user,
+                        password:           wapi_config.password,
+                        rejectUnauthorized: !wapi_config.insecure
+                    })
+                    .then(response => {
+                        if(response.body.data && response.body.data.items){
+                            let PCIobject = {};
+                            for(let item of response.body.data.items){
+                                if(typeof pciRequirements[item] !== 'undefined') PCIobject[item] = pciRequirements[item];
+                            }
+                            return reply(PCIobject);
+                        } else {
+                            return reply({ statusCode: 400, error: '9998', data: 'An error occurred trying to parse PCI DSS requirements' });
+                        }
+                        
+                    })
+                    .catch(error => reply({ statusCode: 400, error: '9997', data: 'An error occurred trying to obtain PCI DSS requirements from Wazuh API' }));
+                });
+            } else {
+                if (typeof pciRequirements[req.params.requirement] !== 'undefined'){
+                    pci_description = pciRequirements[req.params.requirement];
+                }
+                
+                return reply({
+                    pci: {
+                        requirement: req.params.requirement,
+                        description: pci_description
+                    }
+                });
             }
-        });
+        } catch (e) {
+            return reply({ statusCode: 400, error: '9999', data: 'An error occurred trying to obtain PCI DSS requirements' });
+        }
+
     };
 
     const errorControl = (error, response) => {
@@ -424,13 +452,13 @@ module.exports = (server, options) => {
 
             //if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
-            if(configFile.login){
-                delete configFile.login.password;
+            if(configFile && configFile['login.password']){
+                delete configFile['login.password'];
             }
             return reply({
                 statusCode: 200,
                 error:      0,
-                data:       configFile
+                data:       configFile || {}
             });
         } catch (error) {
             return reply(genericErrorBuilder(500,6,error.message || error)).code(500)
@@ -440,10 +468,12 @@ module.exports = (server, options) => {
     const login = (req,reply) => {
         try{
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
-
+            if(!configFile){
+                throw Error('Configuration file not found');
+            }
             if(!req.payload.password) {
                 return reply(genericErrorBuilder(401,7,'Please give me a password.')).code(401)
-            } else if(req.payload.password !== configFile.login.password){
+            } else if(req.payload.password !== configFile['login.password']){
                 return reply(genericErrorBuilder(401,7,'Wrong password, please try again.')).code(401)
             }
             const code = (new Date()-1) + 'wazuhapp';
@@ -532,11 +562,6 @@ module.exports = (server, options) => {
         handler: postErrorLog
     });
 
-    /*
-     * GET /api/wazuh-api/pci/requirement
-     * Return a PCI requirement description
-     *
-     **/
     server.route({
         method:  'GET',
         path:    '/api/wazuh-api/fetchAgents',

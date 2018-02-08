@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="tab == 'pci'" layout-align="start">
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" layout-align="center stretch">
             <md-card flex>
@@ -55,7 +55,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="height-550">
+        <div layout="row" layout-align="center stretch" class="height-570">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>

@@ -31,10 +31,7 @@ module.exports = err => {
         err.message = `Unexpected error filtering the data. Error ${err.message}.`;
     } else if(err.message) {
         err['html'] = err.message;
-    } else {
-        err['html'] = "Unexpected error. Please, report this error.";
-        err.message = "Unexpected error. Please, report this error.";
-    }
-
+    } 
+    
     return err;
 };

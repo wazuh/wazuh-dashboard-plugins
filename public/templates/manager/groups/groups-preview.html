@@ -49,23 +49,22 @@
                             </span>
                         </div>
                     </md-toolbar>
-                    <md-divider></md-divider>
                 </md-card-content>
                 <div flex layout="column" class="md-padding groupsFixPadding" ng-if="!lookingGroup">
                     <div flex class=" clusterScrollable" when-scrolled="groups.nextPage('')">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-click="$parent.loadGroup($index); toggle();"
-                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groups-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
                             <div flex="20">
-                                <span class="md-headline">{{group.name}}</span>
+                                <span>{{group.name}}</span>
                             </div>
                             <div flex="15">
-                                <span class="md-headline">{{group.count}}</span>
+                                <span>{{group.count}}</span>
                             </div>
                             <div flex="15" ng-if="groups[0] && groups[0].files_count">
-                                <span class="md-headline">{{group.files_count}}</span>
+                                <span>{{group.files_count}}</span>
                             </div>
                             <div flex>
-                                <span class="md-headline">{{group.merged_sum}}</span>
+                                <span>{{group.merged_sum}}</span>
                             </div>
                         </div>
                     </div>
@@ -130,7 +129,6 @@
                             </span>
                         </div>
                     </md-toolbar>
-                    <md-divider ng-show="groupsSelectedTab==='agents'"></md-divider>
                     <div layout="row" class="topMarginSearchTop" ng-show="groupsSelectedTab==='files' && !file">
                         <h4>{{ groups.items[selectedGroup].name }}</h4>
                     </div>
@@ -149,42 +147,41 @@
                             <span>MD5 checksum</span>
                         </div>
                     </md-toolbar>
-                    <md-divider ng-show="groupsSelectedTab==='files' && !file"></md-divider>
 
 
                 </md-card-content>
                 <div flex layout="column" class="md-padding groupsFixPadding" ng-if="lookingGroup">
                     <div flex ng-if="groupsSelectedTab==='agents'" class="clusterScrollable" when-scrolled="groupAgents.nextPage()">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' ng-click="showAgent(agent)"
-                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groups-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
                             <div flex>
-                                <span class="md-headline">{{agent.id || 'Unknown'}}</span>
+                                <span>{{agent.id || 'Unknown'}}</span>
                             </div>
                             <div flex>
-                                <span class="md-headline">{{agent.name || 'Unknown'}}</span>
+                                <span>{{agent.name || 'Unknown'}}</span>
                             </div>
                             <div flex>
-                                <span class="md-headline">{{agent.ip || 'Unknown'}}</span>
+                                <span>{{agent.ip || 'Unknown'}}</span>
                             </div>
                             <div flex>
-                                <span class="md-headline">{{agent.os.platform || 'Unknown'}}</span>
+                                <span>{{agent.os.platform || 'Unknown'}}</span>
                             </div>
                             <div flex>
-                                <span class="md-headline">{{agent.os.version || 'Unknown'}}</span>
+                                <span>{{agent.os.version || 'Unknown'}}</span>
                             </div>
                             <div flex>
-                                <span class="md-headline">{{agent.version || 'Unknown'}}</span>
+                                <span>{{agent.version || 'Unknown'}}</span>
                             </div>
                         </div>
                     </div>
                     <div flex ng-if="groupsSelectedTab==='files' && !file" class="clusterScrollable" when-scrolled="groupFiles.nextPage()">
                         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="file in groupFiles.items | orderBy : groupFiles.sortValue : groupFiles.sortDir" ng-click="$parent.showFile($index);"
-                            class="ownNavBarGroupsPadding md-subhead agents-groups-preview agents-preview-table groups-table groupsFixPadding">
+                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
                             <div flex="30">
-                                <span class="md-headline">{{file.filename || 'Unknown'}}</span>
+                                <span>{{file.filename || 'Unknown'}}</span>
                             </div>
                             <div flex>
-                                <span class="md-headline">{{file.hash || 'Unknown'}}</span>
+                                <span>{{file.hash || 'Unknown'}}</span>
                             </div>
                         </div>
                     </div>
@@ -197,9 +194,10 @@
                         </div>
                     </div>
                 </div>
-                <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groupFiles.busy || groups.busy || groupAgents.busy"></md-progress-linear>
             </md-card>
         </div>
-        </div>
+        <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groupFiles.busy || groups.busy || groupAgents.busy"></md-progress-linear>
+
+    </div>
     </div>
 </md-content>

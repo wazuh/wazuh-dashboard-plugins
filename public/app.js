@@ -36,6 +36,7 @@ require('plugins/wazuh/kibana-integrations/kibanaFilterbarDirective.js');
 require('plugins/wazuh/kibana-integrations/kibanaDiscoverDirective.js');
 
 // Require services
+require('plugins/wazuh/services/errorHandler.js');
 require('plugins/wazuh/services/theming.js');
 require('plugins/wazuh/services/apiReq.js');
 require('plugins/wazuh/services/genericReq.js');
@@ -43,6 +44,7 @@ require('plugins/wazuh/services/dataHandler.js');
 require('plugins/wazuh/services/appState.js');
 require('plugins/wazuh/services/testAPI.js');
 require('plugins/wazuh/services/implicitFilters.js');
+require('plugins/wazuh/services/patternHandler.js');
 
 // Set up routes and views
 require('plugins/wazuh/services/routes.js');
@@ -53,6 +55,9 @@ require('plugins/wazuh/services/routes.js');
 require('plugins/wazuh/controllers/common/factories.js');
 require('plugins/wazuh/controllers/common/filters.js');
 require('plugins/wazuh/controllers/common/directives.js');
+
+// Blank Screen
+require('plugins/wazuh/controllers/blankScreenController.js');
 
 // Login
 require('plugins/wazuh/controllers/login.js');
@@ -75,5 +80,3 @@ require('plugins/wazuh/controllers/settings.js');
 
 // Health check
 require('plugins/wazuh/controllers/healthCheck.js');
-
-

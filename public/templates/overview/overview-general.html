@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="tab === 'general'" layout-align="start">
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex>
@@ -71,7 +71,7 @@
             </md-card>
             <md-card flex>
                 <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Top source ip</div>
+                    <div class="ng-binding">Top source IP</div>
                     <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-source-IP'" id="Wazuh-App-Overview-General-Top-source-IP"></kbn-vis>
                 </md-card-content>
             </md-card>
@@ -89,7 +89,7 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="height-550">
+        <div layout="row" layout-align="center stretch" class="height-570">
             <md-card flex="60">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>

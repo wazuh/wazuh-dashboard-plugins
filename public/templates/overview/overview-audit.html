@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="tab == 'audit'" layout-align="space-around">
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" layout-align="center stretch" class="height-125">
             <md-card flex="10">
@@ -113,7 +113,7 @@
             </div>
         </div>
 
-        <div flex layout="row" class="height-550">
+        <div flex layout="row" class="height-570">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>

@@ -1,12 +1,11 @@
-const   app      = require('ui/modules').get('app/wazuh', []);
+const app        = require('ui/modules').get('app/wazuh', []);
 const beautifier = require('plugins/wazuh/utils/json-beautifier');
 
 app.controller('agentsController',
-function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, apiReq, AgentsAutoComplete) {
+function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler) {
     $rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
     $scope.agentsAutoComplete = AgentsAutoComplete;
-    const notify = new Notifier({ location: 'Agents' });
 
     // Check the url hash and retriew the tabView information
     if ($location.search().tabView){
@@ -34,51 +33,33 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
     }
 
     $rootScope.tabVisualizations = {
-        "general": 7,
-        "fim": 8,
-        "pm": 4,
-        "oscap": 13,
-        "audit": 15,
-        "pci": 3,
-        "aws": 10,
-        "virustotal": 6,
-        "configuration": 0
+        general      : 7,
+        fim          : 8,
+        pm           : 4,
+        vuls         : 7,
+        oscap        : 13,
+        audit        : 15,
+        pci          : 3,
+        virustotal   : 6,
+        configuration: 0
     };
 
     // Object for matching nav items and Wazuh groups
-    let tabFilters = {
-        "general": {
-            "group": ""
-        },
-        "fim": {
-            "group": "syscheck"
-        },
-        "pm": {
-            "group": "rootcheck"
-        },
-        "oscap": {
-            "group": "oscap"
-        },
-        "audit": {
-            "group": "audit"
-        },
-        "pci": {
-            "group": "pci_dss"
-        },
-        "aws": {
-            "group": "amazon"
-        },
-        "virustotal": {
-            "group": "virustotal"
-        }
+    const tabFilters = {
+        general   : { group: '' },
+        fim       : { group: 'syscheck' },
+        pm        : { group: 'rootcheck' },
+        vuls      : { group: 'vulnerability-detector' },
+        oscap     : { group: 'oscap' },
+        audit     : { group: 'audit' },
+        pci       : { group: 'pci_dss' },
+        virustotal: { group: 'virustotal' }
     };
 
     // Switch subtab
-    $scope.switchSubtab = (subtab) => {
-        $scope.tabView = subtab;
-    };
+    $scope.switchSubtab = subtab => $scope.tabView = subtab;
 
-    $scope.switchTab = (tab) => {
+    $scope.switchTab = tab => {
 
         if($scope.tab === tab) return;
         if($rootScope.ownHandlers){
@@ -162,55 +143,60 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         }
     }
 
-    $scope.getAgent = newAgentId => {
-        if($scope.tab === 'configuration'){
-            return $scope.getAgentConfig(newAgentId);
-        }
-        let id = null;
-
-        // They passed an id
-        if (newAgentId) {
-            id = newAgentId;
-            $location.search('agent', id);
-        } else {
-            if ($location.search().agent) { // There's one in the url
-                id = $location.search().agent;
-            } else { // We pick the one in the rootScope
-                id = $rootScope.globalAgent;
-                $location.search('agent', id);
-                delete $rootScope.globalAgent;
+    $scope.getAgent = async newAgentId => {
+        try {
+            if($scope.tab === 'configuration'){
+                return $scope.getAgentConfig(newAgentId);
             }
-        }
+            let id = null;
 
-        if (id === '000' && $scope.tab === 'configuration') {
-            $scope.tab = 'general';
-            $scope.switchTab('general');
-        }
+            // They passed an id
+            if (newAgentId) {
+                id = newAgentId;
+                $location.search('agent', id);
+            } else {
+                if ($location.search().agent) { // There's one in the url
+                    id = $location.search().agent;
+                } else { // We pick the one in the rootScope
+                    id = $rootScope.globalAgent;
+                    $location.search('agent', id);
+                    delete $rootScope.globalAgent;
+                }
+            }
 
-        Promise.all([
-            apiReq.request('GET', `/agents/${id}`, {}),
-            apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-            apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
-        ])
-        .then(data => {
+            if (id === '000' && $scope.tab === 'configuration') {
+                $scope.tab = 'general';
+                $scope.switchTab('general');
+            }
+
+            const data = await Promise.all([
+                apiReq.request('GET', `/agents/${id}`, {}),
+                apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
+                apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
+            ]);
+
             // Agent
             $scope.agent = data[0].data.data;
 
             if ($scope.agent.os) {
                 $scope.agentOS = $scope.agent.os.name + ' ' + $scope.agent.os.version;
             }
-            else { $scope.agentOS = "Unkwnown" };
+            else { $scope.agentOS = 'Unkwnown' };
 
             // Syscheck
             $scope.agent.syscheck = data[1].data.data;
             validateSysCheck();
+
             // Rootcheck
             $scope.agent.rootcheck = data[2].data.data;
             validateRootCheck();
 
             if(!$scope.$$phase) $scope.$digest();
-        })
-        .catch(error => notify.error(error.message));
+            return;
+        } catch (error) {
+            errorHandler.handle(error,'Agents');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
     };
 
     $scope.goGroups = agent => {
@@ -221,19 +207,18 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
     };
 
 
-    $scope.analizeAgents = search => {
-        let deferred = $q.defer();
+    $scope.analizeAgents = async search => {
+        try {
+            $scope.agentsAutoComplete.filters = [];
+            await $scope.agentsAutoComplete.addFilter('search',search);
 
-        let promise;
-        $scope.agentsAutoComplete.filters = [];
+            if(!$scope.$$phase) $scope.$digest();
+            return $scope.agentsAutoComplete.items;
+        } catch (error) {
+            errorHandler.handle(error,'Agents');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
 
-        promise = $scope.agentsAutoComplete.addFilter('search',search);
-
-        promise
-        .then(() => deferred.resolve($scope.agentsAutoComplete.items))
-        .catch(error => notify.error(error));
-
-        return deferred.promise;
     }
 
     //Load
@@ -243,14 +228,17 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
         }
         $scope.agentsAutoComplete.nextPage('');
     } catch (e) {
-        notify.error('Unexpected exception loading controller');
+        errorHandler.handle('Unexpected exception loading controller','Agents');
+        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     //Destroy
     $scope.$on("$destroy", () => {
         $scope.agentsAutoComplete.reset();
-        for(let h of $rootScope.ownHandlers){
-            h._scope.$destroy();
+        if($rootScope.ownHandlers) {
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
         }
         $rootScope.ownHandlers = [];
     });
@@ -266,7 +254,10 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
                 });
             }
         })
-        .catch(error => notify.error(error.message));
+        .catch(error => {
+            errorHandler.handle(error,'Agents');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        });
 
     $scope.tabs          = tabs;
     $scope.selectedIndex = 0;
@@ -350,7 +341,8 @@ function ($scope, $location, $q, $rootScope, Notifier, appState, genericReq, api
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error){
-            notify.error(error.message);
+            errorHandler.handle(error,'Agents');
+            if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
     /** End of agent configuration */

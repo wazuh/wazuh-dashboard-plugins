@@ -1,6 +1,6 @@
 <md-content flex layout="column" ng-if="tab === 'general'" layout-align="start">
 
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row" class="height-100">
             <md-card flex>
                 <md-card-content class="text-center">
@@ -24,7 +24,7 @@
                 </md-card-content>
             </md-card>
             <md-card ng-if="agent.group" flex="12">
-                <md-card-content class="text-center" ng-click="goGroups(agent)">
+                <md-card-content class="text-center cursor-pointer" ng-click="goGroups(agent)">
                     <div class="metric-value ng-binding font-size-14-pt" >{{ agent.group }}</div>
                     <!--<md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>-->
                     <div class="ng-binding">Group</div>
@@ -82,7 +82,7 @@
     </div>
 
     <!-- View: Panels -->
-    <div ng-show="resultState === 'ready' && tabView === 'panels'">
+    <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" class="height-230">
             <md-card flex="33">
@@ -120,7 +120,7 @@
             </md-card>
         </div>
 
-        <div layout="row" class="height-550">
+        <div layout="row" class="height-570">
             <md-card  flex="60">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>

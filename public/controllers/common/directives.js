@@ -27,8 +27,7 @@ app.directive('dynamic', function($compile) {
 	})
     .directive('menuTop',function(){
         return {
-            controller: function ($scope, appState, courier, Notifier) {
-                const notify = new Notifier();
+            controller: function ($scope,$window, $rootScope, appState, patternHandler, courier, errorHandler) {
 
                 if(appState.getCurrentAPI()) {
                     $scope.theresAPI = true;
@@ -38,18 +37,45 @@ app.directive('dynamic', function($compile) {
                     $scope.theresAPI = false;
                 }
 
-                courier.indexPatterns.get(appState.getCurrentPattern())
-                .then((data) => {
-                    $scope.theresPattern = true;
-                    $scope.currentPattern = data.title;
-                })
-                .catch((error) => {
-                    notify.error("Error getting patterns from Kibana...");
-                    $scope.theresPattern = false;
-                });
+                const load = async () => {
+                    try {
+                        const data = await courier.indexPatterns.get(appState.getCurrentPattern());
+                        $scope.theresPattern = true;
+                        $scope.currentPattern = data.title;
+
+                        const list = await patternHandler.getPatternList();
+
+                        // Getting the list of index patterns
+                        if(list) {
+                            $scope.patternList = list;
+                            $scope.currentSelectedPattern = appState.getCurrentPattern();
+                        }
+                        if(!$scope.$$phase) $scope.$digest();
+                        return;
+                    } catch (error) {
+                        errorHandler.handle(error,'Directives - Menu');
+                        $scope.theresPattern = false;
+                        if(!$rootScope.$$phase) $rootScope.$digest();
+                    }
+                }
+
+                load();
+
+                // Function to change the current index pattern on the app
+                $scope.changePattern = async selectedPattern => {
+                    try{
+                        $scope.currentSelectedPattern = await patternHandler.changePattern(selectedPattern);
+                        if(!$scope.$$phase) $scope.$digest();
+                        $window.location.reload();
+                        return;
+                    }catch(error){
+                        errorHandler.handle(error,'Directives - Menu');
+                        if(!$rootScope.$$phase) $rootScope.$digest();
+                    }                    
+                }
 
                 $scope.$on('updateAPI', () => {
-                    if(appState.getCurrentAPI()) 
+                    if(appState.getCurrentAPI())
                     {
                         $scope.theresAPI = true;
                         $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
@@ -61,12 +87,13 @@ app.directive('dynamic', function($compile) {
 
                 $scope.$on('updatePattern', () => {
                     courier.indexPatterns.get(appState.getCurrentPattern())
-                    .then((data) => {
+                    .then(data => {
                         $scope.theresPattern = true;
-                        $scope.currentPattern = data.title;
+                        $scope.currentSelectedPattern = appState.getCurrentPattern();
                     })
-                    .catch((error) => {
-                        notify.error("Error getting patterns from Kibana...");
+                    .catch(error => {
+                        errorHandler.handle(error,'Directives - Menu');
+                        if(!$rootScope.$$phase) $rootScope.$digest();
                         $scope.theresPattern = false;
                     });
                 });
@@ -74,4 +101,3 @@ app.directive('dynamic', function($compile) {
             template: menuTemplate
         };
     });
-
