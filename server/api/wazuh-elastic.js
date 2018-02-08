@@ -286,7 +286,7 @@ module.exports = (server, options) => {
             reply({
                 'statusCode': 500,
                 'error':      10000,
-                'message':    error
+                'message':    (error && error.message) ? error.message : error
             }).code(500);
         });
     };

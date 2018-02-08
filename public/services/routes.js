@@ -178,20 +178,20 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
                 })
                 .catch(error => {
                     deferred.reject(error);
-                    $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch');  
+                    $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);  
                     $location.path('/blank-screen');
                 });
 
             })  
             .catch(error => {
                 deferred.reject(error);
-                $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch');  
+                $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);  
                 $location.path('/blank-screen');
             });          
         })
         .catch(error => {
             deferred.reject(error);
-            $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch');  
+            $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);  
             $location.path('/blank-screen');
         });
     }
