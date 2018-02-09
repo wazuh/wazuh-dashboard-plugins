@@ -48,9 +48,9 @@ use it directly from this repository, please ensure that you fit the following r
 
 - Wazuh Manager 3.2.0
 - Wazuh RESTful API 3.2.0
-- Kibana 6.2.0
-- Elasticsearch 6.2.0
-- Logstash / Filebeat 6.2.0
+- Kibana 6.2.1
+- Elasticsearch 6.2.1
+- Logstash / Filebeat 6.2.1
 
 We suggest following the [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html).
 
