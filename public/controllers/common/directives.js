@@ -36,7 +36,9 @@ app.directive('dynamic', function($compile) {
                 else {
                     $scope.theresAPI = false;
                 }
-
+                $scope.goToClick = path => {
+                    $window.location.href = path;
+                }
                 const load = async () => {
                     try {
                         const data = await courier.indexPatterns.get(appState.getCurrentPattern());
