@@ -1,11 +1,11 @@
-<md-nav-bar class="wazuhMenuNav" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
+<md-nav-bar class="wazuhMenuNav" name="menuTopName" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
     <md-nav-item class="wazuhMenuNav-logo" id="header_logo" md-nav-href="#/" name="logo" aria-hidden="true">
         <img aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png" height="44" weight="252"></img>
     </md-nav-item>
-    <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'overview' }" md-nav-href="#/overview" name="overview"><i class="fa fa-bar-chart"></i> Overview</md-nav-item>
-    <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'manager' }" md-nav-href="#/manager" name="manager"><i class="fa fa-server"></i> Manager</md-nav-item>
-    <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'agents' }" md-nav-href="#/agents-preview" name="agents"><i class="fa fa-tv"></i> Agents</md-nav-item>
-    <md-nav-item ng-class="{menuSelectedChangeColor: menuNavItem == 'discover' }" md-nav-href="#/wazuh-discover" name="discover"><i class="fa fa-compass"></i> Discover</md-nav-item>
+    <md-nav-item class="directives-color-white" ng-class="{navItemChangeColor: menuNavItem == 'overview' }" md-nav-click="goToClick('#/overview')" id="overview"><i class="fa fa-bar-chart"></i> Overview</md-nav-item>
+    <md-nav-item class="directives-color-white" ng-class="{navItemChangeColor: menuNavItem == 'manager' }" md-nav-click="goToClick('#/manager')" id="manager"><i class="fa fa-server"></i> Manager</md-nav-item>
+    <md-nav-item class="directives-color-white" ng-class="{navItemChangeColor: menuNavItem == 'agents' }" md-nav-click="goToClick('#/agents-preview')" id="agents"><i class="fa fa-tv"></i> Agents</md-nav-item>
+    <md-nav-item class="directives-color-white" ng-class="{navItemChangeColor: menuNavItem == 'discover' }" md-nav-click="goToClick('#/wazuh-discover')" id="discover"><i class="fa fa-compass"></i> Discover</md-nav-item>
     <div class="wazuhMenuNavBar_API" layout="row" ng-show="theresAPI || theresPattern">
         <div ng-show="theresAPI" layout layout-align="center center"><i class="fa fa-star fa-fw settings-template-1" aria-hidden="true"></i>{{ currentAPI }}&nbsp;&ndash;&nbsp;<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
         <div ng-show="!theresAPI" layout layout-align="center center"><i class="fa fa-star fa-fw settings-template-1" aria-hidden="true"></i>No API &nbsp;&ndash;&nbsp;<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
@@ -17,7 +17,7 @@
             <md-tooltip md-direction="bottom">Selected index pattern</md-tooltip>
         </div>
     </div>
-    <md-nav-item class="wazuhMenuNavBar_gear directives-color-white" md-nav-href="#/settings" name="settings">
+    <md-nav-item class="wazuhMenuNavBar_gear directives-color-white" md-nav-click="goToClick('#/settings')" id="settings" name="settings">
         <i class="fa fa-cog ng-scope" aria-hidden="true"></i>
     </md-nav-item>
 </md-nav-bar>
