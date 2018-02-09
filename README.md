@@ -5,7 +5,7 @@
 [![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
 [![Documentation](https://img.shields.io/badge/web-view-green.svg)](https://wazuh.com)
 
-Wazuh is a security detection, visibility, and compliance open source project. It was born as a fork of OSSEC HIDS, later was integrated with Elastic Stack and OpenSCAP evolving into a more comprehensive solution. You can read more in https://wazuh.com/
+Wazuh is a security detection, visibility, and compliance open source project. It was born as a fork of OSSEC HIDS, and later was integrated with the Elastic Stack and OpenSCAP, evolving into a more comprehensive solution. You can read more in the [official website](https://wazuh.com/).
 
 Table of Contents
 ===================
@@ -19,22 +19,22 @@ Table of Contents
 * [Contribute](#contribute)
 * [Software and libraries used](#software-and-libraries-used)
 
-# Wazuh App Description
+# Description
 
 Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app plugin.
 
-- Obtain statistics per agent, search alerts and filter by using the different visualizations.
+* See at a glance a general overview of your hosts with the different graphics and charts.
+* Search alerts of apply filters to the visualizations. Obtain a more general view with the **Discover** tab.
+* Navigate through the different tabs to see specific alerts, such as **File integrity monitoring**, **OpenSCAP**, **vulnerabilities**, etc.
+* View the Wazuh manager configuration. You can see the current status of your manager, your ruleset configuration, all your available agent groups and their configuration, an more.
+* Customize your app. Add new APIs, select different index-patterns and enable or disable our different extensions, according to your needs.
 
-- View the Wazuh manager configuration.
-
-- File integrity monitoring.
-
-Check our [changelog file](https://github.com/wazuh/wazuh-kibana-app/blob/3.2-6.2.0/CHANGELOG.md) to stay updated about all the new features on this version of the Wazuh App.
+Check our [changelog](https://github.com/wazuh/wazuh-kibana-app/blob/3.2-6.2.0/CHANGELOG.md) to stay updated about all the new features on this version of the Wazuh App.
 
 # Documentation
 
-* Visit [https://documentation.wazuh.com](https://documentation.wazuh.com) for the full Wazuh documentation.
-* Follow our [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html).
+* Visit the [Wazuh documentation](https://documentation.wazuh.com) to get all the info about our software.
+* Follow the [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html).
 * Take a look at some [Wazuh App screenshots](https://documentation.wazuh.com/current/index.html#example-screenshots)
 
 ![Overview](https://wazuh.com/wp-content/uploads/2017/01/Overview_general.png)
@@ -52,11 +52,11 @@ use it directly from this repository, please ensure that you fit the following r
 - Elasticsearch 6.2.0
 - Logstash / Filebeat 6.2.0
 
-Also we recommend to follow the full [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html).
+We suggest following the [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html).
 
 ## Installation
 
-Please check the following compatibility table in order to have a properly working installation:
+In order to have a properly working installation, please check the following compatibility table:
 
 | Kibana version | Wazuh App version | Installation |
 | :---:         | :---:         |     :---      |
@@ -67,12 +67,14 @@ Please check the following compatibility table in order to have a properly worki
 | 6.1.1  | 3.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.1.zip  |
 | 6.1.2  | 3.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.2.zip  |
 | 6.1.3  | 3.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.3.zip  |
+| 6.1.2  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.2.zip  |
 | 6.1.3  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.3.zip  |
 | 6.2.0  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.2.0.zip  |
+| 6.2.1  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.2.1.zip  |
 
 ## Upgrade
 
-If you come from an older version of the Wazuh App you could upgrade it as follow:
+If you come from an previous version of the Wazuh App, you can upgrade it as follow:
 
 - Remove the App using kibana-plugin tool:
 	- ```/usr/share/kibana/bin/kibana-plugin remove wazuh ```
