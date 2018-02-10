@@ -9,11 +9,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 - Updated Bootstrap to 3.3.7.
+- Improved filter propagation between Discover and the visualizations.
 
 ### Fixed
 - Several CSS bugfixes for better compatibility with Kibana 6.2.0.
 - Some variables changed for adapting new Wazuh API requests.
 - Better error handling for some Elastic-related messages.
+- Fixed browser console error from top-menu directive.
 
 ### Removed
 - Removed the `travis.yml` file.
