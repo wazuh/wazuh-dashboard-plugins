@@ -331,7 +331,7 @@ routes
             "checkAPI": goToKibana
         }
     })
-    .when('/login', {
+    .when('/wlogin', {
         template: require('plugins/wazuh/templates/auth/login.html')
     })
     .when('/blank-screen', {
