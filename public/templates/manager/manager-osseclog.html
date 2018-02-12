@@ -52,7 +52,7 @@
         <!-- Realtime -->
         <md-toolbar ng-if="realtime" layout="row" class="wazuh-toolbar md-toolbar-tools">
             <span flex="15">Timestamp</span>
-            <span flex="10">Tag</span>
+            <span flex="25">Tag</span>
             <span flex="10">Level</span>
             <span flex>Description</span>
         </md-toolbar>
@@ -62,7 +62,7 @@
             <md-list class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="log in logs.items | filter : searchTerm | orderBy : logs.sortValue : logs.sortDir">
                 <md-list-item class="wazuh-list-item no-height-limit" layout="row">
                     <span flex="15">{{log.timestamp}}</span>
-                    <span flex="10">{{log.tag}}</span>
+                    <span flex="25">{{log.tag}}</span>
                     <span flex="10">{{log.level}}</span>
                     <span flex>{{log.description}}</span>
                     <div flex layout="row" layout-align="end center"></div>
@@ -75,7 +75,7 @@
             <md-list class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="log in realLogs | filter : searchTerm">
                 <md-list-item class="wazuh-list-item no-height-limit" layout="row">
                     <span flex="15">{{log.timestamp}}</span>
-                    <span flex="10">{{log.tag}}</span>
+                    <span flex="25">{{log.tag}}</span>
                     <span flex="10">{{log.level}}</span>
                     <span flex>{{log.description}}</span>
                     <div flex layout="row" layout-align="end center"></div>
