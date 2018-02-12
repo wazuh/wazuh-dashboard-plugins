@@ -286,7 +286,9 @@ routes
         template: require('plugins/wazuh/templates/manager/manager.jade'),
         resolve: {
             "checkAPI": settingsWizard,
-            "ips": getAllIp
+            "ip": getIp,
+            "ips": getAllIp,
+            "savedSearch": getSavedSearch
         }
     })
     .when('/overview/', {
