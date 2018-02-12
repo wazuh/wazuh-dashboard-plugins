@@ -2,7 +2,7 @@ const app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('loginController', function ($scope, $rootScope, $location, appState, genericReq, $window) {
     $scope.submit = password => {
-        genericReq.request('POST', '/api/wazuh-api/login', {password: password})
+        genericReq.request('POST', '/api/wazuh-api/wlogin', {password: password})
         .then(data => {
             appState.setUserCode(data.data.code);
             $location.path('/overview');

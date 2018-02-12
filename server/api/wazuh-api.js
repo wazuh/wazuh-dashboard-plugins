@@ -576,7 +576,7 @@ module.exports = (server, options) => {
 
     server.route({
         method:  'POST',
-        path:    '/api/wazuh-api/login',
+        path:    '/api/wazuh-api/wlogin',
         handler: login
     });
 };
