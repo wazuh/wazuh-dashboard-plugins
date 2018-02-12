@@ -164,6 +164,12 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         $scope.groups.reset();
         $scope.groupFiles.reset();
         $scope.groupAgents.reset();
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
     });
    
 
@@ -175,7 +181,15 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
     });
 });
 
-app.controller('groupsController', function ($scope) {
+app.controller('groupsController', function ($scope,$rootScope) {
     $scope.groupsMenu = 'preview';
     $scope.groupName  = '';
+    $scope.$on("$destroy", () => {
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
+    });
 });
