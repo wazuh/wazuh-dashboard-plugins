@@ -108,6 +108,12 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         }
     }
 
+    const sortByTimestamp = (a,b) => {
+        const intA = parseInt(a._id);
+        const intB = parseInt(b._id);
+        return intA > intB ? -1 : intA < intB ? 1 : 0;
+    };
+
     // Set default API
     $scope.setDefault = (item) => {
         let index = $scope.apiEntries.indexOf(item);
@@ -144,8 +150,9 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         try {
             const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
             for(const entry of data.data) $scope.showEditForm[entry._id] = false;
-
+            
             $scope.apiEntries = data.data.length > 0 ? data.data : [];
+            $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null)
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
             if(!$scope.$$phase) $scope.$digest();
@@ -247,6 +254,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             };
 
             $scope.apiEntries.push(newEntry);
+            $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
 
             errorHandler.info('Wazuh API successfully added','Settings');
             $scope.addManagerContainer = false;
@@ -328,6 +336,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.apiEntries[index]._source.api_port             = tmpData.port;
             $scope.apiEntries[index]._source.api_user             = tmpData.user;
 
+            $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
             $scope.showEditForm[$scope.apiEntries[index]._id] = false;
 
             errorHandler.info('Connection success','Settings');
