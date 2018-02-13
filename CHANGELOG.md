@@ -10,6 +10,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 - The app now shows the index pattern selector only if the list length is greater than 1.
   - If it's exactly 1 shows the index pattern without a selector.
+- Now the index pattern selector only shows the compatible ones.
+  - It's no longer possible to select the `wazuh-monitoring` index pattern.
 - Updated Bootstrap to 3.3.7.
 - Improved filter propagation between Discover and the visualizations.
 - Replaced the login route name from /login to /wlogin to avoid conflict with X-Pack own login route.
