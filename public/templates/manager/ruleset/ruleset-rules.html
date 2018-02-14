@@ -5,7 +5,7 @@
         <div></div>
     </div>
 
-    <div ng-show="!loading" layout="row" layout-align="start stretch" layout-align="center start" class="manager-ruleset-rules-top-row">
+    <div ng-show="!loading" layout="row" layout-align="start stretch" layout-align="center start" class="manager-ruleset-rules-top-row lateral-padding-4">
         <md-card flex>
             <md-card-content class="wazuh-column">
                 <span class="md-headline">Top 24h - Rule ID</span>
@@ -106,23 +106,18 @@
             </md-chip>
         </md-chips>
 
-        <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools">
-            <span flex="5" ng-click="rules.sort('id')">ID
-                <i class="fa" ng-class="rules.sortValue === 'id' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
-            </span>
-            <span flex="15" ng-click="rules.sort('file')">File
-                <i class="fa" ng-class="rules.sortValue === 'file' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
-            </span>
-            <span flex="35" ng-click="rules.sort('description')">Description
-                <i class="fa" ng-class="rules.sortValue === 'description' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                    aria-hidden="true"></i>
-            </span>
-            <span flex="25">Groups</span>
-            <span flex="15">Requirement</span>
-            <span flex="5" ng-click="rules.sort('level')">Level
-                <i class="fa" ng-class="rules.sortValue === 'level' ? (rules.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'" aria-hidden="true"></i>
-            </span>
-        </md-toolbar>
+        <wz-table-header
+            layout="row" 
+            data="rules" 
+            keys="[
+            {name:'ID',sortValue:'id',size:5},
+            {name:'File',sortValue:'file',size:15},
+            {name:'Description',sortValue:'description',size:35},
+            {name:'Groups',size:25},
+            {name:'Requirement',size:15},
+            {name:'Level',sortValue:'level',size:5},
+            ]">
+        </wz-table-header>
 
         <md-content flex layout="column" class="height-300" when-scrolled="rules.nextPage('')">
             <md-list class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class="activeItem === rule.id ? 'active' : ''">
