@@ -23,7 +23,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 * [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html)
 * [Screenshots](https://documentation.wazuh.com/current/index.html#example-screenshots)
 
-![Overview](https://wazuh.com/wp-content/uploads/2017/01/Overview_general.png)
+![Overview](https://documentation.wazuh.com/current/_images/overview-general.png)
 
 ## Requisites
 
@@ -43,8 +43,12 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 | 6.1.1  | 3.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.1.zip  |
 | 6.1.2  | 3.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.2.zip  |
 | 6.1.3  | 3.1.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.1.0_6.1.3.zip  |
+| 6.1.0  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.0.zip  |
+| 6.1.1  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.1.zip  |
+| 6.1.2  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.2.zip  |
 | 6.1.3  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.1.3.zip  |
 | 6.2.0  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.2.0.zip  |
+| 6.2.1  | 3.2.0  | /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.2.0_6.2.1.zip  |
 
 ## Upgrade
 

@@ -286,7 +286,9 @@ routes
         template: require('plugins/wazuh/templates/manager/manager.jade'),
         resolve: {
             "checkAPI": settingsWizard,
-            "ips": getAllIp
+            "ip": getIp,
+            "ips": getAllIp,
+            "savedSearch": getSavedSearch
         }
     })
     .when('/overview/', {
@@ -331,7 +333,7 @@ routes
             "checkAPI": goToKibana
         }
     })
-    .when('/login', {
+    .when('/wlogin', {
         template: require('plugins/wazuh/templates/auth/login.html')
     })
     .when('/blank-screen', {

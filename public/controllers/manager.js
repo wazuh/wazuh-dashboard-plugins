@@ -29,6 +29,15 @@ app.controller('managerController', function ($scope,$rootScope, $routeParams, $
     });
 
     $scope.setRulesTab = (tab) => $scope.submenuNavItem2 = tab;
+
+    $scope.$on("$destroy", () => {
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
+    });
 });
 
 app.controller('managerStatusController', function ($scope,$rootScope, errorHandler, apiReq) {
@@ -70,6 +79,15 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
         if(!$rootScope.$$phase) $rootScope.$digest();
     });
 
+    $scope.$on("$destroy", () => {
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
+    });
+
 });
 
 const beautifier = require('plugins/wazuh/utils/json-beautifier');
@@ -100,5 +118,12 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, er
     };
 
     load();
-
+    $scope.$on("$destroy", () => {
+        if($rootScope.ownHandlers){
+            for(let h of $rootScope.ownHandlers){
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
+    });
 });

@@ -4,16 +4,26 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## [v3.2.0]
 ### Added
 - Support for **Wazuh 3.2.0**.
-- Compatibility with **Kibana 6.2.0**.
+- Compatibility with **Kibana 6.1.0** to **Kibana 6.2.1**.
 - New tab for **vulnerability detector** alerts.
 
 ### Changed
+- The app now shows the index pattern selector only if the list length is greater than 1.
+  - If it's exactly 1 shows the index pattern without a selector.
+- Now the index pattern selector only shows the compatible ones.
+  - It's no longer possible to select the `wazuh-monitoring` index pattern.
 - Updated Bootstrap to 3.3.7.
+- Improved filter propagation between Discover and the visualizations.
+- Replaced the login route name from /login to /wlogin to avoid conflict with X-Pack own login route.
 
 ### Fixed
-- Several CSS bugfixes for better compatibility with Kibana 6.2.0.
+- Several CSS bugfixes for better compatibility with Kibana 6.2.1.
 - Some variables changed for adapting new Wazuh API requests.
 - Better error handling for some Elastic-related messages.
+- Fixed browser console error from top-menu directive.
+- Removed undesired md-divider from Manager/Logs.
+- Adjusted the width of a column in Manager/Logs to avoid overflow issues with the text.
+- Fixed a wrong situation with the visualizations when we refresh the Manager/Rules tab.
 
 ### Removed
 - Removed the `travis.yml` file.

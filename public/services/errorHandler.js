@@ -40,7 +40,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         let goSettings = false;
         if(isUnauthorized(error)){
             appState.removeUserCode();
-            $location.path('/login');
+            $location.path('/wlogin');
             return;
         }
 

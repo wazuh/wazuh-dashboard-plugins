@@ -319,6 +319,8 @@ function discoverController(
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
+            $rootScope.discoverPendingUpdates = [];
+            $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
             $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
             $rootScope.$broadcast('fetch');
             if($location.search().tab != 'configuration') {
@@ -481,6 +483,8 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    $rootScope.discoverPendingUpdates = [];
+    $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
     $rootScope.$broadcast('fetch');
     ////////////////////////////////////////////////////////////////////////////
