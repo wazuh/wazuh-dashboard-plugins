@@ -1,4 +1,7 @@
 import menuTemplate from '../../templates/directives/menu-top.html'
+import tableTemplate from '../../templates/directives/wz-table.html'
+import tableHeaderTemplate from '../../templates/directives/wz-table-header.html'
+import searchBarTemplate from '../../templates/directives/wz-search-bar.html'
 const app = require('ui/modules').get('app/wazuh', []);
 app.directive('dynamic', function($compile) {
         return {
@@ -102,4 +105,69 @@ app.directive('dynamic', function($compile) {
             },
             template: menuTemplate
         };
+    })
+    .directive('wzTable',function(){
+        return {
+            restrict: 'E',
+            scope: {
+                data: '=data',
+                keys: '=keys',
+                func: '&',
+                noscroll: '=noscroll',
+                nopointer: '=nopointer',
+                full:     '=full',
+                noheight: '=noheight'                 
+            },
+            link: function(scope,ele,attrs){
+                scope.clickAction = index => {
+                    const obj = {};
+                    if(scope.full){
+                        obj[scope.full] = index;
+                    } else {
+                        obj.index = index;
+                    }
+                    scope.func(obj);
+                }   
+                scope.parseItem = (item,key) => {
+                    let tmp = key;
+                    if(key.col) {
+                        tmp = key.col;
+                    }
+                    if(tmp && tmp.includes('.')){
+                        return item[tmp.split('.')[0]][tmp.split('.')[1]];
+                    }
+                    return item[tmp];
+                }
+            },
+            template: tableTemplate
+        }
+    })
+    .directive('wzTableHeader',function(){
+        return {
+            restrict: 'E',
+            scope: {
+                data: '=data',
+                keys: '=keys'          
+            },
+            link: function(scope,ele,attrs){
+ 
+            },
+            template: tableHeaderTemplate
+        }
+    })
+    .directive('wzSearchBar',function(){
+        return {
+            restrict: 'E',
+            scope: {
+                data: '=data',
+                term: '=term',
+                placetext: '=placetext',
+                height: '=height',
+                noleft: '=noleft'           
+            },
+            link: function(scope,ele,attrs){
+ 
+            },
+            template: searchBarTemplate
+        }
     });
