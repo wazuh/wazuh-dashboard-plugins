@@ -32,7 +32,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
                     // First element is now our group $scope.groups.item is an array with only our group
                     $scope.groups.items = filtered;
                     // Load that our group
-                    $scope.loadGroup(0);
+                    $scope.loadGroup(0,true);
                     $scope.lookingGroup=true    
                 }
                 // Clean $rootScope
@@ -43,7 +43,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
                     
                 // If our group was not found  we need to call loadGroup after load some groups
                 if(!len) {
-                    $scope.loadGroup(0);
+                    $scope.loadGroup(0,true);
                     $scope.lookingGroup=true
                 }
 
@@ -51,7 +51,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
             } else {
                 // Actual execution in the controller's initialization
                 await $scope.groups.nextPage();
-                $scope.loadGroup(0);
+                $scope.loadGroup(0,true);
             }
             
             $scope.load = false;
@@ -89,7 +89,8 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         $location.path('/agents');        
     };
 
-    $scope.loadGroup = index => {
+    $scope.loadGroup = (index,firstTime) => {
+        if(!firstTime) $scope.lookingGroup=true;
         $scope.fileViewer = false;
         $scope.groupAgents.reset();
         $scope.groupFiles.reset();
