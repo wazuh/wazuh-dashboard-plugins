@@ -116,7 +116,9 @@ app.directive('dynamic', function($compile) {
                 noscroll: '=noscroll',
                 nopointer: '=nopointer',
                 full:     '=full',
-                noheight: '=noheight'                 
+                noheight: '=noheight',
+                isruleset: '=isruleset',
+                activeitem: '=activeitem'                 
             },
             link: function(scope,ele,attrs){
                 scope.clickAction = index => {
@@ -126,15 +128,20 @@ app.directive('dynamic', function($compile) {
                     } else {
                         obj.index = index;
                     }
+        
                     scope.func(obj);
                 }   
                 scope.parseItem = (item,key) => {
+
                     let tmp = key;
                     if(key.col) {
                         tmp = key.col;
                     }
                     if(tmp && tmp.includes('.')){
                         return item[tmp.split('.')[0]][tmp.split('.')[1]];
+                    }
+                    if(Array.isArray(item[tmp])){
+                        return item[tmp].length ? (item[tmp].join(', ')) : '';
                     }
                     return item[tmp];
                 }
