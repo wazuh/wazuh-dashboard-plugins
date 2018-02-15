@@ -52,8 +52,7 @@ require('plugins/wazuh/services/routes.js');
 // Require controllers
 
 // Factories
-require('plugins/wazuh/controllers/common/factories.js');
-require('plugins/wazuh/controllers/common/filters.js');
+require('plugins/wazuh/factories/data-handler-composer.js');
 
 // Wazuh Directives
 require('plugins/wazuh/directives/wz-dynamic/wz-dynamic.js');
