@@ -118,76 +118,25 @@
             {name:'Level',sortValue:'level',size:5},
             ]">
         </wz-table-header>
+        <wz-table 
+            layout="column" 
+            flex
+            func="closeOther(rule)"
+            data="rules" 
+            full="'rule'"
+            activeitem="activeItem"
+            keys="[
+                {col:'id',size:5},
+                {col:'file',size:15},
+                {col:'description',size:35},
+                {col:'groups',size:25},
+                {col:'pci',size:15},
+                {col:'level',size:5}
+            ]" 
+            isruleset="true"
+            class="no-lateral-padding">
+        </wz-table>
 
-        <md-content flex layout="column" class="height-300" when-scrolled="rules.nextPage('')">
-            <md-list class="wazuh-list" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='rule in rules.items | orderBy : rules.sortValue : rules.sortDir' ng-class="activeItem === rule.id ? 'active' : ''">
-                <md-list-item class="wazuh-list-item" ng-click="closeOther(rule.id)" ng-class="activeItem === rule.id ? 'active' : ''">
-                    <span flex="5">{{rule.id}}</span>
-                    <span flex="15">{{rule.file}}</span>
-                    <span flex="35">{{rule.description}}</span>
-                    <span flex="25">
-                        <span ng-repeat="group in rule.groups">{{ group }}
-                            <span ng-if="!$last">, </span>
-                        </span>
-                    </span>
-                    <span flex="15">
-                        <span ng-repeat="pci in rule.pci">{{ pci }}
-                            <span ng-if="!$last">, </span>
-                        </span>
-                    </span>
-                    <span flex="5">{{rule.level}}</span>
-                </md-list-item>
-
-                <div layout="row"  ng-if="activeItem === rule.id" class="ruleset-card-info">
-                    <md-card flex>
-                        <div layout="column" class="md-padding">
-                            <div layout="row">
-                                <div flex>
-                                    <h4><i class="fa fa-tasks"></i> Overview</h4>
-                                    <md-divider></md-divider>
-                                    <p>{{rule.description}}</p>
-                                    <p>Id <span class="md-secondary pull-right">{{rule.id}}</span></p>
-                                    <p>Level <span class="md-secondary pull-right listHover cursor-pointer" ng-click="rules.addFilter('level', rule.level); $event.stopPropagation();">{{rule.level}}</span></p>
-                                    <p>File <span class="md-secondary pull-right listHover cursor-pointer" ng-click="rules.addFilter('file', rule.file); $event.stopPropagation();">{{rule.file}}</span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </md-card>
-                    <md-card flex>
-                        <div layout="column" class="md-padding">
-                            <div layout="row" ng-if="rule.groups.length > 0">
-                                <div flex>
-                                    <h4><i class="fa fa-reorder"></i> Groups</h4>
-                                    <md-divider></md-divider>
-                                    <p ng-repeat="group in rule.groups"><span class="md-secondary listHover cursor-pointer" ng-click="rules.addFilter('group', group)">{{group}}</span><br></p>
-                               </div>
-                            </div>
-                            <div layout="row" ng-if="rule.pci.length > 0">
-                                <div flex>
-                                    <h4><i class="fa fa-shield"></i> PCI DSS</h4>
-                                    <md-divider></md-divider>
-                                    <p ng-repeat="pci in rule.pci"><span class="md-secondary listHover cursor-pointer" ng-click="rules.addFilter('pci', pci)">{{pci}}</span><br></p>
-                                </div>
-                            </div>
-                        </div>
-                    </md-card>
-                    <md-card flex>
-                        <div layout="column" class="md-padding">
-                            <div layout="row">
-                                <div flex>
-                                    <h4><i class="fa fa-cog"></i> Extra settings</h4>
-                                    <md-divider></md-divider>
-                                    <p ng-repeat="(detailk, detailv) in rule.details">
-                                        {{detailk}}<span class="md-secondary pull-right">{{detailv}}</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </md-card>
-                </div>
-            </md-list>
-        </md-content>
-        <md-divider></md-divider>
         <md-content>
             <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="rules.busy"></md-progress-linear>
         </md-content>
