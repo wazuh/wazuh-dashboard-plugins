@@ -1,7 +1,7 @@
 <div flex ng-controller="agentsPreviewController" layout="column">
 
     <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'agents'">
-        <menu-top></menu-top>
+        <wz-menu></wz-menu>
     </md-content>
 
     <div flex layout="column" id="content" ng-class="tabView != 'discover' ? 'background-e4' : ''" >
