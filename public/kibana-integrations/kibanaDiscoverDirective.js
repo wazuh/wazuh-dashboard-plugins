@@ -6,7 +6,7 @@ require('ui/modules').get('app/wazuh', []).directive('kbnDis', [function() {
     return {
         restrict: 'E',
         scope: {},
-        template: require('../templates/directives/kibana-discover-template.html')
+        template: require('../templates/kibana-template/kibana-discover-template.html')
     }
 }]);
 
