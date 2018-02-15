@@ -21,7 +21,7 @@
                     md-selected-item-change="decoders.addFilter('search', filter.name)" md-search-text="searchTerm" md-items="decoder in analizeDecoders(searchTerm)"
                     md-item-text="decoder.name +' '+ decoder.file" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
                     md-search-text-change="analizeDecoders(searchTerm)" placeholder="Search..." lazy-load-data="decodersAutoComplete.nextPage()"
-                    md-autofocus="" my-enter="checkEnter(searchTerm)">
+                    md-autofocus="" wz-enter="checkEnter(searchTerm)">
                     <md-item-template>
                         <span class="item-title">
                             <span>
