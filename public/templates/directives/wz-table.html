@@ -1,4 +1,4 @@
-<div flex layout="column" class="md-padding groupsFixPadding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+<div flex ng-if="!isruleset" layout="column" class="md-padding groupsFixPadding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-if="!noscroll" flex class="clusterScrollable" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in data.items | filter : searchTerm | orderBy : data.sortValue : data.sortDir" class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding" ng-class="!nopointer ? 'cursor-pointer' : '' " ng-click="clickAction(full ? item : $index)">
             <div ng-repeat="key in keys" flex="{{key.size || ''}}">
@@ -15,7 +15,64 @@
     </div>
 </div>
 
-<div flex layout="row" layout-align="start start" ng-show="(!noscroll && data.items && data.items.length === 0) || (noscroll && !data)">
+<div flex ng-if="isruleset" layout="column" class="md-padding groupsFixPadding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+    <div ng-if="!noscroll" flex class="clusterScrollable" when-scrolled="data.nextPage('')">
+        <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in data.items | filter : searchTerm | orderBy : data.sortValue : data.sortDir" class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding" ng-class="!nopointer && activeitem !== item.id ? 'cursor-pointer' : !nopointer && activeitem === item.id ? 'cursor-pointer wz-active' : ''" ng-click="clickAction(full ? item : $index)" >
+            <div ng-show="activeitem !== item.id" ng-repeat="key in keys" flex="{{key.size || ''}}">
+                <span>{{parseItem(item,key) || '---'}}</span>
+            </div>
+            <div layout="column" flex ng-show="activeitem === item.id">
+            <div layout="row"  class="ruleset-card-info">
+                <div ng-repeat="key in keys" flex="{{key.size || ''}}">
+                    <span>{{parseItem(item,key) || '---'}}</span>
+                </div>
+            </div>
+             <div layout="row" class="ruleset-card-info">
+                <md-card flex class="wz-cursor-default">
+                    <md-card-content>
+                            <h4><i class="fa fa-tasks"></i> Overview</h4>
+                            <md-divider></md-divider>
+                            <p>{{item.description}}</p>
+                            <p>Id <span class="md-secondary pull-right">{{item.id}}</span></p>
+                            <p>Level <span class="md-secondary pull-right listHover cursor-pointer" ng-click="data.addFilter('level', item.level); $event.stopPropagation();">{{item.level}}</span></p>
+                            <p>File <span class="md-secondary pull-right listHover cursor-pointer" ng-click="data.addFilter('file', item.file); $event.stopPropagation();">{{item.file}}</span></p>
+                    </md-card-content>
+                </md-card>
+                <md-card flex class="wz-cursor-default">
+                        <md-card-content>
+                        <div layout="row" ng-if="item.groups.length > 0">
+                            <div flex>
+                                <h4><i class="fa fa-reorder"></i> Groups</h4>
+                                <md-divider></md-divider>
+                                <p ng-repeat="group in item.groups"><span class="md-secondary listHover cursor-pointer" ng-click="data.addFilter('group', group)">{{group}}</span><br></p>
+                           </div>
+                        </div>
+                        <div layout="row" ng-if="item.pci.length > 0">
+                            <div flex>
+                                <h4><i class="fa fa-shield"></i> PCI DSS</h4>
+                                <md-divider></md-divider>
+                                <p ng-repeat="pci in item.pci"><span class="md-secondary listHover cursor-pointer" ng-click="data.addFilter('pci', pci)">{{pci}}</span><br></p>
+                            </div>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <md-card flex class="wz-cursor-default">
+                        <md-card-content>
+                                <h4><i class="fa fa-cog"></i> Extra settings</h4>
+                                <md-divider></md-divider>
+                                <p ng-repeat="(detailk, detailv) in item.details">
+                                    {{detailk}}<span class="md-secondary pull-right">{{detailv}}</span>
+                                </p>
+                            </md-card-content>
+                </md-card>
+            </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div flex layout="row" layout-align="start start" ng-show="!data.busy && ((!noscroll && data.items && data.items.length === 0) || (noscroll && !data))">
     <md-card flex layout="column">
         <md-card-content class="text-center">
             <i class="fa fa-frown-o"></i> No results found
