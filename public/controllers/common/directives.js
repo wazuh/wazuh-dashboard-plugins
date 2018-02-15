@@ -110,15 +110,16 @@ app.directive('dynamic', function($compile) {
         return {
             restrict: 'E',
             scope: {
-                data: '=data',
-                keys: '=keys',
-                func: '&',
-                noscroll: '=noscroll',
-                nopointer: '=nopointer',
-                full:     '=full',
-                noheight: '=noheight',
-                isruleset: '=isruleset',
-                activeitem: '=activeitem'                 
+                data      : '=data',
+                keys      : '=keys',
+                func      : '&',
+                noscroll  : '=noscroll',
+                nopointer : '=nopointer',
+                full      : '=full',
+                noheight  : '=noheight',
+                isruleset : '=isruleset',
+                isdecoders: '=isdecoders',
+                activeitem: '=activeitem'
             },
             link: function(scope,ele,attrs){
                 scope.clickAction = index => {
@@ -166,11 +167,11 @@ app.directive('dynamic', function($compile) {
         return {
             restrict: 'E',
             scope: {
-                data: '=data',
-                term: '=term',
+                data     : '=data',
+                term     : '=term',
                 placetext: '=placetext',
-                height: '=height',
-                noleft: '=noleft'           
+                height   : '=height',
+                noleft   : '=noleft'
             },
             link: function(scope,ele,attrs){
  
