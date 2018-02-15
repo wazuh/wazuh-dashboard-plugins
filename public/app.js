@@ -54,7 +54,14 @@ require('plugins/wazuh/services/routes.js');
 // Factories
 require('plugins/wazuh/controllers/common/factories.js');
 require('plugins/wazuh/controllers/common/filters.js');
-require('plugins/wazuh/controllers/common/directives.js');
+
+// Wazuh Directives
+require('plugins/wazuh/directives/wz-dynamic/wz-dynamic.js');
+require('plugins/wazuh/directives/wz-enter/wz-enter.js');
+require('plugins/wazuh/directives/wz-menu/wz-menu.js');
+require('plugins/wazuh/directives/wz-search-bar/wz-search-bar.js');
+require('plugins/wazuh/directives/wz-table-header/wz-table-header.js');
+require('plugins/wazuh/directives/wz-table/wz-table.js');
 
 // Blank Screen
 require('plugins/wazuh/controllers/blankScreenController.js');
