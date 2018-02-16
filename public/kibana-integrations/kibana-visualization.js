@@ -20,7 +20,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 let renderInProgress = false;
 
                 const myRender = function() {
-                    if ($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) { // There are pending updates from the discover (which is the one who owns the true app state)
+                    if (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ){ // There are pending updates from the discover (which is the one who owns the true app state)
 
                         if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
                             renderInProgress = true;
@@ -30,16 +30,16 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                 visTitle = savedObj.vis.title;
                                 visualization = savedObj;
 
-                                if (implicitFilter && $rootScope.discoverPendingUpdates[0].query) {
+                                if ($rootScope.discoverPendingUpdates && implicitFilter && $rootScope.discoverPendingUpdates[0].query) {
                                     implicitFilter += ' AND ' + $rootScope.discoverPendingUpdates[0].query;
-                                } else if (!implicitFilter && $rootScope.discoverPendingUpdates[0].query) {
+                                } else if ($rootScope.discoverPendingUpdates && !implicitFilter && $rootScope.discoverPendingUpdates[0].query) {
                                     implicitFilter = $rootScope.discoverPendingUpdates[0].query;
                                 }
 
                                 if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
                                     visualization.searchSource
                                     .query({ language: 'lucene', query: implicitFilter })
-                                    .set('filter', $rootScope.discoverPendingUpdates[1]);
+                                    .set('filter',  $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[1] : {});
                                 }
 
                                 let params = {};
@@ -65,16 +65,16 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                         } else if (rendered) { // There's a visualization object -> just update its filters
 
-                            if (implicitFilter && $rootScope.discoverPendingUpdates[0].query) {
+                            if ($rootScope.discoverPendingUpdates && implicitFilter && $rootScope.discoverPendingUpdates[0].query) {
                                 implicitFilter += ' AND ' + $rootScope.discoverPendingUpdates[0].query;
-                            } else if (!implicitFilter && $rootScope.discoverPendingUpdates[0].query) {
+                            } else if ($rootScope.discoverPendingUpdates && !implicitFilter && $rootScope.discoverPendingUpdates[0].query) {
                                 implicitFilter = $rootScope.discoverPendingUpdates[0].query;
                             }
 
                             if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
                                 visualization.searchSource
                                 .query({ language: 'lucene', query: implicitFilter })
-                                .set('filter', $rootScope.discoverPendingUpdates[1]);
+                                .set('filter', $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[1] : {});
                             }
                         }
                     }
