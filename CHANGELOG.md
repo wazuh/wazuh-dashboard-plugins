@@ -1,6 +1,23 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.0 - Kibana v6.2.1 - Revision 384
+### Added
+- **New directives** for the Wazuh app: `wz-table`, `wz-table-header` and `wz-search-bar` ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)):
+  - Maintainable and reusable components for a better structured app.
+  - Several files have been changed, renamed and moved to new folders, following *best practices*.
+  - Minor typos and refactoring changes for the new directives.
+
+### Changed
+- The API list on Settings now shows the latest inserted API at the beggining of the list ([#261](https://github.com/wazuh/wazuh-kibana-app/pull/261)).
+
+### Fixed
+- Fixed visualizations directive to properly load the **Manager/Ruleset** visualizations ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
+
+### Removed
+- Removed the `kbn-dis` directive from **Manager/Ruleset** ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
+- Removed the `filters.js` and `kibana_fields_file.json` files from the app ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)).
+
 ## [v3.2.0]
 ### Added
 - Support for **Wazuh 3.2.0**.
