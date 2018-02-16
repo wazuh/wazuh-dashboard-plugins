@@ -6,8 +6,8 @@
 import angular from 'angular';
 import chrome from 'ui/chrome';
 import 'ui/visualize';
-import visTemplate from './loader_template.html';
-import { EmbeddedVisualizeHandler } from './embedded_visualize_handler';
+import visTemplate from './loader-template.html';
+import { EmbeddedVisualizeHandler } from './embedded-visualize-handler';
 
 /**
  * The parameters accepted by the embedVisualize calls.

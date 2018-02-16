@@ -70,13 +70,14 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
 
     let timesOpened = 0;
     let lastName = false;
-    $scope.closeOther = name => {
-        if(name !== lastName){
-            lastName = name;
+    $scope.closeOther = rule => {
+        const item = rule.id ? rule.id : rule;
+        if(item !== lastName){
+            lastName = item;
             timesOpened = 0;
         }
         timesOpened++;
-        $scope.activeItem = (timesOpened <= 1) ? name : false;
+        $scope.activeItem = (timesOpened <= 1) ? item : false;
         if(timesOpened > 1) timesOpened = 0;
         return true;
     }

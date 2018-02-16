@@ -7,7 +7,7 @@ const getPath   = require('../util/get-path');
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
-const APP_OBJECTS_FILE = './integration_files/app_objects_file_monitoring.json';
+const APP_OBJECTS_FILE = './integration-files/app-objects-file-monitoring.json';
 
 module.exports = (server, options) => {
     // Elastic JS Client

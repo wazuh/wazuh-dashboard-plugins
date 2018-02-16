@@ -400,7 +400,7 @@
                                 <h4>
                                     <i class="fa fa-reorder"></i> Log Files</h4>
                                 <md-divider></md-divider>
-                                <div layout="column" ng-repeat="item in groupConfiguration.config['localfile']" class="md-subhead agents-groups-preview  groupsFixPadding">
+                                <div layout="column" ng-repeat="item in groupConfiguration.config['localfile']" class="md-subhead agents-groups-preview groupsFixPadding">
                                     <div layout="row">
                                         <span flex ng-if="item.location" class="md-headline">{{item.location}}</span>
                                         <span flex ng-if="item.log_format" class="md-headline">{{item.log_format}}</span>
@@ -497,7 +497,7 @@
 
                 <!-- JSON -->
                 <div layout="row" flex class="md-padding height-300 ownNavBarCluster topPaddingSearchNoBottom" ng-show="toggleRAW">
-                    <pre flex layout-fill class="json-beautifier"><code dynamic="rawJSON"></code></pre>
+                    <pre flex layout-fill class="json-beautifier"><code wz-dynamic="rawJSON"></code></pre>
                 </div>
                 <!-- End JSON -->
             </md-card>

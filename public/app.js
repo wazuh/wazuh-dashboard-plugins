@@ -31,20 +31,20 @@ require('plugins/wazuh/../node_modules/angular-cookies/angular-cookies.min.js');
 // Require Kibana integrations
 require('ui/autoload/all');
 require('ui/chrome');
-require('plugins/wazuh/kibana-integrations/kibanaVisualizationDirective.js');
-require('plugins/wazuh/kibana-integrations/kibanaFilterbarDirective.js');
-require('plugins/wazuh/kibana-integrations/kibanaDiscoverDirective.js');
+require('plugins/wazuh/kibana-integrations/kibana-visualization.js');
+require('plugins/wazuh/kibana-integrations/kibana-filter-bar.js');
+require('plugins/wazuh/kibana-integrations/kibana-discover.js');
 
 // Require services
-require('plugins/wazuh/services/errorHandler.js');
+require('plugins/wazuh/services/error-handler.js');
 require('plugins/wazuh/services/theming.js');
-require('plugins/wazuh/services/apiReq.js');
-require('plugins/wazuh/services/genericReq.js');
-require('plugins/wazuh/services/dataHandler.js');
-require('plugins/wazuh/services/appState.js');
-require('plugins/wazuh/services/testAPI.js');
-require('plugins/wazuh/services/implicitFilters.js');
-require('plugins/wazuh/services/patternHandler.js');
+require('plugins/wazuh/services/api-request.js');
+require('plugins/wazuh/services/generic-request.js');
+require('plugins/wazuh/services/data-handler.js');
+require('plugins/wazuh/services/app-state.js');
+require('plugins/wazuh/services/api-tester.js');
+require('plugins/wazuh/services/implicit-filters.js');
+require('plugins/wazuh/services/pattern-handler.js');
 
 // Set up routes and views
 require('plugins/wazuh/services/routes.js');
@@ -52,12 +52,18 @@ require('plugins/wazuh/services/routes.js');
 // Require controllers
 
 // Factories
-require('plugins/wazuh/controllers/common/factories.js');
-require('plugins/wazuh/controllers/common/filters.js');
-require('plugins/wazuh/controllers/common/directives.js');
+require('plugins/wazuh/factories/data-handler-composer.js');
+
+// Wazuh Directives
+require('plugins/wazuh/directives/wz-dynamic/wz-dynamic.js');
+require('plugins/wazuh/directives/wz-enter/wz-enter.js');
+require('plugins/wazuh/directives/wz-menu/wz-menu.js');
+require('plugins/wazuh/directives/wz-search-bar/wz-search-bar.js');
+require('plugins/wazuh/directives/wz-table-header/wz-table-header.js');
+require('plugins/wazuh/directives/wz-table/wz-table.js');
 
 // Blank Screen
-require('plugins/wazuh/controllers/blankScreenController.js');
+require('plugins/wazuh/controllers/blank-screen-controller.js');
 
 // Login
 require('plugins/wazuh/controllers/login.js');
@@ -73,10 +79,10 @@ require('plugins/wazuh/controllers/groups.js');
 
 // Agents
 require('plugins/wazuh/controllers/agents.js');
-require('plugins/wazuh/controllers/agentsPreview.js');
+require('plugins/wazuh/controllers/agents-preview.js');
 
 // Settings
 require('plugins/wazuh/controllers/settings.js');
 
 // Health check
-require('plugins/wazuh/controllers/healthCheck.js');
+require('plugins/wazuh/controllers/health-check.js');

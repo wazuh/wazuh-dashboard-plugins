@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import templateBar from '../templates/directives/kibana-filterbar-template.html';
-import templatePill from '../templates/directives/kibana-filterpill-template.html';
+import templateBar from '../templates/kibana-template/kibana-filterbar-template.html';
+import templatePill from '../templates/kibana-template/kibana-filterpill-template.html';
 import 'ui/directives/json_input';
 import 'ui/filter_editor';
 import 'ui/filter_bar/filter_pill/filter_pill';

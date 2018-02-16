@@ -1,203 +1,115 @@
 <md-content flex layout="column" ng-controller="groupsPreviewController" class="manager-groups-main-div overflow-hidden" ng-if="groupsMenu == 'preview'">
     <div flex layout="column" layout-align="start stretch" ng-init="groupsSelectedTab='agents'">
         <div flex layout="column" ng-init="lookingGroup=false">
-            <div layout="row" class="topMarginSearchBottom margin-8" ng-show="groupsSelectedTab==='agents' && lookingGroup">
-                    <input flex id="query" placeholder="Filter agents..." type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)"
-                            class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
-            </div>
-            <div layout="row" class="topMarginSearchBottom margin-8" ng-show="groupsSelectedTab==='files' && !file && lookingGroup">
-                <input flex id="query" placeholder="Filter files..." type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
-                        class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
-            </div>
-            <div layout="row" class="topMarginSearchBottom margin-8" ng-show="!lookingGroup">
-                    <input flex id="query" placeholder="Filter groups..." type="text" ng-model="searchTerm" ng-change="groups.addFilter('search', searchTerm)"
-                        class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
-            </div>
+            <wz-search-bar ng-show="groupsSelectedTab==='agents' && lookingGroup" data="groupAgents" term="searchTermAgent" placetext="'Filter agents...'"></wz-search-bar>
+            <wz-search-bar ng-show="groupsSelectedTab==='files' && !file && lookingGroup" data="groupFiles" term="searchTermFile" placetext="'Filter files...'"></wz-search-bar>
+            <wz-search-bar ng-show="!lookingGroup" data="groups" term="searchTerm" placetext="'Filter groups...'"></wz-search-bar>
             <div flex layout="row">
-            <md-card flex ng-class="!lookingGroup ? 'mdCardNone' : ''">
-                <!--<span class="own-breadcrumb md-headline">
-                    <a class="a-groups" ng-click="lookingGroup=false">
-                        <i class="fa fa-server"></i> {{ currentAPI }} ></a>
-                    <a class="a-groups" ng-click="lookingGroup=false"> groups ></a>
-                    <a class="a-groups" ng-if="lookingGroup" ng-click="goBackToAgents()"> {{ groups.items[selectedGroup].name }}</a>
-                </span>-->
-                <!-- Selecting a group -->
-                <md-card-content ng-if="!lookingGroup" class="groupsFixPadding md-card-content-groups">
-                    <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools">
-                        <div flex="20">
-                            <span ng-click="groups.sort('name')">Name
-                                <i class="fa" ng-class="groups.sortValue === 'name' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex="15">
-                            <span ng-click="groups.sort('count')">Agents
-                                <i class="fa" ng-class="groups.sortValue === 'count' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex ng-if="groups[0] && groups[0].files_count">
-                            <span ng-click="groups.sort('files_count')">Files
-                                <i class="fa" ng-class="groups.sortValue === 'files_count' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex>
-                            <span ng-click="groups.sort('merged_sum')">MD5 agent.conf
-                                <i class="fa" ng-class="groups.sortValue === 'merged_sum' ? (groups.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                    </md-toolbar>
-                </md-card-content>
-                <div flex layout="column" class="md-padding groupsFixPadding" ng-if="!lookingGroup">
-                    <div flex class=" clusterScrollable" when-scrolled="groups.nextPage('')">
-                        <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="group in groups.items | filter : searchTerm | orderBy : groups.sortValue : groups.sortDir" ng-click="$parent.loadGroup($index); toggle();"
-                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
-                            <div flex="20">
-                                <span>{{group.name}}</span>
-                            </div>
-                            <div flex="15">
-                                <span>{{group.count}}</span>
-                            </div>
-                            <div flex="15" ng-if="groups[0] && groups[0].files_count">
-                                <span>{{group.files_count}}</span>
-                            </div>
-                            <div flex>
-                                <span>{{group.merged_sum}}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Looking a group -->
-                <md-card-content ng-if="lookingGroup" class="groupsFixPadding md-card-content-groups">
-                    <div layout="row">
-                        <md-nav-bar flex md-selected-nav-item="groupsSelectedTab" class="groupsButtonNav lessLeft">
-                            <md-nav-item md-nav-click="goBackToAgents()" name="agents">
-                                <i class="fa fa-tv"></i> Agents
-                            </md-nav-item>
-                            <md-nav-item md-nav-click="goBackFiles()" name="files">
-                                <i class="fa fa-file-o"></i> Content
-                            </md-nav-item>
-                        </md-nav-bar>
-                        <md-button class="no-margin-btn buttonPlayRealTime md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="(file) ? goBackFiles() : goBackGroups()">
-                            <i class="fa fa-reply" aria-hidden="true"></i> Go back
-                        </md-button>
-                    </div>
-                    <div layout="row" class="topMarginSearchTop" ng-show="groupsSelectedTab==='agents'">
-                        <h4>{{ groups.items[selectedGroup].name }}</h4>
-                    </div>
-                    <!--<div layout="row" class="topMarginSearchBottom" ng-show="groupsSelectedTab==='agents'">
-                        <input flex id="query" placeholder="Filter agents..." type="text" ng-model="searchTermAgent" ng-change="groupAgents.addFilter('search', searchTermAgent)"
-                            class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
-                    </div>-->
-                    <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools" ng-show="groupsSelectedTab==='agents'">
-                        <div flex>
-                            <span ng-click="groupAgents.sort('id')">ID
-                                <i class="fa" ng-class="groupAgents.sortValue === 'id' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex>
-                            <span ng-click="groupAgents.sort('name')">Name
-                                <i class="fa" ng-class="groupAgents.sortValue === 'name' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex>
-                            <span ng-click="groupAgents.sort('ip')">IP
-                                <i class="fa" ng-class="groupAgents.sortValue === 'ip' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex>
-                            <span ng-click="groupAgents.sort('os.platform')">OS platform
-                                <i class="fa" ng-class="groupAgents.sortValue === 'os' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex>
-                            <span ng-click="groupAgents.sort('os.version')">OS version
-                                <i class="fa" ng-class="groupAgents.sortValue === 'os' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex>
-                            <span ng-click="groupAgents.sort('version')">Agent version
-                                <i class="fa" ng-class="groupAgents.sortValue === 'version' ? (groupAgents.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                    </md-toolbar>
-                    <div layout="row" class="topMarginSearchTop" ng-show="groupsSelectedTab==='files' && !file">
-                        <h4>{{ groups.items[selectedGroup].name }}</h4>
-                    </div>
-                    <!--<div layout="row" class="topMarginSearchBottom" ng-show="groupsSelectedTab==='files' && !file">
-                        <input flex id="query" placeholder="Filter files..." type="text" ng-model="searchTermFile" ng-change="groupFiles.addFilter('search', searchTermFile)"
-                            class="searchBarCluster groupsNoMarginTop input-filter-box agents-preview-search-box" />
-                    </div>-->
-                    <md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools" ng-show="groupsSelectedTab==='files' && !file">
-                        <div flex="30">
-                            <span ng-click="groupFiles.sort('filename')">File
-                                <i class="fa" ng-class="groupFiles.sortValue === 'filename' ? (groupFiles.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                                    aria-hidden="true"></i>
-                            </span>
-                        </div>
-                        <div flex>
-                            <span>MD5 checksum</span>
-                        </div>
-                    </md-toolbar>
+                <md-card flex ng-class="!lookingGroup ? 'mdCardNone' : ''">
+                    <!-- Selecting a group -->
+                    <md-card-content ng-if="!lookingGroup" class="groupsFixPadding md-card-content-groups">
+                        <wz-table-header
+                            layout="row" 
+                            data="groups" 
+                            keys="[
+                            {name:'Name',sortValue:'name',size:20},
+                            {name:'Agents',sortValue:'count',size:15},
+                            {name:'MD5 agent.conf'}
+                            ]">
+                        </wz-table-header>
+                    </md-card-content>
 
+                    <wz-table 
+                        layout="column" 
+                        flex
+                        func="loadGroup(index)" 
+                        data="groups" 
+                        keys="[{col:'name',size:20},{col:'count',size:15},'merged_sum']" 
+                        ng-if="!lookingGroup">
+                    </wz-table>
 
-                </md-card-content>
-                <div flex layout="column" class="md-padding groupsFixPadding" ng-if="lookingGroup">
-                    <div flex ng-if="groupsSelectedTab==='agents'" class="clusterScrollable" when-scrolled="groupAgents.nextPage()">
-                        <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat='agent in groupAgents.items | orderBy : groupAgents.sortValue : groupAgents.sortDir' ng-click="showAgent(agent)"
-                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
-                            <div flex>
-                                <span>{{agent.id || 'Unknown'}}</span>
+                    <!-- Looking a group -->
+                    <md-card-content ng-if="lookingGroup" class="groupsFixPadding md-card-content-groups">
+                        <div layout="row">
+                            <md-nav-bar flex md-selected-nav-item="groupsSelectedTab" class="groupsButtonNav lessLeft">
+                                <md-nav-item md-nav-click="goBackToAgents()" name="agents">
+                                    <i class="fa fa-tv"></i> Agents
+                                </md-nav-item>
+                                <md-nav-item md-nav-click="goBackFiles()" name="files">
+                                    <i class="fa fa-file-o"></i> Content
+                                </md-nav-item>
+                            </md-nav-bar>
+                            <md-button class="no-margin-btn buttonPlayRealTime md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="(file) ? goBackFiles() : goBackGroups()">
+                                <i class="fa fa-reply" aria-hidden="true"></i> Go back
+                            </md-button>
+                        </div>
+
+                        <div layout="row" class="topMarginSearchTop" ng-show="groupsSelectedTab==='agents'">
+                            <h4>{{ groups.items[selectedGroup].name }}</h4>
+                        </div>
+
+                        <wz-table-header
+                            layout="row" 
+                            data="groupAgents" 
+                            keys="[
+                            {name:'ID',sortValue:'id'},
+                            {name:'Name',sortValue:'name'},
+                            {name:'IP',sortValue:'ip'},
+                            {name:'OS platform',sortValue:'os.platform'},
+                            {name:'OS version',sortValue:'os.version'},
+                            {name:'Agent version',sortValue:'version'}
+                            ]"
+                            ng-show="groupsSelectedTab==='agents'">
+                        </wz-table-header>
+
+                        <div layout="row" class="topMarginSearchTop" ng-show="groupsSelectedTab==='files' && !file">
+                            <h4>{{ groups.items[selectedGroup].name }}</h4>
+                        </div>
+
+                        <wz-table-header
+                            layout="row" 
+                            data="groupFiles" 
+                            keys="[
+                            {name:'File',sortValue:'filename',size:30},
+                            {name:'MD5 checksum'}
+                            ]"
+                            ng-show="groupsSelectedTab==='files' && !file">
+                        </wz-table-header>
+
+                    </md-card-content>
+
+                    <wz-table 
+                        layout="column" 
+                        flex
+                        func="showAgent(agent)" 
+                        data="groupAgents" 
+                        keys="['id','name','ip','os.platform','os.version','version']" 
+                        ng-if="lookingGroup && groupsSelectedTab==='agents'">
+                    </wz-table>
+
+                    <wz-table 
+                        layout="column" 
+                        flex
+                        func="showFile(index)" 
+                        data="groupFiles" 
+                        keys="[{col:'filename',size:30},'hash']" 
+                        ng-if="lookingGroup && groupsSelectedTab==='files' && !file">
+                    </wz-table>
+
+                    <div flex layout="column" class="md-padding groupsFixPadding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
+                        <div flex layout="column">
+                            <div layout="row" class="topMarginSearchBottom ownNavBarCluster groupsHeader">
+                                <h4>{{ groups.items[selectedGroup].name }} / {{ filename }}</h4>
                             </div>
-                            <div flex>
-                                <span>{{agent.name || 'Unknown'}}</span>
-                            </div>
-                            <div flex>
-                                <span>{{agent.ip || 'Unknown'}}</span>
-                            </div>
-                            <div flex>
-                                <span>{{agent.os.platform || 'Unknown'}}</span>
-                            </div>
-                            <div flex>
-                                <span>{{agent.os.version || 'Unknown'}}</span>
-                            </div>
-                            <div flex>
-                                <span>{{agent.version || 'Unknown'}}</span>
+                            <div flex layout="column" class="ownNavBarCluster">
+                                <pre flex class="json-beautifier jsonbeauty2"><code wz-dynamic="file"></code></pre>
                             </div>
                         </div>
                     </div>
-                    <div flex ng-if="groupsSelectedTab==='files' && !file" class="clusterScrollable" when-scrolled="groupFiles.nextPage()">
-                        <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="file in groupFiles.items | orderBy : groupFiles.sortValue : groupFiles.sortDir" ng-click="$parent.showFile($index);"
-                            class="ownNavBarGroupsPadding agents-groups-preview agents-preview-table groups-table groupsFixPadding cursor-pointer">
-                            <div flex="30">
-                                <span>{{file.filename || 'Unknown'}}</span>
-                            </div>
-                            <div flex>
-                                <span>{{file.hash || 'Unknown'}}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div flex layout="column" ng-if="groupsSelectedTab==='files' && file">
-                        <div layout="row" class="topMarginSearchBottom ownNavBarCluster groupsHeader">
-                            <h4>{{ groups.items[selectedGroup].name }} / {{ filename }}</h4>
-                        </div>
-                        <div flex layout="column" class="ownNavBarCluster">
-                            <pre flex class="json-beautifier jsonbeauty2"><code dynamic="file"></code></pre>
-                        </div>
-                    </div>
-                </div>
-            </md-card>
+
+                </md-card>
+            </div>
+            <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groupFiles.busy || groups.busy || groupAgents.busy"></md-progress-linear>
         </div>
-        <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="groupFiles.busy || groups.busy || groupAgents.busy"></md-progress-linear>
-
-    </div>
     </div>
 </md-content>
