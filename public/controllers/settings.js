@@ -25,7 +25,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     $scope.editConfiguration   = true;
     $scope.menuNavItem         = 'settings';
     $scope.load                = true;
-    $scope.extensions          = appState.getExtensions().extensions;
     $scope.addManagerContainer = false;
     $scope.submenuNavItem      = "api";
     $scope.showEditForm        = {};
@@ -134,13 +133,13 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         errorHandler.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`,'Settings');
 
         getCurrentAPIIndex();
-
+        $scope.extensions = {};
         $scope.extensions.oscap      = $scope.apiEntries[index]._source.extensions.oscap;
         $scope.extensions.audit      = $scope.apiEntries[index]._source.extensions.audit;
         $scope.extensions.pci        = $scope.apiEntries[index]._source.extensions.pci;
         $scope.extensions.aws        = $scope.apiEntries[index]._source.extensions.aws;
         $scope.extensions.virustotal = $scope.apiEntries[index]._source.extensions.virustotal;
-
+        if(!$scope.$$phase) $scope.$digest();
         appState.setExtensions($scope.apiEntries[index]._source.extensions);
 
     };
@@ -158,6 +157,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(!$scope.$$phase) $scope.$digest();
             getCurrentAPIIndex();
             if(!currentApiEntryIndex) return;
+            $scope.extensions = {};
             $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
             $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
             $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
@@ -224,13 +224,13 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             };
     
             const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-            
             if(config.data && config.data.data) {
                 tmpData.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
                 tmpData.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
                 tmpData.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
                 tmpData.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 tmpData.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
+                appState.setExtensions(tmpData.extensions);
             }
             
             const checkData = await testAPI.check(tmpData)
@@ -440,12 +440,16 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             } else { // There's no pattern in the cookies, pick the one in the settings
                $scope.selectedIndexPattern = config.data.data["pattern"];
             }
-            if(config.data && config.data.data && !appState.getCurrentPattern()) {
+            if(config.data && config.data.data && !appState.getCurrentAPI()) {
+                $scope.extensions = {};
                 $scope.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
                 $scope.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
                 $scope.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
                 $scope.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 $scope.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
+                appState.setExtensions($scope.extensions);
+            } else {
+                $scope.extensions = appState.getExtensions().extensions;
             }
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -456,6 +460,5 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     };
 
     // Loading data
-    getSettings();
-    getAppInfo();
+    getSettings().then(getAppInfo);
 });
