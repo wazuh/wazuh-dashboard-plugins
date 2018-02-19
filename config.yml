@@ -26,6 +26,9 @@
 # Defines which extensions should be activated when you add a new API entry.
 # You can change them after Wazuh App starts.
 # Values must to be true or false.
+#extensions.pci       : true
+#extensions.audit     : true
+#extensions.oscap     : true
 #extensions.aws       : false
 #extensions.virustotal: false
 #
