@@ -1,4 +1,4 @@
-<div flex ng-if="!isruleset && !isdecoders" layout="column" class="md-padding groupsFixPadding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+<div flex ng-if="!isruleset && !isdecoders" layout="column" class="md-padding groupsFixPadding no-padding-bottom" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-if="!noscroll" flex class="clusterScrollable" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in data.items | filter : searchTerm | orderBy : data.sortValue : data.sortDir"
             class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding" ng-class="!nopointer ? 'cursor-pointer' : '' "
@@ -18,7 +18,7 @@
     </div>
 </div>
 
-<div flex ng-if="isruleset" layout="column" class="md-padding groupsFixPadding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+<div flex ng-if="isruleset" layout="column" class="md-padding groupsFixPadding no-padding-bottom" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-if="!noscroll" flex class="clusterScrollable" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in data.items | filter : searchTerm | orderBy : data.sortValue : data.sortDir"
             class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding" ng-class="!nopointer && activeitem !== item.id ? 'cursor-pointer' : !nopointer && activeitem === item.id ? 'cursor-pointer wz-active' : ''"
@@ -27,12 +27,12 @@
                 <span>{{parseItem(item,key) || '---'}}</span>
             </div>
             <div layout="column" flex ng-show="activeitem === item.id">
-                <div layout="row" class="ruleset-card-info">
+                <div layout="row" class="ruleset-card-info ruleset-opened">
                     <div ng-repeat="key in keys" flex="{{key.size || ''}}">
                         <span>{{parseItem(item,key) || '---'}}</span>
                     </div>
                 </div>
-                <div layout="row" class="ruleset-card-info">
+                <div layout="row" class="ruleset-card-info padding-right-14 padding-bottom-14 ">
                     <md-card flex class="wz-cursor-default">
                         <md-card-content>
                             <h4>
@@ -93,7 +93,7 @@
     </div>
 </div>
 
-<div flex ng-if="isdecoders" layout="column" class="md-padding groupsFixPadding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+<div flex ng-if="isdecoders" layout="column" class="md-padding groupsFixPadding no-padding-bottom" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-if="!noscroll" flex class="clusterScrollable" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="decoder in data.items | filter : searchTerm | orderBy : data.sortValue : data.sortDir"
             class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding" ng-class="!nopointer && activeitem !== decoder.name+decoder.file+decoder.position ? 'cursor-pointer' : !nopointer && activeitem === decoder.name+decoder.file+decoder.position ? 'cursor-pointer wz-active' : ''"
@@ -102,12 +102,12 @@
                 <span>{{parseItem(decoder,key) || '---'}}</span>
             </div>
             <div layout="column" flex ng-show="activeitem === decoder.name+decoder.file+decoder.position">
-                <div layout="row" class="ruleset-card-info">
+                <div layout="row" class="ruleset-card-info ruleset-opened">
                     <div ng-repeat="key in keys" flex="{{key.size || ''}}" class="wz-word-wrap">
                         <span>{{parseItem(decoder,key) || '---'}}</span>
                     </div>
                 </div>
-                <div layout="row" class="ruleset-card-info">
+                <div layout="row" class="ruleset-card-info padding-right-14 padding-bottom-14">
                     <md-card flex class="wz-cursor-default">
                         <md-card-content>
                             <h4>
@@ -142,7 +142,9 @@
         </div>
     </div>
 </div>
-
+<div layout="row">
+    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="data.busy || loading || load"></md-progress-linear>
+</div>
 <div flex layout="row" layout-align="start start" ng-show="!data.busy && ((!noscroll && data.items && data.items.length === 0) || (noscroll && !data))">
     <md-card flex layout="column">
         <md-card-content class="text-center">
