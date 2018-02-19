@@ -29,13 +29,12 @@ app.directive('wzTable',function(){
                 scope.func(obj);
             }   
             scope.parseItem = (item,key) => {
-
-                let tmp = key;
+                 let tmp = key;
                 if(key.col) {
                     tmp = key.col;
                 }
                 if(tmp && tmp.includes('.')){
-                    return item[tmp.split('.')[0]][tmp.split('.')[1]];
+                    return item[tmp.split('.')[0]] ? item[tmp.split('.')[0]][tmp.split('.')[1]] : '---';
                 }
                 if(Array.isArray(item[tmp])){
                     return item[tmp].length ? (item[tmp].join(', ')) : '';
