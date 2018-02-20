@@ -4,10 +4,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
-    // Check the url hash and retriew the tabView information
+    // Check the url hash and retrieve the tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
-    } else { // If tabView doesn't exist, default it to 'panels' view
+    } else { // If tabView doesn't exist, default it to 'panels'
         $scope.tabView = 'panels';
         $location.search('tabView', 'panels');
     }
@@ -15,17 +15,13 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Check the url hash and retrivew the tab information
     if ($location.search().tab) {
         $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'general' view
+    } else { // If tab doesn't exist, default it to 'general'
         $scope.tab = 'general';
         $location.search('tab', 'general');
 
         // Now we initialize the implicitFilter
         $rootScope.currentImplicitFilter = "";
     }
-
-    $rootScope.loadedVisualizations = [];
-    $rootScope.rendered             = false;
-    $rootScope.loadingStatus        = "Fetching data...";
 
     // This object represents the number of visualizations per tab; used to show a progress bar
     $rootScope.tabVisualizations = {
