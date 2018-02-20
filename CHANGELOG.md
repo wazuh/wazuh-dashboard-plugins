@@ -20,7 +20,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 - Removed the `kbn-dis` directive from **Manager/Ruleset** ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
-- Removed the `filters.js` and `kibana_fields_file.json` files from the app ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)).
+- Removed the `filters.js` and `kibana_fields_file.json` files ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)).
+- Removed the `implicitFilters` service ([#270](https://github.com/wazuh/wazuh-kibana-app/pull/270)).
+- Removed visualizations loading status trace from controllers and visualization directive ([#270](https://github.com/wazuh/wazuh-kibana-app/pull/270)).
 
 ## [v3.2.0]
 ### Added
