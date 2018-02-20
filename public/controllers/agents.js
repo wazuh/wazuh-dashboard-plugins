@@ -7,10 +7,10 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
     $scope.extensions = appState.getExtensions().extensions;
     $scope.agentsAutoComplete = AgentsAutoComplete;
 
-    // Check the url hash and retriew the tabView information
+    // Check the url hash and retrieve the tabView information
     if ($location.search().tabView){
         $scope.tabView = $location.search().tabView;
-    } else { // If tabView doesn't exist, default it to 'panels' view
+    } else { // If tabView doesn't exist, default it to 'panels'
         $scope.tabView = "panels";
         $location.search("tabView", "panels");
     }
@@ -18,18 +18,12 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
     // Check the url hash and retrivew the tab information
     if ($location.search().tab){
         $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'general' view
+    } else { // If tab doesn't exist, default it to 'general'
         $scope.tab = "general";
         $location.search("tab", "general");
 
         // Now we initialize the implicitFilter
         $rootScope.currentImplicitFilter = "";
-    }
-
-    if ($scope.tab != 'configuration') {
-        $rootScope.loadedVisualizations = [];
-        $rootScope.rendered = false;
-        $rootScope.loadingStatus = "Fetching data...";
     }
 
     $rootScope.tabVisualizations = {
@@ -206,7 +200,6 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         $location.path('/manager');
     };
 
-
     $scope.analizeAgents = async search => {
         try {
             $scope.agentsAutoComplete.filters = [];
@@ -261,7 +254,6 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
 
     $scope.tabs          = tabs;
     $scope.selectedIndex = 0;
-
 
     /** Agent configuration */
     $scope.switchConfigTab = selected => {
@@ -346,5 +338,4 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         }
     }
     /** End of agent configuration */
-
 });

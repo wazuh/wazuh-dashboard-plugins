@@ -53,7 +53,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                 }
 
                                 $("#"+$scope.visID).on('renderStart', () => {
-                                    $rootScope.loadingStatus = "Fetching data...";
+                                    // TBD: Use renderStart to couple it with renderComplete?
                                 });
 
                                 visHandler = loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, params); 
