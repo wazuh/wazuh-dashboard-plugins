@@ -13,8 +13,8 @@
                     <md-input-container class="md-block">
                         <label>Password</label>
                         <input required type="password" name="passwordField" ng-model="passwordField" minlength="1" maxlength="100" />
-                        <md-button ng-click="submit(passwordField)" class="buttonBlueLightSettings md-raised md-primary pull-right">
-                            <i class="fa fa-check settings-template-3" aria-hidden="true"></i> Submit
+                        <md-button ng-click="submit(passwordField)" class="wazuh-button md-raised md-primary pull-right" aria-label="Submit password button">
+                            <i class="fa fa-check fa-fw" aria-hidden="true"></i> Submit
                         </md-button>
 
                         <div role="alert" ng-show="errorFromRequest">
