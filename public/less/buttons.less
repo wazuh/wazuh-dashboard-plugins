@@ -1,51 +1,18 @@
-/* ------------------------------------------------------------------------ */
-/* ------------------------------- Buttons -------------------------------- */
-/* ------------------------------------------------------------------------ */
+/* -------------------------------------------------------------------------- */
+/* ---------------------- Wazuh stylesheet for buttons ---------------------- */
+/* -------------------------------------------------------------------------- */
 
-.button-active.md-button:not([disabled]):hover,
-.buttonBlueLightRuleset.md-button:not([disabled]):hover {
+.wazuh-button {
+    background-color: rgb(0,85,113) !important;
+    color: white !important;
+}
+
+.wazuh-button.active,
+.wazuh-button:not([disabled]):hover {
     background-color: rgb(0,121,165) !important;
 }
 
-.buttonBlueLight {
-    background-color: rgb(0,121,165) !important;
-    color: white !important;
-    box-shadow: none !important;
-}
-
-.buttonBlueLightSettings,
-.buttonBlueLightRuleset {
-    background-color: #005571 !important;
-    color: white !important;
-    box-shadow: none !important;
-}
-
-.md-button.md-no-style {
-    transition: none !important;
-}
-
-.md-button.buttonMenu.md-default-theme:not([disabled]):hover {
-    background-color: rgba(60, 174, 210, 0.7)
-}
-
-.md-button.buttonMenu {
-    background-color: rgb(0,121,165);
-    color: white;
-}
-
-button._md-no-style.md-button.md-ink-ripple {
-    background: none;
-}
-
-.md-button.buttonBlueLight.md-default-theme:not([disabled]):hover {
-    background-color: rgb(0,121,165);
-}
-
-.button-disabled {
-    background: rgb(0,121,165) !important;
-    color: white !important;
-}
-
+/* Custom styles for Panels and Discover sub-tabs from Overview and Agents */
 .tabView button._md-nav-button.md-accent.md-button.md-ink-ripple.md-active.md-primary,
 .tabView button._md-nav-button.md-accent.md-button.md-ink-ripple.md-unselected:hover {
     background-color: rgb(228, 228, 228);
@@ -53,31 +20,119 @@ button._md-no-style.md-button.md-ink-ripple {
     border-radius: 0px;
 }
 
-.md-button.buttonBlueLightSettings.md-raised.md-primary:not([disabled]):hover{
-    background-color: rgb(0,121,165) !important;
-    color: white !important;
+/* Style to override outline on components but avoid hidden shadow on focus*/
+:focus:not(.wazuh-button) {
     box-shadow: none !important;
 }
 
-.md-button:not([disabled]):hover {
-    background-color: rgb(0,121,165);
+/* Custom Manager/Ruleset styles */
+.manager-ruleset-rules-rulbtn {
+    top: -3px;
 }
 
-md-select-menu.md-default-theme md-content,
-md-select-menu md-content,
-.button-active {
-    background: rgb(0,121,165) !important;
-    color: white !important;
-    box-shadow: none !important;
+/* Custom Manager/Ruleset styles */
+.manager-ruleset-rules-decbtn {
+    padding: 2px;
+    top: -3px;
+    margin-right: 0;
 }
+
+/* Custom Manager/Logs styles */
+.manager-log-buttonplay {
+    margin: 20px 7px !important;
+    margin-top: 20px;
+    width: 180px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --------------------------- OLD BUTTON STYLES ---------------------------- */
+/* ------------------------ TO BE REPLACED OR REMOVED ----------------------- */
+/* -------------------------------------------------------------------------- */
+
+// .md-button.md-no-style {
+//     transition: none !important;
+// }
+//
+// .md-button.buttonMenu.md-default-theme:not([disabled]):hover {
+//     background-color: rgba(60, 174, 210, 0.7)
+// }
+//
+// button._md-no-style.md-button.md-ink-ripple {
+//     background: none;
+// }
+//
+// md-select-menu.md-default-theme md-content,
+// md-select-menu md-content,
+// .button-active {
+//     background: rgb(0,121,165) !important;
+//     color: white !important;
+//     // box-shadow: none !important;
+// }
 
 /* Play Realtime button styles */
-.buttonPlayRealTime {
-    background-color: #005571 !important;
-    color: white !important;
-    margin: 20px 7px !important;
-}
+// .buttonPlayRealTime {
+//     // THIS COLOR STYLES ARE ALREADY DEFINED ON WAZUH-BUTTON CLASS
+//     // background-color: #005571 !important;
+//     // color: white !important;
+//
+// }
 
-.buttonPlayRealTime:hover {
-    background-color: rgb(0,121,165) !important;
-}
+// .manager-log-buttonplay-i {
+//     margin-top: 0px;
+//     margin-right: 15px;
+//     margin-bottom: 5px;
+// }
+
+// THIS IS ALREADY ON NEW WAZUH-BUTTON CLASS
+// .buttonPlayRealTime:hover {
+//     background-color: rgb(0,121,165) !important;
+// }
+
+// ALREADY ON NEW WAZUH-BUTTON CLASS
+// .md-button.buttonMenu {
+//     background-color: rgb(0,121,165);
+//     color: white;
+// }
+
+// APPARENTLY NOT USED ON THE APP
+// .button-disabled {
+//     background: rgb(0,121,165) !important;
+//     color: white !important;
+// }
+
+// TO REMOVE, THIS IS ALREADY ON NEW WAZUH-BUTTON CLASS
+// .md-button:not([disabled]):hover {
+//     background-color: rgb(0,121,165);
+// }
+
+// NOT USED
+// .md-button.buttonBlueLight.md-default-theme:not([disabled]):hover {
+//     background-color: rgb(0,121,165);
+// }
+//
+// .md-button.buttonBlueLightSettings.md-raised.md-primary:not([disabled]):hover{
+//     background-color: rgb(0,121,165) !important;
+//     color: white !important;
+//     // box-shadow: none !important;
+// }
+
+// NOT NECESSARY WITH THE NEW CLASS WAZUH-BUTTON
+// .button-active.md-button:not([disabled]):hover,
+// .buttonBlueLightRuleset.md-button:not([disabled]):hover {
+//     background-color: rgb(0,121,165) !important;
+// }
+
+// NOT USED
+// .buttonBlueLightSettings,
+// .buttonBlueLightRuleset {
+//     background-color: #005571 !important;
+//     color: white !important;
+//     // box-shadow: none !important;
+// }
+
+// NOT USED
+// .buttonBlueLight {
+//     background-color: rgb(0,121,165) !important;
+//     color: white !important;
+//     // box-shadow: none !important;
+// }

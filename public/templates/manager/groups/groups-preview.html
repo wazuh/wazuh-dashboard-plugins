@@ -9,8 +9,8 @@
                     <!-- Selecting a group -->
                     <md-card-content ng-if="!lookingGroup" class="groupsFixPadding md-card-content-groups">
                         <wz-table-header
-                            layout="row" 
-                            data="groups" 
+                            layout="row"
+                            data="groups"
                             keys="[
                             {name:'Name',sortValue:'name',size:20},
                             {name:'Agents',sortValue:'count',size:15},
@@ -19,12 +19,12 @@
                         </wz-table-header>
                     </md-card-content>
 
-                    <wz-table 
-                        layout="column" 
+                    <wz-table
+                        layout="column"
                         flex
-                        func="loadGroup(index)" 
-                        data="groups" 
-                        keys="[{col:'name',size:20},{col:'count',size:15},'merged_sum']" 
+                        func="loadGroup(index)"
+                        data="groups"
+                        keys="[{col:'name',size:20},{col:'count',size:15},'merged_sum']"
                         ng-if="!lookingGroup">
                     </wz-table>
 
@@ -39,8 +39,8 @@
                                     <i class="fa fa-file-o"></i> Content
                                 </md-nav-item>
                             </md-nav-bar>
-                            <md-button class="no-margin-btn buttonPlayRealTime md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="(file) ? goBackFiles() : goBackGroups()">
-                                <i class="fa fa-reply" aria-hidden="true"></i> Go back
+                            <md-button class="wazuh-button md-raised md-primary manager-log-buttonplay" ng-click="(file) ? goBackFiles() : goBackGroups()" aria-label="Go back button">
+                                <i class="fa fa-reply fa-fw" aria-hidden="true"></i> Go back
                             </md-button>
                         </div>
 
@@ -49,8 +49,8 @@
                         </div>
 
                         <wz-table-header
-                            layout="row" 
-                            data="groupAgents" 
+                            layout="row"
+                            data="groupAgents"
                             keys="[
                             {name:'ID',sortValue:'id'},
                             {name:'Name',sortValue:'name'},
@@ -67,8 +67,8 @@
                         </div>
 
                         <wz-table-header
-                            layout="row" 
-                            data="groupFiles" 
+                            layout="row"
+                            data="groupFiles"
                             keys="[
                             {name:'File',sortValue:'filename',size:30},
                             {name:'MD5 checksum'}
@@ -78,22 +78,22 @@
 
                     </md-card-content>
 
-                    <wz-table 
-                        layout="column" 
+                    <wz-table
+                        layout="column"
                         flex
                         full="'agent'"
-                        func="showAgent(agent)" 
-                        data="groupAgents" 
-                        keys="['id','name','ip','os.platform','os.version','version']" 
+                        func="showAgent(agent)"
+                        data="groupAgents"
+                        keys="['id','name','ip','os.platform','os.version','version']"
                         ng-if="lookingGroup && groupsSelectedTab==='agents'">
                     </wz-table>
 
-                    <wz-table 
-                        layout="column" 
+                    <wz-table
+                        layout="column"
                         flex
-                        func="showFile(index)" 
-                        data="groupFiles" 
-                        keys="[{col:'filename',size:30},'hash']" 
+                        func="showFile(index)"
+                        data="groupFiles"
+                        keys="[{col:'filename',size:30},'hash']"
                         ng-if="lookingGroup && groupsSelectedTab==='files' && !file">
                     </wz-table>
 

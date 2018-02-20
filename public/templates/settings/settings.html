@@ -96,16 +96,19 @@
                       <p class="color-f9">{{messageErrorUpdate}}</p>
                     </div>
                     <div layout="row" layout-align="center center">
-                      <md-button flex="15" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle settings-template-3" aria-hidden="true"></i>UPDATE</md-button>
+                      <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Update API button">
+                          <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Update API
+                      </md-button>
                     </div>
                 </form>
             </span>
-
             <md-divider></md-divider>
         </div>
 
-        <div layout="row" ng-show="!isUpdating()" layout-align="center center">
-            <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle font-size-15" aria-hidden="true"></i> Add new API</md-button>
+        <div ng-show="!isUpdating()" layout="row" layout-align="center center">
+            <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="wazuh-button md-raised md-primary" aria-label="Add new API button">
+                <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new API
+            </md-button>
         </div>
 
         <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-if="!currentAPI || $parent.addManagerContainer" class="margin-top-30">
@@ -128,9 +131,13 @@
           <div layout="row" layout-align="center center">
             <p class="color-f9">{{messageError}}</p>
           </div>
+
           <div layout="row" layout-align="center center">
-            <md-button flex="15" type="submit" class="buttonBlueLightSettings md-raised md-primary"><i class="fa fa-plus-circle settings-template-3" aria-hidden="true"></i>SAVE</md-button>
+            <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Save API button">
+                <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save API
+            </md-button>
           </div>
+
         </form>
 
     </md-card>

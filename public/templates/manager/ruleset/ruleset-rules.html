@@ -68,12 +68,12 @@
                 </md-autocomplete>
             </span>
 
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'button-active' : 'buttonBlueLightRuleset'"
-                ng-click="setRulesTab('rules')" class="md-primary manager-ruleset-rules-rulbtn">
+            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'active' : ''"
+                ng-click="setRulesTab('rules')" class="wazuh-button md-raised md-primary manager-ruleset-rules-rulbtn">
                 Rules
             </md-button>
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'button-active' : 'buttonBlueLightRuleset'"
-                ng-click="setRulesTab('decoders')" class="md-primary manager-ruleset-rules-decbtn">
+            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'active' : ''"
+                ng-click="setRulesTab('decoders')" class="wazuh-button md-raised md-primary manager-ruleset-rules-decbtn">
                 Decoders
             </md-button>
         </div>
@@ -107,8 +107,8 @@
         </md-chips>
 
         <wz-table-header
-            layout="row" 
-            data="rules" 
+            layout="row"
+            data="rules"
             keys="[
                 {name:'ID',sortValue:'id',size:5},
                 {name:'File',sortValue:'file',size:15},
@@ -118,11 +118,11 @@
                 {name:'Level',sortValue:'level',size:5}
             ]">
         </wz-table-header>
-        <wz-table 
-            layout="column" 
+        <wz-table
+            layout="column"
             flex
             func="closeOther(rule)"
-            data="rules" 
+            data="rules"
             full="'rule'"
             activeitem="activeItem"
             keys="[
@@ -132,7 +132,7 @@
                 {col:'groups',size:25},
                 {col:'pci',size:15},
                 {col:'level',size:5}
-            ]" 
+            ]"
             isruleset="true"
             class="no-lateral-padding">
         </wz-table>
