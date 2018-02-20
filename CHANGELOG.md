@@ -10,16 +10,17 @@ All notable changes to the Wazuh app project will be documented in this file.
   - Minor typos and refactoring changes for the new directives.
 
 ### Changed
+- **App buttons have been refactored**. Unified CSS and HTML for buttons, providing the same structure for them ([#269](https://github.com/wazuh/wazuh-kibana-app/pull/269)).
 - The API list on Settings now shows the latest inserted API at the beggining of the list ([#261](https://github.com/wazuh/wazuh-kibana-app/pull/261)).
 
 ### Fixed
-- Fixed visualizations directive to properly load the **Manager/Ruleset** visualizations ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
+- Fixed visualizations directive to properly load the *Manager/Ruleset* visualizations ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
 - Fixed a bug where the classic extensions were not affected by the settings of the `config.yml` file ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
 - Fixed minor CSS bugs from the conversion to directives to some components ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
 - Fixed bug on the tables directive when accessing a member it doesn't exists ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
 
 ### Removed
-- Removed the `kbn-dis` directive from **Manager/Ruleset** ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
+- Removed the `kbn-dis` directive from *Manager/Ruleset* ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
 - Removed the `filters.js` and `kibana_fields_file.json` files ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)).
 - Removed the `implicitFilters` service ([#270](https://github.com/wazuh/wazuh-kibana-app/pull/270)).
 - Removed visualizations loading status trace from controllers and visualization directive ([#270](https://github.com/wazuh/wazuh-kibana-app/pull/270)).
