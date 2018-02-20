@@ -43,7 +43,6 @@ require('plugins/wazuh/services/generic-request.js');
 require('plugins/wazuh/services/data-handler.js');
 require('plugins/wazuh/services/app-state.js');
 require('plugins/wazuh/services/api-tester.js');
-require('plugins/wazuh/services/implicit-filters.js');
 require('plugins/wazuh/services/pattern-handler.js');
 
 // Set up routes and views

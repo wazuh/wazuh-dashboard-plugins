@@ -9,7 +9,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, $location, savedVisualizations, implicitFilters) {
+            controller: function VisController($scope, $rootScope, $location, savedVisualizations) {
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
                 let implicitFilter = '';
                 let visTitle       = '';
