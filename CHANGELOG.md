@@ -6,6 +6,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - **New directives** for the Wazuh app: `wz-table`, `wz-table-header` and `wz-search-bar` ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)):
   - Maintainable and reusable components for a better structured app.
   - Several files have been changed, renamed and moved to new folders, following *best practices*.
+  - The progress bar is now within its proper directive ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
   - Minor typos and refactoring changes for the new directives.
 
 ### Changed
@@ -13,6 +14,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 - Fixed visualizations directive to properly load the **Manager/Ruleset** visualizations ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
+- Fixed a bug where the classic extensions were not affected by the settings of the `config.yml` file ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
+- Fixed minor CSS bugs from the conversion to directives to some components ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
+- Fixed bug on the tables directive when accessing a member it doesn't exists ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
 
 ### Removed
 - Removed the `kbn-dis` directive from **Manager/Ruleset** ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
