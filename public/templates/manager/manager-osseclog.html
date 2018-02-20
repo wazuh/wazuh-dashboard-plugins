@@ -19,24 +19,24 @@
             </md-select>
         </md-input-container>
         <span flex></span>
-        <md-button ng-if="!realtime" class="buttonPlayRealTime md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="playRealtime()">
-            <i class="fa fa-play manager-log-buttonplay-i" aria-hidden="true"></i>
+        <md-button ng-if="!realtime" class="wazuh-button md-raised md-primary manager-log-buttonplay" ng-click="playRealtime()" aria-label="Play realtime button">
+            <i class="fa fa-play fa-fw" aria-hidden="true"></i>
             Play realtime
         </md-button>
-        <md-button ng-if="realtime" class="buttonPlayRealTime md-primary md-whiteframe-z1 buttonMenu manager-log-buttonplay" ng-click="stopRealtime()">
-            <i class="fa fa-stop manager-log-buttonplay-i" aria-hidden="true"></i>
+        <md-button ng-if="realtime" class="wazuh-button md-raised md-primary manager-log-buttonplay" ng-click="stopRealtime()" aria-label="Stop realtime button">
+            <i class="fa fa-stop fa-fw" aria-hidden="true"></i>
             Stop realtime
         </md-button>
     </div>
-    
+
     <wz-search-bar class="lateral-padding-8" data="logs" term="searchTerm" placetext="'Filter logs...'"></wz-search-bar>
 
     <div flex layout="column" class="md-padding">
 
         <!-- Standard -->
         <wz-table-header
-            layout="row" 
-            data="logs" 
+            layout="row"
+            data="logs"
             keys="[
             {name:'Timestamp',sortValue:'timestamp',size:15},
             {name:'Tag',sortValue:'tag',size:25},
@@ -48,8 +48,8 @@
 
         <!-- Realtime -->
         <wz-table-header
-            layout="row" 
-            data="realLogs" 
+            layout="row"
+            data="realLogs"
             keys="[
             {name:'Timestamp',size:15},
             {name:'Tag',size:25},
@@ -60,11 +60,11 @@
         </wz-table-header>
 
         <!-- Standard -->
-        <wz-table 
-            layout="column" 
+        <wz-table
+            layout="column"
             flex
-            data="logs" 
-            keys="[{col:'timestamp',size:15},{col:'tag',size:25},{col:'level',size:10},{col:'description'}]" 
+            data="logs"
+            keys="[{col:'timestamp',size:15},{col:'tag',size:25},{col:'level',size:10},{col:'description'}]"
             ng-if="!realtime"
             class="no-lateral-padding"
             nopointer="true"
@@ -72,11 +72,11 @@
         </wz-table>
 
         <!-- Realtime -->
-        <wz-table 
-            layout="column" 
+        <wz-table
+            layout="column"
             flex
-            data="realLogs" 
-            keys="[{col:'timestamp',size:15},{col:'tag',size:25},{col:'level',size:10},{col:'description'}]" 
+            data="realLogs"
+            keys="[{col:'timestamp',size:15},{col:'tag',size:25},{col:'level',size:10},{col:'description'}]"
             ng-if="realtime"
             class="no-lateral-padding",
             noscroll="true"
