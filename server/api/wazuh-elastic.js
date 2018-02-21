@@ -276,18 +276,22 @@ module.exports = (server, options) => {
             type:  'doc',
             q:     `visualization.title:"Wazuh App Overview General Metric alerts"`
         })
-        .then((data) => {
-            reply({
-                'statusCode': 200,
-                'data':       JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index
-            });
+        .then(data => {
+            if(data && data.hits && data.hits.hits && data.hits.hits[0] && data.hits.hits[0]._source){
+                return reply({
+                    statusCode: 200,
+                    data:       JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index
+                });
+            } else {
+                throw Error('no_visualization');
+            }
         })
-        .catch((error) => {
-            reply({
-                'statusCode': 500,
-                'error':      10000,
-                'message':    (error && error.message) ? error.message : error
-            }).code(500);
+        .catch(error => {
+            if(error && error.message && error.message === 'no_visualization'){
+                return reply('kibana_index_pattern_error').code(500);
+            }
+            
+            return reply('elasticsearch_down').code(500);
         });
     };
 
