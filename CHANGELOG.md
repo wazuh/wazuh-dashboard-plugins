@@ -1,23 +1,26 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.2.0 - Kibana v6.2.1 - Revision 384
+## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 384
 ### Added
 - **New directives** for the Wazuh app: `wz-table`, `wz-table-header` and `wz-search-bar` ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)):
   - Maintainable and reusable components for a better structured app.
   - Several files have been changed, renamed and moved to new folders, following *best practices*.
   - The progress bar is now within its proper directive ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
   - Minor typos and refactoring changes for the new directives.
+- Support for **Elastic Stack v6.2.2**.
 
 ### Changed
 - **App buttons have been refactored**. Unified CSS and HTML for buttons, providing the same structure for them ([#269](https://github.com/wazuh/wazuh-kibana-app/pull/269)).
 - The API list on Settings now shows the latest inserted API at the beggining of the list ([#261](https://github.com/wazuh/wazuh-kibana-app/pull/261)).
+- The check for the currently applied pattern has been improved, providing clever handling of Elasticsearch errors ([#271](https://github.com/wazuh/wazuh-kibana-app/pull/271)).
 
 ### Fixed
 - Fixed visualizations directive to properly load the *Manager/Ruleset* visualizations ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
 - Fixed a bug where the classic extensions were not affected by the settings of the `config.yml` file ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
 - Fixed minor CSS bugs from the conversion to directives to some components ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
 - Fixed bug on the tables directive when accessing a member it doesn't exists ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
+- Fixed browser console log error when clicking the Wazuh logo on the app ([#6647fbc](https://github.com/wazuh/wazuh-kibana-app/commit/6647fbc051c2bf69df7df6e247b2b2f46963f194)).
 
 ### Removed
 - Removed the `kbn-dis` directive from *Manager/Ruleset* ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
