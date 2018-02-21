@@ -71,10 +71,10 @@
                     <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
                     <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2 cursor-pointer" aria-hidden="true"></i>
                     <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2 cursor-pointer" aria-hidden="true"></i>
-                    <i ng-click="showEditForm[entry._id] = !showEditForm[entry._id]" tooltip="Edit" class="fa fa-pencil settings-template-2 cursor-pointer" aria-hidden="true"></i>
+                    <i ng-click="toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil settings-template-2 cursor-pointer" aria-hidden="true"></i>
                 </p>
             </span>
-            <span layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id]">
+            <span layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id] && isEditing">
                 <form flex ng-submit="updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
                     <md-input-container>
                       <label>Username</label>
@@ -111,7 +111,7 @@
             </md-button>
         </div>
 
-        <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-if="!currentAPI || $parent.addManagerContainer" class="margin-top-30">
+        <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-if="!currentAPI || ($parent.addManagerContainer && !isEditing)" class="margin-top-30">
           <md-input-container>
             <label>Username</label>
             <input placeholder="" type="text" ng-model="formData.user" aria-label="username" required/>

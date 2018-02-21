@@ -199,6 +199,12 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         return false;
     }
 
+    $scope.toggleEditor = entry => {
+        $scope.showEditForm[entry._id] = !$scope.showEditForm[entry._id];
+        $scope.isEditing = $scope.showEditForm[entry._id];
+        $scope.addManagerContainer = false;
+        if(!$scope.$$phase) $scope.$digest();
+    }
 
     // Save settings function
     const saveSettings = async () => {
