@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - **App buttons have been refactored**. Unified CSS and HTML for buttons, providing the same structure for them ([#269](https://github.com/wazuh/wazuh-kibana-app/pull/269)).
 - The API list on Settings now shows the latest inserted API at the beggining of the list ([#261](https://github.com/wazuh/wazuh-kibana-app/pull/261)).
 - The check for the currently applied pattern has been improved, providing clever handling of Elasticsearch errors ([#271](https://github.com/wazuh/wazuh-kibana-app/pull/271)).
+- Now on *Settings*, when the Add or Edit API form is active, if you press the other button, it will make the previous one disappear, getting a clearer interface ([#9df1e31](https://github.com/wazuh/wazuh-kibana-app/commit/9df1e317903edf01c81eba068da6d20a8a1ea7c2)).
 
 ### Fixed
 - Fixed visualizations directive to properly load the *Manager/Ruleset* visualizations ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
