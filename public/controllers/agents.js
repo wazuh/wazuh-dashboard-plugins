@@ -149,7 +149,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
                 id = newAgentId;
                 $location.search('agent', id);
             } else {
-                if ($location.search().agent) { // There's one in the url
+                if ($location.search().agent && !$rootScope.globalAgent) { // There's one in the url
                     id = $location.search().agent;
                 } else { // We pick the one in the rootScope
                     id = $rootScope.globalAgent;
@@ -288,7 +288,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
             $scope.configurationError = false;
             $scope.load = true;
             let id;
-            if ($location.search().agent) { // There's one in the url
+            if ($location.search().agent && !$rootScope.globalAgent) { // There's one in the url
 				id = $location.search().agent;
 			} else { // We pick the one in the rootScope
 				id = $rootScope.globalAgent;
