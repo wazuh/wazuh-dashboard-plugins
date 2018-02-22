@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed minor CSS bugs from the conversion to directives to some components ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
 - Fixed bug on the tables directive when accessing a member it doesn't exists ([#266](https://github.com/wazuh/wazuh-kibana-app/pull/266)).
 - Fixed browser console log error when clicking the Wazuh logo on the app ([#6647fbc](https://github.com/wazuh/wazuh-kibana-app/commit/6647fbc051c2bf69df7df6e247b2b2f46963f194)).
+- Fixed wrong data flow on *Agents/General* when coming from and going to the *Groups* tab ([#273](https://github.com/wazuh/wazuh-kibana-app/pull/273)).
 
 ### Removed
 - Removed the `kbn-dis` directive from *Manager/Ruleset* ([#262](https://github.com/wazuh/wazuh-kibana-app/pull/262)).
