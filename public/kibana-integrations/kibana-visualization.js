@@ -51,14 +51,13 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                     };
                                     params = {timeRange: timeRange}
                                 }
-
-                                $("#"+$scope.visID).on('renderStart', () => {
+                                $(`[vis-id="'${$scope.visID}'"]`).on('renderStart', () => {
+                                //$("#"+$scope.visID).on('renderStart', () => {
                                     // TBD: Use renderStart to couple it with renderComplete?
                                 });
-
-                                visHandler = loader.embedVisualizationWithSavedObject($("#"+$scope.visID), visualization, params); 
+ 
+                                visHandler = loader.embedVisualizationWithSavedObject($(`[vis-id="'${$scope.visID}'"]`), visualization, params); 
                                 
-
                                 $rootScope.ownHandlers.push(visHandler);
                                 visHandler.addRenderCompleteListener(renderComplete);
                             });     
