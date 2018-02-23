@@ -1,7 +1,7 @@
 <div flex ng-if="!isruleset && !isdecoders" layout="column" class="md-padding groupsFixPadding no-padding-bottom" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-if="!noscroll" flex class="clusterScrollable" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in data.items | filter : searchTerm | orderBy : data.sortValue : data.sortDir"
-            class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding" ng-class="!nopointer ? 'cursor-pointer' : '' "
+            class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding wz-word-wrap" ng-class="!nopointer ? 'cursor-pointer' : '' "
             ng-click="clickAction(full ? item : $index)">
             <div ng-repeat="key in keys" flex="{{key.size || ''}}">
                 <span>{{parseItem(item,key) || '---'}}</span>
@@ -9,7 +9,7 @@
         </div>
     </div>
     <div ng-if="noscroll" flex class="clusterScrollable">
-        <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in data" class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding"
+        <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in data" class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding wz-word-wrap"
             ng-class="!nopointer ? 'cursor-pointer' : '' " ng-click="clickAction($index)">
             <div ng-repeat="key in keys" flex="{{key.size || ''}}">
                 <span>{{parseItem(item,key) || '---'}}</span>
