@@ -16,6 +16,11 @@ app.controller('managerController', function ($scope,$rootScope, $routeParams, $
         if(!$rootScope.$$phase) $rootScope.$digest();
     });
 
+    $scope.reloadGroups = () => {
+        $scope.submenuNavItem = 'groups';
+        $rootScope.groupsIsReloaded = true;
+    }
+
     // Watchers
     $scope.$watch('submenuNavItem', () => {
         if($scope.submenuNavItem === 'ruleset') {
