@@ -4,6 +4,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 385
 ### Fixed
 - Fixed wrong data flow on *Agents/General* when coming from and going to the *Groups* tab ([#273](https://github.com/wazuh/wazuh-kibana-app/pull/273)).
+- Fixed bug on the *Agent configuration* JSON viewer who didn't properly SHOW the full group configuration ([#276](https://github.com/wazuh/wazuh-kibana-app/pull/276)).
 
 ## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 384
 ### Added
