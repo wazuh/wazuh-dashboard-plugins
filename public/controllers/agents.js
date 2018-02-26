@@ -314,7 +314,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
 
             data                      = await apiReq.request('GET', `/agents/groups/${$scope.groupName}/configuration`, {});
             $scope.groupConfiguration = data.data.data.items[0];
-            $scope.rawJSON            = beautifier.prettyPrint($scope.groupConfiguration);
+            $scope.rawJSON            = beautifier.prettyPrint(data.data.data.items);
 
             data = await Promise.all([
                 apiReq.request('GET', `/agents/groups?search=${$scope.groupName}`, {}),
