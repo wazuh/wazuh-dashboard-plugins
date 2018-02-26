@@ -2,9 +2,18 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 385
+### Changed
+- Now clicking again on the *Groups* tab on *Manager* will properly reload the tab and redirect to the beginning ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
+- Now the visualizations only use the `vis-id` attribute for loading them ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
+
 ### Fixed
 - Fixed wrong data flow on *Agents/General* when coming from and going to the *Groups* tab ([#273](https://github.com/wazuh/wazuh-kibana-app/pull/273)).
 - Fixed bug on the *Agent configuration* JSON viewer who didn't properly SHOW the full group configuration ([#276](https://github.com/wazuh/wazuh-kibana-app/pull/276)).
+- Fixed sorting on tables, now they use the sorting functionality provided by the Wazuh API ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
+- Fixed column width issues on some tables ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
+
+### Removed
+- Deleted the `id` attribute from all the app visualizations ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
 
 ## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 384
 ### Added
