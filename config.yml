@@ -46,3 +46,13 @@
 # Default value is 8000. It will be ignored if it is bellow 1500.
 # It means milliseconds before we consider a request as failed.
 #timeout: 4000
+#
+#
+#--------------------- Indices configuration ------------------------------------
+#
+# Configure .wazuh and .wazuh-version indices shards and replicas
+#wazuh.shards              : 3
+#wazuh.replicas            : 7
+#wazuh-version.shards      : 9
+#wazuh-version.replicas    : 6
+#
