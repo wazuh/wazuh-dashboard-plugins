@@ -37,7 +37,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
  
      const assignWatcher8 = () => {
          watcher8 = $scope.$watch(() => {
-             return $('#Wazuh-App-Agents-Audit-New-files-metric > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+             return $('[vis-id="\'Wazuh-App-Agents-Audit-New-files-metric\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
          }, (newVal, oldVal) => {
              if (newVal !== oldVal) {
                  $scope.auditNewFiles = newVal;
@@ -47,7 +47,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
      }
      const assignWatcher9 = () => {
          watcher9 = $scope.$watch(() => {
-             return $('#Wazuh-App-Agents-Audit-Read-files-metric > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+             return $('[vis-id="\'Wazuh-App-Agents-Audit-Read-files-metric\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
          }, (newVal, oldVal) => {
              if (newVal !== oldVal) {
                  $scope.auditReadFiles = newVal;
@@ -58,7 +58,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
  
      const assignWatcher10 = () => {
          watcher10 = $scope.$watch(() => {
-             return $('#Wazuh-App-Agents-Audit-Modified-files-metric > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+             return $('[vis-id="\'Wazuh-App-Agents-Audit-Modified-files-metric\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
          }, (newVal, oldVal) => {
              if (newVal !== oldVal) {
                  $scope.auditModifiedFiles = newVal;
@@ -69,7 +69,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
  
      const assignWatcher11 = () => {
          watcher11 = $scope.$watch(() => {
-             return $('#Wazuh-App-Agents-Audit-Removed-files-metric > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+             return $('[vis-id="\'Wazuh-App-Agents-Audit-Removed-files-metric\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
          }, (newVal, oldVal) => {
              if (newVal !== oldVal) {
                  $scope.auditRemovedFiles = newVal;
@@ -89,7 +89,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
 
     const assignWatcher12 = () => {
         watcher12 = $scope.$watch(() => {
-            return $('#Wazuh-App-Overview-VULS-Metric-Critical-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+            return $('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
         }, (newVal, oldVal) => {
             if (newVal !== oldVal) {
                 $scope.vulnCritical = newVal;
@@ -99,7 +99,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
     }
     const assignWatcher13 = () => {
         watcher13 = $scope.$watch(() => {
-            return $('#Wazuh-App-Overview-VULS-Metric-High-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+            return $('[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
         }, (newVal, oldVal) => {
             if (newVal !== oldVal) {
                 $scope.vulnHigh = newVal;
@@ -110,7 +110,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
 
     const assignWatcher14 = () => {
         watcher14 = $scope.$watch(() => {
-            return $('#Wazuh-App-Overview-VULS-Metric-Medium-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+            return $('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
         }, (newVal, oldVal) => {
             if (newVal !== oldVal) {
                 $scope.vulnMedium = newVal;
@@ -121,7 +121,7 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
 
     const assignWatcher15 = () => {
         watcher15 = $scope.$watch(() => {
-            return $('#Wazuh-App-Overview-VULS-Metric-Low-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+            return $('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
         }, (newVal, oldVal) => {
             if (newVal !== oldVal) {
                 $scope.vulnLow = newVal;
