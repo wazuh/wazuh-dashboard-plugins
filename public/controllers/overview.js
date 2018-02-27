@@ -147,6 +147,57 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     }
 
 
+    // Metrics Vulnerability Detector
+    let watcher12, watcher13, watcher14, watcher15;
+
+    $scope.vulnCritical = '';
+    $scope.vulnHigh     = '';
+    $scope.vulnMedium   = '';
+    $scope.vulnLow      = '';
+
+    const assignWatcher12 = () => {
+        watcher12 = $scope.$watch(() => {
+            return $('#Wazuh-App-Overview-VULS-Metric-Critical-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+        }, (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                $scope.vulnCritical = newVal;
+                if (!$scope.$$phase) $scope.$digest();
+            }
+        });
+    }
+    const assignWatcher13 = () => {
+        watcher13 = $scope.$watch(() => {
+            return $('#Wazuh-App-Overview-VULS-Metric-High-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+        }, (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                $scope.vulnHigh = newVal;
+                if (!$scope.$$phase) $scope.$digest();
+            }
+        });
+    }
+
+    const assignWatcher14 = () => {
+        watcher14 = $scope.$watch(() => {
+            return $('#Wazuh-App-Overview-VULS-Metric-Medium-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+        }, (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                $scope.vulnMedium = newVal;
+                if (!$scope.$$phase) $scope.$digest();
+            }
+        });
+    }
+
+    const assignWatcher15 = () => {
+        watcher15 = $scope.$watch(() => {
+            return $('#Wazuh-App-Overview-VULS-Metric-Low-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+        }, (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                $scope.vulnLow = newVal;
+                if (!$scope.$$phase) $scope.$digest();
+            }
+        });
+    }
+
     // Check the url hash and retrieve the tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
@@ -242,6 +293,24 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         watcher11 = null;
     }
 
+    const assignVulnMetrics = () => {
+        assignWatcher12();
+        assignWatcher13();
+        assignWatcher14();
+        assignWatcher15();
+    }
+
+    const destroyVulnMetrics = () => {
+        watcher12();
+        watcher13();
+        watcher14();
+        watcher15();
+        watcher12 = null;
+        watcher13 = null;
+        watcher14 = null;
+        watcher15 = null;
+    }
+
     if ($scope.tab === 'general' && $scope.tabView === 'panels' && !watcher1) {
         assignOverviewMetrics();
     }
@@ -252,6 +321,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     if ($scope.tab === 'audit' && $scope.tabView === 'panels' && !watcher8) {
         assignAuditMetrics();
+    }
+
+    if ($scope.tab === 'vuls' && $scope.tabView === 'panels' && !watcher12) {
+        assignVulnMetrics();
     }
 
     // Switch subtab
@@ -275,6 +348,12 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         } else if(watcher8) {
             destroyAuditMetrics();
         }
+        
+        if($scope.tab === 'vuls' && subtab === 'panels' && !watcher12){
+            assignVulnMetrics();
+        } else if(watcher8) {
+            destroyVulnMetrics();
+        }
 
     }
     // Switch tab
@@ -297,6 +376,12 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
             assignAuditMetrics();
         } else if(watcher8) {
             destroyAuditMetrics();
+        }
+
+        if(tab === 'vuls' && $scope.tabView === 'panels' && !watcher12){
+            assignVulnMetrics();
+        } else if(watcher8) {
+            destroyVulnMetrics();
         }
 
         if ($rootScope.ownHandlers) {
@@ -333,6 +418,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if(watcher1) destroyOverviewMetrics();
         if(watcher5) destroyFimMetrics();
         if(watcher8) destroyAuditMetrics();
+        if(watcher12) destroyVulnMetrics();
         $rootScope.ownHandlers = [];
     });
 

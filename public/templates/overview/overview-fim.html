@@ -5,8 +5,8 @@
 
 
         <div layout="row">
-            <md-card flex style="height: 30px;">
-                <md-card-content layout="row" style="padding-top: 5px;">
+            <md-card flex class="height-30">
+                <md-card-content layout="row" class="wz-padding-top-5">
                     <span flex><b>Files added:</b> {{fimAdded}}</span>
                     <span flex><b>Files modified:</b> {{fimModified}}</span>
                     <span flex><b>Files deleted:</b> {{fimDeleted}}</span>
@@ -14,7 +14,7 @@
             </md-card>            
         </div>
         <div layout="row" class="height-400">
-            <div flex="15" layout="column" style="display: none">
+            <div flex="15" layout="column" class="wz-no-display">
                 <md-card flex>
                     <md-card-content class="wazuh-column">
                         <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Added'" id="Wazuh-App-Overview-FIM-Added"></kbn-vis>

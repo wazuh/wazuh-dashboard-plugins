@@ -3,8 +3,8 @@
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row">
-            <md-card flex style="height: 30px;">
-                <md-card-content layout="row" style="padding-top: 5px;">
+            <md-card flex class="height-30">
+                <md-card-content layout="row" class="wz-padding-top-5">
                     <span flex><b>Alerts:</b> {{totalAlerts}}</span>
                     <span flex><b>Level 12 or above alerts:</b> {{level12}}</span>
                     <span flex><b>Authentication failure:</b> {{authFailure}}</span>
@@ -13,7 +13,7 @@
             </md-card>            
         </div>
             
-        <div layout="row" layout-align="center stretch" class="height-120" style="display: none !important">
+        <div layout="row" layout-align="center stretch" class="height-120 wz-no-display">
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Metric-alerts'" id="Wazuh-App-Overview-General-Metric-alerts"></kbn-vis>
