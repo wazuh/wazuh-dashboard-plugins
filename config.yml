@@ -51,8 +51,8 @@
 #--------------------- Indices configuration ------------------------------------
 #
 # Configure .wazuh and .wazuh-version indices shards and replicas
-#wazuh.shards              : 3
-#wazuh.replicas            : 7
-#wazuh-version.shards      : 9
-#wazuh-version.replicas    : 6
+#wazuh.shards              : 1
+#wazuh.replicas            : 1
+#wazuh-version.shards      : 1
+#wazuh-version.replicas    : 1
 #
