@@ -15,15 +15,16 @@ module.exports = (server, options) => {
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
-    let objects         = {};
-    let app_objects     = {};
-    let kibana_template = {};
-    let packageJSON     = {};
-    let pattern         = null;
+    let objects           = {};
+    let app_objects       = {};
+    let kibana_template   = {};
+    let packageJSON       = {};
+    let configurationFile = {};
+    let pattern           = null;
 
     // Read config from package.json and config.yml
     try {
-        const configurationFile = yml.load(fs.readFileSync(path.join(__dirname,'../config.yml'), {encoding: 'utf-8'}));
+        configurationFile = yml.load(fs.readFileSync(path.join(__dirname,'../config.yml'), {encoding: 'utf-8'}));
 
         global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern             = (configurationFile && typeof configurationFile.pattern          !== 'undefined') ? configurationFile.pattern          : 'wazuh-alerts-3.x-*';
@@ -192,24 +193,56 @@ module.exports = (server, options) => {
 
     // Save Wazuh App setup
     const saveConfiguration = () => {
-        let configuration = {
-            "name":             "Wazuh App",
-            "app-version":      packageJSON.version,
-            "revision":         packageJSON.revision,
-            "installationDate": new Date().toISOString()
+
+        let shards = 1;
+        let replicas = 1;
+
+        if (configurationFile) {
+            if (configurationFile["wazuh-version.shards"]) {
+                shards = configurationFile["wazuh-version.shards"];
+            }
+            if (configurationFile["wazuh-version.replicas"]) {
+                replicas = configurationFile["wazuh-version.replicas"];
+            }
+        }
+
+        let shard_configuration = {
+            "settings" : {
+                "index" : {
+                    "number_of_shards" : shards, 
+                    "number_of_replicas" : replicas
+                }
+            }
         };
 
-        elasticRequest.callWithInternalUser('create', {
-            index: ".wazuh-version",
-            type:  'wazuh-version',
-            id:    1,
-            body:  configuration
+        elasticRequest.callWithInternalUser('indices.create', {
+            index: '.wazuh-version',
+            body: shard_configuration
         })
         .then(() => {
-            server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
+
+            let configuration = {
+                "name":             "Wazuh App",
+                "app-version":      packageJSON.version,
+                "revision":         packageJSON.revision,
+                "installationDate": new Date().toISOString()
+            };
+
+            elasticRequest.callWithInternalUser('create', {
+                index: ".wazuh-version",
+                type:  'wazuh-version',
+                id:    1,
+                body:  configuration
+            })
+            .then(() => {
+                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
+            })
+            .catch((error) => {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh configuration');
+            });
         })
         .catch((error) => {
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh configuration');
+            server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh-version.');
         });
     };
 
@@ -220,8 +253,31 @@ module.exports = (server, options) => {
         })
         .then((result) => {
             if (!result) {
+
+                let shards = 1;
+                let replicas = 1;
+                
+                if (configurationFile) {
+                    if (configurationFile["wazuh.shards"]) {
+                        shards = configurationFile["wazuh.shards"];
+                    }
+                    if (configurationFile["wazuh.replicas"]) {
+                        replicas = configurationFile["wazuh.replicas"];
+                    }
+                }
+
+                let configuration = {
+                    "settings" : {
+                        "index" : {
+                            "number_of_shards" : shards, 
+                            "number_of_replicas" : replicas
+                        }
+                    }
+                };
+
                 elasticRequest.callWithInternalUser('indices.create', {
-                    index: '.wazuh'
+                    index: '.wazuh',
+                    body: configuration
                 })
                 .then(() => {
                     server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');

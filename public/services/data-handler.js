@@ -36,6 +36,9 @@ app.factory('DataHandler', function ($q, apiReq) {
                     limit:  this.regularBatch
                 };
             }
+            if(this.sortValue){
+                requestData.sort = this.sortDir ? '-' + this.sortValue : this.sortValue;
+            }
 
             for(let filter of this.filters){
                 if (filter.value !== '') requestData[filter.name] = filter.value;
@@ -125,12 +128,16 @@ app.factory('DataHandler', function ($q, apiReq) {
             let requestData;
             this.end       = false;
             this.busy      = false;
-            this.sortValue = '';
+            //this.sortValue = '';
 
             requestData = {
                 offset: 0,
                 limit:  this.initialBatch
             };
+            if(this.sortValue){
+                requestData.sort = this.sortDir ? '-' + this.sortValue : this.sortValue;
+            }
+
             let isUnknown = false;
 
             for(let filter of this.filters){
@@ -162,6 +169,7 @@ app.factory('DataHandler', function ($q, apiReq) {
         sort(by) {
             this.sortValue = by;
             this.sortDir   = !this.sortDir;
+            return this.search();
         }
 
         reset() {

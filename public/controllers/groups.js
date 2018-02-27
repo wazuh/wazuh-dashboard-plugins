@@ -4,6 +4,12 @@ const beautifier = require('plugins/wazuh/utils/json-beautifier');
 // Groups preview controller
 app.controller('groupsPreviewController', 
 function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler) {
+    const reloadWatcher = $rootScope.$watch('groupsIsReloaded',() => {
+        delete $rootScope.groupsIsReloaded;
+        $scope.lookingGroup = false;
+        if(!$scope.$$phase) $scope.$digest();
+    });
+    
     $scope.searchTerm      = '';
     $scope.searchTermAgent = '';
     $scope.searchTermFile  = '';
@@ -171,6 +177,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
             }
         }
         $rootScope.ownHandlers = [];
+        reloadWatcher();
     });
    
 
