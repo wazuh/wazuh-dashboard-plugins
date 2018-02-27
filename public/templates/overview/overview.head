@@ -19,7 +19,7 @@
             </md-nav-bar>
         </div>
 
-        <div class="horizontalTabsBar tabView" layout="column" layout-align="end end">
+        <div class="horizontalTabsBar" layout="column" layout-align="end end">
             <md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
                 <md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
                     <i class="fa fa-th overview-head-1" aria-hidden="true"></i>Panels

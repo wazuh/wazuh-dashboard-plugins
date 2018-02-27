@@ -1,83 +1,40 @@
 <md-content flex layout="column" ng-if="tab === 'general'" layout-align="start">
 
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
-        <div layout="row" class="height-100">
-            <md-card flex>
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-14-pt">{{agent.name}}</div>
-                    <!--<md-tooltip md-direction="bottom">{{ agent.name }}</md-tooltip>-->
-                    <div class="ng-binding">Name</div>
-                </md-card-content>
-            </md-card>
-            <md-card  flex="12">
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-14-pt">{{agent.ip}}</div>
-                    <!--<md-tooltip md-direction="bottom">{{ agent.ip }}</md-tooltip>-->
-                    <div class="ng-binding">IP Address</div>
-                </md-card-content>
-            </md-card>
-            <md-card ng-if="agent.version" flex="12">
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-14-pt">{{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</div>
-                    <!--<md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>-->
-                    <div class="ng-binding">Version</div>
-                </md-card-content>
-            </md-card>
-            <md-card ng-if="agent.group" flex="12">
-                <md-card-content class="text-center cursor-pointer" ng-click="goGroups(agent)">
-                    <div class="metric-value ng-binding font-size-14-pt" >{{ agent.group }}</div>
-                    <!--<md-tooltip md-direction="bottom">{{ agent.version }}</md-tooltip>-->
-                    <div class="ng-binding">Group</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding legend-value-truncate font-size-14-pt">{{ agentOS }}</div>
-                    <!--<md-tooltip md-direction="bottom">{{ agentOS }}</md-tooltip>-->
-                    <div class="ng-binding">OS</div>
-                </md-card-content>
-            </md-card>
+        <div layout="row">
+                <md-card flex class="height-30">
+                    <md-card-content layout="row" class="wz-padding-top-5">
+                        <span flex><b>Name:</b> {{agent.name}}</span>
+                        <span flex><b>IP:</b> {{agent.ip}}</span>
+                        <span ng-if="agent.version" flex><b>Version:</b> {{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</span>
+                        <span ng-if="agent.group" flex><b>Group:</b> {{ agent.group }}</span>
+                        <span flex><b>OS:</b> {{ agentOS }}</span>
+                    </md-card-content>
+                </md-card>            
         </div>
-
-        <div layout="row" class="height-100">
-            <md-card flex ng-show="agent.id != '000'">
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-14-pt">{{agent.lastKeepAlive || 'Unknown' }}</div>
-                    <!--<md-tooltip md-direction="bottom">{{ agent.lastKeepAlive }}</md-tooltip>-->
-                    <div class="ng-binding">Last keep alive</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-14-pt">{{agent.dateAdd}}</div>
-                    <!--<md-tooltip md-direction="bottom">{{ agent.dateAdd }}</md-tooltip>-->
-                    <div class="ng-binding">Registration date</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-14-pt" ng-if="agent.syscheck.inProgress">Scan in progress</div>
-                    <div ng-if="!agent.syscheck.inProgress" class="metric-value ng-binding font-size-14-pt">{{agent.syscheck.end || 'Unknown'}}</div>
-                    <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom">
-                        Start time: {{ agent.syscheck.start || 'Unknown'}} <br>
-                        End time: {{ agent.syscheck.end || 'Unknown'}} <br>
-                        Duration time: {{ agent.syscheck.duration +' minutes' || 'Unknown'}}
-                    </md-tooltip>
-                    <div class="ng-binding">Last syscheck scan</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-14-pt" ng-if="agent.rootcheck.inProgress">Scan in progress</div>
-                    <div ng-if="!agent.rootcheck.inProgress" class="metric-value ng-binding font-size-14-pt">{{agent.rootcheck.end || 'Unknown'}}</div>
-                    <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom">
-                        Start time: {{ agent.rootcheck.start || 'Unknown'}} <br>
-                        End time: {{ agent.rootcheck.end || 'Unknown'}} <br>
-                        Duration time: {{ agent.rootcheck.duration + ' minutes' || 'Unknown' }}
-                    </md-tooltip>
-                    <div class="ng-binding">Last rootcheck scan</div>
-                </md-card-content>
-            </md-card>
+        <div layout="row">
+                <md-card flex class="height-30">
+                    <md-card-content layout="row" class="wz-padding-top-5">
+                        <span flex><b>Last keep alive:</b> {{agent.lastKeepAlive || 'Unknown' }}</span>
+                        <span flex><b>Registration date:</b> {{agent.dateAdd}}</span>
+                        <span flex ng-if="agent.syscheck.inProgress"><b>Last syscheck scan:</b> Scan in progress</span>
+                        <span flex ng-if="!agent.syscheck.inProgress"><b>Last syscheck scan:</b> {{agent.syscheck.end || 'Unknown'}}
+                                <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom">
+                                    Start time: {{ agent.syscheck.start || 'Unknown'}} <br>
+                                    End time: {{ agent.syscheck.end || 'Unknown'}} <br>
+                                    Duration time: {{ agent.syscheck.duration +' minutes' || 'Unknown'}}
+                                </md-tooltip>
+                        </span>
+                        <span flex ng-if="agent.rootcheck.inProgress"><b>Last rootcheck scan:</b> Scan in progress</span>
+                        <span flex ng-if="!agent.rootcheck.inProgress"><b>Last rootcheck scan:</b> {{agent.rootcheck.end || 'Unknown'}}
+                                <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom">
+                                    Start time: {{ agent.rootcheck.start || 'Unknown'}} <br>
+                                    End time: {{ agent.rootcheck.end || 'Unknown'}} <br>
+                                    Duration time: {{ agent.rootcheck.duration +' minutes' || 'Unknown'}}
+                                </md-tooltip>
+                        </span>
+                    </md-card-content>
+                </md-card>            
         </div>
     </div>
 
@@ -88,18 +45,21 @@
             <md-card flex="33">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Top 5 alerts</span>
+                    <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="33">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Top 5 groups</span>
+                    <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-groups'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="33">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Top 5 PCI DSS Requirements</span>
+                    <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements'"></kbn-vis>
                 </md-card-content>
             </md-card>
@@ -109,12 +69,14 @@
             <md-card flex>
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alert level evolution</span>
+                    <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alert-level-evolution'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="60">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts</span>
+                    <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
@@ -124,12 +86,14 @@
             <md-card  flex="60">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Alerts summary</span>
+                    <md-divider></md-divider>
                     <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Agents-Overview-Alerts-summary'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="40">
                 <md-card-content class="wazuh-column">
                     <span class="md-headline">Groups summary</span>
+                    <md-divider></md-divider>
                     <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Agents-Overview-Groups-summary'"></kbn-vis>
                 </md-card-content>
             </md-card>

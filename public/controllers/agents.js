@@ -26,6 +26,155 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
         $rootScope.currentImplicitFilter = "";
     }
 
+
+     // Metrics Audit
+     let watcher8, watcher9, watcher10, watcher11;
+
+     $scope.auditNewFiles      = '';
+     $scope.auditReadFiles     = '';
+     $scope.auditModifiedFiles = '';
+     $scope.auditRemovedFiles  = '';
+ 
+     const assignWatcher8 = () => {
+         watcher8 = $scope.$watch(() => {
+             return $('#Wazuh-App-Agents-Audit-New-files-metric > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+         }, (newVal, oldVal) => {
+             if (newVal !== oldVal) {
+                 $scope.auditNewFiles = newVal;
+                 if (!$scope.$$phase) $scope.$digest();
+             }
+         });
+     }
+     const assignWatcher9 = () => {
+         watcher9 = $scope.$watch(() => {
+             return $('#Wazuh-App-Agents-Audit-Read-files-metric > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+         }, (newVal, oldVal) => {
+             if (newVal !== oldVal) {
+                 $scope.auditReadFiles = newVal;
+                 if (!$scope.$$phase) $scope.$digest();
+             }
+         });
+     }
+ 
+     const assignWatcher10 = () => {
+         watcher10 = $scope.$watch(() => {
+             return $('#Wazuh-App-Agents-Audit-Modified-files-metric > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+         }, (newVal, oldVal) => {
+             if (newVal !== oldVal) {
+                 $scope.auditModifiedFiles = newVal;
+                 if (!$scope.$$phase) $scope.$digest();
+             }
+         });
+     }
+ 
+     const assignWatcher11 = () => {
+         watcher11 = $scope.$watch(() => {
+             return $('#Wazuh-App-Agents-Audit-Removed-files-metric > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+         }, (newVal, oldVal) => {
+             if (newVal !== oldVal) {
+                 $scope.auditRemovedFiles = newVal;
+                 if (!$scope.$$phase) $scope.$digest();
+             }
+         });
+     }
+
+
+         // Metrics Vulnerability Detector
+    let watcher12, watcher13, watcher14, watcher15;
+
+    $scope.vulnCritical = '';
+    $scope.vulnHigh     = '';
+    $scope.vulnMedium   = '';
+    $scope.vulnLow      = '';
+
+    const assignWatcher12 = () => {
+        watcher12 = $scope.$watch(() => {
+            return $('#Wazuh-App-Overview-VULS-Metric-Critical-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+        }, (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                $scope.vulnCritical = newVal;
+                if (!$scope.$$phase) $scope.$digest();
+            }
+        });
+    }
+    const assignWatcher13 = () => {
+        watcher13 = $scope.$watch(() => {
+            return $('#Wazuh-App-Overview-VULS-Metric-High-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+        }, (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                $scope.vulnHigh = newVal;
+                if (!$scope.$$phase) $scope.$digest();
+            }
+        });
+    }
+
+    const assignWatcher14 = () => {
+        watcher14 = $scope.$watch(() => {
+            return $('#Wazuh-App-Overview-VULS-Metric-Medium-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+        }, (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                $scope.vulnMedium = newVal;
+                if (!$scope.$$phase) $scope.$digest();
+            }
+        });
+    }
+
+    const assignWatcher15 = () => {
+        watcher15 = $scope.$watch(() => {
+            return $('#Wazuh-App-Overview-VULS-Metric-Low-severity > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
+        }, (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                $scope.vulnLow = newVal;
+                if (!$scope.$$phase) $scope.$digest();
+            }
+        });
+    }
+
+
+     const assignAuditMetrics = () => {
+        assignWatcher8();
+        assignWatcher9();
+        assignWatcher10();
+        assignWatcher11();
+    }
+
+    const destroyAuditMetrics = () => {
+        watcher8();
+        watcher9();
+        watcher10();
+        watcher11();
+        watcher8 = null;
+        watcher9 = null;
+        watcher10 = null;
+        watcher11 = null;
+    }
+
+    const assignVulnMetrics = () => {
+        assignWatcher12();
+        assignWatcher13();
+        assignWatcher14();
+        assignWatcher15();
+    }
+
+    const destroyVulnMetrics = () => {
+        watcher12();
+        watcher13();
+        watcher14();
+        watcher15();
+        watcher12 = null;
+        watcher13 = null;
+        watcher14 = null;
+        watcher15 = null;
+    }
+
+    if ($scope.tab === 'audit' && $scope.tabView === 'panels' && !watcher8) {
+        assignAuditMetrics();
+    }
+
+    if ($scope.tab === 'vuls' && $scope.tabView === 'panels' && !watcher12) {
+        assignVulnMetrics();
+    }
+
     $rootScope.tabVisualizations = {
         general      : 7,
         fim          : 8,
@@ -51,11 +200,37 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
     };
 
     // Switch subtab
-    $scope.switchSubtab = subtab => $scope.tabView = subtab;
+    $scope.switchSubtab = subtab => {
+        $scope.tabView = subtab;
+        if($scope.tab === 'audit' && subtab === 'panels' && !watcher8){
+            assignAuditMetrics();
+        } else if(watcher8) {
+            destroyAuditMetrics();
+        }
 
+                
+        if($scope.tab === 'vuls' && subtab === 'panels' && !watcher12){
+            assignVulnMetrics();
+        } else if(watcher8) {
+            destroyVulnMetrics();
+        }
+    }
     $scope.switchTab = tab => {
 
         if($scope.tab === tab) return;
+        
+        if(tab === 'audit' && $scope.tabView === 'panels' && !watcher8){
+            assignAuditMetrics();
+        } else if(watcher8) {
+            destroyAuditMetrics();
+        }
+
+        if(tab === 'vuls' && $scope.tabView === 'panels' && !watcher12){
+            assignVulnMetrics();
+        } else if(watcher8) {
+            destroyVulnMetrics();
+        }
+
         if($rootScope.ownHandlers){
             for(let h of $rootScope.ownHandlers){
                 h._scope.$destroy();
@@ -233,6 +408,8 @@ function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, Agent
                 h._scope.$destroy();
             }
         }
+        if(watcher8) destroyAuditMetrics();
+        if(watcher12) destroyVulnMetrics();
         $rootScope.ownHandlers = [];
     });
 
