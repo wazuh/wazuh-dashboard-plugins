@@ -3,6 +3,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
 ### Added
+- Support for **Wazuh v3.2.1**.
 - **Brand-new first redesign for the app user interface** ([#278](https://github.com/wazuh/wazuh-kibana-app/pull/278)):
   - This is the **very first iteration** of a *work-in-progress* **UX redesign** for the Wazuh app.
   - The overall interface has been refreshed, **removing some unnecessary colors and shadow effects**.
