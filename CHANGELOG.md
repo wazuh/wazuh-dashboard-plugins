@@ -1,16 +1,27 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 385
+## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
+### Added
+- **Brand-new first redesign for the app user interface** ([#278](https://github.com/wazuh/wazuh-kibana-app/pull/278)):
+  - This is the **very first iteration** of a *work-in-progress* **UX redesign** for the Wazuh app.
+  - The overall interface has been refreshed, **removing some unnecessary colors and shadow effects**.
+  - The metric visualizations have been **replaced by an information ribbon** under the filter search bar, reducing the amount of space they occupied.
+  - The rest of the app visualizations now have a **new, more detailed card design**.
+- New **shards and replicas settings** to the `config.yml` file ([#277](https://github.com/wazuh/wazuh-kibana-app/pull/277)):
+  - Now you can apply **custom values** to the shards and replicas for the `.wazuh` and `.wazuh-version` indices.
+  - **Warning**: This feature only works before the installation process. If you modify this settings after installing the app, they won't be applied at all.
+
 ### Changed
 - Now clicking again on the *Groups* tab on *Manager* will properly reload the tab and redirect to the beginning ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
 - Now the visualizations only use the `vis-id` attribute for loading them ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
 
 ### Fixed
 - Fixed wrong data flow on *Agents/General* when coming from and going to the *Groups* tab ([#273](https://github.com/wazuh/wazuh-kibana-app/pull/273)).
-- Fixed bug on the *Agent configuration* JSON viewer who didn't properly SHOW the full group configuration ([#276](https://github.com/wazuh/wazuh-kibana-app/pull/276)).
 - Fixed sorting on tables, now they use the sorting functionality provided by the Wazuh API ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
 - Fixed column width issues on some tables ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
+- Fixed bug on the *Agent configuration* JSON viewer who didn't properly show the full group configuration ([#276](https://github.com/wazuh/wazuh-kibana-app/pull/276)).
+- Fixed excesive loading time from some Audit visualizations ([#278](https://github.com/wazuh/wazuh-kibana-app/pull/278)).
 
 ### Removed
 - Deleted the `id` attribute from all the app visualizations ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
