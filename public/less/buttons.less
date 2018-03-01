@@ -21,7 +21,11 @@
 }
 
 /* Style to override outline on components but avoid hidden shadow on focus*/
-:focus:not(.wazuh-button) {
+:focus:not(.wazuh-button, .input-filter-box) {
+    box-shadow: none !important;
+}
+
+md-autocomplete:focus {
     box-shadow: none !important;
 }
 
