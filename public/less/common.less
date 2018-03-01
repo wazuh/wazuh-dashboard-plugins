@@ -168,7 +168,7 @@ navbar {
 /* Input filter box styles */
 
 .input-filter-box {
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 2px 0px, rgba(0, 0, 0, 0.137255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.117647) 0px 0px 0px 0px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 2px 0px, rgba(0, 0, 0, 0.137255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.117647) 0px 0px 0px 0px !important;
     font-size: 14px;
     padding: 0px 15px;
     margin-top: 18px;
@@ -181,6 +181,15 @@ navbar {
 md-autocomplete,
 md-autocomplete md-autocomplete-wrap input {
     box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 2px 0px, rgba(0, 0, 0, 0.137255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.117647) 0px 0px 0px 0px !important;
+}
+
+/* Style to override outline on components but avoid hidden shadow on focus*/
+:focus:not(.wazuh-button, .input-filter-box) {
+    box-shadow: none !important;
+}
+
+md-autocomplete:focus {
+    box-shadow: none !important;
 }
 
 /* Progress Linear */
