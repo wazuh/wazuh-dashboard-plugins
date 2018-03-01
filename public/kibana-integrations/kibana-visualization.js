@@ -18,7 +18,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 let visualization  = null;
                 let visHandler     = null;
                 let renderInProgress = false;
-
+                let originalImplicitFilter;
                 const myRender = function() {
                     if (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ){ // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -27,6 +27,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                             savedVisualizations.get($scope.visID).then(savedObj => {
                                 implicitFilter = savedObj.searchSource.get('query')['query'];
+                                originalImplicitFilter = implicitFilter;
                                 visTitle = savedObj.vis.title;
                                 visualization = savedObj;
 
@@ -70,6 +71,8 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                     implicitFilter += ' AND ' + $rootScope.discoverPendingUpdates[0].query;
                                 } else if(implicitFilter.includes('AND') && $rootScope.discoverPendingUpdates[0].query.length === 0){
                                     implicitFilter = implicitFilter.split('AND')[0];                                    
+                                } else if(!implicitFilter.includes('AND') && $rootScope.discoverPendingUpdates[0].query.length === 0){
+                                    implicitFilter = originalImplicitFilter;                              
                                 }   
                             } else if ($rootScope.discoverPendingUpdates && !implicitFilter && typeof $rootScope.discoverPendingUpdates[0].query === 'string') {
                                 implicitFilter = $rootScope.discoverPendingUpdates[0].query;
