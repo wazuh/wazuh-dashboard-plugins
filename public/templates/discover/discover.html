@@ -36,11 +36,11 @@
 
   <main class="container-fluid">
     <div class="row">
-      <filter-bar
+      <filter-bar-w
         state="state"
         index-patterns="[indexPattern]"
-        ng-if="state.query.language === 'lucene'"
-      ></filter-bar>
+        ng-if="['lucene', 'kql'].includes(state.query.language)"
+      ></filter-bar-w>
     </div>
     <div class="row">
       <div class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">
@@ -65,7 +65,10 @@
           <!-- loading -->
           <div ng-show="resultState === 'loading'">
             <div class="discover-overlay">
-              <h2>Searching</h2>
+              <div class="euiTitle">
+                <h2>Searching</h2>
+              </div>
+              <div class="euiSpacer euiSpacer--m"></div>
               <div ng-show="fetchStatus">{{fetchStatus.complete}}/{{fetchStatus.total}}</div>
             </div>
           </div>
@@ -118,7 +121,7 @@
                  vis-data="visData"
                  show-spy-panel="true"
                  search-source="searchSource"
-                 class="kbn-dis-height-200"
+                 style="height: 200px"
                 >
               </visualization>
             </section>
@@ -136,7 +139,7 @@
                 data-title="{{opts.savedSearch.lastSavedTitle}}"
                 data-description="{{opts.savedSearch.description}}"
                 minimum-visible-rows="minimumVisibleRows"
-                render-counter
+                render-complete
                 on-add-column="addColumn"
                 on-change-sort-order="setSortOrder"
                 on-move-column="moveColumn"
