@@ -3,12 +3,12 @@
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row">
-            <md-card flex class="height-30">
+            <md-card flex class="height-30 wz-metric-color">
                 <md-card-content layout="row" class="wz-padding-top-5">
-                    <span flex><b>New files:</b> {{auditNewFiles}}</span>
-                    <span flex><b>Read files:</b> {{auditReadFiles}}</span>
-                    <span flex><b>Modified files:</b> {{auditModifiedFiles}}</span>
-                    <span flex><b>Removed files:</b> {{auditRemovedFiles}}</span>
+                    <span flex>New files: <b>{{auditNewFiles}}</b></span>
+                    <span flex>Read files: <b>{{auditReadFiles}}</b></span>
+                    <span flex>Modified files: <b>{{auditModifiedFiles}}</b></span>
+                    <span flex>Removed files: <b>{{auditRemovedFiles}}</b></span>
                 </md-card-content>
             </md-card>            
         </div>
