@@ -3,12 +3,12 @@
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row">
-            <md-card flex class="height-30">
+            <md-card flex class="height-30 wz-metric-color">
                 <md-card-content layout="row" class="wz-padding-top-5">
-                    <span flex><b>Critical severity alerts:</b> {{vulnCritical}}</span>
-                    <span flex><b>High severity alerts:</b> {{vulnHigh}}</span>
-                    <span flex><b>Medium severity alerts:</b> {{vulnMedium}}</span>
-                    <span flex><b>Low severity alerts:</b> {{vulnLow}}</span>
+                    <span flex>Critical severity alerts: <b>{{vulnCritical}}</b></span>
+                    <span flex>High severity alerts: <b>{{vulnHigh}}</b></span>
+                    <span flex>Medium severity alerts: <b>{{vulnMedium}}</b></span>
+                    <span flex>Low severity alerts: <b>{{vulnLow}}</b></span>
                 </md-card-content>
             </md-card>            
         </div>

@@ -3,12 +3,12 @@
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row">
-            <md-card flex class="height-30">
+            <md-card flex class="height-30 wz-metric-color">
                 <md-card-content layout="row" class="wz-padding-top-5">
-                    <span flex><b>Alerts:</b> {{totalAlerts}}</span>
-                    <span flex><b>Level 12 or above alerts:</b> {{level12}}</span>
-                    <span flex><b>Authentication failure:</b> {{authFailure}}</span>
-                    <span flex><b>Authentication success:</b> {{authSuccess}}</span>
+                    <span flex>Alerts: <b>{{totalAlerts}}</b></span>
+                    <span flex>Level 12 or above alerts: <b>{{level12}}</b></span>
+                    <span flex>Authentication failure: <b>{{authFailure}}</b></span>
+                    <span flex>Authentication success: <b>{{authSuccess}}</b></span>
                 </md-card-content>
             </md-card>            
         </div>

@@ -2,31 +2,31 @@
 
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
         <div layout="row">
-                <md-card flex class="height-30">
+                <md-card flex class="height-30 wz-metric-color">
                     <md-card-content layout="row" class="wz-padding-top-5">
-                        <span flex><b>Name:</b> {{agent.name}}</span>
-                        <span flex><b>IP:</b> {{agent.ip}}</span>
-                        <span ng-if="agent.version" flex><b>Version:</b> {{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</span>
-                        <span ng-if="agent.group" flex><b>Group:</b> {{ agent.group }}</span>
-                        <span flex><b>OS:</b> {{ agentOS }}</span>
+                        <span flex>Name: <b>{{agent.name}}</b></span>
+                        <span flex>IP: <b>{{agent.ip}}</b></span>
+                        <span ng-if="agent.version" flex>Version:<b> {{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</b></span>
+                        <span ng-if="agent.group" flex>Group:<b> {{ agent.group }}</b></span>
+                        <span flex>OS:<b> {{ agentOS }}</b></span>
                     </md-card-content>
                 </md-card>            
         </div>
         <div layout="row">
-                <md-card flex class="height-30">
+                <md-card flex class="height-30 wz-metric-color">
                     <md-card-content layout="row" class="wz-padding-top-5">
-                        <span flex><b>Last keep alive:</b> {{agent.lastKeepAlive || 'Unknown' }}</span>
-                        <span flex><b>Registration date:</b> {{agent.dateAdd}}</span>
-                        <span flex ng-if="agent.syscheck.inProgress"><b>Last syscheck scan:</b> Scan in progress</span>
-                        <span flex ng-if="!agent.syscheck.inProgress"><b>Last syscheck scan:</b> {{agent.syscheck.end || 'Unknown'}}
+                        <span flex>Last keep alive:<b> {{agent.lastKeepAlive || 'Unknown' }}</b></span>
+                        <span flex>Registration date:<b> {{agent.dateAdd}}</b></span>
+                        <span flex ng-if="agent.syscheck.inProgress">Last syscheck scan:<b> Scan in progress</b></span>
+                        <span flex ng-if="!agent.syscheck.inProgress">Last syscheck scan:<b> {{agent.syscheck.end || 'Unknown'}}</b>
                                 <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom">
                                     Start time: {{ agent.syscheck.start || 'Unknown'}} <br>
                                     End time: {{ agent.syscheck.end || 'Unknown'}} <br>
                                     Duration time: {{ agent.syscheck.duration +' minutes' || 'Unknown'}}
                                 </md-tooltip>
                         </span>
-                        <span flex ng-if="agent.rootcheck.inProgress"><b>Last rootcheck scan:</b> Scan in progress</span>
-                        <span flex ng-if="!agent.rootcheck.inProgress"><b>Last rootcheck scan:</b> {{agent.rootcheck.end || 'Unknown'}}
+                        <span flex ng-if="agent.rootcheck.inProgress">Last rootcheck scan:<b> Scan in progress</b></span>
+                        <span flex ng-if="!agent.rootcheck.inProgress">Last rootcheck scan:<b> {{agent.rootcheck.end || 'Unknown'}}</b>
                                 <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom">
                                     Start time: {{ agent.rootcheck.start || 'Unknown'}} <br>
                                     End time: {{ agent.rootcheck.end || 'Unknown'}} <br>
