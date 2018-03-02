@@ -17,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 - Now clicking again on the *Groups* tab on *Manager* will properly reload the tab and redirect to the beginning ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
 - Now the visualizations only use the `vis-id` attribute for loading them ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
+- The colors from the toast messages have been replaced to follow the Elastic 6 guidelines ([#286](https://github.com/wazuh/wazuh-kibana-app/pull/286)).
 
 ### Fixed
 - Fixed wrong data flow on *Agents/General* when coming from and going to the *Groups* tab ([#273](https://github.com/wazuh/wazuh-kibana-app/pull/273)).
