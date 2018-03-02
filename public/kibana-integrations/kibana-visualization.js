@@ -11,14 +11,15 @@ var app = require('ui/modules').get('apps/webinar_app', [])
             },
             controller: function VisController($scope, $rootScope, $location, savedVisualizations) {
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
-                let implicitFilter = '';
-                let visTitle       = '';
-                let fullFilter     = '';
-                let rendered       = false;
-                let visualization  = null;
-                let visHandler     = null;
-                let renderInProgress = false;
-                let originalImplicitFilter;
+                let originalImplicitFilter = '';
+                let implicitFilter         = '';
+                let visTitle               = '';
+                let fullFilter             = '';
+                let rendered               = false;
+                let visualization          = null;
+                let visHandler             = null;
+                let renderInProgress       = false;
+
                 const myRender = function() {
                     if (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ){ // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -26,15 +27,21 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                             renderInProgress = true;
 
                             savedVisualizations.get($scope.visID).then(savedObj => {
-                                implicitFilter = savedObj.searchSource.get('query')['query'];
-                                originalImplicitFilter = implicitFilter;
+                                originalImplicitFilter = savedObj.searchSource.get('query')['query'];
                                 visTitle = savedObj.vis.title;
                                 visualization = savedObj;
 
-                                if ($rootScope.discoverPendingUpdates && implicitFilter &&  typeof $rootScope.discoverPendingUpdates[0].query === 'string') {
-                                    if($rootScope.discoverPendingUpdates[0].query.length > 0)
-                                        implicitFilter += ' AND ' + $rootScope.discoverPendingUpdates[0].query;
-                                } else if ($rootScope.discoverPendingUpdates && !implicitFilter && typeof $rootScope.discoverPendingUpdates[0].query === 'string') {
+                                // There's an original filter
+                                if (originalImplicitFilter.length > 0 ) {
+                                    // And also a pending one -> concatenate them
+                                    if ($rootScope.discoverPendingUpdates && typeof $rootScope.discoverPendingUpdates[0].query === 'string' && $rootScope.discoverPendingUpdates[0].query.length > 0) {
+                                        implicitFilter = originalImplicitFilter + ' AND ' + $rootScope.discoverPendingUpdates[0].query;
+                                    } else {
+                                        // Only the original filter
+                                        implicitFilter = originalImplicitFilter;
+                                    }
+                                } else {
+                                    // Other case, use the pending one, if it is empty, it won't matter
                                     implicitFilter = $rootScope.discoverPendingUpdates[0].query;
                                 }
 
@@ -66,15 +73,17 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                         } else if (rendered) { // There's a visualization object -> just update its filters
 
-                            if ($rootScope.discoverPendingUpdates && implicitFilter && typeof $rootScope.discoverPendingUpdates[0].query === 'string') {
-                                if($rootScope.discoverPendingUpdates[0].query.length > 0 && !implicitFilter.includes($rootScope.discoverPendingUpdates[0].query)){
-                                    implicitFilter = originalImplicitFilter.length > 0 ? originalImplicitFilter + ' AND ' + $rootScope.discoverPendingUpdates[0].query : $rootScope.discoverPendingUpdates[0].query;
-                                } else if(implicitFilter.includes('AND') && $rootScope.discoverPendingUpdates[0].query.length === 0){
-                                    implicitFilter = implicitFilter.split('AND')[0];                                    
-                                } else if(!implicitFilter.includes('AND') && $rootScope.discoverPendingUpdates[0].query.length === 0){
-                                    implicitFilter = originalImplicitFilter;                              
-                                }   
-                            } else if ($rootScope.discoverPendingUpdates && !implicitFilter && typeof $rootScope.discoverPendingUpdates[0].query === 'string') {
+                            // There's an original filter
+                            if (originalImplicitFilter.length > 0 ) {
+                                // And also a pending one -> concatenate them
+                                if ($rootScope.discoverPendingUpdates && typeof $rootScope.discoverPendingUpdates[0].query === 'string' && $rootScope.discoverPendingUpdates[0].query.length > 0) {
+                                    implicitFilter = originalImplicitFilter + ' AND ' + $rootScope.discoverPendingUpdates[0].query;
+                                } else {
+                                    // Only the original filter
+                                    implicitFilter = originalImplicitFilter;
+                                }
+                            } else {
+                                // Other case, use the pending one, if it is empty, it won't matter
                                 implicitFilter = $rootScope.discoverPendingUpdates[0].query;
                             }
                             
