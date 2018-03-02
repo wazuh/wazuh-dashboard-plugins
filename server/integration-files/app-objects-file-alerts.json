@@ -941,35 +941,31 @@
 	},
 	{
 		"_id": "Wazuh-App-Overview-Audit-File-read-access",
+		"_type": "visualization",
 		"_source": {
-			"title": "Wazuh App Overview Audit File read access",
-			"visState":
-				"{\"params\": {\"isDonut\": false, \"legendPosition\": \"right\", \"shareYAxis\": true, \"addTooltip\": true, \"addLegend\": true}, \"listeners\": {}, \"type\": \"pie\", \"aggs\": [{\"type\": \"count\", \"enabled\": true, \"id\": \"1\", \"params\": {}, \"schema\": \"metric\"}, {\"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"params\": {\"orderBy\": \"1\", \"field\": \"data.audit.file.name\", \"customLabel\": \"\", \"order\": \"desc\", \"size\": 5}, \"schema\": \"segment\"}], \"title\": \"Wazuh App Overview Audit File read access\"}",
-			"uiStateJSON": "{}",
-			"description": "",
-			"version": 1,
-			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.data.id: 80784\",\"language\":\"lucene\"}}"
-			}
-		},
-		"_type": "visualization"
+		  "title": "Wazuh App Overview Audit File read access",
+		  "visState": "{\"title\":\"Wazuh App Overview Audit File read access\",\"type\":\"pie\",\"params\":{\"isDonut\":false,\"legendPosition\":\"right\",\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"data.audit.file.name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"\"}}]}",
+		  "uiStateJSON": "{}",
+		  "description": "",
+		  "version": 1,
+		  "kibanaSavedObjectMeta": {
+			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80784\",\"language\":\"lucene\"}}"
+		  }
+		}
 	},
 	{
 		"_id": "Wazuh-App-Overview-Audit-File-write-access",
+		"_type": "visualization",
 		"_source": {
-			"title": "Wazuh App Overview Audit File write access",
-			"visState":
-				"{\"params\": {\"isDonut\": false, \"legendPosition\": \"right\", \"shareYAxis\": true, \"addTooltip\": true, \"addLegend\": true}, \"listeners\": {}, \"type\": \"pie\", \"aggs\": [{\"type\": \"count\", \"enabled\": true, \"id\": \"1\", \"params\": {}, \"schema\": \"metric\"}, {\"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"params\": {\"orderBy\": \"1\", \"field\": \"data.audit.file.name\", \"customLabel\": \"\", \"order\": \"desc\", \"size\": 5}, \"schema\": \"segment\"}], \"title\": \"Wazuh App Overview Audit File write access\"}",
-			"uiStateJSON": "{}",
-			"description": "",
-			"version": 1,
-			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.data.id: 80781\",\"language\":\"lucene\"}}"
-			}
-		},
-		"_type": "visualization"
+		  "title": "Wazuh App Overview Audit File write access",
+		  "visState": "{\"title\":\"Wazuh App Overview Audit File write access\",\"type\":\"pie\",\"params\":{\"isDonut\":false,\"legendPosition\":\"right\",\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"data.audit.file.name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"\"}}]}",
+		  "uiStateJSON": "{}",
+		  "description": "",
+		  "version": 1,
+		  "kibanaSavedObjectMeta": {
+			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80781\",\"language\":\"lucene\"}}"
+		  }
+		}
 	},
 	{
 		"_id": "Wazuh-App-Overview-Audit-Commands",
@@ -989,49 +985,43 @@
 	},
 	{
 		"_id": "Wazuh-App-Overview-Audit-Files-created",
+		"_type": "visualization",
 		"_source": {
-			"title": "Wazuh App Overview Audit Files created",
-			"visState":
-				"{\"params\": {\"isDonut\": false, \"legendPosition\": \"right\", \"shareYAxis\": true, \"addTooltip\": true, \"addLegend\": true}, \"listeners\": {}, \"type\": \"pie\", \"aggs\": [{\"type\": \"count\", \"enabled\": true, \"id\": \"1\", \"params\": {}, \"schema\": \"metric\"}, {\"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"params\": {\"orderBy\": \"1\", \"field\": \"data.audit.file.name\", \"customLabel\": \"\", \"order\": \"desc\", \"size\": 5}, \"schema\": \"segment\"}], \"title\": \"Wazuh-App-Overview-Audit-Files-created\"}",
-			"uiStateJSON": "{}",
-			"description": "",
-			"version": 1,
-			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.data.id: 80790\",\"language\":\"lucene\"}}"
-			}
-		},
-		"_type": "visualization"
+		  "title": "Wazuh App Overview Audit Files created",
+		  "visState": "{\"title\":\"Wazuh App Overview Audit Files created\",\"type\":\"pie\",\"params\":{\"isDonut\":false,\"legendPosition\":\"right\",\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"data.audit.file.name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"\"}}]}",
+		  "uiStateJSON": "{}",
+		  "description": "",
+		  "version": 1,
+		  "kibanaSavedObjectMeta": {
+			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80790\",\"language\":\"lucene\"}}"
+		  }
+		}
 	},
 	{
 		"_id": "Wazuh-App-Overview-Audit-Files-deleted",
+		"_type": "visualization",
 		"_source": {
-			"title": "Wazuh App Overview Audit Files deleted",
-			"visState":
-				"{\"params\": {\"isDonut\": false, \"legendPosition\": \"right\", \"shareYAxis\": true, \"addTooltip\": true, \"addLegend\": true}, \"listeners\": {}, \"type\": \"pie\", \"aggs\": [{\"type\": \"count\", \"enabled\": true, \"id\": \"1\", \"params\": {}, \"schema\": \"metric\"}, {\"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"params\": {\"orderBy\": \"1\", \"field\": \"data.audit.file.name\", \"customLabel\": \"\", \"order\": \"desc\", \"size\": 5}, \"schema\": \"segment\"}], \"title\": \"Wazuh App Overview Audit Files deleted\"}",
-			"uiStateJSON": "{}",
-			"description": "",
-			"version": 1,
-			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.data.id: 80791\",\"language\":\"lucene\"}}"
-			}
-		},
-		"_type": "visualization"
+		  "title": "Wazuh App Overview Audit Files deleted",
+		  "visState": "{\"title\":\"Wazuh App Overview Audit Files deleted\",\"type\":\"pie\",\"params\":{\"isDonut\":false,\"legendPosition\":\"right\",\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"data.audit.file.name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"\"}}]}",
+		  "uiStateJSON": "{}",
+		  "description": "",
+		  "version": 1,
+		  "kibanaSavedObjectMeta": {
+			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80791\",\"language\":\"lucene\"}}"
+		  }
+		}
 	},
 	{
 		"_id": "Wazuh-App-Overview-Audit-Last-alerts",
 		"_source": {
-			"title": "Wazuh App Overview Audit Last alerts",
-			"visState":
-				"{\"title\":\"Wazuh App Overview Audit Last alerts\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"agent.name\",\"size\":999999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agent\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule.description\",\"size\":999999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Event\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.audit.exe\",\"size\":999999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Command\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.audit.type\",\"size\":999999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Type\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.audit.euid\",\"size\":999999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Effective user ID\"}}]}",
-			"uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-			"description": "",
-			"version": 1,
-			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
-			}
+		  "title": "Wazuh App Overview Audit Last alerts",
+		  "visState": "{\"title\":\"Wazuh App Overview Audit Last alerts\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"agent.name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agent\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule.description\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Event\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.audit.exe\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Command\"}}]}",
+		  "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+		  "description": "",
+		  "version": 1,
+		  "kibanaSavedObjectMeta": {
+			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+		  }
 		},
 		"_type": "visualization"
 	},
@@ -1940,16 +1930,14 @@
 	{
 		"_id": "Wazuh-App-Agents-Audit-Last-alerts",
 		"_source": {
-			"title": "Wazuh App Agents Audit Last alerts",
-			"visState":
-				"{\"title\":\"Wazuh App Agents Audit Last alerts\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"agent.name\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agent name\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule.description\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Event\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.audit.exe\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Command\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.audit.type\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Type\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.audit.euid\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Effective user ID\"}}]}",
-			"uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-			"description": "",
-			"version": 1,
-			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
-			}
+		  "title": "Wazuh App Agents Audit Last alerts",
+		  "visState": "{\"title\":\"Wazuh App Agents Audit Last alerts\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"agent.name\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agent name\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule.description\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":1000,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Event\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.audit.exe\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Command\"}}]}",
+		  "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+		  "description": "",
+		  "version": 1,
+		  "kibanaSavedObjectMeta": {
+			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+		  }
 		},
 		"_type": "visualization"
 	},

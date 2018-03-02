@@ -1,6 +1,37 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
+### Added
+- Support for **Wazuh v3.2.1**.
+- **Brand-new first redesign for the app user interface** ([#278](https://github.com/wazuh/wazuh-kibana-app/pull/278)):
+  - This is the **very first iteration** of a *work-in-progress* **UX redesign** for the Wazuh app.
+  - The overall interface has been refreshed, **removing some unnecessary colors and shadow effects**.
+  - The metric visualizations have been **replaced by an information ribbon** under the filter search bar, reducing the amount of space they occupied.
+    - A new service was implemented for a proper handling of the metric visualizations watchers ([#280](https://github.com/wazuh/wazuh-kibana-app/pull/280)).
+  - The rest of the app visualizations now have a **new, more detailed card design**.
+- New **shards and replicas settings** to the `config.yml` file ([#277](https://github.com/wazuh/wazuh-kibana-app/pull/277)):
+  - Now you can apply **custom values** to the shards and replicas for the `.wazuh` and `.wazuh-version` indices.
+  - **Warning**: This feature only works before the installation process. If you modify this settings after installing the app, they won't be applied at all.
+
+### Changed
+- Now clicking again on the *Groups* tab on *Manager* will properly reload the tab and redirect to the beginning ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
+- Now the visualizations only use the `vis-id` attribute for loading them ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
+- The colors from the toast messages have been replaced to follow the Elastic 6 guidelines ([#286](https://github.com/wazuh/wazuh-kibana-app/pull/286)).
+
+### Fixed
+- Fixed wrong data flow on *Agents/General* when coming from and going to the *Groups* tab ([#273](https://github.com/wazuh/wazuh-kibana-app/pull/273)).
+- Fixed sorting on tables, now they use the sorting functionality provided by the Wazuh API ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
+- Fixed column width issues on some tables ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
+- Fixed bug on the *Agent configuration* JSON viewer who didn't properly show the full group configuration ([#276](https://github.com/wazuh/wazuh-kibana-app/pull/276)).
+- Fixed excesive loading time from some Audit visualizations ([#278](https://github.com/wazuh/wazuh-kibana-app/pull/278)).
+- Fixed Play/Pause button in timepicker's auto-refresh ([#281](https://github.com/wazuh/wazuh-kibana-app/pull/281)).
+- Fixed unusual scenario on visualization directive where sometimes there was duplicated implicit filters when doing a search ([#283](https://github.com/wazuh/wazuh-kibana-app/pull/283)).
+- Fixed some _Overview Audit_ visualizations who were not working properly ([#285](https://github.com/wazuh/wazuh-kibana-app/pull/285)).
+
+### Removed
+- Deleted the `id` attribute from all the app visualizations ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
+
 ## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 384
 ### Added
 - **New directives** for the Wazuh app: `wz-table`, `wz-table-header` and `wz-search-bar` ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)):

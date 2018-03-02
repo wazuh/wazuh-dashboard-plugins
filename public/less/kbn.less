@@ -53,7 +53,7 @@ border-bottom
 }
 
 .kuiLocalNav {
-  background-color: #e4e4e4 !important;
+  background-color: white !important;
 }
 
 .kbn-vis-value td {
@@ -96,6 +96,19 @@ border-bottom
   margin: 0px;
 }
 
+/* Overwriting toaster colors */
+.alert-danger {
+    background-color: #A30000 !important;
+    border-color: #700000 !important;
+    color: #ffffff !important;
+}
+
+.alert-info {
+    background-color: #1F6B7A !important;
+    border-color: #154751 !important;
+    color: #ffffff !important;
+}
+
 /* Hiding overflow for chart type visualizations */
 .kbn-chart .vis-container {
   overflow: hidden;
@@ -122,7 +135,7 @@ border-bottom
 /* Filter bar */
 
 .filter-bar {
-    background-color: #e4e4e4 !important;
+    background-color: white !important;
 }
 
 .chart {
@@ -157,6 +170,10 @@ kbn-dis .euiText {
     color: #FFF !important;
 }
 
+.kuiLocalSearchInput:focus {
+    box-shadow: none !important;
+}
+
 /****************************************************************************/
 /************************** Legacy integrations css *************************/
 /****************************************************************************/
@@ -176,7 +193,7 @@ kbn-dis .euiText {
 
  .legacy-searchbar .typeahead {
      padding: 4px 10px 0 !important;
-     background-color: #e4e4e4 !important;
+     background-color: white !important;
  }
 
 
@@ -198,6 +215,6 @@ table>thead>tr>th {
 }
 
 .hiddenRulesetDiscover {
-  visibility: hidden !important; 
+  visibility: hidden !important;
   height: 0px !important;
 }

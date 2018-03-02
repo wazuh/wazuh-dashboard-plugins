@@ -2,26 +2,36 @@
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
-
-        <div layout="row" layout-align="center stretch" class="height-120">
+        <div layout="row">
+            <md-card flex class="height-30 wz-metric-color">
+                <md-card-content layout="row" class="wz-padding-top-5">
+                    <span flex>Alerts: <b>{{totalAlerts}}</b></span>
+                    <span flex>Level 12 or above alerts: <b>{{level12}}</b></span>
+                    <span flex>Authentication failure: <b>{{authFailure}}</b></span>
+                    <span flex>Authentication success: <b>{{authSuccess}}</b></span>
+                </md-card-content>
+            </md-card>            
+        </div>
+                    
+        <div layout="row" layout-align="center stretch" class="height-120 wz-no-display">
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Metric-alerts'" id="Wazuh-App-Overview-General-Metric-alerts"></kbn-vis>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Metric-alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Level-12-alerts'" id="Wazuh-App-Overview-General-Level-12-alerts"></kbn-vis>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Level-12-alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Authentication-failure'" id="Wazuh-App-Overview-General-Authentication-failure"></kbn-vis>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Authentication-failure'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Authentication-success'" id="Wazuh-App-Overview-General-Authentication-success"></kbn-vis>
+                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Authentication-success'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
@@ -29,14 +39,16 @@
         <div layout="row" layout-align="start stretch" class="height-230">
             <md-card flex="40">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alert level evolution</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'" id="Wazuh-App-Overview-General-Alert-level-evolution"></kbn-vis>
+                    <span class="md-headline wz-vis-title">Alert level evolution</span>
+                    <md-divider></md-divider>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="60">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts'" id="Wazuh-App-Overview-General-Alerts"></kbn-vis>
+                    <span class="md-headline wz-vis-title">Alerts</span>
+                    <md-divider></md-divider>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
@@ -44,47 +56,23 @@
         <div layout="row" layout-align="space-between stretch" class="height-270">
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Top 5 agents</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Top-5-agents'" id="Wazuh-App-Overview-General-Top-5-agents"></kbn-vis>
+                    <span class="md-headline wz-vis-title">Top 5 agents</span>
+                    <md-divider></md-divider>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Top-5-agents'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex>
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts evolution - Top 5 agents</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'" id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents"></kbn-vis>
+                    <span class="md-headline wz-vis-title">Alerts evolution - Top 5 agents</span>
+                    <md-divider></md-divider>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="35">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Agents status</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Agents-status'" id="Wazuh-App-Overview-General-Agents-status"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
-
-        <div layout="row" layout-align="center stretch" class="height-120">
-            <md-card flex>
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Top source user</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-source-user'" id="Wazuh-App-Overview-General-Top-source-user"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Top source IP</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-source-IP'" id="Wazuh-App-Overview-General-Top-source-IP"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Top group</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-group'" id="Wazuh-App-Overview-General-Top-group"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Top PCI DSS requirement</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-General-Top-PCI-DSS-requirement'" id="Wazuh-App-Overview-General-Top-PCI-DSS-requirement"></kbn-vis>
+                    <span class="md-headline wz-vis-title">Agents status</span>
+                    <md-divider></md-divider>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-General-Agents-status'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
@@ -92,14 +80,16 @@
         <div layout="row" layout-align="center stretch" class="height-570">
             <md-card flex="60">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts summary</span>
+                    <span class="md-headline wz-vis-title">Alerts summary</span>
+                    <md-divider></md-divider>
                     <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-General-Alerts-summary'" id="Wazuh-App-Overview-General-Alerts-summary"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="40">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Groups summary</span>
-                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-General-Groups-summary'" id="Wazuh-App-Overview-General-Groups-summary"></kbn-vis>
+                    <span class="md-headline wz-vis-title">Groups summary</span>
+                    <md-divider></md-divider>
+                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-General-Groups-summary'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>

@@ -52,7 +52,7 @@
                             layout="row"
                             data="groupAgents"
                             keys="[
-                            {name:'ID',sortValue:'id'},
+                            {name:'ID',sortValue:'id',size:10},
                             {name:'Name',sortValue:'name'},
                             {name:'IP',sortValue:'ip'},
                             {name:'OS platform',sortValue:'os.platform'},
@@ -84,7 +84,7 @@
                         full="'agent'"
                         func="showAgent(agent)"
                         data="groupAgents"
-                        keys="['id','name','ip','os.platform','os.version','version']"
+                        keys="[{col:'id',size:10},'name','ip','os.platform','os.version','version']"
                         ng-if="lookingGroup && groupsSelectedTab==='agents'">
                     </wz-table>
 

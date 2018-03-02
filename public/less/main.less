@@ -85,7 +85,11 @@ md-content._md.layout-row {
 }
 
 md-content {
-    background-color: #e4e4e4;
+    background-color: white !important;
+}
+
+md-card {
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 2px 0px, rgba(0, 0, 0, 0.137255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.117647) 0px 0px 0px 0px !important;
 }
 
 md-card md-card-content {
@@ -98,6 +102,10 @@ i.fa.fa-times {
 
 a.pull-right {
     visibility: hidden;
+}
+
+.wz-no-display {
+    display: none !important;
 }
 
 .visualize-show-spy {
@@ -127,8 +135,9 @@ visualization .vis-container {
     overflow: hidden;
 }
 
-.md-whiteframe-1dp {
-    box-shadow: none;
+.md-whiteframe-1dp,
+.md-whiteframe-z1 {
+    box-shadow: none !important;
 }
 
 md-select:not([disabled]):focus .md-select-value,
@@ -165,4 +174,12 @@ md-select .md-select-value.md-select-placeholder {
 
 .cursor-pointer {
     cursor: pointer !important;
+}
+
+.wz-padding-top-5 {
+    padding-top: 5px !important;
+}
+
+.wz-metric-color {
+    background-color: #e4f2f5 !important;
 }

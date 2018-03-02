@@ -72,7 +72,7 @@ pre {
     position: relative;
     height: 25px;
     color: #666666;
-    background-color: #e4e4e4 !important;
+    background-color: #white !important;
 }
 /* Wazuh Header */
 
@@ -130,12 +130,12 @@ navbar {
 }
 
 .headBar {
-    background-color: #f7f7f7;
+    background-color: white !important;
     min-width: 463px;
 }
 
 .horizontalTabsBar {
-    background-color: #f7f7f7
+    background-color: white !important;
 }
 
 .tabView md-nav-bar md-nav-ink-bar {
@@ -168,13 +168,31 @@ navbar {
 /* Input filter box styles */
 
 .input-filter-box {
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 2px 0px, rgba(0, 0, 0, 0.137255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.117647) 0px 0px 0px 0px !important;
     font-size: 14px;
     padding: 0px 15px;
     margin-top: 18px;
     border: none;
     height: 40px;
     margin-right: 20px;
+}
+
+.input-filter-box:focus,
+md-autocomplete md-autocomplete-wrap input {
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 2px 0px, rgba(0, 0, 0, 0.137255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.117647) 0px 0px 0px 0px !important;
+}
+
+:focus:not([class^="eui"]) {
+    box-shadow: none;
+}
+
+/* Style to override outline on components but avoid hidden shadow on focus*/
+:focus:not(.wazuh-button, .input-filter-box) {
+    box-shadow: none !important;
+}
+
+md-autocomplete:focus {
+    box-shadow: none !important;
 }
 
 /* Progress Linear */
@@ -262,7 +280,7 @@ md-progress-linear ._md-bar {
 }
 
 .background-e4 {
-    background-color: #e4e4e4;
+    background-color: white;
 }
 
 .background-e2 {
