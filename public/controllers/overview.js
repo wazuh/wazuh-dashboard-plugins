@@ -105,7 +105,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     // Switch subtab
     $scope.switchSubtab = subtab => {
+        if ($scope.tabView === subtab) return;
+
         $scope.tabView = subtab;
+
         checkMetrics($scope.tab,subtab);
     }
     // Switch tab
