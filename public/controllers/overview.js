@@ -1,247 +1,39 @@
 const app = require('ui/modules').get('app/wazuh', []);
 import $ from 'jquery';
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler) {
+app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, metricService) {
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
     // Metrics General
-    let watcher1, watcher2, watcher3, watcher4;
-
-    $scope.totalAlerts = '';
-    $scope.level12     = '';
-    $scope.authFailure = '';
-    $scope.authSuccess = '';
-    const assignWatcher1 = () => {
-        watcher1 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-General-Metric-alerts\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-General-Metric-alerts\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.totalAlerts = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-    const assignWatcher2 = () => {
-        watcher2 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-General-Level-12-alerts\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-General-Level-12-alerts\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.level12 = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-
-    const assignWatcher3 = () => {
-        watcher3 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-General-Authentication-failure\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-General-Authentication-failure\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.authFailure = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-
-    const assignWatcher4 = () => {
-        watcher4 = $scope.$watch(() => {
-            return $('[vis-id="\'Wazuh-App-Overview-General-Authentication-success\'"] > visualize > visualization > div > div > div > div > div.metric-value.ng-binding > span').text();
-            if ($('[vis-id="\'Wazuh-App-Overview-General-Authentication-success\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-General-Authentication-success\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.authSuccess = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
+    const metricsGeneral = {
+        totalAlerts: '[vis-id="\'Wazuh-App-Overview-General-Metric-alerts\'"]',
+        level12    : '[vis-id="\'Wazuh-App-Overview-General-Level-12-alerts\'"]',
+        authFailure: '[vis-id="\'Wazuh-App-Overview-General-Authentication-failure\'"]',
+        authSuccess: '[vis-id="\'Wazuh-App-Overview-General-Authentication-success\'"]'
     }
 
     // Metrics FIM
-    let watcher5, watcher6, watcher7;
-
-    $scope.fimAdded    = '';
-    $scope.fimModified = '';
-    $scope.fimDeleted  = '';
-
-    const assignWatcher5 = () => {
-        watcher5 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-FIM-Added\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-FIM-Added\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.fimAdded = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-    const assignWatcher6 = () => {
-        watcher6 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-FIM-Modified\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-FIM-Modified\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.fimModified = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-
-    const assignWatcher7 = () => {
-        watcher7 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-FIM-Deleted\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-FIM-Deleted\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.fimDeleted = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
+    const metricsFim = {
+        fimAdded   : '[vis-id="\'Wazuh-App-Overview-FIM-Added\'"]',
+        fimModified: '[vis-id="\'Wazuh-App-Overview-FIM-Modified\'"]',
+        fimDeleted : '[vis-id="\'Wazuh-App-Overview-FIM-Deleted\'"]'
     }
 
     // Metrics Audit
-    let watcher8, watcher9, watcher10, watcher11;
-
-    $scope.auditNewFiles      = '';
-    $scope.auditReadFiles     = '';
-    $scope.auditModifiedFiles = '';
-    $scope.auditRemovedFiles  = '';
-
-    const assignWatcher8 = () => {
-        watcher8 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-Audit-New-files\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-Audit-New-files\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.auditNewFiles = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
+    const metricsAudit = {
+        auditNewFiles     : '[vis-id="\'Wazuh-App-Overview-Audit-New-files\'"]',
+        auditReadFiles    : '[vis-id="\'Wazuh-App-Overview-Audit-Read-files\'"]',
+        auditModifiedFiles: '[vis-id="\'Wazuh-App-Overview-Audit-Modified-files\'"]',
+        auditRemovedFiles : '[vis-id="\'Wazuh-App-Overview-Audit-Removed-files\'"]'
     }
-    const assignWatcher9 = () => {
-        watcher9 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-Audit-Read-files\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-Audit-Read-files\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.auditReadFiles = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-
-    const assignWatcher10 = () => {
-        watcher10 = $scope.$watch(() => {
-
-            if ($('[vis-id="\'Wazuh-App-Overview-Audit-Modified-files\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-Audit-Modified-files\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.auditModifiedFiles = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-
-    const assignWatcher11 = () => {
-        watcher11 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-Audit-Removed-files\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-Audit-Removed-files\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.auditRemovedFiles = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-
 
     // Metrics Vulnerability Detector
-    let watcher12, watcher13, watcher14, watcher15;
-
-    $scope.vulnCritical = '';
-    $scope.vulnHigh     = '';
-    $scope.vulnMedium   = '';
-    $scope.vulnLow      = '';
-
-    const assignWatcher12 = () => {
-        watcher12 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.vulnCritical = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-    const assignWatcher13 = () => {
-        watcher13 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.vulnHigh = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-
-    const assignWatcher14 = () => {
-        watcher14 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.vulnMedium = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
-    }
-
-    const assignWatcher15 = () => {
-        watcher15 = $scope.$watch(() => {
-            if ($('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]').html().includes('<span')) {
-                return $('[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]').html().split('<span>')[1].split('</span')[0];
-            }
-            return false;
-        }, (newVal, oldVal) => {
-            if (newVal !== oldVal) {
-                $scope.vulnLow = newVal;
-                if (!$scope.$$phase) $scope.$digest();
-            }
-        });
+    const metricsVulnerability = {
+        vulnCritical: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]',
+        vulnHigh    : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"]',
+        vulnMedium  : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"]',
+        vulnLow     : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
     }
 
     // Check the url hash and retrieve the tabView information
@@ -289,146 +81,38 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         virustotal: { group: 'virustotal' }
     };
 
-    const assignOverviewMetrics = () => {
-        assignWatcher1();
-        assignWatcher2();
-        assignWatcher3();
-        assignWatcher4();
-    }
-    const destroyOverviewMetrics = () => {
-        watcher1();
-        watcher2();
-        watcher3();
-        watcher4();
-        watcher1 = null;
-        watcher2 = null;
-        watcher3 = null;
-        watcher4 = null;
-    }
+    const checkMetrics = (tab,subtab) => {
+        metricService.destroyWatchers();
+        if(tab === 'general' && subtab === 'panels'){
+            metricService.createWatchers(metricsGeneral);
+        }
 
-    const assignFimMetrics = () => {
-        assignWatcher5();
-        assignWatcher6();
-        assignWatcher7();
-    }
+        if(tab === 'fim' && subtab === 'panels'){
+            metricService.createWatchers(metricsFim);
+        } 
 
-    const destroyFimMetrics = () => {
-        watcher5();
-        watcher6();
-        watcher7();
-        watcher5 = null;
-        watcher6 = null;
-        watcher7 = null;
-    }
+        if(tab === 'audit' && subtab === 'panels'){
+            metricService.createWatchers(metricsAudit);
+        } 
 
-    const assignAuditMetrics = () => {
-        assignWatcher8();
-        assignWatcher9();
-        assignWatcher10();
-        assignWatcher11();
+        if(tab === 'vuls' && subtab === 'panels'){
+            metricService.createWatchers(metricsVulnerability);
+        }
+        if(!$rootScope.$$phase) $rootScope.$digest();
     }
-
-    const destroyAuditMetrics = () => {
-        watcher8();
-        watcher9();
-        watcher10();
-        watcher11();
-        watcher8 = null;
-        watcher9 = null;
-        watcher10 = null;
-        watcher11 = null;
-    }
-
-    const assignVulnMetrics = () => {
-        assignWatcher12();
-        assignWatcher13();
-        assignWatcher14();
-        assignWatcher15();
-    }
-
-    const destroyVulnMetrics = () => {
-        watcher12();
-        watcher13();
-        watcher14();
-        watcher15();
-        watcher12 = null;
-        watcher13 = null;
-        watcher14 = null;
-        watcher15 = null;
-    }
-
-    if ($scope.tab === 'general' && $scope.tabView === 'panels' && !watcher1) {
-        assignOverviewMetrics();
-    }
-
-    if ($scope.tab === 'fim' && $scope.tabView === 'panels' && !watcher5) {
-        assignOverviewMetrics();
-    }
-
-    if ($scope.tab === 'audit' && $scope.tabView === 'panels' && !watcher8) {
-        assignAuditMetrics();
-    }
-
-    if ($scope.tab === 'vuls' && $scope.tabView === 'panels' && !watcher12) {
-        assignVulnMetrics();
-    }
+    
+    checkMetrics($scope.tab,$scope.tabView);
 
     // Switch subtab
     $scope.switchSubtab = subtab => {
         $scope.tabView = subtab;
-
-        if($scope.tab === 'general' && subtab === 'panels' && !watcher1){
-            assignOverviewMetrics();
-        } else if(watcher1) {
-            destroyOverviewMetrics();
-        }
-
-        if($scope.tab === 'fim' && subtab === 'panels' && !watcher5){
-            assignFimMetrics();
-        } else if(watcher5) {
-            destroyFimMetrics();
-        }
-
-        if($scope.tab === 'audit' && subtab === 'panels' && !watcher8){
-            assignAuditMetrics();
-        } else if(watcher8) {
-            destroyAuditMetrics();
-        }
-
-        if($scope.tab === 'vuls' && subtab === 'panels' && !watcher12){
-            assignVulnMetrics();
-        } else if(watcher8) {
-            destroyVulnMetrics();
-        }
-
+        checkMetrics($scope.tab,subtab);
     }
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
 
-        if(tab === 'general' && $scope.tabView === 'panels' && !watcher1){
-            assignOverviewMetrics();
-        } else if(watcher1) {
-            destroyOverviewMetrics();
-        }
-
-        if(tab === 'fim' && $scope.tabView === 'panels' && !watcher5){
-            assignFimMetrics();
-        } else if(watcher1) {
-            destroyFimMetrics();
-        }
-
-        if(tab === 'audit' && $scope.tabView === 'panels' && !watcher8){
-            assignAuditMetrics();
-        } else if(watcher8) {
-            destroyAuditMetrics();
-        }
-
-        if(tab === 'vuls' && $scope.tabView === 'panels' && !watcher12){
-            assignVulnMetrics();
-        } else if(watcher8) {
-            destroyVulnMetrics();
-        }
+        checkMetrics(tab,$scope.tabView);
 
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
@@ -461,10 +145,9 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                 h._scope.$destroy();
             }
         }
-        if(watcher1) destroyOverviewMetrics();
-        if(watcher5) destroyFimMetrics();
-        if(watcher8) destroyAuditMetrics();
-        if(watcher12) destroyVulnMetrics();
+
+        if(metricService.hasItems()) metricService.destroyWatchers();
+
         $rootScope.ownHandlers = [];
     });
 

@@ -8,6 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   - This is the **very first iteration** of a *work-in-progress* **UX redesign** for the Wazuh app.
   - The overall interface has been refreshed, **removing some unnecessary colors and shadow effects**.
   - The metric visualizations have been **replaced by an information ribbon** under the filter search bar, reducing the amount of space they occupied.
+    - A new service was implemented for a proper handling of the metric visualizations watchers ([#280](https://github.com/wazuh/wazuh-kibana-app/pull/280)).
   - The rest of the app visualizations now have a **new, more detailed card design**.
 - New **shards and replicas settings** to the `config.yml` file ([#277](https://github.com/wazuh/wazuh-kibana-app/pull/277)):
   - Now you can apply **custom values** to the shards and replicas for the `.wazuh` and `.wazuh-version` indices.
@@ -23,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed column width issues on some tables ([#274](https://github.com/wazuh/wazuh-kibana-app/pull/274)).
 - Fixed bug on the *Agent configuration* JSON viewer who didn't properly show the full group configuration ([#276](https://github.com/wazuh/wazuh-kibana-app/pull/276)).
 - Fixed excesive loading time from some Audit visualizations ([#278](https://github.com/wazuh/wazuh-kibana-app/pull/278)).
+- Fixed Play/Pause button in timepicker's auto-refresh ([#281](https://github.com/wazuh/wazuh-kibana-app/pull/281)).
 
 ### Removed
 - Deleted the `id` attribute from all the app visualizations ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
