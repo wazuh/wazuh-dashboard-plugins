@@ -83,6 +83,8 @@ app.controller('agentsController',
 
         // Switch subtab
         $scope.switchSubtab = subtab => {
+            if($scope.tabView === subtab) return;
+
             $scope.tabView = subtab;
             checkMetrics($scope.tab,subtab);
         }
