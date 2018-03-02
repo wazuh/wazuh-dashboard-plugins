@@ -950,7 +950,7 @@ function discoverController(
     if ($location.search().tab !=  $scope.tab) { // Changing filters
 
       $scope.tab = $location.search().tab;
-      queryFilter.removeAll();
+      //queryFilter.removeAll();
       loadFilters();
     }
     
@@ -958,7 +958,7 @@ function discoverController(
 
       $scope.agentId = $location.search().agent;
 
-      queryFilter.removeAll();
+      //queryFilter.removeAll();
       loadFilters();
     }
   });
