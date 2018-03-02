@@ -65,10 +65,10 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                             });     
 
                         } else if (rendered) { // There's a visualization object -> just update its filters
-                            
+
                             if ($rootScope.discoverPendingUpdates && implicitFilter && typeof $rootScope.discoverPendingUpdates[0].query === 'string') {
                                 if($rootScope.discoverPendingUpdates[0].query.length > 0 && !implicitFilter.includes($rootScope.discoverPendingUpdates[0].query)){
-                                    implicitFilter += ' AND ' + $rootScope.discoverPendingUpdates[0].query;
+                                    implicitFilter = originalImplicitFilter.length > 0 ? originalImplicitFilter + ' AND ' + $rootScope.discoverPendingUpdates[0].query : $rootScope.discoverPendingUpdates[0].query;
                                 } else if(implicitFilter.includes('AND') && $rootScope.discoverPendingUpdates[0].query.length === 0){
                                     implicitFilter = implicitFilter.split('AND')[0];                                    
                                 } else if(!implicitFilter.includes('AND') && $rootScope.discoverPendingUpdates[0].query.length === 0){
@@ -77,7 +77,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                             } else if ($rootScope.discoverPendingUpdates && !implicitFilter && typeof $rootScope.discoverPendingUpdates[0].query === 'string') {
                                 implicitFilter = $rootScope.discoverPendingUpdates[0].query;
                             }
-
+                            
                             if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
                                 visualization.searchSource
                                 .query({ language: 'lucene', query: implicitFilter })
