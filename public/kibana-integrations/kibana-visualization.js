@@ -42,7 +42,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                     }
                                 } else {
                                     // Other case, use the pending one, if it is empty, it won't matter
-                                    implicitFilter = $rootScope.discoverPendingUpdates[0].query;
+                                    implicitFilter = $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[0].query : '';
                                 }
 
                                 if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
@@ -84,7 +84,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                 }
                             } else {
                                 // Other case, use the pending one, if it is empty, it won't matter
-                                implicitFilter = $rootScope.discoverPendingUpdates[0].query;
+                                implicitFilter = $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[0].query : '';
                             }
                             
                             if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern

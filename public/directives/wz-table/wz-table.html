@@ -1,4 +1,4 @@
-<div flex ng-if="!isruleset && !isdecoders" layout="column" class="md-padding groupsFixPadding no-padding-bottom" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+<div flex ng-if="!isruleset && !isdecoders" layout="column" class="groupsFixPadding no-padding-bottom" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-if="!noscroll" flex class="clusterScrollable" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'odd'" ng-class-even="'even'" ng-repeat="item in data.items | filter : searchTerm"
             class="ownNavBarGroupsPadding agents-groups-preview groups-table groupsFixPadding wz-word-wrap wz-table-border" ng-class="!nopointer ? 'cursor-pointer' : '' "
