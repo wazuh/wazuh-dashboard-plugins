@@ -6,11 +6,11 @@
                     <md-card-content layout="row" class="wz-padding-top-5">
                         <span flex>Name: <b>{{agent.name}}</b></span>
                         <span flex>IP: <b>{{agent.ip}}</b></span>
-                        <span ng-if="agent.version" flex>Version:<b> {{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</b></span>
-                        <span ng-if="agent.group" flex>Group:<b> {{ agent.group }}</b></span>
-                        <span flex>OS:<b> {{ agentOS }}</b></span>
+                        <span flex ng-if="agent.version">Version:<b> {{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</b></span>
+                        <span flex ng-if="agent.group">Group:<b> {{ agent.group }}</b></span>
+                        <span flex="35">OS:<b> {{ agentOS }}</b></span>
                     </md-card-content>
-                </md-card>            
+                </md-card>
         </div>
         <div layout="row">
                 <md-card flex class="height-30 wz-metric-color">
@@ -34,7 +34,7 @@
                                 </md-tooltip>
                         </span>
                     </md-card-content>
-                </md-card>            
+                </md-card>
         </div>
     </div>
 
