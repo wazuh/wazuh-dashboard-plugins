@@ -81,10 +81,12 @@
 
                 <div flex layout="column" class="md-padding groupsFixPadding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
                     <div flex layout="column">
-                        <div layout="row" class="topMarginSearchBottom ownNavBarCluster groupsHeader">
-                            <h4>{{ groups.items[selectedGroup].name }} / {{ filename }}</h4>
+                        <div layout="row" class="topMarginSearchBottom groupsHeader">
+                            <span class="md-headline">{{ filename }}</span>
+                            <span flex></span>
+                            <span class="md-headline cursor-pointer" ng-click="goBackFiles()">close</span>
                         </div>
-                        <div flex layout="column" class="ownNavBarCluster">
+                        <div flex layout="column">
                             <pre flex class="json-beautifier jsonbeauty2"><code wz-dynamic="file"></code></pre>
                         </div>
                     </div>

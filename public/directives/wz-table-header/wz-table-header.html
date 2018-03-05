@@ -1,7 +1,7 @@
-<md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools wz-table-border" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+<md-toolbar layout="row" class="wazuh-toolbar md-toolbar-tools wz-bottom-border" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-repeat="key in keys" flex="{{key.size || ''}}">
         <span ng-if="key.sortValue" class="wz-table-header-color" ng-click="data.sort(key.sortValue)">{{key.name}}
-            <i class="fa cursor-pointer" ng-class="data.sortValue === key.sortValue ? (data.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+            <i class="fa cursor-pointer wz-color-sort-icon" ng-class="data.sortValue === key.sortValue ? (data.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                 aria-hidden="true"></i>
         </span>
         <span ng-if="!key.sortValue" class="wz-table-header-color">{{key.name}}</span>
