@@ -40,8 +40,8 @@
         </div>
 
         <div layout="row" layout-align="start stretch">
-            <wz-search-bar flex="60" class="margin-top-9" height="'height-41'" noleft="'margin-left-0'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
-            <md-input-container flex="20" class="md-block md-whiteframe-z1 md-input-margin">
+            <wz-search-bar flex="60" class="margin-top-17 wz-padding-right" height="'height-41'" noleft="'margin-left-0'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
+            <md-input-container flex="20" class="md-block md-whiteframe-z1 md-input-margin margin-top-17">
                 <md-select id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
                     <md-option value="all">All states</md-option>
                     <md-option value="active">Active</md-option>
@@ -50,7 +50,7 @@
                 </md-select>
             </md-input-container>
 
-            <md-input-container flex="20" class="md-block md-whiteframe-z1">
+            <md-input-container flex="20" class="md-block md-whiteframe-z1 margin-top-17">
                 <md-select id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
                     <md-option value="all">All OS platforms</md-option>
                     <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
