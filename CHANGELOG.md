@@ -9,6 +9,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 - Adjusted information ribbon in *Agents/General* for large OS names ([#290](https://github.com/wazuh/wazuh-kibana-app/pull/290)).
 
+### Removed
+- Removed many unused CSS classes from the app code ([#294](https://github.com/wazuh/wazuh-kibana-app/pull/294)).
+
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
 ### Added
 - Support for **Wazuh v3.2.1**.
