@@ -8,6 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 - Adjusted information ribbon in *Agents/General* for large OS names ([#290](https://github.com/wazuh/wazuh-kibana-app/pull/290)).
+- Fixed unsafe array access on the visualization directive when going directly into *Manager/Ruleset/Decoders* ([#293](https://github.com/wazuh/wazuh-kibana-app/pull/293)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
 ### Added
