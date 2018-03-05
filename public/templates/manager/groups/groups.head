@@ -1,4 +1,4 @@
-<div flex layout="column" ng-controller="groupsController" ng-if="submenuNavItem == 'groups'" class="groups-head-height">
+<div flex layout="column" ng-controller="groupsController" ng-if="submenuNavItem == 'groups'">
     <div class="display-none">
         <kbn-searchbar></kbn-searchbar>
     </div>

@@ -1,7 +1,10 @@
-<md-content flex layout="column" ng-controller="managerConfigurationController" class="manager-groups-main-div" ng-if="!load && submenuNavItem == 'configuration'">
+<md-content flex layout="column" ng-controller="managerConfigurationController" ng-if="!load && submenuNavItem == 'configuration'">
+
+    <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="load">
         <div></div>
     </div>
+
     <div flex layout="column" ng-show="!load" layout-align="start stretch">
         <div layout="row" flex>
             <md-card flex>

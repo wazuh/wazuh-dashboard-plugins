@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-controller="groupsPreviewController" class="manager-groups-main-div overflow-hidden" ng-if="groupsMenu == 'preview'">
+<md-content flex layout="column" ng-controller="groupsPreviewController" class="overflow-hidden" ng-if="groupsMenu == 'preview'">
     <div flex layout="column" layout-align="start stretch" ng-init="groupsSelectedTab='agents'">
         <div flex layout="column" ng-init="lookingGroup=false">
             <wz-search-bar ng-show="groupsSelectedTab==='agents' && lookingGroup" data="groupAgents" term="searchTermAgent" placetext="'Filter agents...'"></wz-search-bar>
