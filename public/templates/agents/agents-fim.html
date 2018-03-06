@@ -4,23 +4,23 @@
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" class="height-230">
-            <md-card flex="33">
+            <md-card flex="33" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Users</span>
+                    <span class="wz-headline-title">Users</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Users'">
                 </md-card-content>
             </md-card>
-            <md-card flex="33">
+            <md-card flex="33" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Groups</span>
+                    <span class="wz-headline-title">Groups</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Groups'">
                 </md-card-content>
             </md-card>
-            <md-card flex="33">
+            <md-card flex="33" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Permissions</span>
+                    <span class="wz-headline-title">Permissions</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Permissions'">
                 </md-card-content>
@@ -28,9 +28,9 @@
         </div>
 
         <div layout="row" class="height-230">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Events</span>
+                    <span class="wz-headline-title">Events</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Events'"></kbn-vis>
                 </md-card-content>
@@ -38,23 +38,23 @@
         </div>
 
         <div layout="row" class="height-230">
-            <md-card flex="33">
+            <md-card flex="33" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Files added</span>
+                    <span class="wz-headline-title">Files added</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Files-added'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="33">
+            <md-card flex="33" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Files modified</span>
+                    <span class="wz-headline-title">Files modified</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Files-modified'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="33">
+            <md-card flex="33" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Files deleted</span>
+                    <span class="wz-headline-title">Files deleted</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Files-deleted'"></kbn-vis>
                 </md-card-content>
@@ -62,9 +62,9 @@
         </div>
 
         <div layout="row" layout-align="space-between stretch" class="height-570">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts summary</span>
+                    <span class="wz-headline-title">Alerts summary</span>
                     <md-divider></md-divider>
                     <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Agents-FIM-Alerts-summary'"></kbn-vis>
                 </md-card-content>

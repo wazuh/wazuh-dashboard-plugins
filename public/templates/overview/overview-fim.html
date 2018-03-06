@@ -5,7 +5,7 @@
 
 
         <div layout="row">
-            <md-card flex class="height-30 wz-metric-color">
+            <md-card flex class="height-30 wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-top-5">
                     <div flex>Files added: <span class="wz-font-weight-bold">{{fimAdded}}</span></div>
                     <div flex>Files modified: <span class="wz-font-weight-bold">{{fimModified}}</span></div>
@@ -15,17 +15,17 @@
         </div>
         <div layout="row" class="height-400">
             <div flex="15" layout="column" class="wz-no-display">
-                <md-card flex>
+                <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
                         <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Added'" ></kbn-vis>
                     </md-card-content>
                 </md-card>
-                <md-card flex>
+                <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
                         <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Modified'"></kbn-vis>
                     </md-card-content>
                 </md-card>
-                <md-card flex>
+                <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
                         <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Deleted'"></kbn-vis>
                     </md-card-content>
@@ -33,9 +33,9 @@
             </div>
 
             <div flex layout="column">
-                <md-card flex>
+                <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
-                        <span class="md-headline">Events over time</span>
+                        <span class="wz-headline-title">Events over time</span>
                         <md-divider></md-divider>
                         <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Events-over-time'"></kbn-vis>
                     </md-card-content>
@@ -43,16 +43,16 @@
             </div>
 
             <div flex="30" layout="column">
-                <md-card flex>
+                <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
-                        <span class="md-headline">Top user owners</span>
+                        <span class="wz-headline-title">Top user owners</span>
                         <md-divider></md-divider>
                         <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-user-owners'"></kbn-vis>
                     </md-card-content>
                 </md-card>
-                <md-card flex>
+                <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
-                        <span class="md-headline">Top group owners</span>
+                        <span class="wz-headline-title">Top group owners</span>
                         <md-divider></md-divider>
                         <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-group-owners'"></kbn-vis>
                     </md-card-content>
@@ -61,25 +61,25 @@
         </div>
 
         <div layout="row" class="height-213">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Top file changes</span>
+                    <span class="wz-headline-title">Top file changes</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-file-changes'"></kbn-vis>
                 </md-card-content>
             </md-card>
 
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Root user file changes</span>
+                    <span class="wz-headline-title">Root user file changes</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Root-user-file-changes'"></kbn-vis>
                 </md-card-content>
             </md-card>
 
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">World writable modified files</span>
+                    <span class="wz-headline-title">World writable modified files</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-FIM-World-writable-modified-files'"></kbn-vis>
                 </md-card-content>
@@ -87,9 +87,9 @@
         </div>
 
         <div layout="row" class="height-570">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Events summary</span>
+                    <span class="wz-headline-title">Events summary</span>
                     <md-divider></md-divider>
                     <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-FIM-Events-summary'"></kbn-vis>
                 </md-card-content>

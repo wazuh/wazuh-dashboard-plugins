@@ -4,9 +4,9 @@
         <div flex layout="column" ng-init="lookingGroup=false">
             <div flex layout="column" class="md-padding">
                 <div layout="row" ng-if="lookingGroup">
-                    <md-card flex class="no-margin-left">
+                    <md-card flex class="no-margin-left wz-md-card">
                         <md-card-content>
-                            <span class="md-headline">Details</span>
+                            <span class="wz-headline-title">Details</span>
                             <md-divider></md-divider>
                             <div layout="row">
                                 <p class="manager-status-subtitle">Name</p>
@@ -22,15 +22,15 @@
                             </div>
                         </md-card-content>
                     </md-card>
-                    <md-card flex class="no-margin-right">
+                    <md-card flex class="no-margin-right wz-md-card">
                         <md-card-content>
-                            <span class="md-headline">Group</span>
+                            <span class="wz-headline-title">Group</span>
                             <md-divider></md-divider>
-                            <div layout="row" ng-class="groupsSelectedTab==='agents' ? 'wz-font-wight-bold' : ''">
+                            <div layout="row" ng-class="groupsSelectedTab==='agents' ? 'wz-font-weight-bold' : ''">
                                 <p class="manager-status-subtitle cursor-pointer" ng-click="goBackToAgents()">Agents</p>
                                 <p class="text-right cursor-pointer color-pointer" ng-click="goBackToAgents()">{{ groups.items[selectedGroup].count }} <i class="fa fa-eye"></i></p>
                             </div>
-                            <div layout="row" ng-class="groupsSelectedTab==='files' ? 'wz-font-wight-bold' : ''">
+                            <div layout="row" ng-class="groupsSelectedTab==='files' ? 'wz-font-weight-bold' : ''">
                                 <p class="manager-status-subtitle cursor-pointer" ng-click="goBackFiles()">Content</p>
                                 <p class="text-right cursor-pointer color-pointer" ng-click="goBackFiles()">{{ groupFiles.totalItems }} <i class="fa fa-eye"></i></p>
                             </div>
@@ -82,7 +82,7 @@
                 <div flex layout="column" class="md-padding groupsFixPadding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
                     <div flex layout="column">
                         <div layout="row" class="wz-margin-bottom-10 groupsHeader">
-                            <span class="md-headline">{{ filename }}</span>
+                            <span class="wz-headline-title">{{ filename }}</span>
                             <span flex></span>
                             <span class="md-headline cursor-pointer" ng-click="goBackFiles()">close</span>
                         </div>
