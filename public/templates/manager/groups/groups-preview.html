@@ -26,11 +26,11 @@
                         <md-card-content>
                             <span class="md-headline">Group</span>
                             <md-divider></md-divider>
-                            <div layout="row" ng-class="groupsSelectedTab==='agents' ? 'groups-bold' : ''">
+                            <div layout="row" ng-class="groupsSelectedTab==='agents' ? 'wz-font-wight-bold' : ''">
                                 <p class="manager-status-subtitle cursor-pointer" ng-click="goBackToAgents()">Agents</p>
                                 <p class="text-right cursor-pointer color-pointer" ng-click="goBackToAgents()">{{ groups.items[selectedGroup].count }} <i class="fa fa-eye"></i></p>
                             </div>
-                            <div layout="row" ng-class="groupsSelectedTab==='files' ? 'groups-bold' : ''">
+                            <div layout="row" ng-class="groupsSelectedTab==='files' ? 'wz-font-wight-bold' : ''">
                                 <p class="manager-status-subtitle cursor-pointer" ng-click="goBackFiles()">Content</p>
                                 <p class="text-right cursor-pointer color-pointer" ng-click="goBackFiles()">{{ groupFiles.totalItems }} <i class="fa fa-eye"></i></p>
                             </div>
