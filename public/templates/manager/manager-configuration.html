@@ -20,58 +20,58 @@
                                     <md-divider></md-divider>
 
                                     <p ng-if="managerConfiguration.global">
-                                        <a ng-class="selectedItem === 'global' ? 'underline-config' : ''" ng-click="switchItem('global')">
+                                        <a ng-class="selectedItem === 'global' ? 'wz-underline-config' : ''" ng-click="switchItem('global')">
                                             Global
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration.email_alerts">
-                                        <a ng-class="selectedItem === 'email_alerts' ? 'underline-config' : ''" ng-click="switchItem('email_alerts')">
+                                        <a ng-class="selectedItem === 'email_alerts' ? 'wz-underline-config' : ''" ng-click="switchItem('email_alerts')">
                                             E-mail alerts
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration.remote">
-                                        <a ng-class="selectedItem === 'remote' ? 'underline-config' : ''" ng-click="switchItem('remote')">
+                                        <a ng-class="selectedItem === 'remote' ? 'wz-underline-config' : ''" ng-click="switchItem('remote')">
                                             Remote
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration.cluster">
-                                        <a ng-class="selectedItem === 'cluster' ? 'underline-config' : ''" ng-click="switchItem('cluster')">
+                                        <a ng-class="selectedItem === 'cluster' ? 'wz-underline-config' : ''" ng-click="switchItem('cluster')">
                                             Cluster
                                         </a>
 
                                     </p>
                                     <p ng-if="managerConfiguration.auth">
-                                        <a ng-class="selectedItem === 'auth' ? 'underline-config' : ''" ng-click="switchItem('auth')">
+                                        <a ng-class="selectedItem === 'auth' ? 'wz-underline-config' : ''" ng-click="switchItem('auth')">
                                             Auth
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration.command">
-                                        <a ng-class="selectedItem === 'command' ? 'underline-config' : ''" ng-click="switchItem('command')">
+                                        <a ng-class="selectedItem === 'command' ? 'wz-underline-config' : ''" ng-click="switchItem('command')">
                                             Command
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration.syscheck">
-                                        <a ng-class="selectedItem === 'syscheck' ? 'underline-config' : ''" ng-click="switchItem('syscheck')">
+                                        <a ng-class="selectedItem === 'syscheck' ? 'wz-underline-config' : ''" ng-click="switchItem('syscheck')">
                                             Syscheck
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration.rootcheck">
-                                        <a ng-class="selectedItem === 'rootcheck' ? 'underline-config' : ''" ng-click="switchItem('rootcheck')">
+                                        <a ng-class="selectedItem === 'rootcheck' ? 'wz-underline-config' : ''" ng-click="switchItem('rootcheck')">
                                             Rootcheck
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration.ruleset">
-                                        <a ng-class="selectedItem === 'ruleset' ? 'underline-config' : ''" ng-click="switchItem('ruleset')">
+                                        <a ng-class="selectedItem === 'ruleset' ? 'wz-underline-config' : ''" ng-click="switchItem('ruleset')">
                                             Ruleset
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration.logcollector">
-                                        <a ng-class="selectedItem === 'logcollector' ? 'underline-config' : ''" ng-click="switchItem('logcollector')">
+                                        <a ng-class="selectedItem === 'logcollector' ? 'wz-underline-config' : ''" ng-click="switchItem('logcollector')">
                                             Logcollector
                                         </a>
                                     </p>
                                     <p ng-if="managerConfiguration['active-response'].length > 0">
-                                        <a ng-class="selectedItem === 'active-response' ? 'underline-config' : ''" ng-click="switchItem('active-response')">
+                                        <a ng-class="selectedItem === 'active-response' ? 'wz-underline-config' : ''" ng-click="switchItem('active-response')">
                                             Active response
                                         </a>
                                     </p>
@@ -80,7 +80,7 @@
                         </div>
 
                         <!-- Global -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='global'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='global'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -161,7 +161,7 @@
                         <!-- End global -->
 
                         <!-- E-mail alerts -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='email_alerts'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='email_alerts'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -213,7 +213,7 @@
                         <!-- End e-mail alerts -->
 
                         <!-- Remote -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='remote'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='remote'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -240,7 +240,7 @@
                         <!-- End remote -->
 
                         <!-- Cluster -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='cluster'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='cluster'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -280,7 +280,7 @@
                         <!-- End cluster -->
 
                         <!-- Syscheck -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='syscheck'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='syscheck'">
                             <div flex layout="row" class="md-padding">
                                 <div ng-class="managerConfiguration.syscheck.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
@@ -342,7 +342,7 @@
                         <!-- End syscheck -->
 
                         <!-- Rootcheck -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='rootcheck'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='rootcheck'">
                             <div flex layout="row" class="md-padding">
                                 <div ng-class="managerConfiguration.rootcheck.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
@@ -392,7 +392,7 @@
                         <!-- End rootcheck -->
 
                         <!-- Auth -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='auth'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='auth'">
                             <div flex layout="row" class="md-padding">
                                 <div ng-class="managerConfiguration.auth.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
@@ -457,7 +457,7 @@
                         <!-- End auth -->
 
                         <!-- Logcollector -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='logcollector'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='logcollector'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -499,7 +499,7 @@
                         <!-- End logcollector -->
 
                         <!-- Command -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='command'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='command'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -538,7 +538,7 @@
                         <!-- End logcollector -->
 
                         <!-- Ruleset -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='ruleset'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='ruleset'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -605,7 +605,7 @@
                         <!-- End ruleset -->
 
                         <!-- Active response -->
-                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='active-response'">
+                        <div layout="column" flex class="wz-margin-left-15" ng-show="selectedItem==='active-response'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
