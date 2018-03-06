@@ -175,7 +175,16 @@ app.controller('agentsController',
             }
         }
 
-        $scope.getAgent = async newAgentId => {
+        /** Prevents from double agent and come from autocomplete */
+        let lastAgent = null;
+        const checkDouble = id => {
+            if(lastAgent && lastAgent !== id){
+                $rootScope.agentsAutoCompleteFired = true;
+                if(!$rootScope.$$phase) $rootScope.$digest();
+            }            
+        }
+
+        $scope.getAgent = async (newAgentId,fromAutocomplete) => {
             try {
                 if($scope.tab === 'configuration'){
                     return $scope.getAgentConfig(newAgentId);
@@ -185,12 +194,15 @@ app.controller('agentsController',
                 // They passed an id
                 if (newAgentId) {
                     id = newAgentId;
+                    checkDouble(id);
                     $location.search('agent', id);
                 } else {
                     if ($location.search().agent && !$rootScope.globalAgent) { // There's one in the url
                         id = $location.search().agent;
+                        checkDouble(id);
                     } else { // We pick the one in the rootScope
                         id = $rootScope.globalAgent;
+                        checkDouble(id);
                         $location.search('agent', id);
                         delete $rootScope.globalAgent;
                     }
@@ -209,7 +221,7 @@ app.controller('agentsController',
 
                 // Agent
                 $scope.agent = data[0].data.data;
-
+                lastAgent    = data[0].data.data.id;
                 if ($scope.agent.os) {
                     $scope.agentOS = $scope.agent.os.name + ' ' + $scope.agent.os.version;
                 }

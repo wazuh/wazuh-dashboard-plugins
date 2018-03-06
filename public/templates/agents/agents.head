@@ -23,7 +23,7 @@
 					md-no-cache="true"
 					md-select-on-match="false"
 					md-selected-item="_swpagent"
-					md-selected-item-change="getAgent(_swpagent.id)"
+					md-selected-item-change="getAgent(_swpagent.id,true)"
 					md-search-text="searchTerm"
 					md-items="agentAutoComplete in analizeAgents(searchTerm)"
 					md-item-text="agentAutoComplete.name"
