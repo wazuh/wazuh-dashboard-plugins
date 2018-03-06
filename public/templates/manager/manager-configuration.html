@@ -87,31 +87,17 @@
                     </span>
                     <md-divider></md-divider>
                     <!-- Summary -->
-                    <div layout="row" ng-if="managerConfiguration.rootcheck.scanall">
-                        <p class="manager-status-subtitle">Scan all</p>
-                        <p class="text-right color-grey">{{managerConfiguration.rootcheck.scanall}}</p>
-                    </div>
                     <div layout="row" ng-if="managerConfiguration.rootcheck.frequency">
                         <p class="manager-status-subtitle">Frequency</p>
                         <p class="text-right color-grey">{{managerConfiguration.rootcheck.frequency}}</p>
                     </div>
+                    <div layout="row" ng-if="managerConfiguration.rootcheck.skip_nfs">
+                        <p class="manager-status-subtitle">Skip NFS</p>
+                        <p class="text-right color-grey">{{managerConfiguration.rootcheck.skip_nfs}}</p>
+                    </div>
                 </md-card-content>
             </md-card>
             <!-- END ROOTCHECK -->
-
-            <!-- RULESET -->
-            <md-card flex class="no-margin-left" ng-if="managerConfiguration.ruleset">
-                <md-card-content>
-                    <!-- Section title -->
-                    <span class="md-headline cursor-pointer" ng-click="switchItem('ruleset')">
-                        Ruleset <i class="fa fa-eye"></i>
-                        <md-tooltip md-direction="right">Click to see more details</md-tooltip>
-                    </span>
-                    <md-divider></md-divider>
-                    <p class="manager-status-subtitle">Ruleset settings</p>
-                </md-card-content>
-            </md-card>
-            <!-- END RULESET -->
 
             <!-- LOGCOLLECTOR -->
             <md-card flex class="no-margin-left" ng-if="managerConfiguration.logcollector">
@@ -170,6 +156,20 @@
                 </md-card-content>
             </md-card>
             <!-- END AUTH -->
+
+            <!-- RULESET -->
+            <md-card flex class="no-margin-left" ng-if="managerConfiguration.ruleset">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="md-headline cursor-pointer" ng-click="switchItem('ruleset')">
+                        Ruleset <i class="fa fa-eye"></i>
+                        <md-tooltip md-direction="right">Click to see more details</md-tooltip>
+                    </span>
+                    <md-divider></md-divider>
+                    <p class="manager-status-subtitle">Ruleset settings</p>
+                </md-card-content>
+            </md-card>
+            <!-- END RULESET -->
 
             <!-- COMMAND -->
             <md-card flex class="no-margin-left" ng-if="managerConfiguration.command">
