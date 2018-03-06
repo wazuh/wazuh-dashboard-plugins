@@ -10,7 +10,7 @@
         </md-input-container>
 
         <md-input-container class="md-whiteframe-z1 manager-log-input-2" flex="20">
-            <md-select ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="type_log == 'all' ? logs.removeFilter('type_log', true) : logs.addFilter('type_log', type_log)"
+            <md-select class="wz-border-none" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="type_log == 'all' ? logs.removeFilter('type_log', true) : logs.addFilter('type_log', type_log)"
                 aria-label="Logs level">
                 <md-option selected value="all">Choose log level</md-option>
                 <md-option value="info">Info</md-option>
