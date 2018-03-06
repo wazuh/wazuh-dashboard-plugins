@@ -1,19 +1,18 @@
 // Require CSS
 require('plugins/wazuh/less/loader');
-//require('plugins/wazuh/less/ui_framework.less');
 
 // Set up Wazuh app
-var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial'])
-  .config(['$compileProvider', function ($compileProvider) {
-    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
-  }])
-  .config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.useApplyAsync(true);
-  }]);
+const app = require('ui/modules').get('app/wazuh', ['ngCookies', 'ngMaterial']);
+
+app.config(['$compileProvider', function ($compileProvider) {
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
+}])
+
+app.config(['$httpProvider', function ($httpProvider) {
+  $httpProvider.useApplyAsync(true);
+}]);
 
 //Bootstrap and font awesome
-require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');
-require('plugins/wazuh/../node_modules/bootstrap/dist/js/bootstrap.min.js');
 require('plugins/wazuh/utils/fontawesome/css/font-awesome.min.css');
 require('plugins/wazuh/utils/when-scrolled/when-scrolled.js');
 require('../../../ui_framework/dist/ui_framework.css');

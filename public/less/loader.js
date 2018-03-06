@@ -13,4 +13,5 @@ require('plugins/wazuh/less/overview.less');
 require('plugins/wazuh/less/settings.less');
 require('plugins/wazuh/less/heights.less');
 require('plugins/wazuh/less/tables.less');
+require('plugins/wazuh/less/cleaned.less');
 import 'ui/styles/theme.less';
