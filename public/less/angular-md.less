@@ -1,7 +1,3 @@
-/* ------------------------------------------------------------------------ */
-/* ------------------ Full angular material overrides --------------------- */
-/* ------------------------------------------------------------------------ */
-
 .md-button.active {
     background-color: rgba(158, 158, 158, 0.2);
 }
@@ -10,7 +6,6 @@ md-card-content .ng-binding:not(.color-grey):not(.color-pointer) {
     color: black !important;
 }
 
-/* Fix text color from visualizations tooltips */
 .tooltip > .tooltip-inner {
     color: white !important;
 }
@@ -100,8 +95,6 @@ md-input-container ._md-placeholder {
     font-size: 16px;
 }
 
-/* Overriding the colour for the navbar */
-
 .md-button.md-accent {
     color: black;
 }
@@ -111,21 +104,13 @@ md-nav-bar md-nav-ink-bar {
     background: rgb(0,121,165);
 }
 
-/* ------------------------------------------------------------------------ */
-/* ------------------------ Override for md-switch ------------------------ */
-/* ------------------------------------------------------------------------ */
-
 md-switch.md-checked .md-bar {
-    background-color: rgba(0,121,165,0.5); /* set selected bar color */
+    background-color: rgba(0,121,165,0.5); 
 }
 
 md-switch.md-checked .md-thumb {
-    background-color: rgb(0,121,165); /* selected switch color */
+    background-color: rgb(0,121,165); 
 }
-
-/* ------------------------------------------------------------------------ */
-/* ----------------------- Wazuh class for md-select ---------------------- */
-/* ------------------------------------------------------------------------ */
 
 md-select {
     &.wazuh-select {
@@ -252,4 +237,15 @@ i.fa.fa-times {
 
 a.pull-right {
     visibility: hidden;
+
+md-tooltip.md-default-theme,
+md-tooltip {
+    color: white;
+    height: auto;
+}
+
+md-tooltip.md-default-theme .md-content,
+md-tooltip .md-content {
+    background-color: black;
+    height: auto;
 }

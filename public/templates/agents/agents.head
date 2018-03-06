@@ -9,7 +9,7 @@
 			<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
 				<div class="agents-head-1" ng-if="agent">
 					<div class="agents-head-2">
-						<span> <i class="fa fa-desktop agents-head-3" aria-hidden="true"></i>
+						<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
 						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
 					</div>
 
@@ -68,10 +68,10 @@
 		<div ng-show="tab != 'configuration'" class="horizontalTabsBar" layout="column" layout-align="end end">
 			<md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-					<i class="fa fa-th agents-head-6" aria-hidden="true"></i>Panels
+					<i class="fa fa-th wz-margin-right-6 wz-font-size-13" aria-hidden="true"></i>Panels
 				</md-nav-item>
 				<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-					<img class="agents-head-7" kbn-src="/plugins/wazuh/img/discover.svg">Discover
+					<img class="wz-margin-right-6 wz-width-16" kbn-src="/plugins/wazuh/img/discover.svg">Discover
 				</md-nav-item>
 			</md-nav-bar>
 		</div>

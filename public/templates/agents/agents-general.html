@@ -4,35 +4,35 @@
         <div layout="row">
                 <md-card flex class="height-30 wz-metric-color">
                     <md-card-content layout="row" class="wz-padding-top-5">
-                        <span flex>Name: <b>{{agent.name}}</b></span>
-                        <span flex>IP: <b>{{agent.ip}}</b></span>
-                        <span flex ng-if="agent.version">Version:<b> {{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</b></span>
-                        <span flex ng-if="agent.group">Group:<b> {{ agent.group }}</b></span>
-                        <span flex="35">OS:<b> {{ agentOS }}</b></span>
+                        <div flex>Name: <span class="wz-font-weight-bold">{{agent.name}}</span></div>
+                        <div flex>IP: <span class="wz-font-weight-bold">{{agent.ip}}</span></div>
+                        <div flex ng-if="agent.version">Version:<span class="wz-font-weight-bold"> {{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</span></div>
+                        <div flex ng-if="agent.group">Group:<span class="wz-font-weight-bold"> {{ agent.group }}</span></div>
+                        <div flex="35">OS:<span class="wz-font-weight-bold"> {{ agentOS }}</span></div>
                     </md-card-content>
                 </md-card>
         </div>
         <div layout="row">
                 <md-card flex class="height-30 wz-metric-color">
                     <md-card-content layout="row" class="wz-padding-top-5">
-                        <span flex>Last keep alive:<b> {{agent.lastKeepAlive || 'Unknown' }}</b></span>
-                        <span flex>Registration date:<b> {{agent.dateAdd}}</b></span>
-                        <span flex ng-if="agent.syscheck.inProgress">Last syscheck scan:<b> Scan in progress</b></span>
-                        <span flex ng-if="!agent.syscheck.inProgress">Last syscheck scan:<b> {{agent.syscheck.end || 'Unknown'}}</b>
+                        <div flex>Last keep alive:<span class="wz-font-weight-bold"> {{agent.lastKeepAlive || 'Unknown' }}</span></div>
+                        <div flex>Registration date:<span class="wz-font-weight-bold"> {{agent.dateAdd}}</span></div>
+                        <div flex ng-if="agent.syscheck.inProgress">Last syscheck scan:<span class="wz-font-weight-bold"> Scan in progress</span></div>
+                        <div flex ng-if="!agent.syscheck.inProgress">Last syscheck scan:<span class="wz-font-weight-bold"> {{agent.syscheck.end || 'Unknown'}}</span>
                                 <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom">
                                     Start time: {{ agent.syscheck.start || 'Unknown'}} <br>
                                     End time: {{ agent.syscheck.end || 'Unknown'}} <br>
                                     Duration time: {{ agent.syscheck.duration +' minutes' || 'Unknown'}}
                                 </md-tooltip>
-                        </span>
-                        <span flex ng-if="agent.rootcheck.inProgress">Last rootcheck scan:<b> Scan in progress</b></span>
-                        <span flex ng-if="!agent.rootcheck.inProgress">Last rootcheck scan:<b> {{agent.rootcheck.end || 'Unknown'}}</b>
+                            </div>
+                        <div flex ng-if="agent.rootcheck.inProgress">Last rootcheck scan:<span class="wz-font-weight-bold"> Scan in progress</span></div>
+                        <div flex ng-if="!agent.rootcheck.inProgress">Last rootcheck scan:<span class="wz-font-weight-bold"> {{agent.rootcheck.end || 'Unknown'}}</span>
                                 <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom">
                                     Start time: {{ agent.rootcheck.start || 'Unknown'}} <br>
                                     End time: {{ agent.rootcheck.end || 'Unknown'}} <br>
                                     Duration time: {{ agent.rootcheck.duration +' minutes' || 'Unknown'}}
                                 </md-tooltip>
-                        </span>
+                            </div>
                     </md-card-content>
                 </md-card>
         </div>
