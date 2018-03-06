@@ -2,12 +2,15 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 386
+### Added
+- **New design for the *Manager/Groups* tab** ([#295](https://github.com/wazuh/wazuh-kibana-app/pull/295)).
+
 ### Changed
 - Modified some app components for better follow-up of Kibana guidelines ([#290](https://github.com/wazuh/wazuh-kibana-app/pull/290)).
   - Also, some elements were modified on the *Discover* tab in order to correct some mismatches.
 
 ### Fixed
-- Adjusted information ribbon in *Agents/General* for large OS names ([#290](https://github.com/wazuh/wazuh-kibana-app/pull/290)).
+- Adjusted information ribbon in *Agents/General* for large OS names ([#290](https://github.com/wazuh/wazuh-kibana-app/pull/290) & [#294](https://github.com/wazuh/wazuh-kibana-app/pull/294)).
 - Fixed unsafe array access on the visualization directive when going directly into *Manager/Ruleset/Decoders* ([#293](https://github.com/wazuh/wazuh-kibana-app/pull/293)).
 
 ### Removed
