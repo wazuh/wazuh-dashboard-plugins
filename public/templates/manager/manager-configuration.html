@@ -70,11 +70,6 @@
                                             Logcollector
                                         </a>
                                     </p>
-                                    <!--<p ng-if="managerConfiguration['open-scap']">
-                                        <a ng-class="selectedItem === 'open-scap' ? 'underline-config' : ''" ng-click="switchItem('open-scap')">
-                                            OpenSCAP
-                                        </a>
-                                    </p>-->
                                     <p ng-if="managerConfiguration['active-response'].length > 0">
                                         <a ng-class="selectedItem === 'active-response' ? 'underline-config' : ''" ng-click="switchItem('active-response')">
                                             Active response
@@ -85,7 +80,7 @@
                         </div>
 
                         <!-- Global -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='global'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='global'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -166,7 +161,7 @@
                         <!-- End global -->
 
                         <!-- E-mail alerts -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='email_alerts'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='email_alerts'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -218,7 +213,7 @@
                         <!-- End e-mail alerts -->
 
                         <!-- Remote -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='remote'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='remote'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -245,7 +240,7 @@
                         <!-- End remote -->
 
                         <!-- Cluster -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='cluster'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='cluster'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -285,7 +280,7 @@
                         <!-- End cluster -->
 
                         <!-- Syscheck -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='syscheck'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='syscheck'">
                             <div flex layout="row" class="md-padding">
                                 <div ng-class="managerConfiguration.syscheck.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
@@ -347,7 +342,7 @@
                         <!-- End syscheck -->
 
                         <!-- Rootcheck -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='rootcheck'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='rootcheck'">
                             <div flex layout="row" class="md-padding">
                                 <div ng-class="managerConfiguration.rootcheck.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
@@ -397,7 +392,7 @@
                         <!-- End rootcheck -->
 
                         <!-- Auth -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='auth'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='auth'">
                             <div flex layout="row" class="md-padding">
                                 <div ng-class="managerConfiguration.auth.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
                                     <h4>
@@ -462,7 +457,7 @@
                         <!-- End auth -->
 
                         <!-- Logcollector -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='logcollector'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='logcollector'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -504,7 +499,7 @@
                         <!-- End logcollector -->
 
                         <!-- Command -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='command'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='command'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -543,7 +538,7 @@
                         <!-- End logcollector -->
 
                         <!-- Ruleset -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='ruleset'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='ruleset'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
@@ -609,68 +604,8 @@
                         </div>
                         <!-- End ruleset -->
 
-                        <!-- Wodle -->
-                        <!--<div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='open-scap'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-sliders"></i> OpenSCAP
-                                    </h4>
-                                    <md-divider></md-divider>
-                                    <p ng-if="managerConfiguration['open-scap'].disabled">
-                                        Disabled
-                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].disabled}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration['open-scap'].timeout">
-                                        Timeout
-                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].timeout}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration['open-scap'].interval">
-                                        Interval
-                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].interval}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration['open-scap']['scan-on-start']">
-                                        Scan on start
-                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap']['scan-on-start']}}</span>
-                                    </p>
-                                    <h4 ng-if="managerConfiguration['open-scap'].content">Content</h4>
-                                    <div ng-if="!isArray(managerConfiguration['open-scap'].content)">
-                                        <p>Policy
-                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.path}}
-                                            </span></p>
-                                        <p>Type
-                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.type}}
-                                            </span></p>
-                                        <p>Policy
-                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.path}}
-                                            </span></p>
-                                        <p ng-if="!isArray(managerConfiguration['open-scap'].content.profile)">
-                                            Profile <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.profile.$t}}</span>
-                                        </p>
-                                    </div>
-                                    <div ng-if="isArray(managerConfiguration['open-scap'].content)" ng-repeat="item in managerConfiguration['open-scap'].content track by $index">
-                                        <p>Policy
-                                            <span class="md-secondary pull-right">{{item.path}}
-                                            </span></p>
-                                        <p>Type
-                                            <span class="md-secondary pull-right">{{item.type}}
-                                            </span></p>
-                                        <p>Policy
-                                            <span class="md-secondary pull-right">{{item.path}}
-                                            </span></p>
-                                        <p ng-if="!isArray(item.profile)">
-                                            Profile <span class="md-secondary pull-right">{{item.profile.$t}}</span>
-                                        </p>
-                                        <md-divider ng-if="!$last"></md-divider>
-                                    </div>
-                                </div>
-                                <div flex></div>
-                            </div>
-                        </div> -->
-                        <!-- End wodle -->
-
                         <!-- Active response -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='active-response'">
+                        <div layout="column" flex class="wz-margin-left-15 topPaddingSearchNoBottom" ng-show="selectedItem==='active-response'">
                             <div flex layout="row" class="md-padding">
                                 <div flex="60">
                                     <h4>
