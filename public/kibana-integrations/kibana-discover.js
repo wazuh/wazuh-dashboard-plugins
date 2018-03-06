@@ -330,6 +330,20 @@ function discoverController(
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
+            
+            /** Start of "Prevents from double agent" */
+            let agentsIncluded = [];
+            queryFilter.getFilters().filter(item => {
+                if(typeof item.query.match['agent.id'] !== 'undefined') agentsIncluded.push(item);
+            });
+            if(agentsIncluded.length > 1) {
+                const lastAgent = agentsIncluded.pop();
+                agentsIncluded.filter(item => queryFilter.removeFilter(item));
+                queryFilter.addFilters(lastAgent);
+                agentsIncluded = [];
+            }
+            /** End of "Prevents from double agent" */
+
             $rootScope.discoverPendingUpdates = [];
             $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
             $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
@@ -926,7 +940,7 @@ function discoverController(
           );
         }
       }
-
+      
       queryFilter.addFilters(implicitFilter);
     }
   }
