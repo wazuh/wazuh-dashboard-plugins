@@ -60,6 +60,7 @@ require('plugins/wazuh/directives/wz-enter/wz-enter.js');
 require('plugins/wazuh/directives/wz-menu/wz-menu.js');
 require('plugins/wazuh/directives/wz-search-bar/wz-search-bar.js');
 require('plugins/wazuh/directives/wz-table-header/wz-table-header.js');
+require('plugins/wazuh/directives/wz-table-header/wz-table-header.less');
 require('plugins/wazuh/directives/wz-table/wz-table.js');
 
 // Blank Screen
