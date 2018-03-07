@@ -1,15 +1,13 @@
 <md-content flex layout="column" ng-if="tab === 'configuration' && configurationError" layout-align="start">
 
-    <!-- <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div> -->
-
     <!-- View: Panels -->
     <div layout="column" layout-align="start stretch">
+
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <div layout="row">
                     <div flex>
-                        <h4>
-                            <i class="fa fa-warning"></i> This agent has never been connected, therefore no group has been assigned.</h4>
+                        <h4><i class="fa fa-warning"></i> This agent has never been connected, therefore no group has been assigned.</h4>
                     </div>
                 </div>
                 <div layout="row">
@@ -28,7 +26,9 @@
                 </div>
             </md-card-content>
         </md-card>
+
     </div>
+
 </md-content>
 
 <md-content flex layout="column" ng-if="tab === 'configuration' && !configurationError" layout-align="start">

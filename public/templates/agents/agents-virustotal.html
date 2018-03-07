@@ -1,25 +1,26 @@
 <md-content flex layout="column" ng-if="tab === 'virustotal'" layout-align="start">
+
+    <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
+
         <div layout="row" class="height-120">
-
             <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total-Malicious'"></kbn-vis>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total-Malicious'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total-Positives'"></kbn-vis>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total-Positives'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total'"></kbn-vis>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total'"></kbn-vis>
                 </md-card-content>
             </md-card>
-
-
         </div>
+
         <div layout="row" class="height-250">
             <md-card flex="33" class="wz-md-card">
                 <md-card-content class="wazuh-column">
@@ -47,4 +48,5 @@
         </div>
 
     </div>
+
 </md-content>

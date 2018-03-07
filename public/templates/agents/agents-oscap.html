@@ -2,6 +2,7 @@
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
+
         <div layout="row" layout-align="center stretch" class="height-120">
             <md-card flex="20">
                 <md-card-content class="wazuh-column">
@@ -49,7 +50,6 @@
                     <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Content'"></kbn-vis>
                 </md-card-content>
             </md-card>
-
             <md-card flex="25">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Severity</span>
@@ -104,5 +104,7 @@
                 </md-card-content>
             </md-card>
         </div>
+        
     </div>
+
 </md-content>
