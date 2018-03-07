@@ -62,6 +62,7 @@ require('plugins/wazuh/directives/wz-search-bar/wz-search-bar.js');
 require('plugins/wazuh/directives/wz-table-header/wz-table-header.js');
 require('plugins/wazuh/directives/wz-table-header/wz-table-header.less');
 require('plugins/wazuh/directives/wz-table/wz-table.js');
+require('plugins/wazuh/directives/wz-table/wz-table.less');
 
 // Blank Screen
 require('plugins/wazuh/controllers/blank-screen-controller.js');
