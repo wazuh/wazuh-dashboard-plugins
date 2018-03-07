@@ -7,11 +7,11 @@
     <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'agents' }" md-nav-click="goToClick('#/agents-preview')" id="agents"><i class="fa fa-tv"></i> Agents</md-nav-item>
     <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'discover' }" md-nav-click="goToClick('#/wazuh-discover')" id="discover"><i class="fa fa-compass"></i> Discover</md-nav-item>
     <div class="wz-menu-nav-bar-api" layout="row" ng-show="theresAPI || theresPattern">
-        <div ng-show="theresAPI" layout layout-align="center center"><i class="fa fa-star fa-fw settings-template-1" aria-hidden="true"></i>{{ currentAPI }}&nbsp;&ndash;&nbsp;<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
-        <div ng-show="!theresAPI" layout layout-align="center center"><i class="fa fa-star fa-fw settings-template-1" aria-hidden="true"></i>No API &nbsp;&ndash;&nbsp;<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
+        <div ng-show="theresAPI" layout layout-align="center center"><i class="fa fa-star fa-fw wz-menu-star" aria-hidden="true"></i>{{ currentAPI }}&nbsp;&ndash;&nbsp;<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
+        <div ng-show="!theresAPI" layout layout-align="center center"><i class="fa fa-star fa-fw wz-menu-star" aria-hidden="true"></i>No API &nbsp;&ndash;&nbsp;<md-tooltip md-direction="bottom">Selected API</md-tooltip></div>
         <!-- <div ng-show="theresPattern" layout layout-align="center center">&nbsp;&ndash;&nbsp;{{ currentPattern }}<md-tooltip md-direction="bottom">Selected index-pattern</md-tooltip></div> -->
         <div ng-show="theresPattern && patternList && patternList.length > 1" layout layout-align="center center">
-            <md-select ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" placeholder="Index pattern" class="wazuh-select md-no-underline wz-border-none" aria-label="Select index pattern">
+            <md-select ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" placeholder="Index pattern" class="wz-menu-select md-no-underline wz-border-none" aria-label="Select index pattern">
                 <md-option ng-repeat="pattern in patternList" value="{{ pattern.id }}">{{ pattern.attributes.title }}</md-option>
             </md-select>
             <md-tooltip md-direction="bottom">Selected index pattern</md-tooltip>
