@@ -115,15 +115,6 @@
     margin: 4px !important;
 }
 
-.manager-ruleset-rules-button-bar {
-    padding-left: 0px;
-    padding-right: 0px;
-    min-height: 53px;
-    height: 53px;
-    padding-top: 5px;
-    padding-bottom: 0px;
-}
-
 .ruleset-card-info {
     background-color: rgb(0,121,165);
     height: 100%;
@@ -175,3 +166,83 @@
 .wz-md-navbar ._md-nav-button-text {
     color: black;   
  }
+
+ /* ------------------------------------------------------------------- */
+/* ------------------- Wazuh stylesheet for buttons ------------------ */
+/* ------------------------------------------------------------------- */
+
+.wazuh-button {
+    background-color: rgb(0,85,113) !important;
+    color: white !important;
+}
+
+.wazuh-button.active,
+.wazuh-button:not([disabled]):hover {
+    background-color: rgb(0,121,165) !important;
+}
+
+/* Custom Manager/Ruleset styles */
+.manager-ruleset-rules-rulbtn {
+    top: -3px;
+}
+
+/* Custom Manager/Ruleset styles */
+.manager-ruleset-rules-decbtn {
+    padding: 2px;
+    top: -3px;
+    margin-right: 0;
+}
+
+/* Custom Manager/Logs styles */
+.manager-log-buttonplay {
+    margin: 20px 7px !important;
+    margin-top: 20px;
+    width: 180px;
+}
+
+// KBN CSS
+
+.wazuh-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 100%;
+}
+
+.wazuhNavDiscover .euiTab {
+  font-size: 14px !important;
+}
+
+.wazuhNavDiscover .euiText {
+  font-size: 14px !important;
+}
+
+kbn-vis, visualize, visualization {
+  display: flex;
+  flex: 1 1 100%;
+}
+
+// MAIN LESS
+
+.no-padding-bottom {
+    padding-bottom: 0px !important;
+}
+
+.wz-no-display {
+    display: none !important;
+}
+
+.groupsNoMarginTop {
+    margin-top: 0px !important;
+}
+
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+.wz-padding-top-5 {
+    padding-top: 5px !important;
+}
+
+.wz-metric-color {
+    background-color: #e4f2f5 !important;
+}
