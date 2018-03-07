@@ -92,7 +92,7 @@ app.controller('agentsController',
 
             if($scope.tab === tab) return;
 
-            checkMetrics(tab,$scope.tabView);
+            checkMetrics(tab,'panels');
 
             if($rootScope.ownHandlers){
                 for(let h of $rootScope.ownHandlers){
