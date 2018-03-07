@@ -2,6 +2,7 @@
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
+
         <div layout="row">
             <md-card flex class="height-30 wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-top-5">
@@ -10,14 +11,14 @@
                     <div flex>Medium severity alerts: <span class="wz-font-weight-bold">{{vulnMedium}}</span></div>
                     <div flex>Low severity alerts: <span class="wz-font-weight-bold">{{vulnLow}}</span></div>
                 </md-card-content>
-            </md-card>            
+            </md-card>
         </div>
-                    
-        <div layout="row" class="wz-no-display">
-            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Critical-severity'"></kbn-vis>
-            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-High-severity'"></kbn-vis>
-            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Medium-severity'"></kbn-vis>
-            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Low-severity'"></kbn-vis>
+
+        <div class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Critical-severity'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-High-severity'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Medium-severity'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Low-severity'"></kbn-vis>
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-270">

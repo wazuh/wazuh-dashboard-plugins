@@ -3,7 +3,6 @@
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
-
         <div layout="row">
             <md-card flex class="height-30 wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-top-5">
@@ -11,14 +10,16 @@
                     <div flex>Files modified: <span class="wz-font-weight-bold">{{fimModified}}</span></div>
                     <div flex>Files deleted: <span class="wz-font-weight-bold">{{fimDeleted}}</span></div>
                 </md-card-content>
-            </md-card>            
+            </md-card>
         </div>
+
+        <div class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Added'" ></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Modified'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Deleted'"></kbn-vis>
+        </div>
+
         <div layout="row" class="height-400">
-            <div flex="15" class="wz-no-display">
-                <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Added'" ></kbn-vis>
-                <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Modified'"></kbn-vis>
-                <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Deleted'"></kbn-vis>
-            </div>
 
             <div flex layout="column">
                 <md-card flex class="wz-md-card">
@@ -46,6 +47,7 @@
                     </md-card-content>
                 </md-card>
             </div>
+
         </div>
 
         <div layout="row" class="height-213">
@@ -56,7 +58,6 @@
                     <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Top-file-changes'"></kbn-vis>
                 </md-card-content>
             </md-card>
-
             <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Root user file changes</span>
@@ -64,7 +65,6 @@
                     <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Root-user-file-changes'"></kbn-vis>
                 </md-card-content>
             </md-card>
-
             <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">World writable modified files</span>
@@ -83,5 +83,7 @@
                 </md-card-content>
             </md-card>
         </div>
+
     </div>
+
 </md-content>
