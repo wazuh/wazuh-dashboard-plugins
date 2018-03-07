@@ -13,27 +13,11 @@
             </md-card>            
         </div>
                     
-        <div layout="row" layout-align="center stretch" class="height-120 wz-no-display">
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Critical-severity'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-High-severity'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Medium-severity'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Low-severity'"></kbn-vis>
-                </md-card-content>
-            </md-card>
+        <div layout="row" class="wz-no-display">
+            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Critical-severity'"></kbn-vis>
+            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-High-severity'"></kbn-vis>
+            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Medium-severity'"></kbn-vis>
+            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Low-severity'"></kbn-vis>
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-270">

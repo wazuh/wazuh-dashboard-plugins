@@ -12,31 +12,11 @@
                 </md-card-content>
             </md-card>
         </div>
-        <div layout="row" layout-align="center stretch" class="wz-no-display">
-            <md-card flex>
-                <md-card-content>
-                    <span>New files</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-Audit-New-files'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content>
-                    <span>Read files</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Read-files'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content>
-                    <span>Modified files</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Modified-files'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content>
-                    <span>Removed files</span>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Removed-files'"></kbn-vis>
-                </md-card-content>
-            </md-card>
+        <div layout="row" class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Overview-Audit-New-files'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Read-files'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Modified-files'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-Audit-Removed-files'"></kbn-vis>
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-200">

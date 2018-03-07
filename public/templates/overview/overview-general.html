@@ -13,27 +13,11 @@
             </md-card>            
         </div>
                     
-        <div layout="row" layout-align="center stretch" class="height-120 wz-no-display">
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Metric-alerts'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Level-12-alerts'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Authentication-failure'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Authentication-success'"></kbn-vis>
-                </md-card-content>
-            </md-card>
+        <div layout="row" class="wz-no-display">
+            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Metric-alerts'"></kbn-vis>
+            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Level-12-alerts'"></kbn-vis>
+            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Authentication-failure'"></kbn-vis>
+            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-General-Authentication-success'"></kbn-vis>
         </div>
 
         <div layout="row" layout-align="start stretch" class="height-230">

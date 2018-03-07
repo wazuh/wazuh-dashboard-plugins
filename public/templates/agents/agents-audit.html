@@ -12,37 +12,13 @@
                 </md-card-content>
             </md-card>
         </div>
-        <div layout="row" layout-align="center stretch" class="wz-no-display">
-            <md-card flex>
-                <md-card-content>
-                    <span>New files</span>
-                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-New-files-metric'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content>
-                    <span>Read files</span>
-                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Read-files-metric'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content>
-                    <span>Modified files</span>
-                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Modified-files-metric'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content>
-                    <span>Removed files</span>
-                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Removed-files-metric'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="50">
-                <md-card-content>
-                    <div>Latest alert</div>
-                    <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Latest-alert'"></kbn-vis>
-                </md-card-content>
-            </md-card>
+
+        <div layout="row" class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Agents-Audit-New-files-metric'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Read-files-metric'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Modified-files-metric'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Removed-files-metric'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Latest-alert'"></kbn-vis>
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-230">

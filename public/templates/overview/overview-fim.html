@@ -14,22 +14,10 @@
             </md-card>            
         </div>
         <div layout="row" class="height-400">
-            <div flex="15" layout="column" class="wz-no-display">
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column">
-                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Added'" ></kbn-vis>
-                    </md-card-content>
-                </md-card>
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column">
-                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Modified'"></kbn-vis>
-                    </md-card-content>
-                </md-card>
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column">
-                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Deleted'"></kbn-vis>
-                    </md-card-content>
-                </md-card>
+            <div flex="15" class="wz-no-display">
+                <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Added'" ></kbn-vis>
+                <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Modified'"></kbn-vis>
+                <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-FIM-Deleted'"></kbn-vis>
             </div>
 
             <div flex layout="column">
