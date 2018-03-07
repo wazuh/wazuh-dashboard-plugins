@@ -12,18 +12,18 @@ app.config(['$httpProvider', function ($httpProvider) {
   $httpProvider.useApplyAsync(true);
 }]);
 
-//Bootstrap and font awesome
+// Font Awesome, Kibana UI framework and others
 require('plugins/wazuh/utils/fontawesome/css/font-awesome.min.css');
 require('plugins/wazuh/utils/when-scrolled/when-scrolled.js');
 require('../../../ui_framework/dist/ui_framework.css');
 
-//Material
+// Material
 require('plugins/wazuh/../node_modules/angular-material/angular-material.css');
 require('plugins/wazuh/../node_modules/angular-aria/angular-aria.js');
 require('plugins/wazuh/../node_modules/angular-animate/angular-animate.js');
 require('plugins/wazuh/../node_modules/angular-material/angular-material.js');
 
-//Cookies
+// Cookies
 require('plugins/wazuh/../node_modules/angular-cookies/angular-cookies.min.js');
 
 ////////////////////////////////////////////////////////////////////
