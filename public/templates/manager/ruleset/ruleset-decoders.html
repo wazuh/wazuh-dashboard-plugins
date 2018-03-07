@@ -24,13 +24,13 @@
                     md-search-text-change="analizeDecoders(searchTerm)" placeholder="Search..." lazy-load-data="decodersAutoComplete.nextPage()"
                     md-autofocus="" wz-enter="checkEnter(searchTerm)">
                     <md-item-template>
-                        <span class="item-title">
+                        <span>
                             <span>
                                 <strong md-highlight-text="search" md-highlight-flags="i"> {{decoder.file}} - {{decoder.name}} </strong>
                             </span>
                         </span>
-                        <span class="item-metadata">
-                            <span class="item-metastat"> {{decoder.type}} </span>
+                        <span>
+                            <span> {{decoder.type}} </span>
                         </span>
                     </md-item-template>
                     <md-not-found> No results matching "{{searchTerm}}" were found. </md-not-found>

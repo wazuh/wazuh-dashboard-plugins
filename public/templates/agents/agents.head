@@ -34,11 +34,11 @@
 					placeholder="Search by name, ID or IP address"
 					lazy-load-data="agentsAutoComplete.nextPage('')">
 						<md-item-template>
-							<span class="item-title">
+							<span>
 								<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>
 							</span>
-							<span class="item-metadata">
-								<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
+							<span>
+								<span md-highlight-text="searchTerm" md-highlight-flags="i"> {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
 							</span>
 						</md-item-template>
 						<md-not-found>
