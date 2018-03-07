@@ -9,8 +9,7 @@ app.directive('wzSearchBar',function(){
             data     : '=data',
             term     : '=term',
             placetext: '=placetext',
-            height   : '=height',
-            noleft   : '=noleft'
+            height   : '=height'
         },
         link: function(scope,ele,attrs){
 

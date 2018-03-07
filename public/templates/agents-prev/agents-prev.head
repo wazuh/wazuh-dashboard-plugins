@@ -4,4 +4,4 @@
         <wz-menu></wz-menu>
     </div>
 
-    <div flex layout="column" id="content" ng-class="tabView != 'discover' ? 'background-e4' : ''" >
+    <div flex layout="column" id="content" ng-class="tabView != 'discover' ? 'background-white' : ''" >
