@@ -31,7 +31,7 @@
                     <div>Never connected</div>
                 </md-card-content>
             </md-card>
-            <md-card flex="10" class="margin-right-0 wz-md-card">
+            <md-card flex="10" class="no-margin-right wz-md-card">
                 <md-card-content class="text-center">
                     <div class="font-size-16-pt">{{(agentsCoverity | number:2)}}%</div>
                     <div>Agents coverage</div>
@@ -40,7 +40,7 @@
         </div>
 
         <div layout="row" layout-align="start stretch">
-            <wz-search-bar flex="60" class="wz-margin-top-17 wz-padding-right" height="'height-41'" noleft="'margin-left-0'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
+            <wz-search-bar flex="60" class="wz-margin-top-17 wz-padding-right" height="'height-41'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
             <md-input-container flex="20" class="md-block md-whiteframe-z1 md-input-margin wz-margin-top-17">
                 <md-select class="wz-border-none" id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
                     <md-option value="all">All states</md-option>
