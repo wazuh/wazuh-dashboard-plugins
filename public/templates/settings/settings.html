@@ -1,4 +1,4 @@
-<md-content flex ng-controller="settingsController" layout="column">
+<div flex ng-controller="settingsController" layout="column">
 
     <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'settings'">
         <wz-menu></wz-menu>
@@ -18,7 +18,7 @@
         <md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api' && apiEntries.length == 0">
 
             <span class="wz-headline-title">Welcome to the Wazuh App for Kibana 6</span>
-            <md-divider></md-divider>
+            <md-divider class="wz-margin-top-10"></md-divider>
             <div>
                 <p>The Wazuh App brings together a new and useful web interface for managing and monitoring your Wazuh infrastructure.
                     You can check agent status, alert evolution, most recent events, popular alerts, top alert groups, etc.
@@ -67,7 +67,7 @@
         <md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api'">
 
             <span class="wz-headline-title">Wazuh App: API configuration</span>
-            <md-divider></md-divider>
+            <md-divider class="wz-margin-top-10"></md-divider>
 
             <div layout="row" layout-align="start start">
                 <p flex="15" class="text-bold">Cluster</p>
@@ -168,7 +168,7 @@
         <md-card class="wz-md-card" flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'extensions'">
 
             <span class="wz-headline-title">Wazuh App: Extensions</span>
-            <md-divider></md-divider>
+            <md-divider class="wz-margin-top-10"></md-divider>
 
             <p flex>Enable or disable extensions according to your needs. The extension includes: Panels and Discover, for Overview
                 / Agents tabs.</p>
@@ -254,7 +254,7 @@
         <md-card class="wz-md-card" flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'pattern'">
 
             <span class="wz-headline-title">Wazuh App: Index pattern selection</span>
-            <md-divider></md-divider>
+            <md-divider class="wz-margin-top-10"></md-divider>
 
             <p flex>Select the index pattern to run search and analytics against:</p>
             <p flex>
@@ -279,7 +279,7 @@
                 <md-card-content>
 
                     <span class="wz-headline-title">Wazuh App: About</span>
-                    <md-divider></md-divider>
+                    <md-divider class="wz-margin-top-10"></md-divider>
 
                     <div layout="row">
                         <p>The Wazuh App brings together a new and useful web interface for managing and monitoring your Wazuh
@@ -319,7 +319,7 @@
                 <md-card-content class="width-500">
 
                     <span class="wz-headline-title">Wazuh App: Version</span>
-                    <md-divider></md-divider>
+                    <md-divider class="wz-margin-top-10"></md-divider>
 
                     <div layout="row" layout-align="space-between center">
                         <p>App version</p>
@@ -339,4 +339,4 @@
         </md-content>
     </div>
 
-</md-content>
+</div>

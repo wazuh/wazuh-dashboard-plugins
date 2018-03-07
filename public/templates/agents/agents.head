@@ -6,14 +6,12 @@
 
 	<div layout="row" layout-align="space-between start" class="height-50">
 		<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-			<div class="agents-head-1" ng-if="agent">
-				<div class="agents-head-2">
+			<div flex class="layout-row" ng-if="agent">
+				<div class="flex">
 					<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
-					{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
-				</div>
+						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
 
-				<div class="agents-head-4">
-					<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)">{{formatAgentStatus(agent.status)}}</span>
+					<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
 				</div>
 			</div>
 

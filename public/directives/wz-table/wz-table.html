@@ -26,7 +26,7 @@
             <div ng-show="activeitem !== item.id" ng-repeat="key in keys" flex="{{key.size || ''}}">
                 <span>{{parseItem(item,key) || '---'}}</span>
             </div>
-            <div layout="column" flex ng-show="activeitem === item.id">
+            <div layout="column" flex ng-if="activeitem === item.id">
                 <div layout="row" class="wz-table-ruleset-card-info wz-table-size">
                     <div ng-repeat="key in keys" flex="{{key.size || ''}}">
                         <span>{{parseItem(item,key) || '---'}}</span>
@@ -36,7 +36,7 @@
                     <md-card flex class="wz-cursor-default wz-md-card">
                         <md-card-content>
                             <h1 class="wz-table-color-link wz-table-font">Overview</h1>
-                            <md-divider></md-divider>
+                            <md-divider class="wz-margin-top-10"></md-divider>
                             <div layout="row" class="wz-table-padding-top-10">
                                 <span flex>{{item.description}}</span>
                             </div>
@@ -59,7 +59,7 @@
                             <div layout="row" ng-if="item.groups.length > 0">
                                 <div flex>
                                     <h1 class="wz-table-color-link wz-table-font">Groups</h1>
-                                    <md-divider></md-divider>
+                                    <md-divider class="wz-margin-top-10"></md-divider>
                                     <div layout="row" class="wz-table-padding-top-10" ng-repeat="group in item.groups">
                                         <span flex class="listHover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('group', group)">{{group}}</span>
                                     </div>
@@ -69,7 +69,7 @@
                             <div layout="row" ng-if="item.pci.length > 0">
                                 <div flex>
                                     <h1 class="wz-table-color-link wz-table-font">PCI DSS</h1>
-                                    <md-divider></md-divider>
+                                    <md-divider class="wz-margin-top-10"></md-divider>
                                     <div layout="row" class="wz-table-padding-top-10" ng-repeat="pci in item.pci">
                                         <span flex class="listHover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('pci', pci)">{{pci}}</span>
                                     </div>
@@ -80,7 +80,7 @@
                     <md-card flex class="wz-cursor-default wz-md-card">
                         <md-card-content>
                             <h1 class="wz-table-color-link wz-table-font">Extra settings</h1>
-                            <md-divider></md-divider>
+                            <md-divider class="wz-margin-top-10"></md-divider>
                             <div layout="row" class="wz-table-padding-top-10" ng-repeat="(detailk, detailv) in item.details">
                                 <span flex>{{detailk}}</span>
                                 <span flex class="text-right color-grey">{{detailv}}</span>
@@ -111,7 +111,7 @@
                     <md-card flex class="wz-cursor-default wz-md-card">
                         <md-card-content>
                             <h1 class="wz-table-color-link wz-table-font">Overview</h1>
-                            <md-divider></md-divider>
+                            <md-divider class="wz-margin-top-10"></md-divider>
                             <div layout="row" class="wz-table-padding-top-10">
                                 <span flex>Full path</span>
                                 <span flex class="text-right color-grey">{{decoder.path}}</span>
@@ -129,7 +129,7 @@
                     <md-card flex class="wz-cursor-default wz-md-card" ng-if="detailk != 'parent'">
                         <md-card-content>
                             <h1 class="wz-table-color-link wz-table-font">Details</h1>
-                            <md-divider></md-divider>
+                            <md-divider class="wz-margin-top-10"></md-divider>
                             <div layout="row" class="wz-table-padding-top-10" ng-repeat="(detailk, detailv) in decoder.details">
                                 <span flex ng-if="((detailk !== 'regex') && (detailk !== 'order')) || (detailk === 'regex') || (detailk === 'regex')">{{detailk}}</span>
                                 <span flex class="text-right color-grey" ng-if="(detailk !== 'regex') && (detailk !== 'order')">{{detailv}}</span>
