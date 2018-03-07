@@ -58,12 +58,12 @@
                 md-autofocus=""
                 wz-enter="checkEnter(searchTerm)">
                     <md-item-template>
-                        <span class="item-title">
+                        <span>
                             <strong md-highlight-text="search" md-highlight-flags="i"> {{rule.file}} - {{rule.description}} </strong>
                         </span>
-                        <span class="item-metadata">
-                            <span class="item-metastat" ng-if="rule.type != 'pci'"> {{rule.type}} </span>
-                            <span class="item-metastat" ng-if="rule.type == 'pci'">PCI control</span>
+                        <span>
+                            <span ng-if="rule.type != 'pci'"> {{rule.type}} </span>
+                            <span ng-if="rule.type == 'pci'">PCI control</span>
                         </span>
                     </md-item-template>
                     <md-not-found>
