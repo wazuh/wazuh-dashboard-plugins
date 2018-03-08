@@ -45,28 +45,29 @@
     </div>
 
         <div layout="row" layout-align="start stretch">
-            <wz-search-bar flex="60" class="margin-top-17 wz-padding-right" height="'height-41'" noleft="'margin-left-0'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
-            <md-input-container flex="20" class="md-block md-whiteframe-z1 md-input-margin margin-top-17">
-                <md-select id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
-                    <md-option value="all">All states</md-option>
-                    <md-option value="active">Active</md-option>
-                    <md-option value="disconnected">Disconnected</md-option>
-                    <md-option value="Never Connected">Never connected</md-option>
-                </md-select>
-            </md-input-container>
+            <wz-search-bar flex="60" class="wz-margin-top-17 wz-padding-right" height="'height-41'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
 
-            <md-input-container flex="20" class="md-block md-whiteframe-z1 margin-top-17">
-                <md-select id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
-                    <md-option value="all">All OS platforms</md-option>
-                    <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
+            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
+                    <option value="all">All states</option>
+                    <option value="active">Active</option>
+                    <option value="disconnected">Disconnected</option>
+                    <option value="Never Connected">Never connected</option>
+                </select>
+            </div>
+
+            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 wz-margin-top-17 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
+                    <option value="all">All OS platforms</option>
+                    <option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
                         {{platform.name}} {{platform.version}}
-                    </md-option>
-                </md-select>
-            </md-input-container>
+                    </option>
+                </select>
+            </div>
         </div>
         <wz-table-header
-            layout="row" 
-            data="agents" 
+            layout="row"
+            data="agents"
             keys="[
                 {name:'ID',sortValue:'id',size:5},
                 {name:'Name',sortValue:'name',size:15},
@@ -78,10 +79,10 @@
             ]"
             >
         </wz-table-header>
-        <wz-table 
-            layout="column" 
+        <wz-table
+            layout="column"
             flex
-            data="agents" 
+            data="agents"
             func="showAgent(agent)"
             keys="[
                 {col:'id',size:5},
@@ -91,7 +92,7 @@
                 {col:'os.name',size:30},
                 {col:'os.version',size:15},
                 {col:'version',size:15}
-            ]" 
+            ]"
             class="no-lateral-padding"
             full="'agent'">
         </wz-table>

@@ -1,12 +1,12 @@
 <div flex ng-controller="overviewController" layout="column">
 
-    <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'overview'">
+    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'overview'">
         <wz-menu></wz-menu>
-    </md-content>
+    </div>
 
     <div layout="row" layout-align="space-between start" class="horizontalTabsBar">
         <div class="horizontalTabsBar" layout="column" layout-align="center start">
-            <md-nav-bar class="padding-right-0" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+            <md-nav-bar class="padding-right-0 wz-md-navbar" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
                 <md-nav-item md-nav-click="switchTab('general');" name="general">General</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('fim');" name="fim">File integrity</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy monitoring</md-nav-item>
@@ -20,12 +20,12 @@
         </div>
 
         <div class="horizontalTabsBar" layout="column" layout-align="end end">
-            <md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+            <md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
                 <md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-                    <i class="fa fa-th overview-head-1" aria-hidden="true"></i>Panels
+                    <i class="fa fa-th fa-fw"></i> Panels
                 </md-nav-item>
                 <md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-                    <img class="overview-head-2" kbn-src="/plugins/wazuh/img/discover.svg">Discover
+                    <i class="fa fa-compass fa-fw"></i> Discover
                 </md-nav-item>
             </md-nav-bar>
         </div>
@@ -43,7 +43,7 @@
 
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="resultState !== 'ready' && tabView === 'panels'">
-        <md-card flex layout="column">
+        <md-card flex layout="column" class="wz-md-card">
             <md-card-content class="text-center">
                 No results for selected time interval
             </md-card-content>

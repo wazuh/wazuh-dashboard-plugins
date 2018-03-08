@@ -6,9 +6,9 @@
     </div>
 
     <div ng-show="!loading" layout="row" layout-align="center start">
-        <md-card flex class="manager-ruleset-decoders-top-24">
+        <md-card flex class="manager-ruleset-decoders-top-24 wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="md-headline">Top 24h - Decoder name</span>
+                <span class="wz-headline-title">Top 24h - Decoder name</span>
                 <md-divider></md-divider>
                 <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Decoders-Top-24h-Decoder-name'"></kbn-vis>
             </md-card-content>
@@ -18,40 +18,39 @@
     <div ng-show="!loading" flex layout="column" class="manager-ruleset-decoders-no-padding">
         <div id="content" layout="row" layout-align="start start" class="manager-ruleset-decoders-top-content">
             <span layout="row" class="manager-ruleset-decoders-top-span" flex layout-align="space-between center">
-                <md-autocomplete flex id="Auto" md-input-id="autocomplete" md-select-on-match="true" md-no-cache="noCache" md-selected-item="filter"
+                <md-autocomplete flex id="Auto" class="wz-autocomplete" md-input-id="autocomplete" md-select-on-match="true" md-no-cache="noCache" md-selected-item="filter"
                     md-selected-item-change="decoders.addFilter('search', filter.name)" md-search-text="searchTerm" md-items="decoder in analizeDecoders(searchTerm)"
                     md-item-text="decoder.name +' '+ decoder.file" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
                     md-search-text-change="analizeDecoders(searchTerm)" placeholder="Search..." lazy-load-data="decodersAutoComplete.nextPage()"
                     md-autofocus="" wz-enter="checkEnter(searchTerm)">
                     <md-item-template>
-                        <span class="item-title">
+                        <span>
                             <span>
                                 <strong md-highlight-text="search" md-highlight-flags="i"> {{decoder.file}} - {{decoder.name}} </strong>
                             </span>
                         </span>
-                        <span class="item-metadata">
-                            <span class="item-metastat"> {{decoder.type}} </span>
+                        <span>
+                            <span> {{decoder.type}} </span>
                         </span>
                     </md-item-template>
                     <md-not-found> No results matching "{{searchTerm}}" were found. </md-not-found>
                 </md-autocomplete>
             </span>
 
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
+            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'wz-table-card-active' : ''" ng-click="setRulesTab('rules')"
                 class="wazuh-button md-raised md-primary manager-ruleset-decoders-btn" aria-label="Ruleset rules button">
                 Rules
             </md-button>
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
+            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'wz-table-card-active' : ''" ng-click="setRulesTab('decoders')"
                 class="wazuh-button md-raised md-primary manager-ruleset-decoders-btn" aria-label="Ruleset decoders button">
                 Decoders
             </md-button>
-
-            <md-input-container flex="20" class="md-whiteframe-z1 manager-ruleset-decoders-selector">
-                <md-select ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
-                    <md-option value="all">All</md-option>
-                    <md-option value="parents">Parents only</md-option>
-                </md-select>
-            </md-input-container>
+            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-right-15 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
+                    <option value="all">All</option>
+                    <option value="parents">Parents only</option>
+                </select>
+            </div>
         </div>
 
         <md-chips readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file') || decoders.hasFilter('path')">

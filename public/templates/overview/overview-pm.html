@@ -4,25 +4,25 @@
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row" layout-align="center stretch" class="height-290">
-            <md-card flex="50">
+            <md-card flex="50" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Events over time</span>
+                    <span class="wz-headline-title">Events over time</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Events-over-time'"></kbn-vis>
                 </md-card-content>
             </md-card>
 
-            <md-card flex="25">
+            <md-card flex="25" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Top 5 CIS Requirements</span>
+                    <span class="wz-headline-title">Top 5 CIS Requirements</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Top-5-CIS-requirements'"></kbn-vis>
                 </md-card-content>
             </md-card>
 
-            <md-card flex="25">
+            <md-card flex="25" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Top 5 PCI DSS Requirements</span>
+                    <span class="wz-headline-title">Top 5 PCI DSS Requirements</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Top-5-PCI-DSS-requirements'"></kbn-vis>
                 </md-card-content>
@@ -30,9 +30,9 @@
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-240">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Events per agent evolution</span>
+                    <span class="wz-headline-title">Events per agent evolution</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-PM-Events-per-agent-evolution'"></kbn-vis>
                 </md-card-content>
@@ -40,11 +40,11 @@
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-570">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts summary</span>
+                    <span class="wz-headline-title">Alerts summary</span>
                     <md-divider></md-divider>
-                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-PM-Alerts-summary'"></kbn-vis>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-PM-Alerts-summary'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>

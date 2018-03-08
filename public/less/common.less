@@ -1,18 +1,3 @@
-/* Common HTML styles */
-
-body {
-    min-width: 1250px;
-    width: 100%;
-}
-
-p {
-    margin-top: 4px !important;
-}
-
-body._md-toast-animating {
-    overflow-y: scroll !important;
-}
-
 /* Health check */
 
 .error-notify {
@@ -27,7 +12,7 @@ body._md-toast-animating {
 }
 
 .loading-logo {
-    position:relative ;
+    position: relative;
     top: -157px;
     width: 85px;
     text-align: center;
@@ -60,7 +45,7 @@ body._md-toast-animating {
     text-align: center;
 }
 
-pre {
+.wz-pre {
     white-space: pre-wrap;
     word-wrap: break-word;
     height: 200px;
@@ -72,23 +57,22 @@ pre {
     position: relative;
     height: 25px;
     color: #666666;
-    background-color: #white !important;
+    background-color: white !important;
 }
 /* Wazuh Header */
-
-.wazuh-h3 {
-    font-size: 18px !important;
-    font-weight: 400 !important;
-}
 
 .wazuh-h1 {
     font-size: 24px !important;
 }
 
-/* Fix typography for better consistency */
+  
 
 html, body, button:not(.fa):not(.fa-times), textarea, input, select {
     font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
+}
+
+.wz-line-height {
+    line-height: 20px !important;
 }
 
 /* Loading Ring styles */
@@ -122,13 +106,6 @@ div.uil-ring-css {
 
 /* Navbar Directive */
 
-navbar {
-    padding: 0 0px 6px 7px;
-}
-
-.md-tab.md-active {
-}
-
 .headBar {
     background-color: white !important;
     min-width: 463px;
@@ -136,14 +113,6 @@ navbar {
 
 .horizontalTabsBar {
     background-color: white !important;
-}
-
-.tabView md-nav-bar md-nav-ink-bar {
-    background-color: rgb(228, 228, 228);
-}
-
-.selectedItem {
-    background-color: rgba(129, 200, 222, 0.7) !important
 }
 
 .json-beautifier {
@@ -178,34 +147,47 @@ navbar {
     margin-right: 20px;
 }
 
-.input-filter-box:focus,
-md-autocomplete md-autocomplete-wrap input {
+.input-filter-box:focus {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid #D9D9D9 !important;
 }
 
+/* Styles for input containers */
+.wz-input-container label {
+    font-weight: 700 !important;
+    color: rgba(0, 0, 0, 0.38) !important;
+}
+
+.wz-input-container label.md-required:after {
+    color: #0079a5 !important;
+}
+
+.wz-input-container input,
+.wz-input-container input.md-input-invalid.md-input,
+.wz-input-container input.ng-invalid.ng-touched {
+    border-color: rgba(0,0,0,0.12) !important;
+}
+
+.wz-autocomplete md-autocomplete md-autocomplete-wrap input {
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Style to override outline on components but avoid hidden shadow on focus*/
+/* This is a really important fix and should not be deleted */
 :focus:not([class^="eui"]) {
     box-shadow: none;
 }
 
 /* Style to override outline on components but avoid hidden shadow on focus*/
-:focus:not(.wazuh-button, .input-filter-box) {
-    box-shadow: none !important;
-}
-
-md-autocomplete:focus {
+/* This is a really important fix and should not be deleted */
+:focus:not(.wazuh-button):not(.input-filter-box) {
     box-shadow: none !important;
 }
 
 /* Progress Linear */
 
-md-progress-linear.md-default-theme ._md-bar,
-md-progress-linear ._md-bar {
-    background-color: rgb(0,121,165);
-}
-
 .wazuh-loading md-progress-linear {
-  height: 20px !important;
+    height: 20px !important;
 }
 
 .wazuh-loading md-progress-linear .md-container {
@@ -213,25 +195,10 @@ md-progress-linear ._md-bar {
 }
 
 .wazuh-loading md-progress-linear .md-container .md-bar {
-      height: 20px !important;
+    height: 20px !important;
 }
 .wazuh-loading md-progress-linear .md-container .md-dashed:before {
-      height: 20px !important;
-    }
-
-
-/* Manager Groups Agents/Files tabs fix */
-.md-tab.md-active {
-    color: rgb(0,121,165) !important;
-}
-
-.directives-color-white,
-.directives-color-white button {
-    color: white !important;
-}
-
-.navItemChangeColor button{
-    background-color: #0079a5 !important;
+    height: 20px !important;
 }
 
 /* Common styles for text and font */
@@ -247,24 +214,12 @@ md-progress-linear ._md-bar {
     font-weight: bold !important;
 }
 
-.font-size-14-pt {
-    font-size: 14pt;
-}
-
-.font-size-15 {
-    font-size: 15px;
-}
-
 .font-size-16-pt {
     font-size: 16pt;
 }
 
 .font-size-18 {
     font-size: 18px;
-}
-
-.font-size-19-pt {
-    font-size: 19pt;
 }
 
 .font-size-25 {
@@ -274,14 +229,6 @@ md-progress-linear ._md-bar {
 /* Custom Background colours */
 
 .background-white {
-    background-color: white;
-}
-
-.background-f7 {
-    background-color: #f7f7f7;
-}
-
-.background-e4 {
     background-color: white;
 }
 
@@ -299,7 +246,6 @@ md-progress-linear ._md-bar {
     margin-top: 30px;
 }
 
-.margin-right-0,
 .no-margin-right {
     margin-right: 0px;
 }
@@ -327,20 +273,25 @@ md-progress-linear ._md-bar {
     overflow: hidden;
 }
 
-.display-none {
-	display: none;
+.wz-padding-left-16 {
+    padding-left: 16px
 }
 
-.agent-conf-panel {
-    padding-bottom: 0 !important;
-    overflow-y: auto !important;
+.wz-lateral-padding-16 {
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
-#agent-conf-raw-panel {
-    padding-top: 0 !important;
+/* Custom styles for tooltips */
+.wz-tooltip .md-content {
+    background-color: rgba(0,0,0,0.87) !important;
+    color: #FFF;
 }
 
+/* Special fix to make Kibana search bar similar to the rest from the app */
 
-#agent-conf-raw-card {
-    margin-top: 0 !important;
+.kuiLocalSearchInput,
+.kuiLocalSearchInput:focus {
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #D9D9D9 !important;
 }

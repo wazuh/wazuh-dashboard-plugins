@@ -5,31 +5,31 @@
         <div></div>
     </div>
 
-    <div ng-show="!loading" layout="row" layout-align="start stretch" layout-align="center start" class="manager-ruleset-rules-top-row lateral-padding-4">
-        <md-card flex>
+    <div ng-show="!loading" layout="row" layout-align="start stretch" layout-align="center start" class="manager-ruleset-rules-top-row">
+        <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="md-headline">Top 24h - Rule ID</span>
+                <span class="wz-headline-title">Top 24h - Rule ID</span>
                 <md-divider></md-divider>
                 <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Rule-ID'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex>
+        <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="md-headline">Top 24h - Groups</span>
+                <span class="wz-headline-title">Top 24h - Groups</span>
                 <md-divider></md-divider>
                 <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Groups'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex>
+        <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="md-headline">Top 24h - PCI DSS requirements</span>
+                <span class="wz-headline-title">Top 24h - PCI DSS requirements</span>
                 <md-divider></md-divider>
                 <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-PCI-DSS-requirements'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex>
+        <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="md-headline">Top 24h - Level</span>
+                <span class="wz-headline-title">Top 24h - Level</span>
                 <md-divider></md-divider>
                 <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Level'"></kbn-vis>
             </md-card-content>
@@ -37,9 +37,9 @@
     </div>
 
     <div ng-show="!loading" flex layout="column">
-        <div id="content" layout="row" layout-align="start start" class="manager-ruleset-rules-button-bar">
-            <span layout="row" class="manager-ruleset-rules-button-bar-span" flex layout-align="space-between center">
-                <md-autocomplete flex
+        <div id="content" layout="row" layout-align="start start" class="manager-ruleset-decoders-top-content">
+            <span layout="row" flex layout-align="space-between center">
+                <md-autocomplete flex class="wz-autocomplete"
                 id="Auto"
                 md-input-id="autocomplete"
                 md-select-on-match="true"
@@ -58,12 +58,12 @@
                 md-autofocus=""
                 wz-enter="checkEnter(searchTerm)">
                     <md-item-template>
-                        <span class="item-title">
+                        <span>
                             <strong md-highlight-text="search" md-highlight-flags="i"> {{rule.file}} - {{rule.description}} </strong>
                         </span>
-                        <span class="item-metadata">
-                            <span class="item-metastat" ng-if="rule.type != 'pci'"> {{rule.type}} </span>
-                            <span class="item-metastat" ng-if="rule.type == 'pci'">PCI control</span>
+                        <span>
+                            <span ng-if="rule.type != 'pci'"> {{rule.type}} </span>
+                            <span ng-if="rule.type == 'pci'">PCI control</span>
                         </span>
                     </md-item-template>
                     <md-not-found>
@@ -72,11 +72,11 @@
                 </md-autocomplete>
             </span>
 
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'active' : ''"
+            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'wz-table-card-active' : ''"
                 ng-click="setRulesTab('rules')" class="wazuh-button md-raised md-primary manager-ruleset-rules-rulbtn" aria-label="Ruleset rules button">
                 Rules
             </md-button>
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'active' : ''"
+            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'wz-table-card-active' : ''"
                 ng-click="setRulesTab('decoders')" class="wazuh-button md-raised md-primary manager-ruleset-rules-decbtn" aria-label="Ruleset decoders button">
                 Decoders
             </md-button>

@@ -2,13 +2,17 @@
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
+
         <div layout="row" layout-align="center stretch">
-            <md-card flex>
-                <md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height id="pciReq_tab">
+            <md-card class="wz-md-card" flex>
+                <md-tabs md-selected="selectedIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="pciReq_tab">
                     <md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                        <div flex  class="md-padding background-white">
-                            <h1 class="md-display-2 wazuh-h1 agents-pci-h1">PCI DSS Requirement: {{tab.title}}</h1>
-                            <div ng-bind-html="tab.content"></div>
+                        <div class="md-padding background-white">
+                            <span class="wz-headline-title" >PCI DSS Requirement: {{tab.title}}</span>
+                            <md-divider class="wz-margin-top-10"></md-divider>
+                            <div layout="row" class="wz-padding-top-10">
+                                <div ng-bind-html="tab.content"></div>
+                            </div>
                         </div>
                     </md-tab>
                 </md-tabs>
@@ -16,16 +20,16 @@
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-225">
-            <md-card flex="70">
+            <md-card class="wz-md-card" flex="70">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Requirements</span>
+                    <span class="wz-headline-title">Requirements</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-PCI-Requirements'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="30">
+            <md-card class="wz-md-card" flex="30">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Groups</span>
+                    <span class="wz-headline-title">Groups</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-PCI-Groups'"></kbn-vis>
                 </md-card-content>
@@ -33,13 +37,15 @@
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-570">
-            <md-card flex>
+            <md-card class="wz-md-card" flex>
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts summary</span>
+                    <span class="wz-headline-title">Alerts summary</span>
                     <md-divider></md-divider>
-                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Agents-PCI-Last-alerts'"></kbn-vis>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-PCI-Last-alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
+
     </div>
+
 </md-content>

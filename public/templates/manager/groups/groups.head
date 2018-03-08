@@ -1,5 +1,5 @@
 <div flex layout="column" ng-controller="groupsController" ng-if="submenuNavItem == 'groups'">
-    <div class="display-none">
+    <div class="wz-no-display">
         <kbn-searchbar></kbn-searchbar>
     </div>
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>

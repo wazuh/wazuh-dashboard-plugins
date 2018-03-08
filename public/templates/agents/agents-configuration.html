@@ -1,15 +1,13 @@
 <md-content flex layout="column" ng-if="tab === 'configuration' && configurationError" layout-align="start">
 
-    <!-- <div class='uil-ring-css' ng-show="resultState === 'loading' && tabView === 'panels'"><div></div></div> -->
-
     <!-- View: Panels -->
     <div layout="column" layout-align="start stretch">
-        <md-card flex>
+
+        <md-card flex class="wz-md-card">
             <md-card-content>
                 <div layout="row">
                     <div flex>
-                        <h4>
-                            <i class="fa fa-warning"></i> This agent has never been connected, therefore no group has been assigned.</h4>
+                        <h4><i class="fa fa-warning"></i> This agent has never been connected, therefore no group has been assigned.</h4>
                     </div>
                 </div>
                 <div layout="row">
@@ -28,13 +26,15 @@
                 </div>
             </md-card-content>
         </md-card>
+
     </div>
+
 </md-content>
 
 <md-content flex layout="column" ng-if="tab === 'configuration' && !configurationError" layout-align="start">
     <div flex layout="column" layout-align="start stretch" ng-init="showRaw=false">
         <div flex layout="row">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <div layout="row" class="md-padding">
                     <h1 flex="90" ng-show="!load" class="md-title">Current group:
                         <span ng-click="goGroup()" class="agents-head-5 blue cursor-pointer">{{groupName}}<md-tooltip md-direction="bottom">Click to go to the group details</md-tooltip></span>
@@ -61,31 +61,31 @@
                 </md-card-content>
 
                 <!-- No config -->
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="!groupConfiguration.config.syscheck && configTab==='fim'">
+                <div layout="row" class="wz-margin-left-15" ng-show="!groupConfiguration.config.syscheck && configTab==='fim'">
                     <div flex>
                         <h1 class="md-title text-center">No FIM configuration available</h1>
                         <p class="text-center">There's no FIM group configuration used for this agent.</p>
                     </div>
                 </div>
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="!groupConfiguration.config.rootcheck && configTab==='pm'">
+                <div layout="row" class="wz-margin-left-15" ng-show="!groupConfiguration.config.rootcheck && configTab==='pm'">
                     <div flex>
                         <h1 class="md-title text-center">No PM configuration available</h1>
                         <p class="text-center">There's no PM group configuration used for this agent.</p>
                     </div>
                 </div>
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="!groupConfiguration.config['localfile'] && configTab==='log'">
+                <div layout="row" class="wz-margin-left-15" ng-show="!groupConfiguration.config['localfile'] && configTab==='log'">
                     <div flex>
                         <h1 class="md-title text-center">No Log Collection configuration available</h1>
                         <p class="text-center">There's no Log Collection group configuration used for this agent.</p>
                     </div>
                 </div>
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="!groupConfiguration.config['active-response'] && configTab==='response'">
+                <div layout="row" class="wz-margin-left-15" ng-show="!groupConfiguration.config['active-response'] && configTab==='response'">
                     <div flex>
                         <h1 class="md-title text-center">No Active Response configuration available</h1>
                         <p class="text-center">There's no Active Response group configuration used for this agent.</p>
                     </div>
                 </div>
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="!groupConfiguration.config['open-scap'] && configTab==='scap'">
+                <div layout="row" class="wz-margin-left-15" ng-show="!groupConfiguration.config['open-scap'] && configTab==='scap'">
                     <div flex>
                         <h1 class="md-title text-center">No OpenSCAP configuration available</h1>
                         <p class="text-center">There's no OpenSCAP group configuration used for this agent.</p>
@@ -94,8 +94,8 @@
                 <!-- End no config -->
 
                 <!-- FIM -->
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config.syscheck && configTab==='fim' && !toggleRAW">
-                    <md-card flex>
+                <div layout="row" class="wz-margin-left-15" ng-show="groupConfiguration.config.syscheck && configTab==='fim' && !toggleRAW">
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -136,7 +136,7 @@
                             </div>
                         </div>
                     </md-card>
-                    <md-card flex>
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -161,8 +161,8 @@
                         </div>
                     </md-card>
                 </div>
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config.syscheck && configTab==='fim' && !toggleRAW">
-                    <md-card flex>
+                <div layout="row" class="wz-margin-left-15" ng-show="groupConfiguration.config.syscheck && configTab==='fim' && !toggleRAW">
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -190,7 +190,7 @@
                             </div>
                         </div>
                     </md-card>
-                    <md-card flex>
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -219,8 +219,8 @@
                 <!-- End FIM -->
 
                 <!-- PM -->
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config.rootcheck && configTab==='pm' && !toggleRAW">
-                    <md-card flex>
+                <div layout="row" class="wz-margin-left-15" ng-show="groupConfiguration.config.rootcheck && configTab==='pm' && !toggleRAW">
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -249,7 +249,7 @@
                             </div>
                         </div>
                     </md-card>
-                    <md-card flex>
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -298,7 +298,7 @@
                             </div>
                         </div>
                     </md-card>
-                    <md-card flex>
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -320,9 +320,9 @@
                         </div>
                     </md-card>
                 </div>
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config.rootcheck && configTab==='pm' && !toggleRAW">
+                <div layout="row" class="wz-margin-left-15" ng-show="groupConfiguration.config.rootcheck && configTab==='pm' && !toggleRAW">
 
-                    <md-card flex>
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -339,7 +339,7 @@
                             </div>
                         </div>
                     </md-card>
-                    <md-card flex>
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -352,8 +352,8 @@
                         </div>
                     </md-card>
                 </div>
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config.rootcheck && configTab==='pm' && !toggleRAW">
-                    <md-card flex>
+                <div layout="row" class="wz-margin-left-15" ng-show="groupConfiguration.config.rootcheck && configTab==='pm' && !toggleRAW">
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -365,7 +365,7 @@
                             </div>
                         </div>
                     </md-card>
-                    <md-card flex>
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -377,7 +377,7 @@
                             </div>
                         </div>
                     </md-card>
-                    <md-card flex>
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -393,14 +393,14 @@
                 <!-- End PM -->
 
                 <!-- Log -->
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config['localfile'] && configTab==='log' && !toggleRAW">
-                    <md-card flex>
+                <div layout="row" class="wz-margin-left-15" ng-show="groupConfiguration.config['localfile'] && configTab==='log' && !toggleRAW">
+                    <md-card flex class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
                                     <i class="fa fa-reorder"></i> Log Files</h4>
                                 <md-divider></md-divider>
-                                <div layout="column" ng-repeat="item in groupConfiguration.config['localfile']" class="md-subhead agents-groups-preview groupsFixPadding">
+                                <div layout="column" ng-repeat="item in groupConfiguration.config['localfile']" class="md-subhead groupsFixPadding">
                                     <div layout="row">
                                         <span flex ng-if="item.location" class="md-headline">{{item.location}}</span>
                                         <span flex ng-if="item.log_format" class="md-headline">{{item.log_format}}</span>
@@ -420,8 +420,8 @@
                 <!-- End Log -->
 
                 <!-- OpenScap -->
-                <div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config['open-scap'] && configTab==='scap' && !toggleRAW">
-                    <md-card flex="40">
+                <div layout="row" class="wz-margin-left-15" ng-show="groupConfiguration.config['open-scap'] && configTab==='scap' && !toggleRAW">
+                    <md-card flex="40" class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -455,7 +455,7 @@
                             </div>
                         </div>
                     </md-card>
-                    <md-card flex="40">
+                    <md-card flex="40" class="wz-md-card">
                         <div layout="row" class="md-padding">
                             <div flex>
                                 <h4>
@@ -479,25 +479,9 @@
                 </div>
                 <!-- End OpenScap -->
 
-                <!-- Active Response -->
-                <!--<div layout="row" class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="groupConfiguration.config['active-response'] && configTab==='response' && !toggleRAW">
-                    <md-card flex="50">
-                        <div layout="row" class="md-padding">
-                            <div flex>
-                                <h4>
-                                    <i class="fa fa-tasks"></i> Main Settings
-                                </h4>
-                                <md-divider></md-divider>
-
-                            </div>
-                        </div>
-                    </md-card>
-                </div>-->
-                <!-- End Active Response -->
-
                 <!-- JSON -->
-                <div layout="row" flex class="md-padding height-300 ownNavBarCluster topPaddingSearchNoBottom" ng-show="toggleRAW">
-                    <pre flex layout-fill class="json-beautifier"><code wz-dynamic="rawJSON"></code></pre>
+                <div layout="row" flex class="md-padding height-300 wz-margin-left-15" ng-show="toggleRAW">
+                    <pre flex layout-fill class="wz-pre json-beautifier"><code wz-dynamic="rawJSON"></code></pre>
                 </div>
                 <!-- End JSON -->
             </md-card>

@@ -236,7 +236,7 @@ module.exports = (server, options) => {
             reply({
                 'statusCode': 500,
                 'error':      9,
-                'message':    'Could not get data from elasticsearch'
+                'message':    error
             }).code(500);
         });
     };
