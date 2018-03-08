@@ -143,8 +143,7 @@ div.uil-ring-css {
     margin-right: 20px;
 }
 
-.input-filter-box:focus,
-md-autocomplete md-autocomplete-wrap input {
+.input-filter-box:focus {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid #D9D9D9 !important;
 }
@@ -163,6 +162,10 @@ md-autocomplete md-autocomplete-wrap input {
 .wz-input-container input.md-input-invalid.md-input,
 .wz-input-container input.ng-invalid.ng-touched {
     border-color: rgba(0,0,0,0.12) !important;
+}
+
+.wz-autocomplete md-autocomplete md-autocomplete-wrap input {
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
 /* Style to override outline on components but avoid hidden shadow on focus*/
@@ -266,9 +269,13 @@ md-autocomplete md-autocomplete-wrap input {
     overflow: hidden;
 }
 
+.wz-padding-left-16 {
+    padding-left: 16px
+}
+
 .wz-lateral-padding-16 {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
 /* Custom styles for tooltips */
