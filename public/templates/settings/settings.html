@@ -90,7 +90,7 @@
             <div ng-repeat="entry in apiEntries">
                 <div layout="row" layout-align="space-between center">
                     <p flex="15">
-                        <i ng-show="(entry._id === currentDefault)" tooltip="Set as default Manager" class="fa fa-star settings-template-1" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
+                        <i ng-show="(entry._id === currentDefault)" tooltip="Set as default Manager" tooltip-placement="right" class="fa fa-star settings-template-1" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
                     <p flex="20">{{entry._source.cluster_info.manager}}</p>
                     <p flex="15">{{entry._source.url}}</p>
                     <p flex="15">{{entry._source.api_port}}</p>
