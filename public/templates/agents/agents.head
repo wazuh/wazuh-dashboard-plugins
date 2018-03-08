@@ -13,36 +13,36 @@
 
 					<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
 				</div>
+				
+				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
+					<md-autocomplete id="agentsAutocomplete" flex
+					md-no-cache="true"
+					md-select-on-match="false"
+					md-selected-item="_swpagent"
+					md-selected-item-change="getAgent(_swpagent.id,true)"
+					md-search-text="searchTerm"
+					md-items="agentAutoComplete in analizeAgents(searchTerm)"
+					md-item-text="agentAutoComplete.name"
+					md-min-length="0"
+					md-no-asterisk="false"
+					md-menu-class="autocomplete-custom-agents-bar"
+					md-search-text-change="analizeAgents(searchTerm)"
+					placeholder="Search by name, ID or IP address"
+					lazy-load-data="agentsAutoComplete.nextPage('')">
+						<md-item-template>
+							<span class="item-title">
+								<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>
+							</span>
+							<span class="item-metadata">
+								<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
+							</span>
+						</md-item-template>
+						<md-not-found>
+							No agents matching "{{searchTerm}}" were found.
+						</md-not-found>
+					</md-autocomplete>
+				</span>
 			</div>
-
-			<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
-				<md-autocomplete id="agentsAutocomplete" flex class="wz-autocomplete"
-				md-no-cache="true"
-				md-select-on-match="false"
-				md-selected-item="_swpagent"
-				md-selected-item-change="getAgent(_swpagent.id)"
-				md-search-text="searchTerm"
-				md-items="agentAutoComplete in analizeAgents(searchTerm)"
-				md-item-text="agentAutoComplete.name"
-				md-min-length="0"
-				md-no-asterisk="false"
-				md-menu-class="autocomplete-custom-agents-bar"
-				md-search-text-change="analizeAgents(searchTerm)"
-				placeholder="Search by name, ID or IP address"
-				lazy-load-data="agentsAutoComplete.nextPage('')">
-					<md-item-template>
-						<span>
-							<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>
-						</span>
-						<span>
-							<span md-highlight-text="searchTerm" md-highlight-flags="i"> {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
-						</span>
-					</md-item-template>
-					<md-not-found>
-						No agents matching "{{searchTerm}}" were found.
-					</md-not-found>
-				</md-autocomplete>
-			</span>
 		</div>
 	</div>
 

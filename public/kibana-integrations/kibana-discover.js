@@ -330,6 +330,30 @@ function discoverController(
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
+            
+            /** Start of "Prevents from double agent" */
+            if($rootScope.agentsAutoCompleteFired){
+              let agentsIncluded = [];
+              // Get all filters related to agent.id and store them on an array
+              queryFilter.getFilters().filter(item => {
+                  if(typeof item.query.match['agent.id'] !== 'undefined') agentsIncluded.push(item);
+              });
+              // If the array has a length greater than 1 it means that there are more than one agent.id filter
+              if(agentsIncluded.length > 1) {
+                  // Keep safe the last agent.id filter
+                  const lastAgent = agentsIncluded.pop();
+                  // Remove all the agent.id filters
+                  agentsIncluded.filter(item => queryFilter.removeFilter(item));
+                  // Add the safe kept agent.id filter
+                  queryFilter.addFilters(lastAgent);
+                  // Clear the temporary array
+                  agentsIncluded = [];
+              }
+              $rootScope.agentsAutoCompleteFired = false;
+              if(!$rootScope.$$phase) $rootScope.$digest();
+            }
+            /** End of "Prevents from double agent" */
+
             $rootScope.discoverPendingUpdates = [];
             $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
             $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());

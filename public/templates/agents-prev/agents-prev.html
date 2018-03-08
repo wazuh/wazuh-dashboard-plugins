@@ -1,43 +1,48 @@
-<div flex ng-show="!loading" class="wz-margin-10" layout="column" layout-align="start space-around">
-
-        <div layout="row" layout-align="space-between stretch">
-            <md-card flex class="cardHover margin-left-0 wz-md-card">
-                <md-card-content class="text-center cursor-pointer" ng-click="showAgent(lastAgent)">
-                    <div class="font-size-16-pt">{{lastAgent.name}}</div>
-                    <div>Last registered agent</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="cardHover wz-md-card">
-                <md-card-content class="text-center cursor-pointer" ng-click="showAgent(mostActiveAgent)">
-                    <div class="font-size-16-pt">{{mostActiveAgent.name}}</div>
-                    <div>Higher activity</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex="10" class="wz-md-card">
-                <md-card-content class="text-center">
-                    <div class="font-size-16-pt">{{agentsCountActive}}</div>
-                    <div>Active</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex="10" layout="column" class="wz-md-card">
-                <md-card-content class="text-center">
-                    <div class="font-size-16-pt">{{agentsCountDisconnected}}</div>
-                    <div>Disconnected</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex="10" class="wz-md-card">
-                <md-card-content class="text-center">
-                    <div class="font-size-16-pt">{{agentsCountNeverConnected}}</div>
-                    <div>Never connected</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex="10" class="no-margin-right wz-md-card">
-                <md-card-content class="text-center">
-                    <div class="font-size-16-pt">{{(agentsCoverity | number:2)}}%</div>
-                    <div>Agents coverage</div>
-                </md-card-content>
-            </md-card>
-        </div>
+<div flex ng-show="!loading" class="agentsPreview" layout="column" layout-align="start space-around">
+    <div layout="row" layout-align="space-between stretch">
+        <md-card flex class="no-margin-left">
+            <md-card-content>
+                <span class="md-headline">Status</span>
+                <md-divider></md-divider>
+                <div layout="row">
+                    <div flex layout="column">
+                        <div layout="row">
+                            <p class="manager-status-subtitle">Active</p>
+                            <p class="text-right color-grey">{{agentsCountActive}}</p>
+                        </div>
+                        <div layout="row">
+                            <p class="manager-status-subtitle">Disconnected</p>
+                            <p class="text-right color-grey">{{agentsCountDisconnected}}</p>
+                        </div>
+                    </div>
+                    <div flex layout="column">
+                        <div layout="row">
+                            <p class="manager-status-subtitle">Never connected</p>
+                            <p class="text-right color-grey">{{agentsCountNeverConnected}}</p>
+                        </div>
+                        <div layout="row">
+                            <p class="manager-status-subtitle">Agents coverage</p>
+                            <p class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
+                        </div>
+                    </div>
+                </div>
+        </md-card-content>
+        </md-card>
+        <md-card flex class="no-margin-right">
+            <md-card-content>
+                <span class="md-headline">Top</span>
+                <md-divider></md-divider>
+                <div layout="row">
+                    <p class="manager-status-subtitle" ng-click="showAgent(lastAgent)">Last registered agent</p>
+                    <p class="text-right cursor-pointer color-pointer" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
+                </div>
+                <div layout="row">
+                    <p class="manager-status-subtitle" ng-click="showAgent(mostActiveAgent)">Higher activity</p>
+                    <p class="text-right cursor-pointer color-pointer" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
 
         <div layout="row" layout-align="start stretch">
             <wz-search-bar flex="60" class="wz-margin-top-17 wz-padding-right" height="'height-41'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
