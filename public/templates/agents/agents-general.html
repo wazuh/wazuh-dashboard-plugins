@@ -3,8 +3,8 @@
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
         <div layout="row">
-            <md-card flex class="height-30 wz-metric-color wz-md-card">
-                <md-card-content layout="row" class="wz-padding-top-5">
+            <md-card flex class="wz-metric-color wz-md-card">
+                <md-card-content layout="row" class="wz-padding-metric">
                     <div flex="25">Name: <span class="wz-font-weight-bold">{{agent.name}}</span></div>
                     <div flex="25">IP: <span class="wz-font-weight-bold">{{agent.ip}}</span></div>
                     <div flex ng-if="agent.version">Version:<span class="wz-font-weight-bold"> {{ agent.version | limitTo: 12 }}{{agent.version.length > 12 ? '...' : ''}}</span></div>
@@ -15,8 +15,8 @@
         </div>
 
         <div layout="row">
-            <md-card flex class="height-30 wz-metric-color wz-md-card">
-                <md-card-content layout="row" class="wz-padding-top-5">
+            <md-card flex class="wz-metric-color wz-md-card">
+                <md-card-content layout="row" class="wz-padding-metric">
                     <div flex="25">Last keep alive:<span class="wz-font-weight-bold"> {{agent.lastKeepAlive || 'Unknown' }}</span></div>
                     <div flex="25">Registration date:<span class="wz-font-weight-bold"> {{agent.dateAdd}}</span></div>
                     <div flex="25" ng-if="agent.syscheck.inProgress">Last syscheck scan:<span class="wz-font-weight-bold"> Scan in progress</span></div>
