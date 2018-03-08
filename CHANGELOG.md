@@ -4,14 +4,22 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 386
 ### Added
 - **New design for the *Manager/Groups* tab** ([#295](https://github.com/wazuh/wazuh-kibana-app/pull/295)).
+- **New design for the *Manager/Configuration* tab** ([#297](https://github.com/wazuh/wazuh-kibana-app/pull/297)).
+- **New design of agents statistics for the *Agents* tab** ([#299](https://github.com/wazuh/wazuh-kibana-app/pull/299)).
 
 ### Changed
-- Modified some app components for better follow-up of Kibana guidelines ([#290](https://github.com/wazuh/wazuh-kibana-app/pull/290)).
+- **Wazuh app visualizations reviewed** ([#301](https://github.com/wazuh/wazuh-kibana-app/pull/301)):
+  - The **number of used buckets has been limited**, since most of the table visualizations were surpassing acceptable limits.
+  - Some visualizations have been checked to see if they make complete sense on what they mean to show to the user.
+- Modified some app components for better follow-up of Kibana guidelines ([#290](https://github.com/wazuh/wazuh-kibana-app/pull/290) & [#297](https://github.com/wazuh/wazuh-kibana-app/pull/297)).
   - Also, some elements were modified on the *Discover* tab in order to correct some mismatches.
 
 ### Fixed
 - Adjusted information ribbon in *Agents/General* for large OS names ([#290](https://github.com/wazuh/wazuh-kibana-app/pull/290) & [#294](https://github.com/wazuh/wazuh-kibana-app/pull/294)).
 - Fixed unsafe array access on the visualization directive when going directly into *Manager/Ruleset/Decoders* ([#293](https://github.com/wazuh/wazuh-kibana-app/pull/293)).
+- Fixed a bug where navigating between agents in the *Agents* tab was generating duplicated `agent.id` implicit filters ([#296](https://github.com/wazuh/wazuh-kibana-app/pull/296)).
+- Fixed a bug where navigating between different tabs from *Overview* or *Agents* while being on the *Discover* sub-tab was causing data loss in metric watchers ([#298](https://github.com/wazuh/wazuh-kibana-app/pull/298)).
+- Fixed incorrect visualization of the rule level on *Manager/Ruleset/Rules* when the rule level is zero (0) ([#298](https://github.com/wazuh/wazuh-kibana-app/pull/298)).
 
 ### Removed
 - Removed many unused CSS classes from the app code ([#294](https://github.com/wazuh/wazuh-kibana-app/pull/294)).
