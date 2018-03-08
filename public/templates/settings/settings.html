@@ -95,25 +95,24 @@
                 </div>
                 <div layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id] && isEditing">
                     <form flex ng-submit="updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
-                        <md-input-container>
+                        <!-- Input section -->
+                        <md-input-container class="wz-input-container">
                             <label>Username</label>
-                            <input placeholder="" ng-init="formUpdate.user=entry._source.api_user" type="text" ng-model="formUpdate.user" aria-label="username"
-                                required/>
+                            <input ng-model="formUpdate.user" ng-init="formUpdate.user=entry._source.api_user" type="text" placeholder="" aria-label="username" required/>
                         </md-input-container>
-                        <md-input-container>
+                        <md-input-container class="wz-input-container">
                             <label>Password</label>
-                            <input placeholder="" type="password" ng-model="formUpdate.password" aria-label="password" required/>
+                            <input ng-model="formUpdate.password" type="password" placeholder="" aria-label="password" required/>
                         </md-input-container>
-                        <md-input-container>
+                        <md-input-container class="wz-input-container">
                             <label>URL</label>
-                            <input placeholder="https://" ng-init="formUpdate.url=entry._source.url" ng-model="formUpdate.url" type="url" aria-label="full url"
-                                required/>
+                            <input ng-model="formUpdate.url" ng-init="formUpdate.url=entry._source.url" type="url" placeholder="http(s)://" aria-label="full url" required/>
                         </md-input-container>
-                        <md-input-container>
+                        <md-input-container class="wz-input-container">
                             <label>Port</label>
-                            <input placeholder="" ng-init="formUpdate.port=entry._source.api_port" ng-model="formUpdate.port" type="text" aria-label="port"
-                                required/>
+                            <input ng-model="formUpdate.port" ng-init="formUpdate.port=entry._source.api_port" type="text" placeholder="" aria-label="port" required/>
                         </md-input-container>
+                        <!-- Button and errors section -->
                         <div layout="row" layout-align="center center" ng-if="messageError">
                             <p class="color-f9">{{messageErrorUpdate}}</p>
                         </div>
@@ -127,40 +126,38 @@
             </div>
 
             <div ng-show="!isUpdating()" layout="row" layout-align="center center">
-                <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="wazuh-button md-raised md-primary"
-                    aria-label="Add new API button">
+                <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="wazuh-button md-raised md-primary" aria-label="Add new API button">
                     <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new API
                 </md-button>
             </div>
 
-            <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-if="!currentAPI || ($parent.addManagerContainer && !isEditing)"
-                class="margin-top-30">
-                <md-input-container>
+            <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-if="!currentAPI || ($parent.addManagerContainer && !isEditing)" class="margin-top-30">
+                <!-- Input section -->
+                <md-input-container class="wz-input-container">
                     <label>Username</label>
-                    <input placeholder="" type="text" ng-model="formData.user" aria-label="username" required/>
+                    <input ng-model="formData.user" type="text" placeholder="" aria-label="username" required/>
                 </md-input-container>
-                <md-input-container>
+                <md-input-container class="wz-input-container">
                     <label>Password</label>
-                    <input placeholder="" type="password" ng-model="formData.password" aria-label="password" required/>
+                    <input ng-model="formData.password" type="password" placeholder="" aria-label="password" required/>
                 </md-input-container>
-                <md-input-container>
+                <md-input-container class="wz-input-container">
                     <label>URL</label>
-                    <input placeholder="https://" ng-model="formData.url" type="url" aria-label="full url" required/>
+                    <input ng-model="formData.url" type="url" placeholder="http(s)://" aria-label="full url" required/>
                 </md-input-container>
-                <md-input-container>
+                <md-input-container class="wz-input-container">
                     <label>Port</label>
-                    <input placeholder="" ng-model="formData.port" type="text" aria-label="port" required/>
+                    <input ng-model="formData.port" type="text" placeholder="" aria-label="port" required/>
                 </md-input-container>
+                <!-- Button and errors section -->
                 <div layout="row" layout-align="center center">
                     <p class="color-f9">{{messageError}}</p>
                 </div>
-
                 <div layout="row" layout-align="center center">
                     <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Save API button">
                         <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save API
                     </md-button>
                 </div>
-
             </form>
 
         </md-card>

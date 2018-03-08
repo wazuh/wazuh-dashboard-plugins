@@ -149,19 +149,38 @@ md-autocomplete md-autocomplete-wrap input {
     border: 1px solid #D9D9D9 !important;
 }
 
+/* Styles for input containers */
+.wz-input-container label {
+    font-weight: 700 !important;
+    color: rgba(0, 0, 0, 0.38) !important;
+}
+
+.wz-input-container label.md-required:after {
+    color: #0079a5 !important;
+}
+
+.wz-input-container input,
+.wz-input-container input.md-input-invalid.md-input,
+.wz-input-container input.ng-invalid.ng-touched {
+    border-color: rgba(0,0,0,0.12) !important;
+}
+
+/* Style to override outline on components but avoid hidden shadow on focus*/
+/* This is a really important fix and should not be deleted */
 :focus:not([class^="eui"]) {
     box-shadow: none;
 }
 
 /* Style to override outline on components but avoid hidden shadow on focus*/
-:focus:not(.wazuh-button):not(.input-filter-box) {
+/* This is a really important fix and should not be deleted */
+:focus:not(.wazuh-button, .input-filter-box) {
     box-shadow: none !important;
 }
 
 /* Progress Linear */
 
 .wazuh-loading md-progress-linear {
-  height: 20px !important;
+    height: 20px !important;
 }
 
 .wazuh-loading md-progress-linear .md-container {
@@ -169,11 +188,11 @@ md-autocomplete md-autocomplete-wrap input {
 }
 
 .wazuh-loading md-progress-linear .md-container .md-bar {
-      height: 20px !important;
+    height: 20px !important;
 }
 .wazuh-loading md-progress-linear .md-container .md-dashed:before {
-      height: 20px !important;
-    }
+    height: 20px !important;
+}
 
 /* Common styles for text and font */
 .text-center {
@@ -247,8 +266,21 @@ md-autocomplete md-autocomplete-wrap input {
     overflow: hidden;
 }
 
-
 .wz-lateral-padding-16 {
     padding-left: 16px !important;
     padding-right: 16px !important;
+}
+
+/* Custom styles for tooltips */
+.wz-tooltip .md-content {
+    background-color: rgba(0,0,0,0.87) !important;
+    color: #FFF;
+}
+
+/* Special fix to make Kibana search bar similar to the rest from the app */
+
+.kuiLocalSearchInput,
+.kuiLocalSearchInput:focus {
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #D9D9D9 !important;
 }
