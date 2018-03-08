@@ -64,10 +64,10 @@
 		<div ng-show="tab != 'configuration'" class="horizontalTabsBar" layout="column" layout-align="end end">
 			<md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-					<i class="fa fa-th overview-head-1" aria-hidden="true"></i>Panels
+					<i class="fa fa-th fa-fw" aria-hidden="true"></i>Panels
 				</md-nav-item>
 				<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-					<img class="overview-head-2" kbn-src="/plugins/wazuh/img/discover.svg">Discover
+					<i class="fa fa-compass fa-fw"></i> Discover
 				</md-nav-item>
 			</md-nav-bar>
 		</div>
