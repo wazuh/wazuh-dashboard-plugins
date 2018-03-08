@@ -3,25 +3,20 @@
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
-        <div layout="row" layout-align="center stretch" class="height-120">
-            <md-card flex="20" class="wz-md-card">
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Last score</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-OSCAP-Last-score'"></kbn-vis>
+        <div layout="row">
+            <md-card flex class="wz-metric-color wz-md-card">
+                <md-card-content layout="row" class="wz-padding-metric">
+                    <div flex>Last score: <span class="wz-font-weight-bold">{{scapLastScore}}</span></div>
+                    <div flex>Highest score: <span class="wz-font-weight-bold">{{scapHighestScore}}</span></div>
+                    <div flex>Lowest score: <span class="wz-font-weight-bold">{{scapLowestScore}}</span></div>
                 </md-card-content>
             </md-card>
-            <md-card flex="40" class="wz-md-card">
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Last agent scanned</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-OSCAP-Last-agent-scanned'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="40" class="wz-md-card">
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Last scan profile</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-OSCAP-Last-scan-profile'"></kbn-vis>
-                </md-card-content>
-            </md-card>
+        </div>
+
+        <div class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Overview-OSCAP-Last-score'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-OSCAP-Highest-score'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-OSCAP-Lowest-score'"></kbn-vis>
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-215">
@@ -79,27 +74,6 @@
                     <span class="wz-headline-title">Top 10 - High risk alerts</span>
                     <md-divider></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-OSCAP-Top-10-high-risk-alerts'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
-
-        <div layout="row" layout-align="center stretch" class="height-120">
-            <md-card flex="20" class="wz-md-card">
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Highest score</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-OSCAP-Highest-score'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="20" class="wz-md-card">
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Lowest score</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-OSCAP-Lowest-score'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="60" class="wz-md-card">
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Latest alert</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-OSCAP-Latest-alert'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>

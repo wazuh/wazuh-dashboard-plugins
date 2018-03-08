@@ -42,6 +42,13 @@ app.controller('agentsController',
             vulnLow     : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
         }
 
+        // Metrics Scap
+        const metricsScap = {
+            scapLastScore   : '[vis-id="\'Wazuh-App-Agents-OSCAP-Last-score\'"]',
+            scapHighestScore: '[vis-id="\'Wazuh-App-Agents-OSCAP-Higher-score-metric\'"]',
+            scapLowestScore : '[vis-id="\'Wazuh-App-Agents-OSCAP-Lower-score-metric\'"]'
+       }
+
         $rootScope.tabVisualizations = {
             general      : 7,
             fim          : 8,
@@ -76,6 +83,11 @@ app.controller('agentsController',
             if(tab === 'vuls' && subtab === 'panels'){
                 metricService.createWatchers(metricsVulnerability);
             }
+
+            if(tab === 'oscap' && subtab === 'panels'){
+                metricService.createWatchers(metricsScap);
+            }
+
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
 

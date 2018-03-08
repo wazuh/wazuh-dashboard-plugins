@@ -36,6 +36,13 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         vulnLow     : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
     }
 
+    // Metrics Scap
+    const metricsScap = {
+        scapLastScore   : '[vis-id="\'Wazuh-App-Overview-OSCAP-Last-score\'"]',
+        scapHighestScore: '[vis-id="\'Wazuh-App-Overview-OSCAP-Highest-score\'"]',
+        scapLowestScore : '[vis-id="\'Wazuh-App-Overview-OSCAP-Lowest-score\'"]'
+    }
+
     // Check the url hash and retrieve the tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
@@ -98,6 +105,11 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if(tab === 'vuls' && subtab === 'panels'){
             metricService.createWatchers(metricsVulnerability);
         }
+
+        if(tab === 'oscap' && subtab === 'panels'){
+            metricService.createWatchers(metricsScap);
+        }
+        
         if(!$rootScope.$$phase) $rootScope.$digest();
     }
     
