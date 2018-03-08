@@ -1,26 +1,26 @@
-<div flex ng-show="!loading" class="agentsPreview" layout="column" layout-align="start space-around">
+<div flex ng-show="!loading" class="md-padding" layout="column" layout-align="start space-around">
     <div layout="row" layout-align="space-between stretch">
         <md-card flex class="no-margin-left">
             <md-card-content>
-                <span class="md-headline">Status</span>
-                <md-divider></md-divider>
+                <span class="wz-headline-title">Status</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
-                        <div layout="row">
+                        <div layout="row" class="wz-padding-top-10">
                             <p class="manager-status-subtitle">Active</p>
                             <p class="text-right color-grey">{{agentsCountActive}}</p>
                         </div>
-                        <div layout="row">
+                        <div layout="row" class="wz-padding-top-10">
                             <p class="manager-status-subtitle">Disconnected</p>
                             <p class="text-right color-grey">{{agentsCountDisconnected}}</p>
                         </div>
                     </div>
                     <div flex layout="column">
-                        <div layout="row">
+                        <div layout="row" class="wz-padding-top-10">
                             <p class="manager-status-subtitle">Never connected</p>
                             <p class="text-right color-grey">{{agentsCountNeverConnected}}</p>
                         </div>
-                        <div layout="row">
+                        <div layout="row" class="wz-padding-top-10">
                             <p class="manager-status-subtitle">Agents coverage</p>
                             <p class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
                         </div>
@@ -30,13 +30,13 @@
         </md-card>
         <md-card flex class="no-margin-right">
             <md-card-content>
-                <span class="md-headline">Top</span>
-                <md-divider></md-divider>
-                <div layout="row">
+                <span class="wz-headline-title">Top</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
                     <p class="manager-status-subtitle" ng-click="showAgent(lastAgent)">Last registered agent</p>
                     <p class="text-right cursor-pointer color-pointer" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
                 </div>
-                <div layout="row">
+                <div layout="row" class="wz-padding-top-10">
                     <p class="manager-status-subtitle" ng-click="showAgent(mostActiveAgent)">Higher activity</p>
                     <p class="text-right cursor-pointer color-pointer" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
                 </div>
