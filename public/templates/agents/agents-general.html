@@ -21,7 +21,7 @@
                     <div flex="25">Registration date:<span class="wz-font-weight-bold"> {{agent.dateAdd}}</span></div>
                     <div flex="25" ng-if="agent.syscheck.inProgress">Last syscheck scan:<span class="wz-font-weight-bold"> Scan in progress</span></div>
                     <div flex="25" ng-if="!agent.syscheck.inProgress">Last syscheck scan:<span class="wz-font-weight-bold"> {{agent.syscheck.end || 'Unknown'}}</span>
-                        <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom">
+                        <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom" class="wz-tooltip">
                             Start time: {{ agent.syscheck.start || 'Unknown'}} <br>
                             End time: {{ agent.syscheck.end || 'Unknown'}} <br>
                             Duration time: {{ agent.syscheck.duration +' minutes' || 'Unknown'}}
@@ -29,7 +29,7 @@
                     </div>
                     <div flex ng-if="agent.rootcheck.inProgress">Last rootcheck scan:<span class="wz-font-weight-bold"> Scan in progress</span></div>
                     <div flex ng-if="!agent.rootcheck.inProgress">Last rootcheck scan:<span class="wz-font-weight-bold"> {{agent.rootcheck.end || 'Unknown'}}</span>
-                        <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom">
+                        <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom" class="wz-tooltip">
                             Start time: {{ agent.rootcheck.start || 'Unknown'}} <br>
                             End time: {{ agent.rootcheck.end || 'Unknown'}} <br>
                             Duration time: {{ agent.rootcheck.duration +' minutes' || 'Unknown'}}
@@ -101,7 +101,7 @@
                 </md-card-content>
             </md-card>
         </div>
-        
+
     </div>
 
 </md-content>

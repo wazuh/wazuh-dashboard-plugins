@@ -7,6 +7,8 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
     $scope.logs        = Logs;
     $scope.realtime    = false;
     $scope.realLogs    = [];
+    $scope.type_log    = 'all';
+    $scope.category    = 'all';
     let intervalId     = null;
 
     const getRealLogs = async () => {

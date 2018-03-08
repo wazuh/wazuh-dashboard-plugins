@@ -37,7 +37,7 @@
             <md-card flex class="wz-md-card">
                 <div layout="row" class="md-padding">
                     <h1 flex="90" ng-show="!load" class="md-title">Current group:
-                        <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="bottom">Click to go to the group details</md-tooltip></span>
+                        <span ng-click="goGroup()" class="agents-head-5 blue">{{groupName}}<md-tooltip md-direction="bottom" class="wz-tooltip">Click to go to the group details</md-tooltip></span>
                         &nbsp;&ndash;&nbsp;Configuration status:
                         <span ng-class="isSynchronized ? 'green' : 'red'" class="agents-head-5">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span>
                     </h1>
