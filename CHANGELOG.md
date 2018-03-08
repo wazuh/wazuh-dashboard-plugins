@@ -8,6 +8,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - **New design of agents statistics for the *Agents* tab** ([#299](https://github.com/wazuh/wazuh-kibana-app/pull/299)).
 
 ### Changed
+- **Refactoring of HTML and CSS code throughout the whole Wazuh app** ([#294](https://github.com/wazuh/wazuh-kibana-app/pull/294) & [#302](https://github.com/wazuh/wazuh-kibana-app/pull/302)):
+  - A big milestone for the project was finally achieved with this refactoring.
+  - We've removed the **Bootstrap** dependency from the `package.json` file.
+  - We've **removed and merged many duplicated rules**.
+  - We've removed HTML and `angular-md` overriding rules. Now we have **more own-made classes to avoid undesired results on the UI**.
+  - Also, this update brings several minor bugfixes related with weird HTML code.
+Tons of minor fixes.
 - **Wazuh app visualizations reviewed** ([#301](https://github.com/wazuh/wazuh-kibana-app/pull/301)):
   - The **number of used buckets has been limited**, since most of the table visualizations were surpassing acceptable limits.
   - Some visualizations have been checked to see if they make complete sense on what they mean to show to the user.
@@ -20,9 +27,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a bug where navigating between agents in the *Agents* tab was generating duplicated `agent.id` implicit filters ([#296](https://github.com/wazuh/wazuh-kibana-app/pull/296)).
 - Fixed a bug where navigating between different tabs from *Overview* or *Agents* while being on the *Discover* sub-tab was causing data loss in metric watchers ([#298](https://github.com/wazuh/wazuh-kibana-app/pull/298)).
 - Fixed incorrect visualization of the rule level on *Manager/Ruleset/Rules* when the rule level is zero (0) ([#298](https://github.com/wazuh/wazuh-kibana-app/pull/298)).
-
-### Removed
-- Removed many unused CSS classes from the app code ([#294](https://github.com/wazuh/wazuh-kibana-app/pull/294)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
 ### Added
