@@ -26,13 +26,13 @@
             <div ng-show="activeitem !== item.id" ng-repeat="key in keys" flex="{{key.size || ''}}">
                 <span>{{parseItem(item,key) || '---'}}</span>
             </div>
-            <div layout="column" flex ng-if="activeitem === item.id">
-                <div layout="row" class="wz-table-ruleset-card-info wz-table-size">
+            <div flex ng-show="activeitem === item.id" class="wz-table-height-fixed">
+                <div layout="row" class="wz-table-size">
                     <div ng-repeat="key in keys" flex="{{key.size || ''}}">
                         <span>{{parseItem(item,key) || '---'}}</span>
                     </div>
                 </div>
-                <div layout="row" class="wz-table-ruleset-card-info wz-padding-right-14 wz-padding-bottom-14 ">
+                <div layout="row" class="wz-padding-right-14 wz-padding-bottom-14 ">
                     <md-card flex class="wz-cursor-default wz-md-card">
                         <md-card-content>
                             <h1 class="wz-table-color-link wz-table-font">Overview</h1>
@@ -46,11 +46,11 @@
                             </div>
                             <div layout="row" class="wz-table-padding-top-10">
                                 <span flex>Level</span>
-                                <span flex class="text-right listHover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('level', item.level); $event.stopPropagation();">{{item.level}}</span>
+                                <span flex class="text-right wz-table-hover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('level', item.level); $event.stopPropagation();">{{item.level}}</span>
                             </div>
                             <div layout="File" class="wz-table-padding-top-10">
                                 <span flex>File</span>
-                                <span flex class="text-right listHover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('file', item.file); $event.stopPropagation();">{{item.file}}</span>
+                                <span flex class="text-right wz-table-hover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('file', item.file); $event.stopPropagation();">{{item.file}}</span>
                             </div>
                         </md-card-content>
                     </md-card>
@@ -61,7 +61,7 @@
                                     <h1 class="wz-table-color-link wz-table-font">Groups</h1>
                                     <md-divider class="wz-margin-top-10"></md-divider>
                                     <div layout="row" class="wz-table-padding-top-10" ng-repeat="group in item.groups">
-                                        <span flex class="listHover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('group', group)">{{group}}</span>
+                                        <span flex class="wz-table-hover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('group', group)">{{group}}</span>
                                     </div>
              
                                 </div>
@@ -71,7 +71,7 @@
                                     <h1 class="wz-table-color-link wz-table-font">PCI DSS</h1>
                                     <md-divider class="wz-margin-top-10"></md-divider>
                                     <div layout="row" class="wz-table-padding-top-10" ng-repeat="pci in item.pci">
-                                        <span flex class="listHover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('pci', pci)">{{pci}}</span>
+                                        <span flex class="wz-table-hover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('pci', pci)">{{pci}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -101,13 +101,13 @@
             <div ng-show="activeitem !== decoder.name+decoder.file+decoder.position" class="wz-word-wrap" ng-repeat="key in keys" flex="{{key.size || ''}}">
                 <span>{{parseItem(decoder,key) || '---'}}</span>
             </div>
-            <div layout="column" flex ng-show="activeitem === decoder.name+decoder.file+decoder.position">
-                <div layout="row" class="wz-table-ruleset-card-info wz-table-size">
+            <div flex ng-show="activeitem === decoder.name+decoder.file+decoder.position" class="wz-table-height-fixed">
+                <div layout="row" class="wz-table-size">
                     <div ng-repeat="key in keys" flex="{{key.size || ''}}" class="wz-word-wrap">
                         <span>{{parseItem(decoder,key) || '---'}}</span>
                     </div>
                 </div>
-                <div layout="row" class="wz-table-ruleset-card-info wz-padding-right-14 wz-padding-bottom-14">
+                <div layout="row" class="wz-padding-right-14 wz-padding-bottom-14">
                     <md-card flex class="wz-cursor-default wz-md-card">
                         <md-card-content>
                             <h1 class="wz-table-color-link wz-table-font">Overview</h1>
