@@ -45,13 +45,12 @@
                 class="wazuh-button md-raised md-primary manager-ruleset-decoders-btn" aria-label="Ruleset decoders button">
                 Decoders
             </md-button>
-
-            <md-input-container flex="20" class="md-whiteframe-z1 manager-ruleset-decoders-selector">
-                <md-select class="wz-border-none" ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
-                    <md-option value="all">All</md-option>
-                    <md-option value="parents">Parents only</md-option>
-                </md-select>
-            </md-input-container>
+            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-right-15 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
+                    <option value="all">All</option>
+                    <option value="parents">Parents only</option>
+                </select>
+            </div>
         </div>
 
         <md-chips readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file') || decoders.hasFilter('path')">

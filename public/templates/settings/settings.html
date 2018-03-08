@@ -264,13 +264,12 @@
             <p flex>
                 <strong>Warning: modifying the index-pattern will change it to ALL of the users.</strong>
             </p>
-
-            <md-input-container flex="20" class="md-whiteframe-z1 manager-ruleset-decoders-selector background-e2" ng-if="load === false">
-                <md-select class="wz-border-none" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
-                    <md-option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</md-option>
-                </md-select>
-            </md-input-container>
-
+            
+            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
+                    <option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</option>
+                </select>
+            </div>
         </md-card>
 
         <md-content layout="column" layout-align="start stretch" ng-if="submenuNavItem == 'about'">
