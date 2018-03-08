@@ -1,25 +1,20 @@
 // wazuh-navbar.less
-
 .wz-menu-nav-bar {
     min-width: 1015px;
     background-color: #005571 !important;
 }
 
-
-
 .wz-menu-nav-bar-api {
     float: right;
     position: absolute;
     right: 130px;
-    color:#ffffff;
+    color: #ffffff;
     top: 25px;
     bottom: 0px;
     margin-right: -25px;
 }
 
-
 // RULESET
-
 .manager-ruleset-decoders-top-span {
     padding-left: 0px;
     margin-right: 5px;
@@ -60,13 +55,11 @@
     height: 200px;
 }
 
-.manager-ruleset-rules-top-row > md-card {
+.manager-ruleset-rules-top-row>md-card {
     margin: 4px !important;
 }
 
-
 // SETTINGS
-
 .settings-template-1 {
     color: #f39c12;
     font-size: 18px;
@@ -78,7 +71,6 @@
 }
 
 // OVERVIEW
-
 .overview-pci-tabs-item {
     line-height: 40px;
     margin: 0;
@@ -94,9 +86,8 @@
     margin-right: 6px;
 }
 
-
 // KBN
-.wz-background-transparent{
+.wz-background-transparent {
     background-color: transparent;
 }
 
@@ -105,38 +96,50 @@
     border: 0px;
 }
 
-// Menu tabs and panels/discover
-.wz-md-navbar ._md-nav-button-text {
-    color: black;
- }
+.wz-md-navbar ._md-nav-button-text,
+.wz-md-tab .md-tab,
+.wz-md-tab .md-active {
+    color: black !important;
+}
 
- /* ------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------- */
+
+
 /* ------------------- Wazuh stylesheet for buttons ------------------ */
+
+
 /* ------------------------------------------------------------------- */
 
 .wazuh-button {
-    background-color: rgb(0,85,113) !important;
+    background-color: rgb(0, 85, 113) !important;
     color: white !important;
 }
 
 .wazuh-button.active,
 .wazuh-button:not([disabled]):hover {
-    background-color: rgb(0,121,165) !important;
+    background-color: rgb(0, 121, 165) !important;
 }
 
+
 /* Custom Manager/Ruleset styles */
+
 .manager-ruleset-rules-rulbtn {
     top: -3px;
 }
 
+
 /* Custom Manager/Ruleset styles */
+
 .manager-ruleset-rules-decbtn {
     padding: 2px;
     top: -3px;
     margin-right: 0;
 }
 
+
 /* Custom Manager/Logs styles */
+
 .manager-log-buttonplay {
     margin: 20px 7px !important;
     margin-top: 20px;
@@ -144,24 +147,25 @@
 }
 
 // KBN CSS
-
 .wazuh-column {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100%;
 }
 
 .wazuhNavDiscover .euiTab {
-  font-size: 14px !important;
+    font-size: 14px !important;
 }
 
 .wazuhNavDiscover .euiText {
-  font-size: 14px !important;
+    font-size: 14px !important;
 }
 
-kbn-vis, visualize, visualization {
-  display: flex;
-  flex: 1 1 100%;
+kbn-vis,
+visualize,
+visualization {
+    display: flex;
+    flex: 1 1 100%;
 }
 
 // MAIN LESS
@@ -183,11 +187,8 @@ kbn-vis, visualize, visualization {
 
 .wz-metric-color {
     background-color: #e4f2f5 !important;
-}
-
- // Agents
-
- .wz-margin-10 {
+} // Agents
+.wz-margin-10 {
     margin: 10px;
 }
 
@@ -243,8 +244,13 @@ kbn-vis, visualize, visualization {
     padding-right: 17px;
 }
 
+
 /* ------------------------------------------------------------------------ */
+
+
 /* -------------------------- Manager status ------------------------------ */
+
+
 /* ------------------------------------------------------------------------ */
 
 .status {
@@ -260,7 +266,7 @@ kbn-vis, visualize, visualization {
 }
 
 .blue {
-    background-color: rgb(0,121,165);
+    background-color: rgb(0, 121, 165);
 }
 
 .status.grey {
@@ -279,16 +285,26 @@ kbn-vis, visualize, visualization {
     float: right;
 }
 
+
 /* ------------------------------------------------------------------------ */
+
+
 /* -----------------------    Manager Configuration  ---------------------- */
+
+
 /* ------------------------------------------------------------------------ */
 
 .wazuh-greyed {
     color: #b7b7b7 !important;
 }
 
+
 /* ------------------------------------------------------------------------ */
+
+
 /* -------------------------- Manager Tab Styles -------------------------- */
+
+
 /* ------------------------------------------------------------------------ */
 
 .manager-status-subtitle {
@@ -333,9 +349,9 @@ kbn-vis, visualize, visualization {
     margin-right: 0px !important;
 }
 
-.jsonbeauty2{
+.jsonbeauty2 {
     min-height: 300px;
-    margin:0px !important;
+    margin: 0px !important;
 }
 
 .groupsFixPadding,
@@ -355,7 +371,6 @@ kbn-vis, visualize, visualization {
     color: #0079a5 !important;
 }
 
-
 // Angular.less
 .wz-md-card {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
@@ -363,7 +378,7 @@ kbn-vis, visualize, visualization {
 }
 
 .wz-headline-title {
-    color:#0079a5 !important;
+    color: #0079a5 !important;
     font-size: 17px;
     padding-bottom: 10px;
 }
