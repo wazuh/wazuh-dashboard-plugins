@@ -139,11 +139,22 @@
     font-size: 14px !important;
 }
 
+.kuiLocalNav {
+    border-bottom: none !important;
+}
+
+
 kbn-vis,
 visualize,
 visualization {
     display: flex;
     flex: 1 1 100%;
+}
+
+kbn-vis visualize,
+kbn-vis visualization,
+kbn-vis .vis-container {
+    overflow: hidden;
 }
 
 // MAIN LESS
@@ -359,11 +370,7 @@ visualization {
     overflow-y: auto;
 }
 
-kbn-vis visualize,
-kbn-vis visualization,
-kbn-vis .vis-container {
-    overflow: hidden;
-}
+
 
 .wz-margin-right-15 {
     margin-right: 15px;
