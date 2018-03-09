@@ -7,22 +7,22 @@
                 <div layout="row">
                     <div flex layout="column">
                         <div layout="row" class="wz-padding-top-10">
-                            <p flex="35">Active</p>
-                            <p flex="50" class="text-right color-grey">{{agentsCountActive}}</p>
+                            <p flex="50">Active</p>
+                            <p class="text-right color-grey">{{agentsCountActive}}</p>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
-                            <p flex="35">Disconnected</p>
-                            <p flex="50" class="text-right color-grey">{{agentsCountDisconnected}}</p>
+                            <p flex="50">Disconnected</p>
+                            <p class="text-right color-grey">{{agentsCountDisconnected}}</p>
                         </div>
                     </div>
                     <div flex layout="column">
                         <div layout="row" class="wz-padding-top-10">
-                            <p flex>Never connected</p>
-                            <p flex class="text-right color-grey">{{agentsCountNeverConnected}}</p>
+                            <p flex="50">Never connected</p>
+                            <p class="text-right color-grey">{{agentsCountNeverConnected}}</p>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
-                            <p flex>Agents coverage</p>
-                            <p flex class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
+                            <p flex="50">Agents coverage</p>
+                            <p class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
                         </div>
                     </div>
                 </div>
@@ -33,11 +33,11 @@
                 <span class="wz-headline-title">Top</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
-                    <p class="manager-status-subtitle" ng-click="showAgent(lastAgent)">Last registered agent</p>
+                    <p flex="35" class="manager-status-subtitle" ng-click="showAgent(lastAgent)">Last registered agent</p>
                     <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <p class="manager-status-subtitle" ng-click="showAgent(mostActiveAgent)">Higher activity</p>
+                    <p flex="35" class="manager-status-subtitle" ng-click="showAgent(mostActiveAgent)">Higher activity</p>
                     <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
                 </div>
             </md-card-content>
