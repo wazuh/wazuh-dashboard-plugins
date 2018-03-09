@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 - Removed almost every `md-tooltip` component from the whole app ([#305](https://github.com/wazuh/wazuh-kibana-app/pull/305)).
+- Removed unused images from the `img` folder ([#305](https://github.com/wazuh/wazuh-kibana-app/pull/305)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
 ### Added
