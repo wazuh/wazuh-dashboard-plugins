@@ -14,8 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   - We've removed the **Bootstrap** dependency from the `package.json` file.
   - We've **removed and merged many duplicated rules**.
   - We've removed HTML and `angular-md` overriding rules. Now we have **more own-made classes to avoid undesired results on the UI**.
-  - Also, this update brings several minor bugfixes related with weird HTML code.
-Tons of minor fixes.
+  - Also, this update brings tons of minor bugfixes related with weird HTML code.
 - **Wazuh app visualizations reviewed** ([#301](https://github.com/wazuh/wazuh-kibana-app/pull/301)):
   - The **number of used buckets has been limited**, since most of the table visualizations were surpassing acceptable limits.
   - Some visualizations have been checked to see if they make complete sense on what they mean to show to the user.
