@@ -9,7 +9,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - **Added information ribbon into *Overview/Agent SCAP* tabs** ([#303](https://github.com/wazuh/wazuh-kibana-app/pull/303)).
 
 ### Changed
-- **Refactoring of HTML and CSS code throughout the whole Wazuh app** ([#294](https://github.com/wazuh/wazuh-kibana-app/pull/294) & [#302](https://github.com/wazuh/wazuh-kibana-app/pull/302)):
+- **Refactoring of HTML and CSS code throughout the whole Wazuh app** ([#294](https://github.com/wazuh/wazuh-kibana-app/pull/294), [#302](https://github.com/wazuh/wazuh-kibana-app/pull/302) & [#305](https://github.com/wazuh/wazuh-kibana-app/pull/305)):
   - A big milestone for the project was finally achieved with this refactoring.
   - We've removed the **Bootstrap** dependency from the `package.json` file.
   - We've **removed and merged many duplicated rules**.
@@ -28,6 +28,9 @@ Tons of minor fixes.
 - Fixed a bug where navigating between agents in the *Agents* tab was generating duplicated `agent.id` implicit filters ([#296](https://github.com/wazuh/wazuh-kibana-app/pull/296)).
 - Fixed a bug where navigating between different tabs from *Overview* or *Agents* while being on the *Discover* sub-tab was causing data loss in metric watchers ([#298](https://github.com/wazuh/wazuh-kibana-app/pull/298)).
 - Fixed incorrect visualization of the rule level on *Manager/Ruleset/Rules* when the rule level is zero (0) ([#298](https://github.com/wazuh/wazuh-kibana-app/pull/298)).
+
+### Removed
+- Removed almost every `md-tooltip` component from the whole app ([#305](https://github.com/wazuh/wazuh-kibana-app/pull/305)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
 ### Added
