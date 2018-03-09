@@ -3,6 +3,24 @@
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
 
+        <div layout="row">
+            <md-card flex class="wz-metric-color wz-md-card">
+                <md-card-content layout="row" class="wz-padding-metric">
+                    <div flex>Successful logins: <span class="wz-font-weight-bold">{{awsLogins}}</span></div>
+                    <div flex>Most active user: <span class="wz-font-weight-bold">{{awsMostActiveUser}}</span></div>
+                    <div flex>Authorized security groups: <span class="wz-font-weight-bold">{{awsAuthorized}}</span></div>    
+                    <div flex>Revoked security groups: <span class="wz-font-weight-bold">{{awsRevoked}}</span></div>                  
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Metric-Successful-logins'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Most-active-user'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Metric-Authorize-security'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Metric-Revoke-security'"></kbn-vis>
+        </div>
+
         <div layout="row" layout-align="center stretch" class="height-300">
             <div flex layout="column">
                 <md-card flex class="wz-md-card">
@@ -13,34 +31,9 @@
                     </md-card-content>
                 </md-card>
             </div>
-            <div flex="25" layout="column">
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column text-center">
-                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Successful-logins'"></kbn-vis>
-                    </md-card-content>
-                </md-card>
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column text-center">
-                        <div class="ng-binding">Most active user</div>
-                        <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Overview-AWS-Most-active-user'"></kbn-vis>
-                    </md-card-content>
-                </md-card>
-            </div>
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-270">
-            <div flex="25" layout="column">
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column">
-                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Authorize-security'"></kbn-vis>
-                    </md-card-content>
-                </md-card>
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column">
-                        <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-AWS-Metric-Revoke-security'"></kbn-vis>
-                    </md-card-content>
-                </md-card>
-            </div>
             <div flex layout="column">
                 <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
