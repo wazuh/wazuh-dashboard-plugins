@@ -7,6 +7,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - **New design for the *Manager/Configuration* tab** ([#297](https://github.com/wazuh/wazuh-kibana-app/pull/297)).
 - **New design of agents statistics for the *Agents* tab** ([#299](https://github.com/wazuh/wazuh-kibana-app/pull/299)).
 - **Added information ribbon into *Overview/Agent SCAP* tabs** ([#303](https://github.com/wazuh/wazuh-kibana-app/pull/303)).
+- **Added information ribbon into *Overview/Agent VirusTotal* tabs** ([#306](https://github.com/wazuh/wazuh-kibana-app/pull/306)).
+- **Added information ribbon into *Overview AWS* tab** ([#306](https://github.com/wazuh/wazuh-kibana-app/pull/306)).
 
 ### Changed
 - **Refactoring of HTML and CSS code throughout the whole Wazuh app** ([#294](https://github.com/wazuh/wazuh-kibana-app/pull/294), [#302](https://github.com/wazuh/wazuh-kibana-app/pull/302) & [#305](https://github.com/wazuh/wazuh-kibana-app/pull/305)):
