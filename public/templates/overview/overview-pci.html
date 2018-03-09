@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="tab == 'pci'" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'pci'" layout-align="start">
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
@@ -8,9 +8,9 @@
                 <md-tabs md-selected="selectedIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="pciReq_tab">
                     <md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
                         <div class="md-padding background-white">
-                            <span class="wz-headline-title" >PCI DSS Requirement: {{tab.title}}</span>
+                            <span class="wz-headline-title">PCI DSS Requirement: {{tab.title}}</span>
                             <md-divider class="wz-margin-top-10"></md-divider>
-                            <div layout="row" class="wz-padding-top-10">
+                            <div layout="row" class="wz-padding-top-10 wz-line-height">
                                 <div ng-bind-html="tab.content"></div>
                             </div>
                         </div>
