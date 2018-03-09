@@ -2,7 +2,7 @@
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
-        
+
         <div layout="row">
             <md-card flex class="wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-metric">
@@ -25,14 +25,14 @@
             <md-card flex="60" class="wz-md-card">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Alerts severity over time</span>
-                    <md-divider></md-divider>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-severity-over-time'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex="40" class="wz-md-card">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Affected packages - Top 5</span>
-                    <md-divider></md-divider>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Top-5-affected-packages'"></kbn-vis>
                 </md-card-content>
             </md-card>
@@ -42,7 +42,7 @@
             <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Alerts summary</span>
-                    <md-divider></md-divider>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-summary'"></kbn-vis>
                 </md-card-content>
             </md-card>
