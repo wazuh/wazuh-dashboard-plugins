@@ -7,22 +7,22 @@
                 <div layout="row">
                     <div flex layout="column">
                         <div layout="row" class="wz-padding-top-10">
-                            <p class="manager-status-subtitle">Active</p>
-                            <p class="text-right color-grey">{{agentsCountActive}}</p>
+                            <p flex="35">Active</p>
+                            <p flex="50" class="text-right color-grey">{{agentsCountActive}}</p>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
-                            <p class="manager-status-subtitle">Disconnected</p>
-                            <p class="text-right color-grey">{{agentsCountDisconnected}}</p>
+                            <p flex="35">Disconnected</p>
+                            <p flex="50" class="text-right color-grey">{{agentsCountDisconnected}}</p>
                         </div>
                     </div>
                     <div flex layout="column">
                         <div layout="row" class="wz-padding-top-10">
-                            <p class="manager-status-subtitle">Never connected</p>
-                            <p class="text-right color-grey">{{agentsCountNeverConnected}}</p>
+                            <p flex>Never connected</p>
+                            <p flex class="text-right color-grey">{{agentsCountNeverConnected}}</p>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
-                            <p class="manager-status-subtitle">Agents coverage</p>
-                            <p class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
+                            <p flex>Agents coverage</p>
+                            <p flex class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
                         </div>
                     </div>
                 </div>

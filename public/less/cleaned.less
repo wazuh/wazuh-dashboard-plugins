@@ -139,11 +139,22 @@
     font-size: 14px !important;
 }
 
+.kuiLocalNav {
+    border-bottom: none !important;
+}
+
+
 kbn-vis,
 visualize,
 visualization {
     display: flex;
     flex: 1 1 100%;
+}
+
+kbn-vis visualize,
+kbn-vis visualization,
+kbn-vis .vis-container {
+    overflow: hidden;
 }
 
 // MAIN LESS
@@ -265,10 +276,6 @@ visualization {
 /* -------------------------- Manager Tab Styles -------------------------- */
 /* ------------------------------------------------------------------------ */
 
-.manager-status-subtitle {
-    min-width: 150px
-}
-
 .manager-log-top-row {
     height: 70px;
     padding-right: 8px;
@@ -339,7 +346,6 @@ visualization {
 .wz-headline-title {
     color: #0079a5 !important;
     font-size: 17px;
-    padding-bottom: 10px;
 }
 
 .wz-border-none,
@@ -364,11 +370,7 @@ visualization {
     overflow-y: auto;
 }
 
-kbn-vis visualize,
-kbn-vis visualization,
-kbn-vis .vis-container {
-    overflow: hidden;
-}
+
 
 .wz-margin-right-15 {
     margin-right: 15px;
