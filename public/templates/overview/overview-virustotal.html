@@ -1,36 +1,24 @@
 <md-content flex layout="column" ng-if="tab === 'virustotal'" layout-align="start">
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
+        <div layout="row">
+            <md-card flex class="wz-metric-color wz-md-card">
+                <md-card-content layout="row" class="wz-padding-metric">
+                    <div flex>Total malicious: <span class="wz-font-weight-bold">{{virusMalicious}}</span></div>
+                    <div flex>Total positives: <span class="wz-font-weight-bold">{{virusPositives}}</span></div>
+                    <div flex>Total: <span class="wz-font-weight-bold">{{virusTotal}}</span></div>                    
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total-Malicious'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total-Positives'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total'"></kbn-vis>
+        </div>
+
         <div layout="row" class="height-360">
             <div flex layout="column">
                 <div flex layout="row">
-                    <md-card flex class="wz-md-card">
-                        <md-card-content class="wazuh-column">
-                            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total-Malicious'"></kbn-vis>
-                        </md-card-content>
-                    </md-card>
-
-                </div>
-
-                <div flex layout="row">
-
-                    <md-card flex class="wz-md-card">
-                        <md-card-content class="wazuh-column">
-                            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total-Positives'"></kbn-vis>
-                        </md-card-content>
-                    </md-card>
-                </div>
-                <div flex layout="row">
-
-                    <md-card flex class="wz-md-card">
-                        <md-card-content class="wazuh-column">
-                            <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-Virustotal-Total'"></kbn-vis>
-                        </md-card-content>
-                    </md-card>
-                </div>
-            </div>
-            <div flex layout="column">
-                <div flex layout="row">
-
                     <md-card flex class="wz-md-card">
                         <md-card-content class="wazuh-column">
                             <span class="wz-headline-title">Unique malicious files per agent</span>
@@ -51,8 +39,6 @@
                     </md-card>
                 </div>
             </div>
-
-
         </div>
         <div layout="row" class="height-550">
             <md-card flex class="wz-md-card">

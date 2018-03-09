@@ -33,12 +33,12 @@
                 <span class="wz-headline-title">Top</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
-                    <p flex ng-click="showAgent(lastAgent)">Last registered agent</p>
-                    <p flex class="text-right cursor-pointer color-pointer" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
+                    <p class="manager-status-subtitle" ng-click="showAgent(lastAgent)">Last registered agent</p>
+                    <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <p flex ng-click="showAgent(mostActiveAgent)">Higher activity</p>
-                    <p flex class="text-right cursor-pointer color-pointer" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
+                    <p class="manager-status-subtitle" ng-click="showAgent(mostActiveAgent)">Higher activity</p>
+                    <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
                 </div>
             </md-card-content>
         </md-card>

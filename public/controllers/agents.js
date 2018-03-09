@@ -47,7 +47,14 @@ app.controller('agentsController',
             scapLastScore   : '[vis-id="\'Wazuh-App-Agents-OSCAP-Last-score\'"]',
             scapHighestScore: '[vis-id="\'Wazuh-App-Agents-OSCAP-Higher-score-metric\'"]',
             scapLowestScore : '[vis-id="\'Wazuh-App-Agents-OSCAP-Lower-score-metric\'"]'
-       }
+        }
+
+        // Metrics Virustotal
+        const metricsVirustotal = {
+            virusMalicious: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Malicious\'"]',
+            virusPositives: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Positives\'"]',
+            virusTotal    : '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
+        }
 
         $rootScope.tabVisualizations = {
             general      : 7,
@@ -76,16 +83,21 @@ app.controller('agentsController',
         const checkMetrics = (tab,subtab) => {
             metricService.destroyWatchers();
 
-            if(tab === 'audit' && subtab === 'panels'){
-                metricService.createWatchers(metricsAudit);
-            } 
-    
-            if(tab === 'vuls' && subtab === 'panels'){
-                metricService.createWatchers(metricsVulnerability);
-            }
-
-            if(tab === 'oscap' && subtab === 'panels'){
-                metricService.createWatchers(metricsScap);
+            if(subtab === 'panels'){
+                switch (tab) {
+                    case 'audit':
+                        metricService.createWatchers(metricsAudit);
+                        break;
+                    case 'vuls':
+                        metricService.createWatchers(metricsVulnerability);
+                        break;
+                    case 'oscap':
+                        metricService.createWatchers(metricsScap);
+                        break;
+                    case 'virustotal':
+                        metricService.createWatchers(metricsVirustotal);
+                        break;
+                }
             }
 
             if(!$rootScope.$$phase) $rootScope.$digest();
