@@ -27,7 +27,7 @@ app.service('metricService', function ($rootScope) {
                         return false;
                     }, (newVal, oldVal) => {
                         if (newVal !== oldVal) {
-                            $rootScope[id] = newVal ? newVal : '---';
+                            $rootScope[id] = newVal ? newVal : '';
                             if (!$rootScope.$$phase) $rootScope.$digest();
                         }
                     })
