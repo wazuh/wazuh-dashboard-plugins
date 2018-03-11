@@ -1,6 +1,5 @@
 <div flex layout="column">
-
-    <md-content  class="wazuhMenuNavBar kbn-dis-height-70" ng-init="menuNavItem = 'discover'">
-		  <wz-menu></wz-menu>
-    </md-content>
+    <div  class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'discover'">
+		<wz-menu></wz-menu>
+    </div>
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>

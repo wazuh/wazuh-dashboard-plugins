@@ -2,62 +2,48 @@
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
+
         <div layout="row">
-            <md-card flex class="height-30 wz-metric-color">
-                <md-card-content layout="row" class="wz-padding-top-5">
-                    <span flex>Critical severity alerts: <b>{{vulnCritical}}</b></span>
-                    <span flex>High severity alerts: <b>{{vulnHigh}}</b></span>
-                    <span flex>Medium severity alerts: <b>{{vulnMedium}}</b></span>
-                    <span flex>Low severity alerts: <b>{{vulnLow}}</b></span>
-                </md-card-content>
-            </md-card>            
-        </div>
-        <div layout="row" layout-align="center stretch" class="height-120 wz-no-display">
-            <md-card flex>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Critical-severity'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-High-severity'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Medium-severity'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Overview-VULS-Metric-Low-severity'"></kbn-vis>
+            <md-card flex class="wz-metric-color wz-md-card">
+                <md-card-content layout="row" class="wz-padding-metric">
+                    <div flex>Critical severity alerts: <span class="wz-font-weight-bold">{{vulnCritical}}</span></div>
+                    <div flex>High severity alerts: <span class="wz-font-weight-bold">{{vulnHigh}}</span></div>
+                    <div flex>Medium severity alerts: <span class="wz-font-weight-bold">{{vulnMedium}}</span></div>
+                    <div flex>Low severity alerts: <span class="wz-font-weight-bold">{{vulnLow}}</span></div>
                 </md-card-content>
             </md-card>
         </div>
 
+        <div class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Critical-severity'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-High-severity'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Medium-severity'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Low-severity'"></kbn-vis>
+        </div>
+
         <div layout="row" layout-align="center stretch" class="height-270">
-            <md-card flex="60">
+            <md-card flex="60" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts severity over time</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Alerts severity over time</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-severity-over-time'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="40">
+            <md-card flex="40" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Affected packages - Top 5</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Affected packages - Top 5</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Top-5-affected-packages'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
         <div layout="row" class="height-570">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts summary</span>
-                    <md-divider></md-divider>
-                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Overview-VULS-Alerts-summary'"></kbn-vis>
+                    <span class="wz-headline-title">Alerts summary</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-summary'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>

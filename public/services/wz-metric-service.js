@@ -14,12 +14,20 @@ app.service('metricService', function ($rootScope) {
                         if (typeof html !== 'undefined' && html.includes('<span')) {
                             if(typeof html.split('<span>')[1] !== 'undefined'){
                                 return html.split('<span>')[1].split('</span')[0];
+                            } else if(html.includes('table') && html.includes('cell-hover')){
+                                let nonB = html.split('ng-non-bindable')[1];
+                                if(nonB && 
+                                   nonB.split('>')[1] && 
+                                   nonB.split('>')[1].split('</')[0]
+                                ) {
+                                    return nonB.split('>')[1].split('</')[0];
+                                }
                             }
                         }
                         return false;
                     }, (newVal, oldVal) => {
                         if (newVal !== oldVal) {
-                            $rootScope[id] = newVal ? newVal : '---';
+                            $rootScope[id] = newVal ? newVal : '';
                             if (!$rootScope.$$phase) $rootScope.$digest();
                         }
                     })

@@ -1,23 +1,23 @@
-<div flex ng-cloak ng-if="!loading && submenuNavItem == 'logs'" layout="column" ng-controller="managerLogController" class="manager-background">
+<div flex ng-cloak ng-if="!loading && submenuNavItem == 'logs'" layout="column" ng-controller="managerLogController">
 
-    <div layout="row" layout-align="start start" class="manager-log-top-row">
-        <md-input-container class="md-whiteframe-z1 manager-log-input-1" flex="20">
-            <md-select ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
-                aria-label="Logs category">
-                <md-option selected value="all">Choose daemon</md-option>
-                <md-option ng-repeat="(key, value) in summary" value="{{key}}">{{key}}</md-option>
-            </md-select>
-        </md-input-container>
+    <div layout="row" layout-align="start start" class="manager-log-top-row wz-padding-left-16">
+        <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
+            aria-label="Logs category">
+                <option value="all">Choose daemon</option>
+                <option ng-repeat="(key, value) in summary" value="{{key}}">{{key}}</option>
+            </select>
+        </div>
 
-        <md-input-container class="md-whiteframe-z1 manager-log-input-2" flex="20">
-            <md-select ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="type_log == 'all' ? logs.removeFilter('type_log', true) : logs.addFilter('type_log', type_log)"
-                aria-label="Logs level">
-                <md-option selected value="all">Choose log level</md-option>
-                <md-option value="info">Info</md-option>
-                <md-option value="error">Error</md-option>
-                <md-option value="warning">Warning</md-option>
-            </md-select>
-        </md-input-container>
+        <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="type_log == 'all' ? logs.removeFilter('type_log', true) : logs.addFilter('type_log', type_log)"
+            aria-label="Logs level">
+                <option value="all">Choose log level</option>
+                <option value="info">Info</option>
+                <option value="error">Error</option>
+                <option value="warning">Warning</option>
+            </select>
+        </div>
         <span flex></span>
         <md-button ng-if="!realtime" class="wazuh-button md-raised md-primary manager-log-buttonplay" ng-click="playRealtime()" aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
@@ -29,9 +29,9 @@
         </md-button>
     </div>
 
-    <wz-search-bar class="lateral-padding-8" data="logs" term="searchTerm" placetext="'Filter logs...'"></wz-search-bar>
+    <wz-search-bar class="wz-lateral-padding-16" data="logs" term="searchTerm" placetext="'Filter logs...'"></wz-search-bar>
 
-    <div flex layout="column" class="md-padding">
+    <div flex layout="column" class="md-padding no-padding-top">
 
         <!-- Standard -->
         <wz-table-header

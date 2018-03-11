@@ -1,67 +1,73 @@
-<div flex ng-show="!loading" class="agentsPreview" layout="column" layout-align="start space-around">
-
-        <div layout="row" layout-align="space-between stretch">
-            <md-card flex class="cardHover margin-left-0">
-                <md-card-content class="text-center cursor-pointer" ng-click="showAgent(lastAgent)">
-                    <div class="metric-value ng-binding font-size-16-pt">{{lastAgent.name}}</div>
-                    <div class="ng-binding">Last registered agent</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="cardHover">
-                <md-card-content class="text-center cursor-pointer" ng-click="showAgent(mostActiveAgent)">
-                    <div class="metric-value ng-binding font-size-16-pt">{{mostActiveAgent.name}}</div>
-                    <div class="ng-binding">Higher activity</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex="10">
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-16-pt">{{agentsCountActive}}</div>
-                    <div class="ng-binding">Active</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex="10" layout="column">
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-16-pt">{{agentsCountDisconnected}}</div>
-                    <div class="ng-binding">Disconnected</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex="10">
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-16-pt">{{agentsCountNeverConnected}}</div>
-                    <div class="ng-binding">Never connected</div>
-                </md-card-content>
-            </md-card>
-            <md-card flex="10" class="margin-right-0">
-                <md-card-content class="text-center">
-                    <div class="metric-value ng-binding font-size-16-pt">{{(agentsCoverity | number:2)}}%</div>
-                    <div class="ng-binding">Agents coverage</div>
-                </md-card-content>
-            </md-card>
-        </div>
+<div flex ng-show="!loading" class="md-padding" layout="column" layout-align="start space-around">
+    <div layout="row" layout-align="space-between stretch">
+        <md-card flex class="no-margin-left wz-md-card">
+            <md-card-content>
+                <span class="wz-headline-title">Status</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row">
+                    <div flex layout="column">
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50">Active</p>
+                            <p class="text-right color-grey">{{agentsCountActive}}</p>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50">Disconnected</p>
+                            <p class="text-right color-grey">{{agentsCountDisconnected}}</p>
+                        </div>
+                    </div>
+                    <div flex layout="column">
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50">Never connected</p>
+                            <p class="text-right color-grey">{{agentsCountNeverConnected}}</p>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50">Agents coverage</p>
+                            <p class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
+                        </div>
+                    </div>
+                </div>
+        </md-card-content>
+        </md-card>
+        <md-card flex class="no-margin-right wz-md-card">
+            <md-card-content>
+                <span class="wz-headline-title">Top</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p flex="35" class="manager-status-subtitle" ng-click="showAgent(lastAgent)">Last registered agent</p>
+                    <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <p flex="35" class="manager-status-subtitle" ng-click="showAgent(mostActiveAgent)">Higher activity</p>
+                    <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
 
         <div layout="row" layout-align="start stretch">
-            <wz-search-bar flex="60" class="margin-top-9" height="'height-41'" noleft="'margin-left-0'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
-            <md-input-container flex="20" class="md-block md-whiteframe-z1 md-input-margin">
-                <md-select id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
-                    <md-option value="all">All states</md-option>
-                    <md-option value="active">Active</md-option>
-                    <md-option value="disconnected">Disconnected</md-option>
-                    <md-option value="Never Connected">Never connected</md-option>
-                </md-select>
-            </md-input-container>
+            <wz-search-bar flex="60" class="wz-margin-top-17 wz-padding-right" height="'height-41'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
 
-            <md-input-container flex="20" class="md-block md-whiteframe-z1">
-                <md-select id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
-                    <md-option value="all">All OS platforms</md-option>
-                    <md-option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
+            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
+                    <option value="all">All states</option>
+                    <option value="active">Active</option>
+                    <option value="disconnected">Disconnected</option>
+                    <option value="Never Connected">Never connected</option>
+                </select>
+            </div>
+
+            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 wz-margin-top-17 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
+                    <option value="all">All OS platforms</option>
+                    <option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
                         {{platform.name}} {{platform.version}}
-                    </md-option>
-                </md-select>
-            </md-input-container>
+                    </option>
+                </select>
+            </div>
         </div>
         <wz-table-header
-            layout="row" 
-            data="agents" 
+            layout="row"
+            data="agents"
             keys="[
                 {name:'ID',sortValue:'id',size:5},
                 {name:'Name',sortValue:'name',size:15},
@@ -73,10 +79,10 @@
             ]"
             >
         </wz-table-header>
-        <wz-table 
-            layout="column" 
+        <wz-table
+            layout="column"
             flex
-            data="agents" 
+            data="agents"
             func="showAgent(agent)"
             keys="[
                 {col:'id',size:5},
@@ -86,7 +92,7 @@
                 {col:'os.name',size:30},
                 {col:'os.version',size:15},
                 {col:'version',size:15}
-            ]" 
+            ]"
             class="no-lateral-padding"
             full="'agent'">
         </wz-table>

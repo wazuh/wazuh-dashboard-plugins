@@ -29,7 +29,8 @@ app.directive('wzTable',function(){
                 scope.func(obj);
             }   
             scope.parseItem = (item,key) => {
-                 let tmp = key;
+                if(scope.isruleset && key.col === 'level' && item.level === 0) return '0';
+                let tmp = key;
                 if(key.col) {
                     tmp = key.col;
                 }

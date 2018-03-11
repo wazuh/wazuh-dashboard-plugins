@@ -1,712 +1,802 @@
-<md-content flex layout="column" ng-controller="managerConfigurationController" class="manager-groups-main-div" ng-if="!load && submenuNavItem == 'configuration'">
+<md-content flex layout="column" ng-controller="managerConfigurationController" ng-if="!load && submenuNavItem == 'configuration'">
+
+    <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="load">
         <div></div>
     </div>
-    <div flex layout="column" ng-show="!load" layout-align="start stretch">
-        <div layout="row" flex>
-            <md-card flex>
+
+    <!-- The section container -->
+    <div flex layout="row" layout-align="start stretch" class="md-padding" ng-show="!load"  ng-init="selectedItem='global'">
+
+        <!-- Left column - Configuration summary and section links -->
+        <div flex="25">
+
+            <!-- GLOBAL -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.global">
                 <md-card-content>
-                    <div layout="row">
-                        <div layout="column" flex="15" ng-init="selectedItem='global'">
-                            <!-- Selecting a configuration -->
-                            <div flex layout="row" class="md-padding ">
-                                <div flex>
-                                    <h4>
-                                        <i class="fa fa-reorder"></i> Section
-                                    </h4>
-                                    <md-divider></md-divider>
-
-                                    <p ng-if="managerConfiguration.global">
-                                        <a ng-class="selectedItem === 'global' ? 'underline-config' : ''" ng-click="switchItem('global')">
-                                            Global
-                                        </a>
-                                    </p>
-                                    <p ng-if="managerConfiguration.email_alerts">
-                                        <a ng-class="selectedItem === 'email_alerts' ? 'underline-config' : ''" ng-click="switchItem('email_alerts')">
-                                            E-mail alerts
-                                        </a>
-                                    </p>
-                                    <p ng-if="managerConfiguration.remote">
-                                        <a ng-class="selectedItem === 'remote' ? 'underline-config' : ''" ng-click="switchItem('remote')">
-                                            Remote
-                                        </a>
-                                    </p>
-                                    <p ng-if="managerConfiguration.cluster">
-                                        <a ng-class="selectedItem === 'cluster' ? 'underline-config' : ''" ng-click="switchItem('cluster')">
-                                            Cluster
-                                        </a>
-
-                                    </p>
-                                    <p ng-if="managerConfiguration.auth">
-                                        <a ng-class="selectedItem === 'auth' ? 'underline-config' : ''" ng-click="switchItem('auth')">
-                                            Auth
-                                        </a>
-                                    </p>
-                                    <p ng-if="managerConfiguration.command">
-                                        <a ng-class="selectedItem === 'command' ? 'underline-config' : ''" ng-click="switchItem('command')">
-                                            Command
-                                        </a>
-                                    </p>
-                                    <p ng-if="managerConfiguration.syscheck">
-                                        <a ng-class="selectedItem === 'syscheck' ? 'underline-config' : ''" ng-click="switchItem('syscheck')">
-                                            Syscheck
-                                        </a>
-                                    </p>
-                                    <p ng-if="managerConfiguration.rootcheck">
-                                        <a ng-class="selectedItem === 'rootcheck' ? 'underline-config' : ''" ng-click="switchItem('rootcheck')">
-                                            Rootcheck
-                                        </a>
-                                    </p>
-                                    <p ng-if="managerConfiguration.ruleset">
-                                        <a ng-class="selectedItem === 'ruleset' ? 'underline-config' : ''" ng-click="switchItem('ruleset')">
-                                            Ruleset
-                                        </a>
-                                    </p>
-                                    <p ng-if="managerConfiguration.logcollector">
-                                        <a ng-class="selectedItem === 'logcollector' ? 'underline-config' : ''" ng-click="switchItem('logcollector')">
-                                            Logcollector
-                                        </a>
-                                    </p>
-                                    <!--<p ng-if="managerConfiguration['open-scap']">
-                                        <a ng-class="selectedItem === 'open-scap' ? 'underline-config' : ''" ng-click="switchItem('open-scap')">
-                                            OpenSCAP
-                                        </a>
-                                    </p>-->
-                                    <p ng-if="managerConfiguration['active-response'].length > 0">
-                                        <a ng-class="selectedItem === 'active-response' ? 'underline-config' : ''" ng-click="switchItem('active-response')">
-                                            Active response
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Global -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='global'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-dashboard"></i> Global</h4>
-                                    <md-divider></md-divider>
-                                    <p ng-if="managerConfiguration.global.white_list">
-                                        JSON output
-                                        <span ng-class="managerConfiguration.global.jsonout_output === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.global.jsonout_output}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.logall">
-                                        Log all
-                                        <span ng-class="managerConfiguration.global.logall === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.global.logall}}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.logall">
-                                        Log all in JSON
-                                        <span ng-class="managerConfiguration.global.logall_json === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.global.logall_json}}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.white_list">
-                                        White list
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.white_list.length
-                                            <=5 ? managerConfiguration.global.white_list : managerConfiguration.global.white_list.length }} </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.stats">
-                                        Stats
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.stats }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.host_infomation">
-                                        Host information
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.host_infomation }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.alerts.log_alert_level">
-                                        Log alert level
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.alerts.log_alert_level }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.email_notification">
-                                        E-mail notifications
-                                        <span ng-class="managerConfiguration.global.email_notification === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{ managerConfiguration.global.email_notification }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.email_alert_level">
-                                        E-mail alert level
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.email_alert_level }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.email_to">
-                                        E-mail to
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.email_to }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.email_from">
-                                        E-mail from
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.email_from }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.smtp_server">
-                                        SMTP server
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.smtp_server }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.email_maxperhour">
-                                        Max email per hour
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.email_maxperhour }}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.global.email_idsname">
-                                        E-mail IDS name
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.global.email_idsname }}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div flex></div>
-                            </div>
-                        </div>
-                        <!-- End global -->
-
-                        <!-- E-mail alerts -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='email_alerts'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-envelope-o"></i> E-mail alerts</h4>
-                                    <md-divider></md-divider>
-                                    <p ng-if="managerConfiguration.email_alerts.email_to">
-                                        Email to
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.email_alerts.email_to }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.email_alerts.level">
-                                        Alert level
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.email_alerts.level }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.email_alerts.group">
-                                        Group
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.email_alerts.group }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.email_alerts.event_location">
-                                        Event location
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.email_alerts.event_location }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.email_alerts.format">
-                                        Format
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.email_alerts.format }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.email_alerts.rule_id">
-                                        Rule ID
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.email_alerts.rule_id }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.email_alerts.do_not_delay">
-                                        Do not delay
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.email_alerts.do_not_delay }}
-                                        </span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.email_alerts.do_not_group">
-                                        Do not group
-                                        <span class="md-secondary pull-right">{{ managerConfiguration.email_alerts.do_not_group }}
-                                        </span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End e-mail alerts -->
-
-                        <!-- Remote -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='remote'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-feed"></i> Remote</h4>
-                                    <md-divider></md-divider>
-                                    <div ng-repeat="item in managerConfiguration.remote">
-                                        <p>
-                                            Connection
-                                            <span class="md-secondary pull-right">{{item.connection}}</span>
-                                        </p>
-                                        <p>
-                                            Port
-                                            <span class="md-secondary pull-right">{{item.port}}</span>
-                                        </p>
-                                        <p>
-                                            Protocol
-                                            <span class="md-secondary pull-right">{{item.protocol}}</span>
-                                        </p>
-                                        <md-divider ng-if="!$last"></md-divider>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End remote -->
-
-                        <!-- Cluster -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='cluster'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-server"></i> Cluster</h4>
-                                    <md-divider></md-divider>
-                                    <p>
-                                        Name
-                                        <span class="md-secondary pull-right">{{managerConfiguration.cluster.name}}</span>
-                                    </p>
-                                    <p>
-                                        Interval
-                                        <span class="md-secondary pull-right">{{managerConfiguration.cluster.interval}}</span>
-                                    </p>
-                                    <p>
-                                        Node name
-                                        <span class="md-secondary pull-right">{{managerConfiguration.cluster.node_name}}</span>
-                                    </p>
-                                    <p>
-                                        Bind address
-                                        <span class="md-secondary pull-right">{{managerConfiguration.cluster.bind_addr}}</span>
-                                    </p>
-                                    <p>
-                                        Node type
-                                        <span class="md-secondary pull-right">{{managerConfiguration.cluster.node_type}}</span>
-                                    </p>
-                                    <p>
-                                        Nodes
-                                        <span class="md-secondary pull-right">{{managerConfiguration.cluster.nodes}}</span>
-                                    </p>
-                                    <p>
-                                        Port
-                                        <span class="md-secondary pull-right">{{managerConfiguration.cluster.port}}</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End cluster -->
-
-                        <!-- Syscheck -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='syscheck'">
-                            <div flex layout="row" class="md-padding">
-                                <div ng-class="managerConfiguration.syscheck.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
-                                    <h4>
-                                        <i class="fa fa-shield"></i> Syscheck</h4>
-                                    <md-divider></md-divider>
-                                    <p>
-                                        Syscheck disabled
-                                        <span ng-class="managerConfiguration.syscheck.disabled === 'yes' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.disabled}}</span>
-                                    </p>
-                                    <p>
-                                        Frequency
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.frequency}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.syscheck.scan_time">
-                                        Scan time
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_time}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.syscheck.scan_day">
-                                        Scan day
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_day}}</span>
-                                    </p>
-                                    <p>
-                                        Auto ignore
-                                        <span ng-class="managerConfiguration.syscheck.auto_ignore === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.auto_ignore}}</span>
-                                    </p>
-                                    <p>
-                                        Alert new files
-                                        <span ng-class="managerConfiguration.syscheck.alert_new_files === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.alert_new_files}}</span>
-                                    </p>
-                                    <p>
-                                        Scan on start
-                                        <span ng-class="managerConfiguration.syscheck.scan_on_start === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.scan_on_start}}</span>
-                                    </p>
-                                    <p>
-                                        No diff
-                                        <span class="md-secondary pull-right">{{managerConfiguration.syscheck.nodiff}}</span>
-                                    </p>
-                                    <p>
-                                        Skip NFS
-                                        <span ng-class="managerConfiguration.syscheck.skip_nfs === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.syscheck.skip_nfs}}</span>
-                                    </p>
-                                    <br>
-                                    <h4>
-                                        <i class="fa fa-folder-o"></i> Monitoring directories</h4>
-                                    <md-divider></md-divider>
-                                    <div ng-repeat="item in managerConfiguration.syscheck.directories">
-                                        <p>
-                                            Path
-                                            <span class="md-secondary pull-right">{{item.path}}</span>
-                                        </p>
-                                        <p>
-                                            Check all
-                                            <span ng-class="item.check_all === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{item.check_all}}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End syscheck -->
-
-                        <!-- Rootcheck -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='rootcheck'">
-                            <div flex layout="row" class="md-padding">
-                                <div ng-class="managerConfiguration.rootcheck.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
-                                    <h4>
-                                        <i class="fa fa-check"></i> Rootcheck</h4>
-                                    <md-divider></md-divider>
-                                    <p>
-                                        Rootcheck disabled
-                                        <span ng-class="managerConfiguration.rootcheck.disabled === 'yes' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.rootcheck.disabled}}</span>
-                                    </p>
-                                    <p>
-                                        Rootkit files
-                                        <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.rootkit_files}}</span>
-                                    </p>
-                                    <p>
-                                        Rootkit trojans
-                                        <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.rootkit_trojans}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.rootcheck.base_directory">
-                                        Base directory
-                                        <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.base_directory}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration.rootcheck.scanall">
-                                        Scan all
-                                        <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.scanall}}</span>
-                                    </p>
-                                    <p>
-                                        Frequency
-                                        <span class="md-secondary pull-right">{{managerConfiguration.rootcheck.frequency}}</span>
-                                    </p>
-                                    <p>
-                                        Skip NFS
-                                        <span ng-class="managerConfiguration.rootcheck.skip_nfs === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.rootcheck.skip_nfs}}</span>
-                                    </p>
-                                    <br>
-                                    <h4>
-                                        <i class="fa fa-file-o"></i> System audit files</h4>
-                                    <md-divider></md-divider>
-                                    <div ng-repeat="item in managerConfiguration.rootcheck.system_audit">
-                                        <p>
-                                            File
-                                            <span class="md-secondary pull-right">{{item}}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End rootcheck -->
-
-                        <!-- Auth -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='auth'">
-                            <div flex layout="row" class="md-padding">
-                                <div ng-class="managerConfiguration.auth.disabled === 'yes' ? 'wazuh-greyed' : ''" flex="60">
-                                    <h4>
-                                        <i class="fa fa-user"></i> Auth</h4>
-                                    <md-divider></md-divider>
-                                    <p>
-                                        Disabled
-                                        <span ng-class="managerConfiguration.auth.disabled === 'yes' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.disabled}}</span>
-                                    </p>
-                                    <p>
-                                        Purge
-                                        <span ng-class="managerConfiguration.auth.purge === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.purge}}</span>
-                                    </p>
-                                    <p>
-                                        Force insert
-                                        <span ng-class="managerConfiguration.auth.force_insert === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.force_insert}}</span>
-                                    </p>
-                                    <p>
-                                        SSL verify host
-                                        <span ng-class="managerConfiguration.auth.ssl_verify_host === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.ssl_verify_host}}</span>
-                                    </p>
-                                    <p>
-                                        Limit max agents
-                                        <span ng-class="managerConfiguration.auth.limit_maxagents === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.limit_maxagents}}</span>
-                                    </p>
-                                    <p>
-                                        Force time
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.force_time}}</span>
-                                    </p>
-                                    <p>
-                                        SSL manager key
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_manager_key}}</span>
-                                    </p>
-                                    <p>
-                                        SSL manager cert
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.ssl_manager_cert}}</span>
-                                    </p>
-                                    <p>
-                                        Use source ip
-                                        <span ng-class="managerConfiguration.auth.use_source_ip === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.use_source_ip}}</span>
-                                    </p>
-                                    <p>
-                                        Use password
-                                        <span ng-class="managerConfiguration.auth.use_password === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.use_password}}</span>
-                                    </p>
-                                    <p>
-                                        Port
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.port}}</span>
-                                    </p>
-                                    <p>
-                                        SSL auto negotiate
-                                        <span ng-class="managerConfiguration.auth.ssl_auto_negotiate === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{managerConfiguration.auth.ssl_auto_negotiate}}</span>
-                                    </p>
-                                    <p>
-                                        Ciphers
-                                        <span class="md-secondary pull-right">{{managerConfiguration.auth.ciphers}}</span>
-                                    </p>
-                                </div>
-                                <div flex></div>
-                            </div>
-                        </div>
-                        <!-- End auth -->
-
-                        <!-- Logcollector -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='logcollector'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-reorder"></i> Logcollector
-                                    </h4>
-                                    <md-divider></md-divider>
-                                    <div ng-repeat="item in managerConfiguration['localfile'] | orderBy:['location', 'command']">
-                                        <p ng-if="item.location">
-                                            Location
-                                            <span class="md-secondary pull-right">{{item.location}}</span>
-                                        </p>
-                                        <p ng-if="item.command">
-                                            Command
-                                            <span class="md-secondary pull-right">{{item.command}}</span>
-                                        </p>
-                                        <p>
-                                            Log format
-                                            <span class="md-secondary pull-right">{{item.log_format}}</span>
-                                        </p>
-                                        <p ng-if="item.frequency">
-                                            Frequency
-                                            <span class="md-secondary pull-right">{{item.frequency}}</span>
-                                        </p>
-                                        <p ng-if="item.alias">
-                                            Alias
-                                            <span class="md-secondary pull-right">{{item.alias}}</span>
-                                        </p>
-                                        <p ng-if="item.check_diff">
-                                            Check diff
-                                            <span class="md-secondary pull-right">{{item.check_diff}}</span>
-                                        </p>
-                                        <md-divider ng-if="!$last"></md-divider>
-                                    </div>
-                                </div>
-                                <div flex>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End logcollector -->
-
-                        <!-- Command -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='command'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-terminal"></i> Command
-                                    </h4>
-                                    <md-divider></md-divider>
-                                    <div ng-repeat="item in managerConfiguration.command|orderBy:'name'">
-
-                                        <p>
-                                            Name
-                                            <span class="md-secondary pull-right"> {{ item.name }} </span>
-
-                                        </p>
-                                        <p ng-if="item.expect">
-                                            Expect
-                                            <span class="md-secondary pull-right">{{ item.expect }}
-                                            </span>
-                                        </p>
-                                        <p ng-if="item.executable">
-                                            Executable
-                                            <span class="md-secondary pull-right">{{ item.executable }}
-                                            </span>
-                                        </p>
-                                        <p ng-if="item.timeout_allowed">
-                                            Timeout allowed
-                                            <span ng-class="item.timeout_allowed === 'no' ? 'wazuh-greyed' : ''" class="md-secondary pull-right">{{ item.timeout_allowed}}
-                                            </span>
-                                        </p>
-                                        <md-divider ng-if="!$last"></md-divider>
-                                    </div>
-                                </div>
-                                <div flex>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End logcollector -->
-
-                        <!-- Ruleset -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='ruleset'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-dot-circle-o"></i> Ruleset
-                                    </h4>
-                                    <md-divider></md-divider>
-                                    <h4 ng-if="managerConfiguration.ruleset.decoder_dir">Decoder directories</h4>
-                                    <div ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ item }}
-                                            </span></p>
-                                    </div>
-                                    <h4 ng-if="managerConfiguration.ruleset.decoder_exclude">Decoder excludes</h4>
-                                    <div ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ item }}
-                                            </span></p>
-                                    </div>
-                                    <h4 ng-if="managerConfiguration.ruleset.decoder">Decoder files</h4>
-                                    <div ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ item }}
-                                            </span></p>
-                                    </div>
-                                    <h4 ng-if="managerConfiguration.ruleset.rule_dir">Rules directories</h4>
-                                    <div ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ item }}
-                                            </span></p>
-                                    </div>
-                                    <h4 ng-if="managerConfiguration.ruleset.include">Rules files</h4>
-                                    <div ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ item }}
-                                            </span></p>
-                                    </div>
-                                    <h4 ng-if="managerConfiguration.ruleset.rule_exclude">Rule excludes</h4>
-                                    <div ng-if="isArray(managerConfiguration.ruleset.rule_exclude)" ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ item }}
-                                            </span></p>
-                                    </div>
-                                    <div ng-if="!isArray(managerConfiguration.ruleset.rule_exclude)">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ managerConfiguration.ruleset.rule_exclude }}
-                                            </span></p>
-                                    </div>
-                                    <h4 ng-if="managerConfiguration.ruleset.list">CDB lists</h4>
-                                    <div ng-if="isArray(managerConfiguration.ruleset.list)" ng-repeat="item in managerConfiguration.ruleset.list|orderBy">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ item }}
-                                            </span></p>
-                                    </div>
-                                    <div ng-if="!isArray(managerConfiguration.ruleset.list)">
-                                        <p>Path
-                                            <span class="md-secondary pull-right">{{ managerConfiguration.ruleset.list }}
-                                            </span></p>
-                                    </div>
-                                </div>
-                                <div flex>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End ruleset -->
-
-                        <!-- Wodle -->
-                        <!--<div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='open-scap'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-sliders"></i> OpenSCAP
-                                    </h4>
-                                    <md-divider></md-divider>
-                                    <p ng-if="managerConfiguration['open-scap'].disabled">
-                                        Disabled
-                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].disabled}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration['open-scap'].timeout">
-                                        Timeout
-                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].timeout}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration['open-scap'].interval">
-                                        Interval
-                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].interval}}</span>
-                                    </p>
-                                    <p ng-if="managerConfiguration['open-scap']['scan-on-start']">
-                                        Scan on start
-                                        <span class="md-secondary pull-right">{{managerConfiguration['open-scap']['scan-on-start']}}</span>
-                                    </p>
-                                    <h4 ng-if="managerConfiguration['open-scap'].content">Content</h4>
-                                    <div ng-if="!isArray(managerConfiguration['open-scap'].content)">
-                                        <p>Policy
-                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.path}}
-                                            </span></p>
-                                        <p>Type
-                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.type}}
-                                            </span></p>
-                                        <p>Policy
-                                            <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.path}}
-                                            </span></p>
-                                        <p ng-if="!isArray(managerConfiguration['open-scap'].content.profile)">
-                                            Profile <span class="md-secondary pull-right">{{managerConfiguration['open-scap'].content.profile.$t}}</span>
-                                        </p>
-                                    </div>
-                                    <div ng-if="isArray(managerConfiguration['open-scap'].content)" ng-repeat="item in managerConfiguration['open-scap'].content track by $index">
-                                        <p>Policy
-                                            <span class="md-secondary pull-right">{{item.path}}
-                                            </span></p>
-                                        <p>Type
-                                            <span class="md-secondary pull-right">{{item.type}}
-                                            </span></p>
-                                        <p>Policy
-                                            <span class="md-secondary pull-right">{{item.path}}
-                                            </span></p>
-                                        <p ng-if="!isArray(item.profile)">
-                                            Profile <span class="md-secondary pull-right">{{item.profile.$t}}</span>
-                                        </p>
-                                        <md-divider ng-if="!$last"></md-divider>
-                                    </div>
-                                </div>
-                                <div flex></div>
-                            </div>
-                        </div> -->
-                        <!-- End wodle -->
-
-                        <!-- Active response -->
-                        <div layout="column" flex class="ownNavBarCluster topPaddingSearchNoBottom" ng-show="selectedItem==='active-response'">
-                            <div flex layout="row" class="md-padding">
-                                <div flex="60">
-                                    <h4>
-                                        <i class="fa fa-random"></i> Active response
-                                    </h4>
-                                    <md-divider></md-divider>
-                                    <div ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
-                                        <p ng-if="item.command">Command
-                                            <span class="md-secondary pull-right">{{item.command}}
-                                            </span></p>
-                                        <p ng-if="item.location">Location
-                                            <span class="md-secondary pull-right">{{item.location}}
-                                            </span></p>
-                                        <p ng-if="item.agent_id">Agent ID(s)
-                                            <span class="md-secondary pull-right">{{item.agent_id}}
-                                            </span></p>
-                                        <p ng-if="item.level">
-                                            Level <span class="md-secondary pull-right">{{item.level}}</span>
-                                        </p>
-                                        <p ng-if="item.timeout">
-                                            Timeout <span class="md-secondary pull-right">{{item.timeout}}</span>
-                                        </p>
-                                        <p ng-if="item.rules_id">
-                                            Rules ID(s) <span class="md-secondary pull-right">{{item.rules_id}}</span>
-                                        </p>
-                                        <p ng-if="item.repeated_offenders">
-                                            Repeated offenders <span class="md-secondary pull-right">{{item.repeated_offenders}}</span>
-                                        </p>
-                                        <md-divider ng-if="!$last"></md-divider>
-                                    </div>
-                                </div>
-                                <div flex></div>
-                            </div>
-                        </div>
-                        <!-- End active response -->
-
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('global')" tooltip="Click to see more details" tooltip-placement="right">
+                        Global <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Summary -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.jsonout_output">
+                        <span flex>JSON output</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.jsonout_output}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.alerts.log_alert_level">
+                        <span flex>Log alert level</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.alerts.log_alert_level}}</span>
                     </div>
                 </md-card-content>
             </md-card>
+            <!-- END GLOBAL -->
+
+            <!-- CLUSTER -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.cluster">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('cluster')" tooltip="Click to see more details" tooltip-placement="right">
+                        Cluster <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Summary -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.name">
+                        <span flex>Name</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.name}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.node_type">
+                        <span flex>Node type</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.node_type}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END CLUSTER -->
+
+            <!-- SYSCHECK -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.syscheck">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('syscheck')" tooltip="Click to see more details" tooltip-placement="right">
+                        Syscheck <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Summary -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.frequency">
+                        <span flex>Frequency</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.frequency}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.alert_new_files">
+                        <span flex>Alert new files</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.alert_new_files}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END SYSCHECK -->
+
+            <!-- ROOTCHECK -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.rootcheck">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('rootcheck')" tooltip="Click to see more details" tooltip-placement="right">
+                        Rootcheck <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Summary -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.frequency">
+                        <span flex>Frequency</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.frequency}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.skip_nfs">
+                        <span flex>Skip NFS</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.skip_nfs}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END ROOTCHECK -->
+
+            <!-- LOGCOLLECTOR -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.logcollector">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('logcollector')" tooltip="Click to see more details" tooltip-placement="right">
+                        Logcollector <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" class="wz-padding-top-10">
+                        <span flex>Logcollector settings</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END LOGCOLLECTOR -->
+
+            <!-- E-MAIL ALERTS -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.email_alerts">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('email_alerts')" tooltip="Click to see more details" tooltip-placement="right">
+                        E-mail alerts <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Summary -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.email_to">
+                        <span flex>Email to</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.email_to}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.alert_level">
+                        <span flex>Alert level</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.alert_level}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END E-MAIL ALERTS -->
+
+            <!-- AUTH -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.auth">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('auth')" tooltip="Click to see more details" tooltip-placement="right">
+                        Auth <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Summary -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.purge">
+                        <span flex>Purge</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.purge}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.force_insert">
+                        <span flex>Force insert</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.force_insert}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END AUTH -->
+
+            <!-- RULESET -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.ruleset">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('ruleset')" tooltip="Click to see more details" tooltip-placement="right">
+                        Ruleset <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" class="wz-padding-top-10">
+                        <span flex>Ruleset settings</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END RULESET -->
+
+            <!-- COMMAND -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.command">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('command')" tooltip="Click to see more details" tooltip-placement="right">
+                        Command <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" class="wz-padding-top-10">
+                        <span flex>Command settings</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END COMMAND -->
+
+            <!-- ACTIVE RESPONSE -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration['active-response'].length > 0">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('active-response')" tooltip="Click to see more details" tooltip-placement="right">
+                        Active response <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" class="wz-padding-top-10">
+                        <span flex>Active response settings</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END ACTIVE RESPONSE -->
+
+            <!-- REMOTE -->
+            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.remote">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('remote')" tooltip="Click to see more details" tooltip-placement="right">
+                        Remote <i class="fa fa-eye"></i>
+                    </span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" class="wz-padding-top-10">
+                        <span flex>Agents events listening settings</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END REMOTE -->
+
         </div>
+        <!-- End left column -->
+
+        <!-- Right column - Full configuration details -->
+        <div flex="75" layout="row" layout-align="start stretch">
+
+            <!-- GLOBAL -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'global'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-dashboard"></i> Global</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.jsonout_output">
+                        <span flex>JSON output</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.jsonout_output}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.logall">
+                        <span flex>Log all</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.logall}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.logall">
+                        <span flex>Log all in JSON</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.logall_json}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.white_list">
+                        <span flex>White list</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.white_list.length
+                            <= 5 ? managerConfiguration.global.white_list : managerConfiguration.global.white_list.length}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.stats">
+                        <span flex>Stats</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.stats}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.host_infomation">
+                        <span flex>Host information</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.host_infomation}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.alerts.log_alert_level">
+                        <span flex>Log alert level</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.alerts.log_alert_level}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_notification">
+                        <span flex>E-mail notifications</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_notification}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.alerts.email_alert_level">
+                        <span flex>E-mail alert level</span>
+                        <span flex class="text-right color-grey">{{ managerConfiguration.alerts.email_alert_level }}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_to">
+                        <span flex>E-mail to</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_to}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_from">
+                        <span flex>E-mail from</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_from}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.smtp_server">
+                        <span flex>SMTP server</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.smtp_server}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_maxperhour">
+                        <span flex>Max email per hour</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_maxperhour}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_idsname">
+                        <span flex>E-mail IDS name</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_idsname}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END GLOBAL -->
+
+            <!-- CLUSTER -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'cluster'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-server"></i> Cluster</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.disabled">
+                        <span flex>Disabled</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.disabled}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.hidden">
+                        <span flex>Hidden</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.hidden}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.name">
+                        <span flex>Name</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.name}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.interval">
+                        <span flex>Interval</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.interval}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.node_name">
+                        <span flex>Node name</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.node_name}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.node_type">
+                        <span flex>Node type</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.node_type}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.port">
+                        <span flex>Port</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.port}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.bind_addr">
+                        <span flex>Bind address</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.bind_addr}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.nodes">
+                        <span flex>Nodes</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.nodes}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END CLUSTER -->
+
+            <!-- SYSCHECK -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'syscheck'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> Syscheck</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.disabled">
+                        <span flex>Disabled</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.disabled}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.frequency">
+                        <span flex>Frequency</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.frequency}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_time">
+                        <span flex>Scan time</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.scan_time}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_day">
+                        <span flex>Scan day</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.scan_day}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.auto_ignore">
+                        <span flex>Auto ignore</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.auto_ignore}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.alert_new_files">
+                        <span flex>Alert new files</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.alert_new_files}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_on_start">
+                        <span flex>Scan on start</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.scan_on_start}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.nodiff">
+                        <span flex>No diff</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.nodiff}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.skip_nfs">
+                        <span flex>Skip NFS</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.skip_nfs}}</span>
+                    </div>
+
+                    <!-- Section title -->
+                    <div layout="row" class="wz-padding-top-10">
+                        <span class="wz-headline-title"><i class="fa fa-fw fa-folder-o"></i> Monitoring directories</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div ng-repeat="item in managerConfiguration.syscheck.directories">
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.path">
+                            <span flex>Path</span>
+                            <span flex class="text-right color-grey">{{item.path}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_all">
+                            <span flex>Check all</span>
+                            <span flex class="text-right color-grey">{{item.check_all}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END SYSCHECK -->
+
+            <!-- ROOTCHECK -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'rootcheck'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-check"></i> Rootcheck</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.disabled">
+                        <span flex>Disabled</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.disabled}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.rootkit_files">
+                        <span flex>Rootkit files</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.rootkit_files}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.rootkit_trojans">
+                        <span flex>Rootkit trojans</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.rootkit_trojans}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.base_directory">
+                        <span flex>Base directory</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.base_directory}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.scanall">
+                        <span flex>Scan all</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.scanall}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.frequency">
+                        <span flex>Frequency</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.frequency}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.skip_nfs">
+                        <span flex>Skip NFS</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.skip_nfs}}</span>
+                    </div>
+
+                    <!-- Section title -->
+                    <div layout="row" class="wz-padding-top-10">
+                        <span class="wz-headline-title"><i class="fa fa-fw fa-file-o"></i> System audit files</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div ng-repeat="item in managerConfiguration.rootcheck.system_audit">
+                        <div layout="row" class="wz-padding-top-10" ng-if="item">
+                            <span flex>File</span>
+                            <span flex class="text-right color-grey">{{item}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END ROOTCHECK -->
+
+            <!-- RULESET -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'ruleset'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-dot-circle-o"></i> Ruleset</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Decoder directories -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.decoder_dir">
+                        <span class="wz-headline-title">Decoder directories</span>
+                    </div>
+                    <div ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>Path</span>
+                            <span flex class="text-right color-grey">{{item}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+
+                    <!-- Decoder excludes -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.decoder_exclude">
+                        <span class="wz-headline-title">Decoder excludes</span>
+                    </div>
+                    <div ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>Path</span>
+                            <span flex class="text-right color-grey">{{item}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+
+                    <!-- Decoder files -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.decoder">
+                        <span class="wz-headline-title">Decoder files</span>
+                    </div>
+                    <div ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>Path</span>
+                            <span flex class="text-right color-grey">{{item}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+
+                    <!-- Rules directories -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.rule_dir">
+                        <span class="wz-headline-title">Rules directories</span>
+                    </div>
+                    <div ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>Path</span>
+                            <span flex class="text-right color-grey">{{item}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+
+                    <!-- Rules files -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.include">
+                        <span class="wz-headline-title">Rules files</span>
+                    </div>
+                    <div ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>Path</span>
+                            <span flex class="text-right color-grey">{{item}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+
+                    <!-- Rule excludes -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.rule_exclude">
+                        <span class="wz-headline-title">Rule excludes</span>
+                    </div>
+                    <div ng-if="isArray(managerConfiguration.ruleset.rule_exclude)" ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index">
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>Path</span>
+                            <span flex class="text-right color-grey">{{item}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="!isArray(managerConfiguration.ruleset.rule_exclude)">
+                        <span flex>Path</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.ruleset.rule_exclude}}</span>
+                    </div>
+
+                    <!-- CDB Lists -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.list">
+                        <span class="wz-headline-title">CDB Lists</span>
+                    </div>
+                    <div ng-if="isArray(managerConfiguration.ruleset.list)" ng-repeat="item in managerConfiguration.ruleset.list|orderBy">
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>Path</span>
+                            <span flex class="text-right color-grey">{{item}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="!isArray(managerConfiguration.ruleset.list)">
+                        <span flex>Path</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.ruleset.list}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END RULESET -->
+
+            <!-- LOGCOLLECTOR -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'logcollector'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-reorder"></i> Logcollector</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div ng-repeat="item in managerConfiguration['localfile'] | orderBy:['location', 'command']">
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.location">
+                            <span flex>Location</span>
+                            <span flex class="text-right color-grey">{{item.location}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.command">
+                            <span flex>Command</span>
+                            <span flex class="text-right color-grey">{{item.command}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.log_format">
+                            <span flex>Log format</span>
+                            <span flex class="text-right color-grey">{{item.log_format}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.frequency">
+                            <span flex>Frequency</span>
+                            <span flex class="text-right color-grey">{{item.frequency}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.alias">
+                            <span flex>Alias</span>
+                            <span flex class="text-right color-grey">{{item.alias}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_diff">
+                            <span flex>Check diff</span>
+                            <span flex class="text-right color-grey">{{item.check_diff}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END LOGCOLLECTOR -->
+
+            <!-- EMAIL ALERTS -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'email_alerts'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-envelope-o"></i> E-mail alerts</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.email_to">
+                        <span flex>Email to</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.email_to}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.alert_level">
+                        <span flex>Alert level</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.alert_level}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.group">
+                        <span flex>Group</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.group}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.event_location">
+                        <span flex>Event location</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.event_location}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.format">
+                        <span flex>Format</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.format}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.rule_id">
+                        <span flex>Rule ID</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.rule_id}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.do_not_delay">
+                        <span flex>Do not delay</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.do_not_delay}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.do_not_group">
+                        <span flex>Do not group</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.do_not_group}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END EMAIL ALERTS -->
+
+            <!-- AUTH -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'auth'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-server"></i> Auth</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.disabled">
+                        <span flex>Disabled</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.disabled}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.purge">
+                        <span flex>Purge</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.purge}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.force_insert">
+                        <span flex>Force insert</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.force_insert}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_verify_host">
+                        <span flex>SSL verify host</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ssl_verify_host}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.limit_maxagents">
+                        <span flex>Limit max agents</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.limit_maxagents}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.force_time">
+                        <span flex>Force time</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.force_time}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_manager_key">
+                        <span flex>SSL manager key</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ssl_manager_key}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_manager_cert">
+                        <span flex>SSL manager cert</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ssl_manager_cert}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.use_source_ip">
+                        <span flex>Use source IP</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.use_source_ip}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.use_password">
+                        <span flex>Use password</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.use_password}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.port">
+                        <span flex>Port</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.port}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_auto_negotiate">
+                        <span flex>SSL auto negotiate</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ssl_auto_negotiate}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ciphers">
+                        <span flex>Ciphers</span>
+                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ciphers}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END AUTH -->
+
+            <!-- COMMAND -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'command'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-terminal"></i> Command</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div ng-repeat="item in managerConfiguration.command|orderBy:'name'">
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.name">
+                            <span flex>Name</span>
+                            <span flex class="text-right color-grey">{{item.name}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.expect">
+                            <span flex>Expect</span>
+                            <span flex class="text-right color-grey">{{item.expect}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.executable">
+                            <span flex>Executable</span>
+                            <span flex class="text-right color-grey">{{item.executable}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.timeout_allowed">
+                            <span flex>Timeout allowed</span>
+                            <span flex class="text-right color-grey">{{item.timeout_allowed}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END COMMAND -->
+
+            <!-- ACTIVE RESPONSE -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'active-response'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-random"></i> Active response</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.command">
+                            <span flex>Command</span>
+                            <span flex class="text-right color-grey">{{item.command}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.location">
+                            <span flex>Location</span>
+                            <span flex class="text-right color-grey">{{item.location}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.agent_id">
+                            <span flex>Agent ID(s)</span>
+                            <span flex class="text-right color-grey">{{item.agent_id}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.level">
+                            <span flex>Level</span>
+                            <span flex class="text-right color-grey">{{item.level}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.timeout">
+                            <span flex>Timeout</span>
+                            <span flex class="text-right color-grey">{{item.timeout}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id">
+                            <span flex>Rules ID(s)</span>
+                            <span flex class="text-right color-grey">{{item.rules_id}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.repeated_offenders">
+                            <span flex>Repeated offenders</span>
+                            <span flex class="text-right color-grey">{{item.repeated_offenders}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END ACTIVE RESPONSE -->
+
+            <!-- REMOTE -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'remote'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-feed"></i> Remote</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Full details -->
+                    <div ng-repeat="item in managerConfiguration.remote">
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.connection">
+                            <span flex>Connection</span>
+                            <span flex class="text-right color-grey">{{item.connection}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.port">
+                            <span flex>Port</span>
+                            <span flex class="text-right color-grey">{{item.port}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.protocol">
+                            <span flex>Protocol</span>
+                            <span flex class="text-right color-grey">{{item.protocol}}</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END REMOTE -->
+
+        </div>
+        <!-- End right column -->
+
     </div>
+
 </md-content>

@@ -1,30 +1,29 @@
 // Require CSS
 require('plugins/wazuh/less/loader');
-//require('plugins/wazuh/less/ui_framework.less');
 
 // Set up Wazuh app
-var app = require('ui/modules').get('app/wazuh', ['ngCookies','ngMaterial'])
-  .config(['$compileProvider', function ($compileProvider) {
-    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
-  }])
-  .config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.useApplyAsync(true);
-  }]);
+const app = require('ui/modules').get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
-//Bootstrap and font awesome
-require('plugins/wazuh/../node_modules/bootstrap/dist/css/bootstrap.min.css');
-require('plugins/wazuh/../node_modules/bootstrap/dist/js/bootstrap.min.js');
+app.config(['$compileProvider', function ($compileProvider) {
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
+}])
+
+app.config(['$httpProvider', function ($httpProvider) {
+  $httpProvider.useApplyAsync(true);
+}]);
+
+// Font Awesome, Kibana UI framework and others
 require('plugins/wazuh/utils/fontawesome/css/font-awesome.min.css');
 require('plugins/wazuh/utils/when-scrolled/when-scrolled.js');
 require('../../../ui_framework/dist/ui_framework.css');
 
-//Material
+// Material
 require('plugins/wazuh/../node_modules/angular-material/angular-material.css');
 require('plugins/wazuh/../node_modules/angular-aria/angular-aria.js');
 require('plugins/wazuh/../node_modules/angular-animate/angular-animate.js');
 require('plugins/wazuh/../node_modules/angular-material/angular-material.js');
 
-//Cookies
+// Cookies
 require('plugins/wazuh/../node_modules/angular-cookies/angular-cookies.min.js');
 
 ////////////////////////////////////////////////////////////////////
@@ -58,9 +57,12 @@ require('plugins/wazuh/factories/data-handler-composer.js');
 require('plugins/wazuh/directives/wz-dynamic/wz-dynamic.js');
 require('plugins/wazuh/directives/wz-enter/wz-enter.js');
 require('plugins/wazuh/directives/wz-menu/wz-menu.js');
+require('plugins/wazuh/directives/wz-menu/wz-menu.less');
 require('plugins/wazuh/directives/wz-search-bar/wz-search-bar.js');
 require('plugins/wazuh/directives/wz-table-header/wz-table-header.js');
+require('plugins/wazuh/directives/wz-table-header/wz-table-header.less');
 require('plugins/wazuh/directives/wz-table/wz-table.js');
+require('plugins/wazuh/directives/wz-table/wz-table.less');
 
 // Blank Screen
 require('plugins/wazuh/controllers/blank-screen-controller.js');

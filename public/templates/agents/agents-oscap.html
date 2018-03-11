@@ -2,107 +2,90 @@
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
-        <div layout="row" layout-align="center stretch" class="height-120">
-            <md-card flex="20">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Agents-OSCAP-Higher-score-metric'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="20">
-                <md-card-content class="wazuh-column">
-                    <kbn-vis class="metric" vis-id="'Wazuh-App-Agents-OSCAP-Lower-score-metric'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="20">
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Last score</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-OSCAP-Last-score'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="40">
-                <md-card-content class="wazuh-column text-center">
-                    <div class="ng-binding">Last scan profile</div>
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-OSCAP-Last-scan-profile'"></kbn-vis>
+        <div layout="row">
+            <md-card flex class="wz-metric-color wz-md-card">
+                <md-card-content layout="row" class="wz-padding-metric">
+                    <div flex>Last score: <span class="wz-font-weight-bold">{{scapLastScore}}</span></div>
+                    <div flex>Highest score: <span class="wz-font-weight-bold">{{scapHighestScore}}</span></div>
+                    <div flex>Lowest score: <span class="wz-font-weight-bold">{{scapLowestScore}}</span></div>
                 </md-card-content>
             </md-card>
         </div>
 
+        <div class="wz-no-display">
+            <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Last-score'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Higher-score-metric'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Lower-score-metric'"></kbn-vis>
+        </div>
+
         <div layout="row" layout-align="center stretch" class="height-230">
-            <md-card flex="25">
+            <md-card flex="25" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Scans</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Scans</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Scans'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="25">
+            <md-card flex="25" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Profiles</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Profiles</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Profiles'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="25">
+            <md-card flex="25" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Content</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Content</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Content'"></kbn-vis>
                 </md-card-content>
             </md-card>
-
-            <md-card flex="25">
+            <md-card flex="25" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Severity</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Severity</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Severity'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
         <div layout="row" layout-align="start stretch" class="height-230">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Daily scans evolution</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Daily scans evolution</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Daily-scans-evolution'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
         <div layout="row" layout-align="center stretch" class="height-250">
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Top 5 - Alerts</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Top 5 - Alerts</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Top-5-Alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Top 5 - High risk alerts</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Top 5 - High risk alerts</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Top-5-High-risk-alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="height-120">
-            <md-card flex>
-                <md-card-content class="wazuh-column text-center">
-                    <kbn-vis class="kbn-vis-value" vis-id="'Wazuh-App-Agents-OSCAP-Top-alert'"></kbn-vis>
-                    <div class="ng-binding">Top alert</div>
+        <div layout="row" layout-align="center stretch" class="height-570">
+            <md-card flex class="wz-md-card"> 
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title">Alerts summary</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-OSCAP-Last-alerts'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="height-570">
-            <md-card flex>
-                <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts summary</span>
-                    <md-divider></md-divider>
-                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Agents-OSCAP-Last-alerts'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
     </div>
+
 </md-content>

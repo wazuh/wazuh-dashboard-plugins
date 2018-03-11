@@ -36,6 +36,28 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         vulnLow     : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
     }
 
+    // Metrics Scap
+    const metricsScap = {
+        scapLastScore   : '[vis-id="\'Wazuh-App-Overview-OSCAP-Last-score\'"]',
+        scapHighestScore: '[vis-id="\'Wazuh-App-Overview-OSCAP-Highest-score\'"]',
+        scapLowestScore : '[vis-id="\'Wazuh-App-Overview-OSCAP-Lowest-score\'"]'
+    }
+
+    // Metrics Virustotal
+    const metricsVirustotal = {
+        virusMalicious: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Malicious\'"]',
+        virusPositives: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Positives\'"]',
+        virusTotal    : '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
+    }
+
+    // Metrics AWS
+    const metricsAws = {
+        awsLogins        :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Successful-logins\'"]',
+        awsMostActiveUser:'[vis-id="\'Wazuh-App-Overview-AWS-Most-active-user\'"]',
+        awsAuthorized    :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Authorize-security\'"]',
+        awsRevoked       :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
+    }
+
     // Check the url hash and retrieve the tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
@@ -83,21 +105,33 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     const checkMetrics = (tab,subtab) => {
         metricService.destroyWatchers();
-        if(tab === 'general' && subtab === 'panels'){
-            metricService.createWatchers(metricsGeneral);
+
+        if(subtab === 'panels'){
+            switch (tab) {
+                case 'general':
+                    metricService.createWatchers(metricsGeneral);
+                    break;
+                case 'fim':
+                    metricService.createWatchers(metricsFim);
+                    break;
+                case 'audit':
+                    metricService.createWatchers(metricsAudit);
+                    break;
+                case 'vuls':
+                    metricService.createWatchers(metricsVulnerability);
+                    break;
+                case 'oscap':
+                    metricService.createWatchers(metricsScap);
+                    break;
+                case 'virustotal':
+                    metricService.createWatchers(metricsVirustotal);
+                    break;
+                case 'aws':
+                    metricService.createWatchers(metricsAws);
+                    break;
+            }
         }
-
-        if(tab === 'fim' && subtab === 'panels'){
-            metricService.createWatchers(metricsFim);
-        } 
-
-        if(tab === 'audit' && subtab === 'panels'){
-            metricService.createWatchers(metricsAudit);
-        } 
-
-        if(tab === 'vuls' && subtab === 'panels'){
-            metricService.createWatchers(metricsVulnerability);
-        }
+        
         if(!$rootScope.$$phase) $rootScope.$digest();
     }
     
@@ -114,8 +148,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-
-        checkMetrics(tab,$scope.tabView);
+        checkMetrics(tab,'panels');
 
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {

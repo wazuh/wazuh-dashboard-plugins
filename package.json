@@ -1,7 +1,7 @@
 {
   "name": "wazuh",
   "version": "3.2.1",
-  "revision": "0385",
+  "revision": "0386",
   "kibana": {
     "version": "6.2.2"
   },
@@ -29,7 +29,6 @@
     "angular-material": "1.1.1",
     "angular-md5": "^0.1.10",
     "ansicolors": "^0.3.2",
-    "bootstrap": "^3.3.7",
     "install": "^0.10.1",
     "js-yaml": "3.10.0",
     "lodash": "3.10.1",

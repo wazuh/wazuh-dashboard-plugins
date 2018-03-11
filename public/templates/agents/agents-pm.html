@@ -2,40 +2,41 @@
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
-        <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
 
         <div layout="row" class="height-240">
-            <md-card flex="50">
+            <md-card flex="50" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts over time</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Alerts over time</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-PM-Alerts-over-time'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="25">
+            <md-card flex="25" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Top 5 CIS Requirements</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Top 5 CIS Requirements</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-PM-Top-5-CIS-Requirements'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="25">
+            <md-card flex="25" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Top 5 PCI DSS Requirements</span>
-                    <md-divider></md-divider>
+                    <span class="wz-headline-title">Top 5 PCI DSS Requirements</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-PM-Top-5-PCI-DSS-Requirements'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
         <div layout="row" layout-align="space-between stretch" class="height-570">
-            <md-card flex="100">
+            <md-card flex="100" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="md-headline">Alerts summary</span>
-                    <md-divider></md-divider>
-                    <kbn-vis class="kbn-chart" vis-id="'Wazuh-App-Agents-PM-Alerts-summary'"></kbn-vis>
+                    <span class="wz-headline-title">Alerts summary</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-PM-Alerts-summary'"></kbn-vis>
                 </md-card-content>
             </md-card>
        </div>
+
     </div>
+
 </md-content>

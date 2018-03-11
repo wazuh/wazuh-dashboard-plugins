@@ -1,29 +1,25 @@
 <div flex ng-controller="agentsController" layout="column">
 
-    <md-content class="wazuhMenuNavBar height-70" ng-init="menuNavItem = 'agents'">
+    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'agents'">
 		<wz-menu></wz-menu>
-    </md-content>
+    </div>
 
-	<div layout="row" layout-align="space-between start" class="background-f7">
-		<md-toolbar class="height-50">
-			<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-				<div class="agents-head-1" ng-if="agent">
-					<div class="agents-head-2">
-						<span> <i class="fa fa-desktop agents-head-3" aria-hidden="true"></i>
+	<div layout="row" layout-align="space-between start" class="height-50">
+		<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+			<div flex class="layout-row" ng-if="agent">
+				<div class="flex">
+					<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
 						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
-					</div>
 
-					<div class="agents-head-4">
-						<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)">{{formatAgentStatus(agent.status)}}</span>
-					</div>
+					<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
 				</div>
-
+				
 				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
 					<md-autocomplete id="agentsAutocomplete" flex
 					md-no-cache="true"
 					md-select-on-match="false"
 					md-selected-item="_swpagent"
-					md-selected-item-change="getAgent(_swpagent.id)"
+					md-selected-item-change="getAgent(_swpagent.id,true)"
 					md-search-text="searchTerm"
 					md-items="agentAutoComplete in analizeAgents(searchTerm)"
 					md-item-text="agentAutoComplete.name"
@@ -47,12 +43,12 @@
 					</md-autocomplete>
 				</span>
 			</div>
-		</md-toolbar>
+		</div>
 	</div>
 
 	<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
 		<div class="horizontalTabsBar" layout="column" layout-align="center start">
-			<md-nav-bar class="padding-right-0" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
+			<md-nav-bar class="padding-right-0 wz-md-navbar" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchTab('general')" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy Monitoring</md-nav-item>
@@ -66,12 +62,12 @@
 		</div>
 
 		<div ng-show="tab != 'configuration'" class="horizontalTabsBar" layout="column" layout-align="end end">
-			<md-nav-bar layout-align="end end" class="padding-right-0" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
+			<md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-					<i class="fa fa-th agents-head-6" aria-hidden="true"></i>Panels
+					<i class="fa fa-th fa-fw"></i> Panels
 				</md-nav-item>
 				<md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-					<img class="agents-head-7" kbn-src="/plugins/wazuh/img/discover.svg">Discover
+					<i class="fa fa-compass fa-fw"></i> Discover
 				</md-nav-item>
 			</md-nav-bar>
 		</div>
@@ -89,7 +85,7 @@
 
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="tab != 'configuration' && resultState !== 'ready' && tabView === 'panels'">
-        <md-card flex layout="column">
+        <md-card flex layout="column" class="wz-md-card">
             <md-card-content class="text-center">
                 No results for selected time interval
             </md-card-content>
