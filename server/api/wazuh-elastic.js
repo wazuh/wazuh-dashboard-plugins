@@ -20,7 +20,7 @@ module.exports = (server, options) => {
             type:  'wazuh-configuration',
             id:     id
         })
-        .then((data) => {
+        .then(data => {
             callback({
                 'user':         data._source.api_user,
                 'password':     Buffer.from(data._source.api_password, 'base64').toString("ascii"),
@@ -31,7 +31,13 @@ module.exports = (server, options) => {
                 'extensions':   data._source.extensions
             });
         })
-        .catch((error) => {
+        .catch(error => {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-elastic.js getConfig',
+                message: error.message || error
+            });
             callback({
                 'error': 'no elasticsearch',
                 'error_code': 2
@@ -60,7 +66,7 @@ module.exports = (server, options) => {
                 }
             } 
         })
-        .then((resp) => {
+        .then(resp => {
             // Update the pattern in the configuration
             importAppObjects(req.params.pattern);
             reply({
@@ -68,7 +74,13 @@ module.exports = (server, options) => {
                 'data':       'Index pattern updated'
             });
         })
-        .catch((err) => {
+        .catch(error => {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-elastic.js updateAppObjects',
+                message: error.message || error
+            });
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -79,7 +91,7 @@ module.exports = (server, options) => {
 
     const getTemplate = (req, reply) => {
         elasticRequest.callWithInternalUser('cat.templates', {})
-        .then((data) => {
+        .then(data => {
             if (req.params.pattern == "wazuh-alerts-3.x-*" && data.includes("wazuh-alerts-3.*")) {
                 reply({
                     'statusCode': 200,
@@ -115,7 +127,13 @@ module.exports = (server, options) => {
                 }
             }
         })
-        .catch((error) => {
+        .catch(error => {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-elastic.js getTemplate',
+                message: error.message || error
+            });
             reply({
                 'statusCode': 500,
                 'error':      10000,
@@ -156,7 +174,13 @@ module.exports = (server, options) => {
                 'data': 'Index pattern not found'
             });
         })
-        .catch((error) => {
+        .catch(error => {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-elastic.js checkPattern',
+                message: error.message || error
+            });
             reply({
                 'statusCode': 500,
                 'error':      10000,
@@ -218,7 +242,7 @@ module.exports = (server, options) => {
         payload.aggs['2'].terms.field = req.params.field;
 
         fetchElastic(req, payload)
-        .then((data) => {
+        .then(data => {
 
             if (data.hits.total === 0 || typeof data.aggregations['2'].buckets[0] === 'undefined'){
                 reply({
@@ -232,7 +256,13 @@ module.exports = (server, options) => {
                 });
             }
         })
-        .catch((error) => {
+        .catch(error => {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-elastic.js getFieldTop',
+                message: error.message || error
+            });
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -247,7 +277,7 @@ module.exports = (server, options) => {
                 index: '.wazuh-version',
                 type: 'wazuh-version'
         })
-        .then((data) => {
+        .then(data => {
             if (data.hits.total === 0) {
                 reply({
                     'statusCode': 200,
@@ -260,7 +290,13 @@ module.exports = (server, options) => {
                 });
             }
         })
-        .catch((error) => {
+        .catch(error => {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-elastic.js getSetupInfo',
+                message: error.message || error
+            });
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -287,6 +323,12 @@ module.exports = (server, options) => {
             }
         })
         .catch(error => {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-elastic.js getCurrentlyAppliedPattern',
+                message: error.message || error
+            });
             if(error && error.message && error.message === 'no_visualization'){
                 return reply('kibana_index_pattern_error').code(500);
             }
