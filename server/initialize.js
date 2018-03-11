@@ -11,16 +11,24 @@ const fs   = require('fs');
 const yml  = require('js-yaml');
 const path = require('path');
 const winston = require('winston');
-global.wazuhlogger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-      new winston.transports.File({ filename: 'error.log', level: 'error' }),
-      new winston.transports.File({ filename: 'combined.log' })
-    ]
-});
+
 module.exports = (server, options) => {
-    
+
+    global.wazuhlogger = winston.createLogger({
+        level: 'info',
+        format: winston.format.json(),
+        transports: [
+          new winston.transports.File({ filename: path.join(__dirname,'../../error.log'), level: 'error' }),
+          new winston.transports.File({ filename: path.join(__dirname,'../../combined.log') })
+        ]
+    });
+    wazuhlogger.exitOnError = false;
+    wazuhlogger.log({
+        date: new Date(),
+        level: 'info',
+        location: 'initialize.js',
+        message: 'Initializing'
+    });
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
