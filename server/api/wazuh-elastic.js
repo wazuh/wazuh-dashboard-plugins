@@ -5,6 +5,26 @@ module.exports = (server, options) => {
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
+    const getTimeStamp = async (req,reply) => {
+        try {
+            const data = await elasticRequest.callWithInternalUser('search', {
+                index: '.wazuh-version',
+                type:  'wazuh-version'
+            })
+            if(data.hits && data.hits.hits[0] && data.hits.hits[0]._source && data.hits.hits[0]._source.installationDate){
+                return reply({installationDate: data.hits.hits[0]._source.installationDate});
+            } else {
+                throw new Error('Could not fetch .wazuh-version index');
+            }
+        } catch (err) {
+            reply({
+                'statusCode': 500,
+                'error':      99,
+                'message':    err.message || 'Could not fetch .wazuh-version index'
+            }).code(500);
+        }
+    }
+
     //Handlers
     const fetchElastic = (req, payload) => {
         return elasticRequest.callWithRequest(req, 'search', {
@@ -365,5 +385,11 @@ module.exports = (server, options) => {
         method: 'GET',
         path: '/api/wazuh-elastic/updatePattern/{pattern}',
         handler: updateAppObjects
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/timestamp',
+        handler: getTimeStamp
     });
 };
