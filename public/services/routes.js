@@ -14,9 +14,24 @@ const healthCheck = ($window, $rootScope) => {
     }
 };
 
+const checkTimestamp = async (appState,genericReq,errorHandler) => {
+    try {
+        const data = await genericReq.request('GET', '/api/wazuh-elastic/timestamp');
+        const current = appState.getCreatedAt();
+        if(!current && data && data.data && data.data.installationDate) {
+            appState.setCreatedAt(data.data.installationDate);
+        }   
+        return;
+    } catch (err){
+        errorHandler.handle(err,'Routes - Check timestamp');
+    }
+}
+
 //Installation wizard
 const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler) => {
     let deferred = $q.defer();
+
+    
 
     // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
     if (!$location.path().includes("/health-check")) {
@@ -72,8 +87,14 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
     }
 
     const callCheckStored = () => {
-        testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id)
+        checkTimestamp(appState,genericReq,errorHandler)
+        .then(() => testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id))
         .then(data => {
+            if(data === 'cookies_outdated'){
+                $location.search('tab','api');
+                $location.path('/settings');
+                return;
+            }
             if (data.data.error || data.data.data.apiIsDown) {
                 checkResponse(data);
             } else {
@@ -152,7 +173,6 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
 
             genericReq.request('GET', '/api/wazuh-elastic/current-pattern')
             .then(data => {
-
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
