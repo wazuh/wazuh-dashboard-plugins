@@ -4,11 +4,27 @@ const app = require('ui/modules').get('app/wazuh', []);
 app.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
     return {
         check_stored: data => {
-            const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
-            if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
+            
             let defered = $q.defer();
+
+            const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
             $http
-            .post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers)
+            .get(chrome.addBasePath('/api/wazuh-elastic/timestamp'))
+            .then(timestamp => {
+                const current = appState.getCreatedAt();
+                if(!$rootScope.comeFromSettings && current && timestamp.data && timestamp.data.installationDate && timestamp.data.installationDate > current){
+                    appState.removeCurrentPattern();
+                    appState.removeCurrentAPI();
+                    appState.removeClusterInfo();
+                    delete $rootScope.comeFromSettings;
+                    return defered.resolve('cookies_outdated');
+                }
+                delete $rootScope.comeFromSettings;
+                if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
+                
+                return $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers)
+
+            })
             .then(response => {
                 if (response.error) {
                     defered.reject(response);
