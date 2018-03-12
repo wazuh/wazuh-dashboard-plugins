@@ -59,6 +59,9 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
         getCreatedAt: () => {
             return $cookies.getObject('_createdAt');
         }, 
+        removeCreatedAt: () => {
+            return $cookies.remove('_createdAt');
+        }, 
         getCurrentAPI: () => {
             return $cookies.getObject('API');
         },

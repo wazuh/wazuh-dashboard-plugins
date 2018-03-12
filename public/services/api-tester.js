@@ -6,17 +6,23 @@ app.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
         check_stored: data => {
             
             let defered = $q.defer();
-
+            
             const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
-            let timestamp = $rootScope.installationDate;
-   
-            const current = appState.getCreatedAt();
-            if(!$rootScope.comeFromSettings && current && timestamp && timestamp > current){
+            
+            /** Checks for outdated cookies */
+            const current     = appState.getCreatedAt();
+            const lastRestart = $rootScope.lastRestart;
+
+            if(current && lastRestart && lastRestart > current){
                 appState.removeCurrentPattern();
                 appState.removeCurrentAPI();
                 appState.removeClusterInfo();
-                return defered.resolve('cookies_outdated');
+                appState.removeCreatedAt();
+                defered.resolve('cookies_outdated');
+                delete $rootScope.lastRestart;
+                return defered.promise;
             }
+            /** End of checks for outdated cookies */
 
             if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
                 
