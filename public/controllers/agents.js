@@ -33,7 +33,7 @@ app.controller('agentsController',
             auditModifiedFiles: '[vis-id="\'Wazuh-App-Agents-Audit-Modified-files-metric\'"]',
             auditRemovedFiles : '[vis-id="\'Wazuh-App-Agents-Audit-Removed-files-metric\'"]'
         }
-    
+
         // Metrics Vulnerability Detector
         const metricsVulnerability = {
             vulnCritical: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]',
@@ -205,7 +205,7 @@ app.controller('agentsController',
             if(lastAgent && lastAgent !== id){
                 $rootScope.agentsAutoCompleteFired = true;
                 if(!$rootScope.$$phase) $rootScope.$digest();
-            }            
+            }
         }
 
         $scope.getAgent = async (newAgentId,fromAutocomplete) => {
@@ -332,7 +332,8 @@ app.controller('agentsController',
 
         /** Agent configuration */
         $scope.switchConfigTab = selected => {
-
+            $scope.configTab = selected;
+            if(!$scope.$$phase) $scope.$digest();
         };
 
         $scope.isArray = angular.isArray;

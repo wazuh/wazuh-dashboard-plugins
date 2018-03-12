@@ -4,9 +4,9 @@
 		<wz-menu></wz-menu>
     </div>
 
-	<div layout="row" layout-align="space-between start">
-		<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-			<div flex class="layout-row" ng-if="agent">
+	<div layout="row">
+		<div class="md-toolbar-tools" layout="row">
+			<div flex layout-align="center center" class="layout-row" ng-if="agent">
 				<div class="flex">
 					<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
 						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
