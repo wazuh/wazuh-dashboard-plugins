@@ -330,12 +330,6 @@ app.controller('agentsController',
         $scope.tabs          = tabs;
         $scope.selectedIndex = 0;
 
-        /** Agent configuration */
-        $scope.switchConfigTab = item => {
-            $scope.selectedConfigTab = item;
-            if(!$scope.$$phase) $scope.$digest();
-        };
-
         $scope.isArray = angular.isArray;
 
         const getAgent = newAgentId => {
