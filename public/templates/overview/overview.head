@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
+    <!-- <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear> -->
 
     <!-- View: Discover -->
     <kbn-dis></kbn-dis>
