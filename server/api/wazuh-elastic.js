@@ -32,12 +32,6 @@ module.exports = (server, options) => {
             });
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-elastic.js getConfig',
-                message: error.message || error
-            });
             callback({
                 'error': 'no elasticsearch',
                 'error_code': 2
@@ -75,12 +69,6 @@ module.exports = (server, options) => {
             });
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-elastic.js updateAppObjects',
-                message: error.message || error
-            });
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -128,12 +116,6 @@ module.exports = (server, options) => {
             }
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-elastic.js getTemplate',
-                message: error.message || error
-            });
             reply({
                 'statusCode': 500,
                 'error':      10000,
@@ -175,12 +157,6 @@ module.exports = (server, options) => {
             });
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-elastic.js checkPattern',
-                message: error.message || error
-            });
             reply({
                 'statusCode': 500,
                 'error':      10000,
@@ -257,12 +233,6 @@ module.exports = (server, options) => {
             }
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-elastic.js getFieldTop',
-                message: error.message || error
-            });
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -291,12 +261,6 @@ module.exports = (server, options) => {
             }
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-elastic.js getSetupInfo',
-                message: error.message || error
-            });
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -323,12 +287,6 @@ module.exports = (server, options) => {
             }
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-elastic.js getCurrentlyAppliedPattern',
-                message: error.message || error
-            });
             if(error && error.message && error.message === 'no_visualization'){
                 return reply('kibana_index_pattern_error').code(500);
             }

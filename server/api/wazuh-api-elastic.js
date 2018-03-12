@@ -15,12 +15,6 @@ module.exports = (server, options) => {
             reply(data.hits.hits);
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-api-elastic.js getAPIEntries',
-                message: error.message || error
-            });
             reply(error);
         });
     };
@@ -36,12 +30,6 @@ module.exports = (server, options) => {
             reply(data);
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-api-elastic.js deleteAPIEntries',
-                message: error.message || error
-            });
             reply(error);
         });
     };
@@ -85,12 +73,6 @@ module.exports = (server, options) => {
                     });
                 })
                 .catch(error => {
-                    wazuhlogger.log({
-                        date: new Date(),
-                        level: 'error',
-                        location: 'wazuh-api-elastic.js setAPIEntryDefault',
-                        message: error.message || error
-                    });
                     reply({
                         statusCode: 500,
                         error:      8,
@@ -117,12 +99,6 @@ module.exports = (server, options) => {
                     });
                 })
                 .catch(error => {
-                    wazuhlogger.log({
-                        date: new Date(),
-                        level: 'error',
-                        location: 'wazuh-api-elastic.js setAPIEntryDefault',
-                        message: error.message || error
-                    });
                     reply({
                         'statusCode': 500,
                         'error':      8,
@@ -132,12 +108,6 @@ module.exports = (server, options) => {
             }
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-api-elastic.js setAPIEntryDefault',
-                message: error.message || error
-            });
             reply({
                 'statusCode': 500,
                 'error':      8,
@@ -156,12 +126,6 @@ module.exports = (server, options) => {
             reply(data.hits.hits);
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-api-elastic.js getExtensions',
-                message: error.message || error
-            });
             reply(error);
         });
     };
@@ -189,12 +153,6 @@ module.exports = (server, options) => {
             });
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-api-elastic.js toggleExtension',
-                message: error.message || error
-            });
             reply({
                 'statusCode': 500,
                 'error':      8,
@@ -266,12 +224,6 @@ module.exports = (server, options) => {
             });
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-api-elastic.js saveAPI',
-                message: error.message || error
-            });
             reply({
                 statusCode: 500,
                 error:      8,
@@ -298,12 +250,6 @@ module.exports = (server, options) => {
             });
         })
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-api-elastic.js updateAPIHostname',
-                message: error.message || error
-            });
             reply({
                 statusCode: 500,
                 error:      8,
@@ -370,12 +316,6 @@ module.exports = (server, options) => {
         })
         .then(() => reply({ statusCode: 200, message: 'ok' }))
         .catch(error => {
-            wazuhlogger.log({
-                date: new Date(),
-                level: 'error',
-                location: 'wazuh-api-elastic.js updateFullAPI',
-                message: error.message || error
-            });
             reply({
                 statusCode: 500,
                 error:      8,
