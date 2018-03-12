@@ -47,28 +47,11 @@
         <div layout="row">
             <md-card flex class="wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-metric">
-                    <div flex>Group: <span ng-click="goGroup()" class="wz-font-weight-bold cursor-pointer" tooltip="Click to go to the group details" tooltip-placement="bottom">{{groupName}} <i class="fa fa-eye"></i></span></div>
-                    <div flex>Configuration status: <span class="wz-font-weight-bold" tooltip="The current synchronization status" tooltip-placement="bottom">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></div>
+                    <div flex>Group: <span ng-click="goGroup()" class="wz-font-weight-bold cursor-pointer" tooltip="Click to go to the group details" tooltip-placement="right">{{groupName}} <i class="fa fa-eye"></i></span></div>
+                    <div flex>Configuration status: <span class="wz-font-weight-bold" tooltip="The current synchronization status" tooltip-placement="right">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></div>
                 </md-card-content>
             </md-card>
         </div>
-
-        <!-- <div layout="row">
-            <md-card flex class="wz-md-card">
-                <md-card-content>
-                    <span class="wz-headline-title">Details</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="row" class="wz-padding-top-10">
-                        <p flex="15" class="manager-status-subtitle">Configuration group</p>
-                        <p class="cursor-pointer color-pointer wz-table-hover" ng-click="goGroup()" tooltip="Click to go to the group details" tooltip-placement="right">{{groupName}} <i class="fa fa-eye"></i></p>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <p flex="15" class="manager-status-subtitle">Configuration status</p>
-                        <p class="color-grey wz-font-weight-bold" ng-class="isSynchronized ? 'color-green' : 'color-red'" tooltip="The current synchronization status" tooltip-placement="right">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</p>
-                    </div>
-                </md-card-content>
-            </md-card>
-        </div> -->
 
         <!-- Second row - The configuration section itself -->
         <div layout="row">
@@ -89,6 +72,51 @@
                     </md-card-content>
                 </md-card>
                 <!-- END FILE INTEGRITY -->
+
+                <!-- POLICY MONITORING -->
+                <md-card flex class="wz-md-card">
+                    <md-card-content>
+                        <!-- Section title -->
+                        <span class="wz-headline-title cursor-pointer" tooltip="Click to see more details" tooltip-placement="right" ng-click="switchConfigTab('pm')">
+                            Policy Monitoring <i class="fa fa-eye"></i>
+                        </span>
+                        <md-divider class="wz-margin-top-10"></md-divider>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>View Policy Monitoring settings</span>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END POLICY MONITORING -->
+
+                <!-- LOG COLLECTION -->
+                <md-card flex class="wz-md-card">
+                    <md-card-content>
+                        <!-- Section title -->
+                        <span class="wz-headline-title cursor-pointer" tooltip="Click to see more details" tooltip-placement="right" ng-click="switchConfigTab('log')">
+                            Log Collection <i class="fa fa-eye"></i>
+                        </span>
+                        <md-divider class="wz-margin-top-10"></md-divider>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>View Log Collection settings</span>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END LOG COLLECTION -->
+
+                <!-- OPENSCAP -->
+                <md-card flex class="wz-md-card">
+                    <md-card-content>
+                        <!-- Section title -->
+                        <span class="wz-headline-title cursor-pointer" tooltip="Click to see more details" tooltip-placement="right" ng-click="switchConfigTab('scap')">
+                            OpenSCAP <i class="fa fa-eye"></i>
+                        </span>
+                        <md-divider class="wz-margin-top-10"></md-divider>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>View OpenSCAP settings</span>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END OPENSCAP -->
 
             </div>
 
@@ -213,7 +241,70 @@
                 </md-card>
                 <!-- END FILE INTEGRITY -->
 
-                <!-- FILE INTEGRITY -->
+                <!-- POLICY MONITORING -->
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'pm' && !toggleRAW">
+                    <md-card-content>
+
+                        <!-- Section title -->
+                        <div layout="row" layout-align="start center">
+                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-check"></i> Policy Monitoring</span>
+                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                        </div>
+
+                        <md-divider class="wz-margin-top-10"></md-divider>
+
+                        <!-- No configuration panel -->
+                        <div layout="column" ng-show="!groupConfiguration.config.rootcheck">
+                            <h1 flex class="md-title text-center wz-padding-top-10">No PM configuration available</h1>
+                            <p flex class="text-center wz-padding-top-10">There's no PM group configuration used for this agent.</p>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END POLICY MONITORING -->
+
+                <!-- LOG COLLECTION -->
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'log' && !toggleRAW">
+                    <md-card-content>
+
+                        <!-- Section title -->
+                        <div layout="row" layout-align="start center">
+                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-check"></i> Log Collection</span>
+                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                        </div>
+
+                        <md-divider class="wz-margin-top-10"></md-divider>
+
+                        <!-- No configuration panel -->
+                        <div layout="column" ng-show="!groupConfiguration.config['localfile']">
+                            <h1 flex class="md-title text-center wz-padding-top-10">No Log Collection configuration available</h1>
+                            <p flex class="text-center wz-padding-top-10">There's no Log Collection group configuration used for this agent.</p>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END LOG COLLECTION -->
+
+                <!-- OPENSCAP -->
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'scap' && !toggleRAW">
+                    <md-card-content>
+
+                        <!-- Section title -->
+                        <div layout="row" layout-align="start center">
+                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-check"></i> OpenSCAP</span>
+                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                        </div>
+
+                        <md-divider class="wz-margin-top-10"></md-divider>
+
+                        <!-- No configuration panel -->
+                        <div layout="column" ng-show="!groupConfiguration.config['open-scap']">
+                            <h1 flex class="md-title text-center wz-padding-top-10">No OpenSCAP configuration available</h1>
+                            <p flex class="text-center wz-padding-top-10">There's no OpenSCAP group configuration used for this agent.</p>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END OPENSCAP -->
+
+                <!-- JSON VIEWER -->
                 <md-card flex class="wz-md-card" ng-show="toggleRAW">
                     <md-card-content>
 
@@ -231,7 +322,7 @@
                         </div>
                     </md-card-content>
                 </md-card>
-                <!-- END FILE INTEGRITY -->
+                <!-- END JSON VIEWER -->
 
             </div>
 
