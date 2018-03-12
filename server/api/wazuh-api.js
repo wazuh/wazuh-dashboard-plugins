@@ -38,7 +38,7 @@ module.exports = (server, options) => {
                 wazuhlogger.log({
                     date: new Date(),
                     level: 'error',
-                    location: 'wazuh-api.js checkStoredAPI',
+                    location: 'wazuh-api.js checkStoredAPI 1',
                     message: 'no_elasticsearch'
                 });
                 // Can not connect to elasticsearch
@@ -52,7 +52,7 @@ module.exports = (server, options) => {
                 wazuhlogger.log({
                     date: new Date(),
                     level: 'error',
-                    location: 'wazuh-api.js checkStoredAPI',
+                    location: 'wazuh-api.js checkStoredAPI 2',
                     message: 'no_credentials'
                 });
                 // Credentials not found
@@ -102,7 +102,7 @@ module.exports = (server, options) => {
                                             date: new Date(),
                                             level: 'error',
                                             location: 'wazuh-api.js checkStoredAPI',
-                                            message: response.body.message || response.body || response
+                                            message: response.body.error || response.body || response
                                         });
                                         reply({
                                             'statusCode': 500,
@@ -297,9 +297,21 @@ module.exports = (server, options) => {
                 }
                 getConfig(req.headers.id, wapi_config => {
                     if (wapi_config.error_code > 1) {
+                        wazuhlogger.log({
+                            date: new Date(),
+                            level: 'error',
+                            location: 'wazuh-api.js getPciRequirement 1',
+                            message: 'no_elasticsearch'
+                        });
                         // Can not connect to elasticsearch
                         return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
                     } else if (wapi_config.error_code > 0) {
+                        wazuhlogger.log({
+                            date: new Date(),
+                            level: 'error',
+                            location: 'wazuh-api.js getPciRequirement 2',
+                            message: 'no_credentials'
+                        });
                         // Credentials not found
                         return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
                      }
@@ -351,6 +363,12 @@ module.exports = (server, options) => {
 
     const errorControl = (error, response) => {
         if (error) {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-api.js errorControl',
+                message: error.message || error
+            });
             return ({
                 'isError': true,
                 'body': {
@@ -361,6 +379,12 @@ module.exports = (server, options) => {
                 }
             });
         } else if (!error && response.body.error) {
+            wazuhlogger.log({
+                date: new Date(),
+                level: 'error',
+                location: 'wazuh-api.js errorControl',
+                message: response.body.error || response.body || 'Wazuh api error'
+            });
             return ({
                 'isError': true,
                 'body': {
@@ -379,6 +403,12 @@ module.exports = (server, options) => {
     const makeRequest = (method, path, data, id, reply) => {
         getConfig(id, (wapi_config) => {
             if (wapi_config.error_code > 1) {
+                wazuhlogger.log({
+                    date: new Date(),
+                    level: 'error',
+                    location: 'wazuh-api.js makeRequest',
+                    message: 'Could not connect with elasticsearch'
+                });
                 //Can not connect to elasticsearch
                 return reply({
                     'statusCode': 404,
@@ -387,6 +417,12 @@ module.exports = (server, options) => {
                 }).code(404);
                 
             } else if (wapi_config.error_code > 0) {
+                wazuhlogger.log({
+                    date: new Date(),
+                    level: 'error',
+                    location: 'wazuh-api.js makeRequest',
+                    message: 'Credentials does not exists'
+                });
                 //Credentials not found
                 return reply({
                     'statusCode': 404,
@@ -446,6 +482,12 @@ module.exports = (server, options) => {
         getConfig(req.payload.id, (wapi_config) => {
 
             if (wapi_config.error_code > 1) {
+                wazuhlogger.log({
+                    date: new Date(),
+                    level: 'error',
+                    location: 'wazuh-api.js getApiSettings',
+                    message: 'no_elasticsearch'
+                });
                 //Can not connect to elasticsearch
                 return reply({
                     'statusCode': 200,
@@ -454,6 +496,12 @@ module.exports = (server, options) => {
                 });
                 
             } else if (wapi_config.error_code > 0) {
+                wazuhlogger.log({
+                    date: new Date(),
+                    level: 'error',
+                    location: 'wazuh-api.js getApiSettings 2',
+                    message: 'no_credentials'
+                });
                 //Credentials not found
                 return reply({
                     'statusCode': 200,

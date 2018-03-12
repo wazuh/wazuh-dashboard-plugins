@@ -110,6 +110,12 @@ module.exports = (server, options) => {
                 'insecure': element._source.insecure
             };
             if (apiEntry.error) {
+                wazuhlogger.log({
+                    date: new Date(),
+                    level: 'error',
+                    location: 'monitoring.js loadCredentials',
+                    message: apiEntry.error || apiEntry
+                });
                 server.log([blueWazuh, 'monitoring', 'error'], `Error getting wazuh-api data: ${apiEntry.error}`);
                 break;
             }
