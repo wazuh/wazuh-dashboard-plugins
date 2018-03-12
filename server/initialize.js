@@ -313,7 +313,6 @@ module.exports = (server, options) => {
         })
         .then(data => {
             server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information and visualizations...');
-            server.log([blueWazuh, 'initialize', 'info'], 'FUUUUUCK');
             
             elasticRequest.callWithInternalUser('update', { 
                 index: '.wazuh-version', 
