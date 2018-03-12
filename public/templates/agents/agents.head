@@ -4,16 +4,16 @@
 		<wz-menu></wz-menu>
     </div>
 
-	<div layout="row" layout-align="space-between start" class="height-50">
-		<div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-			<div flex class="layout-row" ng-if="agent">
+	<div layout="row">
+		<div class="md-toolbar-tools" layout="row">
+			<div flex layout-align="center center" class="layout-row" ng-if="agent">
 				<div class="flex">
 					<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
 						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
 
 					<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
 				</div>
-				
+
 				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
 					<md-autocomplete id="agentsAutocomplete" flex
 					md-no-cache="true"
@@ -73,7 +73,7 @@
 		</div>
 	</div>
 
-    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
+    <!-- <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear> -->
 
 	<!-- View: Discover -->
     <kbn-dis ng-show="tab != 'configuration'"></kbn-dis>
