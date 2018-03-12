@@ -1,6 +1,19 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 387
+### Added
+- **New logging system** ([#307](https://github.com/wazuh/wazuh-kibana-app/pull/307)):
+  - New module implemented to **write app logs**.
+  - Now **a trace is stored every time the app is re/started**.
+  - Currently, the `initialize.js` and `monitoring.js` files **works with this system**.
+  - **Note**: the logs will live under `/var/log/wazuh/wazuhapp.log` on Linux systems, on Windows systems they will live under `kibana/plugins/`. **It rotates the log whenever it reaches 100MB**.
+- **Better cookies handling** ([#308](https://github.com/wazuh/wazuh-kibana-app/pull/308)):
+  - New field on the `.wazuh-version` index to store the **last time the Kibana server was restarted**.
+  - This is used to **check if the cookies have consistency** with the current sever status.
+  - Now the app is clever and **takes decissions depending on new consistency checks**.
+- **New design for the *Agents/Configuration* tab** ([#309](https://github.com/wazuh/wazuh-kibana-app/pull/309)).
+
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 386
 ### Added
 - **New design for the *Manager/Groups* tab** ([#295](https://github.com/wazuh/wazuh-kibana-app/pull/295)).
