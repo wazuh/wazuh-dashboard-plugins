@@ -331,8 +331,8 @@ app.controller('agentsController',
         $scope.selectedIndex = 0;
 
         /** Agent configuration */
-        $scope.switchConfigTab = selected => {
-            $scope.configTab = selected;
+        $scope.switchConfigTab = item => {
+            $scope.selectedConfigTab = item;
             if(!$scope.$$phase) $scope.$digest();
         };
 
