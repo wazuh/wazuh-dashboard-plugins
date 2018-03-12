@@ -2,31 +2,28 @@
 
     <!-- View: Panels -->
     <div layout="column" layout-align="start stretch">
-
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <div layout="row">
-                    <div flex>
-                        <h4><i class="fa fa-warning"></i> This agent has never been connected, therefore no group has been assigned.</h4>
-                    </div>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-warning"></i> Warning</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10 wz-line-height">
+                    This agent has never been connected, therefore no group has been assigned.
                 </div>
-                <div layout="row">
-                    <div flex>
-                        <p>Use the following links to learn about the agent registration process and grouping of agents:
-                        </p>
-                        <ul>
-                            <li>
-                                <a href="https://documentation.wazuh.com/current/user-manual/registering/index.html">https://documentation.wazuh.com/current/user-manual/registering/index.html</a>
-                            </li>
-                            <li>
-                                <a href="https://documentation.wazuh.com/current/user-manual/agents/grouping-agents.html">https://documentation.wazuh.com/current/user-manual/agents/grouping-agents.html</a>
-                            </li>
-                        </ul>
-                    </div>
+                <div layout="row" class="wz-padding-top-10 wz-line-height">
+                    Use the following links to learn about the agent registration process and grouping of agents:
+                </div>
+                <div layout="row" class="wz-padding-top-10 wz-line-height">
+                    <ul>
+                        <li>
+                            <a href="https://documentation.wazuh.com/current/user-manual/registering/index.html">https://documentation.wazuh.com/current/user-manual/registering/index.html</a>
+                        </li>
+                        <li>
+                            <a href="https://documentation.wazuh.com/current/user-manual/agents/grouping-agents.html">https://documentation.wazuh.com/current/user-manual/agents/grouping-agents.html</a>
+                        </li>
+                    </ul>
                 </div>
             </md-card-content>
         </md-card>
-
     </div>
 
 </md-content>
