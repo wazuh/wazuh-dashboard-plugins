@@ -23,7 +23,7 @@ const checkTimestamp = async (appState,genericReq,errorHandler,$rootScope,$locat
             $rootScope.lastRestart = data.data.lastRestart;
             if(!$rootScope.$$phase) $rootScope.$digest();
         } else {
-            $rootScope.blankScreenError = 'Your .wazuh.version index is empty or corrupt'
+            $rootScope.blankScreenError = 'Your .wazuh-version index is empty or corrupt.'
             $location.search('tab',null);
             $location.path('/blank-screen');            
         }
@@ -38,8 +38,6 @@ const checkTimestamp = async (appState,genericReq,errorHandler,$rootScope,$locat
 //Installation wizard
 const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler) => {
     let deferred = $q.defer();
-
-    
 
     // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
     if (!$location.path().includes("/health-check")) {
