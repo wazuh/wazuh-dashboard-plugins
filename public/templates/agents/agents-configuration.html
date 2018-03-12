@@ -59,12 +59,10 @@
             <div flex="25">
 
                 <!-- FILE INTEGRITY -->
-                <md-card flex class="wz-md-card">
+                <md-card flex class="wz-md-card" ng-if="groupConfiguration.config.syscheck">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='fim'">
-                            File Integrity <i class="fa fa-eye"></i>
-                        </span>
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='fim'">File Integrity</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>View File Integrity settings</span>
@@ -74,12 +72,10 @@
                 <!-- END FILE INTEGRITY -->
 
                 <!-- POLICY MONITORING -->
-                <md-card flex class="wz-md-card">
+                <md-card flex class="wz-md-card" ng-if="groupConfiguration.config.rootcheck">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='pm'">
-                            Policy Monitoring <i class="fa fa-eye"></i>
-                        </span>
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='pm'">Policy Monitoring</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>View Policy Monitoring settings</span>
@@ -89,12 +85,10 @@
                 <!-- END POLICY MONITORING -->
 
                 <!-- LOG COLLECTION -->
-                <md-card flex class="wz-md-card">
+                <md-card flex class="wz-md-card" ng-if="!groupConfiguration.config['localfile']">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='log'">
-                            Log Collection <i class="fa fa-eye"></i>
-                        </span>
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='log'">Log Collection</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>View Log Collection settings</span>
@@ -104,12 +98,10 @@
                 <!-- END LOG COLLECTION -->
 
                 <!-- OPENSCAP -->
-                <md-card flex class="wz-md-card">
+                <md-card flex class="wz-md-card" ng-if="!groupConfiguration.config['open-scap']">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='scap'">
-                            OpenSCAP <i class="fa fa-eye"></i>
-                        </span>
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='scap'">OpenSCAP</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>View OpenSCAP settings</span>
@@ -133,12 +125,6 @@
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
-
-                        <!-- No configuration panel -->
-                        <div layout="column" ng-show="!groupConfiguration.config.syscheck">
-                            <h1 flex class="md-title text-center wz-padding-top-10">No FIM configuration available</h1>
-                            <p flex class="text-center wz-padding-top-10">There's no FIM group configuration used for this agent.</p>
-                        </div>
 
                         <!-- Main settings -->
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.disabled">
@@ -253,11 +239,6 @@
 
                         <md-divider class="wz-margin-top-10"></md-divider>
 
-                        <!-- No configuration panel -->
-                        <div layout="column" ng-show="!groupConfiguration.config.rootcheck">
-                            <h1 flex class="md-title text-center wz-padding-top-10">No PM configuration available</h1>
-                            <p flex class="text-center wz-padding-top-10">There's no PM group configuration used for this agent.</p>
-                        </div>
                     </md-card-content>
                 </md-card>
                 <!-- END POLICY MONITORING -->
@@ -274,11 +255,6 @@
 
                         <md-divider class="wz-margin-top-10"></md-divider>
 
-                        <!-- No configuration panel -->
-                        <div layout="column" ng-show="!groupConfiguration.config['localfile']">
-                            <h1 flex class="md-title text-center wz-padding-top-10">No Log Collection configuration available</h1>
-                            <p flex class="text-center wz-padding-top-10">There's no Log Collection group configuration used for this agent.</p>
-                        </div>
                     </md-card-content>
                 </md-card>
                 <!-- END LOG COLLECTION -->
@@ -295,11 +271,6 @@
 
                         <md-divider class="wz-margin-top-10"></md-divider>
 
-                        <!-- No configuration panel -->
-                        <div layout="column" ng-show="!groupConfiguration.config['open-scap']">
-                            <h1 flex class="md-title text-center wz-padding-top-10">No OpenSCAP configuration available</h1>
-                            <p flex class="text-center wz-padding-top-10">There's no OpenSCAP group configuration used for this agent.</p>
-                        </div>
                     </md-card-content>
                 </md-card>
                 <!-- END OPENSCAP -->
