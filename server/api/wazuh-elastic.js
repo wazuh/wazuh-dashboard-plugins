@@ -7,15 +7,27 @@ module.exports = (server, options) => {
 
     const getTimeStamp = async (req,reply) => {
         try {
+
             const data = await elasticRequest.callWithInternalUser('search', {
                 index: '.wazuh-version',
-                type:  'wazuh-version'
+                type :  'wazuh-version'
             })
-            if(data.hits && data.hits.hits[0] && data.hits.hits[0]._source && data.hits.hits[0]._source.installationDate){
-                return reply({installationDate: data.hits.hits[0]._source.installationDate});
+
+            if(data.hits && 
+               data.hits.hits[0] && 
+               data.hits.hits[0]._source && 
+               data.hits.hits[0]._source.installationDate && 
+               data.hits.hits[0]._source.lastRestart){
+                
+                    return reply({
+                        installationDate: data.hits.hits[0]._source.installationDate,
+                        lastRestart     : data.hits.hits[0]._source.lastRestart
+                    });
+
             } else {
                 throw new Error('Could not fetch .wazuh-version index');
             }
+
         } catch (err) {
             reply({
                 'statusCode': 500,

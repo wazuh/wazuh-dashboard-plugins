@@ -220,12 +220,14 @@ module.exports = (server, options) => {
             body: shard_configuration
         })
         .then(() => {
+            const commonDate = new Date().toISOString();
 
-            let configuration = {
-                "name":             "Wazuh App",
-                "app-version":      packageJSON.version,
-                "revision":         packageJSON.revision,
-                "installationDate": new Date().toISOString()
+            const configuration = {
+                name            : 'Wazuh App',
+                'app-version'   : packageJSON.version,
+                revision        : packageJSON.revision,
+                installationDate: commonDate,
+                lastRestart     : commonDate
             };
 
             elasticRequest.callWithInternalUser('create', {
@@ -251,7 +253,7 @@ module.exports = (server, options) => {
         elasticRequest.callWithInternalUser('indices.exists', {
             index: '.wazuh'
         })
-        .then((result) => {
+        .then(result => {
             if (!result) {
 
                 let shards = 1;
@@ -309,17 +311,19 @@ module.exports = (server, options) => {
             type: "wazuh-version",
             id: "1"
         })
-        .then((data) => {
+        .then(data => {
             server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information and visualizations...');
-
+            server.log([blueWazuh, 'initialize', 'info'], 'FUUUUUCK');
+            
             elasticRequest.callWithInternalUser('update', { 
                 index: '.wazuh-version', 
-                type: 'wazuh-version',
-                id: 1,
-                body: {
-                    'doc': {
-                        "app-version": packageJSON.version,
-                        "revision": packageJSON.revision
+                type : 'wazuh-version',
+                id   : 1,
+                body : {
+                    doc: {
+                        'app-version': packageJSON.version,
+                        revision     : packageJSON.revision,
+                        lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
                     }
                 } 
             })
