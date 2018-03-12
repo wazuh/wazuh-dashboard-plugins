@@ -343,11 +343,11 @@
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
 
-                        <!-- System Audit Files -->
-                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.system_audit">
-                            <span class="wz-headline-title wz-padding-top-10">System Audit Files</span>
+                        <!-- Windows Audit Files -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.windows_audit">
+                            <span class="wz-headline-title wz-padding-top-10">Windows Audit Files</span>
                         </div>
-                        <div ng-repeat="item in groupConfiguration.config.rootcheck.system_audit">
+                        <div ng-repeat="item in groupConfiguration.config.rootcheck.windows_audit">
                             <div ng-if="item" layout="row" class="wz-padding-top-10">
                                 <span flex class="color-grey">{{item}}</span>
                             </div>
