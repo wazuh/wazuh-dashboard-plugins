@@ -2,16 +2,19 @@ const winston = require('winston');
 const fs      = require('fs');
 const path    = require('path');
 
+const initDirectory = () => {
+    if (!fs.existsSync('/var/log/wazuh') && process.platform === 'linux') {
+        fs.mkdirSync('/var/log/wazuh');
+    }
+    return;
+}
+
 const wazuhlogger = winston.createLogger({
     level     : 'info',
     format    : winston.format.json(),
     transports: [
         new winston.transports.File({ 
-            filename: path.join(__dirname, '../../error.log'), 
-            level   : 'error' 
-        }),
-        new winston.transports.File({ 
-            filename: path.join(__dirname, '../../combined.log') 
+            filename: process.platform === 'linux' ? '/var/log/wazuh/wazuhapp.log' : path.join(__dirname, '../../wazuhapp.log') 
         })
     ]
 });
@@ -31,19 +34,14 @@ const getFilesizeInMegaBytes = filename => {
 const checkFiles = () => {
     if (getFilesizeInMegaBytes(path.join(__dirname, '../../error.log')) >= 100) {
         fs.renameSync(
-            path.join(__dirname, '../../error.log'), 
-            path.join(__dirname, `../../error.${new Date().getTime()}.log`)
-        )
-    }
-    if (getFilesizeInMegaBytes(path.join(__dirname, '../../combined.log')) >= 100) {
-        fs.renameSync(
-            path.join(__dirname, '../../combined.log'), 
-            path.join(__dirname, `../../combined.${new Date().getTime()}.log`)
+            process.platform === 'linux' ? '/var/log/wazuh/wazuhapp.log' : path.join(__dirname, '../../wazuhapp.log'), 
+            process.platform === 'linux' ? '/var/log/wazuh/wazuhapp.log' : path.join(__dirname, `../../wazuhapp.${new Date().getTime()}.log`)
         )
     }
 };
 
 const log = (location, message, level) => {
+    initDirectory();
     checkFiles();
     wazuhlogger.log({
         date    : new Date(),
