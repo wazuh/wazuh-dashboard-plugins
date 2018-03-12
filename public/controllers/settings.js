@@ -209,7 +209,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Save settings function
     const saveSettings = async () => {
         try {
-            $rootScope.comeFromSettings = true;
             const invalid = validator('formData');
 
             if(invalid) {

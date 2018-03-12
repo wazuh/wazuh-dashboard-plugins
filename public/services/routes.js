@@ -14,15 +14,20 @@ const healthCheck = ($window, $rootScope) => {
     }
 };
 
-const checkTimestamp = async (appState,genericReq,errorHandler) => {
+const checkTimestamp = async (appState,genericReq,errorHandler,$rootScope) => {
     try {
         const data = await genericReq.request('GET', '/api/wazuh-elastic/timestamp');
         const current = appState.getCreatedAt();
+        if(data && data.data && data.data.installationDate){
+            $rootScope.installationDate = data.data.installationDate;
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
         if(!current && data && data.data && data.data.installationDate) {
             appState.setCreatedAt(data.data.installationDate);
         }   
         return;
     } catch (err){
+        // IR AL BLANK SCREEN E INFORMAR
         errorHandler.handle(err,'Routes - Check timestamp');
     }
 }
@@ -87,12 +92,12 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
     }
 
     const callCheckStored = () => {
-        checkTimestamp(appState,genericReq,errorHandler)
+        checkTimestamp(appState,genericReq,errorHandler,$rootScope)
         .then(() => testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id))
         .then(data => {
             if(data === 'cookies_outdated'){
-                $location.search('tab','api');
-                $location.path('/settings');
+                $location.search('tab','panels');
+                $location.path('/overview');
                 return;
             }
             if (data.data.error || data.data.data.apiIsDown) {
