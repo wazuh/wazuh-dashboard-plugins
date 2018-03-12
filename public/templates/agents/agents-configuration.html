@@ -41,7 +41,7 @@
     </div>
 
     <!-- The section container -->
-    <div flex layout="column" layout-align="start stretch" ng-init="showRaw=false;selectedConfigTab='fim'" ng-show="!load">
+    <div flex layout="column" layout-align="start stretch" ng-init="toggleRAW=false;selectedConfigTab='fim'" ng-show="!load">
 
         <!-- First row - Configuration status and other details -->
         <div layout="row">
@@ -62,7 +62,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config.syscheck">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='fim'">File Integrity</span>
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='fim';toggleRAW=false" ng-class="selectedConfigTab === 'fim' ? wz-font-weight-bold : ''">File Integrity</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>View File Integrity settings</span>
@@ -75,7 +75,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config.rootcheck">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='pm'">Policy Monitoring</span>
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='pm';toggleRAW=false" ng-class="selectedConfigTab === 'pm' ? wz-font-weight-bold : ''">Policy Monitoring</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>View Policy Monitoring settings</span>
@@ -88,10 +88,10 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['localfile']">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='log'">Log Collection</span>
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='log';toggleRAW=false" ng-class="selectedConfigTab === 'log' ? wz-font-weight-bold : ''">Log Collection</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex>View Log Collection settings</span>
+                            <span flex>Visualize all Log Collecting settings</span>
                         </div>
                     </md-card-content>
                 </md-card>
@@ -101,7 +101,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['open-scap']">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='scap'">OpenSCAP</span>
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='scap';toggleRAW=false" ng-class="selectedConfigTab === 'scap' ? wz-font-weight-bold : ''">OpenSCAP</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>View OpenSCAP settings</span>
@@ -390,6 +390,35 @@
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
+
+                        <!-- Log Files -->
+                        <div layout="row" class="wz-padding-top-10">
+                            <span class="wz-headline-title wz-padding-top-10">Log files</span>
+                        </div>
+                        <div ng-repeat="item in groupConfiguration.config['localfile']">
+                            <div ng-if="item.location" layout="row" class="wz-padding-top-10">
+                                <span flex class="text-right color-grey">{{item.location}}</span>
+                            </div>
+                            <div ng-if="item.log_format" layout="row" class="wz-padding-top-10">
+                                <span flex class="text-right color-grey">{{item.log_format}}</span>
+                            </div>
+                            <div ng-if="item.frequency" layout="row" class="wz-padding-top-10">
+                                <span flex class="text-right color-grey">{{item.frequency}}</span>
+                            </div>
+                            <div ng-if="item.query" layout="row" class="wz-padding-top-10">
+                                <span flex class="text-right color-grey">{{item.query}}</span>
+                            </div>
+                            <div ng-if="item.command" layout="row" class="wz-padding-top-10">
+                                <span flex class="text-right color-grey">{{item.command}}</span>
+                            </div>
+                            <div ng-if="item.alias" layout="row" class="wz-padding-top-10">
+                                <span flex class="text-right color-grey">{{item.alias}}</span>
+                            </div>
+                            <div ng-if="item.label" layout="row" class="wz-padding-top-10">
+                                <span flex class="text-right color-grey">{{item.label}}</span>
+                            </div>
+                            <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                        </div>
 
                     </md-card-content>
                 </md-card>
