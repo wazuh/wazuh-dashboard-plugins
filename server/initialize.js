@@ -22,7 +22,27 @@ module.exports = (server, options) => {
           new winston.transports.File({ filename: path.join(__dirname,'../../combined.log') })
         ]
     });
+
     wazuhlogger.exitOnError = false;
+
+    const getFilesizeInMegaBytes = filename => {
+        if(fs.existsSync(filename)){
+            const stats = fs.statSync(filename)
+            const fileSizeInMegaBytes = stats.size
+            return fileSizeInMegaBytes / 1000000.0;
+        }
+        return 0;
+    }
+
+    global.checkFiles = () => {
+        if(getFilesizeInMegaBytes(path.join(__dirname,'../../error.log')) >= 10 ){
+            fs.renameSync(path.join(__dirname,'../../error.log'),path.join(__dirname,`../../error.${new Date().getTime()}.log`))
+        }
+        if(getFilesizeInMegaBytes(path.join(__dirname,'../../combined.log')) >= 10 ){
+            fs.renameSync(path.join(__dirname,'../../combined.log'),path.join(__dirname,`../../combined.${new Date().getTime()}.log`))
+        }
+    }
+    checkFiles();
     wazuhlogger.log({
         date: new Date(),
         level: 'info',
@@ -618,6 +638,12 @@ module.exports = (server, options) => {
                                         wapi_config.cluster_info.node = response.body.data.node;
                                         wapi_config.cluster_info.cluster = response.body.data.cluster;
                                     } else if (response.body.error){
+                                        wazuhlogger.log({
+                                            date: new Date(),
+                                            level: 'error',
+                                            location: 'initialize.js reachAPI',
+                                            message: response.body.error || response.body
+                                        });
                                         server.log([blueWazuh, 'reindex', 'error'], 'Could not get cluster/node information for ', wapi_config.manager);
                                     }
                                 });
