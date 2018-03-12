@@ -41,7 +41,7 @@
     </div>
 
     <!-- The section container -->
-    <div flex layout="column" layout-align="start stretch" ng-init="showRaw=false; selectedConfigTab='fim'" ng-show="!load">
+    <div flex layout="column" layout-align="start stretch" ng-init="showRaw=false;selectedConfigTab='fim'" ng-show="!load">
 
         <!-- First row - Configuration status and other details -->
         <div layout="row">
@@ -59,7 +59,7 @@
             <div flex="25">
 
                 <!-- FILE INTEGRITY -->
-                <md-card flex class="wz-md-card" ng-if="groupConfiguration.config.syscheck">
+                <md-card flex class="wz-md-card" ng-show="groupConfiguration.config.syscheck">
                     <md-card-content>
                         <!-- Section title -->
                         <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='fim'">File Integrity</span>
@@ -72,7 +72,7 @@
                 <!-- END FILE INTEGRITY -->
 
                 <!-- POLICY MONITORING -->
-                <md-card flex class="wz-md-card" ng-if="groupConfiguration.config.rootcheck">
+                <md-card flex class="wz-md-card" ng-show="groupConfiguration.config.rootcheck">
                     <md-card-content>
                         <!-- Section title -->
                         <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='pm'">Policy Monitoring</span>
@@ -85,7 +85,7 @@
                 <!-- END POLICY MONITORING -->
 
                 <!-- LOG COLLECTION -->
-                <md-card flex class="wz-md-card" ng-if="!groupConfiguration.config['localfile']">
+                <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['localfile']">
                     <md-card-content>
                         <!-- Section title -->
                         <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='log'">Log Collection</span>
@@ -98,7 +98,7 @@
                 <!-- END LOG COLLECTION -->
 
                 <!-- OPENSCAP -->
-                <md-card flex class="wz-md-card" ng-if="!groupConfiguration.config['open-scap']">
+                <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['open-scap']">
                     <md-card-content>
                         <!-- Section title -->
                         <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='scap'">OpenSCAP</span>
@@ -239,6 +239,142 @@
 
                         <md-divider class="wz-margin-top-10"></md-divider>
 
+                        <!-- Main settings -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.disabled">
+                            <span flex>Disabled</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.disabled}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.base_directory">
+                            <span flex>Base directory</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.frequency}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.frequency">
+                            <span flex>Frequency</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.frequency}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.scanall">
+                            <span flex>Scan all files</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.scanall}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.skip_nfs">
+                            <span flex>Skip NFS</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.skip_nfs}}</span>
+                        </div>
+
+                        <!-- Checks -->
+                        <div layout="row" class="wz-padding-top-10">
+                            <span class="wz-headline-title wz-padding-top-10">Checks</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_unixaudit">
+                            <span flex>Check UNIX Audit</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_unixaudit}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_dev">
+                            <span flex>Check /dev</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_dev}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_files">
+                            <span flex>Check files</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_files}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_if">
+                            <span flex>Check interfaces</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_if}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_pids">
+                            <span flex>Check PIDs</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_pids}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_policy">
+                            <span flex>Check policy</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_policy}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_ports">
+                            <span flex>Check ports</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_ports}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_sys">
+                            <span flex>Check SYSt</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_sys}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_trojans">
+                            <span flex>Check Trojans</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_trojans}}</span>
+                        </div>
+
+                        <!-- Windows Settings -->
+                        <div layout="row" class="wz-padding-top-10">
+                            <span class="wz-headline-title wz-padding-top-10">Windows Settings</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winaudit">
+                            <span flex>Check Windows Audit</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_winaudit}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winapps">
+                            <span flex>Check Windows apps</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_winapps}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winmalware">
+                            <span flex>Check Windows malware</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_winmalware}}</span>
+                        </div>
+
+                        <!-- Rootkit -->
+                        <div layout="row" class="wz-padding-top-10">
+                            <span class="wz-headline-title wz-padding-top-10">Rootkit</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winaudit">
+                            <span flex>Trojans path</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.rootkit_trojans[0]}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winapps">
+                            <span flex>Files path</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.rootkit_files[0]}}</span>
+                        </div>
+
+                        <!-- System Audit Files -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.system_audit">
+                            <span class="wz-headline-title wz-padding-top-10">System Audit Files</span>
+                        </div>
+                        <div ng-repeat="item in groupConfiguration.config.rootcheck.system_audit">
+                            <div ng-if="item" layout="row" class="wz-padding-top-10">
+                                <span flex class="color-grey">{{item}}</span>
+                            </div>
+                            <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                        </div>
+
+                        <!-- System Audit Files -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.system_audit">
+                            <span class="wz-headline-title wz-padding-top-10">System Audit Files</span>
+                        </div>
+                        <div ng-repeat="item in groupConfiguration.config.rootcheck.system_audit">
+                            <div ng-if="item" layout="row" class="wz-padding-top-10">
+                                <span flex class="color-grey">{{item}}</span>
+                            </div>
+                            <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                        </div>
+
+                        <!-- Windows Apps Files -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.windows_apps">
+                            <span class="wz-headline-title wz-padding-top-10">Windows Apps Files</span>
+                        </div>
+                        <div ng-repeat="item in groupConfiguration.config.rootcheck.windows_apps">
+                            <div ng-if="item" layout="row" class="wz-padding-top-10">
+                                <span flex class="color-grey">{{item}}</span>
+                            </div>
+                            <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                        </div>
+
+                        <!-- Windows Malware Files -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.windows_malware">
+                            <span class="wz-headline-title wz-padding-top-10">Windows Malware Files</span>
+                        </div>
+                        <div ng-repeat="item in groupConfiguration.config.rootcheck.windows_malware">
+                            <div ng-if="item" layout="row" class="wz-padding-top-10">
+                                <span flex class="color-grey">{{item}}</span>
+                            </div>
+                            <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                        </div>
                     </md-card-content>
                 </md-card>
                 <!-- END POLICY MONITORING -->
@@ -249,7 +385,7 @@
 
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
-                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-check"></i> Log Collection</span>
+                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-reorder"></i> Log Collection</span>
                             <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
@@ -265,7 +401,7 @@
 
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
-                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-check"></i> OpenSCAP</span>
+                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-sliders"></i> OpenSCAP</span>
                             <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 

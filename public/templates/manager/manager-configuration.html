@@ -15,9 +15,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.global">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('global')" tooltip="Click to see more details" tooltip-placement="right">
-                        Global <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('global')" tooltip="Click to see more details" tooltip-placement="right">Global</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.jsonout_output">
@@ -36,9 +34,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.cluster">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('cluster')" tooltip="Click to see more details" tooltip-placement="right">
-                        Cluster <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('cluster')" tooltip="Click to see more details" tooltip-placement="right">Cluster</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.name">
@@ -57,9 +53,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.syscheck">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('syscheck')" tooltip="Click to see more details" tooltip-placement="right">
-                        Syscheck <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('syscheck')" tooltip="Click to see more details" tooltip-placement="right">Syscheck</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.frequency">
@@ -78,9 +72,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.rootcheck">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('rootcheck')" tooltip="Click to see more details" tooltip-placement="right">
-                        Rootcheck <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('rootcheck')" tooltip="Click to see more details" tooltip-placement="right">Rootcheck</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.frequency">
@@ -99,9 +91,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.logcollector">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('logcollector')" tooltip="Click to see more details" tooltip-placement="right">
-                        Logcollector <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('logcollector')" tooltip="Click to see more details" tooltip-placement="right">Logcollector</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Logcollector settings</span>
@@ -114,9 +104,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.email_alerts">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('email_alerts')" tooltip="Click to see more details" tooltip-placement="right">
-                        E-mail alerts <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('email_alerts')" tooltip="Click to see more details" tooltip-placement="right">E-mail alerts</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.email_to">
@@ -135,9 +123,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.auth">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('auth')" tooltip="Click to see more details" tooltip-placement="right">
-                        Auth <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('auth')" tooltip="Click to see more details" tooltip-placement="right">Auth</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.purge">
@@ -156,9 +142,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.ruleset">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('ruleset')" tooltip="Click to see more details" tooltip-placement="right">
-                        Ruleset <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('ruleset')" tooltip="Click to see more details" tooltip-placement="right">Ruleset</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Ruleset settings</span>
@@ -171,9 +155,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.command">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('command')" tooltip="Click to see more details" tooltip-placement="right">
-                        Command <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('command')" tooltip="Click to see more details" tooltip-placement="right">Command</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Command settings</span>
@@ -186,9 +168,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration['active-response'].length > 0">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('active-response')" tooltip="Click to see more details" tooltip-placement="right">
-                        Active response <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('active-response')" tooltip="Click to see more details" tooltip-placement="right">Active response</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Active response settings</span>
@@ -201,9 +181,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.remote">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer" ng-click="switchItem('remote')" tooltip="Click to see more details" tooltip-placement="right">
-                        Remote <i class="fa fa-eye"></i>
-                    </span>
+                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('remote')" tooltip="Click to see more details" tooltip-placement="right">Remote</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Agents events listening settings</span>
