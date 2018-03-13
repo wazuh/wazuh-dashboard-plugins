@@ -64,6 +64,15 @@
                     </option>
                 </select>
             </div>
+            <!-- This will work once the Wazuh API implements this feature -->
+            <!--<div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 wz-margin-top-17 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="group" ng-change="applyFilters('group-' + group)" aria-label="Filter by group">
+                    <option value="all">All groups</option>
+                    <option ng-repeat='group in groups' value="{{group}}">
+                        {{group}}
+                    </option>
+                </select>
+            </div>-->
         </div>
         <wz-table-header
             layout="row"
@@ -73,7 +82,8 @@
                 {name:'Name',sortValue:'name',size:15},
                 {name:'IP',sortValue:'ip',size:10},
                 {name:'Status',sortValue:'status',size:10},
-                {name:'OS platform',sortValue:'os.platform',size:30},
+                {name:'Group',size:10},
+                {name:'OS platform',sortValue:'os.platform',size:20},
                 {name:'OS version',sortValue:'os.version',size:15},
                 {name:'Agent version',sortValue:'version',size:15}
             ]"
@@ -83,13 +93,16 @@
             layout="column"
             flex
             data="agents"
+            isagents="true"
             func="showAgent(agent)"
+            specialfunc="goGroup(agent)"
             keys="[
                 {col:'id',size:5},
                 {col:'name',size:15},
                 {col:'ip',size:10},
                 {col:'status',size:10},
-                {col:'os.name',size:30},
+                {col:'group',size:10},
+                {col:'os.name',size:20},
                 {col:'os.version',size:15},
                 {col:'version',size:15}
             ]"
