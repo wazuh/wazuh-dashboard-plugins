@@ -90,6 +90,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
     const load = async () => {
         try {
             const configuration = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+            appState.setPatternSelector(typeof configuration.data.data['ip.selector'] !== 'undefined' ? configuration.data.data['ip.selector'] : true)
             if('data' in configuration.data &&
                'timeout' in configuration.data.data && 
                Number.isInteger(configuration.data.data.timeout) && 
@@ -97,7 +98,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
             ) {
                 $rootScope.userTimeout = configuration.data.data.timeout;   
             }
-
+            
             if('data' in configuration.data) {
                 checks.pattern  = typeof configuration.data.data['checks.pattern']  !== 'undefined' ? configuration.data.data['checks.pattern']  : true;
                 checks.template = typeof configuration.data.data['checks.template'] !== 'undefined' ? configuration.data.data['checks.template'] : true;

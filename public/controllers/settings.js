@@ -230,6 +230,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             };
     
             const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+            appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
             if(config.data && config.data.data) {
                 tmpData.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
                 tmpData.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
@@ -441,6 +442,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.appInfo["revision"]         = data.data.data["revision"];
             $scope.load = false;
             const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+            appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
             if (appState.getCurrentPattern() !== undefined && appState.getCurrentPattern() !== null) { // There's a pattern in the cookies
                 $scope.selectedIndexPattern = appState.getCurrentPattern();
             } else { // There's no pattern in the cookies, pick the one in the settings
