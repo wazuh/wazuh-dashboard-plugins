@@ -61,8 +61,14 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
                         const versionData = await apiReq.request('GET', '/version', {});
                         const apiVersion  = versionData.data.data;
                         const setupData   = await genericReq.request('GET', '/api/wazuh-elastic/setup');
+                        if(!setupData.data.data["app-version"] || !apiVersion){
+                            errorHandler.handle('Error fetching app version or API version','Health Check');
+                            $scope.errors.push('Error fetching version');
+                        }
+                        const apiSplit = apiVersion.split('v')[1].split('.');
+                        const appSplit = setupData.data.data["app-version"].split('.');
 
-                        if (apiVersion !== 'v' + setupData.data.data["app-version"]) {
+                        if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
                             $scope.errors.push("API version mismatch. Expected v" + setupData.data.data["app-version"]);
                         } else {
                             $scope.processedChecks++;
