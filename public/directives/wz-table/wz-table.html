@@ -1,5 +1,5 @@
 <div flex ng-if="!isruleset && !isdecoders" layout="column" class="wz-table-no-padding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
-    <div ng-if="!noscroll" flex class="wz-table-scroll" when-scrolled="data.nextPage('')">
+    <div ng-if="!isagents && !noscroll" flex class="wz-table-scroll" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data.items | filter : searchTerm"
             class="wz-table-common" ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' "
             ng-click="clickAction(full ? item : $index)">
@@ -8,10 +8,19 @@
             </div>
         </div>
     </div>
-    <div ng-if="noscroll" flex class="wz-table-scroll">
+    <div ng-if="!isagents && noscroll" flex class="wz-table-scroll">
         <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data" class="wz-table-common"
             ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' " ng-click="clickAction($index)">
             <div ng-repeat="key in keys" flex="{{key.size || ''}}">
+                <span>{{parseItem(item,key) || '---'}}</span>
+            </div>
+        </div>
+    </div>
+    <div ng-if="!noscroll && isagents" flex class="wz-table-scroll" when-scrolled="data.nextPage('')">
+        <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data.items | filter : searchTerm"
+            class="wz-table-common" ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' "
+            >
+            <div ng-repeat="key in keys" flex="{{key.size || ''}}" ng-click="clickAction(full ? item : $index,key)">
                 <span>{{parseItem(item,key) || '---'}}</span>
             </div>
         </div>
