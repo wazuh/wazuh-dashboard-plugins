@@ -9,12 +9,12 @@
                             <span class="wz-headline-title">{{ groups.items[selectedGroup].name }}</span>
                             <md-divider class="wz-margin-top-10"></md-divider>
                             <div layout="row" class="wz-padding-top-10">
-                                <span flex>Configuration sum</span>
-                                <span flex class="text-right color-grey">{{ groups.items[selectedGroup].conf_sum }}</span>
+                                <span flex="25">Configuration sum</span>
+                                <span class="text-right color-grey">{{ groups.items[selectedGroup].conf_sum }}</span>
                             </div>
                             <div layout="row" class="wz-padding-top-10">
-                                <span flex>Merged sum</span>
-                                <span flex class="text-right color-grey">{{ groups.items[selectedGroup].merged_sum }}</span>
+                                <span flex="25">Merged sum</span>
+                                <span class="text-right color-grey">{{ groups.items[selectedGroup].merged_sum }}</span>
                             </div>
                         </md-card-content>
                     </md-card>
@@ -24,11 +24,11 @@
                             <md-divider class="wz-margin-top-10"></md-divider>
                             <div layout="row" class="wz-padding-top-10" ng-class="groupsSelectedTab==='agents' ? 'wz-font-weight-bold' : ''">
                                 <span flex="20" class="cursor-pointer" ng-click="goBackToAgents()">Agents</span>
-                                <span flex class="cursor-pointer color-pointer" ng-click="goBackToAgents()">{{ groups.items[selectedGroup].count }} <i class="fa fa-eye"></i></span>
+                                <span class="cursor-pointer color-pointer" ng-click="goBackToAgents()">{{ groups.items[selectedGroup].count }} <i class="fa fa-eye"></i></span>
                             </div>
                             <div layout="row" class="wz-padding-top-10" ng-class="groupsSelectedTab==='files' ? 'wz-font-weight-bold' : ''">
                                 <span flex="20" class="cursor-pointer" ng-click="goBackFiles()">Content</span>
-                                <span flex class="cursor-pointer color-pointer" ng-click="goBackFiles()">{{ groupFiles.totalItems }} <i class="fa fa-eye"></i></span>
+                                <span class="cursor-pointer color-pointer" ng-click="goBackFiles()">{{ groupFiles.totalItems }} <i class="fa fa-eye"></i></span>
                             </div>
                         </md-card-content>
                     </md-card>
