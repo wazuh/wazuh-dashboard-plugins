@@ -19,7 +19,7 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
             return data;
         },
         setExtensions: extensions => {
-            var exp = new Date();
+            const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (extensions) {
                 $cookies.putObject('extensions', extensions, { 'expires': exp });
@@ -28,8 +28,11 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
         getClusterInfo: () => {
             return $cookies.getObject('_clusterInfo');
         },
+        removeClusterInfo: () => {
+            return $cookies.remove('_clusterInfo');
+        },
         setClusterInfo: cluster_info => {
-            var exp = new Date();
+            const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (cluster_info) {
                 $cookies.putObject('_clusterInfo', cluster_info, { 'expires': exp });
@@ -38,13 +41,27 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
         getCurrentPattern: () => {
             return $cookies.getObject('_currentPattern');
         },
+        setCreatedAt: date => {
+            const exp = new Date();
+            exp.setDate(exp.getDate() + 365);
+            $cookies.putObject('_createdAt',date,{ 'expires': exp });
+        },
         setCurrentPattern: newPattern => {
-            var exp = new Date();
+            const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (newPattern) {
                 $cookies.putObject('_currentPattern', newPattern, { 'expires': exp });
             }
         },
+        removeCurrentPattern: () => {
+            return $cookies.remove('_currentPattern');
+        },
+        getCreatedAt: () => {
+            return $cookies.getObject('_createdAt');
+        }, 
+        removeCreatedAt: () => {
+            return $cookies.remove('_createdAt');
+        }, 
         getCurrentAPI: () => {
             return $cookies.getObject('API');
         },
@@ -52,7 +69,7 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
             return $cookies.remove('API');
         },
         setCurrentAPI: API => {
-            var exp = new Date();
+            const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (API) {
                 $cookies.putObject('API', API, { 'expires': exp});

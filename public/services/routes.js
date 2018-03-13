@@ -14,6 +14,27 @@ const healthCheck = ($window, $rootScope) => {
     }
 };
 
+const checkTimestamp = async (appState,genericReq,errorHandler,$rootScope,$location) => {
+    try {
+        const data = await genericReq.request('GET', '/api/wazuh-elastic/timestamp');
+        const current = appState.getCreatedAt();
+        if(data && data.data){
+            if(!current) appState.setCreatedAt(data.data.lastRestart);
+            $rootScope.lastRestart = data.data.lastRestart;
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        } else {
+            $rootScope.blankScreenError = 'Your .wazuh-version index is empty or corrupt.'
+            $location.search('tab',null);
+            $location.path('/blank-screen');            
+        }
+        return;
+    } catch (err){
+        $rootScope.blankScreenError = err.message || err;
+        $location.search('tab',null);
+        $location.path('/blank-screen');  
+    }
+}
+
 //Installation wizard
 const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler) => {
     let deferred = $q.defer();
@@ -39,10 +60,16 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
         if(!fromElastic){
             $rootScope.comeFromWizard = true;
             if(!$rootScope.$$phase) $rootScope.$digest();
-            if(!$location.path().includes("/settings")) $location.path('/settings');
+            if(!$location.path().includes("/settings")) {
+                $location.search('_a', null);
+                $location.search('tab', 'api');
+                $location.path('/settings');
+            }
         } else {
             if(data && data.data && parseInt(data.data.statusCode) === 500 && parseInt(data.data.error) === 7 && data.data.message === '401 Unauthorized'){
                 errorHandler.handle('Wrong Wazuh API credentials, please add a new API and/or modify the existing one.','Routes');
+                $location.search('_a', null);
+                $location.search('tab', 'api');
                 $location.path('/settings');
             } else {
                 $location.path('/blank-screen');
@@ -72,13 +99,19 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
     }
 
     const callCheckStored = () => {
-        testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id)
+        checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location)
+        .then(() => testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id))
         .then(data => {
-            if (data.data.error || data.data.data.apiIsDown) {
-                checkResponse(data);
+            if(data && data === 'cookies_outdated'){
+                $location.search('tab','general');
+                $location.path('/overview')
             } else {
-                $rootScope.apiIsDown = null;
-                changeCurrentApi(data);
+                if (data.data.error || data.data.data.apiIsDown) {
+                    checkResponse(data);
+                } else {
+                    $rootScope.apiIsDown = null;
+                    changeCurrentApi(data);
+                }
             }
         })
         .catch(error => errorHandler.handle(error,'Routes'));
@@ -99,14 +132,22 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
                 } else {
                     errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
                     $rootScope.comeFromWizard = true;
-                    if(!$location.path().includes("/settings")) $location.path('/settings');
+                    if(!$location.path().includes("/settings")) {
+                        $location.search('_a', null);
+                        $location.search('tab', 'api');
+                        $location.path('/settings');
+                    }
                     deferred.reject();
                 }
             })
             .catch(error => {
                 errorHandler.handle(error,'Routes');
                 $rootScope.comeFromWizard = true;
-                if(!$location.path().includes("/settings")) $location.path('/settings');
+                if(!$location.path().includes("/settings")) {
+                    $location.search('_a', null);
+                    $location.search('tab', 'api');
+                    $location.path('/settings');
+                }
                 deferred.reject();
             });
         } else {
@@ -152,7 +193,6 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
 
             genericReq.request('GET', '/api/wazuh-elastic/current-pattern')
             .then(data => {
-
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {

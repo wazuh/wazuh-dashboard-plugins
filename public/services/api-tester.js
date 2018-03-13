@@ -4,11 +4,29 @@ const app = require('ui/modules').get('app/wazuh', []);
 app.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
     return {
         check_stored: data => {
-            const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
-            if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
+            
             let defered = $q.defer();
-            $http
-            .post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers)
+            
+            const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
+            
+            /** Checks for outdated cookies */
+            const current     = appState.getCreatedAt();
+            const lastRestart = $rootScope.lastRestart;
+
+            if(current && lastRestart && lastRestart > current){
+                appState.removeCurrentPattern();
+                appState.removeCurrentAPI();
+                appState.removeClusterInfo();
+                appState.removeCreatedAt();
+                defered.resolve('cookies_outdated');
+                delete $rootScope.lastRestart;
+                return defered.promise;
+            }
+            /** End of checks for outdated cookies */
+
+            if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
+                
+            $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers)
             .then(response => {
                 if (response.error) {
                     defered.reject(response);

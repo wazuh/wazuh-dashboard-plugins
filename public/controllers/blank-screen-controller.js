@@ -1,11 +1,13 @@
 const app = require('ui/modules').get('app/wazuh', []);
-import $ from 'jquery';
+
 // Logs controller
-app.controller('blankScreenController', function ($scope, $rootScope, errorHandler) {
+app.controller('blankScreenController', function ($scope, $rootScope, errorHandler,$location) {
     if($rootScope.blankScreenError) {
-        $('#result').html(errorHandler.handle($rootScope.blankScreenError,'',false,true));
+        $scope.errorToShow = $rootScope.blankScreenError;
         delete $rootScope.blankScreenError;
-    } else {
-        $('#result').html('Something went wrong')
+        if(!$scope.$$phase) $scope.$digest();
+    } 
+    $scope.goOverview = () => {
+        $location.path('/overview'); 
     }
 });

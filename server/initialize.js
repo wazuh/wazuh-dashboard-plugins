@@ -239,6 +239,23 @@ module.exports = (server, options) => {
             index: '.wazuh-version',
             body: shard_configuration
         })
+        .then(() => {
+            const commonDate = new Date().toISOString();
+
+            const configuration = {
+                name            : 'Wazuh App',
+                'app-version'   : packageJSON.version,
+                revision        : packageJSON.revision,
+                installationDate: commonDate,
+                lastRestart     : commonDate
+            };
+
+            elasticRequest.callWithInternalUser('create', {
+                index: ".wazuh-version",
+                type:  'wazuh-version',
+                id:    1,
+                body:  configuration
+            })
             .then(() => {
 
                 let configuration = {
@@ -274,8 +291,20 @@ module.exports = (server, options) => {
         elasticRequest.callWithInternalUser('indices.exists', {
             index: '.wazuh'
         })
-            .then((result) => {
-                if (!result) {
+        .then(result => {
+            if (!result) {
+
+                let shards = 1;
+                let replicas = 1;
+                
+                if (configurationFile) {
+                    if (configurationFile["wazuh.shards"]) {
+                        shards = configurationFile["wazuh.shards"];
+                    }
+                    if (configurationFile["wazuh.replicas"]) {
+                        replicas = configurationFile["wazuh.replicas"];
+                    }
+                }
 
                     let shards = 1;
                     let replicas = 1;
@@ -338,8 +367,27 @@ module.exports = (server, options) => {
             type: "wazuh-version",
             id: "1"
         })
-            .then(data => {
-                server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information and visualizations...');
+        .then(data => {
+            server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information and visualizations...');
+            
+            elasticRequest.callWithInternalUser('update', { 
+                index: '.wazuh-version', 
+                type : 'wazuh-version',
+                id   : 1,
+                body : {
+                    doc: {
+                        'app-version': packageJSON.version,
+                        revision     : packageJSON.revision,
+                        lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
+                    }
+                } 
+            })
+            .then((response) => {
+                server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated version information');
+            })
+            .catch((error) => {
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not update version information due to ' + error);
+            });
 
                 elasticRequest.callWithInternalUser('update', {
                     index: '.wazuh-version',
