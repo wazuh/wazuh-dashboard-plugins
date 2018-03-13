@@ -257,33 +257,18 @@ module.exports = (server, options) => {
                 body:  configuration
             })
             .then(() => {
-
-                let configuration = {
-                    "name": "Wazuh App",
-                    "app-version": packageJSON.version,
-                    "revision": packageJSON.revision,
-                    "installationDate": new Date().toISOString()
-                };
-
-                elasticRequest.callWithInternalUser('create', {
-                    index: ".wazuh-version",
-                    type: 'wazuh-version',
-                    id: 1,
-                    body: configuration
-                })
-                    .then(() => {
-                        log('initialize.js saveConfiguration', 'Wazuh configuration inserted','info')
-                        server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
-                    })
-                    .catch(error => {
-                        log('initialize.js saveConfiguration', error.message || error);
-                        server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh configuration');
-                    });
+                log('initialize.js saveConfiguration', 'Wazuh configuration inserted','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
             })
             .catch(error => {
                 log('initialize.js saveConfiguration', error.message || error);
-                server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh-version.');
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh configuration');
             });
+        })
+        .catch(error => {
+            log('initialize.js saveConfiguration', error.message || error);
+            server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh-version.');
+        });
     };
 
     // Init function. Check for "wazuh-version" document existance.
@@ -293,10 +278,9 @@ module.exports = (server, options) => {
         })
         .then(result => {
             if (!result) {
-
                 let shards = 1;
                 let replicas = 1;
-                
+
                 if (configurationFile) {
                     if (configurationFile["wazuh.shards"]) {
                         shards = configurationFile["wazuh.shards"];
@@ -306,61 +290,49 @@ module.exports = (server, options) => {
                     }
                 }
 
-                    let shards = 1;
-                    let replicas = 1;
-
-                    if (configurationFile) {
-                        if (configurationFile["wazuh.shards"]) {
-                            shards = configurationFile["wazuh.shards"];
-                        }
-                        if (configurationFile["wazuh.replicas"]) {
-                            replicas = configurationFile["wazuh.replicas"];
+                let configuration = {
+                    "settings": {
+                        "index": {
+                            "number_of_shards": shards,
+                            "number_of_replicas": replicas
                         }
                     }
+                };
 
-                    let configuration = {
-                        "settings": {
-                            "index": {
-                                "number_of_shards": shards,
-                                "number_of_replicas": replicas
-                            }
+                elasticRequest.callWithInternalUser('indices.create', {
+                    index: '.wazuh',
+                    body: configuration
+                })
+                    .then(() => {
+                        log('initialize.js init', 'Index .wazuh created.','info')
+                        server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
+                    })
+                    .catch(error => {
+                        server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh.');
+                    });
+            } else { // The .wazuh index exists, we now proceed to check whether it's from an older version
+                elasticRequest.callWithInternalUser('get', {
+                    index: ".wazuh",
+                    type: "wazuh-setup",
+                    id: "1"
+                })
+                    .then(data => {
+                        // Reindex!
+                        reindexOldVersion();
+                    })
+                    .catch(error => {
+                        if (error.message && error.message !== 'Not Found') {
+                            log('initialize.js init 1', error.message || error);
                         }
-                    };
-
-                    elasticRequest.callWithInternalUser('indices.create', {
-                        index: '.wazuh',
-                        body: configuration
-                    })
-                        .then(() => {
-                            log('initialize.js init', 'Index .wazuh created.','info')
-                            server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
-                        })
-                        .catch(error => {
-                            server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh.');
-                        });
-                } else { // The .wazuh index exists, we now proceed to check whether it's from an older version
-                    elasticRequest.callWithInternalUser('get', {
-                        index: ".wazuh",
-                        type: "wazuh-setup",
-                        id: "1"
-                    })
-                        .then(data => {
-                            // Reindex!
-                            reindexOldVersion();
-                        })
-                        .catch(error => {
-                            if (error.message && error.message !== 'Not Found') {
-                                log('initialize.js init 1', error.message || error);
-                            }
-                            log('initialize.js init', 'No older .wazuh index found -> no need to reindex.','info')
-                            server.log([blueWazuh, 'initialize', 'info'], 'No older .wazuh index found -> no need to reindex.');
-                        });
-                }
-            })
-            .catch(error => {
-                log('initialize.js init 2', error.message || error);
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not check if .wazuh index exists due to ' + error);
-            });
+                        log('initialize.js init', 'No older .wazuh index found -> no need to reindex.','info')
+                        server.log([blueWazuh, 'initialize', 'info'], 'No older .wazuh index found -> no need to reindex.');
+                    });
+            }
+        })
+        .catch(error => {
+            log('initialize.js init 2', error.message || error);
+            server.log([blueWazuh, 'initialize', 'error'], 'Could not check if .wazuh index exists due to ' + error);
+        });
 
         elasticRequest.callWithInternalUser('get', {
             index: ".wazuh-version",
@@ -389,76 +361,56 @@ module.exports = (server, options) => {
                 server.log([blueWazuh, 'initialize', 'error'], 'Could not update version information due to ' + error);
             });
 
-                elasticRequest.callWithInternalUser('update', {
-                    index: '.wazuh-version',
-                    type: 'wazuh-version',
-                    id: 1,
-                    body: {
-                        'doc': {
-                            "app-version": packageJSON.version,
-                            "revision": packageJSON.revision
-                        }
-                    }
-                })
-                    .then(response => {
-                        log('initialize.js init', 'Successfully updated version information','info')
-                        server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated version information');
-                    })
-                    .catch(error => {
-                        log('initialize.js init 3', error.message || error);
-                        server.log([blueWazuh, 'initialize', 'error'], 'Could not update version information due to ' + error);
-                    });
+            // We search for the currently applied pattern in the visualizations
+            elasticRequest.callWithInternalUser('search', {
+                index: '.kibana',
+                type: 'doc',
+                q: `visualization.title:"Wazuh App Overview General Metric alerts"`
+            })
+            .then(data => {
 
-                // We search for the currently applied pattern in the visualizations
-                elasticRequest.callWithInternalUser('search', {
+                elasticRequest.callWithInternalUser('deleteByQuery', {
                     index: '.kibana',
-                    type: 'doc',
-                    q: `visualization.title:"Wazuh App Overview General Metric alerts"`
-                })
-                    .then(data => {
-
-                        elasticRequest.callWithInternalUser('deleteByQuery', {
-                            index: '.kibana',
-                            body: {
-                                'query': {
-                                    'bool': {
-                                        'must': {
-                                            'match': {
-                                                "visualization.title": 'Wazuh App*'
-                                            }
-                                        },
-                                        'must_not': {
-                                            "match": {
-                                                "visualization.title": 'Wazuh App Overview General Agents status'
-                                            }
-                                        }
+                    body: {
+                        'query': {
+                            'bool': {
+                                'must': {
+                                    'match': {
+                                        "visualization.title": 'Wazuh App*'
+                                    }
+                                },
+                                'must_not': {
+                                    "match": {
+                                        "visualization.title": 'Wazuh App Overview General Agents status'
                                     }
                                 }
                             }
-                        })
-                            .then((response) => {
-                                // Update the visualizations
-                                importAppObjects(JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index);
-                            })
-                            .catch(error => {
-                                log('initialize.js init 4', error.message || error);
-                                server.log([blueWazuh, 'initialize', 'error'], 'Could not update visualizations due to ' + error);
-                            });
+                        }
+                    }
+                })
+                .then((response) => {
+                    // Update the visualizations
+                    importAppObjects(JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index);
+                })
+                .catch(error => {
+                    log('initialize.js init 4', error.message || error);
+                    server.log([blueWazuh, 'initialize', 'error'], 'Could not update visualizations due to ' + error);
+                });
 
-                    })
-                    .catch(error => {
-                        log('initialize.js init 5', error.message || error);
-                        server.log([blueWazuh, 'initialize', 'error'], 'Could not get a sample for the pattern due to ' + error);
-                    });
             })
             .catch(error => {
-                log('initialize.js init 6', error.message || error);
-                server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
-
-                // Save Setup Info
-                saveConfiguration(index_pattern);
-                configureKibana("install");
+                log('initialize.js init 5', error.message || error);
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not get a sample for the pattern due to ' + error);
             });
+        })
+        .catch(error => {
+            log('initialize.js init 6', error.message || error);
+            server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
+
+            // Save Setup Info
+            saveConfiguration(index_pattern);
+            configureKibana("install");
+        });
     };
 
     const createKibanaTemplate = () => {
