@@ -1,7 +1,7 @@
 import chrome from 'ui/chrome';
 const app = require('ui/modules').get('app/wazuh', []);
 
-app.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
+app.service('testAPI', function ($q, $http, $location, $rootScope, appState, genericReq) {
     return {
         check_stored: data => {
             
@@ -18,30 +18,39 @@ app.service('testAPI', function ($q, $http, $location, $rootScope, appState) {
                 appState.removeCurrentAPI();
                 appState.removeClusterInfo();
                 appState.removeCreatedAt();
-                defered.resolve('cookies_outdated');
                 delete $rootScope.lastRestart;
-                return defered.promise;
-            }
-            /** End of checks for outdated cookies */
+                genericReq.request('GET', '/api/wazuh-api/configuration', {})
+                .then(configuration => {
+                    appState.setPatternSelector(typeof configuration.data.data['ip.selector'] !== 'undefined' ? configuration.data.data['ip.selector'] : true)
+                    defered.resolve('cookies_outdated');
+                })
+                .catch(error => defered.reject(error));            
 
-            if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
+                /** End of checks for outdated cookies */
+            } else {
+                if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
                 
-            $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers)
-            .then(response => {
-                if (response.error) {
-                    defered.reject(response);
-                } else {
-                    defered.resolve(response);
-                }
-            })
-            .catch(error => {
-                if(error.status && error.status === -1){
-                    $rootScope.apiIsDown = true;
-                    defered.reject({data: 'request_timeout_checkstored'});
-                } else {
-                    defered.reject(error);
-                }
-            });
+                Promise.all([
+                    genericReq.request('GET', '/api/wazuh-api/configuration', {}),
+                    $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers)
+                ])
+                .then(data => {
+                    appState.setPatternSelector(typeof data[0].data.data['ip.selector'] !== 'undefined' ? data[0].data.data['ip.selector'] : true)
+                    if (data[1].error) {
+                        defered.reject(data[1]);
+                    } else {
+                        defered.resolve(data[1]);
+                    }
+                })
+                .catch(error => {
+                    if(error.status && error.status === -1){
+                        $rootScope.apiIsDown = true;
+                        defered.reject({data: 'request_timeout_checkstored'});
+                    } else {
+                        defered.reject(error);
+                    }
+                });
+            }
             return defered.promise;
         },
         check: data => {
