@@ -9,6 +9,8 @@ const blueWazuh = colors.blue('wazuh');
 
 const APP_OBJECTS_FILE = './integration-files/app-objects-file-monitoring.json';
 
+const { log } = require('./logger');
+
 module.exports = (server, options) => {
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('admin');
@@ -25,13 +27,15 @@ module.exports = (server, options) => {
     // Read Wazuh App package file
     try {
         packageJSON = require('../package.json');
-    } catch (e) {
-        server.log([blueWazuh, 'monitoring', 'error'], 'Could not read the Wazuh package file due to ' + e);
+    } catch (error) {
+        log('monitoring.js', error.message || error);
+        server.log([blueWazuh, 'monitoring', 'error'], 'Could not read the Wazuh package file due to ' + error.message || error);
     }
 
     // Check status and get agent status array
     const checkStatus = (apiEntry, maxSize, offset) => {
         if (!maxSize) {
+            log('monitoring.js', 'You must provide a max size');
             server.log([blueWazuh, 'monitoring', 'error'], 'You must provide a max size');
         }
 
@@ -58,6 +62,7 @@ module.exports = (server, options) => {
                     saveStatus();
                 }
             } else {
+                log('monitoring.js', 'Can not access Wazuh API');
                 server.log([blueWazuh, 'monitoring', 'error'], 'Can not access Wazuh API');
             }
         });
@@ -83,6 +88,7 @@ module.exports = (server, options) => {
             if (!response.error && response.body.data && response.body.data.totalItems) {
                 checkStatus(apiEntry, response.body.data.totalItems);
             } else {
+                log('monitoring.js', 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
                 server.log([blueWazuh, 'monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
             }
         });
@@ -110,6 +116,7 @@ module.exports = (server, options) => {
                 'insecure': element._source.insecure
             };
             if (apiEntry.error) {
+                log('monitoring.js loadCredentials', apiEntry.error || apiEntry);
                 server.log([blueWazuh, 'monitoring', 'error'], `Error getting wazuh-api data: ${apiEntry.error}`);
                 break;
             }
@@ -127,13 +134,15 @@ module.exports = (server, options) => {
             if (data.hits.total > 0) {
                 callback(data.hits);
             } else {
+                log('monitoring.js getConfig','no credentials');
                 callback({
                     'error': 'no credentials',
                     'error_code': 1
                 });
             }
         })
-        .catch(() => {
+        .catch(error => {
+            log('monitoring.js getConfig',error.message || error);
             callback({
                 'error': 'no elasticsearch',
                 'error_code': 2
@@ -143,14 +152,16 @@ module.exports = (server, options) => {
 
     // Importing Wazuh app visualizations and dashboards
     const importAppObjects = (id) => {
+        log('monitoring.js importAppObjects','Importing Wazuh app visualizations...','info');
         server.log([blueWazuh, 'monitoring', 'info'], 'Importing Wazuh app visualizations...');
 
         try {
             app_objects = require(APP_OBJECTS_FILE);
-        } catch (e) {
+        } catch (error) {
+            log('monitoring.js importAppObjects', error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], 'Could not read the objects file.');
             server.log([blueWazuh, 'monitoring', 'error'], 'Path: ' + APP_OBJECTS_FILE);
-            server.log([blueWazuh, 'monitoring', 'error'], 'Exception: ' + e);
+            server.log([blueWazuh, 'monitoring', 'error'], 'Exception: ' + error.message || error);
         }
 
         let body = '';
@@ -180,9 +191,11 @@ module.exports = (server, options) => {
             index: ['.kibana', index_pattern]
         }))
         .then(() => {
+            log('monitoring.js importAppObjects', 'Wazuh app visualizations were successfully installed. App ready to be used.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Wazuh app visualizations were successfully installed. App ready to be used.');
         })
-        .catch((error) => {
+        .catch(error => {
+            log('monitoring.js importAppObjects',error.message || error);
             server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch. Bulk request failed.');
         });
     };
@@ -192,6 +205,7 @@ module.exports = (server, options) => {
 
     // Configure Kibana patterns.
     const configureKibana = () => {
+        log('monitoring.js configureKibana', `Creating index pattern: ${index_pattern}`, 'info');
         server.log([blueWazuh, 'monitoring', 'info'], `Creating index pattern: ${index_pattern}`);
 
         let patternId = 'index-pattern:' + index_pattern;
@@ -207,23 +221,27 @@ module.exports = (server, options) => {
                 } 
             } 
         })
-        .then((resp) => {
-            server.log([blueWazuh, 'monitoring', 'info'], 'Created index pattern: ' + index_pattern);
+        .then(resp => {
+            log('monitoring.js configureKibana', `Created index pattern: ${index_pattern}`, 'info');
+            server.log([blueWazuh, 'monitoring', 'info'], `Created index pattern: ${index_pattern}`);
             importAppObjects(index_pattern);
         })
-        .catch((error) => {
+        .catch(error => {
+            log('monitoring.js configureKibana',error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], 'Error creating index-pattern due to ' + error);
-        });;
+        });
     };
 
     // Creating wazuh-monitoring index
     const createIndex = (todayIndex) => {
         elasticRequest.callWithInternalUser('indices.create', { index: todayIndex })
         .then(() => {
+            log('monitoring.js createIndex', 'Successfully created today index.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Successfully created today index.');
             insertDocument(todayIndex);
         })
-        .catch((error) => {
+        .catch(error => {
+            log('monitoring.js createIndex', error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], `Could not create ${todayIndex} index on elasticsearch due to ` + error);
         });
     };
@@ -250,7 +268,8 @@ module.exports = (server, options) => {
                 body:  body
             })
             .then((response) => agentsArray.length = 0)
-            .catch((error) => {
+            .catch(error => {
+                log('monitoring.js insertDocument', error.message || error);
                 server.log([blueWazuh, 'monitoring', 'error'], 'Error inserting agent data into elasticsearch. Bulk request failed due to ' + error);
             });
         }
@@ -266,13 +285,15 @@ module.exports = (server, options) => {
             if (result) insertDocument(todayIndex);
             else createIndex(todayIndex);
         })
-        .catch((error) => {
+        .catch(error => {
+            log('monitoring.js saveStatus', `Could not check if the index ${todayIndex} exists due to ${error.message || error}`);
             server.log([blueWazuh, 'monitoring', 'error'], `Could not check if the index ${todayIndex} exists due to ` + error);
         });
     };
 
     // Main. First execution when installing / loading App.
     const init = () => {
+        log('monitoring.js init', 'Creating today index...', 'info');
         server.log([blueWazuh, 'monitoring', 'info'], 'Creating today index...');
         saveStatus();
 
@@ -282,10 +303,12 @@ module.exports = (server, options) => {
             type:  'doc',
             id: patternId
         })
-        .then((data) => {
+        .then(data => {
+            log('monitoring.js init', 'Skipping index-pattern creation. Already exists.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Skipping index-pattern creation. Already exists.');
         })
-        .catch((error) => {
+        .catch(error => {
+            log('monitoring.js init', 'Didn\'t find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...');
             server.log([blueWazuh, 'monitoring', 'info'], "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...");
 
             elasticRequest.callWithInternalUser('delete', { 
@@ -293,10 +316,12 @@ module.exports = (server, options) => {
                 type: 'doc',
                 id: 'index-pattern:wazuh-monitoring-*' 
             })
-            .then((resp) => {
+            .then(resp => {
+                log('monitoring.js init', 'Successfully deleted old wazuh-monitoring pattern.', 'info');
                 server.log([blueWazuh, 'monitoring', 'info'], "Successfully deleted old wazuh-monitoring pattern.");
             })
-            .catch((error) => {
+            .catch(error => {
+                log('monitoring.js init', 'Didn\'t find old wazuh-monitoring pattern. Skipping deletion.');
                 server.log([blueWazuh, 'monitoring', 'info'], "Didn't find old wazuh-monitoring pattern. Skipping deletion.");
             });
             configureKibana();
@@ -307,11 +332,12 @@ module.exports = (server, options) => {
     const checkElasticsearchServer  = () => {
         return new Promise(function (resolve, reject) {
             elasticRequest.callWithInternalUser('indices.exists', { index: ".kibana" })
-            .then((data) => {
-                if (data) server.plugins.elasticsearch.waitUntilReady().then((data) => { resolve(data); });
+            .then(data => {
+                if (data) server.plugins.elasticsearch.waitUntilReady().then(data => { resolve(data); });
                 else reject(data);
             })
-            .catch((error) => {
+            .catch(error => {
+                log('monitoring.js checkElasticsearchServer',error.message || error);
                 reject(error);
             });
         })
@@ -319,8 +345,9 @@ module.exports = (server, options) => {
 
     // Wait until Kibana server is ready
     const checkKibanaStatus = () => {
-        checkElasticsearchServer().then((data) => { init() })
-        .catch((error) => {
+        checkElasticsearchServer().then(data => { init() })
+        .catch(error => {
+            log('monitoring.js checkKibanaStatus',error.message || error);
             server.log([blueWazuh, 'monitoring', 'info'], 'Waiting for Kibana and Elasticsearch servers to be ready...');
             setTimeout(() => checkKibanaStatus(), 3000);
         });

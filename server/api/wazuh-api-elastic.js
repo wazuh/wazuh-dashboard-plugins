@@ -11,10 +11,10 @@ module.exports = (server, options) => {
             type:  'wazuh-configuration',
             size:  '100'
         })
-        .then((data) => {
+        .then(data => {
             reply(data.hits.hits);
         })
-        .catch((error) => {
+        .catch(error => {
             reply(error);
         });
     };
@@ -26,10 +26,10 @@ module.exports = (server, options) => {
             type:  'wazuh-configuration',
             id:    req.params.id
         })
-        .then((data) => {
+        .then(data => {
             reply(data);
         })
-        .catch((error) => {
+        .catch(error => {
             reply(error);
         });
     };
@@ -42,7 +42,7 @@ module.exports = (server, options) => {
             type:  'wazuh-configuration',
             q:     'active:true'
         })
-        .then((data) => {
+        .then(data => {
             if (data.hits.total === 1) {
                 // Setting off previous default
                 elasticRequest.callWithRequest(req, 'update', {
@@ -72,7 +72,7 @@ module.exports = (server, options) => {
                         message:    'ok'
                     });
                 })
-                .catch((error) => {
+                .catch(error => {
                     reply({
                         statusCode: 500,
                         error:      8,
@@ -98,7 +98,7 @@ module.exports = (server, options) => {
                         'message':    'ok'
                     });
                 })
-                .catch((error) => {
+                .catch(error => {
                     reply({
                         'statusCode': 500,
                         'error':      8,
@@ -107,7 +107,7 @@ module.exports = (server, options) => {
                 });
             }
         })
-        .catch((error) => {
+        .catch(error => {
             reply({
                 'statusCode': 500,
                 'error':      8,
@@ -122,10 +122,10 @@ module.exports = (server, options) => {
             index: '.wazuh',
             type:  'wazuh-configuration'
         })
-        .then((data) => {
+        .then(data => {
             reply(data.hits.hits);
         })
-        .catch((error) => {
+        .catch(error => {
             reply(error);
         });
     };
@@ -152,7 +152,7 @@ module.exports = (server, options) => {
                 'message':    'ok'
             });
         })
-        .catch((error) => {
+        .catch(error => {
             reply({
                 'statusCode': 500,
                 'error':      8,
@@ -223,7 +223,7 @@ module.exports = (server, options) => {
                 response:   response
             });
         })
-        .catch((error) => {
+        .catch(error => {
             reply({
                 statusCode: 500,
                 error:      8,
@@ -249,7 +249,7 @@ module.exports = (server, options) => {
                 message:    'ok'
             });
         })
-        .catch((error) => {
+        .catch(error => {
             reply({
                 statusCode: 500,
                 error:      8,
