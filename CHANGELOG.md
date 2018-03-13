@@ -12,7 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   - New field on the `.wazuh-version` index to store the **last time the Kibana server was restarted**.
   - This is used to **check if the cookies have consistency** with the current sever status.
   - Now the app is clever and **takes decissions depending on new consistency checks**.
-- **New design for the *Agents/Configuration* tab** ([#309](https://github.com/wazuh/wazuh-kibana-app/pull/309)).
+- **New design for the *Agents/Configuration* tab** ([#310](https://github.com/wazuh/wazuh-kibana-app/pull/310)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 386
 ### Added
