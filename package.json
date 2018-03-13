@@ -34,6 +34,6 @@
     "lodash": "3.10.1",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
-    "winston": "^3.0.0-rc1"
+    "winston": "3.0.0-rc1"
   }
 }
