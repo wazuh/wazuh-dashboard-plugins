@@ -77,9 +77,9 @@
 
                 <div flex layout="column" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
                     <div flex layout="column">
-                        <div layout="row" class="groupsHeader">
+                        <div layout="row">
                             <span flex class="wz-headline-title">{{ filename }}</span>
-                            <span flex class="text-right cursor-pointer" ng-click="goBackFiles()">close</span>
+                            <span flex class="text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>
                         </div>
                         <div flex layout="column">
                             <pre flex class="wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="file"></code></pre>
