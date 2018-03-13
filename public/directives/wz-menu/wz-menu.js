@@ -19,6 +19,7 @@ app.directive('wzMenu',function(){
             }
             const load = async () => {
                 try {
+                    if(!appState.getPatternSelector()) return;
                     const data = await courier.indexPatterns.get(appState.getCurrentPattern());
                     $scope.theresPattern = true;
                     $scope.currentPattern = data.title;
@@ -44,6 +45,7 @@ app.directive('wzMenu',function(){
             // Function to change the current index pattern on the app
             $scope.changePattern = async selectedPattern => {
                 try{
+                    if(!appState.getPatternSelector()) return;
                     $scope.currentSelectedPattern = await patternHandler.changePattern(selectedPattern);
                     if(!$scope.$$phase) $scope.$digest();
                     $window.location.reload();
@@ -66,6 +68,7 @@ app.directive('wzMenu',function(){
             });
 
             $scope.$on('updatePattern', () => {
+                if(!appState.getPatternSelector()) return;
                 courier.indexPatterns.get(appState.getCurrentPattern())
                 .then(data => {
                     $scope.theresPattern = true;
