@@ -5,7 +5,7 @@
         <div></div>
     </div>
 
-    <!-- View: Panels -->
+    <!-- This container appears when there's some error getting the configuration -->
     <div layout="column" layout-align="start stretch" ng-show="!load">
         <md-card flex class="wz-md-card">
             <md-card-content>
@@ -112,6 +112,24 @@
                 </md-card>
                 <!-- END OPENSCAP -->
 
+                <!-- CISCAT -->
+                <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['cis-cat']">
+                    <md-card-content>
+                        <!-- Section title -->
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='ciscat';toggleRAW=false" ng-class="selectedConfigTab === 'ciscat' ? 'wz-font-weight-bold' : ''">CIS-CAT</span>
+                        <md-divider class="wz-margin-top-10"></md-divider>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].disabled">
+                            <span flex>Disabled</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].disabled}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].interval">
+                            <span flex>Interval</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].interval}}</span>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END CISCAT -->
+
                 <!-- LOG COLLECTION -->
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['localfile']">
                     <md-card-content>
@@ -124,6 +142,19 @@
                     </md-card-content>
                 </md-card>
                 <!-- END LOG COLLECTION -->
+
+                <!-- COMMAND -->
+                <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['localfile']">
+                    <md-card-content>
+                        <!-- Section title -->
+                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='command';toggleRAW=false" ng-class="selectedConfigTab === 'command' ? 'wz-font-weight-bold' : ''">Remote Command</span>
+                        <md-divider class="wz-margin-top-10"></md-divider>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex>Visualize all Remote Command settings</span>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END COMMAND -->
 
             </div>
 
@@ -451,6 +482,47 @@
                 </md-card>
                 <!-- END OPENSCAP -->
 
+                <!-- CIS-CAT -->
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'ciscat' && !toggleRAW">
+                    <md-card-content>
+
+                        <!-- Section title -->
+                        <div layout="row" layout-align="start center">
+                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-rocket"></i> CIS-CAT</span>
+                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                        </div>
+
+                        <md-divider class="wz-margin-top-10"></md-divider>
+
+                        <!-- Main settings -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].disabled">
+                            <span flex>Disabled</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].disabled}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].interval">
+                            <span flex>Interval</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].interval}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].timeout">
+                            <span flex>Timeout</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].timeout}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat']['scan-on-start']">
+                            <span flex>Scan on start</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat']['scan-on-start']}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].java_path">
+                            <span flex>Java path</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].java_path}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].ciscat_path">
+                            <span flex>CIS-CAT path</span>
+                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].ciscat_path}}</span>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END CIS-CAT -->
+
                 <!-- LOG COLLECTION -->
                 <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'log' && !toggleRAW">
                     <md-card-content>
@@ -493,11 +565,59 @@
                                 <span flex>Label</span>
                                 <span flex class="text-right color-grey">{{item.label}}</span>
                             </div>
+                            <div ng-if="item.label" layout="row" class="wz-padding-top-10">
+                                <span flex>Only future events</span>
+                                <span flex class="text-right color-grey">{{item['only-future-events']}}</span>
+                            </div>
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
                     </md-card-content>
                 </md-card>
                 <!-- END LOG COLLECTION -->
+
+                <!-- COMMAND -->
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'command' && !toggleRAW">
+                    <md-card-content>
+
+                        <!-- Section title -->
+                        <div layout="row" layout-align="start center">
+                            <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-terminal"></i> Remote Command</span>
+                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                        </div>
+
+                        <md-divider class="wz-margin-top-10"></md-divider>
+
+                        <!-- Commands -->
+                        <div ng-repeat="item in groupConfiguration.config['command']">
+                            <div ng-if="item.disabled" layout="row" class="wz-padding-top-10">
+                                <span flex>Disabled</span>
+                                <span flex class="text-right color-grey">{{item.disabled}}</span>
+                            </div>
+                            <div ng-if="item.tag" layout="row" class="wz-padding-top-10">
+                                <span flex>Tag</span>
+                                <span flex class="text-right color-grey">{{item.tag}}</span>
+                            </div>
+                            <div ng-if="item.command" layout="row" class="wz-padding-top-10">
+                                <span flex>Command</span>
+                                <span flex class="text-right color-grey">{{item.command}}</span>
+                            </div>
+                            <div ng-if="item.interval" layout="row" class="wz-padding-top-10">
+                                <span flex>Interval</span>
+                                <span flex class="text-right color-grey">{{item.interval}}</span>
+                            </div>
+                            <div ng-if="item.run_on_start" layout="row" class="wz-padding-top-10">
+                                <span flex>Run on start</span>
+                                <span flex class="text-right color-grey">{{item.run_on_start}}</span>
+                            </div>
+                            <div ng-if="item.ignore_output" layout="row" class="wz-padding-top-10">
+                                <span flex>Ignore output</span>
+                                <span flex class="text-right color-grey">{{item.ignore_output}}</span>
+                            </div>
+                            <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- END COMMAND -->
 
                 <!-- JSON VIEWER -->
                 <md-card flex class="wz-md-card" ng-show="toggleRAW">
