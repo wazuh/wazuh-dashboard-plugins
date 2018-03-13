@@ -5,7 +5,8 @@ const app = require('ui/modules').get('app/wazuh', []);
 app.directive('wzMenu',function(){
     return {
         controller: function ($scope,$window, $rootScope, appState, patternHandler, courier, errorHandler) {
-
+            $rootScope.showSelector = appState.getPatternSelector();
+            if(!$rootScope.$$phase) $rootScope.$digest();
             if(appState.getCurrentAPI()) {
                 $scope.theresAPI = true;
                 $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
