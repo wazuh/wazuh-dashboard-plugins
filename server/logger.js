@@ -1,15 +1,21 @@
 const winston = require('winston');
 const fs      = require('fs');
 const path    = require('path');
-
+let allowed   = false;
 /** 
  * Checks if /var/log/wazuh exists on linux systems. If it doesn't exist, it will be created.
  */
 const initDirectory = () => {
-    if (!fs.existsSync('/var/log/wazuh') && process.platform === 'linux') {
-        fs.mkdirSync('/var/log/wazuh');
+    try{
+        if (!fs.existsSync(path.join(__dirname, '../../wazuh-logs'))) {
+            fs.mkdirSync(path.join(__dirname, '../../wazuh-logs'));
+        }
+        allowed = true;
+        return;
+    } catch (error) {
+        allowed = false;
+        console.error('Cannot create the logs directory');
     }
-    return;
 }
 
 /** 
@@ -20,7 +26,7 @@ const wazuhlogger = winston.createLogger({
     format    : winston.format.json(),
     transports: [
         new winston.transports.File({ 
-            filename: process.platform === 'linux' ? '/var/log/wazuh/wazuhapp.log' : path.join(__dirname, '../../wazuhapp.log') 
+            filename: path.join(__dirname, '../../wazuh-logs/wazuhapp.log') 
         })
     ]
 });
@@ -35,11 +41,13 @@ wazuhlogger.exitOnError = false;
  * @param {*} filename Path to the file
  */
 const getFilesizeInMegaBytes = filename => {
-    if (fs.existsSync(filename)) {
-        const stats               = fs.statSync(filename)
-        const fileSizeInMegaBytes = stats.size
+    if(allowed){
+        if (fs.existsSync(filename)) {
+            const stats               = fs.statSync(filename)
+            const fileSizeInMegaBytes = stats.size
 
-        return fileSizeInMegaBytes / 1000000.0;
+            return fileSizeInMegaBytes / 1000000.0;
+        }
     }
     return 0;
 }
@@ -48,11 +56,13 @@ const getFilesizeInMegaBytes = filename => {
  * Checks if the wazuhapp.log file size is greater than 100MB, if so it rotates the file.
  */
 const checkFiles = () => {
-    if (getFilesizeInMegaBytes(process.platform === 'linux' ? '/var/log/wazuh/wazuhapp.log' : path.join(__dirname, '../../wazuhapp.log')) >= 100) {
-        fs.renameSync(
-            process.platform === 'linux' ? '/var/log/wazuh/wazuhapp.log' : path.join(__dirname, '../../wazuhapp.log'), 
-            process.platform === 'linux' ? '/var/log/wazuh/wazuhapp.log' : path.join(__dirname, `../../wazuhapp.${new Date().getTime()}.log`)
-        )
+    if(allowed){
+        if (getFilesizeInMegaBytes(path.join(__dirname, '../../wazuh-logs/wazuhapp.log')) >= 100) {
+            fs.renameSync(
+                path.join(__dirname, '../../wazuh-logs/wazuhapp.log'), 
+                path.join(__dirname, `../../wazuh-logs/wazuhapp.${new Date().getTime()}.log`)
+            )
+        }
     }
 };
 
@@ -64,13 +74,15 @@ const checkFiles = () => {
  */
 const log = (location, message, level) => {
     initDirectory();
-    checkFiles();
-    wazuhlogger.log({
-        date    : new Date(),
-        level   : level || 'error',
-        location: location || 'unknown',
-        message : message || 'An error occurred'
-    });
+    if(allowed){
+        checkFiles();
+        wazuhlogger.log({
+            date    : new Date(),
+            level   : level || 'error',
+            location: location || 'unknown',
+            message : message || 'An error occurred'
+        });
+    }
 };
 
 module.exports = { log }
