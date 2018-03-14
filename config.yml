@@ -45,7 +45,7 @@
 # Defines maximum timeout to be used on the Wazuh App requests.
 # Default value is 8000. It will be ignored if it is bellow 1500.
 # It means milliseconds before we consider a request as failed.
-#timeout: 4000
+#timeout: 8000
 #
 #
 #--------------------- Indices configuration ------------------------------------
@@ -56,3 +56,9 @@
 #wazuh-version.shards      : 1
 #wazuh-version.replicas    : 1
 #
+#
+#--------------------- Index pattern selector ------------------------------------
+#
+# Defines if the user is allowed to change the selected index pattern
+# directly from the Wazuh App top menu. Default: yes
+#ip.selector: true

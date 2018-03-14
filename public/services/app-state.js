@@ -83,6 +83,15 @@ require('ui/modules').get('app/wazuh', []).service('appState', function ($cookie
         },
         removeUserCode: () => {
             return $cookies.remove('userCode');
+        },
+        getPatternSelector: () => {
+            return $cookies.getObject('patternSelector');
+        },
+        setPatternSelector: value => {
+            $cookies.putObject('patternSelector', value);
+        },
+        removePatternSelector: () => {
+            return $cookies.remove('patternSelector');
         }
     };
 });

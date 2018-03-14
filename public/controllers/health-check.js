@@ -61,8 +61,14 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
                         const versionData = await apiReq.request('GET', '/version', {});
                         const apiVersion  = versionData.data.data;
                         const setupData   = await genericReq.request('GET', '/api/wazuh-elastic/setup');
+                        if(!setupData.data.data["app-version"] || !apiVersion){
+                            errorHandler.handle('Error fetching app version or API version','Health Check');
+                            $scope.errors.push('Error fetching version');
+                        }
+                        const apiSplit = apiVersion.split('v')[1].split('.');
+                        const appSplit = setupData.data.data["app-version"].split('.');
 
-                        if (apiVersion !== 'v' + setupData.data.data["app-version"]) {
+                        if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
                             $scope.errors.push("API version mismatch. Expected v" + setupData.data.data["app-version"]);
                         } else {
                             $scope.processedChecks++;
@@ -84,6 +90,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
     const load = async () => {
         try {
             const configuration = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+            appState.setPatternSelector(typeof configuration.data.data['ip.selector'] !== 'undefined' ? configuration.data.data['ip.selector'] : true)
             if('data' in configuration.data &&
                'timeout' in configuration.data.data && 
                Number.isInteger(configuration.data.data.timeout) && 
@@ -91,7 +98,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
             ) {
                 $rootScope.userTimeout = configuration.data.data.timeout;   
             }
-
+            
             if('data' in configuration.data) {
                 checks.pattern  = typeof configuration.data.data['checks.pattern']  !== 'undefined' ? configuration.data.data['checks.pattern']  : true;
                 checks.template = typeof configuration.data.data['checks.template'] !== 'undefined' ? configuration.data.data['checks.template'] : true;
