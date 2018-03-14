@@ -2,6 +2,8 @@
 /* ------------------------ Wazuh commons stylesheet ------------------------ */
 /* -------------------------------------------------------------------------- */
 
+/* Custom healthcheck and blank screen styles */
+
 .error-notify {
     font-size: 20px;
     color: black;
@@ -43,12 +45,6 @@
     text-align: center;
 }
 
-.wz-pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    height: 200px;
-}
-
 .percentage {
     font-size: 18px;
     text-align: center;
@@ -58,15 +54,17 @@
     background-color: white !important;
 }
 
-/* Navbar Directive */
+/* Custom JSON viewer settings */
 
-.headBar {
-    background-color: white !important;
-    min-width: 463px;
+.wz-pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    height: 200px;
 }
 
-.horizontalTabsBar {
-    background-color: white !important;
+.jsonbeauty2 {
+    min-height: 300px;
+    margin: 0px !important;
 }
 
 .json-beautifier {
@@ -137,6 +135,22 @@ div.uil-ring-css {
     color: #FFF;
 }
 
+/* Custom Manager/Status styles */
+
+.status {
+    width: 3%;
+}
+
+.status.round {
+    border-radius: 50%;
+    height: 15px;
+    width: 15px;
+}
+
+.joinCardsRow {
+    margin-top: 5px;
+}
+
 /* Custom Manager/Ruleset styles */
 
 .manager-ruleset-decoders-top-24 {
@@ -151,6 +165,11 @@ div.uil-ring-css {
 
 .manager-ruleset-btn {
     top: -3px;
+}
+
+.wazuh-chip {
+    background-color: #0079a5 !important;
+    color: #ffffff !important;
 }
 
 /* Custom Manager/Logs styles */
@@ -212,14 +231,133 @@ div.uil-ring-css {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Style to override outline on components but avoid hidden shadow on focus*/
-/* This is a really important fix and should not be deleted */
+/* Styles to override outline on components but avoid hidden shadow on focus */
+/* These are really important fixex and should not be deleted */
+
 :focus:not([class^="eui"]) {
     box-shadow: none;
 }
 
-/* Style to override outline on components but avoid hidden shadow on focus*/
-/* This is a really important fix and should not be deleted */
 :focus:not(.wazuh-button):not(.input-filter-box) {
     box-shadow: none !important;
+}
+
+/* Custom colors styles */
+
+.green {
+    background-color: rgb(42, 204, 67);
+}
+
+.teal {
+    background-color: rgb(0, 166, 155);
+}
+
+.red {
+    background-color: rgb(255, 100, 92);
+}
+
+.yellow {
+    background-color: rgb(255, 192, 74);
+}
+
+.blue {
+    background-color: rgb(0, 121, 165);
+}
+
+.grey {
+    background-color: grey;
+}
+
+.wz-metric-color {
+    background-color: #e4f2f5 !important;
+}
+
+.wz-background-transparent {
+    background-color: transparent;
+}
+
+.wz-background-white {
+    background-color: white !important;
+}
+
+/* Custom Kibana styles */
+
+.wz-border-none,
+.wz-border-none md-select-value {
+    border: none;
+}
+
+.wz-border-0,
+.wz-md-navbar .md-nav-bar {
+    border: 0px;
+}
+
+.wz-md-navbar ._md-nav-button-text,
+.wz-md-tab .md-tab,
+.wz-md-tab .md-active {
+    color: black !important;
+}
+
+.wazuhNavDiscover .euiTab ,
+.wazuhNavDiscover .euiText {
+    font-size: 14px !important;
+}
+
+.kuiLocalNav {
+    border-bottom: none !important;
+}
+
+kbn-vis,
+visualize,
+visualization {
+    display: flex;
+    flex: 1 1 100%;
+}
+
+kbn-vis visualize,
+kbn-vis visualization,
+kbn-vis .vis-container {
+    overflow: hidden;
+}
+
+/* Custom md-switch styles */
+
+.wz-md-switch {
+    margin: 0px !important;
+}
+
+/* Card and select input shadow overriding */
+
+.wz-md-card {
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #D9D9D9 !important;
+    overflow: hidden;
+}
+
+.wz-select-input {
+    border-radius: 0;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #D9D9D9;
+}
+
+/* Unclassified but important Wazuh app component styles */
+
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+.wz-agent-status-indicator {
+    width: 100%;
+    padding: 4px;
+    color: white;
+    font-weight: normal;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.wz-search-bar-size {
+    padding: 5px;
+    height: 35px;
+    margin-top: 0px !important;
+    margin-right: 0px !important;
 }
