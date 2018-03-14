@@ -15,9 +15,9 @@
         </md-card>
     </div>
 
-    <div ng-show="!loading" flex layout="column" class="manager-ruleset-decoders-no-padding">
-        <div id="content" layout="row" layout-align="start start" class="manager-ruleset-decoders-top-content">
-            <span layout="row" class="manager-ruleset-decoders-top-span" flex layout-align="space-between center">
+    <div ng-show="!loading" flex layout="column">
+        <div id="content" layout="row" layout-align="start start">
+            <span layout="row" flex layout-align="space-between center">
                 <md-autocomplete flex id="Auto" class="wz-autocomplete" md-input-id="autocomplete" md-select-on-match="true" md-no-cache="noCache" md-selected-item="filter"
                     md-selected-item-change="decoders.addFilter('search', filter.name)" md-search-text="searchTerm" md-items="decoder in analizeDecoders(searchTerm)"
                     md-item-text="decoder.name +' '+ decoder.file" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
@@ -45,7 +45,7 @@
                 class="wazuh-button md-raised md-primary manager-ruleset-decoders-btn" aria-label="Ruleset decoders button">
                 Decoders
             </md-button>
-            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-right-15 wz-select-input">
+            <div flex="20" layout="column" class="height-41 wz-select-input">
                 <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
                     <option value="all">All</option>
                     <option value="parents">Parents only</option>

@@ -90,16 +90,16 @@
             <div ng-repeat="entry in apiEntries">
                 <div layout="row" layout-align="space-between center">
                     <p flex="15">
-                        <i ng-show="(entry._id === currentDefault)" tooltip="Set as default Manager" tooltip-placement="right" class="fa fa-star settings-template-1" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
+                        <i ng-show="(entry._id === currentDefault)" tooltip="Set as default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
                     <p flex="20">{{entry._source.cluster_info.manager}}</p>
                     <p flex="15">{{entry._source.url}}</p>
                     <p flex="15">{{entry._source.api_port}}</p>
                     <p flex="15">{{entry._source.api_user}}</p>
                     <p flex="20">
                         <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
-                        <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2 cursor-pointer" aria-hidden="true"></i>
-                        <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2 cursor-pointer" aria-hidden="true"></i>
-                        <i ng-click="toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil settings-template-2 cursor-pointer" aria-hidden="true"></i>
+                        <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                        <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                        <i ng-click="toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
                     </p>
                 </div>
                 <div layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id] && isEditing">
@@ -276,7 +276,7 @@
                 <strong>Warning:</strong>&nbsp;modifying the index-pattern will change it to ALL of the users.
             </div>
 
-            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+            <div flex="20" layout="column" class="height-41 md-block wz-margin-top-17 wz-margin-right-15 wz-select-input">
                 <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)"
                     aria-label="Select index pattern">
                     <option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</option>
