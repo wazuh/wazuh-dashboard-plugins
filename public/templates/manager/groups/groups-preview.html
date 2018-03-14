@@ -10,11 +10,11 @@
                             <md-divider class="wz-margin-top-10"></md-divider>
                             <div layout="row" class="wz-padding-top-10">
                                 <span flex="25">Configuration sum</span>
-                                <span class="text-right color-grey">{{ groups.items[selectedGroup].conf_sum }}</span>
+                                <span class="wz-text-right color-grey">{{ groups.items[selectedGroup].conf_sum }}</span>
                             </div>
                             <div layout="row" class="wz-padding-top-10">
                                 <span flex="25">Merged sum</span>
-                                <span class="text-right color-grey">{{ groups.items[selectedGroup].merged_sum }}</span>
+                                <span class="wz-text-right color-grey">{{ groups.items[selectedGroup].merged_sum }}</span>
                             </div>
                         </md-card-content>
                     </md-card>
@@ -79,7 +79,7 @@
                     <div flex layout="column">
                         <div layout="row">
                             <span flex class="wz-headline-title">{{ filename }}</span>
-                            <span flex class="text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>
+                            <span flex class="wz-text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>
                         </div>
                         <div flex layout="column">
                             <pre flex class="wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="file"></code></pre>

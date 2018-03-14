@@ -8,21 +8,21 @@
                     <div flex layout="column">
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Active</p>
-                            <p class="text-right color-grey">{{agentsCountActive}}</p>
+                            <p class="wz-text-right color-grey">{{agentsCountActive}}</p>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Disconnected</p>
-                            <p class="text-right color-grey">{{agentsCountDisconnected}}</p>
+                            <p class="wz-text-right color-grey">{{agentsCountDisconnected}}</p>
                         </div>
                     </div>
                     <div flex layout="column">
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Never connected</p>
-                            <p class="text-right color-grey">{{agentsCountNeverConnected}}</p>
+                            <p class="wz-text-right color-grey">{{agentsCountNeverConnected}}</p>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Agents coverage</p>
-                            <p class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
+                            <p class="wz-text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
                         </div>
                     </div>
                 </div>
@@ -34,11 +34,11 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle" ng-click="showAgent(lastAgent)">Last registered agent</p>
-                    <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
+                    <p class="wz-text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle" ng-click="showAgent(mostActiveAgent)">Higher activity</p>
-                    <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
+                    <p class="wz-text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
                 </div>
             </md-card-content>
         </md-card>

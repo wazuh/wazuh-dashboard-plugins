@@ -90,7 +90,7 @@
             <div ng-repeat="entry in apiEntries">
                 <div layout="row" layout-align="space-between center">
                     <p flex="15">
-                        <i ng-show="(entry._id === currentDefault)" tooltip="Set as default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
+                        <i ng-show="(entry._id === currentDefault)" tooltip="This is the default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
                     <p flex="20">{{entry._source.cluster_info.manager}}</p>
                     <p flex="15">{{entry._source.url}}</p>
                     <p flex="15">{{entry._source.api_port}}</p>
@@ -330,15 +330,15 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>App version</span>
-                        <span flex class="text-right color-grey">{{appInfo["app-version"]}}</span>
+                        <span flex class="wz-text-right color-grey">{{appInfo["app-version"]}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Install date</span>
-                        <span flex class="text-right color-grey">{{appInfo["installationDate"]}}</span>
+                        <span flex class="wz-text-right color-grey">{{appInfo["installationDate"]}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Revision</span>
-                        <span flex class="text-right color-grey">{{appInfo["revision"]}}</span>
+                        <span flex class="wz-text-right color-grey">{{appInfo["revision"]}}</span>
                     </div>
                 </md-card-content>
             </md-card>

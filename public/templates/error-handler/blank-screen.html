@@ -1,11 +1,11 @@
 <div flex layout="column" ng-controller="blankScreenController" layout-align="center center">
-    <div class="present-logo">
+    <div class="wz-text-center">
         <img class="loading-logo-fail" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_fail.png"></img>
     </div>
 
     <div class="checks-fail">
             <md-divider></md-divider>
-        <div layout="row" class="wz-line-height layout-align-center-center"> 
+        <div layout="row" class="wz-line-height layout-align-center-center">
             <pre class="json-beautifier"><code>{{errorToShow || 'Something went wrong'}}</code></pre>
         </div>
         <md-divider></md-divider>

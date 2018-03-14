@@ -66,11 +66,11 @@
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.disabled">
                             <span flex>Disabled</span>
-                            <span flex class="text-right color-grey">{{groupConfiguration.config.syscheck.disabled}}</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.disabled}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.frequency">
                             <span flex>Frrequency</span>
-                            <span flex class="text-right color-grey">{{groupConfiguration.config.syscheck.frequency}}</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.frequency}}</span>
                         </div>
                     </md-card-content>
                 </md-card>
@@ -84,11 +84,11 @@
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.disabled">
                             <span flex>Disabled</span>
-                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.disabled}}</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.disabled}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.base_directory">
                             <span flex>Base directory</span>
-                            <span flex class="text-right color-grey">{{groupConfiguration.config.rootcheck.frequency}}</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.frequency}}</span>
                         </div>
                     </md-card-content>
                 </md-card>
@@ -102,11 +102,11 @@
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap'].disabled">
                             <span flex>Disabled</span>
-                            <span flex class="text-right color-grey">{{groupConfiguration.config['open-scap'].disabled}}</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config['open-scap'].disabled}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap'].interval">
                             <span flex>Interval</span>
-                            <span flex class="text-right color-grey">{{groupConfiguration.config['open-scap'].interval}}</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config['open-scap'].interval}}</span>
                         </div>
                     </md-card-content>
                 </md-card>
@@ -120,11 +120,11 @@
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].disabled">
                             <span flex>Disabled</span>
-                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].disabled}}</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config['cis-cat'].disabled}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].interval">
                             <span flex>Interval</span>
-                            <span flex class="text-right color-grey">{{groupConfiguration.config['cis-cat'].interval}}</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config['cis-cat'].interval}}</span>
                         </div>
                     </md-card-content>
                 </md-card>
@@ -175,35 +175,35 @@
                         <!-- Main settings -->
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.disabled">
                             <span flex="25">Disabled</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.syscheck.disabled}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.disabled}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.frequency">
                             <span flex="25">Frrequency</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.syscheck.frequency}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.frequency}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.alert_new_files">
                             <span flex="25">Alert new files</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.syscheck.alert_new_files}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.alert_new_files}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.skip_nfs">
                             <span flex="25">Skip NFS</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.syscheck.skip_nfs}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.skip_nfs}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.scan_on_start">
                             <span flex="25">Scan on start</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.syscheck.scan_on_start}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.scan_on_start}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.scan_time">
                             <span flex="25">Scan time</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.syscheck.scan_time}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.scan_time}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.scan_day">
                             <span flex="25">Scan day</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.syscheck.scan_day}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.scan_day}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.auto_ignore">
                             <span flex="25">Auto ignore</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.syscheck.auto_ignore}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.auto_ignore}}</span>
                         </div>
 
                         <!-- No diff settings -->
@@ -213,15 +213,15 @@
                         <div ng-repeat="item in groupConfiguration.config.syscheck.nodiff">
                             <div ng-if="!item.type" layout="row" class="wz-padding-top-10">
                                 <span flex="25">File</span>
-                                <span class="text-right color-grey">{{item}}</span>
+                                <span class="wz-text-right color-grey">{{item}}</span>
                             </div>
                             <div ng-if="item.type" layout="row" class="wz-padding-top-10">
                                 <span flex="25">File</span>
-                                <span class="text-right color-grey">{{item.item}}</span>
+                                <span class="wz-text-right color-grey">{{item.item}}</span>
                             </div>
                             <div ng-if="item.type" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Type</span>
-                                <span class="text-right color-grey">{{item.type}}</span>
+                                <span class="wz-text-right color-grey">{{item.type}}</span>
                             </div>
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
@@ -233,19 +233,19 @@
                         <div ng-repeat="item in groupConfiguration.config.syscheck.directories">
                             <div ng-if="item.path" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Path</span>
-                                <span class="text-right color-grey">{{item.path}}</span>
+                                <span class="wz-text-right color-grey">{{item.path}}</span>
                             </div>
                             <div ng-if="item.check_all" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Check all</span>
-                                <span class="text-right color-grey">{{item.check_all}}</span>
+                                <span class="wz-text-right color-grey">{{item.check_all}}</span>
                             </div>
                             <div ng-if="item.realtime" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Realtime</span>
-                                <span class="text-right color-grey">{{item.realtime}}</span>
+                                <span class="wz-text-right color-grey">{{item.realtime}}</span>
                             </div>
                             <div ng-if="item.report_changes" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Report changes</span>
-                                <span class="text-right color-grey">{{item.report_changes}}</span>
+                                <span class="wz-text-right color-grey">{{item.report_changes}}</span>
                             </div>
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
@@ -257,15 +257,15 @@
                         <div ng-repeat="item in groupConfiguration.config.syscheck.ignore">
                             <div ng-if="!item.type" layout="row" class="wz-padding-top-10">
                                 <span flex="25">File</span>
-                                <span class="text-right color-grey">{{item}}</span>
+                                <span class="wz-text-right color-grey">{{item}}</span>
                             </div>
                             <div ng-if="item.type" layout="row" class="wz-padding-top-10">
                                 <span flex="25">File</span>
-                                <span class="text-right color-grey">{{item.item}}</span>
+                                <span class="wz-text-right color-grey">{{item.item}}</span>
                             </div>
                             <div ng-if="item.type" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Type</span>
-                                <span class="text-right color-grey">{{item.type}}</span>
+                                <span class="wz-text-right color-grey">{{item.type}}</span>
                             </div>
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
@@ -288,23 +288,23 @@
                         <!-- Main settings -->
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.disabled">
                             <span flex="25">Disabled</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.disabled}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.disabled}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.base_directory">
                             <span flex="25">Base directory</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.frequency}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.frequency}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.frequency">
                             <span flex="25">Frequency</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.frequency}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.frequency}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.scanall">
                             <span flex="25">Scan all files</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.scanall}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.scanall}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.skip_nfs">
                             <span flex="25">Skip NFS</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.skip_nfs}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.skip_nfs}}</span>
                         </div>
 
                         <!-- Checks -->
@@ -313,39 +313,39 @@
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_unixaudit">
                             <span flex="25">Check UNIX Audit</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_unixaudit}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_unixaudit}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_dev">
                             <span flex="25">Check /dev</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_dev}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_dev}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_files">
                             <span flex="25">Check files</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_files}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_files}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_if">
                             <span flex="25">Check interfaces</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_if}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_if}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_pids">
                             <span flex="25">Check PIDs</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_pids}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_pids}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_policy">
                             <span flex="25">Check policy</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_policy}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_policy}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_ports">
                             <span flex="25">Check ports</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_ports}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_ports}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_sys">
                             <span flex="25">Check SYSt</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_sys}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_sys}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_trojans">
                             <span flex="25">Check Trojans</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_trojans}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_trojans}}</span>
                         </div>
 
                         <!-- Windows Settings -->
@@ -354,15 +354,15 @@
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winaudit">
                             <span flex="25">Check Windows Audit</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_winaudit}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_winaudit}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winapps">
                             <span flex="25">Check Windows apps</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_winapps}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_winapps}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winmalware">
                             <span flex="25">Check Windows malware</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.check_winmalware}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.check_winmalware}}</span>
                         </div>
 
                         <!-- Rootkit -->
@@ -371,11 +371,11 @@
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winaudit">
                             <span flex="25">Trojans path</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.rootkit_trojans[0]}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.rootkit_trojans[0]}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.check_winapps">
                             <span flex="25">Files path</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config.rootcheck.rootkit_files[0]}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config.rootcheck.rootkit_files[0]}}</span>
                         </div>
 
                         <!-- System Audit Files -->
@@ -440,27 +440,27 @@
                         <!-- Main settings -->
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap'].disabled">
                             <span flex="25">Disabled</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['open-scap'].disabled}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['open-scap'].disabled}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap'].interval">
                             <span flex="25">Interval</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['open-scap'].interval}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['open-scap'].interval}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap']['scan-on-start']">
                             <span flex="25">Scan on start</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['open-scap']['scan-on-start']}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['open-scap']['scan-on-start']}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap'].ciscat_path">
                             <span flex="25">CIS-CAT path</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['open-scap'].ciscat_path}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['open-scap'].ciscat_path}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap'].java_path">
                             <span flex="25">Java path</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['open-scap'].java_path}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['open-scap'].java_path}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap'].timeout">
                             <span flex="25">Timeout</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['open-scap'].timeout}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['open-scap'].timeout}}</span>
                         </div>
 
                         <!-- Content -->
@@ -470,11 +470,11 @@
                         <div ng-repeat="item in groupConfiguration.config['open-scap'].content">
                             <div ng-if="item.path" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Path</span>
-                                <span class="text-right color-grey">{{item.path}}</span>
+                                <span class="wz-text-right color-grey">{{item.path}}</span>
                             </div>
                             <div ng-if="item.type" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Type</span>
-                                <span class="text-right color-grey">{{item.type}}</span>
+                                <span class="wz-text-right color-grey">{{item.type}}</span>
                             </div>
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
@@ -497,27 +497,27 @@
                         <!-- Main settings -->
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].disabled">
                             <span flex="25">Disabled</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['cis-cat'].disabled}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['cis-cat'].disabled}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].interval">
                             <span flex="25">Interval</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['cis-cat'].interval}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['cis-cat'].interval}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].timeout">
                             <span flex="25">Timeout</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['cis-cat'].timeout}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['cis-cat'].timeout}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat']['scan-on-start']">
                             <span flex="25">Scan on start</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['cis-cat']['scan-on-start']}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['cis-cat']['scan-on-start']}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].java_path">
                             <span flex="25">Java path</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['cis-cat'].java_path}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['cis-cat'].java_path}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].ciscat_path">
                             <span flex="25">CIS-CAT path</span>
-                            <span class="text-right color-grey">{{groupConfiguration.config['cis-cat'].ciscat_path}}</span>
+                            <span class="wz-text-right color-grey">{{groupConfiguration.config['cis-cat'].ciscat_path}}</span>
                         </div>
                     </md-card-content>
                 </md-card>
@@ -539,35 +539,35 @@
                         <div ng-repeat="item in groupConfiguration.config['localfile']">
                             <div ng-if="item.location" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Location</span>
-                                <span class="text-right color-grey">{{item.location}}</span>
+                                <span class="wz-text-right color-grey">{{item.location}}</span>
                             </div>
                             <div ng-if="item.log_format" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Log format</span>
-                                <span class="text-right color-grey">{{item.log_format}}</span>
+                                <span class="wz-text-right color-grey">{{item.log_format}}</span>
                             </div>
                             <div ng-if="item.frequency" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Frequency</span>
-                                <span class="text-right color-grey">{{item.frequency}}</span>
+                                <span class="wz-text-right color-grey">{{item.frequency}}</span>
                             </div>
                             <div ng-if="item.query" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Query</span>
-                                <span class="text-right color-grey">{{item.query}}</span>
+                                <span class="wz-text-right color-grey">{{item.query}}</span>
                             </div>
                             <div ng-if="item.command" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Command</span>
-                                <span class="text-right color-grey">{{item.command}}</span>
+                                <span class="wz-text-right color-grey">{{item.command}}</span>
                             </div>
                             <div ng-if="item.alias" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Alias</span>
-                                <span class="text-right color-grey">{{item.alias}}</span>
+                                <span class="wz-text-right color-grey">{{item.alias}}</span>
                             </div>
                             <div ng-if="item.label" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Label</span>
-                                <span class="text-right color-grey">{{item.label}}</span>
+                                <span class="wz-text-right color-grey">{{item.label}}</span>
                             </div>
                             <div ng-if="item.label" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Only future events</span>
-                                <span class="text-right color-grey">{{item['only-future-events']}}</span>
+                                <span class="wz-text-right color-grey">{{item['only-future-events']}}</span>
                             </div>
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
@@ -591,27 +591,27 @@
                         <div ng-repeat="item in groupConfiguration.config['command']">
                             <div ng-if="item.disabled" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Disabled</span>
-                                <span class="text-right color-grey">{{item.disabled}}</span>
+                                <span class="wz-text-right color-grey">{{item.disabled}}</span>
                             </div>
                             <div ng-if="item.tag" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Tag</span>
-                                <span class="text-right color-grey">{{item.tag}}</span>
+                                <span class="wz-text-right color-grey">{{item.tag}}</span>
                             </div>
                             <div ng-if="item.command" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Command</span>
-                                <span class="text-right color-grey">{{item.command}}</span>
+                                <span class="wz-text-right color-grey">{{item.command}}</span>
                             </div>
                             <div ng-if="item.interval" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Interval</span>
-                                <span class="text-right color-grey">{{item.interval}}</span>
+                                <span class="wz-text-right color-grey">{{item.interval}}</span>
                             </div>
                             <div ng-if="item.run_on_start" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Run on start</span>
-                                <span class="text-right color-grey">{{item.run_on_start}}</span>
+                                <span class="wz-text-right color-grey">{{item.run_on_start}}</span>
                             </div>
                             <div ng-if="item.ignore_output" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Ignore output</span>
-                                <span class="text-right color-grey">{{item.ignore_output}}</span>
+                                <span class="wz-text-right color-grey">{{item.ignore_output}}</span>
                             </div>
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
