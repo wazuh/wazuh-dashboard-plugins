@@ -80,7 +80,7 @@ app.controller('agentsController',
             virustotal: { group: 'virustotal' }
         };
 
-        const checkMetrics = (tab,subtab) => {
+        const checkMetrics = (tab, subtab) => {
             metricService.destroyWatchers();
 
             if(subtab === 'panels'){
@@ -109,36 +109,48 @@ app.controller('agentsController',
         $scope.switchSubtab = subtab => {
             if($scope.tabView === subtab) return;
 
-            $scope.tabView = subtab;
-            checkMetrics($scope.tab,subtab);
+            checkMetrics($scope.tab, subtab);
         }
+
+        // Switch tab
         $scope.switchTab = tab => {
-
             if($scope.tab === tab) return;
-
-            checkMetrics(tab,'panels');
-
-            if($rootScope.ownHandlers){
-                for(let h of $rootScope.ownHandlers){
-                    h._scope.$destroy();
-                }
-            }
-            $rootScope.ownHandlers = [];
+            checkMetrics(tab, 'panels');
 
             // Deleting app state traces in the url
             $location.search('_a', null);
-            $scope.tabView = 'panels';
-
-            $rootScope.loadedVisualizations = [];
         };
 
         // Watchers
 
         // We watch the resultState provided by the discover
-        $scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
+        $scope.$watch('tabView', () => {
+            $location.search('tabView', $scope.tabView);
+
+            if ($rootScope.ownHandlers) {
+                for (let h of $rootScope.ownHandlers) {
+                    h._scope.$destroy();
+                }
+            }
+            $rootScope.ownHandlers = [];
+
+            $rootScope.loadedVisualizations = [];  
+        });
+
         $scope.$watch('tab', () => {
             $location.search('tab', $scope.tab);
 
+            $scope.tabView = 'panels';
+
+            if ($rootScope.ownHandlers) {
+                for (let h of $rootScope.ownHandlers) {
+                    h._scope.$destroy();
+                }
+            }
+            $rootScope.ownHandlers = [];
+
+            $rootScope.loadedVisualizations = [];
+            
             // Update the implicit filter
             if (typeof tabFilters[$scope.tab] !== 'undefined' && tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
             else $rootScope.currentImplicitFilter = (typeof tabFilters[$scope.tab] !== 'undefined') ? tabFilters[$scope.tab].group : '';

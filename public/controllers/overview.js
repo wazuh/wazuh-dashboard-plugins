@@ -103,7 +103,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         virustotal: { group: 'virustotal' }
     };
 
-    const checkMetrics = (tab,subtab) => {
+    const checkMetrics = (tab, subtab) => {
         metricService.destroyWatchers();
 
         if(subtab === 'panels'){
@@ -135,20 +135,28 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if(!$rootScope.$$phase) $rootScope.$digest();
     }
     
-    checkMetrics($scope.tab,$scope.tabView);
+    checkMetrics($scope.tab, $scope.tabView);
 
     // Switch subtab
     $scope.switchSubtab = subtab => {
         if ($scope.tabView === subtab) return;
 
-        $scope.tabView = subtab;
-
-        checkMetrics($scope.tab,subtab);
+        checkMetrics($scope.tab, subtab); 
     }
+
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-        checkMetrics(tab,'panels');
+        checkMetrics(tab, 'panels');
+
+        // Deleting app state traces in the url
+        $location.search('_a', null);
+    };
+
+    // Watchers
+
+    $scope.$watch('tabView', () => {
+        $location.search('tabView', $scope.tabView);
 
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
@@ -157,25 +165,31 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         }
         $rootScope.ownHandlers = [];
 
-        // Deleting app state traces in the url
-        $location.search('_a', null);
+        $rootScope.loadedVisualizations = [];
+    });
+
+    $scope.$watch('tab', () => {
+
+        $location.search('tab', $scope.tab);
+
         $scope.tabView = 'panels';
 
+        if ($rootScope.ownHandlers) {
+            for (let h of $rootScope.ownHandlers) {
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
+
         $rootScope.loadedVisualizations = [];
-    };
 
-    // Watchers
-
-    // We watch the resultState provided by the discover
-    $scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
-    $scope.$watch('tab', () => {
-        $location.search('tab', $scope.tab);
         // Update the implicit filter
         if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
         else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
     });
 
     $scope.$on('$destroy', () => {
+
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
@@ -206,6 +220,4 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     $scope.tabs = tabs;
     $scope.selectedIndex = 0;
-
-
 });
