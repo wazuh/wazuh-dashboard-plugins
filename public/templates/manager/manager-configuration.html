@@ -20,11 +20,11 @@
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.jsonout_output">
                         <span flex>JSON output</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.jsonout_output}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.global.jsonout_output}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.alerts.log_alert_level">
                         <span flex>Log alert level</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.alerts.log_alert_level}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.alerts.log_alert_level}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -39,11 +39,11 @@
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.name">
                         <span flex>Name</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.name}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.cluster.name}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.node_type">
                         <span flex>Node type</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.node_type}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.cluster.node_type}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -58,11 +58,11 @@
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.frequency">
                         <span flex>Frequency</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.frequency}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.syscheck.frequency}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.alert_new_files">
                         <span flex>Alert new files</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.alert_new_files}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.syscheck.alert_new_files}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -77,11 +77,11 @@
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.frequency">
                         <span flex>Frequency</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.frequency}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.rootcheck.frequency}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.skip_nfs">
                         <span flex>Skip NFS</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.skip_nfs}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.rootcheck.skip_nfs}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -109,11 +109,11 @@
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.email_to">
                         <span flex>Email to</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.email_to}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.email_alerts.email_to}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.alert_level">
                         <span flex>Alert level</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.alert_level}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.email_alerts.alert_level}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -128,11 +128,11 @@
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.purge">
                         <span flex>Purge</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.purge}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.auth.purge}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.force_insert">
                         <span flex>Force insert</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.force_insert}}</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.auth.force_insert}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -204,61 +204,61 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Full details -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.jsonout_output">
-                        <span flex>JSON output</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.jsonout_output}}</span>
+                        <span flex="25">JSON output</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.jsonout_output}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.logall">
-                        <span flex>Log all</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.logall}}</span>
+                        <span flex="25">Log all</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.logall}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.logall">
-                        <span flex>Log all in JSON</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.logall_json}}</span>
+                        <span flex="25">Log all in JSON</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.logall_json}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.white_list">
-                        <span flex>White list</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.white_list.length
+                        <span flex="25">White list</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.white_list.length
                             <= 5 ? managerConfiguration.global.white_list : managerConfiguration.global.white_list.length}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.stats">
-                        <span flex>Stats</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.stats}}</span>
+                        <span flex="25">Stats</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.stats}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.host_infomation">
-                        <span flex>Host information</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.host_infomation}}</span>
+                        <span flex="25">Host information</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.host_infomation}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.alerts.log_alert_level">
-                        <span flex>Log alert level</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.alerts.log_alert_level}}</span>
+                        <span flex="25">Log alert level</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.alerts.log_alert_level}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_notification">
-                        <span flex>E-mail notifications</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_notification}}</span>
+                        <span flex="25">E-mail notifications</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.email_notification}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.alerts.email_alert_level">
-                        <span flex>E-mail alert level</span>
-                        <span flex class="text-right color-grey">{{ managerConfiguration.alerts.email_alert_level }}</span>
+                        <span flex="25">E-mail alert level</span>
+                        <span class="wz-text-right color-grey">{{ managerConfiguration.alerts.email_alert_level }}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_to">
-                        <span flex>E-mail to</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_to}}</span>
+                        <span flex="25">E-mail to</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.email_to}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_from">
-                        <span flex>E-mail from</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_from}}</span>
+                        <span flex="25">E-mail from</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.email_from}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.smtp_server">
-                        <span flex>SMTP server</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.smtp_server}}</span>
+                        <span flex="25">SMTP server</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.smtp_server}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_maxperhour">
-                        <span flex>Max email per hour</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_maxperhour}}</span>
+                        <span flex="25">Max email per hour</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.email_maxperhour}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_idsname">
-                        <span flex>E-mail IDS name</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.global.email_idsname}}</span>
+                        <span flex="25">E-mail IDS name</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.global.email_idsname}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -272,40 +272,40 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Full details -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.disabled">
-                        <span flex>Disabled</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.disabled}}</span>
+                        <span flex="25">Disabled</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.disabled}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.hidden">
-                        <span flex>Hidden</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.hidden}}</span>
+                        <span flex="25">Hidden</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.hidden}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.name">
-                        <span flex>Name</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.name}}</span>
+                        <span flex="25">Name</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.name}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.interval">
-                        <span flex>Interval</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.interval}}</span>
+                        <span flex="25">Interval</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.interval}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.node_name">
-                        <span flex>Node name</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.node_name}}</span>
+                        <span flex="25">Node name</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.node_name}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.node_type">
-                        <span flex>Node type</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.node_type}}</span>
+                        <span flex="25">Node type</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.node_type}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.port">
-                        <span flex>Port</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.port}}</span>
+                        <span flex="25">Port</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.port}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.bind_addr">
-                        <span flex>Bind address</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.bind_addr}}</span>
+                        <span flex="25">Bind address</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.bind_addr}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.nodes">
-                        <span flex>Nodes</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.cluster.nodes}}</span>
+                        <span flex="25">Nodes</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.cluster.nodes}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -319,40 +319,40 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Full details -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.disabled">
-                        <span flex>Disabled</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.disabled}}</span>
+                        <span flex="25">Disabled</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.disabled}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.frequency">
-                        <span flex>Frequency</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.frequency}}</span>
+                        <span flex="25">Frequency</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.frequency}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_time">
-                        <span flex>Scan time</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.scan_time}}</span>
+                        <span flex="25">Scan time</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.scan_time}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_day">
-                        <span flex>Scan day</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.scan_day}}</span>
+                        <span flex="25">Scan day</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.scan_day}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.auto_ignore">
-                        <span flex>Auto ignore</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.auto_ignore}}</span>
+                        <span flex="25">Auto ignore</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.auto_ignore}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.alert_new_files">
-                        <span flex>Alert new files</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.alert_new_files}}</span>
+                        <span flex="25">Alert new files</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.alert_new_files}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_on_start">
-                        <span flex>Scan on start</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.scan_on_start}}</span>
+                        <span flex="25">Scan on start</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.scan_on_start}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.nodiff">
-                        <span flex>No diff</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.nodiff}}</span>
+                        <span flex="25">No diff</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.nodiff}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.skip_nfs">
-                        <span flex>Skip NFS</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.syscheck.skip_nfs}}</span>
+                        <span flex="25">Skip NFS</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.skip_nfs}}</span>
                     </div>
 
                     <!-- Section title -->
@@ -363,12 +363,12 @@
                     <!-- Full details -->
                     <div ng-repeat="item in managerConfiguration.syscheck.directories">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.path">
-                            <span flex>Path</span>
-                            <span flex class="text-right color-grey">{{item.path}}</span>
+                            <span flex="25">Path</span>
+                            <span class="wz-text-right color-grey">{{item.path}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.check_all">
-                            <span flex>Check all</span>
-                            <span flex class="text-right color-grey">{{item.check_all}}</span>
+                            <span flex="25">Check all</span>
+                            <span class="wz-text-right color-grey">{{item.check_all}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -384,32 +384,32 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Full details -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.disabled">
-                        <span flex>Disabled</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.disabled}}</span>
+                        <span flex="25">Disabled</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.disabled}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.rootkit_files">
-                        <span flex>Rootkit files</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.rootkit_files}}</span>
+                        <span flex="25">Rootkit files</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.rootkit_files}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.rootkit_trojans">
-                        <span flex>Rootkit trojans</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.rootkit_trojans}}</span>
+                        <span flex="25">Rootkit trojans</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.rootkit_trojans}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.base_directory">
-                        <span flex>Base directory</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.base_directory}}</span>
+                        <span flex="25">Base directory</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.base_directory}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.scanall">
-                        <span flex>Scan all</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.scanall}}</span>
+                        <span flex="25">Scan all</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.scanall}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.frequency">
-                        <span flex>Frequency</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.frequency}}</span>
+                        <span flex="25">Frequency</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.frequency}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.skip_nfs">
-                        <span flex>Skip NFS</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.rootcheck.skip_nfs}}</span>
+                        <span flex="25">Skip NFS</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.skip_nfs}}</span>
                     </div>
 
                     <!-- Section title -->
@@ -420,8 +420,8 @@
                     <!-- Full details -->
                     <div ng-repeat="item in managerConfiguration.rootcheck.system_audit">
                         <div layout="row" class="wz-padding-top-10" ng-if="item">
-                            <span flex>File</span>
-                            <span flex class="text-right color-grey">{{item}}</span>
+                            <span flex="25">File</span>
+                            <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -441,8 +441,8 @@
                     </div>
                     <div ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex>Path</span>
-                            <span flex class="text-right color-grey">{{item}}</span>
+                            <span flex="25">Path</span>
+                            <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -453,8 +453,8 @@
                     </div>
                     <div ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex>Path</span>
-                            <span flex class="text-right color-grey">{{item}}</span>
+                            <span flex="25">Path</span>
+                            <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -465,8 +465,8 @@
                     </div>
                     <div ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex>Path</span>
-                            <span flex class="text-right color-grey">{{item}}</span>
+                            <span flex="25">Path</span>
+                            <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -477,8 +477,8 @@
                     </div>
                     <div ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex>Path</span>
-                            <span flex class="text-right color-grey">{{item}}</span>
+                            <span flex="25">Path</span>
+                            <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -489,8 +489,8 @@
                     </div>
                     <div ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex>Path</span>
-                            <span flex class="text-right color-grey">{{item}}</span>
+                            <span flex="25">Path</span>
+                            <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -501,14 +501,14 @@
                     </div>
                     <div ng-if="isArray(managerConfiguration.ruleset.rule_exclude)" ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index">
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex>Path</span>
-                            <span flex class="text-right color-grey">{{item}}</span>
+                            <span flex="25">Path</span>
+                            <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="!isArray(managerConfiguration.ruleset.rule_exclude)">
-                        <span flex>Path</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.ruleset.rule_exclude}}</span>
+                        <span flex="25">Path</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.ruleset.rule_exclude}}</span>
                     </div>
 
                     <!-- CDB Lists -->
@@ -517,14 +517,14 @@
                     </div>
                     <div ng-if="isArray(managerConfiguration.ruleset.list)" ng-repeat="item in managerConfiguration.ruleset.list|orderBy">
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex>Path</span>
-                            <span flex class="text-right color-grey">{{item}}</span>
+                            <span flex="25">Path</span>
+                            <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="!isArray(managerConfiguration.ruleset.list)">
-                        <span flex>Path</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.ruleset.list}}</span>
+                        <span flex="25">Path</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.ruleset.list}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -539,28 +539,28 @@
                     <!-- Full details -->
                     <div ng-repeat="item in managerConfiguration['localfile'] | orderBy:['location', 'command']">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.location">
-                            <span flex>Location</span>
-                            <span flex class="text-right color-grey">{{item.location}}</span>
+                            <span flex="25">Location</span>
+                            <span class="wz-text-right color-grey">{{item.location}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.command">
-                            <span flex>Command</span>
-                            <span flex class="text-right color-grey">{{item.command}}</span>
+                            <span flex="25">Command</span>
+                            <span class="wz-text-right color-grey">{{item.command}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.log_format">
-                            <span flex>Log format</span>
-                            <span flex class="text-right color-grey">{{item.log_format}}</span>
+                            <span flex="25">Log format</span>
+                            <span class="wz-text-right color-grey">{{item.log_format}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.frequency">
-                            <span flex>Frequency</span>
-                            <span flex class="text-right color-grey">{{item.frequency}}</span>
+                            <span flex="25">Frequency</span>
+                            <span class="wz-text-right color-grey">{{item.frequency}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.alias">
-                            <span flex>Alias</span>
-                            <span flex class="text-right color-grey">{{item.alias}}</span>
+                            <span flex="25">Alias</span>
+                            <span class="wz-text-right color-grey">{{item.alias}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.check_diff">
-                            <span flex>Check diff</span>
-                            <span flex class="text-right color-grey">{{item.check_diff}}</span>
+                            <span flex="25">Check diff</span>
+                            <span class="wz-text-right color-grey">{{item.check_diff}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -576,36 +576,36 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Full details -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.email_to">
-                        <span flex>Email to</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.email_to}}</span>
+                        <span flex="25">Email to</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.email_to}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.alert_level">
-                        <span flex>Alert level</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.alert_level}}</span>
+                        <span flex="25">Alert level</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.alert_level}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.group">
-                        <span flex>Group</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.group}}</span>
+                        <span flex="25">Group</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.group}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.event_location">
-                        <span flex>Event location</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.event_location}}</span>
+                        <span flex="25">Event location</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.event_location}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.format">
-                        <span flex>Format</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.format}}</span>
+                        <span flex="25">Format</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.format}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.rule_id">
-                        <span flex>Rule ID</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.rule_id}}</span>
+                        <span flex="25">Rule ID</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.rule_id}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.do_not_delay">
-                        <span flex>Do not delay</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.do_not_delay}}</span>
+                        <span flex="25">Do not delay</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.do_not_delay}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.do_not_group">
-                        <span flex>Do not group</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.email_alerts.do_not_group}}</span>
+                        <span flex="25">Do not group</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.do_not_group}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -619,56 +619,56 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Full details -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.disabled">
-                        <span flex>Disabled</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.disabled}}</span>
+                        <span flex="25">Disabled</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.disabled}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.purge">
-                        <span flex>Purge</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.purge}}</span>
+                        <span flex="25">Purge</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.purge}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.force_insert">
-                        <span flex>Force insert</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.force_insert}}</span>
+                        <span flex="25">Force insert</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.force_insert}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_verify_host">
-                        <span flex>SSL verify host</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ssl_verify_host}}</span>
+                        <span flex="25">SSL verify host</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.ssl_verify_host}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.limit_maxagents">
-                        <span flex>Limit max agents</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.limit_maxagents}}</span>
+                        <span flex="25">Limit max agents</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.limit_maxagents}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.force_time">
-                        <span flex>Force time</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.force_time}}</span>
+                        <span flex="25">Force time</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.force_time}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_manager_key">
-                        <span flex>SSL manager key</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ssl_manager_key}}</span>
+                        <span flex="25">SSL manager key</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.ssl_manager_key}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_manager_cert">
-                        <span flex>SSL manager cert</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ssl_manager_cert}}</span>
+                        <span flex="25">SSL manager cert</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.ssl_manager_cert}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.use_source_ip">
-                        <span flex>Use source IP</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.use_source_ip}}</span>
+                        <span flex="25">Use source IP</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.use_source_ip}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.use_password">
-                        <span flex>Use password</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.use_password}}</span>
+                        <span flex="25">Use password</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.use_password}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.port">
-                        <span flex>Port</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.port}}</span>
+                        <span flex="25">Port</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.port}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_auto_negotiate">
-                        <span flex>SSL auto negotiate</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ssl_auto_negotiate}}</span>
+                        <span flex="25">SSL auto negotiate</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.ssl_auto_negotiate}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ciphers">
-                        <span flex>Ciphers</span>
-                        <span flex class="text-right color-grey">{{managerConfiguration.auth.ciphers}}</span>
+                        <span flex="25">Ciphers</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.auth.ciphers}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -683,20 +683,20 @@
                     <!-- Full details -->
                     <div ng-repeat="item in managerConfiguration.command|orderBy:'name'">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.name">
-                            <span flex>Name</span>
-                            <span flex class="text-right color-grey">{{item.name}}</span>
+                            <span flex="25">Name</span>
+                            <span class="wz-text-right color-grey">{{item.name}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.expect">
-                            <span flex>Expect</span>
-                            <span flex class="text-right color-grey">{{item.expect}}</span>
+                            <span flex="25">Expect</span>
+                            <span class="wz-text-right color-grey">{{item.expect}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.executable">
-                            <span flex>Executable</span>
-                            <span flex class="text-right color-grey">{{item.executable}}</span>
+                            <span flex="25">Executable</span>
+                            <span class="wz-text-right color-grey">{{item.executable}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.timeout_allowed">
-                            <span flex>Timeout allowed</span>
-                            <span flex class="text-right color-grey">{{item.timeout_allowed}}</span>
+                            <span flex="25">Timeout allowed</span>
+                            <span class="wz-text-right color-grey">{{item.timeout_allowed}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -713,32 +713,32 @@
                     <!-- Full details -->
                     <div ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.command">
-                            <span flex>Command</span>
-                            <span flex class="text-right color-grey">{{item.command}}</span>
+                            <span flex="25">Command</span>
+                            <span class="wz-text-right color-grey">{{item.command}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.location">
-                            <span flex>Location</span>
-                            <span flex class="text-right color-grey">{{item.location}}</span>
+                            <span flex="25">Location</span>
+                            <span class="wz-text-right color-grey">{{item.location}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.agent_id">
-                            <span flex>Agent ID(s)</span>
-                            <span flex class="text-right color-grey">{{item.agent_id}}</span>
+                            <span flex="25">Agent ID(s)</span>
+                            <span class="wz-text-right color-grey">{{item.agent_id}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.level">
-                            <span flex>Level</span>
-                            <span flex class="text-right color-grey">{{item.level}}</span>
+                            <span flex="25">Level</span>
+                            <span class="wz-text-right color-grey">{{item.level}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.timeout">
-                            <span flex>Timeout</span>
-                            <span flex class="text-right color-grey">{{item.timeout}}</span>
+                            <span flex="25">Timeout</span>
+                            <span class="wz-text-right color-grey">{{item.timeout}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id">
-                            <span flex>Rules ID(s)</span>
-                            <span flex class="text-right color-grey">{{item.rules_id}}</span>
+                            <span flex="25">Rules ID(s)</span>
+                            <span class="wz-text-right color-grey">{{item.rules_id}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.repeated_offenders">
-                            <span flex>Repeated offenders</span>
-                            <span flex class="text-right color-grey">{{item.repeated_offenders}}</span>
+                            <span flex="25">Repeated offenders</span>
+                            <span class="wz-text-right color-grey">{{item.repeated_offenders}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
@@ -755,16 +755,16 @@
                     <!-- Full details -->
                     <div ng-repeat="item in managerConfiguration.remote">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.connection">
-                            <span flex>Connection</span>
-                            <span flex class="text-right color-grey">{{item.connection}}</span>
+                            <span flex="25">Connection</span>
+                            <span class="wz-text-right color-grey">{{item.connection}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.port">
-                            <span flex>Port</span>
-                            <span flex class="text-right color-grey">{{item.port}}</span>
+                            <span flex="25">Port</span>
+                            <span class="wz-text-right color-grey">{{item.port}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.protocol">
-                            <span flex>Protocol</span>
-                            <span flex class="text-right color-grey">{{item.protocol}}</span>
+                            <span flex="25">Protocol</span>
+                            <span class="wz-text-right color-grey">{{item.protocol}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>

@@ -11,7 +11,7 @@
 					<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
 						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
 
-					<span ng-show="agent.status" class="agents-head-5" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
+					<span ng-show="agent.status" class="wz-agent-status-indicator" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
 				</div>
 
 				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
@@ -46,8 +46,8 @@
 		</div>
 	</div>
 
-	<div layout="row" layout-align="space-between start" class="horizontalTabsBar">
-		<div class="horizontalTabsBar" layout="column" layout-align="center start">
+	<div layout="row" layout-align="space-between start" class="wz-background-white">
+		<div class="wz-background-white" layout="column" layout-align="center start">
 			<md-nav-bar class="padding-right-0 wz-md-navbar" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchTab('general')" name="general">General</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('fim');" name="fim">File Integrity</md-nav-item>
@@ -61,7 +61,7 @@
 			</md-nav-bar>
 		</div>
 
-		<div ng-show="tab != 'configuration'" class="horizontalTabsBar" layout="column" layout-align="end end">
+		<div ng-show="tab != 'configuration'" class="wz-background-white" layout="column" layout-align="end end">
 			<md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
 					<i class="fa fa-th fa-fw"></i> Panels
@@ -86,7 +86,7 @@
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="tab != 'configuration' && resultState !== 'ready' && tabView === 'panels'">
         <md-card flex layout="column" class="wz-md-card">
-            <md-card-content class="text-center">
+            <md-card-content class="wz-text-center">
                 No results for selected time interval
             </md-card-content>
         </md-card>

@@ -149,7 +149,7 @@ app.controller('agentsController',
         });
 
         // Agent data
-        $scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "green" : "red";
+        $scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "teal" : "red";
 
         $scope.formatAgentStatus = (agentStatus) => {
             return ['Active','Disconnected'].includes(agentStatus) ? agentStatus : 'Never connected';

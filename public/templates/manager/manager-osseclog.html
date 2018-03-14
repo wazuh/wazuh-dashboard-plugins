@@ -1,7 +1,7 @@
 <div flex ng-cloak ng-if="!loading && submenuNavItem == 'logs'" class="mozilla-table-size-85" layout="column" ng-controller="managerLogController">
 
-    <div layout="row" layout-align="start start" class="manager-log-top-row wz-padding-left-16">
-        <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+    <div layout="row" layout-align="start start" class="wz-padding-right-8 wz-padding-left-16">
+        <div flex="20" layout="column" class="height-41 wz-margin-top-17 wz-margin-right-15 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
             aria-label="Logs category">
                 <option value="all">Choose daemon</option>
@@ -9,7 +9,7 @@
             </select>
         </div>
 
-        <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+        <div flex="20" layout="column" class="height-41 wz-margin-top-17 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="type_log == 'all' ? logs.removeFilter('type_log', true) : logs.addFilter('type_log', type_log)"
             aria-label="Logs level">
                 <option value="all">Choose log level</option>

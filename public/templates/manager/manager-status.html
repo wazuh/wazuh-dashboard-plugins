@@ -7,7 +7,7 @@
 
         <div class="joinCardsRow" layout="row" layout-align="start stretch">
             <md-card flex ng-repeat="(k,v) in daemons" class="wz-md-card">
-                <md-card-content class="text-center">
+                <md-card-content class="wz-text-center">
                     <center>
                         <p ng-class="getDaemonStatusClass(v)" class="round"></p>
                         <p class="wz-padding-top-10">{{k}}</p>
@@ -44,36 +44,36 @@
                     <span class="wz-headline-title">Manager information</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Version</span>
-                        <span flex class="text-right color-grey">{{managerInfo.version ? managerInfo.version : '-'}}</span>
+                        <span flex="25">Version</span>
+                        <span class="wz-text-right color-grey">{{managerInfo.version ? managerInfo.version : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Compilation date</span>
-                        <span flex class="text-right color-grey">{{managerInfo.compilation_date ? managerInfo.compilation_date : '-'}}</span>
+                        <span flex="25">Compilation date</span>
+                        <span class="wz-text-right color-grey">{{managerInfo.compilation_date ? managerInfo.compilation_date : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Installation path</span>
-                        <span flex class="text-right color-grey">{{managerInfo.path ? managerInfo.path : '-'}}</span>
+                        <span flex="25">Installation path</span>
+                        <span class="wz-text-right color-grey">{{managerInfo.path ? managerInfo.path : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Installation type</span>
-                        <span flex class="text-right color-grey">{{managerInfo.type ? managerInfo.type : '-'}}</span>
+                        <span flex="25">Installation type</span>
+                        <span class="wz-text-right color-grey">{{managerInfo.type ? managerInfo.type : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Agents limit</span>
-                        <span flex class="text-right color-grey">{{managerInfo.max_agents ? managerInfo.max_agents : '-'}}</span>
+                        <span flex="25">Agents limit</span>
+                        <span class="wz-text-right color-grey">{{managerInfo.max_agents ? managerInfo.max_agents : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>OpenSSL Support</span>
-                        <span flex class="text-right color-grey">{{managerInfo.openssl_support ? managerInfo.openssl_support : '-'}}</span>
+                        <span flex="25">OpenSSL Support</span>
+                        <span class="wz-text-right color-grey">{{managerInfo.openssl_support ? managerInfo.openssl_support : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Total rules</span>
-                        <span flex class="text-right color-grey">{{totalRules ? totalRules : '-'}}</span>
+                        <span flex="25">Total rules</span>
+                        <span class="wz-text-right color-grey">{{totalRules ? totalRules : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Total decoders</span>
-                        <span flex class="text-right color-grey">{{totalDecoders ? totalDecoders : '-'}}</span>
+                        <span flex="25">Total decoders</span>
+                        <span class="wz-text-right color-grey">{{totalDecoders ? totalDecoders : '-'}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -83,36 +83,36 @@
                     <span class="wz-headline-title">Last registered agent</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Name</span>
-                        <span flex class="text-right color-grey">{{agentInfo.name ? agentInfo.name : '-'}}</span>
+                        <span flex="25">Name</span>
+                        <span class="wz-text-right color-grey">{{agentInfo.name ? agentInfo.name : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>ID</span>
-                        <span flex class="text-right color-grey">{{agentInfo.id ? agentInfo.id : '-'}}</span>
+                        <span flex="25">ID</span>
+                        <span class="wz-text-right color-grey">{{agentInfo.id ? agentInfo.id : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Status</span>
-                        <span flex class="text-right color-grey">{{agentInfo.status ? agentInfo.status : '-'}}</span>
+                        <span flex="25">Status</span>
+                        <span class="wz-text-right color-grey">{{agentInfo.status ? agentInfo.status : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>IP Address</span>
-                        <span flex class="text-right color-grey">{{agentInfo.ip ? agentInfo.ip : '-'}}</span>
+                        <span flex="25">IP Address</span>
+                        <span class="wz-text-right color-grey">{{agentInfo.ip ? agentInfo.ip : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Date add</span>
-                        <span flex class="text-right color-grey">{{agentInfo.dateAdd ? agentInfo.dateAdd : '-'}}</span>
+                        <span flex="25">Date add</span>
+                        <span class="wz-text-right color-grey">{{agentInfo.dateAdd ? agentInfo.dateAdd : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Version</span>
-                        <span flex class="text-right color-grey">{{agentInfo.version ? agentInfo.version : '-'}}</span>
+                        <span flex="25">Version</span>
+                        <span class="wz-text-right color-grey">{{agentInfo.version ? agentInfo.version : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10" ng-if="agentInfo.id !== '000'">
-                        <span flex>Last keep alive</span>
-                        <span flex class="text-right color-grey">{{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</span>
+                        <span flex="25">Last keep alive</span>
+                        <span class="wz-text-right color-grey">{{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
-                        <span flex>Operating system</span>
-                        <span flex class="text-right color-grey">{{agentInfo.os.name ? agentInfo.os.name + agentInfo.os.version : agentInfo.os.uname ? agentInfo.os.uname
+                        <span flex="25">Operating system</span>
+                        <span class="wz-text-right color-grey">{{agentInfo.os.name ? agentInfo.os.name + agentInfo.os.version : agentInfo.os.uname ? agentInfo.os.uname
                             : '-'}}</span>
                     </div>
                 </md-card-content>
