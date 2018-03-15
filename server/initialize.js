@@ -107,6 +107,11 @@ module.exports = (server, options) => {
             });
     };
 
+    /**
+     * This function creates a new index pattern with a custom ID.
+     * @param {*} patternId 'index-pattern:' + id;
+     * @param {*} id Eg: 'wazuh-alerts'
+     */
     const createCustomPattern = async (patternId,id) => {
         try{
             if(!id) return Promise.reject(new Error('No valid id for index pattern'));
@@ -130,6 +135,11 @@ module.exports = (server, options) => {
         }
     }
 
+    /**
+     * This function checks if an index pattern exists, 
+     * you should check response.hits.total
+     * @param {*} id Eg: 'wazuh-alerts'
+     */
     const searchIndexPatternById = async id => {
         try {
             if(!id) return Promise.reject(new Error('No valid id for search index pattern'))
@@ -145,6 +155,10 @@ module.exports = (server, options) => {
         }
     }
 
+    /**
+     * Updates .kibana index known fields
+     * @param {*} patternId 'index-pattern:' + id
+     */
     const updateKibanaIndexWithKnownFields = async patternId => {
         try {
             if(!patternId) return Promise.reject(new Error('No valid patternId for update index pattern'))
@@ -170,6 +184,11 @@ module.exports = (server, options) => {
         }
     }
 
+    /**
+     * Replaces our visualizations main fields to fit our pattern needs.
+     * @param {*} app_objects Object with the visualizations raw content.
+     * @param {*} id Eg: 'wazuh-alerts'
+     */
     const buildVisualizationsBulk = (app_objects,id) => {
         let body = '';
         for (let element of app_objects) {
@@ -191,7 +210,11 @@ module.exports = (server, options) => {
         return body;
     }
 
-    // Importing Wazuh app visualizations and dashboards
+    /**
+     * Importing Wazuh app visualizations and dashboards
+     * @param {*} id Eg: 'wazuh-alerts'
+     * @param {*} firstTime Optional, if true it means that is the very first time of execution.
+     */
     const importAppObjects = async (id,firstTime) => {
         try {
             const patternId        = 'index-pattern:' + id;
