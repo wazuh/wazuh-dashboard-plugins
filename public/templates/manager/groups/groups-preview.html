@@ -25,12 +25,12 @@
                             <md-divider class="wz-margin-top-10"></md-divider>
 
                             <div layout="row" class="wz-padding-top-10">
-                                <span flex="20" ng-class="groupsSelectedTab==='agents' ? 'wz-text-active' : ''" ng-click="goBackToAgents()" tooltip="Click to open the list of agents" tooltip-placement="left">Agents</span>
+                                <span flex="20" class="wz-text-link" ng-class="groupsSelectedTab==='agents' ? 'wz-text-active' : ''" ng-click="goBackToAgents()" tooltip="Click to open the list of agents" tooltip-placement="left">Agents</span>
                                 <span class="wz-text-link" tooltip="Click to open the list of agents" tooltip-placement="right"
                                 ng-click="goBackToAgents()">{{ groups.items[selectedGroup].count }}</span>
                             </div>
                             <div layout="row" class="wz-padding-top-10">
-                                <span flex="20" ng-class="groupsSelectedTab==='files' ? 'wz-text-active' : ''" ng-click="goBackFiles()" tooltip="Click to open the list of files" tooltip-placement="left">Content</span>
+                                <span flex="20" class="wz-text-link" ng-class="groupsSelectedTab==='files' ? 'wz-text-active' : ''" ng-click="goBackFiles()" tooltip="Click to open the list of files" tooltip-placement="left">Content</span>
                                 <span class="wz-text-link" tooltip="Click to open the list of files" tooltip-placement="right"
                                 ng-click="goBackFiles()">{{ groupFiles.totalItems }}</span>
                             </div>
