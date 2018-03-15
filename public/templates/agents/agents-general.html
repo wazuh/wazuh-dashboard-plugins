@@ -8,7 +8,7 @@
                     <div flex="20">
                         Name: <span class="wz-font-weight-bold">{{ agent.name | limitTo: 25 }}{{ agent.name.length > 25 ? '&hellip;' : '' }}</span>
                         <md-tooltip ng-if="agent.name.length > 25" md-direction="bottom" class="wz-tooltip">
-                            agent.name
+                            Full name: {{agent.name}}
                         </md-tooltip>
                     </div>
                     <div flex="20">
@@ -23,7 +23,7 @@
                     <div flex>
                         OS: <span class="wz-font-weight-bold">{{ agentOS | limitTo: 25 }}{{ agentOS.length > 25 ? '&hellip;' : '' }}</span>
                         <md-tooltip ng-if="agentOS.length > 25" md-direction="bottom" class="wz-tooltip">
-                            agentOS
+                            Full OS name: {{agentOS}}
                         </md-tooltip>
                     </div>
                 </md-card-content>
