@@ -14,7 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
   - Now the app is clever and **takes decissions depending on new consistency checks**.
 - **New design for the *Agents/Configuration* tab** ([#310](https://github.com/wazuh/wazuh-kibana-app/pull/310)):
   - The style is the same as the *Manager/Configuration* tab.
-  - Two more tabs added: **CIS-CAT and Commands** ([#315](https://github.com/wazuh/wazuh-kibana-app/pull/315)).
+  - Added two more sections: **CIS-CAT and Commands** ([#315](https://github.com/wazuh/wazuh-kibana-app/pull/315)).
 - **Added *"group"* column on the agents list in *Agents*** ([#312](https://github.com/wazuh/wazuh-kibana-app/pull/312)):
   - If you click on the group, it will redirect the user to the specified group in *Manager/Groups*.
 - **New option for the `config.yml` file, `ip.selector`** ([#313](https://github.com/wazuh/wazuh-kibana-app/pull/313)):
