@@ -9,7 +9,7 @@ const { log } = require('./logger');
 const OBJECTS_FILE = './integration-files/objects-file.json';
 const APP_OBJECTS_FILE = './integration-files/app-objects-file-alerts.json';
 const KIBANA_TEMPLATE = './integration-files/kibana-template.json';
-
+const knownFields = require('./integration-files/known-fields')
 
 
 module.exports = (server, options) => {
@@ -103,25 +103,74 @@ module.exports = (server, options) => {
             })
             .catch(error => {
                 log('initialize.js importObjects', error.message || error);
-                server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch. Bulk request failed.');
+                server.log([blueWazuh, 'server', 'error'], 'DEBUG Error importing objects into elasticsearch. Bulk request failed.');
             });
     };
 
-    // Importing Wazuh app visualizations and dashboards
-    const importAppObjects = (id) => {
-        console.log("Importing objects");
-        log('initialize.js importAppObjects', 'Importing Wazuh app visualizations...','info')
-        server.log([blueWazuh, 'initialize', 'info'], 'Importing Wazuh app visualizations...');
-
-        try {
-            app_objects = require(APP_OBJECTS_FILE);
-        } catch (e) {
-            log('initialize.js importAppObjects', e.message || e)
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
-            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + APP_OBJECTS_FILE);
-            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+    const createCustomPattern = async (patternId,id) => {
+        try{
+            if(!id) return Promise.reject(new Error('No valid id for index pattern'));
+            if(!patternId) return Promise.reject(new Error('No valid patternId for index pattern'));
+            await elasticRequest
+            .callWithInternalUser('create', {
+                index: '.kibana',
+                type: 'doc',
+                id: patternId,
+                body: {
+                    "type": 'index-pattern',
+                    "index-pattern": {
+                        "title": id,
+                        "timeFieldName": '@timestamp'
+                    }
+                }
+            });
+            return;
+        }catch(error){
+            return Promise.reject(error)
         }
+    }
 
+    const searchIndexPatternById = async id => {
+        try {
+            if(!id) return Promise.reject(new Error('No valid id for search index pattern'))
+            const data = await elasticRequest
+                        .callWithInternalUser('search', {
+                            index: '.kibana',
+                            type: 'doc',
+                            q: `index-pattern.title:"${id}"`
+                        });
+            return data;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    const updateKibanaIndexWithKnownFields = async patternId => {
+        try {
+            if(!patternId) return Promise.reject(new Error('No valid patternId for update index pattern'))
+            const newFields = JSON.stringify(knownFields);
+            await elasticRequest
+            .callWithInternalUser('update', {
+                index: '.kibana',
+                type: 'doc',
+                id: patternId,
+                body: {
+                    doc: {
+                        "type": 'index-pattern',
+                        "index-pattern": {  
+                            "fields": newFields,
+                            "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
+                        }
+                     }
+                }
+             });
+             return;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    const buildVisualizationsBulk = (app_objects,id) => {
         let body = '';
         for (let element of app_objects) {
             body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '" } }\n';
@@ -139,22 +188,63 @@ module.exports = (server, options) => {
             temp["type"] = element._type;
             body += JSON.stringify(temp) + "\n";
         }
+        return body;
+    }
 
-        elasticRequest.callWithInternalUser('bulk', {
-            index: '.kibana',
-            body: body
-        })
-            .then(() => elasticRequest.callWithInternalUser('indices.refresh', {
-                index: ['.kibana', index_pattern]
-            }))
-            .then(() => {
-                log('initialize.js importAppObjects', 'Wazuh app visualizations were successfully installed. App ready to be used.','info')
-                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh app visualizations were successfully installed. App ready to be used.');
-            })
-            .catch(error => {
-                log('initialize.js importAppObjects', error.message || error);
-                server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch. Bulk request failed.');
-            });
+    // Importing Wazuh app visualizations and dashboards
+    const importAppObjects = async (id,firstTime) => {
+        try {
+            const patternId        = 'index-pattern:' + id;
+            let indexPatternList = await searchIndexPatternById(id);
+
+            if (!firstTime && indexPatternList.hits.total < 1) {  
+                log('initialize.js importAppObjects', 'Visualizations pattern not found. Creating it...','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Visualizations pattern not found. Creating it...');              
+                await createCustomPattern(patternId,id)
+                firstTime = true;
+            }
+
+            if(firstTime && indexPatternList.hits.total < 1){
+                log('initialize.js importAppObjects', 'Waiting for index pattern creation to complete...','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Waiting for index pattern creation to complete...');   
+                let waitTill = new Date(new Date().getTime() + 0.2 * 1000);
+                while(waitTill > new Date()){
+                    indexPatternList = await searchIndexPatternById(id);
+                    if(indexPatternList.hits.total >= 1) break;
+                    else waitTill = new Date(new Date().getTime() + 0.2 * 1000);
+                }
+            }
+
+            log('initialize.js importAppObjects', 'Importing/Updating index pattern known fields...','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Importing/Updating index pattern known fields...');
+            await updateKibanaIndexWithKnownFields(patternId)
+
+            log('initialize.js importAppObjects', 'Importing/Updating Wazuh app visualizations...','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Importing/Updating Wazuh app visualizations...');
+    
+            try {
+                app_objects = require(APP_OBJECTS_FILE);
+            } catch (e) {
+                log('initialize.js importAppObjects', e.message || e)
+                server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
+                server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + APP_OBJECTS_FILE);
+                server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+            }
+    
+            
+            const body = buildVisualizationsBulk(app_objects,id);
+    
+            await elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: body });
+            await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana', index_pattern]})
+                
+            log('initialize.js importAppObjects', 'Wazuh app visualizations were successfully installed. App ready to be used.','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Wazuh app visualizations were successfully installed. App ready to be used.');
+
+            return;
+        } catch (error){
+            log('initialize.js importAppObjects', error.message || error);
+            server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch.' +  error.message || error);
+        }
     };
 
     // Create index pattern TODO: remove hardcoded index-patterns ids
@@ -171,8 +261,7 @@ module.exports = (server, options) => {
                 "type": 'index-pattern',
                 "index-pattern": {
                     "title": index_pattern,
-                    "timeFieldName": '@timestamp',
-                    "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
+                    "timeFieldName": '@timestamp'
                 }
             }
         })
@@ -181,7 +270,7 @@ module.exports = (server, options) => {
                 server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
                 // Import objects (dashboards and visualizations)
                 importObjects(index_pattern);
-                importAppObjects(index_pattern);
+                importAppObjects(index_pattern,true);
             })
             .catch(error => {
                 log('initialize.js createIndexPattern', error.message || error);
