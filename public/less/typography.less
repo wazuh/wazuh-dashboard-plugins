@@ -9,7 +9,6 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select {
 }
 
 .wz-headline-title {
-    color: #0079a5 !important;
     font-size: 17px;
 }
 
@@ -69,4 +68,19 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select {
 
 .json-string {
     color: olive;
+}
+
+/* Class for linkable text elements */
+
+.wz-text-link {
+    cursor: pointer;
+    color: #0079a5;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.wz-text-active {
+    color: #0079a5;
 }

@@ -47,7 +47,7 @@
         <div layout="row">
             <md-card flex class="wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-metric">
-                    <div flex>Group: <span ng-click="goGroup()" class="wz-font-weight-bold cursor-pointer" tooltip="Click to go to the group details" tooltip-placement="right">{{groupName}} <i class="fa fa-eye"></i></span></div>
+                    <div flex>Group: <span ng-click="goGroup()" class="wz-font-weight-bold wz-text-link" tooltip="Click to go to the group details" tooltip-placement="right">{{groupName}}</span></div>
                     <div flex>Configuration status: <span class="wz-font-weight-bold" tooltip="The current synchronization status" tooltip-placement="right">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></div>
                 </md-card-content>
             </md-card>
@@ -62,7 +62,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config.syscheck">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='fim';toggleRAW=false" ng-class="selectedConfigTab === 'fim' ? 'wz-font-weight-bold' : ''">File Integrity</span>
+                        <span class="wz-headline-title wz-text-link" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='fim';toggleRAW=false" ng-class="selectedConfigTab === 'fim' ? 'wz-text-active' : ''">File Integrity</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.disabled">
                             <span flex>Disabled</span>
@@ -80,7 +80,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config.rootcheck">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='pm';toggleRAW=false" ng-class="selectedConfigTab === 'pm' ? 'wz-font-weight-bold' : ''">Policy Monitoring</span>
+                        <span class="wz-headline-title wz-text-link" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='pm';toggleRAW=false" ng-class="selectedConfigTab === 'pm' ? 'wz-text-active' : ''">Policy Monitoring</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.rootcheck.disabled">
                             <span flex>Disabled</span>
@@ -98,7 +98,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['open-scap']">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='scap';toggleRAW=false" ng-class="selectedConfigTab === 'scap' ? 'wz-font-weight-bold' : ''">OpenSCAP</span>
+                        <span class="wz-headline-title wz-text-link" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='scap';toggleRAW=false" ng-class="selectedConfigTab === 'scap' ? 'wz-text-active' : ''">OpenSCAP</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['open-scap'].disabled">
                             <span flex>Disabled</span>
@@ -116,7 +116,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['cis-cat']">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='ciscat';toggleRAW=false" ng-class="selectedConfigTab === 'ciscat' ? 'wz-font-weight-bold' : ''">CIS-CAT</span>
+                        <span class="wz-headline-title wz-text-link" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='ciscat';toggleRAW=false" ng-class="selectedConfigTab === 'ciscat' ? 'wz-text-active' : ''">CIS-CAT</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config['cis-cat'].disabled">
                             <span flex>Disabled</span>
@@ -134,7 +134,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['localfile']">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='log';toggleRAW=false" ng-class="selectedConfigTab === 'log' ? 'wz-font-weight-bold' : ''">Log Collection</span>
+                        <span class="wz-headline-title wz-text-link" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='log';toggleRAW=false" ng-class="selectedConfigTab === 'log' ? 'wz-text-active' : ''">Log Collection</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>Visualize all Log Collection settings</span>
@@ -147,7 +147,7 @@
                 <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['localfile']">
                     <md-card-content>
                         <!-- Section title -->
-                        <span class="wz-headline-title cursor-pointer wz-table-hover" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='command';toggleRAW=false" ng-class="selectedConfigTab === 'command' ? 'wz-font-weight-bold' : ''">Remote Command</span>
+                        <span class="wz-headline-title wz-text-link" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='command';toggleRAW=false" ng-class="selectedConfigTab === 'command' ? 'wz-text-active' : ''">Remote Command</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex>Visualize all Remote Command settings</span>
