@@ -15,7 +15,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.global">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('global')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'global' ? 'wz-font-weight-bold' : ''">Global</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('global')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'global' ? 'wz-text-active' : ''">Global</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.jsonout_output">
@@ -34,7 +34,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.cluster">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('cluster')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'cluster' ? 'wz-font-weight-bold' : ''">Cluster</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('cluster')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'cluster' ? 'wz-text-active' : ''">Cluster</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.name">
@@ -53,7 +53,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.syscheck">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('syscheck')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'syscheck' ? 'wz-font-weight-bold' : ''">Syscheck</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('syscheck')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'syscheck' ? 'wz-text-active' : ''">Syscheck</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.frequency">
@@ -72,7 +72,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.rootcheck">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('rootcheck')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'rootcheck' ? 'wz-font-weight-bold' : ''">Rootcheck</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('rootcheck')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'rootcheck' ? 'wz-text-active' : ''">Rootcheck</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.frequency">
@@ -91,7 +91,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.logcollector">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('logcollector')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'logcollector' ? 'wz-font-weight-bold' : ''">Logcollector</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('logcollector')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'logcollector' ? 'wz-text-active' : ''">Logcollector</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Logcollector settings</span>
@@ -104,7 +104,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.email_alerts">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('email_alerts')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'email_alerts' ? 'wz-font-weight-bold' : ''">E-mail alerts</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('email_alerts')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'email_alerts' ? 'wz-text-active' : ''">E-mail alerts</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.email_to">
@@ -123,7 +123,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.auth">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('auth')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'auth' ? 'wz-font-weight-bold' : ''">Auth</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('auth')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'auth' ? 'wz-text-active' : ''">Auth</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Summary -->
                     <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.purge">
@@ -142,7 +142,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.ruleset">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('ruleset')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'ruleset' ? 'wz-font-weight-bold' : ''">Ruleset</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('ruleset')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'ruleset' ? 'wz-text-active' : ''">Ruleset</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Ruleset settings</span>
@@ -155,7 +155,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.command">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('command')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'command' ? 'wz-font-weight-bold' : ''">Command</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('command')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'command' ? 'wz-text-active' : ''">Command</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Command settings</span>
@@ -168,7 +168,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration['active-response'].length > 0">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('active-response')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'active-response' ? 'wz-font-weight-bold' : ''">Active response</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('active-response')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'active-response' ? 'wz-text-active' : ''">Active response</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Active response settings</span>
@@ -181,7 +181,7 @@
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.remote">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title cursor-pointer wz-table-hover" ng-click="switchItem('remote')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'remote' ? 'wz-font-weight-bold' : ''">Remote</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('remote')" tooltip="Click to see more details" tooltip-placement="right" ng-class="selectedItem === 'remote' ? 'wz-text-active' : ''">Remote</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Agents events listening settings</span>

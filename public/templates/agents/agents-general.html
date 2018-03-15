@@ -6,7 +6,7 @@
             <md-card flex class="wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-metric">
                     <div flex="20">
-                        Name: <span class="wz-font-weight-bold">{{ agent.name | limitTo: 15 }}{{ agent.name.length > 15 ? '...' : '' }}</span>
+                        Name: <span class="wz-font-weight-bold">{{ agent.name | limitTo: 15 }}{{ agent.name.length > 15 ? '&hellip;' : '' }}</span>
                     </div>
                     <div flex="20">
                         IP: <span class="wz-font-weight-bold">{{agent.ip}}</span>
@@ -15,10 +15,10 @@
                         Group: <span class="wz-font-weight-bold">{{ agent.group }}</span>
                     </div>
                     <div flex="20" ng-if="agent.version">
-                        Version: <span class="wz-font-weight-bold">{{ agent.version | limitTo: 15 }}{{ agent.version.length > 15 ? '...' : '' }}</span>
+                        Version: <span class="wz-font-weight-bold">{{ agent.version | limitTo: 15 }}{{ agent.version.length > 15 ? '&hellip;' : '' }}</span>
                     </div>
                     <div flex>
-                        OS: <span class="wz-font-weight-bold">{{ agentOS | limitTo: 25 }}{{ agentOS.length > 25 ? '...' : '' }}</span>
+                        OS: <span class="wz-font-weight-bold">{{ agentOS | limitTo: 25 }}{{ agentOS.length > 25 ? '&hellip;' : '' }}</span>
                     </div>
                 </md-card-content>
             </md-card>
