@@ -229,11 +229,11 @@ module.exports = (server, options) => {
                        item._source['index-pattern'].title.trim() === id.trim()){
 
                         patternId = item._id;
-                      
+                        id        = patternId.split('index-pattern:')[1]
                     }
                 }
             }
-            
+
             if (!firstTime && indexPatternList.hits.total < 1) {  
                 log('initialize.js importAppObjects', 'Visualizations pattern not found. Creating it...','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Visualizations pattern not found. Creating it...');              
