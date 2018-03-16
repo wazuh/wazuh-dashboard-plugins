@@ -6,7 +6,7 @@
     <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'manager' }" md-nav-click="goToClick('#/manager')" id="manager"><i class="fa fa-server"></i> Manager</md-nav-item>
     <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'agents' }" md-nav-click="goToClick('#/agents-preview')" id="agents"><i class="fa fa-tv"></i> Agents</md-nav-item>
     <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'discover' }" md-nav-click="goToClick('#/wazuh-discover')" id="discover"><i class="fa fa-compass"></i> Discover</md-nav-item>
-    <div class="wz-menu-nav-bar-api" layout="row" ng-show="theresAPI || theresPattern">
+    <div class="wz-menu-nav-bar-api" layout="row">
         <div ng-show="theresAPI" layout layout-align="center center" tooltip="Selected API" tooltip-placement="bottom"><i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{ currentAPI }}<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span></div>
         <div ng-show="!theresAPI" layout layout-align="center center" tooltip="Selected API" tooltip-placement="bottom"><i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>No API <span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span></div>
         <div ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" layout layout-align="center center">
