@@ -1,6 +1,6 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
-
+* * *
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 387
 ### Added
 - **New logging system** ([#307](https://github.com/wazuh/wazuh-kibana-app/pull/307)):
@@ -28,6 +28,12 @@ All notable changes to the Wazuh app project will be documented in this file.
   - The *Settings* tab has been refactored to correct some visual errors with some card components.
 
 ### Changed
+- **Improved the initialization system** ([#317](https://github.com/wazuh/wazuh-kibana-app/pull/317)):
+  - Now the app will **re-create the index-pattern** if the user deletes the currently used by the Wazuh app.
+  - The fieldset is now **automatically refreshed** if the app detects mismatches.
+  - Now every index-pattern is **dynamically formatted** (for example, to enable the URLs in the *Vulnerabilities* tab).
+  - Several **code refactoring** for a better handling of possible use cases.
+  - And the best thing, **it's no longer needed to insert the sample alert**!
 - Now the app healthcheck system only checks if the API and app **have the same `major.minor` version** ([#311](https://github.com/wazuh/wazuh-kibana-app/pull/311)):
   - Previously, the API and app had to be on the same `major.minor.patch` version.
 - Adjusted space between title and value in some cards showing Manager or Agent configurations ([#315](https://github.com/wazuh/wazuh-kibana-app/pull/315)).
@@ -36,7 +42,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 - Fixed bug on Firefox browser who was not properly showing the tables with the scroll pagination functionality ([#314](https://github.com/wazuh/wazuh-kibana-app/pull/314)).
 - Fixed bug where visualizations weren't being destroyed due to ongoing renderization processes ([#316](https://github.com/wazuh/wazuh-kibana-app/pull/316)).
-
+- Fixed several UI bugs for a better consistency and usability ([#318](https://github.com/wazuh/wazuh-kibana-app/pull/318)).
+* * *
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 386
 ### Added
 - **New design for the *Manager/Groups* tab** ([#295](https://github.com/wazuh/wazuh-kibana-app/pull/295)).
@@ -69,7 +76,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Removed
 - Removed almost every `md-tooltip` component from the whole app ([#305](https://github.com/wazuh/wazuh-kibana-app/pull/305)).
 - Removed unused images from the `img` folder ([#305](https://github.com/wazuh/wazuh-kibana-app/pull/305)).
-
+* * *
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 385
 ### Added
 - Support for **Wazuh v3.2.1**.
@@ -100,7 +107,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 - Deleted the `id` attribute from all the app visualizations ([#275](https://github.com/wazuh/wazuh-kibana-app/pull/275)).
-
+* * *
 ## Wazuh v3.2.0 - Kibana v6.2.2 - Revision 384
 ### Added
 - **New directives** for the Wazuh app: `wz-table`, `wz-table-header` and `wz-search-bar` ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)):
@@ -128,7 +135,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the `filters.js` and `kibana_fields_file.json` files ([#263](https://github.com/wazuh/wazuh-kibana-app/pull/263)).
 - Removed the `implicitFilters` service ([#270](https://github.com/wazuh/wazuh-kibana-app/pull/270)).
 - Removed visualizations loading status trace from controllers and visualization directive ([#270](https://github.com/wazuh/wazuh-kibana-app/pull/270)).
-
+* * *
 ## [v3.2.0]
 ### Added
 - Support for **Wazuh 3.2.0**.
@@ -155,7 +162,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 - Removed the `travis.yml` file.
-
+* * *
 ## [v3.1.0]
 ### Added
 - Support for **Wazuh 3.1.0**.
@@ -201,7 +208,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Removed
 - Removed index pattern configuration from the `package.json` file.
 - Removed unnecessary dependencies from the `package.json` file.
-
+* * *
 ## [v3.0.0]
 ### Added
 - You can **configure the initial index-pattern** used by the plugin in the initialPattern variable of the app's package.json.
@@ -223,9 +230,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Visualizations loaded at initialization time.
 - New sync system to wait for Elasticsearch JS.
 - Decoupling selected API and pattern from backend and moved to client side.
-
+* * *
 ## [v2.1.0]
-
 ## Added
 - Loading icon while Wazuh loads the visualizations.
 - Add/Delete/Restart agents.
@@ -233,9 +239,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 - Using genericReq when possible.
-
+* * *
 ## [v2.0.1]
-
 ### Changed
 - New index in Elasticsearch to save Wazuh set up configuration
 - Short URL's is now supported
