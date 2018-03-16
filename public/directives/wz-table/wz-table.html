@@ -20,7 +20,7 @@
         <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data.items | filter : searchTerm"
             class="wz-table-common" ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' "
             >
-            <div ng-repeat="key in keys" flex="{{key.size || ''}}" ng-click="clickAction(full ? item : $index,key)">
+            <div class="wz-table-agents" ng-repeat="key in keys" flex="{{key.size || ''}}" ng-click="clickAction(full ? item : $index,key)">
                 <span>{{parseItem(item,key) || '---'}}</span>
             </div>
         </div>
