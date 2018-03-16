@@ -217,8 +217,22 @@ module.exports = (server, options) => {
      */
     const importAppObjects = async (id,firstTime) => {
         try {
-            const patternId        = 'index-pattern:' + id;
+            let patternId        = 'index-pattern:' + id;
             let indexPatternList = await searchIndexPatternById(id);
+
+            if(indexPatternList.hits.total >= 1){
+                for(let item of indexPatternList.hits.hits){
+                    if(item._source && 
+                       item._source['index-pattern'] && 
+                       item._source['index-pattern'].title && 
+                       id && 
+                       item._source['index-pattern'].title.trim() === id.trim()){
+
+                        patternId = item._id;
+                        id        = patternId.split('index-pattern:')[1]
+                    }
+                }
+            }
 
             if (!firstTime && indexPatternList.hits.total < 1) {  
                 log('initialize.js importAppObjects', 'Visualizations pattern not found. Creating it...','info')
