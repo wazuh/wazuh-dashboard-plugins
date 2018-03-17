@@ -147,7 +147,13 @@ module.exports = (server, options) => {
                         .callWithInternalUser('search', {
                             index: '.kibana',
                             type: 'doc',
-                            q: `index-pattern.title:"${id}"`
+                            body: {
+                                "query": {
+                                    "match": {
+                                        "_id":"index-pattern:" + id 
+                                    }
+                                }
+                            }
                         });
             return data;
         } catch (error) {
