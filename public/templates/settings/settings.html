@@ -286,7 +286,7 @@
 
                 <div flex="20" layout="column" class="height-41 md-block wz-margin-top-17 wz-margin-right-15 wz-select-input">
                     <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
-                        <option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</option>
+                        <option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.title}}</option>
                     </select>
                 </div>
             </md-card-content>
