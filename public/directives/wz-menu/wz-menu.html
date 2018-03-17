@@ -11,7 +11,7 @@
         <div ng-show="!theresAPI" layout layout-align="center center" tooltip="Selected API" tooltip-placement="bottom"><i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>No API <span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span></div>
         <div ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" layout layout-align="center center">
             <md-select ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" placeholder="Index pattern" class="wz-menu-select md-no-underline wz-border-none" aria-label="Select index pattern" tooltip="Selected index pattern" tooltip-placement="bottom">
-                <md-option ng-repeat="pattern in patternList" value="{{ pattern.id }}">{{ pattern.attributes.title }}</md-option>
+                <md-option ng-repeat="pattern in patternList" value="{{ pattern.id }}">{{ pattern.title }}</md-option>
             </md-select>
         </div>
         <div ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" layout layout-align="center center" tooltip="Selected index pattern" tooltip-placement="bottom"> {{ patternList[0].attributes.title }}</div>
