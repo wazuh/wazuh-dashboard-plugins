@@ -43,26 +43,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     $scope.indexPatterns = [];
 
-    // Getting the index pattern list into the scope, but selecting only "valid" ones
-    for (let i = 0; i < $route.current.locals.ips.list.length; i ++) {
-        courier.indexPatterns.get($route.current.locals.ips.list[i].id)
-        .then((data) => {
-            let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
-            let minimumCount = 0;
-
-            for (let j = 0; j < data.fields.length; j++) {
-                if (minimum.includes(data.fields[j].name)) {
-                    minimumCount++;
-                }
-            }
-
-            if (minimumCount == minimum.length) {
-                $scope.indexPatterns.push($route.current.locals.ips.list[i]);
-            }
-
-        });
-    }
-
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
@@ -147,6 +127,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Get settings function
     const getSettings = async () => {
         try {
+            const patternList = await genericReq.request('GET','/get-list',{});
+            $scope.indexPatterns = patternList.data.data;
             const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
             for(const entry of data.data) $scope.showEditForm[entry._id] = false;
             
