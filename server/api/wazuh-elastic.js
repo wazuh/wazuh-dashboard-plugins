@@ -329,6 +329,49 @@ module.exports = (server, options) => {
 
     module.exports = getConfig;
 
+
+    const getlist = async (req,res) => {
+        try {
+            const data = await elasticRequest
+            .callWithInternalUser('search', {
+                    index: '.kibana',
+                    type: 'doc',
+                    body: {
+                        "query":{
+                            "match":{
+                              "type": "index-pattern"
+                            }
+                          }
+                    }
+                    
+            });
+            
+            const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+            let list = [];
+            for(const index of data.hits.hits){
+                let valid = JSON.parse(index._source['index-pattern'].fields).filter(item => minimum.includes(item.name));
+                if(valid.length === 4){
+                    list.push({
+                        id: index._id.split('index-pattern:')[1],
+                        title: index._source['index-pattern'].title
+                    })
+                }
+       
+            }
+            
+            return res({data: list});
+
+        } catch(error){
+            return res({error: error.message})
+        }
+    }
+
+    // Get index patterns list
+    server.route({
+        method:  'GET',
+        path:    '/get-list',
+        handler: getlist
+    });
     //Server routes
 
     /*
