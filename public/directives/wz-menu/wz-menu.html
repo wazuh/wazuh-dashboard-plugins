@@ -14,7 +14,7 @@
                 <md-option ng-repeat="pattern in patternList" value="{{ pattern.id }}">{{ pattern.title }}</md-option>
             </md-select>
         </div>
-        <div ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" layout layout-align="center center" tooltip="Selected index pattern" tooltip-placement="bottom"> {{ patternList[0].attributes.title }}</div>
+        <div ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" layout layout-align="center center" tooltip="Selected index pattern" tooltip-placement="bottom"> {{ patternList[0].title }}</div>
     </div>
     <md-nav-item class="wz-menu-nav-gear wz-color-white" md-nav-click="goToClick('#/settings')" id="settings" name="settings">
         <i class="fa fa-cog ng-scope" aria-hidden="true"></i>

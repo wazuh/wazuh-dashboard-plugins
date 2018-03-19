@@ -42,7 +42,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
     $scope.indexPatterns = [];
-
+    $scope.apiEntries    = [];
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
@@ -241,7 +241,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                     extensions  : tmpData.extensions
                 }
             };
-
+            console.log($scope.apiEntries)
             $scope.apiEntries.push(newEntry);
             $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
 
