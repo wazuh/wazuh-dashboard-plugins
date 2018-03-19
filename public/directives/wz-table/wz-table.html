@@ -44,8 +44,9 @@
                 <div layout="row" class="wz-padding-right-14 wz-padding-bottom-14 ">
                     <md-card flex class="wz-cursor-default wz-md-card">
                         <md-card-content>
-                            <h1 class="wz-table-color-link wz-table-font">Overview</h1>
+                            <span class="wz-headline-title">Overview</span>
                             <md-divider class="wz-margin-top-10"></md-divider>
+
                             <div layout="row" class="wz-table-padding-top-10">
                                 <span flex>{{item.description}}</span>
                             </div>
@@ -55,11 +56,11 @@
                             </div>
                             <div layout="row" class="wz-table-padding-top-10">
                                 <span flex>Level</span>
-                                <span flex class="wz-text-right wz-table-hover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('level', item.level); $event.stopPropagation();">{{item.level}}</span>
+                                <span flex class="wz-text-right wz-text-link" ng-click="data.addFilter('level', item.level); $event.stopPropagation();">{{item.level}}</span>
                             </div>
                             <div layout="File" class="wz-table-padding-top-10">
                                 <span flex>File</span>
-                                <span flex class="wz-text-right wz-table-hover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('file', item.file); $event.stopPropagation();">{{item.file}}</span>
+                                <span flex class="wz-text-right wz-text-link" ng-click="data.addFilter('file', item.file); $event.stopPropagation();">{{item.file}}</span>
                             </div>
                         </md-card-content>
                     </md-card>
@@ -67,20 +68,22 @@
                         <md-card-content>
                             <div layout="row" ng-if="item.groups.length > 0">
                                 <div flex>
-                                    <h1 class="wz-table-color-link wz-table-font">Groups</h1>
+                                    <span class="wz-headline-title">Groups</span>
                                     <md-divider class="wz-margin-top-10"></md-divider>
+
                                     <div layout="row" class="wz-table-padding-top-10" ng-repeat="group in item.groups">
-                                        <span flex class="wz-table-hover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('group', group)">{{group}}</span>
+                                        <span flex class="wz-text-link" ng-click="data.addFilter('group', group)">{{group}}</span>
                                     </div>
-             
+
                                 </div>
                             </div>
                             <div layout="row" class="wz-padding-top-10" ng-if="item.pci.length > 0">
                                 <div flex>
-                                    <h1 class="wz-table-color-link wz-table-font">PCI DSS</h1>
+                                    <span class="wz-headline-title">PCI DSS</span>
                                     <md-divider class="wz-margin-top-10"></md-divider>
+
                                     <div layout="row" class="wz-table-padding-top-10" ng-repeat="pci in item.pci">
-                                        <span flex class="wz-table-hover wz-table-cursor-pointer wz-table-color-link" ng-click="data.addFilter('pci', pci)">{{pci}}</span>
+                                        <span flex class="wz-text-link" ng-click="data.addFilter('pci', pci)">{{pci}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -88,8 +91,9 @@
                     </md-card>
                     <md-card flex class="wz-cursor-default wz-md-card">
                         <md-card-content>
-                            <h1 class="wz-table-color-link wz-table-font">Extra settings</h1>
+                            <span class="wz-headline-title">Extra settings</span>
                             <md-divider class="wz-margin-top-10"></md-divider>
+
                             <div layout="row" class="wz-table-padding-top-10" ng-repeat="(detailk, detailv) in item.details">
                                 <span flex>{{detailk}}</span>
                                 <span flex class="wz-text-right color-grey">{{detailv}}</span>
@@ -119,8 +123,9 @@
                 <div layout="row" class="wz-padding-right-14 wz-padding-bottom-14">
                     <md-card flex class="wz-cursor-default wz-md-card">
                         <md-card-content>
-                            <h1 class="wz-table-color-link wz-table-font">Overview</h1>
+                            <span class="wz-headline-title">Overview</span>
                             <md-divider class="wz-margin-top-10"></md-divider>
+
                             <div layout="row" class="wz-table-padding-top-10">
                                 <span flex>Full path</span>
                                 <span flex class="wz-text-right color-grey">{{decoder.path}}</span>
@@ -137,8 +142,9 @@
                     </md-card>
                     <md-card flex class="wz-cursor-default wz-md-card" ng-if="detailk != 'parent'">
                         <md-card-content>
-                            <h1 class="wz-table-color-link wz-table-font">Details</h1>
+                            <span class="wz-headline-title">Details</span>
                             <md-divider class="wz-margin-top-10"></md-divider>
+
                             <div layout="row" class="wz-table-padding-top-10" ng-repeat="(detailk, detailv) in decoder.details">
                                 <span flex ng-if="((detailk !== 'regex') && (detailk !== 'order')) || (detailk === 'regex') || (detailk === 'regex')">{{detailk}}</span>
                                 <span flex class="wz-text-right color-grey" ng-if="(detailk !== 'regex') && (detailk !== 'order')">{{detailv}}</span>
