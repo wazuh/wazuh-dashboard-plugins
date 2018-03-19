@@ -34,6 +34,10 @@ All notable changes to the Wazuh app project will be documented in this file.
   - Now every index-pattern is **dynamically formatted** (for example, to enable the URLs in the *Vulnerabilities* tab).
   - Several **code refactoring** for a better handling of possible use cases.
   - And the best thing, **it's no longer needed to insert the sample alert**!
+- **Improvements and changes to index-patterns** ([#320](https://github.com/wazuh/wazuh-kibana-app/pull/320)):
+  - There's a new route, `/get-list`, to fetch the index pattern list.
+  - We've removed and changes several functions for a proper management of index-patterns.
+  - We've improved the compatibility with user-created index-patterns, known to have unpredictable IDs.
 - Now the app healthcheck system only checks if the API and app **have the same `major.minor` version** ([#311](https://github.com/wazuh/wazuh-kibana-app/pull/311)):
   - Previously, the API and app had to be on the same `major.minor.patch` version.
 - Adjusted space between title and value in some cards showing Manager or Agent configurations ([#315](https://github.com/wazuh/wazuh-kibana-app/pull/315)).
