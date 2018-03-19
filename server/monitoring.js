@@ -345,14 +345,17 @@ module.exports = (server, options) => {
 
     const checkTemplate = async () => {
         try {
+            log('monitoring.js checkTemplate', 'Updating wazuh-monitoring template...', 'info');
+            server.log([blueWazuh, 'monitoring', 'info'], "Updating wazuh-monitoring template...");
             const monitoringTemplate = require('./integration-files/monitoring-template');
             const data = await elasticRequest.callWithInternalUser('indices.putTemplate', {
                 name  : 'wazuh-agent',
                 body  : monitoringTemplate
             });
-            console.log(data);
             return;
         } catch(error){
+            log('monitoring.js checkTemplate', 'Something went wrong updating wazuh-monitoring template...' + error.message || error);
+            server.log([blueWazuh, 'monitoring', 'info'], "Something went wrong updating wazuh-monitoring template..." + error.message || error);
             return Promise.reject(error);
         }
     }
