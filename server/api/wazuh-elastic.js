@@ -346,23 +346,28 @@ module.exports = (server, options) => {
                     
             });
             
-            const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
-            let list = [];
-            for(const index of data.hits.hits){
-                let valid = JSON.parse(index._source['index-pattern'].fields).filter(item => minimum.includes(item.name));
-                if(valid.length === 4){
-                    list.push({
-                        id: index._id.split('index-pattern:')[1],
-                        title: index._source['index-pattern'].title
-                    })
+            if(data && data.hits && data.hits.hits){
+                const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+                let list = [];
+                if(data.hits.hits.length === 0) throw new Error('There is no index pattern');
+                for(const index of data.hits.hits){
+                    let valid = JSON.parse(index._source['index-pattern'].fields).filter(item => minimum.includes(item.name));
+                    if(valid.length === 4){
+                        list.push({
+                            id: index._id.split('index-pattern:')[1],
+                            title: index._source['index-pattern'].title
+                        })
+                    }
+           
                 }
-       
+                
+                return res({data: list});
             }
             
-            return res({data: list});
+            throw new Error('The Elasticsearch request didn\'t fetch the expected data');
 
         } catch(error){
-            return res({error: error.message})
+            return res({error: error.message}).code(500)
         }
     }
 
