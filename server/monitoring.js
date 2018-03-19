@@ -321,14 +321,20 @@ module.exports = (server, options) => {
 
     const createWazuhMonitoring = async () => {
         try{
-            await elasticRequest.callWithInternalUser('delete', { 
-                index: '.kibana', 
-                type: 'doc',
-                id: 'index-pattern:wazuh-monitoring-*' 
-            })
-
-            log('monitoring.js init', 'Successfully deleted old wazuh-monitoring pattern.', 'info');
-            server.log([blueWazuh, 'monitoring', 'info'], "Successfully deleted old wazuh-monitoring pattern.");
+            
+            const patternId = 'index-pattern:' + index_pattern;
+            try{
+                await elasticRequest.callWithInternalUser('delete', { 
+                    index: '.kibana', 
+                    type: 'doc',
+                    id: 'index-pattern:wazuh-monitoring-*' 
+                })
+                log('monitoring.js init', 'Successfully deleted old wazuh-monitoring pattern.', 'info');
+                server.log([blueWazuh, 'monitoring', 'info'], "Successfully deleted old wazuh-monitoring pattern.");
+            } catch (error) {
+                log('monitoring.js init', 'No need to delete old wazuh-monitoring pattern.', 'info');
+                server.log([blueWazuh, 'monitoring', 'info'], "No need to delete  old wazuh-monitoring pattern.");
+            }
 
             await configureKibana();
             return;
@@ -365,13 +371,12 @@ module.exports = (server, options) => {
             await saveStatus();
     
             const patternId = 'index-pattern:' + index_pattern;
-            
             await elasticRequest.callWithInternalUser('get', {
                 index: '.kibana',
                 type:  'doc',
                 id: patternId
             });
-    
+
             log('monitoring.js init', 'Skipping index-pattern creation. Already exists.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Skipping index-pattern creation. Already exists.');
             
