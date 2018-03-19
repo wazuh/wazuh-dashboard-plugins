@@ -33,7 +33,7 @@
 
 </md-content>
 
-<md-content flex layout="column" ng-if="tab === 'configuration' && !configurationError" layout-align="start">
+<md-content flex layout="column" layout-align="start" ng-if="tab === 'configuration' && !configurationError">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="load">
@@ -41,7 +41,7 @@
     </div>
 
     <!-- The section container -->
-    <div flex layout="column" layout-align="start stretch" ng-init="toggleRAW=false;selectedConfigTab='fim'" ng-show="!load">
+    <div flex layout="column" layout-align="start stretch" ng-show="!load" ng-init="toggleRAW=false;selectedConfigTab='fim';">
 
         <!-- First row - Configuration status and other details -->
         <div layout="row">
@@ -49,6 +49,37 @@
                 <md-card-content layout="row" class="wz-padding-metric">
                     <div flex>Group: <span ng-click="goGroup()" class="wz-font-weight-bold wz-text-link" tooltip="Click to go to the group details" tooltip-placement="right">{{groupName}}</span></div>
                     <div flex>Configuration status: <span class="wz-font-weight-bold" tooltip="The current synchronization status" tooltip-placement="right">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></div>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <!-- Second row - There's no applied configuration at all -->
+        <div layout="row"
+            ng-if="tab === 'configuration'
+                && !configurationError
+                && !groupConfiguration.config.syscheck
+                && !groupConfiguration.config.rootcheck
+                && !groupConfiguration.config['open-scap']
+                && !groupConfiguration.config['cis-cat']
+                && !groupConfiguration.config['localfile']
+                && !groupConfiguration.config['command']">
+            <md-card flex class="wz-md-card">
+                <md-card-content>
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-warning"></i> Warning</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        This agent belongs to a group where there's actually no configuration.
+                    </div>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        Use the following link to learn about the centralized configuration process and how to proceed:
+                    </div>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        <ul>
+                            <li>
+                                <a href="https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html">https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html</a>
+                            </li>
+                        </ul>
+                    </div>
                 </md-card-content>
             </md-card>
         </div>
@@ -144,7 +175,7 @@
                 <!-- END LOG COLLECTION -->
 
                 <!-- COMMAND -->
-                <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['localfile']">
+                <md-card flex class="wz-md-card" ng-show="groupConfiguration.config['command']">
                     <md-card-content>
                         <!-- Section title -->
                         <span class="wz-headline-title wz-text-link" tooltip="Click to see more details" tooltip-placement="right" ng-click="selectedConfigTab='command';toggleRAW=false">Remote Command</span>
@@ -161,7 +192,7 @@
             <div flex="75" layout="row" layout-align="start stretch">
 
                 <!-- FILE INTEGRITY -->
-                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'fim' && !toggleRAW">
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'fim' && !toggleRAW && groupConfiguration.config.syscheck">
                     <md-card-content>
 
                         <!-- Section title -->
@@ -274,7 +305,7 @@
                 <!-- END FILE INTEGRITY -->
 
                 <!-- POLICY MONITORING -->
-                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'pm' && !toggleRAW">
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'pm' && !toggleRAW && groupConfiguration.config.rootcheck">
                     <md-card-content>
 
                         <!-- Section title -->
@@ -426,7 +457,7 @@
                 <!-- END POLICY MONITORING -->
 
                 <!-- OPENSCAP -->
-                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'scap' && !toggleRAW">
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'scap' && !toggleRAW && groupConfiguration.config['open-scap']">
                     <md-card-content>
 
                         <!-- Section title -->
@@ -483,7 +514,7 @@
                 <!-- END OPENSCAP -->
 
                 <!-- CIS-CAT -->
-                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'ciscat' && !toggleRAW">
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'ciscat' && !toggleRAW && groupConfiguration.config['cis-cat']">
                     <md-card-content>
 
                         <!-- Section title -->
@@ -524,7 +555,7 @@
                 <!-- END CIS-CAT -->
 
                 <!-- LOG COLLECTION -->
-                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'log' && !toggleRAW">
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'log' && !toggleRAW && groupConfiguration.config['localfile']">
                     <md-card-content>
 
                         <!-- Section title -->
@@ -576,7 +607,7 @@
                 <!-- END LOG COLLECTION -->
 
                 <!-- COMMAND -->
-                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'command' && !toggleRAW">
+                <md-card flex class="wz-md-card" ng-show="selectedConfigTab === 'command' && !toggleRAW && groupConfiguration.config['command']">
                     <md-card-content>
 
                         <!-- Section title -->
@@ -644,4 +675,5 @@
         </div>
 
     </div>
+
 </md-content>
