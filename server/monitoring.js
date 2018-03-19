@@ -53,7 +53,7 @@ module.exports = (server, options) => {
                 rejectUnauthorized: !apiEntry.insecure
             };
     
-            const response = await needle.request('get', `${getPath(apiEntry)}/agents`, payload, options);
+            const response = await needle('get', `${getPath(apiEntry)}/agents`, payload, options);
 
             if (!response.error && response.body.data.items) {
                 agentsArray = agentsArray.concat(response.body.data.items);
