@@ -46,7 +46,7 @@
 		</div>
 	</div>
 
-	<div layout="row" layout-align="space-between start">
+	<div layout="row" layout-align="space-between start" class="wz-md-navbar-kbn">
 		<div layout="column" layout-align="center start">
 			<md-nav-bar class="padding-right-0 wz-md-navbar" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
 				<md-nav-item md-nav-click="switchTab('general')" name="general">General</md-nav-item>
