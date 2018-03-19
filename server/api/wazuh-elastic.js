@@ -345,13 +345,19 @@ module.exports = (server, options) => {
                     }
                     
             });
-            
             if(data && data.hits && data.hits.hits){
                 const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
                 let list = [];
                 if(data.hits.hits.length === 0) throw new Error('There is no index pattern');
-                for(const index of data.hits.hits){
-                    let valid = JSON.parse(index._source['index-pattern'].fields).filter(item => minimum.includes(item.name));
+                for(const index of data.hits.hits){   
+                    let valid, parsed;        
+                    try{
+                        parsed = JSON.parse(index._source['index-pattern'].fields)
+                    } catch (error){
+                        continue;
+                    }     
+                    
+                    valid = parsed.filter(item => minimum.includes(item.name));
                     if(valid.length === 4){
                         list.push({
                             id: index._id.split('index-pattern:')[1],
@@ -360,7 +366,6 @@ module.exports = (server, options) => {
                     }
            
                 }
-                
                 return res({data: list});
             }
             
