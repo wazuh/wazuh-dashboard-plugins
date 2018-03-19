@@ -38,6 +38,10 @@ All notable changes to the Wazuh app project will be documented in this file.
   - There's a new route, `/get-list`, to fetch the index pattern list.
   - We've removed and changes several functions for a proper management of index-patterns.
   - We've improved the compatibility with user-created index-patterns, known to have unpredictable IDs.
+- **Improvements to monitoring module** ([#322](https://github.com/wazuh/wazuh-kibana-app/pull/322)):
+  - We don't need the monitoring template insertion step anymore.
+  - Minor refactor to the whole module.
+  - Regenerate the index pattern if it's missing.
 - Now the app healthcheck system only checks if the API and app **have the same `major.minor` version** ([#311](https://github.com/wazuh/wazuh-kibana-app/pull/311)):
   - Previously, the API and app had to be on the same `major.minor.patch` version.
 - Adjusted space between title and value in some cards showing Manager or Agent configurations ([#315](https://github.com/wazuh/wazuh-kibana-app/pull/315)).
