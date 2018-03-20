@@ -329,6 +329,59 @@ module.exports = (server, options) => {
 
     module.exports = getConfig;
 
+
+    const getlist = async (req,res) => {
+        try {
+            const data = await elasticRequest
+            .callWithInternalUser('search', {
+                    index: '.kibana',
+                    type: 'doc',
+                    body: {
+                        "query":{
+                            "match":{
+                              "type": "index-pattern"
+                            }
+                          }
+                    }
+                    
+            });
+            if(data && data.hits && data.hits.hits){
+                const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+                let list = [];
+                if(data.hits.hits.length === 0) throw new Error('There is no index pattern');
+                for(const index of data.hits.hits){   
+                    let valid, parsed;        
+                    try{
+                        parsed = JSON.parse(index._source['index-pattern'].fields)
+                    } catch (error){
+                        continue;
+                    }     
+                    
+                    valid = parsed.filter(item => minimum.includes(item.name));
+                    if(valid.length === 4){
+                        list.push({
+                            id: index._id.split('index-pattern:')[1],
+                            title: index._source['index-pattern'].title
+                        })
+                    }
+           
+                }
+                return res({data: list});
+            }
+            
+            throw new Error('The Elasticsearch request didn\'t fetch the expected data');
+
+        } catch(error){
+            return res({error: error.message}).code(500)
+        }
+    }
+
+    // Get index patterns list
+    server.route({
+        method:  'GET',
+        path:    '/get-list',
+        handler: getlist
+    });
     //Server routes
 
     /*
