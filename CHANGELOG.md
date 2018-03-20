@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - **New design for the *Agents/Configuration* tab** ([#310](https://github.com/wazuh/wazuh-kibana-app/pull/310)):
   - The style is the same as the *Manager/Configuration* tab.
   - Added two more sections: **CIS-CAT and Commands** ([#315](https://github.com/wazuh/wazuh-kibana-app/pull/315)).
+  - Added a new card that will appear when there's no group configuration at all ([#323](https://github.com/wazuh/wazuh-kibana-app/pull/323)).
 - **Added *"group"* column on the agents list in *Agents*** ([#312](https://github.com/wazuh/wazuh-kibana-app/pull/312)):
   - If you click on the group, it will redirect the user to the specified group in *Manager/Groups*.
 - **New option for the `config.yml` file, `ip.selector`** ([#313](https://github.com/wazuh/wazuh-kibana-app/pull/313)):
@@ -26,6 +27,11 @@ All notable changes to the Wazuh app project will be documented in this file.
   - Removed `cleaned.less` file.
   - Reordering and cleaning of existing CSS files, including removal of unused classes, renaming, and more.
   - The *Settings* tab has been refactored to correct some visual errors with some card components.
+  - Small refactoring to some components from *Manager/Ruleset* ([#323](https://github.com/wazuh/wazuh-kibana-app/pull/323)).
+- **New design for the top navbar** ([#326](https://github.com/wazuh/wazuh-kibana-app/pull/326)):
+  - Cleaned and refactored code
+  - Revamped design, smaller and with minor details to follow the rest of Wazuh app guidelines.
+- **New design for the wz-chip component** to follow the new Wazuh app guidelines ([#323](https://github.com/wazuh/wazuh-kibana-app/pull/323)).
 
 ### Changed
 - **Improved the initialization system** ([#317](https://github.com/wazuh/wazuh-kibana-app/pull/317)):
