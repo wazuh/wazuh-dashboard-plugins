@@ -1,8 +1,6 @@
 <div flex ng-controller="managerController" layout="column">
 
-    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'manager';">
-		<wz-menu></wz-menu>
-    </div>
+    <wz-menu ng-init="menuNavItem = 'manager'"></wz-menu>
 
 	<div layout="row"  layout-align="center start">
         <md-nav-bar flex class="pading-right-0 wz-md-navbar" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">

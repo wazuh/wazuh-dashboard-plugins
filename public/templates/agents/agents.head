@@ -1,8 +1,6 @@
 <div flex ng-controller="agentsController" layout="column">
 
-    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'agents'">
-		<wz-menu></wz-menu>
-    </div>
+    <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
 
 	<div layout="row">
 		<div class="md-toolbar-tools" layout="row">

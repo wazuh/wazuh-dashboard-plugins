@@ -25,13 +25,13 @@ const checkTimestamp = async (appState,genericReq,errorHandler,$rootScope,$locat
         } else {
             $rootScope.blankScreenError = 'Your .wazuh-version index is empty or corrupt.'
             $location.search('tab',null);
-            $location.path('/blank-screen');            
+            $location.path('/blank-screen');
         }
         return;
     } catch (err){
         $rootScope.blankScreenError = err.message || err;
         $location.search('tab',null);
-        $location.path('/blank-screen');  
+        $location.path('/blank-screen');
     }
 }
 
@@ -181,7 +181,7 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
     } else {
         const State = Private(StateProvider);
         const savedObjectsClient = Private(SavedObjectsClientProvider);
-        
+
         savedObjectsClient.find({
             type   : 'index-pattern',
             fields : ['title'],
@@ -218,25 +218,25 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
                 })
                 .catch(error => {
                     deferred.reject(error);
-                    $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);  
+                    $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);
                     $location.path('/blank-screen');
                 });
 
-            })  
+            })
             .catch(error => {
                 deferred.reject(error);
-                $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);  
+                $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);
                 $location.path('/blank-screen');
-            });          
+            });
         })
         .catch(error => {
             deferred.reject(error);
-            $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);  
+            $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);
             $location.path('/blank-screen');
         });
     }
     return deferred.promise;
-    
+
 };
 
 const getSavedSearch = (courier, $q, $window, $rootScope, savedSearches, $route) => {
@@ -271,7 +271,7 @@ routes
             "savedSearch": getSavedSearch
         }
     })
-    .when('/agents-preview', {
+    .when('/agents-preview/:tab?/', {
         template: require('plugins/wazuh/templates/agents-prev/agents-prev.jade'),
         resolve: {
             "checkAPI": settingsWizard

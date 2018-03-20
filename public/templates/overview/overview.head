@@ -1,8 +1,6 @@
 <div flex ng-controller="overviewController" layout="column">
 
-    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'overview'">
-        <wz-menu></wz-menu>
-    </div>
+    <wz-menu ng-init="menuNavItem = 'overview'"></wz-menu>
 
     <div layout="row" layout-align="space-between start" class="wz-md-navbar-kbn">
         <div layout="column" layout-align="center start">

@@ -1,7 +1,7 @@
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope,$rootScope, $routeParams, $location,apiReq, errorHandler) {
+app.controller('managerController', function ($scope, $rootScope, $routeParams, $location, apiReq, errorHandler) {
     $scope.submenuNavItem  = 'status';
     $scope.submenuNavItem2 = 'rules';
 
