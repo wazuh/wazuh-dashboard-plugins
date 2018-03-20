@@ -5,22 +5,22 @@
         <div class="md-toolbar-tools wz-menu-content">
 
             <!-- Wazuh app logo -->
-            <span ng-click="goToClick('#/')" class="wz-margin-right-24 cursor-pointer"><img aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png"></img></span>
+            <span class="wz-margin-right-24 cursor-pointer" ng-click="goToClick('#/')"><img aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png"></img></span>
 
             <!-- Main Wazuh app navigation buttons -->
-            <md-button class="wz-menu-button" ng-click="goToClick('#/overview')" ng-class="{'wz-menu-active': menuNavItem == 'overview' }" aria-label="Overview tab">
+            <md-button class="wz-menu-button" ng-href="#/overview" ng-class="{'wz-menu-active': menuNavItem == 'overview' }" aria-label="Overview tab">
                 <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i> Overview
             </md-button>
 
-            <md-button class="wz-menu-button" ng-click="goToClick('#/manager')" ng-class="{'wz-menu-active': menuNavItem == 'manager' }" aria-label="Manager tab">
+            <md-button class="wz-menu-button" ng-href="#/manager" ng-class="{'wz-menu-active': menuNavItem == 'manager' }" aria-label="Manager tab">
                 <i class="fa fa-fw fa-server" aria-hidden="true"></i> Manager
             </md-button>
 
-            <md-button class="wz-menu-button" ng-click="goToClick('#/agents-preview')" ng-class="{'wz-menu-active': menuNavItem == 'agents' }" aria-label="Agents tab">
+            <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-class="{'wz-menu-active': menuNavItem == 'agents' }" aria-label="Agents tab">
                 <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
             </md-button>
 
-            <md-button class="wz-menu-button" ng-click="goToClick('#/wazuh-discover')" ng-class="{'wz-menu-active': menuNavItem == 'discover' }" aria-label="Discover tab">
+            <md-button class="wz-menu-button" ng-href="#/wazuh-discover" ng-class="{'wz-menu-active': menuNavItem == 'discover' }" aria-label="Discover tab">
                 <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
             </md-button>
 
@@ -30,14 +30,12 @@
             <!-- API/Index pattern section -->
             <!-- Case 1a - There's API -->
             <span ng-show="theresAPI" tooltip="Selected API" tooltip-placement="bottom">
-                <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}
-                <span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
+                <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
             </span>
 
             <!-- Case 1b - There's no API -->
             <span ng-show="!theresAPI" tooltip="No API credentials inserted" tooltip-placement="bottom">
-                No API
-                <span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
+                No API<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
             </span>
 
             <!-- Case 2a - There's pattern and there's more than one -->
@@ -55,7 +53,7 @@
             </span>
 
             <!-- Settings tab button -->
-            <md-button class="wz-menu-button md-icon-button" ng-click="goToClick('#/settings')" ng-class="{'wz-menu-active': menuNavItem == 'settings' }" aria-label="Settings tab">
+            <md-button class="wz-menu-button md-icon-button" ng-href="#/settings" ng-class="{'wz-menu-active': menuNavItem == 'settings' }" aria-label="Settings tab">
                 <i class="fa fa-cog" aria-hidden="true"></i>
             </md-button>
 

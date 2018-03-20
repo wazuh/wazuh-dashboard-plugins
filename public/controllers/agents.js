@@ -134,7 +134,7 @@ app.controller('agentsController',
             }
             $rootScope.ownHandlers = [];
 
-            $rootScope.loadedVisualizations = [];  
+            $rootScope.loadedVisualizations = [];
         });
 
         $scope.$watch('tab', () => {
@@ -150,7 +150,7 @@ app.controller('agentsController',
             $rootScope.ownHandlers = [];
 
             $rootScope.loadedVisualizations = [];
-            
+
             // Update the implicit filter
             if (typeof tabFilters[$scope.tab] !== 'undefined' && tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
             else $rootScope.currentImplicitFilter = (typeof tabFilters[$scope.tab] !== 'undefined') ? tabFilters[$scope.tab].group : '';
