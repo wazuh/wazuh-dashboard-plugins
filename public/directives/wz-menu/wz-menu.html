@@ -44,7 +44,7 @@
             <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" tooltip="Selected index pattern" tooltip-placement="bottom">
                 <select class="wz-menu-select" ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" aria-label="Index pattern selector" placeholder="Index pattern">
                     <option class="wz-menu-select-option" ng-repeat="pattern in patternList" value="{{pattern.id}}">
-                        {{pattern.attributes.title}}
+                        {{pattern.title}}
                     </option>
                 </select>
             </span>
