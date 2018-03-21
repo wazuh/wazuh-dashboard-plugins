@@ -130,6 +130,12 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             const patternList = await genericReq.request('GET','/get-list',{});
             $scope.indexPatterns = patternList.data.data;
             const currentPattern = await genericReq.request('GET', '/api/wazuh-elastic/current-pattern');
+            if(!patternList.data.data.length){
+                $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                $location.search('tab',null);
+                $location.path('/blank-screen');   
+                return;
+            }
             if(!appState.getCurrentPattern()) appState.setCurrentPattern(currentPattern.data.data);
             else {
                 const filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
