@@ -129,6 +129,13 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         try {
             const patternList = await genericReq.request('GET','/get-list',{});
             $scope.indexPatterns = patternList.data.data;
+
+            if(!patternList.data.data.length){
+                $rootScope.blankScreenError = 'Sorry but your user has no access to any valid index pattern'
+                $location.search('tab',null);
+                $location.path('/blank-screen');   
+                return;
+            }
             const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
             for(const entry of data.data) $scope.showEditForm[entry._id] = false;
             
