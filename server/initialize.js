@@ -223,6 +223,10 @@ module.exports = (server, options) => {
      */
     const importAppObjects = async (id,firstTime) => {
         try {
+            const xpack = await elasticRequest.callWithInternalUser('cat.plugins', { });
+            log('initialize.js importAppObjects', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
+            
             const patternId        = 'index-pattern:' + id;
             let indexPatternList = await searchIndexPatternById(id);
 
