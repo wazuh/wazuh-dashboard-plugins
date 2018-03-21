@@ -374,22 +374,31 @@ module.exports = (server, options) => {
             await saveStatus();
     
             const patternId = 'index-pattern:' + index_pattern;
-            await elasticRequest.callWithInternalUser('get', {
-                index: '.kibana',
-                type:  'doc',
-                id: patternId
-            });
 
-            log('monitoring.js init', 'Skipping index-pattern creation. Already exists.', 'info');
-            server.log([blueWazuh, 'monitoring', 'info'], 'Skipping index-pattern creation. Already exists.');
+            // Checks if wazuh-monitoring index pattern is already created, if it fails create it
+            try{
+                log('monitoring.js init', 'Checking if wazuh-monitoring pattern exists...', 'info');
+                server.log([blueWazuh, 'monitoring', 'info'], 'Checking if wazuh-monitoring pattern exists...');
+                await elasticRequest.callWithInternalUser('get', {
+                    index: '.kibana',
+                    type:  'doc',
+                    id: patternId
+                });
+            } catch (error) {
+                log('monitoring.js init', 'Didn\'t find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...');
+                server.log([blueWazuh, 'monitoring', 'info'], "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...");
+                return createWazuhMonitoring();
+            }
+
+            log('monitoring.js init', 'Skipping wazuh-monitoring pattern creation. Already exists.', 'info');
+            server.log([blueWazuh, 'monitoring', 'info'], 'Skipping wazuh-monitoring creation. Already exists.');
             
             return;
  
         } catch (error) {
-            server.log([blueWazuh, 'monitoring', 'error'], error.message);
-            log('monitoring.js init', 'Didn\'t find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...');
-            server.log([blueWazuh, 'monitoring', 'info'], "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...");
-            return createWazuhMonitoring();
+            server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
+            log('monitoring.js init', error.message || error);
+            return;
         }
     };
 
