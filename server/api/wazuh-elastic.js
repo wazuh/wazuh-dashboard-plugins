@@ -329,9 +329,56 @@ module.exports = (server, options) => {
 
     module.exports = getConfig;
 
+    const getAllowedIndices = async roles => {
+        try {
+            const xpacksec = await elasticRequest
+            .callWithInternalUser('search', {
+                    index: '.security-6',
+                    type: 'doc'
+                    
+            });
+
+            let allowedIndices = [];
+            for(const rol of roles){
+                const myIndices = xpacksec.hits.hits.filter(item => item._id === `role-${rol}`);
+                for(let set of myIndices){                    
+                    if(set && set._source && set._source.indices){
+                        for(let index of set._source.indices){
+                            if(index.privileges.includes('read')){
+                                for(let name of index.names){
+                                    allowedIndices.push(name);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return allowedIndices;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    const filterAllowedIndexPatternList = (allowedIndices,list) => {
+        let finalList = [];
+        for(let allowed of allowedIndices){
+            let sanitized = allowed[allowed.length-1] === '*' ? allowed.split('*')[0] : allowed;
+            for(let item of list){
+                if(item.title.includes(sanitized)){
+                    finalList.push(item);
+                }
+            }
+        }
+        return finalList;
+    }
 
     const getlist = async (req,res) => {
         try {
+            const xpack          = await elasticRequest.callWithInternalUser('cat.plugins', { });
+            const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
+            const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
+            const allowedIndices = isXpackEnabled && !isSuperUser ? await getAllowedIndices(req.auth.credentials.roles) : false;
+            
             const data = await elasticRequest
             .callWithInternalUser('search', {
                     index: '.kibana',
@@ -366,7 +413,7 @@ module.exports = (server, options) => {
                     }
            
                 }
-                return res({data: list});
+                return res({data: isXpackEnabled && !isSuperUser ? filterAllowedIndexPatternList(allowedIndices,list) : list});
             }
             
             throw new Error('The Elasticsearch request didn\'t fetch the expected data');
