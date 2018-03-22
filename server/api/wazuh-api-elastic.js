@@ -1,181 +1,121 @@
 module.exports = (server, options) => {
+    const userRegEx  = new RegExp(/^.{3,100}$/);
+    const passRegEx  = new RegExp(/^.{3,100}$/); 
+    const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/); 
+    const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/); 
+    const portRegEx  = new RegExp(/^[0-9]{2,5}$/); 
+
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
     // Handlers
 
-    const getAPIEntries = (req, reply) => {
-        elasticRequest
-        .callWithRequest(req, 'search', {
-            index: '.wazuh',
-            type:  'wazuh-configuration',
-            size:  '100'
-        })
-        .then(data => {
-            reply(data.hits.hits);
-        })
-        .catch(error => {
-            reply(error);
-        });
+    const getAPIEntries = async (req, reply) => {
+        try {
+            const data = await elasticRequest.callWithInternalUser('search', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                size : '100'
+            });
+                
+            return reply(data.hits.hits);
+ 
+        } catch(error){
+            return reply(error);
+        }
     };
 
-    const deleteAPIEntries = (req, reply) => {
-        elasticRequest
-        .callWithRequest(req, 'delete', {
-            index: '.wazuh',
-            type:  'wazuh-configuration',
-            id:    req.params.id
-        })
-        .then(data => {
-            reply(data);
-        })
-        .catch(error => {
-            reply(error);
-        });
+    const deleteAPIEntries = async (req, reply) => {
+        try {
+            const data = await elasticRequest.callWithInternalUser('delete', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id   : req.params.id
+            });
+                
+            return reply(data);
+ 
+        } catch(error){
+            return reply(error);
+        }
     };
 
-    const setAPIEntryDefault = (req, reply) => {
-        // Searching for previous default
-        elasticRequest
-        .callWithRequest(req, 'search', {
-            index: '.wazuh',
-            type:  'wazuh-configuration',
-            q:     'active:true'
-        })
-        .then(data => {
+    const setAPIEntryDefault = async (req, reply) => {
+        try{
+
+            // Searching for previous default
+            const data = await elasticRequest.callWithInternalUser('search', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                q    : 'active:true'
+            });
+    
             if (data.hits.total === 1) {
                 // Setting off previous default
-                elasticRequest.callWithRequest(req, 'update', {
+                await elasticRequest.callWithInternalUser('update', {
                     index: '.wazuh',
-                    type:  'wazuh-configuration',
-                    id:    data.hits.hits[0]._id,
-                    body: {
-                        doc: {
-                            "active": "false"
-                        }
-                    }
-                })
-                .then(() => elasticRequest.callWithRequest(req, 'update', {
-                        index: '.wazuh',
-                        type:  'wazuh-configuration',
-                        id:    req.params.id,
-                        body: {
-                            doc: {
-                                "active": 'true'
-                            }
-                        }
-                    })
-                )
-                .then(() => {
-                    reply({
-                        statusCode: 200,
-                        message:    'ok'
-                    });
-                })
-                .catch(error => {
-                    reply({
-                        statusCode: 500,
-                        error:      8,
-                        message:    'Could not save data in elasticsearch'
-                    }).code(500);
+                    type : 'wazuh-configuration',
+                    id   : data.hits.hits[0]._id,
+                    body : { doc: { active: 'false' } }
                 });
-            } else {
-                // Set new default
-                elasticRequest
-                .callWithRequest(req, 'update', {
-                    index: '.wazuh',
-                    type:  'wazuh-configuration',
-                    id:    req.params.id,
-                    body: {
-                        doc: {
-                            "active": "true"
-                        }
-                    }
-                })
-                .then(() => {
-                    reply({
-                        'statusCode': 200,
-                        'message':    'ok'
-                    });
-                })
-                .catch(error => {
-                    reply({
-                        'statusCode': 500,
-                        'error':      8,
-                        'message':    'Could not save data in elasticsearch'
-                    }).code(500);
-                });
-            }
-        })
-        .catch(error => {
-            reply({
-                'statusCode': 500,
-                'error':      8,
-                'message':    'Could not set API default entry'
-            }).code(500);
-        });
-    };
+            } 
 
-    const getExtensions = (req, reply) => {
-        elasticRequest
-        .callWithRequest(req, 'search', {
-            index: '.wazuh',
-            type:  'wazuh-configuration'
-        })
-        .then(data => {
-            reply(data.hits.hits);
-        })
-        .catch(error => {
-            reply(error);
-        });
-    };
-
-    const toggleExtension = (req, reply) => {
-        // Toggle extenion state
-        let extension = {};
-        extension[req.params.extensionName] = (req.params.extensionValue === 'true');
-
-        elasticRequest
-        .callWithRequest(req, 'update', {
-            index: '.wazuh',
-            type:  'wazuh-configuration',
-            id:    req.params.id,
-            body: {
-                doc: {
-                    "extensions": extension
-                }
-            }
-        })
-        .then(() => {
-            reply({
-                'statusCode': 200,
-                'message':    'ok'
+            // Set new default
+            await elasticRequest.callWithInternalUser('update', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id   : req.params.id,
+                body : { doc: { active: 'true' } }
             });
-        })
-        .catch(error => {
-            reply({
-                'statusCode': 500,
-                'error':      8,
-                'message':    'Could not save data in elasticsearch'
+
+            return reply({ statusCode: 200, message:    'ok' });
+
+        }catch(error){
+            return reply({
+                statusCode: 500,
+                error     : 8,
+                message   : `Could not save data in elasticsearch due to ${error.message || error}`
             }).code(500);
-        });
+        }
     };
 
-    const saveAPI = (req, reply) => {
-        if (!('user' in req.payload) || !('password' in req.payload) || !('url' in req.payload) || !('port' in req.payload)) {
-            return reply({
-                'statusCode': 400,
-                'error': 7,
-                'message': 'Missing data'
-            }).code(400);
+    const getExtensions = async (req, reply) => {
+        try{
+            const data = await elasticRequest.callWithInternalUser('search', {
+                index: '.wazuh',
+                type :  'wazuh-configuration'
+            });
+            return reply(data.hits.hits);
+        } catch(error){
+            return reply(error);
         }
+    };
 
-        const userRegEx  = new RegExp(/^.{3,100}$/);
-        const passRegEx  = new RegExp(/^.{3,100}$/); 
-        const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/); 
-        const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/); 
-        const portRegEx  = new RegExp(/^[0-9]{2,5}$/); 
+    const toggleExtension = async (req, reply) => {
+        try {
+            // Toggle extenion state
+            let extension = {};
+            extension[req.params.extensionName] = (req.params.extensionValue === 'true');
 
+            await elasticRequest.callWithInternalUser('update', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id   : req.params.id,
+                body : { doc: { extensions: extension } }
+            })
+
+            return reply({ statusCode: 200, message: 'ok' });
+
+        } catch (error){
+            return reply({
+                statusCode: 500,
+                error     : 8,
+                message   : `Could not save data in elasticsearch due to ${error.message || error}` 
+            }).code(500);
+        }
+    };
+
+    const validateData = payload => {
         // Validate user
         if(!userRegEx.test(req.payload.user)){
             return reply({ statusCode: 400, error: 10001, message: 'Invalid user field' }).code(400);
@@ -197,131 +137,108 @@ module.exports = (server, options) => {
             return reply({ statusCode: 400, error: 10004, message: 'Invalid port field' }).code(400);
         }
 
-        let settings = {
-            api_user:     req.payload.user,
-            api_password: req.payload.password,
-            url:          req.payload.url,
-            api_port:     req.payload.port,
-            insecure:     req.payload.insecure,
-            component:    'API',
-            active:       req.payload.active,
-            cluster_info: req.payload.cluster_info,
-            extensions:   req.payload.extensions
-        };
+        return false;
+    }
 
-        elasticRequest.callWithRequest(req, 'create', {
-                index:   '.wazuh',
-                type:    'wazuh-configuration',
-                id:      new Date().getTime(),
-                body:    settings,
+    const buildSettingsObject = payload => {
+        return {
+            api_user    : payload.user,
+            api_password: payload.password,
+            url         : payload.url,
+            api_port    : payload.port,
+            insecure    : payload.insecure,
+            component   : 'API',
+            active      : payload.active,
+            cluster_info: payload.cluster_info,
+            extensions  : payload.extensions
+        }
+    }
+
+    const saveAPI = async (req, reply) => {
+        try {
+            if (!('user' in req.payload) || !('password' in req.payload) || !('url' in req.payload) || !('port' in req.payload)) {
+                return reply({
+                    statusCode: 400,
+                    error     : 7,
+                    message   : 'Missing data'
+                }).code(400);
+            }
+    
+            const valid = validateData(req.payload);
+            if(valid) return reply(valid).code(400);
+    
+            const settings = buildSettingsObject(req.payload);
+    
+            const response = await elasticRequest.callWithInternalUser('create', {
+                index  : '.wazuh',
+                type   : 'wazuh-configuration',
+                id     : new Date().getTime(),
+                body   : settings,
                 refresh: true
-        })
-        .then((response) => {
-            reply({
-                statusCode: 200,
-                message:    'ok',
-                response:   response
             });
-        })
-        .catch(error => {
-            reply({
-                statusCode: 500,
-                error:      8,
-                message:    'Could not save data in elasticsearch'
-            }).code(500);
-        });
-    };
 
-    const updateAPIHostname = (req, reply) => {
-        elasticRequest.callWithRequest(req, 'update', {
-            index: '.wazuh',
-            type:  'wazuh-configuration',
-            id:    req.params.id,
-            body: {
-                doc: {
-                    "cluster_info": req.payload.cluster_info
-                }
-            }
-        })
-        .then(() => {
-            reply({
-                statusCode: 200,
-                message:    'ok'
-            });
-        })
-        .catch(error => {
-            reply({
-                statusCode: 500,
-                error:      8,
-                message:    'Could not save data in elasticsearch'
-            }).code(500);
-        });
-    };
-
-    const updateFullAPI = (req, reply) => {
-        if (!('user' in req.payload) || !('password' in req.payload) || !('url' in req.payload) || !('port' in req.payload)) {
+            return reply({ statusCode: 200, message: 'ok', response });
+   
+        } catch (error){
             return reply({
-                'statusCode': 400,
-                'error': 7,
-                'message': 'Missing data'
-            }).code(400);
-        }
-
-        const userRegEx  = new RegExp(/^.{3,100}$/);
-        const passRegEx  = new RegExp(/^.{3,100}$/); 
-        const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/); 
-        const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/); 
-        const portRegEx  = new RegExp(/^[0-9]{2,5}$/); 
-
-        // Validate user
-        if(!userRegEx.test(req.payload.user)){
-            return reply({ statusCode: 400, error: 10001, message: 'Invalid user field' }).code(400);
-        }
-
-        // Validate password
-        if(!passRegEx.test(req.payload.password)){
-            return reply({ statusCode: 400, error: 10002, message: 'Invalid password field' }).code(400);
-        }
-
-        // Validate url
-        if(!urlRegEx.test(req.payload.url) && !urlRegExIP.test(req.payload.url)){
-            return reply({ statusCode: 400, error: 10003, message: 'Invalid url field' }).code(400);
-        }
-
-        // Validate port
-        const validatePort = parseInt(req.payload.port);
-        if(!portRegEx.test(req.payload.port) || validatePort <= 0 || validatePort >= 99999) {
-            return reply({ statusCode: 400, error: 10004, message: 'Invalid port field' }).code(400);
-        }
-
-        const settings = {
-            api_user:     req.payload.user,
-            api_password: req.payload.password,
-            url:          req.payload.url,
-            api_port:     req.payload.port,
-            insecure:     req.payload.insecure,
-            component:    'API',
-            active:       req.payload.active,
-            cluster_info: req.payload.cluster_info,
-            extensions:   req.payload.extensions
-        };
-
-        elasticRequest.callWithRequest(req, 'update', {
-            index: '.wazuh',
-            type : 'wazuh-configuration',
-            id   : req.payload.id,
-            body: {
-                doc: settings
-            }
-        })
-        .then(() => reply({ statusCode: 200, message: 'ok' }))
-        .catch(error => {
-            reply({
                 statusCode: 500,
-                error:      8,
-                message:    'Could not update data in elasticsearch'
+                error     : 8,
+                message   : `Could not save data in elasticsearch due to ${error.message || error}`
             }).code(500);
-        });
+        }
+    };
+
+    const updateAPIHostname = async (req, reply) => {
+        try {
+            await elasticRequest.callWithInternalUser('update', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id   : req.params.id,
+                body : { doc: { cluster_info: req.payload.cluster_info } }
+            });
+
+            return reply({ statusCode: 200, message: 'ok' });
+        
+        } catch (error) {
+            return reply({
+                statusCode: 500,
+                error     : 8,
+                message   : `Could not save data in elasticsearch due to ${error.message || error}`
+            }).code(500);
+        }
+    };
+
+    const updateFullAPI = async (req, reply) => {
+        try {
+            if (!('user' in req.payload) || !('password' in req.payload) || !('url' in req.payload) || !('port' in req.payload)) {
+                return reply({
+                    statusCode: 400,
+                    error     : 7,
+                    message   : 'Missing data'
+                }).code(400);
+            }
+    
+            const valid = validateData(req.payload);
+            if(valid) return reply(valid).code(400);
+    
+            const settings = buildSettingsObject(req.payload);
+    
+            await elasticRequest.callWithInternalUser('update', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id   : req.payload.id,
+                body : { doc: settings }
+            });
+
+            return reply({ statusCode: 200, message: 'ok' });
+
+        } catch (error) {
+            return reply({
+                statusCode: 500,
+                error     : 8,
+                message   : `Could not save data in elasticsearch due to ${error.message || error}`
+            }).code(500);
+        }
     };
 
 
