@@ -142,7 +142,7 @@ module.exports = (server, options) => {
     };
 
     // Get API configuration from elastic and callback to loadCredentials
-    const getConfig = async callback => {
+    const getConfig = async () => {
         try {
             const data = await elasticRequest.callWithInternalUser('search', {
                 index: '.wazuh',
@@ -150,21 +150,21 @@ module.exports = (server, options) => {
             })
             
             if (data.hits.total > 0) {
-                return callback(data.hits);
+                return data.hits;
             }
 
             log('monitoring.js getConfig','no credentials');
-            return callback({
-                'error': 'no credentials',
-                'error_code': 1
-            });
+            return {
+                error     : 'no credentials',
+                error_code: 1
+            };
             
         } catch (error){
             log('monitoring.js getConfig',error.message || error);
-            return callback({
-                'error': 'no elasticsearch',
-                'error_code': 2
-            });
+            return {
+                error     : 'no elasticsearch',
+                error_code: 2
+            };
         }
     };
 
@@ -224,7 +224,14 @@ module.exports = (server, options) => {
     };
 
     // fetchAgents on demand
-    const fetchAgents = () => getConfig(loadCredentials);
+    const fetchAgents = async () => {
+        try {
+            const data = await getConfig();
+            return loadCredentials(data);
+        } catch(error){
+            return Promise.reject(error);
+        }
+    };
 
     // Configure Kibana patterns.
     const configureKibana = async () => {
@@ -429,7 +436,12 @@ module.exports = (server, options) => {
     // Cron tab for getting agent status.
     cron.schedule('0 */10 * * * *', () => {
         agentsArray.length = 0;
-        getConfig(loadCredentials);
+        getConfig()
+        .then(data => loadCredentials(data))
+        .catch(error => {
+            log('monitoring.js',error.message || error);
+            server.log([blueWazuh, 'monitoring', 'error'], error.message || error)
+        });
     }, true);
 
     module.exports = fetchAgents;
