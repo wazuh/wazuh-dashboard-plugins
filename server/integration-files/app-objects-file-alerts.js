@@ -1,4 +1,4 @@
-[
+module.exports = [
 	{
 		"_id": "Wazuh-App-Overview-General-Metric-alerts",
 		"_source": {
