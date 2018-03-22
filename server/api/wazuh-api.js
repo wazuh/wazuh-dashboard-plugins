@@ -14,7 +14,7 @@ const blueWazuh = colors.blue('wazuh');
 const fs   = require('fs');
 const yml  = require('js-yaml');
 const path = require('path');
-const pciRequirementsFile = '../integration-files/pci-requirements.json';
+const pciRequirementsFile = '../integration-files/pci-requirements';
 
 module.exports = (server, options) => {
 
