@@ -1,7 +1,6 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
 app.controller('agentsPreviewController', function ($scope, $rootScope, $routeParams, genericReq, apiReq, appState, Agents, $location, errorHandler) {
-    $scope.submenuNavItem  = 'preview';
     $scope.loading     = true;
     $scope.agents      = Agents;
     $scope.status      = 'all';
