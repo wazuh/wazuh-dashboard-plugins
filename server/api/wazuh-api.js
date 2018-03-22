@@ -137,109 +137,111 @@ module.exports = (server, options) => {
         });
     };
 
+    const validateCheckApiParams = payload =>  {
+        if (!('user' in payload)) {
+            return genericErrorBuilder(400,3,'Missing param: API USER');
+        } 
+
+        if (!('password' in payload)) {
+            return genericErrorBuilder(400,4,'Missing param: API PASSWORD');
+        } 
+        
+        if (!('url' in payload)) {
+            return genericErrorBuilder(400,5,'Missing param: API URL');
+        } 
+        
+        if (!('port' in payload)) {
+            return genericErrorBuilder(400,6,'Missing param: API PORT');
+        } 
+        
+        if (!(payload.url.includes('https://')) && !(payload.url.includes('http://'))) {
+            return genericErrorBuilder(200,1,'protocol_error');
+        } 
+
+        return false;
+    }
 
     const genericErrorBuilder = (status,code,message) => {
         return {
             statusCode: status,
-            error:      code,
-            message:    message || 'Error ocurred'
+            error     : code,
+            message   :message || 'Error ocurred'
         };
     }
 
-    const checkAPI = (req, reply) => {
-        
-        if (!('user' in req.payload)) {
-            return reply(genericErrorBuilder(400,3,'Missing param: API USER'));
-        } 
+    const checkAPI = async (req, reply) => {
+        try {
+            const notValid = validateCheckApiParams(req.payload);
+            if(notValid) return genericErrorBuilder(valid);
 
-        if (!('password' in req.payload)) {
-            return reply(genericErrorBuilder(400,4,'Missing param: API PASSWORD'));
-        } 
+            req.payload.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
         
-        if (!('url' in req.payload)) {
-            return reply(genericErrorBuilder(400,5,'Missing param: API URL'));
-        } 
-        
-        if (!('port' in req.payload)) {
-            return reply(genericErrorBuilder(400,6,'Missing param: API PORT'));
-        } 
-        
-        if (!(req.payload.url.includes('https://')) && !(req.payload.url.includes('http://'))) {
-            return reply(genericErrorBuilder(200,1,'protocol_error'));
-        } 
-
-        req.payload.password = Buffer.from(req.payload.password, 'base64').toString("ascii");
-        
-        needle('get', `${req.payload.url}:${req.payload.port}/version`, {}, {
-            username:           req.payload.user,
-            password:           req.payload.password,
-            rejectUnauthorized: !req.payload.insecure
-        })
-        .then(response => {
-
+            let response = await needle('get', `${req.payload.url}:${req.payload.port}/version`, {}, {
+                username          : req.payload.user,
+                password          : req.payload.password,
+                rejectUnauthorized: !req.payload.insecure
+            })
+            
+    
             // Check wrong credentials
             if(parseInt(response.statusCode) === 401){
                 return reply(genericErrorBuilder(500,10401,'wrong_credentials')).code(500);
             }
-
+    
             if (parseInt(response.body.error) === 0 && response.body.data) {
-                needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
-                    username:           req.payload.user,
-                    password:           req.payload.password,
+                    
+                response = await needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
+                    username          : req.payload.user,
+                    password          : req.payload.password,
                     rejectUnauthorized: !req.payload.insecure
                 })
-                .then(response => {
+      
+                if (!response.body.error) {
+                    const managerName = response.body.data.name;
+                    
+                    response = await needle('get', `${req.payload.url}:${req.payload.port}/cluster/status`, {}, { // Checking the cluster status
+                        username          : req.payload.user,
+                        password          : req.payload.password,
+                        rejectUnauthorized: !req.payload.insecure
+                    })
+
                     if (!response.body.error) {
-                        var managerName = response.body.data.name;
-                        needle('get', `${req.payload.url}:${req.payload.port}/cluster/status`, {}, { // Checking the cluster status
-                            username:           req.payload.user,
-                            password:           req.payload.password,
-                            rejectUnauthorized: !req.payload.insecure
-                        })
-                        .then(response => {
+                        if (response.body.data.enabled === 'yes') { 
+                            
+                            // If cluster mode is active
+                            response = await needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
+                                username          : req.payload.user,
+                                password          : req.payload.password,
+                                rejectUnauthorized: !req.payload.insecure
+                            })
+
                             if (!response.body.error) {
-                                if (response.body.data.enabled === 'yes') { // If cluster mode is active
-                                    needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
-                                        username:           req.payload.user,
-                                        password:           req.payload.password,
-                                        rejectUnauthorized: !req.payload.insecure
-                                    })
-                                    .then(response => {
-                                        if (!response.body.error) {
-                                            reply({
-                                                "manager": managerName,
-                                                "node":    response.body.data.node,
-                                                "cluster": response.body.data.cluster,
-                                                "status": 'enabled'
-                                            });
-                                        } else {
-                                            return reply(genericErrorBuilder(500,7,response.body.message)).code(500);
-                                        }
-                                    })
-                                    .catch(error => reply(genericErrorBuilder(500,5,error.message || error)).code(500)); 
-                                }
-                                else { // Cluster mode is not active
-                                    return reply({
-                                        manager: managerName,
-                                        cluster: 'Disabled',
-                                        status : 'disabled'
-                                    });
-                                }
-                            } else {
-                                return reply(genericErrorBuilder(500,5,response.body.message)).code(500);
-                            }
-                        })
-                        .catch(error => reply(genericErrorBuilder(500,5,error.message || error)).code(500)); 
-                    } else {
-                        return reply(genericErrorBuilder(500,5,response.body.message)).code(500);
+                                return reply({
+                                    manager: managerName,
+                                    node   :    response.body.data.node,
+                                    cluster: response.body.data.cluster,
+                                    status : 'enabled'
+                                });
+                            } 
+                            
+                        } else { 
+                            
+                            // Cluster mode is not active
+                            return reply({
+                                manager: managerName,
+                                cluster: 'Disabled',
+                                status : 'disabled'
+                            });
+                        }
                     }
-                })
-                .catch(error => reply(genericErrorBuilder(500,5,error.message || error)).code(500)); 
-            } else {
-                return reply(genericErrorBuilder(500,5,response.body.message)).code(500);
-            }
-        })
-        .catch(error => reply(genericErrorBuilder(500,5,error.message || error)).code(500));        
+                }
+            } 
+              
+            throw new Error(response.body.message)
+
+        } catch(error) {
+            return reply(genericErrorBuilder(500,5,error.message || error)).code(500);
+        }
     };
 
     const getPciRequirement = (req, reply) => {
@@ -295,8 +297,12 @@ module.exports = (server, options) => {
                     }
                 });
             }
-        } catch (e) {
-            return reply({ statusCode: 400, error: '9999', data: 'An error occurred trying to obtain PCI DSS requirements' });
+        } catch (error) {
+            return reply({ 
+                statusCode: 400, 
+                error     : '9999', 
+                data      : `An error occurred trying to obtain PCI DSS requirements due to ${error.message || error}` 
+            });
         }
 
     };
@@ -304,46 +310,45 @@ module.exports = (server, options) => {
     const errorControl = (error, response) => {
         if (error) {
             return ({
-                'isError': true,
-                'body': {
-                    'statusCode':   500,
-                    'error':        5,
-                    'message':      'Request error',
-                    'errorMessage': error.message
+                isError: true,
+                body: {
+                    statusCode  : 500,
+                    error       : 5,
+                    message     : 'Request error',
+                    errorMessage: error.message || error
                 }
             });
         } else if (!error && response.body.error) {
             return ({
-                'isError': true,
-                'body': {
-                    'statusCode': 500,
-                    'error':      6,
-                    'message':    'Wazuh api error',
-                    'errorData':  response.body
+                isError: true,
+                body: {
+                    statusCode: 500,
+                    error     : 6,
+                    message   : 'Wazuh api error',
+                    errorData : response.body
                 }
             });
         }
-        return ({
-            'isError': false
-        });
+
+        return ({ isError: false });
     };
 
     const makeRequest = (method, path, data, id, reply) => {
-        getConfig(id, (wapi_config) => {
+        getConfig(id, wapi_config => {
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
                 return reply({
-                    'statusCode': 404,
-                    'error':      2,
-                    'message':    'Could not connect with elasticsearch'
+                    statusCode: 404,
+                    error     : 2,
+                    message   : 'Could not connect with elasticsearch'
                 }).code(404);
                 
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
                 return reply({
-                    'statusCode': 404,
-                    'error':      1,
-                    'message':    'Credentials does not exists'
+                    statusCode: 404,
+                    error     : 1,
+                    message   : 'Credentials does not exists'
                 }).code(404);
                 
             }
@@ -352,7 +357,7 @@ module.exports = (server, options) => {
                 data = {};
             }
 
-            var options = {
+            const options = {
                 headers: {
                     'wazuh-app-version': packageInfo.version
                 },
@@ -438,31 +443,32 @@ module.exports = (server, options) => {
                 'statusCode': 500,
                 'message':    'You must provide at least one error message to log'
             });
+        
         } else {
+            
             server.log([blueWazuh, 'client', 'error'], req.payload.message);
             if (req.payload.details) {
                 server.log([blueWazuh, 'client', 'error'], req.payload.details);
             }
-            return reply({
-                'statusCode': 200,
-                'message':    'Error logged succesfully'
-            });
+
+            return reply({ statusCode: 200, message: 'Error logged succesfully' });
         }
     };
 
     const getConfigurationFile = (req,reply) => {
         try{
-
-            //if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
+  
             if(configFile && configFile['login.password']){
                 delete configFile['login.password'];
             }
+            
             return reply({
                 statusCode: 200,
-                error:      0,
-                data:       configFile || {}
+                error     : 0,
+                data      : configFile || {}
             });
+
         } catch (error) {
             return reply(genericErrorBuilder(500,6,error.message || error)).code(500)
         }
@@ -470,25 +476,28 @@ module.exports = (server, options) => {
 
     const login = (req,reply) => {
         try{
+            
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
+
             if(!configFile){
-                throw Error('Configuration file not found');
+                throw new Error('Configuration file not found');
             }
+
             if(!req.payload.password) {
                 return reply(genericErrorBuilder(401,7,'Please give me a password.')).code(401)
             } else if(req.payload.password !== configFile['login.password']){
                 return reply(genericErrorBuilder(401,7,'Wrong password, please try again.')).code(401)
             }
+
             const code = (new Date()-1) + 'wazuhapp';
+
             sessions[code] = {
                 created: new Date(),
                 exp    : 86400
             }
-            return reply({
-                statusCode: 200,
-                error:      0,
-                code: code
-            });
+
+            return reply({ statusCode: 200, error: 0, code });
+
         } catch (error) {
             return reply(genericErrorBuilder(500,6,error.message || error)).code(500)
         }
