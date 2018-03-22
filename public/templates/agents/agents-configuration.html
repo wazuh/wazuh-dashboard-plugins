@@ -47,8 +47,8 @@
         <div layout="row">
             <md-card flex class="wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-metric">
-                    <div flex>Group: <span ng-click="goGroup()" class="wz-font-weight-bold wz-text-link" tooltip="Click to go to the group details" tooltip-placement="right">{{groupName}}</span></div>
-                    <div flex>Configuration status: <span class="wz-font-weight-bold" tooltip="The current synchronization status" tooltip-placement="right">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></div>
+                    <div class="wz-text-truncatable" flex>Group: <span ng-click="goGroup()" class="wz-text-bold wz-text-link" tooltip="Click to go to the group details" tooltip-placement="right">{{groupName}}</span></div>
+                    <div class="wz-text-truncatable" flex>Configuration status: <span class="wz-text-bold" tooltip="The current synchronization status" tooltip-placement="right">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span></div>
                 </md-card-content>
             </md-card>
         </div>
