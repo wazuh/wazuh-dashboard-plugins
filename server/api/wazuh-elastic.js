@@ -378,7 +378,7 @@ module.exports = (server, options) => {
             const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
             const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
             const allowedIndices = isXpackEnabled && !isSuperUser ? await getAllowedIndices(req.auth.credentials.roles) : false;
-            
+
             const data = await elasticRequest
             .callWithInternalUser('search', {
                     index: '.kibana',
@@ -419,7 +419,7 @@ module.exports = (server, options) => {
             throw new Error('The Elasticsearch request didn\'t fetch the expected data');
 
         } catch(error){
-            return res({error: error.message}).code(500)
+            return res({error: error.message || error}).code(500)
         }
     }
 
