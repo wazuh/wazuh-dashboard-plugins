@@ -32,6 +32,8 @@ All notable changes to the Wazuh app project will be documented in this file.
   - Cleaned and refactored code
   - Revamped design, smaller and with minor details to follow the rest of Wazuh app guidelines.
 - **New design for the wz-chip component** to follow the new Wazuh app guidelines ([#323](https://github.com/wazuh/wazuh-kibana-app/pull/323)).
+- Added **more descriptive error messages** when the user inserts bad credentials on the *Add new API* form in the *Settings* tab ([#331](https://github.com/wazuh/wazuh-kibana-app/pull/331)).
+- Added a new CSS class to **truncate overflowing text** on tables and metric ribbons ([#332](https://github.com/wazuh/wazuh-kibana-app/pull/332)).
 
 ### Changed
 - **Improved the initialization system** ([#317](https://github.com/wazuh/wazuh-kibana-app/pull/317)):
