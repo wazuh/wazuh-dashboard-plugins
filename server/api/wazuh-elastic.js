@@ -29,99 +29,95 @@ module.exports = (server, options) => {
             }
 
         } catch (err) {
-            reply({
-                'statusCode': 500,
-                'error':      99,
-                'message':    err.message || 'Could not fetch .wazuh-version index'
+            return reply({
+                statusCode: 500,
+                error     : 99,
+                message   : err.message || 'Could not fetch .wazuh-version index'
             }).code(500);
         }
     }
 
     //Handlers
-    const fetchElastic = (req, payload) => {
-        return elasticRequest.callWithRequest(req, 'search', {
-            index: 'wazuh-alerts-3.x-*',
-            type:  'wazuh',
-            body:  payload
-        });
+    const fetchElastic = async (req, payload) => {
+        try {
+            const data = await elasticRequest.callWithInternalUser('search', {
+                index: 'wazuh-alerts-3.x-*',
+                type:  'wazuh',
+                body:  payload
+            });
+
+            return data;
+        } catch (error) {
+            return Promise.reject(error);
+        }
     };
 
-    const getConfig = (id, callback) => {
-        elasticRequest.callWithInternalUser('get', {
-            index: '.wazuh',
-            type:  'wazuh-configuration',
-            id:     id
-        })
-        .then(data => {
-            callback({
-                'user':         data._source.api_user,
-                'password':     Buffer.from(data._source.api_password, 'base64').toString("ascii"),
-                'url':          data._source.url,
-                'port':         data._source.api_port,
-                'insecure':     data._source.insecure,
-                'cluster_info': data._source.cluster_info,
-                'extensions':   data._source.extensions
+    const getConfig = async (id, callback) => {
+        try {
+            const data = await elasticRequest.callWithInternalUser('get', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id
             });
-        })
-        .catch(error => {
-            callback({
-                'error': 'no elasticsearch',
-                'error_code': 2
+
+            return callback({
+                user        : data._source.api_user,
+                password    : Buffer.from(data._source.api_password, 'base64').toString("ascii"),
+                url         : data._source.url,
+                port        : data._source.api_port,
+                insecure    : data._source.insecure,
+                cluster_info: data._source.cluster_info,
+                extensions  : data._source.extensions
             });
-        });
+
+        } catch (error){
+            return   callback({ error: 'no elasticsearch', error_code: 2 });
+        }
     };
 
     // Updating Wazuh app visualizations and dashboards
-    const updateAppObjects = (req, reply) => {
-        elasticRequest.callWithInternalUser('deleteByQuery', { 
-            index: '.kibana', 
-            body: {
-                'query': {
-                    'bool': {
-                        'must': {
-                            'match': {
-                                "visualization.title": 'Wazuh App*'
-                            }
-                        },
-                        'must_not': {
-                            "match": {
-                                "visualization.title": 'Wazuh App Overview General Agents status'
-                            }
+    const updateAppObjects = async (req, reply) => {
+        try {
+            await elasticRequest.callWithInternalUser('deleteByQuery', { 
+                index: '.kibana', 
+                body : {
+                    query: {
+                        bool: {
+                            must: { match: { 'visualization.title': 'Wazuh App*' } },
+                            must_not: { match: { 'visualization.title': 'Wazuh App Overview General Agents status' } }
                         }
                     }
-                }
-            } 
-        })
-        .then(resp => {
+                } 
+            })
+
             // Update the pattern in the configuration
             importAppObjects(req.params.pattern);
-            reply({
-                'statusCode': 200,
-                'data':       'Index pattern updated'
-            });
-        })
-        .catch(error => {
-            reply({
-                'statusCode': 500,
-                'error':      9,
-                'message':    'Could not delete visualizations'
+            
+            return reply({ statusCode: 200, data: 'Index pattern updated' });
+    
+        } catch (error) {
+            return reply({
+                statusCode: 500,
+                error     : 9,
+                message   : `Could not delete visualizations due to ${error.message || error}`
             }).code(500);
-        });
+        }
     };
 
-    const getTemplate = (req, reply) => {
-        elasticRequest.callWithInternalUser('cat.templates', {})
-        .then(data => {
+    const getTemplate = async (req, reply) => {
+        try {
+            const data = await elasticRequest.callWithInternalUser('cat.templates', {})
+
             if (req.params.pattern == "wazuh-alerts-3.x-*" && data.includes("wazuh-alerts-3.*")) {
-                reply({
-                    'statusCode': 200,
-                    'status': true,
-                    'data': `Template found for ${req.params.pattern}`
+                return reply({
+                    statusCode: 200,
+                    status    : true,
+                    data      : `Template found for ${req.params.pattern}`
                 });   
             } else {
-                let lastChar = req.params.pattern[req.params.pattern.length -1];
-                let array = data.match(/[^\s]+/g);
-                let found = false;
+
+                const lastChar = req.params.pattern[req.params.pattern.length -1];
+                const array    = data.match(/[^\s]+/g);
 
                 let pattern = req.params.pattern;
                 if (lastChar === '*') { // Remove last character if it is a '*'
@@ -130,147 +126,102 @@ module.exports = (server, options) => {
 
                 for (let i = 1; i < array.length; i++) {
                     if (array[i].includes(pattern) && array[i-1] == `wazuh`) {
-                        found = true;
-                        reply({
-                            'statusCode': 200,
-                            'status': true,
-                            'data': `Template found for ${req.params.pattern}`
+                        return reply({
+                            statusCode: 200,
+                            status    : true,
+                            data      : `Template found for ${req.params.pattern}`
                         });    
                     }
                 }
-                if (!found) {
-                    reply({
-                        'statusCode': 200,
-                        'status': false,
-                        'data': `No template found for ${req.params.pattern}`
-                    });      
-                }
-            }
-        })
-        .catch(error => {
-            reply({
-                'statusCode': 500,
-                'error':      10000,
-                'message':    'Could not retrieve templates from Elasticsearch'
-            }).code(500);
-        }); 
-    };
 
-    const checkPattern = (req, reply) => {
-        elasticRequest.callWithInternalUser('search', { 
-            index: '.kibana', 
-            body: {
-                'query': {
-                    'bool': {
-                        'must': {
-                            'match': {
-                                "type": 'index-pattern'
-                            }
-                        }
-                    }
-                }
-            } 
-        })
-        .then((response) => {
-            // Looking for the pattern
-            for (let i = 0, len = response.hits.hits.length; i < len; i++) {
-                if (response.hits.hits[i]._source['index-pattern'].title == req.params.pattern) {
-                    return reply({
-                        'statusCode': 200,
-                        'status': true,
-                        'data': 'Index pattern found'
-                    });
-                }
+                return reply({
+                    statusCode: 200,
+                    status    : false,
+                    data      : `No template found for ${req.params.pattern}`
+                });     
             }
+
+        } catch (error){
             return reply({
-                'statusCode': 200,
-                'status': false, 
-                'data': 'Index pattern not found'
-            });
-        })
-        .catch(error => {
-            reply({
-                'statusCode': 500,
-                'error':      10000,
-                'message':    'Something went wrong retrieving index-patterns from Elasticsearch'
+                statusCode: 500,
+                error     : 10000,
+                message   : `Could not retrieve templates from Elasticsearch due to ${error.message || error}`
             }).code(500);
-        });
+        }
     };
 
-    const getFieldTop = (req, reply) => {
+    const checkPattern = async (req, reply) => {
+        try {
+            const response = await elasticRequest.callWithInternalUser('search', { 
+                index: '.kibana', 
+                body : { query: { bool: { must: { match: { type: 'index-pattern' } } } } } 
+            })
 
-        // Top field payload
-        var payload = {
-            "size": 1,
-            "query": {
-                "bool": {
-                    "must": [],
-                    "filter": {
-                        "range": {
-                            "@timestamp": {}
-                        }
-                    }
-                }
-            },
-            "aggs": {
-                "2": {
-                    "terms": {
-                        "field": "",
-                        "size": 1,
-                        "order": {
-                            "_count": "desc"
-                        }
-                    }
-                }
-            }
-        };
+            const filtered = response.hits.hits.filter(item => item._source['index-pattern'].title === req.params.pattern);
 
-        // Set up time interval, default to Last 24h
-        const timeGTE = 'now-1d';
-        const timeLT  = 'now';
-        payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
-        payload.query.bool.filter.range['@timestamp']['lt']  = timeLT;
-
-        if (req.params.mode === 'cluster') {
-            // Set up match for default cluster name
-            payload.query.bool.must.push({
-                "match": {
-                    "cluster.name": req.params.cluster
-                }
-            });
-        } else {
-            // Set up match for default cluster name
-            payload.query.bool.must.push({
-                "match": {
-                    "manager.name": req.params.cluster
-                }
-            });
-        }
-
-        payload.aggs['2'].terms.field = req.params.field;
-
-        fetchElastic(req, payload)
-        .then(data => {
-
-            if (data.hits.total === 0 || typeof data.aggregations['2'].buckets[0] === 'undefined'){
-                reply({
-                    'statusCode': 200,
-                    'data':       ''
-                });
-            } else {
-                reply({
-                    'statusCode': 200,
-                    'data':       data.aggregations['2'].buckets[0].key
-                });
-            }
-        })
-        .catch(error => {
-            reply({
-                'statusCode': 500,
-                'error':      9,
-                'message':    error
+            return filtered.length >= 1 ?
+                   reply({ statusCode: 200, status: true, data: 'Index pattern found' }) :
+                   reply({ statusCode: 200, status: false, data: 'Index pattern not found' });
+        
+        } catch (error) {
+            return reply({
+                statusCode: 500,
+                error     : 10000,
+                message   : `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message || error}`
             }).code(500);
-        });
+        }
+    };
+
+    const getFieldTop = async (req, reply) => {
+        try{
+            // Top field payload
+            let payload = {
+                size: 1,
+                query: {
+                    bool: {
+                        must  : [],
+                        filter: { range: { '@timestamp': {} } }
+                    }
+                },
+                aggs: {
+                    '2': {
+                        terms: {
+                            field: '',
+                            size : 1,
+                            order: { _count: 'desc' } 
+                        }
+                    }
+                }
+            };
+
+            // Set up time interval, default to Last 24h
+            const timeGTE = 'now-1d';
+            const timeLT  = 'now';
+            payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
+            payload.query.bool.filter.range['@timestamp']['lt']  = timeLT;
+
+            // Set up match for default cluster name
+            payload.query.bool.must.push(
+                req.params.mode === 'cluster'                     ?
+                { match: { 'cluster.name': req.params.cluster } } :
+                { match: { 'manager.name': req.params.cluster } }
+            );
+     
+            payload.aggs['2'].terms.field = req.params.field;
+
+            const data = await fetchElastic(req, payload);
+
+            return (data.hits.total === 0 || typeof data.aggregations['2'].buckets[0] === 'undefined') ?
+                    reply({ statusCode: 200, data: '' }) :
+                    reply({ statusCode: 200, data: data.aggregations['2'].buckets[0].key });
+
+        } catch (error) {
+            return reply({
+                statusCode: 500,
+                error     : 9,
+                message   : error.message || error
+            }).code(500);
+        }
     };
 
     const getSetupInfo = (req, reply) => {
