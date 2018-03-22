@@ -224,87 +224,74 @@ module.exports = (server, options) => {
         }
     };
 
-    const getSetupInfo = (req, reply) => {
-        elasticRequest
-        .callWithInternalUser('search', {
-                index: '.wazuh-version',
-                type: 'wazuh-version'
-        })
-        .then(data => {
-            if (data.hits.total === 0) {
-                reply({
-                    'statusCode': 200,
-                    'data':       ''
-                });
-            } else {
-                reply({
-                    'statusCode': 200,
-                    'data':       data.hits.hits[0]._source
-                });
-            }
-        })
-        .catch(error => {
-            reply({
-                'statusCode': 500,
-                'error':      9,
-                'message':    'Could not get data from elasticsearch'
+    const getSetupInfo = async (req, reply) => {
+        try {
+            const data = await elasticRequest.callWithInternalUser('search', {
+                    index: '.wazuh-version',
+                    type : 'wazuh-version'
+            })
+            
+            return data.hits.total === 0 ?
+                   reply({ statusCode: 200, data: '' }) :
+                   reply({ statusCode: 200, data: data.hits.hits[0]._source });
+                
+            
+        } catch (error) {
+            return reply({
+                statusCode: 500,
+                error     : 9,
+                message   : `Could not get data from elasticsearch due to ${error.message || error}`
             }).code(500);
-        });
+        }
     };
 
-    const getCurrentlyAppliedPattern = (req, reply) => {
-        // We search for the currently applied pattern in the visualizations
-        elasticRequest .callWithInternalUser('search', {
-            index: '.kibana',
-            type:  'doc',
-            q:     `visualization.title:"Wazuh App Overview General Metric alerts"`
-        })
-        .then(data => {
+    const getCurrentlyAppliedPattern = async (req, reply) => {
+        try{
+            // We search for the currently applied pattern in the visualizations
+            const data = await elasticRequest .callWithInternalUser('search', {
+                index: '.kibana',
+                type : 'doc',
+                q    : `visualization.title:"Wazuh App Overview General Metric alerts"`
+            })
+
             if(data && data.hits && data.hits.hits && data.hits.hits[0] && data.hits.hits[0]._source){
                 return reply({
                     statusCode: 200,
-                    data:       JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index
+                    data      : JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index
                 });
-            } else {
-                throw Error('no_visualization');
-            }
-        })
-        .catch(error => {
-            if(error && error.message && error.message === 'no_visualization'){
-                return reply('kibana_index_pattern_error').code(500);
-            }
+            } 
             
-            return reply('elasticsearch_down').code(500);
-        });
+            throw new Error('no_visualization');
+
+        } catch (error) {
+            return (error && error.message && error.message === 'no_visualization') ?
+                   reply('kibana_index_pattern_error').code(500) :
+                   reply('elasticsearch_down').code(500);
+        }
     };
 
     module.exports = getConfig;
 
     const getAllowedIndices = async roles => {
         try {
-            const xpacksec = await elasticRequest
-            .callWithInternalUser('search', {
-                    index: '.security-6',
-                    type: 'doc'
-                    
+            const xpacksec = await elasticRequest.callWithInternalUser('search', {
+                index: '.security-6',
+                type : 'doc'
             });
 
             let allowedIndices = [];
             for(const rol of roles){
-                const myIndices = xpacksec.hits.hits.filter(item => item._id === `role-${rol}`);
-                for(let set of myIndices){                    
-                    if(set && set._source && set._source.indices){
-                        for(let index of set._source.indices){
-                            if(index.privileges.includes('read')){
-                                for(let name of index.names){
-                                    allowedIndices.push(name);
-                                }
-                            }
-                        }
+                const myIndices = xpacksec.hits.hits.filter(item => item._id === `role-${rol}` && item._source && item._source.indices);
+                for(const set of myIndices){                    
+                    const filteredIndices = set._source.indices.filter(item => item.privileges.includes('read'));
+                    for(const index of filteredIndices){
+                        allowedIndices.push(...index.names);
                     }
                 }
             }
+
             return allowedIndices;
+
         } catch (error) {
             return Promise.reject(error);
         }
@@ -313,12 +300,9 @@ module.exports = (server, options) => {
     const filterAllowedIndexPatternList = (allowedIndices,list) => {
         let finalList = [];
         for(let allowed of allowedIndices){
-            let sanitized = allowed[allowed.length-1] === '*' ? allowed.split('*')[0] : allowed;
-            for(let item of list){
-                if(item.title.includes(sanitized)){
-                    finalList.push(item);
-                }
-            }
+            const sanitized = allowed[allowed.length-1] === '*' ? allowed.split('*')[0] : allowed;
+            const filtered  = list.filter(item => item.title.includes(sanitized));
+            if(filtered.length) finalList.push(...filtered)
         }
         return finalList;
     }
@@ -358,7 +342,7 @@ module.exports = (server, options) => {
                     valid = parsed.filter(item => minimum.includes(item.name));
                     if(valid.length === 4){
                         list.push({
-                            id: index._id.split('index-pattern:')[1],
+                            id   : index._id.split('index-pattern:')[1],
                             title: index._source['index-pattern'].title
                         })
                     }
