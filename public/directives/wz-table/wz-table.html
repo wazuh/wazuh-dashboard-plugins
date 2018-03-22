@@ -4,7 +4,7 @@
         <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data.items | filter : searchTerm"
             class="wz-table-common" ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' "
             ng-click="clickAction(full ? item : $index)">
-            <div class="wz-text-truncatable" ng-repeat="key in keys" flex="{{key.size || ''}}">
+            <div ng-class="key.truncatable === 'true' ? 'wz-text-truncatable' : ''" ng-repeat="key in keys" flex="{{key.size || ''}}">
                 <span>{{parseItem(item,key) || '---'}}</span>
             </div>
         </div>
@@ -13,7 +13,7 @@
     <div ng-if="!isagents && noscroll" flex class="wz-table-scroll">
         <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data" class="wz-table-common"
             ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' " ng-click="clickAction($index)">
-            <div class="wz-text-truncatable" ng-repeat="key in keys" flex="{{key.size || ''}}">
+            <div ng-class="key.truncatable === 'true' ? 'wz-text-truncatable' : ''" ng-repeat="key in keys" flex="{{key.size || ''}}">
                 <span>{{parseItem(item,key) || '---'}}</span>
             </div>
         </div>
