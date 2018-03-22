@@ -30,111 +30,103 @@ module.exports = (server, options) => {
     
  
 
-    const checkStoredAPI = (req, reply) => {
-        if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
-        // Get config from elasticsearch
-        getConfig(req.payload, (wapi_config) => {
+    const checkStoredAPI = async (req, reply) => {
+        try{
+            if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
+            // Get config from elasticsearch
+            const wapi_config = await getConfig(req.payload)
+                
             if (wapi_config.error_code > 1) {
                 // Can not connect to elasticsearch
-                reply({
-                    'statusCode': 200,
-                    'error':      '1',
-                    'data':       'no_elasticsearch'
-                });
-                return;
+                return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
+                
             } else if (wapi_config.error_code > 0) {
                 // Credentials not found
-                reply({
-                    'statusCode': 400,
-                    'error':      '2',
-                    'data':       'no_credentials'
-                });
-                return;
+                return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
             }
 
-            needle('get', `${wapi_config.url}:${wapi_config.port}/version`, {}, {
-                username:           wapi_config.user,
-                password:           wapi_config.password,
+            let response = await needle('get', `${wapi_config.url}:${wapi_config.port}/version`, {}, {
+                username          : wapi_config.user,
+                password          : wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
             })
-            .then((response) => {
-                if (parseInt(response.body.error) === 0 && response.body.data) {
-                    needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/status`, {}, { // Checking the cluster status
-                        username:           wapi_config.user,
-                        password:           wapi_config.password,
-                        rejectUnauthorized: !wapi_config.insecure
-                    })
-                    .then((response) => {
+
+            if (parseInt(response.body.error) === 0 && response.body.data) {
+                // Checking the cluster status
+                response = await needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/status`, {}, { 
+                    username          : wapi_config.user,
+                    password          : wapi_config.password,
+                    rejectUnauthorized: !wapi_config.insecure
+                })
+
+                if (!response.body.error) {
+                    // If cluster mode is active
+                    if (response.body.data.enabled === 'yes') { 
+                        response = await needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/node`, {}, {
+                            username          : wapi_config.user,
+                            password          : wapi_config.password,
+                            rejectUnauthorized: !wapi_config.insecure
+                        })
+             
                         if (!response.body.error) {
-                            if (response.body.data.enabled === 'yes') { // If cluster mode is active
-                                needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/node`, {}, {
-                                    username:           wapi_config.user,
-                                    password:           wapi_config.password,
-                                    rejectUnauthorized: !wapi_config.insecure
-                                })
-                                .then((response) => {
-                                    if (!response.body.error) {
-                                        let managerName = wapi_config.cluster_info.manager;
-                                        delete wapi_config.cluster_info;
-                                        wapi_config.cluster_info = {};
-                                        wapi_config.cluster_info.status = 'enabled';
-                                        wapi_config.cluster_info.manager = managerName;
-                                        wapi_config.cluster_info.node = response.body.data.node;
-                                        wapi_config.cluster_info.cluster = response.body.data.cluster;
-                                        reply({
-                                            'statusCode': 200,
-                                            'data': wapi_config
-                                        });
-                                    } else if (response.body.error){
-                                        reply({
-                                            'statusCode': 500,
-                                            'error':      7,
-                                            'message':    response.body.message
-                                        }).code(500);
-                                    }
-                                });
-                            }
-                            else { // Cluster mode is not active
-                                let managerName = wapi_config.cluster_info.manager;
-                                delete wapi_config.cluster_info;
-                                wapi_config.cluster_info = {};
-                                wapi_config.cluster_info.status = 'disabled';
-                                wapi_config.cluster_info.cluster = 'Disabled';
-                                wapi_config.cluster_info.manager = managerName;
-                                reply({
-                                    'statusCode': 200,
-                                    'data': wapi_config
-                                });
-                            }
-                        } else {
-                            reply({
-                                'statusCode': 500,
-                                'error':      5,
-                                'message':    'Error occurred'
+                            let managerName = wapi_config.cluster_info.manager;
+                            delete wapi_config.cluster_info;
+                            wapi_config.cluster_info         = {};
+                            wapi_config.cluster_info.status  = 'enabled';
+                            wapi_config.cluster_info.manager = managerName;
+                            wapi_config.cluster_info.node    = response.body.data.node;
+                            wapi_config.cluster_info.cluster = response.body.data.cluster;
+
+                            return reply({ statusCode: 200, data: wapi_config });
+
+                        } else if (response.body.error){
+                            return reply({
+                                statusCode: 500,
+                                error     :      7,
+                                message   :    response.body.message
                             }).code(500);
                         }
-                    });
+          
+                    } else { // Cluster mode is not active
+                        let managerName = wapi_config.cluster_info.manager;
+                        delete wapi_config.cluster_info;
+                        wapi_config.cluster_info         = {};
+                        wapi_config.cluster_info.status  = 'disabled';
+                        wapi_config.cluster_info.cluster = 'Disabled';
+                        wapi_config.cluster_info.manager = managerName;
+
+                        return reply({ statusCode: 200, data: wapi_config });
+
+                    }
                 } else {
-                    reply({
-                        'statusCode': 500,
-                        'error':      7,
-                        'message':    response.body
-                    });
+                    return reply({
+                        statusCode: 500,
+                        error     : 5,
+                        message   : 'Error occurred'
+                    }).code(500);
                 }
-            })
-            .catch(error => {
-                if(error.code === 'ECONNREFUSED'){
-                    wapi_config.password = "You shall not pass";
-                    wapi_config.apiIsDown = true;
-                    reply({
-                        'statusCode': 200,
-                        'data':       wapi_config
-                    });
-                } else {
-                    server.log([blueWazuh, 'wazuh-api', 'error'], error);
-                }
-            });
-        });
+             
+            } else {
+                return reply({
+                    statusCode: 500,
+                    error     : 7,
+                    message   : response.body
+                });
+            }
+        } catch(error){
+            if(error.code === 'ECONNREFUSED'){
+                wapi_config.password  = "You shall not pass";
+                wapi_config.apiIsDown = true;
+                return reply({ statusCode: 200, data: wapi_config });
+            } else {
+                return reply({
+                    statusCode: 500,
+                    error     : 8,
+                    message   : error.message || error
+                });
+                server.log([blueWazuh, 'wazuh-api', 'error'], error.message || error);
+            }
+        }
     };
 
     const validateCheckApiParams = payload =>  {
@@ -244,7 +236,7 @@ module.exports = (server, options) => {
         }
     };
 
-    const getPciRequirement = (req, reply) => {
+    const getPciRequirement = async (req, reply) => {
         try {
             
             if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
@@ -255,36 +247,32 @@ module.exports = (server, options) => {
                 if(!req.headers.id) {
                     return reply(pciRequirements);
                 }
-                getConfig(req.headers.id, wapi_config => {
-                    if (wapi_config.error_code > 1) {
-                         // Can not connect to elasticsearch
-                        return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
-                    } else if (wapi_config.error_code > 0) {
-                        // Credentials not found
-                        return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
-                     }
+                let wapi_config = await getConfig(req.headers.id);
+
+                if (wapi_config.error_code > 1) {
+                    // Can not connect to elasticsearch
+                    return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
+                } else if (wapi_config.error_code > 0) {
+                    // Credentials not found
+                    return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
+                }
+    
+                const response = await needle('get', `${wapi_config.url}:${wapi_config.port}/rules/pci`, {}, {
+                    username          : wapi_config.user,
+                    password          : wapi_config.password,
+                    rejectUnauthorized: !wapi_config.insecure
+                })
         
-                    needle('get', `${wapi_config.url}:${wapi_config.port}/rules/pci`, {}, {
-                        username:           wapi_config.user,
-                        password:           wapi_config.password,
-                        rejectUnauthorized: !wapi_config.insecure
-                    })
-                    .then(response => {
-                        if(response.body.data && response.body.data.items){
-                            let PCIobject = {};
-                            for(let item of response.body.data.items){
-                                if(typeof pciRequirements[item] !== 'undefined') PCIobject[item] = pciRequirements[item];
-                            }
-                            return reply(PCIobject);
-                        } else {
-                            return reply({ statusCode: 400, error: '9998', data: 'An error occurred trying to parse PCI DSS requirements' });
-                        }
-                        
-                    })
-                    .catch(error => {
-                        reply({ statusCode: 400, error: '9997', data: 'An error occurred trying to obtain PCI DSS requirements from Wazuh API' })
-                    });
-                });
+                if(response.body.data && response.body.data.items){
+                    let PCIobject = {};
+                    for(let item of response.body.data.items){
+                        if(typeof pciRequirements[item] !== 'undefined') PCIobject[item] = pciRequirements[item];
+                    }
+                    return reply(PCIobject);
+                } else {
+                    return reply({ statusCode: 400, error: '9998', data: 'An error occurred trying to parse PCI DSS requirements' });
+                }
+              
             } else {
                 if (typeof pciRequirements[req.params.requirement] !== 'undefined'){
                     pci_description = pciRequirements[req.params.requirement];
@@ -298,6 +286,7 @@ module.exports = (server, options) => {
                 });
             }
         } catch (error) {
+
             return reply({ 
                 statusCode: 400, 
                 error     : '9999', 
@@ -309,7 +298,7 @@ module.exports = (server, options) => {
 
     const errorControl = (error, response) => {
         if (error) {
-            return ({
+            return {
                 isError: true,
                 body: {
                     statusCode  : 500,
@@ -317,9 +306,9 @@ module.exports = (server, options) => {
                     message     : 'Request error',
                     errorMessage: error.message || error
                 }
-            });
+            };
         } else if (!error && response.body.error) {
-            return ({
+            return {
                 isError: true,
                 body: {
                     statusCode: 500,
@@ -327,14 +316,16 @@ module.exports = (server, options) => {
                     message   : 'Wazuh api error',
                     errorData : response.body
                 }
-            });
+            };
         }
 
         return ({ isError: false });
     };
 
-    const makeRequest = (method, path, data, id, reply) => {
-        getConfig(id, wapi_config => {
+    const makeRequest = async (method, path, data, id, reply) => {
+        try {
+            const wapi_config = await getConfig(id);
+
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
                 return reply({
@@ -350,7 +341,6 @@ module.exports = (server, options) => {
                     error     : 1,
                     message   : 'Credentials does not exists'
                 }).code(404);
-                
             }
 
             if (!data) {
@@ -361,64 +351,72 @@ module.exports = (server, options) => {
                 headers: {
                     'wazuh-app-version': packageInfo.version
                 },
-                username:           wapi_config.user,
-                password:           wapi_config.password,
+                username          : wapi_config.user,
+                password          : wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
             };
 
-            let fullUrl = getPath(wapi_config) + path;
+            const fullUrl   = getPath(wapi_config) + path;
+            const response  = await needle(method, fullUrl, data, options);
+            const errorData = errorControl(false, response);
 
-            needle.request(method, fullUrl, data, options, (error, response) => {
-                let errorData = errorControl(error, response);
-                if (errorData.isError) {
-                    reply(errorData.body).code(500);
-                } else {
-                    reply(response.body);
-                }
-            });
-        });
+            if (errorData.isError) {
+                return reply(errorData.body).code(500);
+            } 
+
+            return reply(response.body);
+            
+        } catch (error) {
+            return reply({
+                statusCode: 500,
+                data      : error.message || error
+            }).code(500);
+        }
     };
 
     const requestApi = (req, reply) => {
         if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
         if (!req.payload.method) {
-            reply({
-                'statusCode': 400,
-                'error':      3,
-                'message':    'Missing param: Method'
+            return reply({
+                statusCode: 400,
+                error     : 3,
+                message   : 'Missing param: Method'
             }).code(400);
         } else if (!req.payload.path) {
-            reply({
-                'statusCode': 400,
-                'error':      4,
-                'message':    'Missing param: Path'
+            return reply({
+                statusCode: 400,
+                error     : 4,
+                message   : 'Missing param: Path'
             }).code(400);
         } else {
-            makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
+            return makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
         }
     };
 
-    const getApiSettings = (req, reply) => {
-        if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
-        getConfig(req.payload.id, (wapi_config) => {
+    const getApiSettings = async (req, reply) => {
+        try{
+            if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
 
+            const wapi_config = await getConfig(req.payload.id); 
+    
             if (wapi_config.error_code > 1) {
-                //Can not connect to elasticsearch
-                return reply({
-                    'statusCode': 200,
-                    'error': '1',
-                    'data': 'no_elasticsearch'
-                });
-                
+                throw new Error('no_elasticsearch');                
             } else if (wapi_config.error_code > 0) {
-                //Credentials not found
-                return reply({
-                    'statusCode': 200,
-                    'error': '1',
-                    'data': 'no_credentials'
-                });                
+                throw new Error('no_credentials');            
             }
-        });
+            return reply({
+                statusCode: 200,
+                data      : ''
+            });
+            
+        } catch(error){
+            return reply({
+                statusCode: 200,
+                error     : '1',
+                data      : error.message || error
+            }); 
+        }
+
     };
 
     // Fetch agent status and insert it directly on demand

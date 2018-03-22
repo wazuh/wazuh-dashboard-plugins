@@ -52,7 +52,7 @@ module.exports = (server, options) => {
         }
     };
 
-    const getConfig = async (id, callback) => {
+    const getConfig = async id => {
         try {
             const data = await elasticRequest.callWithInternalUser('get', {
                 index: '.wazuh',
@@ -60,7 +60,7 @@ module.exports = (server, options) => {
                 id
             });
 
-            return callback({
+            return {
                 user        : data._source.api_user,
                 password    : Buffer.from(data._source.api_password, 'base64').toString("ascii"),
                 url         : data._source.url,
@@ -68,7 +68,7 @@ module.exports = (server, options) => {
                 insecure    : data._source.insecure,
                 cluster_info: data._source.cluster_info,
                 extensions  : data._source.extensions
-            });
+            };
 
         } catch (error){
             return   callback({ error: 'no elasticsearch', error_code: 2 });
@@ -281,13 +281,17 @@ module.exports = (server, options) => {
 
             let allowedIndices = [];
             for(const rol of roles){
+                console.log('-----------------------------')
+                console.log(`rol ${rol}`);
                 const myIndices = xpacksec.hits.hits.filter(item => item._id === `role-${rol}` && item._source && item._source.indices);
+                console.log(myIndices)
                 for(const set of myIndices){                    
-                    const filteredIndices = set._source.indices.filter(item => item.privileges.includes('read'));
+                    const filteredIndices = set._source.indices.filter(item => item.privileges.includes('all') || item.privileges.includes('read'));
                     for(const index of filteredIndices){
                         allowedIndices.push(...index.names);
                     }
                 }
+                console.log('-----------------------------')
             }
 
             return allowedIndices;
@@ -313,7 +317,7 @@ module.exports = (server, options) => {
             const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
             const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
             const allowedIndices = isXpackEnabled && !isSuperUser ? await getAllowedIndices(req.auth.credentials.roles) : false;
-
+            console.log(req.auth.credentials,allowedIndices)
             const data = await elasticRequest
             .callWithInternalUser('search', {
                     index: '.kibana',

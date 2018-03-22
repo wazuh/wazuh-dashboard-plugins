@@ -117,23 +117,23 @@ module.exports = (server, options) => {
 
     const validateData = payload => {
         // Validate user
-        if(!userRegEx.test(req.payload.user)){
+        if(!userRegEx.test(payload.user)){
             return reply({ statusCode: 400, error: 10001, message: 'Invalid user field' }).code(400);
         }
 
         // Validate password
-        if(!passRegEx.test(req.payload.password)){
+        if(!passRegEx.test(payload.password)){
             return reply({ statusCode: 400, error: 10002, message: 'Invalid password field' }).code(400);
         }
 
         // Validate url
-        if(!urlRegEx.test(req.payload.url) && !urlRegExIP.test(req.payload.url)){
+        if(!urlRegEx.test(payload.url) && !urlRegExIP.test(payload.url)){
             return reply({ statusCode: 400, error: 10003, message: 'Invalid url field' }).code(400);
         }
 
         // Validate port
-        const validatePort = parseInt(req.payload.port);
-        if(!portRegEx.test(req.payload.port) || validatePort <= 0 || validatePort >= 99999) {
+        const validatePort = parseInt(payload.port);
+        if(!portRegEx.test(payload.port) || validatePort <= 0 || validatePort >= 99999) {
             return reply({ statusCode: 400, error: 10004, message: 'Invalid port field' }).code(400);
         }
 
