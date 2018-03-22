@@ -6,9 +6,8 @@ const yml = require('js-yaml');
 const path = require('path');
 const { log } = require('./logger');
 
-const OBJECTS_FILE = './integration-files/objects-file.json';
-const APP_OBJECTS_FILE = './integration-files/app-objects-file-alerts.json';
-const KIBANA_TEMPLATE = './integration-files/kibana-template.json';
+const APP_OBJECTS_FILE = './integration-files/app-objects-file-alerts';
+const KIBANA_TEMPLATE = './integration-files/kibana-template';
 const knownFields = require('./integration-files/known-fields')
 
 
@@ -56,56 +55,6 @@ module.exports = (server, options) => {
     }
 
     let index_pattern = pattern || "wazuh-alerts-3.x-*";
-
-    // Importing Wazuh built-in visualizations and dashboards
-    const importObjects = (id) => {
-        log('initialize.js importObjects', 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...','info');
-        server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...');
-
-        try {
-            objects = require(OBJECTS_FILE);
-        } catch (e) {
-            log('initialize.js', e.message || e);
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
-            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + OBJECTS_FILE);
-            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-        }
-
-        let body = '';
-        for (let element of objects) {
-            body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' +
-                '"_id": "' + element._type + ':' + element._id + '" } }\n';
-
-            let temp = {};
-            let aux = JSON.stringify(element._source);
-            aux = aux.replace("wazuh-alerts", id);
-            aux = JSON.parse(aux);
-            temp[element._type] = aux;
-
-            if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
-                temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
-            }
-
-            temp["type"] = element._type;
-            body += JSON.stringify(temp) + "\n";
-        }
-
-        elasticRequest.callWithInternalUser('bulk', {
-            index: '.kibana',
-            body: body
-        })
-            .then(() => elasticRequest.callWithInternalUser('indices.refresh', {
-                index: ['.kibana', index_pattern]
-            }))
-            .then(() => {
-                log('initialize.js importObjects', 'Templates, mappings, index patterns, visualizations, searches and dashboards were successfully installed. App ready to be used.','info');
-                server.log([blueWazuh, 'initialize', 'info'], 'Templates, mappings, index patterns, visualizations, searches and dashboards were successfully installed. App ready to be used.');
-            })
-            .catch(error => {
-                log('initialize.js importObjects', error.message || error);
-                server.log([blueWazuh, 'server', 'error'], 'DEBUG Error importing objects into elasticsearch. Bulk request failed.');
-            });
-    };
 
     /**
      * This function creates a new index pattern with a custom ID.
@@ -301,8 +250,6 @@ module.exports = (server, options) => {
             .then(resp => {
                 log('initialize.js createIndexPattern', `Created index pattern: ${index_pattern}`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
-                // Import objects (dashboards and visualizations)
-                importObjects(index_pattern);
                 importAppObjects(index_pattern,true);
             })
             .catch(error => {
