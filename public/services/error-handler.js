@@ -97,12 +97,13 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 if(isHttps(error)){
                     text = 'Wrong Wazuh API protocol, please check it and try again with http instead https';
                 } else {
-                    text = 'Could not connect with Wazuh API, please check url and port and try again'
+                    text = 'Could not connect with Wazuh API, please check url and port and try again.'
                 }
                 break;
             default:
                 text = isWarning ? `Warning. ${message}` : `Error. ${message}`;
         }
+        if(error.extraMessage) text = error.extraMessage;
         text = location ? location + '. ' + text : text;
         if(!silent){
             if(isWarning) notify.warning(text);
