@@ -77,7 +77,7 @@ app.service('testAPI', function ($q, $http, $location, $rootScope, appState, gen
                 } else if (error.data && error.data.message && error.data.message === 'wrong_credentials') {
                     defered.reject({data: 'wrong_credentials'});
                 } else if(error.data && ((error.data.message && error.data.message === 'socket hang up') || (parseInt(error.data.error) === 5))) {
-                    defered.reject({data:'socket_hang_up',https: (data.url && data.url.includes('https'))});
+                    defered.reject({data:'socket_hang_up',extraMessage: `Wazuh API throws ${error.data.message}`, https: (data.url && data.url.includes('https'))});
                 } else {
                     defered.reject(error);
                 }
