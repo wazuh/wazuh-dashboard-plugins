@@ -15,7 +15,7 @@
                         IP: <span class="wz-text-bold">{{ agent.ip }}</span>
                     </div>
                     <div class="wz-text-truncatable" flex ng-if="agent.group">
-                        Group: <span class="wz-text-bold">{{ agent.group }}</span>
+                        Group: <span class="wz-text-bold wz-text-link" ng-click="goGroups(agent)">{{ agent.group }}</span>
                     </div>
                     <div class="wz-text-truncatable" flex ng-if="agent.version">
                         Version: <span class="wz-text-bold">{{ agent.version }}</span>

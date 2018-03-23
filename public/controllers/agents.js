@@ -281,6 +281,14 @@ app.controller('agentsController',
 
         $scope.goGroups = agent => {
             $rootScope.globalAgent = agent;
+            $scope.agentsAutoComplete.reset();
+            if($rootScope.ownHandlers) {
+                for(let h of $rootScope.ownHandlers){
+                    h._scope.$destroy();
+                }
+            }
+            if(metricService.hasItems()) metricService.destroyWatchers();
+            $rootScope.ownHandlers = [];
             $rootScope.comeFrom    = 'agents';
             $location.search('tab', 'groups');
             $location.path('/manager');
