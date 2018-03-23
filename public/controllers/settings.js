@@ -131,6 +131,10 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.indexPatterns = patternList.data.data;
             const currentPattern = await genericReq.request('GET', '/api/wazuh-elastic/current-pattern');
             if(!appState.getCurrentPattern()) appState.setCurrentPattern(currentPattern.data.data);
+            else {
+                const filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
+                if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
+            }
             const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
             for(const entry of data.data) $scope.showEditForm[entry._id] = false;
 
