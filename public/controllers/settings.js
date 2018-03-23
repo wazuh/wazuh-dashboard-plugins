@@ -62,7 +62,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             let index = $scope.apiEntries.indexOf(item);
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
                 if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
-                    errorHandler.handle('Please remove another API.','Settings',true);
+                    errorHandler.handle("Can't delete the currently selected API. Please, select another API as default before deleting this one.",'Settings',true);
                     if(!$rootScope.$$phase) $rootScope.$digest();
                     return;
                 }
