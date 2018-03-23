@@ -130,6 +130,13 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             const patternList = await genericReq.request('GET','/get-list',{});
             $scope.indexPatterns = patternList.data.data;
             const currentPattern = await genericReq.request('GET', '/api/wazuh-elastic/current-pattern');
+             
+            // Useful to show the applied pattern withou API or any data (very first time)
+            const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+            appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
+            $rootScope.showSelector = appState.getPatternSelector();
+            if(!$rootScope.$$phase) $rootScope.$digest();
+
             if(!patternList.data.data.length){
                 $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
                 $location.search('tab',null);
