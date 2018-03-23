@@ -42,10 +42,14 @@ All notable changes to the Wazuh app project will be documented in this file.
   - Now every index-pattern is **dynamically formatted** (for example, to enable the URLs in the *Vulnerabilities* tab).
   - Several **code refactoring** for a better handling of possible use cases.
   - And the best thing, **it's no longer needed to insert the sample alert!**
-- **Improvements and changes to index-patterns** ([#320](https://github.com/wazuh/wazuh-kibana-app/pull/320)):
-  - There's a new route, `/get-list`, to fetch the index pattern list.
-  - We've removed and changes several functions for a proper management of index-patterns.
-  - We've improved the compatibility with user-created index-patterns, known to have unpredictable IDs.
+- **Improvements and changes to index-patterns** ([#320](https://github.com/wazuh/wazuh-kibana-app/pull/320) & [#333](https://github.com/wazuh/wazuh-kibana-app/pull/333)):
+  - New route, `/get-list`, to fetch the index pattern list.
+  - Removed and changed several functions for a proper management of index-patterns.
+  - Improved the compatibility with user-created index-patterns, known to have unpredictable IDs.
+  - Now the app properly redirects to `/blank-screen` if the length of the index patterns list is 0.
+  - Ignored custom index patterns with auto-generated ID on the initialization process.
+    - Now it uses the value set on the `config.yml` file.
+  - If the index pattern is no longer available, the cookie will be overwritten.
 - **Improvements to the monitoring module** ([#322](https://github.com/wazuh/wazuh-kibana-app/pull/322)):
   - Minor refactoring to the whole module.
   - Now the `wazuh-monitoring` index pattern is regenerated if it's missing.
