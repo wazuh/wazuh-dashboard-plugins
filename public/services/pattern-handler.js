@@ -4,6 +4,10 @@ require('ui/modules').get('app/wazuh', [])
         getPatternList: async () => {
             try {
                 const patternList = await genericReq.request('GET','/get-list',{});
+                if(appState.getCurrentPattern()){
+                    let filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
+                    if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
+                }
                 return patternList.data.data;
             } catch (error) {
                 errorHandler.handle(error,'Pattern Handler (getPatternList)');
