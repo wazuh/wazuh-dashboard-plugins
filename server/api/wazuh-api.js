@@ -81,6 +81,10 @@ module.exports = (server, options) => {
                                         wapi_config.cluster_info.manager = managerName;
                                         wapi_config.cluster_info.node = response.body.data.node;
                                         wapi_config.cluster_info.cluster = response.body.data.cluster;
+
+                                        // Don't return the API password in clear text to the client application
+                                        wapi_config.password = "****"
+
                                         reply({
                                             'statusCode': 200,
                                             'data': wapi_config
