@@ -119,7 +119,7 @@ module.exports = (server, options) => {
             
             const customPatternRegex = new RegExp(/[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}/g);
             if(id && customPatternRegex.test(id.trim())){
-                id        = configurationFile.pattern;
+                id        = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
                 patternId = 'index-pattern:' + id.trim();
             }
 
