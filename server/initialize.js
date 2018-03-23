@@ -116,6 +116,13 @@ module.exports = (server, options) => {
         try{
             if(!id) return Promise.reject(new Error('No valid id for index pattern'));
             if(!patternId) return Promise.reject(new Error('No valid patternId for index pattern'));
+            
+            const customPatternRegex = new RegExp(/[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}/g);
+            if(id && customPatternRegex.test(id.trim())){
+                id        = configurationFile.pattern;
+                patternId = 'index-pattern:' + id.trim();
+            }
+
             await elasticRequest
             .callWithInternalUser('create', {
                 index: '.kibana',
