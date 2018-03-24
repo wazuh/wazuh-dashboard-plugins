@@ -160,6 +160,7 @@ module.exports = (server, options) => {
         elasticRequest.callWithInternalUser('search', { 
             index: '.kibana', 
             body: {
+                'size' : 999,
                 'query': {
                     'bool': {
                         'must': {
