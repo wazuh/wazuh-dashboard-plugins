@@ -1,6 +1,6 @@
 module.exports = {
     "order": 0,
-    "template": "wazuh-monitoring*",
+    "template": "wazuh-monitoring-3.x-*",
     "settings": {
         "index.refresh_interval": "5s"
     },

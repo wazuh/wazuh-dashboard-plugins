@@ -64,7 +64,7 @@
             layout="column"
             flex
             data="logs"
-            keys="[{col:'timestamp',size:15},{col:'tag',size:25},{col:'level',size:10},{col:'description'}]"
+            keys="[{col:'timestamp',size:15,truncatable:'true'},{col:'tag',size:25,truncatable:'true'},{col:'level',size:10,truncatable:'true'},{col:'description',truncatable:'false'}]"
             ng-if="!realtime"
             class="no-lateral-padding"
             nopointer="true"
@@ -76,7 +76,7 @@
             layout="column"
             flex
             data="realLogs"
-            keys="[{col:'timestamp',size:15},{col:'tag',size:25},{col:'level',size:10},{col:'description'}]"
+            keys="[{col:'timestamp',size:15,truncatable:'true'},{col:'tag',size:25,truncatable:'true'},{col:'level',size:10,truncatable:'true'},{col:'description',truncatable:'false'}]"
             ng-if="realtime"
             class="no-lateral-padding",
             noscroll="true"

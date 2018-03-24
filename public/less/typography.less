@@ -4,16 +4,12 @@
 
 /* Apply the Open Sans font in the whole app */
 
-html, body, button:not(.fa):not(.fa-times), textarea, input, select {
+html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
     font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
 }
 
 .wz-headline-title {
     font-size: 17px;
-}
-
-.wz-font-weight-bold {
-    font-weight: bold !important;
 }
 
 .color-grey {
@@ -42,6 +38,16 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select {
 
 .wz-text-right {
     text-align: right;
+}
+
+.wz-text-bold {
+    font-weight: bold !important;
+}
+
+.wz-text-truncatable {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .font-size-16-pt {

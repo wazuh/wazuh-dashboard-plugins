@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - **New design for the *Agents/Configuration* tab** ([#310](https://github.com/wazuh/wazuh-kibana-app/pull/310)):
   - The style is the same as the *Manager/Configuration* tab.
   - Added two more sections: **CIS-CAT and Commands** ([#315](https://github.com/wazuh/wazuh-kibana-app/pull/315)).
+  - Added a new card that will appear when there's no group configuration at all ([#323](https://github.com/wazuh/wazuh-kibana-app/pull/323)).
 - **Added *"group"* column on the agents list in *Agents*** ([#312](https://github.com/wazuh/wazuh-kibana-app/pull/312)):
   - If you click on the group, it will redirect the user to the specified group in *Manager/Groups*.
 - **New option for the `config.yml` file, `ip.selector`** ([#313](https://github.com/wazuh/wazuh-kibana-app/pull/313)):
@@ -26,6 +27,13 @@ All notable changes to the Wazuh app project will be documented in this file.
   - Removed `cleaned.less` file.
   - Reordering and cleaning of existing CSS files, including removal of unused classes, renaming, and more.
   - The *Settings* tab has been refactored to correct some visual errors with some card components.
+  - Small refactoring to some components from *Manager/Ruleset* ([#323](https://github.com/wazuh/wazuh-kibana-app/pull/323)).
+- **New design for the top navbar** ([#326](https://github.com/wazuh/wazuh-kibana-app/pull/326)):
+  - Cleaned and refactored code
+  - Revamped design, smaller and with minor details to follow the rest of Wazuh app guidelines.
+- **New design for the wz-chip component** to follow the new Wazuh app guidelines ([#323](https://github.com/wazuh/wazuh-kibana-app/pull/323)).
+- Added **more descriptive error messages** when the user inserts bad credentials on the *Add new API* form in the *Settings* tab ([#331](https://github.com/wazuh/wazuh-kibana-app/pull/331)).
+- Added a new CSS class to **truncate overflowing text** on tables and metric ribbons ([#332](https://github.com/wazuh/wazuh-kibana-app/pull/332)).
 
 ### Changed
 - **Improved the initialization system** ([#317](https://github.com/wazuh/wazuh-kibana-app/pull/317)):
@@ -33,15 +41,19 @@ All notable changes to the Wazuh app project will be documented in this file.
   - The fieldset is now **automatically refreshed** if the app detects mismatches.
   - Now every index-pattern is **dynamically formatted** (for example, to enable the URLs in the *Vulnerabilities* tab).
   - Several **code refactoring** for a better handling of possible use cases.
-  - And the best thing, **it's no longer needed to insert the sample alert**!
-- **Improvements and changes to index-patterns** ([#320](https://github.com/wazuh/wazuh-kibana-app/pull/320)):
-  - There's a new route, `/get-list`, to fetch the index pattern list.
-  - We've removed and changes several functions for a proper management of index-patterns.
-  - We've improved the compatibility with user-created index-patterns, known to have unpredictable IDs.
-- **Improvements to monitoring module** ([#322](https://github.com/wazuh/wazuh-kibana-app/pull/322)):
-  - We don't need the monitoring template insertion step anymore.
-  - Minor refactor to the whole module.
-  - Regenerate the index pattern if it's missing.
+  - And the best thing, **it's no longer needed to insert the sample alert!**
+- **Improvements and changes to index-patterns** ([#320](https://github.com/wazuh/wazuh-kibana-app/pull/320) & [#333](https://github.com/wazuh/wazuh-kibana-app/pull/333)):
+  - New route, `/get-list`, to fetch the index pattern list.
+  - Removed and changed several functions for a proper management of index-patterns.
+  - Improved the compatibility with user-created index-patterns, known to have unpredictable IDs.
+  - Now the app properly redirects to `/blank-screen` if the length of the index patterns list is 0.
+  - Ignored custom index patterns with auto-generated ID on the initialization process.
+    - Now it uses the value set on the `config.yml` file.
+  - If the index pattern is no longer available, the cookie will be overwritten.
+- **Improvements to the monitoring module** ([#322](https://github.com/wazuh/wazuh-kibana-app/pull/322)):
+  - Minor refactoring to the whole module.
+  - Now the `wazuh-monitoring` index pattern is regenerated if it's missing.
+  - And the best thing, **it's no longer needed to insert the monitoring template!**
 - Now the app healthcheck system only checks if the API and app **have the same `major.minor` version** ([#311](https://github.com/wazuh/wazuh-kibana-app/pull/311)):
   - Previously, the API and app had to be on the same `major.minor.patch` version.
 - Adjusted space between title and value in some cards showing Manager or Agent configurations ([#315](https://github.com/wazuh/wazuh-kibana-app/pull/315)).
@@ -51,6 +63,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed bug on Firefox browser who was not properly showing the tables with the scroll pagination functionality ([#314](https://github.com/wazuh/wazuh-kibana-app/pull/314)).
 - Fixed bug where visualizations weren't being destroyed due to ongoing renderization processes ([#316](https://github.com/wazuh/wazuh-kibana-app/pull/316)).
 - Fixed several UI bugs for a better consistency and usability ([#318](https://github.com/wazuh/wazuh-kibana-app/pull/318)).
+- Fixed an error where the initial index-pattern was not loaded properly the very first time you enter the app ([#328](https://github.com/wazuh/wazuh-kibana-app/pull/328)).
+- Fixed an error message that appeared whenever the app was not able to found the `wazuh-monitoring` index pattern ([#328](https://github.com/wazuh/wazuh-kibana-app/pull/328)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.2 - Revision 386
 ### Added

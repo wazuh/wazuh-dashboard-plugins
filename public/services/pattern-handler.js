@@ -6,11 +6,17 @@ require('ui/modules').get('app/wazuh', [])
                 const patternList = await genericReq.request('GET','/get-list',{});
 
                 if(!patternList.data.data.length){
-                    $rootScope.blankScreenError = 'Sorry but your user has no access to any valid index pattern'
+                    $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
                     $location.search('tab',null);
                     $location.path('/blank-screen'); 
                     return;  
                 }
+
+                if(appState.getCurrentPattern()){
+                    let filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
+                    if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
+                }
+
                 return patternList.data.data;
             } catch (error) {
                 errorHandler.handle(error,'Pattern Handler (getPatternList)');

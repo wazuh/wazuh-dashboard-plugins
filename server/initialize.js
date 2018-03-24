@@ -65,6 +65,33 @@ module.exports = (server, options) => {
         try{
             if(!id) return Promise.reject(new Error('No valid id for index pattern'));
             if(!patternId) return Promise.reject(new Error('No valid patternId for index pattern'));
+            
+            const customPatternRegex = new RegExp(/[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}/g);
+            if(id && customPatternRegex.test(id.trim())){
+                server.log([blueWazuh, 'initialize', 'info'], 'Custom id detected for index pattern...');
+                id        = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
+                patternId = 'index-pattern:' + id.trim();
+                server.log([blueWazuh, 'initialize', 'info'], 'Modified values to be default values, now checking if default index pattern exists...');
+                const data = await elasticRequest
+                .callWithInternalUser('search', {
+                    index: '.kibana',
+                    type: 'doc',
+                    body: {
+                        "query": {
+                            "match": {
+                                "_id":"index-pattern:" + id 
+                            }
+                        }
+                    }
+                });
+                if(data && data.hits && data.hits.total > 0) {
+                    server.log([blueWazuh, 'initialize', 'info'], 'Default index pattern exists, skipping its creation...');
+                    return id;
+                }
+            }
+
+
+
             await elasticRequest
             .callWithInternalUser('create', {
                 index: '.kibana',
@@ -78,7 +105,7 @@ module.exports = (server, options) => {
                     }
                 }
             });
-            return;
+            return id;
         }catch(error){
             return Promise.reject(error)
         }
@@ -103,7 +130,7 @@ module.exports = (server, options) => {
                                     }
                                 }
                             }
-                        });
+                        });        
             return data;
         } catch (error) {
             return Promise.reject(error);
@@ -182,19 +209,21 @@ module.exports = (server, options) => {
             if (!firstTime && indexPatternList.hits.total < 1) {  
                 log('initialize.js importAppObjects', 'Visualizations pattern not found. Creating it...','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Visualizations pattern not found. Creating it...');              
-                await createCustomPattern(patternId,id)
+                id = await createCustomPattern(patternId,id)
                 firstTime = true;
             }
+            patternId = 'index-pattern:' + id;
 
             if(firstTime && indexPatternList.hits.total < 1){
                 log('initialize.js importAppObjects', 'Waiting for index pattern creation to complete...','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Waiting for index pattern creation to complete...');   
-                let waitTill = new Date(new Date().getTime() + 0.2 * 1000);
+                let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 while(waitTill > new Date()){
                     indexPatternList = await searchIndexPatternById(id);
                     if(indexPatternList.hits.total >= 1) break;
-                    else waitTill = new Date(new Date().getTime() + 0.2 * 1000);
+                    else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 }
+                server.log([blueWazuh, 'initialize', 'info'], 'Index pattern created...');
             }
 
             log('initialize.js importAppObjects', 'Importing/Updating index pattern known fields...','info')

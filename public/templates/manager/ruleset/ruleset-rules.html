@@ -83,29 +83,29 @@
         </div>
 
         <md-chips readonly="true" ng-show="rules.hasFilter('level') || rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('group') || rules.hasFilter('pci')">
-            <md-chip class="wazuh-chip" ng-click="rules.removeFilter('search', true)" ng-if="rules.hasFilter('search') && rules.getFilter('search')">
-                <span class="bold">Search: {{rules.getFilter('search')}}
-                    <i class="fa fa-times cursor-pointer" aria-hidden="true"></i>
+            <md-chip class="wz-chip" ng-click="rules.removeFilter('search', true)" ng-if="rules.hasFilter('search') && rules.getFilter('search')">
+                <span>Search: {{rules.getFilter('search')}}
+                    <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"></i>
                 </span>
             </md-chip>
-            <md-chip class="wazuh-chip" ng-click="rules.removeFilter('file', true)" ng-if="rules.hasFilter('file')">
-                <span class="bold">File: {{rules.getFilter('file')}}
-                    <i class="fa fa-times cursor-pointer" aria-hidden="true"></i>
+            <md-chip class="wz-chip" ng-click="rules.removeFilter('file', true)" ng-if="rules.hasFilter('file')">
+                <span>File: {{rules.getFilter('file')}}
+                    <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"></i>
                 </span>
             </md-chip>
-            <md-chip class="wazuh-chip" ng-click="rules.removeFilter('level', true)" ng-if="rules.hasFilter('level')">
-                <span class="bold">Level: {{rules.getFilter('level')}}
-                    <i class="fa fa-times cursor-pointer" aria-hidden="true"></i>
+            <md-chip class="wz-chip" ng-click="rules.removeFilter('level', true)" ng-if="rules.hasFilter('level')">
+                <span>Level: {{rules.getFilter('level')}}
+                    <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"></i>
                 </span>
             </md-chip>
-            <md-chip class="wazuh-chip" ng-click="rules.removeFilter('group', true)" ng-if="rules.hasFilter('group')">
-                <span class="bold">Group: {{rules.getFilter('group')}}
-                    <i class="fa fa-times cursor-pointer" aria-hidden="true"></i>
+            <md-chip class="wz-chip" ng-click="rules.removeFilter('group', true)" ng-if="rules.hasFilter('group')">
+                <span>Group: {{rules.getFilter('group')}}
+                    <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"></i>
                 </span>
             </md-chip>
-            <md-chip class="wazuh-chip" ng-click="rules.removeFilter('pci', true)" ng-if="rules.hasFilter('pci')">
+            <md-chip class="wz-chip" ng-click="rules.removeFilter('pci', true)" ng-if="rules.hasFilter('pci')">
                 <span>PCI control: {{rules.getFilter('pci')}}
-                    <i class="fa fa-times cursor-pointer" aria-hidden="true"></i>
+                    <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"></i>
                 </span>
             </md-chip>
         </md-chips>

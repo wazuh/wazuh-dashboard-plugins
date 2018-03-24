@@ -16,25 +16,13 @@
     align-items: center;
 }
 
-.wz-word-wrap {
-    word-wrap: break-word;
-}
-
-.wz-table-color-link {
-    color:#0079a5 !important;
-}
-
-.wz-table-font {
-    font-size: 16px;
-}
-
 .wz-table-common {
-    padding-left: 15px;
-    min-height: 34px;
     height: auto;
-    align-items: center;
+    min-height: 34px;
+    line-height: 20px;
     padding-top: 0px;
-    word-wrap: break-word;
+    padding-left: 15px;
+    align-items: center;
     box-shadow: 0 1px 0px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -90,13 +78,7 @@
 
 .wz-table-height-fixed {
     min-height: 220px;
-    max-height: 320px;
     overflow: hidden;
-}
-
-// Style for text who applies filters when hovering
-.wz-table-hover:hover {
-    font-weight: bold;
 }
 
 .wz-table-card-active {
@@ -111,6 +93,6 @@
 }
 
 @-moz-document url-prefix() {
-    .mozilla-table-size-85 {max-height: 85vh !important;} 
-    .mozilla-table-size-99 {max-height: 99vh !important;} 
+    .mozilla-table-size-85 {max-height: 85vh !important;}
+    .mozilla-table-size-99 {max-height: 99vh !important;}
 }

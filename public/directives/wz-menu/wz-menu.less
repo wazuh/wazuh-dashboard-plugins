@@ -1,80 +1,43 @@
-.wz-menu-nav div md-nav-ink-bar {
-    left: 0px !important;
-    width: 0px !important;
+/* -------------------------------------------------------------------------- */
+/* ---------------------- Wazuh top nav bar stylesheet ---------------------- */
+/* -------------------------------------------------------------------------- */
+
+/* Style to the base toolbar */
+.wz-menu {
+    height: 58px;
+    min-height: 58px;
+    border-bottom: 1px solid #D9D9D9 !important;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
 }
 
-.wz-menu-nav div nav {
-    padding-top: 12px;
-    height: 70px;
-    background-color: #00445a;
-    color: rgb(0,121,165);
-    font-size: 14px;
-}
-
-.wz-menu-nav div nav ul li a {
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
-    color: #ffffff;
-    font-size: 14px;
-    padding-bottom: 0px;
-    height: 96%;
-}
-
-.wz-menu-nav div nav ul li a:hover {
-    background-color: #005571;
-}
-
-.wz-menu-nav div nav ul li .md-active,
-.wz-menu-nav .md-button:not([disabled]):hover{
-    background-color: #0079a5;
-}
-
-.wz-color-white,
-.wz-color-white button {
-    color: white !important;
-}
-
-.wz-nav-item-change-color button{
-    background-color: #0079a5;
-}
-
-.wz-menu-nav-logo .md-button:not([disabled]):hover{
-    background-color: #00445a;
-}
-
-.wz-menu-nav-gear {
-    float: right;
-    position: absolute;
-    right: 10px;
-}
-
-.wz-menu-nav-gear i.fa.fa-cog {
-    font-size: 18px;
-    color:#ffffff;
-}
-
-.wz-menu-select {
-    margin-top: 0;
-    margin-bottom: 0;
+/* Style applied to the toolbar-tools container */
+.wz-menu-content {
     color: white;
+    background-color: rgb(0, 68, 90);
 }
 
-.wz-menu-select:focus,
-.wz-menu-select > md-select-value {
-    color: white !important;
+/* Style to override the font on the toolbar */
+.wz-menu-content,
+.wz-menu-button {
+    font-size: 16px;
 }
 
-.wz-menu-nav-bar {
-    min-width: 1015px;
-    background-color: #005571 !important;
+/* Style to mark active or when-hover buttons on the toolbar */
+.wz-menu-button.wz-menu-active,
+.wz-menu-button:not([disabled]):hover {
+    background-color: rgb(0, 121, 165) !important;
 }
 
-.wz-menu-nav-bar-api {
-    float: right;
-    position: absolute;
-    right: 130px;
-    color: #ffffff;
-    top: 25px;
-    bottom: 0px;
-    margin-right: -25px;
+/* Style for index-pattern selector */
+.wz-menu-select {
+    border: none;
+    color: white;
+    cursor: pointer;
+    background-color: rgb(0, 68, 90);
+}
+
+/* Style for index-pattern selector options */
+.wz-menu-select-option {
+    color: rgba(0, 0, 0, 0.87);
+    background-color: white;
 }

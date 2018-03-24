@@ -1,8 +1,6 @@
 <div flex ng-controller="settingsController" layout="column">
 
-    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'settings'">
-        <wz-menu></wz-menu>
-    </div>
+    <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
 
     <!-- Settings navbar -->
     <div layout="row" layout-align="center start">
@@ -90,12 +88,12 @@
 
                 <!-- API list headings row -->
                 <div layout="row" layout-align="start start" class="wz-padding-top-10 wz-padding-bottom-14">
-                    <p flex="15" class="wz-font-weight-bold">Cluster</p>
-                    <p flex="20" class="wz-font-weight-bold">Manager</p>
-                    <p flex="15" class="wz-font-weight-bold">API URL</p>
-                    <p flex="15" class="wz-font-weight-bold">API Port</p>
-                    <p flex="15" class="wz-font-weight-bold">User</p>
-                    <p flex="20" class="wz-font-weight-bold">Actions</p>
+                    <p flex="15" class="wz-text-bold">Cluster</p>
+                    <p flex="20" class="wz-text-bold">Manager</p>
+                    <p flex="15" class="wz-text-bold">API URL</p>
+                    <p flex="15" class="wz-text-bold">API Port</p>
+                    <p flex="15" class="wz-text-bold">User</p>
+                    <p flex="20" class="wz-text-bold">Actions</p>
                 </div>
 
                 <div ng-repeat="entry in apiEntries">
@@ -201,7 +199,7 @@
                 <div layout="row" class="wz-padding-top-10">Enable or disable extensions according to your needs. The extension includes: Panels and Discover, for Overview / Agents tabs.</div>
 
                 <div class="wz-padding-top-10">
-                    <div layout="row" layout-align="space-between center" class="wz-font-weight-bold">PCI DSS</div>
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">PCI DSS</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
                         The Payment Card Industry Data Security Standard (PCI DSS) is a proprietary information security standard for organizations
                         that handle branded credit cards from the major card schemes including Visa, MasterCard, American Express,
@@ -216,7 +214,7 @@
                 </div>
 
                 <div class="wz-padding-top-10">
-                    <div layout="row" layout-align="space-between center" class="wz-font-weight-bold">OpenSCAP</div>
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">OpenSCAP</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
                         OVAL (Open Vulnerability Assessment Language) interpreter used to check system configuration and detect vulnerable applications.
                         <br> It is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.
@@ -228,7 +226,7 @@
                 </div>
 
                 <div class="wz-padding-top-10">
-                    <div layout="row" layout-align="space-between center" class="wz-font-weight-bold">Audit</div>
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">Audit</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
                         The Linux Audit system provides a way to track security-relevant information on your system. Based on pre-configured rules,
                         Audit generates log entries to record as much information about the events that are happening on your
@@ -241,7 +239,7 @@
                 </div>
 
                 <div class="wz-padding-top-10">
-                    <div layout="row" class="wz-font-weight-bold">Amazon Web Services (AWS)</div>
+                    <div layout="row" class="wz-text-bold">Amazon Web Services (AWS)</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
                         Wazuh provides a way to collect alerts from your AWS machines and store them to an agent. Once the agent reads the message,
                         it sends it to the Wazuh manager which analyses it with decoders and rules. When a rule matches, an alert
@@ -255,7 +253,7 @@
                 </div>
 
                 <div class="wz-padding-top-10">
-                    <div layout="row" layout-align="space-between center" class="wz-font-weight-bold">VirusTotal</div>
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">VirusTotal</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
                         VirusTotal is an online service that analyzes files and URLs enabling the detection of viruses, worms, trojans and other
                         kinds of malicious content using antivirus engines and website scanners. It also can be used to detect
