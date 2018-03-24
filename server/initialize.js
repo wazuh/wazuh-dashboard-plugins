@@ -203,7 +203,7 @@ module.exports = (server, options) => {
             log('initialize.js importAppObjects', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
             
-            const patternId        = 'index-pattern:' + id;
+            let patternId        = 'index-pattern:' + id;
             let indexPatternList = await searchIndexPatternById(id);
 
             if (!firstTime && indexPatternList.hits.total < 1) {  
