@@ -154,14 +154,14 @@ module.exports = (server, options) => {
         try {
             const response = await elasticRequest.callWithInternalUser('search', { 
                 index: '.kibana', 
-                body : { query: { bool: { must: { match: { type: 'index-pattern' } } } } } 
+                body : { size:999, query: { bool: { must: { match: { type: 'index-pattern' } } } } } 
             })
 
             const filtered = response.hits.hits.filter(item => item._source['index-pattern'].title === req.params.pattern);
 
             return filtered.length >= 1 ?
                    reply({ statusCode: 200, status: true, data: 'Index pattern found' }) :
-                   reply({ statusCode: 200, status: false, data: 'Index pattern not found' });
+                   reply({ statusCode: 500, status: false, error:10020, message: 'Index pattern not found' });
         
         } catch (error) {
             return reply({
