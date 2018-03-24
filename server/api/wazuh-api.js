@@ -81,6 +81,7 @@ module.exports = (server, options) => {
                                         wapi_config.cluster_info.manager = managerName;
                                         wapi_config.cluster_info.node = response.body.data.node;
                                         wapi_config.cluster_info.cluster = response.body.data.cluster;
+                                        wapi_config.password = '****';
                                         reply({
                                             'statusCode': 200,
                                             'data': wapi_config
@@ -101,6 +102,7 @@ module.exports = (server, options) => {
                                 wapi_config.cluster_info.status = 'disabled';
                                 wapi_config.cluster_info.cluster = 'Disabled';
                                 wapi_config.cluster_info.manager = managerName;
+                                wapi_config.password = '****';
                                 reply({
                                     'statusCode': 200,
                                     'data': wapi_config
@@ -124,7 +126,7 @@ module.exports = (server, options) => {
             })
             .catch(error => {
                 if(error.code === 'ECONNREFUSED'){
-                    wapi_config.password = "You shall not pass";
+                    wapi_config.password = '****';
                     wapi_config.apiIsDown = true;
                     reply({
                         'statusCode': 200,
