@@ -159,7 +159,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the `implicitFilters` service ([#270](https://github.com/wazuh/wazuh-kibana-app/pull/270)).
 - Removed visualizations loading status trace from controllers and visualization directive ([#270](https://github.com/wazuh/wazuh-kibana-app/pull/270)).
 
-## [v3.2.0]
+## Wazuh v3.2.0 - Kibana v6.2.1 - Revision 383
 ### Added
 - Support for Wazuh 3.2.0.
 - Compatibility with Kibana 6.1.0 to Kibana 6.2.1.
@@ -186,7 +186,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Removed
 - Removed the `travis.yml` file.
 
-## [v3.1.0]
+## Wazuh v3.1.0 - Kibana v6.1.3 - Revision 380
 ### Added
 - Support for Wazuh 3.1.0.
 - Compatibility with Kibana 6.1.3.
@@ -232,7 +232,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed index pattern configuration from the `package.json` file.
 - Removed unnecessary dependencies from the `package.json` file.
 
-## [v3.0.0]
+## Wazuh v3.0.0 - Kibana v6.1.0 - Revision 371
 ### Added
 - You can configure the initial index-pattern used by the plugin in the initialPattern variable of the app's package.json.
 - Auto `.wazuh` reindex from Wazuh 2.x - Kibana 5.x to Wazuh 3.x - Kibana 6.x.
@@ -254,7 +254,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - New sync system to wait for Elasticsearch JS.
 - Decoupling selected API and pattern from backend and moved to client side.
 
-## [v2.1.0]
+## Wazuh v2.1.0 - Kibana v5.6.1 - Revision 345
 ### Added
 - Loading icon while Wazuh loads the visualizations.
 - Add/Delete/Restart agents.
@@ -263,7 +263,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 - Using genericReq when possible.
 
-## [v2.0.1]
+## Wazuh v2.0.1 - Kibana v5.5.1 - Revision 339
 ### Changed
 - New index in Elasticsearch to save Wazuh set up configuration
 - Short URL's is now supported
