@@ -1,6 +1,21 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.2 - Kibana v6.2.2/v6.2.3 - Revision 388
+### Added
+- Support for Wazuh v3.2.2.
+- Support for Elastic Stack v6.2.2/v6.2.3.
+- Added the `errorHandler` service to the `dataHandler` factory ([#340](https://github.com/wazuh/wazuh-kibana-app/pull/340)).
+
+### Changed
+- Increased query size when fetching index pattern list ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
+
+### Fixed
+- Fixed a bug where several `agent.id` filters were created at the same time when navigating between *Agents* and *Groups* with different selected agents ([#342](https://github.com/wazuh/wazuh-kibana-app/pull/342)).
+
+### Removed
+- Removed clear API password on `checkPattern` response ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
+
 ## Wazuh v3.2.1 - Kibana v6.2.2/v6.2.3 - Revision 387
 ### Added
 - New logging system ([#307](https://github.com/wazuh/wazuh-kibana-app/pull/307)):
