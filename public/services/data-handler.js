@@ -1,6 +1,6 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.factory('DataHandler', function ($q, apiReq) {
+app.factory('DataHandler', function ($q, apiReq,errorHandler) {
     class DataHandler {
         constructor() {
             this.items        = [];
@@ -74,7 +74,10 @@ app.factory('DataHandler', function ($q, apiReq) {
                     deferred.resolve(true);
                 }
             })
-            .catch(err => this.busy = false);
+            .catch(error => {
+                this.busy = false;
+                errorHandler.handle(error,'Datahandler factory');
+            });
 
             return deferred.promise;
         }
@@ -120,7 +123,7 @@ app.factory('DataHandler', function ($q, apiReq) {
             .then(function (data) {
                 this.items.splice(index, 1);
             }.bind(this))
-            .catch(console.error);
+            .catch(error => errorHandler.handle(error,'Datahandler factory'));
         }
 
         search () {
@@ -161,7 +164,7 @@ app.factory('DataHandler', function ($q, apiReq) {
                 this.offset = items.length;
                 deferred.resolve(true);
             })
-            .catch(console.error);
+            .catch(error => errorHandler.handle(error,'Datahandler factory'));
 
             return deferred.promise;
         }
