@@ -272,41 +272,19 @@ module.exports = (server, options) => {
 
     module.exports = getConfig;
 
-    const getAllowedIndices = async roles => {
-        try {
-            const xpacksec = await elasticRequest.callWithInternalUser('search', {
-                index: '.security-6',
-                type : 'doc'
-            });
-
-            let allowedIndices = [];
-            for(const rol of roles){
-                console.log('-----------------------------')
-                console.log(`rol ${rol}`);
-                const myIndices = xpacksec.hits.hits.filter(item => item._id === `role-${rol}` && item._source && item._source.indices);
-                console.log(myIndices)
-                for(const set of myIndices){                    
-                    const filteredIndices = set._source.indices.filter(item => item.privileges.includes('all') || item.privileges.includes('read'));
-                    for(const index of filteredIndices){
-                        allowedIndices.push(...index.names);
-                    }
-                }
-                console.log('-----------------------------')
+    const filterAllowedIndexPatternList = async (list,req) => {
+        let finalList = [];
+        for(let item of list){
+            try {
+                const allow = await elasticRequest.callWithRequest(req,'search', {
+                    index: item.title,
+                    type : 'doc'
+                });
+                finalList.push(item);
+            } catch (error){
+                console.log(`Some user trys to fetch the index pattern ${item.title} without permissions`)
             }
 
-            return allowedIndices;
-
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    const filterAllowedIndexPatternList = (allowedIndices,list) => {
-        let finalList = [];
-        for(let allowed of allowedIndices){
-            const sanitized = allowed[allowed.length-1] === '*' ? allowed.split('*')[0] : allowed;
-            const filtered  = list.filter(item => item.title.includes(sanitized));
-            if(filtered.length) finalList.push(...filtered)
         }
         return finalList;
     }
@@ -316,8 +294,6 @@ module.exports = (server, options) => {
             const xpack          = await elasticRequest.callWithInternalUser('cat.plugins', { });
             const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
             const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
-            const allowedIndices = isXpackEnabled && !isSuperUser ? await getAllowedIndices(req.auth.credentials.roles) : false;
-            console.log(req.auth.credentials,allowedIndices)
             const data = await elasticRequest
             .callWithInternalUser('search', {
                     index: '.kibana',
@@ -352,7 +328,7 @@ module.exports = (server, options) => {
                     }
            
                 }
-                return res({data: isXpackEnabled && !isSuperUser ? filterAllowedIndexPatternList(allowedIndices,list) : list});
+                return res({data: isXpackEnabled && !isSuperUser ? await filterAllowedIndexPatternList(list,req) : list});
             }
             
             throw new Error('The Elasticsearch request didn\'t fetch the expected data');
