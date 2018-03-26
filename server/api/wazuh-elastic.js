@@ -278,9 +278,9 @@ module.exports = (server, options) => {
             try {
                 const allow = await elasticRequest.callWithRequest(req,'search', {
                     index: item.title,
-                    type : 'doc'
+                    type : 'wazuh'
                 });
-                finalList.push(item);
+                if(allow && allow.hits && allow.hits.total >= 1) finalList.push(item);
             } catch (error){
                 console.log(`Some user trys to fetch the index pattern ${item.title} without permissions`)
             }
