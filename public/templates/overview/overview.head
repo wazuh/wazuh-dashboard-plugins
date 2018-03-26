@@ -1,11 +1,9 @@
 <div flex ng-controller="overviewController" layout="column">
 
-    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'overview'">
-        <wz-menu></wz-menu>
-    </div>
+    <wz-menu ng-init="menuNavItem = 'overview'"></wz-menu>
 
-    <div layout="row" layout-align="space-between start" class="horizontalTabsBar">
-        <div class="horizontalTabsBar" layout="column" layout-align="center start">
+    <div layout="row" layout-align="space-between start" class="wz-md-navbar-kbn">
+        <div layout="column" layout-align="center start">
             <md-nav-bar class="padding-right-0 wz-md-navbar" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
                 <md-nav-item md-nav-click="switchTab('general');" name="general">General</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('fim');" name="fim">File integrity</md-nav-item>
@@ -19,7 +17,7 @@
             </md-nav-bar>
         </div>
 
-        <div class="horizontalTabsBar" layout="column" layout-align="end end">
+        <div layout="column" layout-align="end end">
             <md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
                 <md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
                     <i class="fa fa-th fa-fw"></i> Panels
@@ -31,7 +29,7 @@
         </div>
     </div>
 
-    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
+    <!-- <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear> -->
 
     <!-- View: Discover -->
     <kbn-dis></kbn-dis>
@@ -44,7 +42,7 @@
     <!-- No results message -->
     <md-content flex layout="row" layout-align="start start" ng-show="resultState !== 'ready' && tabView === 'panels'">
         <md-card flex layout="column" class="wz-md-card">
-            <md-card-content class="text-center">
+            <md-card-content class="wz-text-center">
                 No results for selected time interval
             </md-card-content>
         </md-card>

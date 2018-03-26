@@ -103,7 +103,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                 var renderComplete = function() {
                     rendered = true;
-
+                    
                     if(typeof $rootScope.loadedVisualizations === 'undefined') $rootScope.loadedVisualizations = [];
                     $rootScope.loadedVisualizations.push(true);
                     let currentCompleted = Math.round(($rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100);

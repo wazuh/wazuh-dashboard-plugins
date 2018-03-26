@@ -1,9 +1,9 @@
 {
   "name": "wazuh",
   "version": "3.2.1",
-  "revision": "0386",
+  "revision": "0387",
   "kibana": {
-    "version": "6.2.2"
+    "version": "6.2.3"
   },
   "description": "Wazuh App",
   "main": "index.js",
@@ -33,6 +33,7 @@
     "js-yaml": "3.10.0",
     "lodash": "3.10.1",
     "needle": "^2.0.1",
-    "node-cron": "^1.1.2"
+    "node-cron": "^1.1.2",
+    "winston": "3.0.0-rc1"
   }
 }

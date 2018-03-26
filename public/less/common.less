@@ -1,4 +1,8 @@
-/* Health check */
+/* -------------------------------------------------------------------------- */
+/* ------------------------ Wazuh commons stylesheet ------------------------ */
+/* -------------------------------------------------------------------------- */
+
+/* Custom healthcheck and blank screen styles */
 
 .error-notify {
     font-size: 20px;
@@ -15,10 +19,6 @@
     position: relative;
     top: -157px;
     width: 85px;
-    text-align: center;
-}
-
-.present-logo {
     text-align: center;
 }
 
@@ -45,12 +45,6 @@
     text-align: center;
 }
 
-.wz-pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    height: 200px;
-}
-
 .percentage {
     font-size: 18px;
     text-align: center;
@@ -59,23 +53,54 @@
     color: #666666;
     background-color: white !important;
 }
-/* Wazuh Header */
 
-.wazuh-h1 {
-    font-size: 24px !important;
-}
+/* Custom JSON viewer settings */
 
-  
-
-html, body, button:not(.fa):not(.fa-times), textarea, input, select {
-    font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
-}
-
-.wz-line-height {
+.wz-pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    height: 200px;
     line-height: 20px !important;
 }
 
-/* Loading Ring styles */
+.jsonbeauty2 {
+    min-height: 300px;
+    margin: 0px !important;
+}
+
+.json-beautifier {
+    background-color: ghostwhite;
+    border: 1px solid silver;
+    padding: 10px 20px;
+    margin: 20px;
+}
+
+/* Special fix to make Kibana search bar similar to the rest from the app */
+
+.kuiLocalSearchInput,
+.kuiLocalSearchInput:focus {
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #D9D9D9 !important;
+}
+
+/* Custom progress linear styles */
+
+.wazuh-loading md-progress-linear {
+    height: 20px !important;
+}
+
+.wazuh-loading md-progress-linear .md-container {
+    height: 20px !important;
+}
+
+.wazuh-loading md-progress-linear .md-container .md-bar {
+    height: 20px !important;
+}
+.wazuh-loading md-progress-linear .md-container .md-dashed:before {
+    height: 20px !important;
+}
+
+/* Custom loading ring styles */
 
 div.uil-ring-css {
     transform: scale(0.8);
@@ -104,37 +129,74 @@ div.uil-ring-css {
     animation: uil-ring-anim 1.5s linear infinite;
 }
 
-/* Navbar Directive */
+/* Custom tooltips styles */
 
-.headBar {
-    background-color: white !important;
-    min-width: 463px;
+.wz-tooltip .md-content {
+    background-color: rgba(0,0,0,0.87) !important;
+    color: #FFF;
 }
 
-.horizontalTabsBar {
-    background-color: white !important;
+/* Custom Manager/Status styles */
+
+.status {
+    width: 3%;
 }
 
-.json-beautifier {
-    background-color: ghostwhite;
-    border: 1px solid silver;
-    padding: 10px 20px;
-    margin: 20px;
+.status.round {
+    border-radius: 50%;
+    height: 15px;
+    width: 15px;
 }
 
-.json-key {
-    color: brown;
+.joinCardsRow {
+    margin-top: 5px;
 }
 
-.json-value {
-    color: navy;
+/* Custom Manager/Ruleset styles */
+
+.manager-ruleset-decoders-top-24 {
+    margin: 0;
+    height: 220px;
 }
 
-.json-string {
-    color: olive;
+.manager-ruleset-rules-top-row {
+    padding: 0px !important;
+    height: 200px;
 }
 
-/* Input filter box styles */
+.manager-ruleset-btn {
+    top: -3px;
+}
+
+.wz-chip {
+    font-size: 14px;
+    color: white;
+    background-color: #0079a5;
+    border: 1px solid #D9D9D9;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Manager/Logs styles */
+
+.manager-log-buttonplay {
+    margin: 20px 7px !important;
+    margin-top: 20px;
+    width: 180px;
+}
+
+/* Custom buttons styles */
+
+.wazuh-button {
+    background-color: rgb(0, 85, 113) !important;
+    color: white !important;
+}
+
+.wazuh-button.active,
+.wazuh-button:not([disabled]):hover {
+    background-color: rgb(0, 121, 165) !important;
+}
+
+/* Custom input filter box styles */
 
 .input-filter-box {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
@@ -152,7 +214,8 @@ div.uil-ring-css {
     border: 1px solid #D9D9D9 !important;
 }
 
-/* Styles for input containers */
+/* Custom input container styles */
+
 .wz-input-container label {
     font-weight: 700 !important;
     color: rgba(0, 0, 0, 0.38) !important;
@@ -172,126 +235,133 @@ div.uil-ring-css {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Style to override outline on components but avoid hidden shadow on focus*/
-/* This is a really important fix and should not be deleted */
+/* Styles to override outline on components but avoid hidden shadow on focus */
+/* These are really important fixex and should not be deleted */
+
 :focus:not([class^="eui"]) {
     box-shadow: none;
 }
 
-/* Style to override outline on components but avoid hidden shadow on focus*/
-/* This is a really important fix and should not be deleted */
-:focus:not(.wazuh-button):not(.input-filter-box) {
+:focus:not(.wazuh-button):not(.input-filter-box):not(.kuiLocalSearchInput) {
     box-shadow: none !important;
 }
 
-/* Progress Linear */
+/* Custom colors styles */
 
-.wazuh-loading md-progress-linear {
-    height: 20px !important;
+.green {
+    background-color: rgb(42, 204, 67);
 }
 
-.wazuh-loading md-progress-linear .md-container {
-    height: 20px !important;
+.teal {
+    background-color: rgb(0, 166, 155);
 }
 
-.wazuh-loading md-progress-linear .md-container .md-bar {
-    height: 20px !important;
-}
-.wazuh-loading md-progress-linear .md-container .md-dashed:before {
-    height: 20px !important;
+.red {
+    background-color: rgb(255, 100, 92);
 }
 
-/* Common styles for text and font */
-.text-center {
-    text-align: center;
+.yellow {
+    background-color: rgb(255, 192, 74);
 }
 
-.text-right {
-    text-align: right;
+.blue {
+    background-color: rgb(0, 121, 165);
 }
 
-.text-bold {
-    font-weight: bold !important;
+.grey {
+    background-color: grey;
 }
 
-.font-size-16-pt {
-    font-size: 16pt;
+.wz-metric-color {
+    background-color: #e4f2f5 !important;
 }
 
-.font-size-18 {
-    font-size: 18px;
+.wz-background-transparent {
+    background-color: transparent;
 }
 
-.font-size-25 {
-    font-size: 25px;
+/* Custom Kibana styles */
+
+.wz-border-none,
+.wz-border-none md-select-value {
+    border: none;
 }
 
-/* Custom Background colours */
-
-.background-white {
-    background-color: white;
+.wz-border-0,
+.wz-md-navbar .md-nav-bar {
+    border: 0px;
 }
 
-.background-e2 {
-    background-color: #e2e2e2;
+.wz-md-navbar ._md-nav-button-text,
+.wz-md-tab .md-tab,
+.wz-md-tab .md-active {
+    color: black !important;
 }
 
-.color-f9 {
-    color: #ff9999;
+.wazuhNavDiscover .euiTab ,
+.wazuhNavDiscover .euiText {
+    font-size: 14px !important;
 }
 
-/* Custom styles for the box model */
-
-.margin-top-30 {
-    margin-top: 30px;
+.kuiLocalNav {
+    border-bottom: none !important;
 }
 
-.no-margin-right {
-    margin-right: 0px;
+.wz-md-navbar-kbn {
+    margin-bottom: 15px !important;
 }
 
-.no-margin-left {
-    margin-left: 0px;
+kbn-vis,
+visualize,
+visualization {
+    display: flex;
+    flex: 1 1 100%;
 }
 
-.margin-left-0 {
-    margin-left: 0px !important;
-    margin-right: 8px !important;
-    margin-top: 8px !important;
-    margin-bottom: 8px !important;
-}
-
-.padding-left-0 {
-    padding-left: 0px;
-}
-
-.padding-right-0 {
-    padding-right: 0px;
-}
-
-.overflow-hidden {
+kbn-vis visualize,
+kbn-vis visualization,
+kbn-vis .vis-container {
     overflow: hidden;
 }
 
-.wz-padding-left-16 {
-    padding-left: 16px
+/* Custom md-switch styles */
+
+.wz-md-switch {
+    margin: 0px !important;
 }
 
-.wz-lateral-padding-16 {
-    padding-left: 16px;
-    padding-right: 16px;
-}
+/* Card and select input shadow overriding */
 
-/* Custom styles for tooltips */
-.wz-tooltip .md-content {
-    background-color: rgba(0,0,0,0.87) !important;
-    color: #FFF;
-}
-
-/* Special fix to make Kibana search bar similar to the rest from the app */
-
-.kuiLocalSearchInput,
-.kuiLocalSearchInput:focus {
+.wz-md-card {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid #D9D9D9 !important;
+    overflow: hidden;
+}
+
+.wz-select-input {
+    border-radius: 0;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #D9D9D9;
+}
+
+/* Unclassified but important Wazuh app component styles */
+
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+.wz-agent-status-indicator {
+    width: 100%;
+    padding: 4px;
+    color: white;
+    font-weight: normal;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.wz-search-bar-size {
+    padding: 5px;
+    height: 35px;
+    margin-top: 0px !important;
+    margin-right: 0px !important;
 }

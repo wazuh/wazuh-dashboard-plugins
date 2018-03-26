@@ -33,7 +33,7 @@ app.controller('agentsController',
             auditModifiedFiles: '[vis-id="\'Wazuh-App-Agents-Audit-Modified-files-metric\'"]',
             auditRemovedFiles : '[vis-id="\'Wazuh-App-Agents-Audit-Removed-files-metric\'"]'
         }
-    
+
         // Metrics Vulnerability Detector
         const metricsVulnerability = {
             vulnCritical: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]',
@@ -80,7 +80,7 @@ app.controller('agentsController',
             virustotal: { group: 'virustotal' }
         };
 
-        const checkMetrics = (tab,subtab) => {
+        const checkMetrics = (tab, subtab) => {
             metricService.destroyWatchers();
 
             if(subtab === 'panels'){
@@ -109,35 +109,47 @@ app.controller('agentsController',
         $scope.switchSubtab = subtab => {
             if($scope.tabView === subtab) return;
 
-            $scope.tabView = subtab;
-            checkMetrics($scope.tab,subtab);
+            checkMetrics($scope.tab, subtab);
         }
+
+        // Switch tab
         $scope.switchTab = tab => {
-
             if($scope.tab === tab) return;
-
-            checkMetrics(tab,'panels');
-
-            if($rootScope.ownHandlers){
-                for(let h of $rootScope.ownHandlers){
-                    h._scope.$destroy();
-                }
-            }
-            $rootScope.ownHandlers = [];
+            checkMetrics(tab, 'panels');
 
             // Deleting app state traces in the url
             $location.search('_a', null);
-            $scope.tabView = 'panels';
-
-            $rootScope.loadedVisualizations = [];
         };
 
         // Watchers
 
         // We watch the resultState provided by the discover
-        $scope.$watch('tabView', () => $location.search('tabView', $scope.tabView));
+        $scope.$watch('tabView', () => {
+            $location.search('tabView', $scope.tabView);
+
+            if ($rootScope.ownHandlers) {
+                for (let h of $rootScope.ownHandlers) {
+                    h._scope.$destroy();
+                }
+            }
+            $rootScope.ownHandlers = [];
+
+            $rootScope.loadedVisualizations = [];
+        });
+
         $scope.$watch('tab', () => {
             $location.search('tab', $scope.tab);
+
+            $scope.tabView = 'panels';
+
+            if ($rootScope.ownHandlers) {
+                for (let h of $rootScope.ownHandlers) {
+                    h._scope.$destroy();
+                }
+            }
+            $rootScope.ownHandlers = [];
+
+            $rootScope.loadedVisualizations = [];
 
             // Update the implicit filter
             if (typeof tabFilters[$scope.tab] !== 'undefined' && tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
@@ -149,7 +161,7 @@ app.controller('agentsController',
         });
 
         // Agent data
-        $scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "green" : "red";
+        $scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "teal" : "red";
 
         $scope.formatAgentStatus = (agentStatus) => {
             return ['Active','Disconnected'].includes(agentStatus) ? agentStatus : 'Never connected';
@@ -205,7 +217,7 @@ app.controller('agentsController',
             if(lastAgent && lastAgent !== id){
                 $rootScope.agentsAutoCompleteFired = true;
                 if(!$rootScope.$$phase) $rootScope.$digest();
-            }            
+            }
         }
 
         $scope.getAgent = async (newAgentId,fromAutocomplete) => {
@@ -269,6 +281,14 @@ app.controller('agentsController',
 
         $scope.goGroups = agent => {
             $rootScope.globalAgent = agent;
+            $scope.agentsAutoComplete.reset();
+            if($rootScope.ownHandlers) {
+                for(let h of $rootScope.ownHandlers){
+                    h._scope.$destroy();
+                }
+            }
+            if(metricService.hasItems()) metricService.destroyWatchers();
+            $rootScope.ownHandlers = [];
             $rootScope.comeFrom    = 'agents';
             $location.search('tab', 'groups');
             $location.path('/manager');
@@ -329,11 +349,6 @@ app.controller('agentsController',
 
         $scope.tabs          = tabs;
         $scope.selectedIndex = 0;
-
-        /** Agent configuration */
-        $scope.switchConfigTab = selected => {
-
-        };
 
         $scope.isArray = angular.isArray;
 

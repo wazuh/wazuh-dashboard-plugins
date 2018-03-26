@@ -5,6 +5,38 @@ module.exports = (server, options) => {
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
+    const getTimeStamp = async (req,reply) => {
+        try {
+
+            const data = await elasticRequest.callWithInternalUser('search', {
+                index: '.wazuh-version',
+                type :  'wazuh-version'
+            })
+
+            if(data.hits && 
+               data.hits.hits[0] && 
+               data.hits.hits[0]._source && 
+               data.hits.hits[0]._source.installationDate && 
+               data.hits.hits[0]._source.lastRestart){
+                
+                    return reply({
+                        installationDate: data.hits.hits[0]._source.installationDate,
+                        lastRestart     : data.hits.hits[0]._source.lastRestart
+                    });
+
+            } else {
+                throw new Error('Could not fetch .wazuh-version index');
+            }
+
+        } catch (err) {
+            reply({
+                'statusCode': 500,
+                'error':      99,
+                'message':    err.message || 'Could not fetch .wazuh-version index'
+            }).code(500);
+        }
+    }
+
     //Handlers
     const fetchElastic = (req, payload) => {
         return elasticRequest.callWithRequest(req, 'search', {
@@ -20,7 +52,7 @@ module.exports = (server, options) => {
             type:  'wazuh-configuration',
             id:     id
         })
-        .then((data) => {
+        .then(data => {
             callback({
                 'user':         data._source.api_user,
                 'password':     Buffer.from(data._source.api_password, 'base64').toString("ascii"),
@@ -31,7 +63,7 @@ module.exports = (server, options) => {
                 'extensions':   data._source.extensions
             });
         })
-        .catch((error) => {
+        .catch(error => {
             callback({
                 'error': 'no elasticsearch',
                 'error_code': 2
@@ -60,7 +92,7 @@ module.exports = (server, options) => {
                 }
             } 
         })
-        .then((resp) => {
+        .then(resp => {
             // Update the pattern in the configuration
             importAppObjects(req.params.pattern);
             reply({
@@ -68,7 +100,7 @@ module.exports = (server, options) => {
                 'data':       'Index pattern updated'
             });
         })
-        .catch((err) => {
+        .catch(error => {
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -79,7 +111,7 @@ module.exports = (server, options) => {
 
     const getTemplate = (req, reply) => {
         elasticRequest.callWithInternalUser('cat.templates', {})
-        .then((data) => {
+        .then(data => {
             if (req.params.pattern == "wazuh-alerts-3.x-*" && data.includes("wazuh-alerts-3.*")) {
                 reply({
                     'statusCode': 200,
@@ -115,7 +147,7 @@ module.exports = (server, options) => {
                 }
             }
         })
-        .catch((error) => {
+        .catch(error => {
             reply({
                 'statusCode': 500,
                 'error':      10000,
@@ -156,7 +188,7 @@ module.exports = (server, options) => {
                 'data': 'Index pattern not found'
             });
         })
-        .catch((error) => {
+        .catch(error => {
             reply({
                 'statusCode': 500,
                 'error':      10000,
@@ -218,7 +250,7 @@ module.exports = (server, options) => {
         payload.aggs['2'].terms.field = req.params.field;
 
         fetchElastic(req, payload)
-        .then((data) => {
+        .then(data => {
 
             if (data.hits.total === 0 || typeof data.aggregations['2'].buckets[0] === 'undefined'){
                 reply({
@@ -232,7 +264,7 @@ module.exports = (server, options) => {
                 });
             }
         })
-        .catch((error) => {
+        .catch(error => {
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -247,7 +279,7 @@ module.exports = (server, options) => {
                 index: '.wazuh-version',
                 type: 'wazuh-version'
         })
-        .then((data) => {
+        .then(data => {
             if (data.hits.total === 0) {
                 reply({
                     'statusCode': 200,
@@ -260,7 +292,7 @@ module.exports = (server, options) => {
                 });
             }
         })
-        .catch((error) => {
+        .catch(error => {
             reply({
                 'statusCode': 500,
                 'error':      9,
@@ -297,6 +329,59 @@ module.exports = (server, options) => {
 
     module.exports = getConfig;
 
+
+    const getlist = async (req,res) => {
+        try {
+            const data = await elasticRequest
+            .callWithInternalUser('search', {
+                    index: '.kibana',
+                    type: 'doc',
+                    body: {
+                        "query":{
+                            "match":{
+                              "type": "index-pattern"
+                            }
+                          }
+                    }
+                    
+            });
+            if(data && data.hits && data.hits.hits){
+                const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+                let list = [];
+                if(data.hits.hits.length === 0) throw new Error('There is no index pattern');
+                for(const index of data.hits.hits){   
+                    let valid, parsed;        
+                    try{
+                        parsed = JSON.parse(index._source['index-pattern'].fields)
+                    } catch (error){
+                        continue;
+                    }     
+                    
+                    valid = parsed.filter(item => minimum.includes(item.name));
+                    if(valid.length === 4){
+                        list.push({
+                            id: index._id.split('index-pattern:')[1],
+                            title: index._source['index-pattern'].title
+                        })
+                    }
+           
+                }
+                return res({data: list});
+            }
+            
+            throw new Error('The Elasticsearch request didn\'t fetch the expected data');
+
+        } catch(error){
+            return res({error: error.message}).code(500)
+        }
+    }
+
+    // Get index patterns list
+    server.route({
+        method:  'GET',
+        path:    '/get-list',
+        handler: getlist
+    });
     //Server routes
 
     /*
@@ -365,5 +450,11 @@ module.exports = (server, options) => {
         method: 'GET',
         path: '/api/wazuh-elastic/updatePattern/{pattern}',
         handler: updateAppObjects
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/timestamp',
+        handler: getTimeStamp
     });
 };

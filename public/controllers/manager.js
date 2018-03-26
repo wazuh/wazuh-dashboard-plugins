@@ -1,14 +1,14 @@
 // Require config
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('managerController', function ($scope,$rootScope, $routeParams, $location,apiReq, errorHandler) {
+app.controller('managerController', function ($scope, $rootScope, $routeParams, $location, apiReq, errorHandler) {
     $scope.submenuNavItem  = 'status';
     $scope.submenuNavItem2 = 'rules';
 
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
-    
+
     apiReq.request('GET', `/agents/000`, {})
     .then(data => $rootScope.agent = data.data.data)
     .catch(error => {
@@ -50,7 +50,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
     $scope.load  = true;
 
     //Functions
-    $scope.getDaemonStatusClass = daemonStatus => (daemonStatus === 'running') ? 'status green' : 'status red';
+    $scope.getDaemonStatusClass = daemonStatus => (daemonStatus === 'running') ? 'status teal' : 'status red';
 
     Promise.all([
         apiReq.request('GET', '/agents/summary', {}),
@@ -80,7 +80,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
         if(!$scope.$$phase) $scope.$digest();
     })
     .catch(error => {
-        errorHandler.handle(error,'Manager'); 
+        errorHandler.handle(error,'Manager');
         if(!$rootScope.$$phase) $rootScope.$digest();
     });
 

@@ -1,6 +1,10 @@
+/* -------------------------------------------------------------------------- */
+/* ------------------------ Wazuh stylesheets loader ------------------------ */
+/* -------------------------------------------------------------------------- */
+
 require('plugins/wazuh/less/common.less');
-require('plugins/wazuh/less/heights.less');
+require('plugins/wazuh/less/layout.less');
+require('plugins/wazuh/less/height.less');
+require('plugins/wazuh/less/typography.less');
 require('plugins/wazuh/less/media-queries.less');
 import 'ui/styles/theme.less';
-
-require('plugins/wazuh/less/cleaned.less');

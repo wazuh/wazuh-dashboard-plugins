@@ -1,10 +1,9 @@
 <div flex ng-controller="settingsController" layout="column">
 
-    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'settings'">
-        <wz-menu></wz-menu>
-    </div>
+    <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
 
-    <div class="headBar" layout="row" layout-align="center start">
+    <!-- Settings navbar -->
+    <div layout="row" layout-align="center start">
         <md-nav-bar flex class="padding-right-0 wz-md-navbar" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-click="submenuNavItem = 'api'" name="api">API</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'extensions'" name="extensions">Extensions</md-nav-item>
@@ -15,15 +14,18 @@
 
     <div layout="column" layout-align="start stretch">
 
+        <!-- First-time welcome card -->
         <md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api' && apiEntries.length == 0">
             <md-card-content>
                 <span class="wz-headline-title">Welcome to the Wazuh App for Kibana 6</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
+
                 <div layout="row" class="wz-padding-top-10 wz-line-height">
                     The Wazuh App brings together a new and useful web interface for managing and monitoring your Wazuh infrastructure. You can
                     check agent status, alert evolution, most recent events, popular alerts, top alert groups, etc. You can
                     also display configuration and logs of the manager.
                 </div>
+
                 <div layout="row" class="wz-padding-top-10">
                     In addition, make use of any or all of these extensions:
                 </div>
@@ -37,14 +39,15 @@
                         <li>VirusTotal integration</li>
                     </ul>
                 </div>
+
                 <div layout="row" class="wz-padding-top-10 wz-line-height">
                     The app joins Wazuh features like:
                     <strong>&nbsp;Log management and analysis</strong>,
                     <strong>&nbsp;file integrity monitoring</strong>,
                     <strong>&nbsp;intrusion and anomaly detection&nbsp;</strong> and
                     <strong>&nbsp;policy and compliance monitoring.</strong>
-
                 </div>
+
                 <div layout="row" class="wz-padding-top-10">
                     Help us to improve this app. We would appreciate your feedback. Collaborate with us on the
                     <a href="https://groups.google.com/forum/#!forum/wazuh">&nbsp;mailing lists&nbsp;</a> and/or the Wazuh App
@@ -52,13 +55,17 @@
                 </div>
             </md-card-content>
         </md-card>
+
+        <!-- API down error card -->
         <md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="apiIsDown">
             <md-card-content>
                 <span class="wz-headline-title">Wazuh API seems to be down</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
+
                 <div layout="row" class="wz-padding-top-10 wz-line-height">
-                        Please, check if Wazuh RESTful API is running with one of the commands below:
+                    Please, check if Wazuh RESTful API is running with one of the commands below:
                 </div>
+
                 <div layout="row" class="wz-padding-top-10 wz-line-height">
                     <ul>
                         <li>For Systemd:</li>
@@ -67,223 +74,223 @@
                         <li><pre class="json-beautifier"><code># service wazuh-api status</code></pre></li>
                     </ul>
                 </div>
+
                 <div layout="row" class="wz-padding-top-10 wz-line-height">
-                    If the API is <code>active (running)</code> please check its configuration below.
+                    If the API is&nbsp;<code>active (running)</code> please check its configuration below.
                 </div>
             </md-card-content>
         </md-card>
 
         <md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api'">
+            <md-card-content>
+                <span class="wz-headline-title">Wazuh App: API configuration</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
 
-            <span class="wz-headline-title">Wazuh App: API configuration</span>
-            <md-divider class="wz-margin-top-10"></md-divider>
-
-            <div layout="row" layout-align="start start">
-                <p flex="15" class="text-bold">Cluster</p>
-                <p flex="20" class="text-bold">Manager</p>
-                <p flex="15" class="text-bold">API URL</p>
-                <p flex="15" class="text-bold">API Port</p>
-                <p flex="15" class="text-bold">User</p>
-                <p flex="20" class="text-bold">Actions</p>
-            </div>
-
-            <div ng-repeat="entry in apiEntries">
-                <div layout="row" layout-align="space-between center">
-                    <p flex="15">
-                        <i ng-show="(entry._id === currentDefault)" tooltip="Set as default Manager" tooltip-placement="right" class="fa fa-star settings-template-1" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
-                    <p flex="20">{{entry._source.cluster_info.manager}}</p>
-                    <p flex="15">{{entry._source.url}}</p>
-                    <p flex="15">{{entry._source.api_port}}</p>
-                    <p flex="15">{{entry._source.api_user}}</p>
-                    <p flex="20">
-                        <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
-                        <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash settings-template-2 cursor-pointer" aria-hidden="true"></i>
-                        <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh settings-template-2 cursor-pointer" aria-hidden="true"></i>
-                        <i ng-click="toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil settings-template-2 cursor-pointer" aria-hidden="true"></i>
-                    </p>
+                <!-- API list headings row -->
+                <div layout="row" layout-align="start start" class="wz-padding-top-10 wz-padding-bottom-14">
+                    <p flex="15" class="wz-text-bold">Cluster</p>
+                    <p flex="20" class="wz-text-bold">Manager</p>
+                    <p flex="15" class="wz-text-bold">API URL</p>
+                    <p flex="15" class="wz-text-bold">API Port</p>
+                    <p flex="15" class="wz-text-bold">User</p>
+                    <p flex="20" class="wz-text-bold">Actions</p>
                 </div>
-                <div layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id] && isEditing">
-                    <form flex ng-submit="updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
-                        <!-- Input section -->
-                        <md-input-container class="wz-input-container">
-                            <label>Username</label>
-                            <input ng-model="formUpdate.user" ng-init="formUpdate.user=entry._source.api_user" type="text" placeholder="" aria-label="username"
-                                required/>
-                        </md-input-container>
-                        <md-input-container class="wz-input-container">
-                            <label>Password</label>
-                            <input ng-model="formUpdate.password" type="password" placeholder="" aria-label="password" required/>
-                        </md-input-container>
-                        <md-input-container class="wz-input-container">
-                            <label>URL</label>
-                            <input ng-model="formUpdate.url" ng-init="formUpdate.url=entry._source.url" type="url" placeholder="http(s)://" aria-label="full url"
-                                required/>
-                        </md-input-container>
-                        <md-input-container class="wz-input-container">
-                            <label>Port</label>
-                            <input ng-model="formUpdate.port" ng-init="formUpdate.port=entry._source.api_port" type="text" placeholder="" aria-label="port"
-                                required/>
-                        </md-input-container>
-                        <!-- Button and errors section -->
-                        <div layout="row" layout-align="center center" ng-if="messageError">
-                            <p class="color-f9">{{messageErrorUpdate}}</p>
-                        </div>
-                        <div layout="row" layout-align="center center">
-                            <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Update API button">
-                                <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Update API
-                            </md-button>
-                        </div>
-                    </form>
-                </div>
-            </div>
 
-            <div ng-show="!isUpdating()" layout="row" layout-align="center center">
-                <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="wazuh-button md-raised md-primary"
-                    aria-label="Add new API button">
-                    <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new API
-                </md-button>
-            </div>
+                <div ng-repeat="entry in apiEntries">
+                    <!-- API entry -->
+                    <div layout="row" layout-align="space-between center" class="wz-padding-top-10 wz-padding-bottom-14">
+                        <p flex="15">
+                            <i ng-show="(entry._id === currentDefault)" tooltip="This is the default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
+                        <p flex="20">{{entry._source.cluster_info.manager}}</p>
+                        <p flex="15">{{entry._source.url}}</p>
+                        <p flex="15">{{entry._source.api_port}}</p>
+                        <p flex="15">{{entry._source.api_user}}</p>
+                        <p flex="20">
+                            <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                        </p>
+                    </div>
 
-            <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-if="!currentAPI || ($parent.addManagerContainer && !isEditing)"
-                class="margin-top-30">
-                <!-- Input section -->
-                <md-input-container class="wz-input-container">
-                    <label>Username</label>
-                    <input ng-model="formData.user" type="text" placeholder="" aria-label="username" required/>
-                </md-input-container>
-                <md-input-container class="wz-input-container">
-                    <label>Password</label>
-                    <input ng-model="formData.password" type="password" placeholder="" aria-label="password" required/>
-                </md-input-container>
-                <md-input-container class="wz-input-container">
-                    <label>URL</label>
-                    <input ng-model="formData.url" type="url" placeholder="http(s)://" aria-label="full url" required/>
-                </md-input-container>
-                <md-input-container class="wz-input-container">
-                    <label>Port</label>
-                    <input ng-model="formData.port" type="text" placeholder="" aria-label="port" required/>
-                </md-input-container>
-                <!-- Button and errors section -->
-                <div layout="row" layout-align="center center">
-                    <p class="color-f9">{{messageError}}</p>
+                    <!-- Edit API form -->
+                    <div layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id] && isEditing">
+                        <form flex ng-submit="updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
+                            <!-- Input section -->
+                            <md-input-container class="wz-input-container">
+                                <label>Username</label>
+                                <input ng-model="formUpdate.user" ng-init="formUpdate.user=entry._source.api_user" type="text" placeholder="" aria-label="username"
+                                    required/>
+                            </md-input-container>
+                            <md-input-container class="wz-input-container">
+                                <label>Password</label>
+                                <input ng-model="formUpdate.password" type="password" placeholder="" aria-label="password" required/>
+                            </md-input-container>
+                            <md-input-container class="wz-input-container">
+                                <label>URL</label>
+                                <input ng-model="formUpdate.url" ng-init="formUpdate.url=entry._source.url" type="url" placeholder="http(s)://" aria-label="full url"
+                                    required/>
+                            </md-input-container>
+                            <md-input-container class="wz-input-container">
+                                <label>Port</label>
+                                <input ng-model="formUpdate.port" ng-init="formUpdate.port=entry._source.api_port" type="text" placeholder="" aria-label="port"
+                                    required/>
+                            </md-input-container>
+                            <!-- Button and errors section -->
+                            <div layout="row" layout-align="center center" ng-if="messageError">
+                                <p class="color-f9">{{messageErrorUpdate}}</p>
+                            </div>
+                            <div layout="row" layout-align="center center">
+                                <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Update API button">
+                                    <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Update API
+                                </md-button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div layout="row" layout-align="center center">
-                    <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Save API button">
-                        <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save API
+
+                <!-- Add API button container -->
+                <div ng-show="!isUpdating()" layout="row" layout-align="center center" class="wz-padding-top-10">
+                    <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="wazuh-button md-raised md-primary"
+                        aria-label="Add new API button">
+                        <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new API
                     </md-button>
                 </div>
-            </form>
 
+                <!-- Add API form -->
+                <form flex ng-submit="processForm()" layout="column" layout-align="start stretch" ng-if="!currentAPI || ($parent.addManagerContainer && !isEditing)"
+                    class="margin-top-30">
+                    <!-- Input section -->
+                    <md-input-container class="wz-input-container">
+                        <label>Username</label>
+                        <input ng-model="formData.user" type="text" placeholder="" aria-label="username" required/>
+                    </md-input-container>
+                    <md-input-container class="wz-input-container">
+                        <label>Password</label>
+                        <input ng-model="formData.password" type="password" placeholder="" aria-label="password" required/>
+                    </md-input-container>
+                    <md-input-container class="wz-input-container">
+                        <label>URL</label>
+                        <input ng-model="formData.url" type="url" placeholder="http(s)://" aria-label="full url" required/>
+                    </md-input-container>
+                    <md-input-container class="wz-input-container">
+                        <label>Port</label>
+                        <input ng-model="formData.port" type="text" placeholder="" aria-label="port" required/>
+                    </md-input-container>
+                    <!-- Button and errors section -->
+                    <div layout="row" layout-align="center center">
+                        <p class="color-f9">{{messageError}}</p>
+                    </div>
+                    <div layout="row" layout-align="center center">
+                        <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Save API button">
+                            <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save API
+                        </md-button>
+                    </div>
+                </form>
+            </md-card-content>
         </md-card>
 
+        <!-- Extensions section -->
         <md-card class="wz-md-card" flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'extensions'">
+            <md-card-content>
+                <span class="wz-headline-title">Wazuh App: Extensions</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
 
-            <span class="wz-headline-title">Wazuh App: Extensions</span>
-            <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">Enable or disable extensions according to your needs. The extension includes: Panels and Discover, for Overview / Agents tabs.</div>
 
-            <div layout="row">Enable or disable extensions according to your needs. The extension includes: Panels and Discover, for Overview
-                / Agents tabs.</div>
+                <div class="wz-padding-top-10">
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">PCI DSS</div>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        The Payment Card Industry Data Security Standard (PCI DSS) is a proprietary information security standard for organizations
+                        that handle branded credit cards from the major card schemes including Visa, MasterCard, American Express,
+                        Discover, and JCB. The PCI Standard is mandated by the card brands and administered by the Payment Card
+                        Industry Security Standards Council. The standard was created to increase controls around cardholder
+                        data to reduce credit card fraud.
+                    </div>
+                    <div layout="row" layout-align="space-between center">
+                        <md-switch flex ng-model="extensions.pci" aria-label="extensionsPci" ng-change="toggleExtension('pci',extensions.pci)"></md-switch>
+                    </div>
+                    <md-divider></md-divider>
+                </div>
 
-            <div>
-                <div layout="row" layout-align="space-between center" class="text-bold">
-                    PCI DSS
+                <div class="wz-padding-top-10">
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">OpenSCAP</div>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        OVAL (Open Vulnerability Assessment Language) interpreter used to check system configuration and detect vulnerable applications.
+                        <br> It is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.
+                    </div>
+                    <div layout="row" layout-align="space-between center">
+                        <md-switch flex ng-model="extensions.oscap" aria-label="extensionsOscap" ng-change="toggleExtension('oscap',extensions.oscap)"></md-switch>
+                    </div>
+                    <md-divider></md-divider>
                 </div>
-                <div layout="row" class="wz-padding-top-10 wz-line-height">
-                    The Payment Card Industry Data Security Standard (PCI DSS) is a proprietary information security standard for organizations
-                    that handle branded credit cards from the major card schemes including Visa, MasterCard, American Express,
-                    Discover, and JCB. The PCI Standard is mandated by the card brands and administered by the Payment Card
-                    Industry Security Standards Council. The standard was created to increase controls around cardholder
-                    data to reduce credit card fraud.
-                </div>
-                <div>
-                    <md-switch flex ng-model="extensions.pci" aria-label="extensionsPci" ng-change="toggleExtension('pci',extensions.pci)"></md-switch>
-                </div>
-                <md-divider></md-divider>
-            </div>
 
-            <div>
-                <div layout="row" layout-align="space-between center" class="text-bold">
-                    OpenSCAP
+                <div class="wz-padding-top-10">
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">Audit</div>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        The Linux Audit system provides a way to track security-relevant information on your system. Based on pre-configured rules,
+                        Audit generates log entries to record as much information about the events that are happening on your
+                        system as possible.
+                    </div>
+                    <div layout="row" layout-align="space-between center">
+                        <md-switch flex ng-model="extensions.audit" aria-label="extensionsAudit" ng-change="toggleExtension('audit',extensions.audit)"></md-switch>
+                    </div>
+                    <md-divider></md-divider>
                 </div>
-                <div layout="row" class="wz-padding-top-10 wz-line-height">
-                    OVAL (Open Vulnerability Assessment Language) interpreter used to check system configuration and detect vulnerable applications.
-                    <br> It is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.
-                </div>
-                <div>
-                    <md-switch flex ng-model="extensions.oscap" aria-label="extensionsOscap" ng-change="toggleExtension('oscap',extensions.oscap)"></md-switch>
-                </div>
-                <md-divider></md-divider>
-            </div>
 
-            <div>
-                <div layout="row" layout-align="space-between center" class="text-bold">
-                    Audit
+                <div class="wz-padding-top-10">
+                    <div layout="row" class="wz-text-bold">Amazon Web Services (AWS)</div>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        Wazuh provides a way to collect alerts from your AWS machines and store them to an agent. Once the agent reads the message,
+                        it sends it to the Wazuh manager which analyses it with decoders and rules. When a rule matches, an alert
+                        is triggered if the rule severity is high enough. Wazuh can be used to alert on specific events from
+                        IAM, EC2 and VPC.
+                    </div>
+                    <div layout="row" layout-align="space-between center">
+                        <md-switch flex ng-model="extensions.aws" aria-label="extensionsAWS" ng-change="toggleExtension('aws',extensions.aws)"></md-switch>
+                    </div>
+                    <md-divider></md-divider>
                 </div>
-                <div layout="row" class="wz-padding-top-10 wz-line-height">
-                    The Linux Audit system provides a way to track security-relevant information on your system. Based on pre-configured rules,
-                    Audit generates log entries to record as much information about the events that are happening on your
-                    system as possible.
-                </div>
-                <div layout="row" layout-align="space-between center">
-                    <md-switch flex ng-model="extensions.audit" aria-label="extensionsAudit" ng-change="toggleExtension('audit',extensions.audit)"></md-switch>
-                </div>
-                <md-divider></md-divider>
-            </div>
 
-            <div>
-                <div layout="row" class="text-bold">
-                    Amazon Web Services (AWS)
+                <div class="wz-padding-top-10">
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">VirusTotal</div>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        VirusTotal is an online service that analyzes files and URLs enabling the detection of viruses, worms, trojans and other
+                        kinds of malicious content using antivirus engines and website scanners. It also can be used to detect
+                        false positives.
+                    </div>
+                    <div layout="row" layout-align="space-between center">
+                        <md-switch flex ng-model="extensions.virustotal" aria-label="extensionsVirusTotal" ng-change="toggleExtension('virustotal',extensions.virustotal)"></md-switch>
+                    </div>
                 </div>
-                <div layout="row" class="wz-padding-top-10 wz-line-height">
-                    Wazuh provides a way to collect alerts from your AWS machines and store them to an agent. Once the agent reads the message,
-                    it sends it to the Wazuh manager which analyses it with decoders and rules. When a rule matches, an alert
-                    is triggered if the rule severity is high enough. Wazuh can be used to alert on specific events from
-                    IAM, EC2 and VPC.
-                </div>
-                <div layout="row" layout-align="space-between center">
-                    <md-switch flex ng-model="extensions.aws" aria-label="extensionsAWS" ng-change="toggleExtension('aws',extensions.aws)"></md-switch>
-                </div>
-                <md-divider></md-divider>
-            </div>
-
-            <div>
-                <div layout="row" layout-align="space-between center" class="text-bold">
-                    VirusTotal
-                </div>
-                <div layout="row" class="wz-padding-top-10 wz-line-height">
-                    VirusTotal is an online service that analyzes files and URLs enabling the detection of viruses, worms, trojans and other
-                    kinds of malicious content using antivirus engines and website scanners. It also can be used to detect
-                    false positives.
-                </div>
-                <div layout="row" layout-align="space-between center">
-                    <md-switch flex ng-model="extensions.virustotal" aria-label="extensionsVirusTotal" ng-change="toggleExtension('virustotal',extensions.virustotal)"></md-switch>
-                </div>
-            </div>
-
+            </md-card-content>
         </md-card>
 
         <md-card class="wz-md-card" flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'pattern'">
+            <md-card-content>
+                <span class="wz-headline-title">Wazuh App: Index pattern selection</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
 
-            <span class="wz-headline-title">Wazuh App: Index pattern selection</span>
-            <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">Select the index pattern to run search and analytics against.</div>
 
-            <div layout="row">Select the index pattern to run search and analytics against.</div>
-            <div layout="row">
-                <strong>Beware:</strong>&nbsp;the new index-pattern structure must be compatible with Wazuh alerts, otherwise the visualizations
-                will load erroneous data, or no data at all.
-            </div>
-            <div layout="row">
-                <strong>Warning:</strong>&nbsp;modifying the index-pattern will change it to ALL of the users.
-            </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <strong>Beware:</strong>&nbsp;the new index-pattern structure must be compatible with Wazuh alerts, otherwise the visualizations
+                    will load erroneous data, or no data at all.
+                </div>
 
-            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
-                <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)"
-                    aria-label="Select index pattern">
-                    <option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.attributes.title}}</option>
-                </select>
-            </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <strong>Warning:</strong>&nbsp;modifying the index-pattern will change it to ALL of the users.
+                </div>
+
+                <div flex="20" layout="column" class="height-41 md-block wz-margin-top-17 wz-margin-right-15 wz-select-input">
+                    <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
+                        <option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.title}}</option>
+                    </select>
+                </div>
+            </md-card-content>
         </md-card>
 
+        <!-- About section -->
         <md-content layout="column" layout-align="start stretch" ng-if="submenuNavItem == 'about'">
 
             <md-card flex class="wz-md-card">
@@ -293,9 +300,7 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
 
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
-                        The Wazuh App brings together a new and useful web interface for managing and monitoring your Wazuh infrastructure. You can
-                        check agent status, alert evolution, most recent events, popular alerts, top alert groups, etc. You
-                        can also display configuration and logs of the manager.
+                        The Wazuh App brings together a new and useful web interface for managing and monitoring your Wazuh infrastructure. You can check agent status, alert evolution, most recent events, popular alerts, top alert groups, etc. You can also display configuration and logs of the manager.
                     </div>
                     <div layout="row" class="wz-padding-top-10">
                         In addition, make use of any or all of these extensions:
@@ -332,19 +337,18 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>App version</span>
-                        <span flex class="text-right color-grey">{{appInfo["app-version"]}}</span>
+                        <span flex class="wz-text-right color-grey">{{appInfo["app-version"]}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Install date</span>
-                        <span flex class="text-right color-grey">{{appInfo["installationDate"]}}</span>
+                        <span flex class="wz-text-right color-grey">{{appInfo["installationDate"]}}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Revision</span>
-                        <span flex class="text-right color-grey">{{appInfo["revision"]}}</span>
+                        <span flex class="wz-text-right color-grey">{{appInfo["revision"]}}</span>
                     </div>
                 </md-card-content>
             </md-card>
         </md-content>
     </div>
-
 </div>

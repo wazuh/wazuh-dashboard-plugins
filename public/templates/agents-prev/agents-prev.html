@@ -8,46 +8,46 @@
                     <div flex layout="column">
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Active</p>
-                            <p class="text-right color-grey">{{agentsCountActive}}</p>
+                            <p class="wz-text-right color-grey">{{agentsCountActive}}</p>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Disconnected</p>
-                            <p class="text-right color-grey">{{agentsCountDisconnected}}</p>
+                            <p class="wz-text-right color-grey">{{agentsCountDisconnected}}</p>
                         </div>
                     </div>
                     <div flex layout="column">
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Never connected</p>
-                            <p class="text-right color-grey">{{agentsCountNeverConnected}}</p>
+                            <p class="wz-text-right color-grey">{{agentsCountNeverConnected}}</p>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Agents coverage</p>
-                            <p class="text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
+                            <p class="wz-text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
                         </div>
                     </div>
                 </div>
-        </md-card-content>
+            </md-card-content>
         </md-card>
         <md-card flex class="no-margin-right wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title">Top</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
-                    <p flex="35" class="manager-status-subtitle" ng-click="showAgent(lastAgent)">Last registered agent</p>
-                    <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(lastAgent)">{{lastAgent.name}} <i class="fa fa-eye"></i></p>
+                    <p flex="35" class="manager-status-subtitle">Last registered agent</p>
+                    <p class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right" ng-click="showAgent(lastAgent)">{{lastAgent.name}}</p>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <p flex="35" class="manager-status-subtitle" ng-click="showAgent(mostActiveAgent)">Higher activity</p>
-                    <p class="text-right cursor-pointer color-pointer wz-table-hover" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}} <i class="fa fa-eye"></i></p>
+                    <p flex="35" class="manager-status-subtitle">Higher activity</p>
+                    <p class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}}</p>
                 </div>
             </md-card-content>
         </md-card>
     </div>
 
         <div layout="row" layout-align="start stretch">
-            <wz-search-bar flex="60" class="wz-margin-top-17 wz-padding-right" height="'height-41'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
+            <wz-search-bar flex="60" class="wz-margin-top-17 wz-padding-right-17" height="'height-41'" data="agents" term="searchTerm" placetext="'Filter agents...'"></wz-search-bar>
 
-            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 md-input-margin wz-margin-top-17 wz-margin-right-15 wz-select-input">
+            <div flex="20" layout="column" class="height-41 wz-margin-top-17 wz-margin-right-15 wz-select-input">
                 <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="status" ng-change="agents.addFilter('status', status)" aria-label="Filter by status">
                     <option value="all">All states</option>
                     <option value="active">Active</option>
@@ -56,7 +56,7 @@
                 </select>
             </div>
 
-            <div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 wz-margin-top-17 wz-select-input">
+            <div flex="20" layout="column" class="height-41 wz-margin-top-17 wz-select-input">
                 <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
                     <option value="all">All OS platforms</option>
                     <option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
@@ -64,6 +64,15 @@
                     </option>
                 </select>
             </div>
+            <!-- This will work once the Wazuh API implements this feature -->
+            <!--<div flex="20" layout="column" class="height-41 md-block md-whiteframe-z1 wz-margin-top-17 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="group" ng-change="applyFilters('group-' + group)" aria-label="Filter by group">
+                    <option value="all">All groups</option>
+                    <option ng-repeat='group in groups' value="{{group}}">
+                        {{group}}
+                    </option>
+                </select>
+            </div>-->
         </div>
         <wz-table-header
             layout="row"
@@ -73,7 +82,8 @@
                 {name:'Name',sortValue:'name',size:15},
                 {name:'IP',sortValue:'ip',size:10},
                 {name:'Status',sortValue:'status',size:10},
-                {name:'OS platform',sortValue:'os.platform',size:30},
+                {name:'Group',size:10},
+                {name:'OS platform',sortValue:'os.platform',size:20},
                 {name:'OS version',sortValue:'os.version',size:15},
                 {name:'Agent version',sortValue:'version',size:15}
             ]"
@@ -83,13 +93,16 @@
             layout="column"
             flex
             data="agents"
+            isagents="true"
             func="showAgent(agent)"
+            specialfunc="goGroup(agent)"
             keys="[
                 {col:'id',size:5},
                 {col:'name',size:15},
                 {col:'ip',size:10},
                 {col:'status',size:10},
-                {col:'os.name',size:30},
+                {col:'group',size:10},
+                {col:'os.name',size:20},
                 {col:'os.version',size:15},
                 {col:'version',size:15}
             ]"

@@ -1,27 +1,20 @@
 require('ui/modules').get('app/wazuh', [])
-.service('patternHandler', function ($rootScope, $route, genericReq, courier, appState, errorHandler) {
+.service('patternHandler', function ($rootScope, $route, $location, genericReq, courier, appState, errorHandler) {
     return {
         getPatternList: async () => {
             try {
-                let patternList = [];
-
-                // Getting the index pattern list into the array,
-                // but selecting only "valid" ones
-                const len = $route.current.locals.ips.list.length;
-                let data;
-                for (let i = 0; i < len; i ++) {
-                    data = await courier.indexPatterns.get($route.current.locals.ips.list[i].id)
-                    
-                    let minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
-                    let minimumCount = 0;
-                    data.fields.filter(element => minimumCount += (minimum.includes(element.name)) ? 1 : 0);
-
-                    if (minimumCount === minimum.length) {
-                        patternList.push($route.current.locals.ips.list[i]);
-                    }
+                const patternList = await genericReq.request('GET','/get-list',{});
+                if(!patternList.data.data.length){
+                    $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                    $location.search('tab',null);
+                    $location.path('/blank-screen'); 
+                    return;  
                 }
-    
-                return patternList;
+                if(appState.getCurrentPattern()){
+                    let filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
+                    if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
+                }
+                return patternList.data.data;
             } catch (error) {
                 errorHandler.handle(error,'Pattern Handler (getPatternList)');
                 if(!$rootScope.$$phase) $rootScope.$digest();

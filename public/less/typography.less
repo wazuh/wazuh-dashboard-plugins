@@ -1,0 +1,94 @@
+/* -------------------------------------------------------------------------- */
+/* ------------------- Wazuh text & typography stylesheet ------------------- */
+/* -------------------------------------------------------------------------- */
+
+/* Apply the Open Sans font in the whole app */
+
+html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
+    font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
+}
+
+.wz-headline-title {
+    font-size: 17px;
+}
+
+.color-grey {
+    color: grey !important;
+}
+
+.color-f9 {
+    color: #ff9999;
+}
+
+.wz-color-orange {
+    color: #f39c12 !important;
+}
+
+.color-pointer {
+    color: #0079a5 !important;
+}
+
+.wz-line-height {
+    line-height: 20px !important;
+}
+
+.wz-text-center {
+    text-align: center;
+}
+
+.wz-text-right {
+    text-align: right;
+}
+
+.wz-text-bold {
+    font-weight: bold !important;
+}
+
+.wz-text-truncatable {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.font-size-16-pt {
+    font-size: 16pt;
+}
+
+.font-size-18 {
+    font-size: 18px;
+}
+
+.font-size-25 {
+    font-size: 25px;
+}
+
+/* JSON viewer font colors */
+
+.json-key {
+    color: brown;
+}
+
+.json-value {
+    color: navy;
+}
+
+.json-string {
+    color: olive;
+}
+
+/* Class for linkable text elements */
+
+.wz-text-link {
+    cursor: pointer;
+    color: rgb(0, 121, 165);
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.wz-text-active {
+    color: rgb(0, 121, 165);
+    font-weight: bold;
+    text-decoration: underline;
+}

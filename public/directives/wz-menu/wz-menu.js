@@ -4,7 +4,10 @@ const app = require('ui/modules').get('app/wazuh', []);
 
 app.directive('wzMenu',function(){
     return {
-        controller: function ($scope,$window, $rootScope, appState, patternHandler, courier, errorHandler) {
+        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler) {
+            $rootScope.showSelector = appState.getPatternSelector();
+
+            if(!$rootScope.$$phase) $rootScope.$digest();
 
             if(appState.getCurrentAPI()) {
                 $scope.theresAPI = true;
@@ -13,11 +16,14 @@ app.directive('wzMenu',function(){
             else {
                 $scope.theresAPI = false;
             }
+
             $scope.goToClick = path => {
                 $window.location.href = path;
             }
+
             const load = async () => {
                 try {
+                    if(!appState.getPatternSelector()) return;
                     const data = await courier.indexPatterns.get(appState.getCurrentPattern());
                     $scope.theresPattern = true;
                     $scope.currentPattern = data.title;
@@ -43,6 +49,7 @@ app.directive('wzMenu',function(){
             // Function to change the current index pattern on the app
             $scope.changePattern = async selectedPattern => {
                 try{
+                    if(!appState.getPatternSelector()) return;
                     $scope.currentSelectedPattern = await patternHandler.changePattern(selectedPattern);
                     if(!$scope.$$phase) $scope.$digest();
                     $window.location.reload();
@@ -50,7 +57,7 @@ app.directive('wzMenu',function(){
                 }catch(error){
                     errorHandler.handle(error,'Directives - Menu');
                     if(!$rootScope.$$phase) $rootScope.$digest();
-                }                    
+                }
             }
 
             $scope.$on('updateAPI', () => {
@@ -65,6 +72,7 @@ app.directive('wzMenu',function(){
             });
 
             $scope.$on('updatePattern', () => {
+                if(!appState.getPatternSelector()) return;
                 courier.indexPatterns.get(appState.getCurrentPattern())
                 .then(data => {
                     $scope.theresPattern = true;

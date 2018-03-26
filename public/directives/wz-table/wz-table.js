@@ -6,28 +6,31 @@ app.directive('wzTable',function(){
     return {
         restrict: 'E',
         scope: {
-            data      : '=data',
-            keys      : '=keys',
-            func      : '&',
-            noscroll  : '=noscroll',
-            nopointer : '=nopointer',
-            full      : '=full',
-            noheight  : '=noheight',
-            isruleset : '=isruleset',
-            isdecoders: '=isdecoders',
-            activeitem: '=activeitem'
+            data        : '=data',
+            keys        : '=keys',
+            func        : '&',
+            noscroll    : '=noscroll',
+            nopointer   : '=nopointer',
+            full        : '=full',
+            noheight    : '=noheight',
+            isruleset   : '=isruleset',
+            isdecoders  : '=isdecoders',
+            activeitem  : '=activeitem',
+            isagents    : '=isagents',
+            specialfunc : '&'
         },
         link: function(scope,ele,attrs){
-            scope.clickAction = index => {
+            scope.clickAction = (index,special) => {
                 const obj = {};
                 if(scope.full){
                     obj[scope.full] = index;
                 } else {
                     obj.index = index;
                 }
-    
-                scope.func(obj);
-            }   
+
+                if(scope.isagents && special && special.col && special.col === 'group') scope.specialfunc(obj)
+                else scope.func(obj);
+            }
             scope.parseItem = (item,key) => {
                 if(scope.isruleset && key.col === 'level' && item.level === 0) return '0';
                 let tmp = key;

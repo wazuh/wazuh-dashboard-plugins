@@ -1,22 +1,63 @@
-<md-nav-bar class="wz-menu-nav" name="menuTopName" md-selected-nav-item="menuNavItem" nav-bar-aria-label="navigation menu">
-    <md-nav-item class="wz-menu-nav-logo" style="margin-top:-10px !important" id="header_logo" md-nav-click="goToClick('#/')" name="logo" aria-hidden="true">
-        <img aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png" height="37" weight="252"></img>
-    </md-nav-item>
-    <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'overview' }" md-nav-click="goToClick('#/overview')" id="overview"><i class="fa fa-bar-chart"></i> Overview</md-nav-item>
-    <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'manager' }" md-nav-click="goToClick('#/manager')" id="manager"><i class="fa fa-server"></i> Manager</md-nav-item>
-    <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'agents' }" md-nav-click="goToClick('#/agents-preview')" id="agents"><i class="fa fa-tv"></i> Agents</md-nav-item>
-    <md-nav-item class="wz-color-white" ng-class="{'wz-nav-item-change-color': menuNavItem == 'discover' }" md-nav-click="goToClick('#/wazuh-discover')" id="discover"><i class="fa fa-compass"></i> Discover</md-nav-item>
-    <div class="wz-menu-nav-bar-api" layout="row" ng-show="theresAPI || theresPattern">
-        <div ng-show="theresAPI" layout layout-align="center center" tooltip="Selected API" tooltip-placement="bottom"><i class="fa fa-star fa-fw wz-menu-star" aria-hidden="true"></i>{{ currentAPI }}&nbsp;&ndash;&nbsp;</div>
-        <div ng-show="!theresAPI" layout layout-align="center center" tooltip="Selected API" tooltip-placement="bottom"><i class="fa fa-star fa-fw wz-menu-star" aria-hidden="true"></i>No API &nbsp;&ndash;&nbsp;</div>
-        <div ng-show="theresPattern && patternList && patternList.length > 1" layout layout-align="center center">
-            <md-select ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" placeholder="Index pattern" class="wz-menu-select md-no-underline wz-border-none" aria-label="Select index pattern" tooltip="Selected index pattern" tooltip-placement="bottom">
-                <md-option ng-repeat="pattern in patternList" value="{{ pattern.id }}">{{ pattern.attributes.title }}</md-option>
-            </md-select>
+<div layout="column" layout-fill>
+    <md-toolbar class="wz-menu">
+
+        <!-- Main toolbar content -->
+        <div class="md-toolbar-tools wz-menu-content">
+
+            <!-- Wazuh app logo -->
+            <a class="wz-margin-right-20 cursor-pointer" href="#/"><img aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png"></img></a>
+
+            <!-- Main Wazuh app navigation buttons -->
+            <md-button class="wz-menu-button" ng-href="#/overview" ng-class="{'wz-menu-active': menuNavItem == 'overview' }" aria-label="Overview tab">
+                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i> Overview
+            </md-button>
+
+            <md-button class="wz-menu-button" ng-href="#/manager" ng-class="{'wz-menu-active': menuNavItem == 'manager' }" aria-label="Manager tab">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i> Manager
+            </md-button>
+
+            <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-class="{'wz-menu-active': menuNavItem == 'agents' }" aria-label="Agents tab">
+                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
+            </md-button>
+
+            <md-button class="wz-menu-button" ng-href="#/wazuh-discover" ng-class="{'wz-menu-active': menuNavItem == 'discover' }" aria-label="Discover tab">
+                <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
+            </md-button>
+
+            <!-- Fill up the space between left and right area -->
+            <span flex></span>
+
+            <!-- API/Index pattern section -->
+            <!-- Case 1a - There's API -->
+            <span ng-show="theresAPI" tooltip="Selected API" tooltip-placement="bottom">
+                <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
+            </span>
+
+            <!-- Case 1b - There's no API -->
+            <span ng-show="!theresAPI" tooltip="No API credentials inserted" tooltip-placement="bottom">
+                No API<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
+            </span>
+
+            <!-- Case 2a - There's pattern and there's more than one -->
+            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" tooltip="Selected index pattern" tooltip-placement="bottom">
+                <select class="wz-menu-select" ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" aria-label="Index pattern selector" placeholder="Index pattern">
+                    <option class="wz-menu-select-option" ng-repeat="pattern in patternList" value="{{pattern.id}}">
+                        {{pattern.title}}
+                    </option>
+                </select>
+            </span>
+
+            <!-- Case 2b - There's pattern and there's only one-->
+            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" tooltip="Selected index pattern" tooltip-placement="bottom">
+                {{patternList[0].title}}
+            </span>
+
+            <!-- Settings tab button -->
+            <md-button class="wz-menu-button md-icon-button" ng-href="#/settings" ng-class="{'wz-menu-active': menuNavItem == 'settings' }" aria-label="Settings tab">
+                <i class="fa fa-cog" aria-hidden="true"></i>
+            </md-button>
+
         </div>
-        <div ng-show="theresPattern && patternList && patternList.length === 1" layout layout-align="center center" tooltip="Selected index pattern" tooltip-placement="bottom"> {{ patternList[0].attributes.title }}</div>
-    </div>
-    <md-nav-item class="wz-menu-nav-gear wz-color-white" md-nav-click="goToClick('#/settings')" id="settings" name="settings">
-        <i class="fa fa-cog ng-scope" aria-hidden="true"></i>
-    </md-nav-item>
-</md-nav-bar>
+
+    </md-toolbar>
+</div>

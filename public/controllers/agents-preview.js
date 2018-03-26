@@ -1,16 +1,26 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('agentsPreviewController', function ($scope,$rootScope, genericReq, apiReq, appState, Agents, $location, errorHandler) {
+app.controller('agentsPreviewController', function ($scope, $rootScope, $routeParams, genericReq, apiReq, appState, Agents, $location, errorHandler) {
     $scope.loading     = true;
     $scope.agents      = Agents;
     $scope.status      = 'all';
     $scope.osPlatform  = 'all';
     $scope.osPlatforms = [];
-
+    $scope.groups      = [];
     $scope.mostActiveAgent = {
         name: '',
         id  : ''
     };
+
+    // Load URL params
+    if ($routeParams.tab){
+        $scope.submenuNavItem = $routeParams.tab;
+    }
+
+    // Watcher for URL params
+    $scope.$watch('submenuNavItem', () => {
+        $location.search('tab', $scope.submenuNavItem);
+    });
 
     let tmpUrl, tmpUrl2;
     if (appState.getClusterInfo().status === 'enabled') {
@@ -25,6 +35,11 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, genericRe
         $scope.agents.filters = [];
         if(filter.includes('Unknown')){
             $scope.agents.addFilter('status','Never connected');
+
+        /** Pending API implementation */
+        //} else if(filter.includes('group-')){
+        //    $scope.agents.addFilter('group',filter.split('group-')[1]);
+
         } else {
             const platform = filter.split(' - ')[0];
             const version  = filter.split(' - ')[1];
@@ -38,7 +53,7 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, genericRe
     // Retrieve os list
     const retrieveList = agents => {
         for(let agent of agents){
-
+            if(agent.group && !$scope.groups.includes(agent.group)) $scope.groups.push(agent.group);
             if('os' in agent && 'name' in agent.os){
                 let exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
                 if(!exists.length){
@@ -103,15 +118,22 @@ app.controller('agentsPreviewController', function ($scope,$rootScope, genericRe
         }
     };
 
+    $scope.goGroup = agent => {
+        $rootScope.globalAgent = agent;
+        $rootScope.comeFrom    = 'agents';
+        $location.search('tab', 'groups');
+        $location.path('/manager');
+    };
+
     $scope.showAgent = agent => {
         $rootScope.globalAgent = agent.id;
         $rootScope.comeFrom    = 'agentsPreview';
-        $location.path('/agents');        
+        $location.path('/agents');
     };
 
     //Load
     load();
-   
+
     //Destroy
     $scope.$on("$destroy", () => $scope.agents.reset());
 });

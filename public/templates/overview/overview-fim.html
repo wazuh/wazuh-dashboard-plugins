@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="tab == 'fim'">
+<md-content flex layout="column" ng-if="tab === 'fim'">
 
     <!-- View: Panels -->
     <div ng-if="resultState === 'ready' && tabView === 'panels'">
@@ -6,9 +6,9 @@
         <div layout="row">
             <md-card flex class="wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-metric">
-                    <div flex>Files added: <span class="wz-font-weight-bold">{{fimAdded}}</span></div>
-                    <div flex>Files modified: <span class="wz-font-weight-bold">{{fimModified}}</span></div>
-                    <div flex>Files deleted: <span class="wz-font-weight-bold">{{fimDeleted}}</span></div>
+                    <div class="wz-text-truncatable" flex>Files added: <span class="wz-text-bold">{{fimAdded}}</span></div>
+                    <div class="wz-text-truncatable" flex>Files modified: <span class="wz-text-bold">{{fimModified}}</span></div>
+                    <div class="wz-text-truncatable" flex>Files deleted: <span class="wz-text-bold">{{fimDeleted}}</span></div>
                 </md-card-content>
             </md-card>
         </div>

@@ -1,19 +1,26 @@
 <div flex layout="column" ng-controller="blankScreenController" layout-align="center center">
-    <div class="present-logo">
+    <div class="wz-text-center">
         <img class="loading-logo-fail" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_fail.png"></img>
     </div>
 
     <div class="checks-fail">
-        <div class="health-check-error">
-            
-            <center><span class="error-notify">Ups, something went wrong...</span></center>
-            <center class="wz-padding-top-10"><div id="result"></div></center>
-
-            <div layout="row" class="wz-padding-top-10 wz-line-height">
-                <p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html</a>
-                <br>
-                <a href="https://documentation.wazuh.com/current/installation-guide/">https://documentation.wazuh.com/current/installation-guide/</a></p>
-            </div>
+            <md-divider></md-divider>
+        <div layout="row" class="wz-line-height layout-align-center-center">
+            <pre class="json-beautifier"><code>{{errorToShow || 'Something went wrong'}}</code></pre>
+        </div>
+        <md-divider></md-divider>
+        <div layout="row" class="wz-padding-top-10 wz-line-height layout-align-center-center">
+            <p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html</a>
+            <br>
+            <a href="https://documentation.wazuh.com/current/installation-guide/">https://documentation.wazuh.com/current/installation-guide/</a></p>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+        <div layout="row" class="wz-padding-top-10 wz-line-height layout-align-center-center">
+            <p>Let me out of here!<br>
+            <md-button class="wazuh-button md-raised md-primary" ng-click="goOverview()" aria-label="Go overview">
+                <i class="fa fa-fw fa-sign-out"></i> Go app
+            </md-button>
+            </p>
         </div>
     </div>
 </div>

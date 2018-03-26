@@ -255,7 +255,7 @@ module.exports = (server, options) => {
                 }
                 getConfig(req.headers.id, wapi_config => {
                     if (wapi_config.error_code > 1) {
-                        // Can not connect to elasticsearch
+                         // Can not connect to elasticsearch
                         return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
                     } else if (wapi_config.error_code > 0) {
                         // Credentials not found
@@ -279,7 +279,9 @@ module.exports = (server, options) => {
                         }
                         
                     })
-                    .catch(error => reply({ statusCode: 400, error: '9997', data: 'An error occurred trying to obtain PCI DSS requirements from Wazuh API' }));
+                    .catch(error => {
+                        reply({ statusCode: 400, error: '9997', data: 'An error occurred trying to obtain PCI DSS requirements from Wazuh API' })
+                    });
                 });
             } else {
                 if (typeof pciRequirements[req.params.requirement] !== 'undefined'){
@@ -394,6 +396,7 @@ module.exports = (server, options) => {
     const getApiSettings = (req, reply) => {
         if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
         getConfig(req.payload.id, (wapi_config) => {
+
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
                 return reply({

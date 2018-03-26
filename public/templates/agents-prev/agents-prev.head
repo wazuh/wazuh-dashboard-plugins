@@ -1,7 +1,5 @@
-<div flex ng-controller="agentsPreviewController" layout="column">
+<div flex ng-controller="agentsPreviewController" layout="column" class="mozilla-table-size-99">
 
-    <div class="wz-menu-nav-bar height-70" ng-init="menuNavItem = 'agents'">
-        <wz-menu></wz-menu>
-    </div>
+    <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
 
-    <div flex layout="column" id="content" ng-class="tabView != 'discover' ? 'background-white' : ''" >
+    <div flex layout="column" id="content">
