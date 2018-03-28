@@ -129,24 +129,12 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         try {
             const patternList = await genericReq.request('GET','/get-list',{});
             $scope.indexPatterns = patternList.data.data;
-            const currentPattern = await genericReq.request('GET', '/api/wazuh-elastic/current-pattern');
              
-            // Useful to show the applied pattern withou API or any data (very first time)
-            const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-            appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
-            $rootScope.showSelector = appState.getPatternSelector();
-            if(!$rootScope.$$phase) $rootScope.$digest();
-
             if(!patternList.data.data.length){
                 $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
                 $location.search('tab',null);
                 $location.path('/blank-screen');   
                 return;
-            }
-            if(!appState.getCurrentPattern()) appState.setCurrentPattern(currentPattern.data.data);
-            else {
-                const filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
-                if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
             }
             const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
             for(const entry of data.data) $scope.showEditForm[entry._id] = false;
