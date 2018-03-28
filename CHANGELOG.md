@@ -8,10 +8,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added the `errorHandler` service to the `dataHandler` factory ([#340](https://github.com/wazuh/wazuh-kibana-app/pull/340)).
 
 ### Changed
-- Increased query size when fetching index pattern list ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
+- Increased the query size when fetching the index pattern list ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
 
 ### Fixed
 - Fixed a bug where several `agent.id` filters were created at the same time when navigating between *Agents* and *Groups* with different selected agents ([#342](https://github.com/wazuh/wazuh-kibana-app/pull/342)).
+- Fixed logic on the index-pattern selector which wasn't showing the currently selected pattern the very first time a user opened the app ([#345](https://github.com/wazuh/wazuh-kibana-app/pull/345)).
 
 ### Removed
 - Removed clear API password on `checkPattern` response ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
