@@ -114,6 +114,7 @@ module.exports = (server, options) => {
                 });
             }
         } catch(error){
+            server.log([blueWazuh, 'wazuh-api', 'error'], error.message || error);
             if(error.code === 'ECONNREFUSED'){
                 wapi_config.password = '****'
                 wapi_config.apiIsDown = true;
@@ -124,7 +125,6 @@ module.exports = (server, options) => {
                     error     : 8,
                     message   : error.message || error
                 });
-                server.log([blueWazuh, 'wazuh-api', 'error'], error.message || error);
             }
         }
     };
