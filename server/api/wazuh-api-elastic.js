@@ -27,7 +27,7 @@ module.exports = (server, options) => {
 
     const deleteAPIEntries = async (req, reply) => {
         try {
-            const data = await elasticRequest.callWithInternalUser('delete', {
+            const data = await elasticRequest.callWithRequest(req,'delete', {
                 index: '.wazuh',
                 type : 'wazuh-configuration',
                 id   : req.params.id
@@ -44,7 +44,7 @@ module.exports = (server, options) => {
         try{
 
             // Searching for previous default
-            const data = await elasticRequest.callWithInternalUser('search', {
+            const data = await elasticRequest.callWithRequest(req,'search', {
                 index: '.wazuh',
                 type : 'wazuh-configuration',
                 q    : 'active:true'
@@ -169,7 +169,7 @@ module.exports = (server, options) => {
     
             const settings = buildSettingsObject(req.payload);
     
-            const response = await elasticRequest.callWithInternalUser('create', {
+            const response = await elasticRequest.callWithRequest(req,'create', {
                 index  : '.wazuh',
                 type   : 'wazuh-configuration',
                 id     : new Date().getTime(),
