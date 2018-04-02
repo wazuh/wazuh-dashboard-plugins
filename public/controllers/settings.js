@@ -248,7 +248,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                     extensions  : tmpData.extensions
                 }
             };
-            console.log($scope.apiEntries)
             $scope.apiEntries.push(newEntry);
             $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
 
