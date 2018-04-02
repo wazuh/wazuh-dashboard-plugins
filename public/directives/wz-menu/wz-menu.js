@@ -4,7 +4,8 @@ const app = require('ui/modules').get('app/wazuh', []);
 
 app.directive('wzMenu',function(){
     return {
-        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler) {
+        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler,genericReq) {
+
             $rootScope.showSelector = appState.getPatternSelector();
 
             if(!$rootScope.$$phase) $rootScope.$digest();
@@ -23,11 +24,39 @@ app.directive('wzMenu',function(){
 
             const load = async () => {
                 try {
+                    // Get the configuration to check if pattern selector is enabled
+                    const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+                    appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
+
+                    // Abort if we have disabled the pattern selector
                     if(!appState.getPatternSelector()) return;
-                    const data = await courier.indexPatterns.get(appState.getCurrentPattern());
+
+                    // Show the pattern selector
+                    $rootScope.showSelector = true;
+                    let filtered = false;
+                    // If there is no current pattern, fetch it
+                    if(!appState.getCurrentPattern()) {
+                        const currentPattern = await genericReq.request('GET', '/api/wazuh-elastic/current-pattern');
+                        appState.setCurrentPattern(currentPattern.data.data);
+                    } else {
+
+                        // If there is current pattern, check if there is some pattern
+                        const patternList = await genericReq.request('GET','/get-list',{});                                
+                        if(!patternList.data.data.length){
+                            $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                            $location.search('tab',null);
+                            $location.path('/blank-screen');   
+                            return;
+                        }
+
+                        // Check if the current pattern cookie is valid
+                        filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
+                        if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
+                    }
+                    
+                    const data = filtered ? filtered : await courier.indexPatterns.get(appState.getCurrentPattern());
                     $scope.theresPattern = true;
                     $scope.currentPattern = data.title;
-
                     const list = await patternHandler.getPatternList();
 
                     // Getting the list of index patterns
@@ -36,6 +65,7 @@ app.directive('wzMenu',function(){
                         $scope.currentSelectedPattern = appState.getCurrentPattern();
                     }
                     if(!$scope.$$phase) $scope.$digest();
+                    if(!$rootScope.$$phase) $rootScope.$digest();
                     return;
                 } catch (error) {
                     errorHandler.handle(error,'Directives - Menu');

@@ -290,6 +290,7 @@ app.controller('agentsController',
             if(metricService.hasItems()) metricService.destroyWatchers();
             $rootScope.ownHandlers = [];
             $rootScope.comeFrom    = 'agents';
+            $location.search('_a',null);
             $location.search('tab', 'groups');
             $location.path('/manager');
         };
