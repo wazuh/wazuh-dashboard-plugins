@@ -54,6 +54,7 @@ module.exports = (server, options) => {
 
     const getConfig = async id => {
         try {
+
             const data = await elasticRequest.callWithInternalUser('get', {
                 index: '.wazuh',
                 type : 'wazuh-configuration',
@@ -71,7 +72,7 @@ module.exports = (server, options) => {
             };
 
         } catch (error){
-            return   callback({ error: 'no elasticsearch', error_code: 2 });
+            return { error: 'no elasticsearch', error_code: 2 };
         }
     };
 
