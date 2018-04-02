@@ -53,36 +53,35 @@ app.service('testAPI', function ($q, $http, $location, $rootScope, appState, gen
             }
             return defered.promise;
         },
-        check: data => {
-            const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
-            if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
-            let defered = $q.defer();
-            const url = chrome.addBasePath("/api/wazuh-api/checkAPI");
-            $http
-            .post(url, data, headers)
-            .then(response => {
+        check: async data => {
+            try {
+                const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
+                if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
+                
+                const url = chrome.addBasePath("/api/wazuh-api/checkAPI");
+                const response = await $http.post(url, data, headers);
+
                 if (response.error) {
-                    defered.reject(response);
-                } else {
-                    defered.resolve(response);
-                }
-            })
-            .catch(error => {
+                    return Promise.reject(response);
+                } 
+                    
+                return response;
+
+            } catch(error) {
                 if(error.data && error.data.message && error.data.message.includes('ENOTFOUND')) {   
-                    defered.reject({data: 'invalid_url'}); 
+                    return Promise.reject({data: 'invalid_url'}); 
                 } else if(error.data && error.data.message && error.data.message.includes('ECONNREFUSED')) {   
-                    defered.reject({data: 'invalid_port'}); 
+                    return Promise.reject({data: 'invalid_port'}); 
                 } else if(error.status && error.status === -1){
-                    defered.reject({data: 'request_timeout_checkapi'});
+                    return Promise.reject({data: 'request_timeout_checkapi'});
                 } else if (error.data && error.data.message && error.data.message === 'wrong_credentials') {
-                    defered.reject({data: 'wrong_credentials'});
+                    return Promise.reject({data: 'wrong_credentials'});
                 } else if(error.data && ((error.data.message && error.data.message === 'socket hang up') || (parseInt(error.data.error) === 5))) {
-                    defered.reject({data:'socket_hang_up',extraMessage: `Wazuh API throws ${error.data.message}`, https: (data.url && data.url.includes('https'))});
+                    return Promise.reject({data:'socket_hang_up',extraMessage: `Wazuh API throws ${error.data.message}`, https: (data.url && data.url.includes('https'))});
                 } else {
-                    defered.reject(error);
+                    return Promise.reject(error);
                 }
-            });
-            return defered.promise;
+            }
         }
     };
 });
