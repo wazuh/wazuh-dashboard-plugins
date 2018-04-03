@@ -43,8 +43,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     $scope.indexPatterns = [];
     $scope.apiEntries    = [];
-    $scope.apiEntriesLoaded = false;
-
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
@@ -143,8 +141,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             $scope.apiEntries = data.data.length > 0 ? data.data : [];
             $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
-            $scope.apiEntriesLoaded = true;
-
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null)
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
             if(!$scope.$$phase) $scope.$digest();
