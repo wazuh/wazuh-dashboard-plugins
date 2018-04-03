@@ -43,6 +43,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     $scope.indexPatterns = [];
     $scope.apiEntries    = [];
+    $scope.apiEntriesLoaded = false;
+
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
     }
@@ -129,11 +131,11 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         try {
             const patternList = await genericReq.request('GET','/get-list',{});
             $scope.indexPatterns = patternList.data.data;
-            
+
             if(!patternList.data.data.length){
                 $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
                 $location.search('tab',null);
-                $location.path('/blank-screen');   
+                $location.path('/blank-screen');
                 return;
             }
             const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
@@ -141,6 +143,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             $scope.apiEntries = data.data.length > 0 ? data.data : [];
             $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
+            $scope.apiEntriesLoaded = true;
+
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null)
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
             if(!$scope.$$phase) $scope.$digest();
