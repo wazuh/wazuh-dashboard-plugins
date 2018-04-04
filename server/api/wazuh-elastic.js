@@ -364,7 +364,6 @@ module.exports = (server, options) => {
             const filtered = visSet.hits.total > 0 ? visSet.hits.hits.filter(vis => vis._id.includes(req.params.timestamp)) : [];
             let promises = [];
             for(let vis of filtered){
-                console.log(`Deleting ${vis._id}...`);
                 let tmp = await elasticRequest.callWithInternalUser('deleteByQuery', {
                     index: '.kibana',
                     body: {

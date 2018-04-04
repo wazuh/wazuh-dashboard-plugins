@@ -152,7 +152,8 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-        $rootScope.resultState = 'none'
+
+
         // call backend to create visualizations
         $rootScope.backFinished = false;
         genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
@@ -173,6 +174,9 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.backFinished = false;
         $location.search('tabView', $scope.tabView);  
         if($scope.tabView === 'panels'){
+            // Update the implicit filter
+            if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
+            else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
             genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
             .then(() => genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`))
             .then(() => {
