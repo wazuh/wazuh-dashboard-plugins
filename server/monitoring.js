@@ -428,14 +428,14 @@ module.exports = (server, options) => {
     // Wait until Kibana server is ready
     const checkKibanaStatus = async () => {
         try {
-            log('monitoring.js checkKibanaStatus','Waiting for Kibana and Elasticsearch servers to be ready...');
+            log('monitoring.js checkKibanaStatus','Waiting for Kibana and Elasticsearch servers to be ready...','info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Waiting for Kibana and Elasticsearch servers to be ready...');
             await checkElasticsearchServer();
             await init();
             return;
         } catch(error) {
             log('monitoring.js checkKibanaStatus',error.message || error);
-            server.log([blueWazuh, 'monitoring', 'info'], 'Waiting for Kibana and Elasticsearch servers to be ready...');
+            server.log([blueWazuh, 'monitoring', 'info'], 'Waiting for Kibana and Elasticsearch servers to be ready...','info');
             setTimeout(() => checkKibanaStatus(), 3000);
         }
     };
