@@ -2,6 +2,11 @@ const app = require('ui/modules').get('app/wazuh', []);
 import $ from 'jquery';
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, metricService) {
+
+    if(!$rootScope.visTimestamp) $rootScope.visTimestamp = new Date().getTime();
+    $rootScope.backFinished = false;
+    if(!$rootScope.$$phase) $rootScope.$digest
+
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
@@ -147,27 +152,51 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-        checkMetrics(tab, 'panels');
+        $rootScope.resultState = 'none'
+        // call backend to create visualizations
+        $rootScope.backFinished = false;
+        genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
+        .then(() => genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`))
+        .then(() => {
+            checkMetrics(tab, 'panels');
 
-        // Deleting app state traces in the url
-        $location.search('_a', null);
+            // Deleting app state traces in the url
+            $location.search('_a', null);
+            $rootScope.backFinished = true;
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        })
+        .catch(console.error)
+
     };
 
-    // Watchers
-
     $scope.$watch('tabView', () => {
-        $location.search('tabView', $scope.tabView);
-
-        // call backend to create visualizations
-
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
+        $rootScope.backFinished = false;
+        $location.search('tabView', $scope.tabView);  
+        if($scope.tabView === 'panels'){
+            genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
+            .then(() => genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`))
+            .then(() => {
+                $rootScope.backFinished = true;
+                if(!$rootScope.$$phase) $rootScope.$digest();
+            })
+            .catch(console.error)
+        } else {
+            genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
+            .then(() => {
+                if ($rootScope.ownHandlers) {
+                    for (let h of $rootScope.ownHandlers) {
+                        h._scope.$destroy();
+                    }
+                }
+                $rootScope.ownHandlers = [];
+        
+                $rootScope.loadedVisualizations = [];
+                $rootScope.backFinished = true;
+                if(!$rootScope.$$phase) $rootScope.$digest();
+            })
+            .catch(console.error)
         }
-        $rootScope.ownHandlers = [];
 
-        $rootScope.loadedVisualizations = [];
     });
 
     $scope.$watch('tab', () => {
@@ -191,7 +220,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     });
 
     $scope.$on('$destroy', () => {
-
+        $rootScope.backFinished = false;
+        genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)        
+        .then(() => $rootScope.backFinished = true)
+        .catch(console.error)
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
@@ -205,6 +237,14 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
 
     // call backend to create visualizations at controller's initialization
+
+    genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
+    .then(() => genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`))
+    .then(() => {
+        $rootScope.backFinished = true;
+        if(!$rootScope.$$phase) $rootScope.$digest();
+    })
+    .catch(console.error)
 
     //PCI tab
     let tabs = [];
