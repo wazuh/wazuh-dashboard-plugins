@@ -22,7 +22,6 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 let renderInProgress       = false;
 
                 const myRender = function() {
-                    console.log($rootScope.visTimestamp,$rootScope.resultState)
                     if ($rootScope.visTimestamp) { // Only render if we already have the timestamp for it
                         if (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ){ // There are pending updates from the discover (which is the one who owns the true app state)
 
