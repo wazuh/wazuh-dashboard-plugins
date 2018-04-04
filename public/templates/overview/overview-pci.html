@@ -1,7 +1,7 @@
-<md-content flex layout="column" ng-if="tab === 'pci'" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'pci' && tabView === 'panels' && backFinished" ng-show="resultState === 'ready'" layout-align="start">
 
     <!-- View: Panels -->
-    <div ng-if="resultState === 'ready' && tabView === 'panels'">
+    
 
         <div layout="row" layout-align="center stretch">
             <md-card flex class="wz-md-card">
@@ -72,5 +72,5 @@
                 </md-card-content>
             </md-card>
         </div>
-    </div>
+    
 </md-content>
