@@ -158,6 +158,8 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     $scope.$watch('tabView', () => {
         $location.search('tabView', $scope.tabView);
 
+        // call backend to create visualizations
+
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
@@ -200,6 +202,9 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
         $rootScope.ownHandlers = [];
     });
+
+
+    // call backend to create visualizations at controller's initialization
 
     //PCI tab
     let tabs = [];
