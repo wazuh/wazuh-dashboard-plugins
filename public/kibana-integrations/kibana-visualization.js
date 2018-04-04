@@ -21,15 +21,58 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 let renderInProgress       = false;
 
                 const myRender = function() {
-                    if (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ){ // There are pending updates from the discover (which is the one who owns the true app state)
+                    if ($rootScope.visTimestamp) { // Only render if we already have the timestamp for it
+                        if (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ){ // There are pending updates from the discover (which is the one who owns the true app state)
 
-                        if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
-                            renderInProgress = true;
+                            if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
+                                renderInProgress = true;
 
-                            savedVisualizations.get($scope.visID).then(savedObj => {
-                                originalImplicitFilter = savedObj.searchSource.get('query')['query'];
-                                visTitle = savedObj.vis.title;
-                                visualization = savedObj;
+                                savedVisualizations.get($scope.visID + "-" + $rootScope.visTimestamp).then(savedObj => {
+                                    originalImplicitFilter = savedObj.searchSource.get('query')['query'];
+                                    visTitle = savedObj.vis.title;
+                                    visualization = savedObj;
+
+                                    // There's an original filter
+                                    if (originalImplicitFilter.length > 0 ) {
+                                        // And also a pending one -> concatenate them
+                                        if ($rootScope.discoverPendingUpdates && typeof $rootScope.discoverPendingUpdates[0].query === 'string' && $rootScope.discoverPendingUpdates[0].query.length > 0) {
+                                            implicitFilter = originalImplicitFilter + ' AND ' + $rootScope.discoverPendingUpdates[0].query;
+                                        } else {
+                                            // Only the original filter
+                                            implicitFilter = originalImplicitFilter;
+                                        }
+                                    } else {
+                                        // Other case, use the pending one, if it is empty, it won't matter
+                                        implicitFilter = $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[0].query : '';
+                                    }
+
+                                    if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
+                                        visualization.searchSource
+                                        .query({ language: 'lucene', query: implicitFilter })
+                                        .set('filter',  $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[1] : {});
+                                    }
+
+                                    let params = {};
+
+                                    if ($scope.specificTimeRange) {
+                                        const timeRange = {
+                                            from: 'now-1d/d',
+                                            to: 'now'
+                                        };
+                                        params = {timeRange: timeRange}
+                                    }
+                                    $(`[vis-id="'${$scope.visID}'"]`).on('renderStart', () => {
+                                    //$("#"+$scope.visID).on('renderStart', () => {
+                                        // TBD: Use renderStart to couple it with renderComplete?
+                                    });
+     
+                                    visHandler = loader.embedVisualizationWithSavedObject($(`[vis-id="'${$scope.visID}'"]`), visualization, params); 
+                                    
+                                    $rootScope.ownHandlers.push(visHandler);
+                                    visHandler.addRenderCompleteListener(renderComplete);
+                                });     
+
+                            } else if (rendered) { // There's a visualization object -> just update its filters
 
                                 // There's an original filter
                                 if (originalImplicitFilter.length > 0 ) {
@@ -44,53 +87,12 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                     // Other case, use the pending one, if it is empty, it won't matter
                                     implicitFilter = $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[0].query : '';
                                 }
-
+                                
                                 if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
                                     visualization.searchSource
                                     .query({ language: 'lucene', query: implicitFilter })
-                                    .set('filter',  $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[1] : {});
+                                    .set('filter', $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[1] : {});
                                 }
-
-                                let params = {};
-
-                                if ($scope.specificTimeRange) {
-                                    const timeRange = {
-                                        from: 'now-1d/d',
-                                        to: 'now'
-                                    };
-                                    params = {timeRange: timeRange}
-                                }
-                                $(`[vis-id="'${$scope.visID}'"]`).on('renderStart', () => {
-                                //$("#"+$scope.visID).on('renderStart', () => {
-                                    // TBD: Use renderStart to couple it with renderComplete?
-                                });
- 
-                                visHandler = loader.embedVisualizationWithSavedObject($(`[vis-id="'${$scope.visID}'"]`), visualization, params); 
-                                
-                                $rootScope.ownHandlers.push(visHandler);
-                                visHandler.addRenderCompleteListener(renderComplete);
-                            });     
-
-                        } else if (rendered) { // There's a visualization object -> just update its filters
-
-                            // There's an original filter
-                            if (originalImplicitFilter.length > 0 ) {
-                                // And also a pending one -> concatenate them
-                                if ($rootScope.discoverPendingUpdates && typeof $rootScope.discoverPendingUpdates[0].query === 'string' && $rootScope.discoverPendingUpdates[0].query.length > 0) {
-                                    implicitFilter = originalImplicitFilter + ' AND ' + $rootScope.discoverPendingUpdates[0].query;
-                                } else {
-                                    // Only the original filter
-                                    implicitFilter = originalImplicitFilter;
-                                }
-                            } else {
-                                // Other case, use the pending one, if it is empty, it won't matter
-                                implicitFilter = $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[0].query : '';
-                            }
-                            
-                            if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
-                                visualization.searchSource
-                                .query({ language: 'lucene', query: implicitFilter })
-                                .set('filter', $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[1] : {});
                             }
                         }
                     }
@@ -119,9 +121,6 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                 // Initializing the visualization
                 const loader = ownLoader.getVisualizeLoader();
-
-                myRender();
-     
             }
         }
     }]);

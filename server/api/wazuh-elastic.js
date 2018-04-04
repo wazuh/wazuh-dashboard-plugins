@@ -347,6 +347,28 @@ module.exports = (server, options) => {
     //Server routes
 
     /*
+     * GET /api/wazuh-elastic/create-vis/{tab}
+     * Create visualizations specified in 'tab' parameter
+     *
+     **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/create-vis/{tab}',
+        handler: createVis
+    });
+
+    /*
+     * GET /api/wazuh-elastic/delete-vis/{tab}
+     * Delete visualizations specified in 'tab' parameter
+     *
+     **/
+    server.route({
+        method: 'GET',
+        path: '/api/wazuh-elastic/delete-vis/{tab}',
+        handler: deleteVis
+    });
+
+    /*
      * GET /api/wazuh-elastic/current-pattern
      * Returns the currently applied pattern
      *
