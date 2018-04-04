@@ -1,5 +1,9 @@
 const importAppObjects = require('../initialize');
 
+const fs   = require('fs');
+const yml  = require('js-yaml');
+const path = require('path');
+
 module.exports = (server, options) => {
 
     // Elastic JS Client
@@ -339,6 +343,100 @@ module.exports = (server, options) => {
         }
     }
 
+    const deleteVis = async (req,res) => {
+        try {
+            const visSet = await elasticRequest.callWithInternalUser('search', {
+                index: '.kibana',
+                body: {
+                    'query': {
+                        'bool': {
+                            'must': {
+                                'match': {
+                                    "visualization.title": 'Wazuh App*'
+                                }
+                            }
+                        }
+                    },
+                    'size': 9999
+                }
+            })
+
+            const filtered = visSet.hits.total > 0 ? visSet.hits.hits.filter(vis => vis._id.includes(req.params.timestamp)) : [];
+            let promises = [];
+            for(let vis of filtered){
+                console.log(`Deleting ${vis._id}...`);
+                let tmp = await elasticRequest.callWithInternalUser('deleteByQuery', {
+                    index: '.kibana',
+                    body: {
+                        query: {
+                            match: {
+                                _id: vis._id
+                            }
+                        }
+                    }
+                })
+                console.log(tmp);
+            }
+
+            await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
+            return res({aknowledge: true });
+            
+        } catch(error){
+            return res({error:error.message || error}).code(500);
+        }
+    }
+
+    /**
+     * Replaces our visualizations main fields to fit our pattern needs.
+     * @param {*} app_objects Object with the visualizations raw content.
+     * @param {*} id Eg: 'wazuh-alerts'
+     */
+    const buildVisualizationsBulk = (app_objects,id,timestamp) => {
+        let body = '';
+        for (let element of app_objects) {
+            body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-'+timestamp+'" } }\n';
+
+            let temp = {};
+            let aux = JSON.stringify(element._source);
+            aux = aux.replace("wazuh-alerts", id);
+            aux = JSON.parse(aux);
+            temp[element._type] = aux;
+
+            if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
+                temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
+            }
+
+            temp["type"] = element._type;
+            body += JSON.stringify(temp) + "\n";
+        }
+        return body;
+    }
+
+    const createVis = async (req,res) => {
+        try {
+            if(!req.params.pattern || 
+               !req.params.tab || 
+               !req.params.timestamp || 
+               (req.params.tab && !req.params.tab.includes('overview') && !req.params.tab.includes('agents'))
+            ) {
+                throw new Error('Missing parameters');
+            }
+            const tabPrefix = req.params.tab.includes('overview') ? 'overview' : 'agents';
+            const file = require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
+            const bulkBody = buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
+            await elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: bulkBody });
+
+            await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
+            return res({aknowledge: true});
+            
+        } catch(error){
+            return res({error:error.message || error}).code(500);
+        }
+    }
+
+
+
+
     // Get index patterns list
     server.route({
         method:  'GET',
@@ -348,13 +446,13 @@ module.exports = (server, options) => {
     //Server routes
 
     /*
-     * GET /api/wazuh-elastic/create-vis/{tab}
-     * Create visualizations specified in 'tab' parameter
+     * GET /api/wazuh-elastic/create-vis/{tab}/{timestamp}/{pattern}
+     * Create visualizations specified in 'tab' parameter with the 'timestamp' sufix and applying to 'pattern'
      *
      **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/create-vis/{tab}',
+        path: '/api/wazuh-elastic/create-vis/{tab}/{timestamp}/{pattern}',
         handler: createVis
     });
 
@@ -365,7 +463,7 @@ module.exports = (server, options) => {
      **/
     server.route({
         method: 'GET',
-        path: '/api/wazuh-elastic/delete-vis/{tab}',
+        path: '/api/wazuh-elastic/delete-vis/{timestamp}',
         handler: deleteVis
     });
 
