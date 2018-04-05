@@ -345,42 +345,19 @@ module.exports = (server, options) => {
 
     const deleteVis = async (req,res) => {
         try {
-            const visSet = await elasticRequest.callWithInternalUser('search', {
+            const tmp = await elasticRequest.callWithInternalUser('deleteByQuery', {
                 index: '.kibana',
                 body: {
-                    'query': {
-                        'bool': {
-                            'must': {
-                                'match': {
-                                    "visualization.title": 'Wazuh App*'
-                                }
-                            }
-                        }
-                    },
-                    'size': 9999
+                    query: { bool: { must: { match: { 'visualization.description': req.params.timestamp } } } },
+                    size : 9999
                 }
             })
 
-            const filtered = visSet.hits.total > 0 ? visSet.hits.hits.filter(vis => vis._id.includes(req.params.timestamp)) : [];
-            let promises = [];
-            for(let vis of filtered){
-                let tmp = await elasticRequest.callWithInternalUser('deleteByQuery', {
-                    index: '.kibana',
-                    body: {
-                        query: {
-                            match: {
-                                _id: vis._id
-                            }
-                        }
-                    }
-                })
-                console.log(tmp);
-            }
-
             await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
-            return res({aknowledge: true });
+            return res({aknowledge: true , output: tmp});
             
         } catch(error){
+            console.log(error.message || error)
             return res({error:error.message || error}).code(500);
         }
     }
@@ -391,24 +368,32 @@ module.exports = (server, options) => {
      * @param {*} id Eg: 'wazuh-alerts'
      */
     const buildVisualizationsBulk = (app_objects,id,timestamp) => {
-        let body = '';
-        for (let element of app_objects) {
-            body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-'+timestamp+'" } }\n';
+        try{
+            let body = '';
+            for (let element of app_objects) {
+                body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-'+timestamp+'" } }\n';
+               
 
-            let temp = {};
-            let aux = JSON.stringify(element._source);
-            aux = aux.replace("wazuh-alerts", id);
-            aux = JSON.parse(aux);
-            temp[element._type] = aux;
-
-            if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
-                temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
+                let temp = {};
+                let aux = JSON.stringify(element._source);
+                aux = aux.replace("wazuh-alerts", id);
+                aux = JSON.parse(aux);
+                temp[element._type] = aux;
+    
+                if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
+                    temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
+                }
+                
+                temp["type"] = element._type;
+                temp.visualization.description = timestamp;
+                
+                body += JSON.stringify(temp) + "\n";
             }
-
-            temp["type"] = element._type;
-            body += JSON.stringify(temp) + "\n";
+            return body;
+        } catch (error) {
+            console.log(error.message || error)
         }
-        return body;
+
     }
 
     const createVis = async (req,res) => {
@@ -429,6 +414,7 @@ module.exports = (server, options) => {
             return res({aknowledge: true});
             
         } catch(error){
+            console.log(error.message || error)
             return res({error:error.message || error}).code(500);
         }
     }
