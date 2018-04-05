@@ -9,7 +9,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, $location, savedVisualizations, $window) {
+            controller: function VisController($scope, $rootScope, $location, savedVisualizations, $window,genericReq) {
 
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
                 let originalImplicitFilter = '';
@@ -105,7 +105,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                     myRender();
                 });
 
-                var renderComplete = function() {
+                const renderComplete = () => {
                     rendered = true;
                     
                     if(typeof $rootScope.loadedVisualizations === 'undefined') $rootScope.loadedVisualizations = [];
@@ -114,9 +114,14 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                     $rootScope.loadingStatus = `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`;
 
                     if (currentCompleted >= 100) {
-                        if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
-                        // Forcing a digest cycle
-                        if(!$rootScope.$$phase) $rootScope.$digest();
+                        genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
+                        .then(() => {
+                            if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
+                            // Forcing a digest cycle
+                            if(!$rootScope.$$phase) $rootScope.$digest();
+                        })
+                        .catch(error => console.error(error.message || error))
+
                     }
                     else if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = false;
                 };
