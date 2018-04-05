@@ -1,6 +1,6 @@
 import $ from 'jquery';
 const ownLoader = require('./loader/loader-import');
-
+let accumulate = {},stopLoop = false;
 var app = require('ui/modules').get('apps/webinar_app', [])
     .directive('kbnVis', [function () {
         return {
@@ -10,7 +10,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 specificTimeRange: '=specificTimeRange'
             },
             controller: function VisController($scope, $rootScope, $location, savedVisualizations, $window,genericReq) {
-
+                 
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
@@ -22,12 +22,13 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 let renderInProgress       = false;
 
                 const myRender = function() {
+                    if(typeof accumulate[$scope.visID] === 'undefined') accumulate[$scope.visID] = 'pending'
                     if ($rootScope.visTimestamp) { // Only render if we already have the timestamp for it
                         if (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ){ // There are pending updates from the discover (which is the one who owns the true app state)
 
                             if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
                                 renderInProgress = true;
-
+                                
                                 savedVisualizations.get(!$scope.visID.includes('Agents-status') ? $scope.visID + "-" + $rootScope.visTimestamp : $scope.visID)
                                 .then(savedObj => {
                                     originalImplicitFilter = savedObj.searchSource.get('query')['query'];
@@ -106,24 +107,40 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 });
 
                 const renderComplete = () => {
+                    if(accumulate[$scope.visID] === 'pending'){
+                        accumulate[$scope.visID] = 'complete'
+                    }
                     rendered = true;
                     
                     if(typeof $rootScope.loadedVisualizations === 'undefined') $rootScope.loadedVisualizations = [];
                     $rootScope.loadedVisualizations.push(true);
                     let currentCompleted = Math.round(($rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100);
                     $rootScope.loadingStatus = `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`;
-
-                    if (currentCompleted >= 100) {
-                        genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
-                        .then(() => {
+                    let completed = true;
+                    for(let key in accumulate){
+                        if(accumulate[key] === 'pending') completed = false;
+                        break;
+                    }
+                    if (completed && currentCompleted >= 100) {
+                        if(!stopLoop){
+                            stopLoop =true;
+                            genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
+                            .then(() => {
+                                if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
+                                // Forcing a digest cycle
+                                if(!$rootScope.$$phase) $rootScope.$digest();
+                            })
+                            .catch(error => console.error(error.message || error))
+                        } else {
                             if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
                             // Forcing a digest cycle
                             if(!$rootScope.$$phase) $rootScope.$digest();
-                        })
-                        .catch(error => console.error(error.message || error))
-
+                        }
+                    } else if (!visTitle !== 'Wazuh App Overview General Agents status') {
+                        
+                        $rootScope.rendered = false;
+                        if(!$rootScope.$$phase) $rootScope.$digest();
                     }
-                    else if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = false;
                 };
 
                 // Initializing the visualization
