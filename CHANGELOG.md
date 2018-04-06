@@ -9,6 +9,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 - Increased the query size when fetching the index pattern list ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
+- Changed validation regex to accept URLs with non-numeric format ([#353](https://github.com/wazuh/wazuh-kibana-app/pull/353)).
 
 ### Fixed
 - Fixed a bug where several `agent.id` filters were created at the same time when navigating between *Agents* and *Groups* with different selected agents ([#342](https://github.com/wazuh/wazuh-kibana-app/pull/342)).
