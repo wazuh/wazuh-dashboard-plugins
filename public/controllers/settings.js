@@ -37,7 +37,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     const userRegEx  = new RegExp(/^.{3,100}$/);
     const passRegEx  = new RegExp(/^.{3,100}$/);
-    const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/);
+    const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9-.]{1,300}$/);
     const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
