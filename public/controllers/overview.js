@@ -3,8 +3,8 @@ import $ from 'jquery';
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, metricService) {
 
+    // Timestamp for visualizations at controller's startup
     if(!$rootScope.visTimestamp) $rootScope.visTimestamp = new Date().getTime();
-    $rootScope.backFinished = false;
     if(!$rootScope.$$phase) $rootScope.$digest
 
     $rootScope.page = 'overview';
@@ -63,7 +63,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         awsRevoked       :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
     }
 
-    // Check the url hash and retrieve the tabView information
+    // Check the url hash and retrieve tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
     } else { // If tabView doesn't exist, default it to 'panels'
@@ -71,7 +71,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $location.search('tabView', 'panels');
     }
 
-    // Check the url hash and retrivew the tab information
+    // Check the url hash and retrieve tab information
     if ($location.search().tab) {
         $scope.tab = $location.search().tab;
     } else { // If tab doesn't exist, default it to 'general'
@@ -140,8 +140,6 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if(!$rootScope.$$phase) $rootScope.$digest();
     }
     
-    checkMetrics($scope.tab, $scope.tabView);
-
     // Switch subtab
     $scope.switchSubtab = subtab => {
         if ($scope.tabView === subtab) return;
@@ -153,54 +151,39 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
 
-        
-        // call backend to create visualizations
-        $rootScope.backFinished = false;
-        genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
-        .then(() => genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`))
+        // Create current tab visualizations
+        genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
         .then(() => {
+
+            // Render visualizations
+            $rootScope.$broadcast('updateVis');
+
             checkMetrics(tab, 'panels');
 
             // Deleting app state traces in the url
             $location.search('_a', null);
-            $rootScope.backFinished = true;
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        })
-        .catch(console.error)
 
+        })
+        .catch(error => {
+            errorHandler.handle(error, 'Overview');
+        });
     };
 
+    // Watch tabView
     $scope.$watch('tabView', () => {
-        $rootScope.backFinished = false;
-        $location.search('tabView', $scope.tabView);  
-        if($scope.tabView === 'panels'){
-            // Update the implicit filter
-            genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
-            .then(() => genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`))
-            .then(() => {
-                $rootScope.backFinished = true;
-                if(!$rootScope.$$phase) $rootScope.$digest();
-            })
-            .catch(console.error)
-        } else {
-            genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
-            .then(() => {
-                if ($rootScope.ownHandlers) {
-                    for (let h of $rootScope.ownHandlers) {
-                        h._scope.$destroy();
-                    }
-                }
-                $rootScope.ownHandlers = [];
-        
-                $rootScope.loadedVisualizations = [];
-                $rootScope.backFinished = true;
-                if(!$rootScope.$$phase) $rootScope.$digest();
-            })
-            .catch(console.error)
-        }
+        $location.search('tabView', $scope.tabView);
 
+        if ($rootScope.ownHandlers) {
+            for (let h of $rootScope.ownHandlers) {
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
+
+        $rootScope.loadedVisualizations = [];
     });
 
+    // Watch tab
     $scope.$watch('tab', () => {
 
         $location.search('tab', $scope.tab);
@@ -222,10 +205,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     });
 
     $scope.$on('$destroy', () => {
-        $rootScope.backFinished = false;
-        genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)        
-        .then(() => $rootScope.backFinished = true)
-        .catch(console.error)
+
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
@@ -237,16 +217,18 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.ownHandlers = [];
     });
 
-
-    // call backend to create visualizations at controller's initialization
-
-    genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
-    .then(() => genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`))
+    // Create visualizations for controller's first execution
+    genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
     .then(() => {
-        $rootScope.backFinished = true;
-        if(!$rootScope.$$phase) $rootScope.$digest();
+
+        // Render visualizations
+        $rootScope.$broadcast('updateVis');
+
+        checkMetrics($scope.tab, $scope.tabView);
     })
-    .catch(console.error)
+    .catch(error => {
+        errorHandler.handle(error, 'Overview');
+    });
 
     //PCI tab
     let tabs = [];
