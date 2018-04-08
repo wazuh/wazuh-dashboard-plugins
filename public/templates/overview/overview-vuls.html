@@ -1,63 +1,58 @@
-<md-content flex layout="column" ng-if="tab === 'vuls' && tabView === 'panels' && backFinished" ng-show="resultState === 'ready'" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'vuls' && tabView === 'panels'" ng-show="resultState === 'ready'" layout-align="start">
 
-    <!-- View: Panels -->
+    <div layout="row">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div class="wz-text-truncatable" flex>Critical severity alerts: <span class="wz-text-bold">{{vulnCritical}}</span></div>
+                <div class="wz-text-truncatable" flex>High severity alerts: <span class="wz-text-bold">{{vulnHigh}}</span></div>
+                <div class="wz-text-truncatable" flex>Medium severity alerts: <span class="wz-text-bold">{{vulnMedium}}</span></div>
+                <div class="wz-text-truncatable" flex>Low severity alerts: <span class="wz-text-bold">{{vulnLow}}</span></div>
+            </md-card-content>
+        </md-card>
+    </div>
 
+    <div class="wz-no-display">
+        <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Critical-severity'"></kbn-vis>
+        <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-High-severity'"></kbn-vis>
+        <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Medium-severity'"></kbn-vis>
+        <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Low-severity'"></kbn-vis>
+    </div>
 
-        <div layout="row">
-            <md-card flex class="wz-metric-color wz-md-card">
-                <md-card-content layout="row" class="wz-padding-metric">
-                    <div class="wz-text-truncatable" flex>Critical severity alerts: <span class="wz-text-bold">{{vulnCritical}}</span></div>
-                    <div class="wz-text-truncatable" flex>High severity alerts: <span class="wz-text-bold">{{vulnHigh}}</span></div>
-                    <div class="wz-text-truncatable" flex>Medium severity alerts: <span class="wz-text-bold">{{vulnMedium}}</span></div>
-                    <div class="wz-text-truncatable" flex>Low severity alerts: <span class="wz-text-bold">{{vulnLow}}</span></div>
-                </md-card-content>
-            </md-card>
-        </div>
+    <div layout="row" layout-align="center stretch" class="height-270">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Alerts severity over time</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-severity-over-time'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
 
-        <div class="wz-no-display">
-            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Critical-severity'"></kbn-vis>
-            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-High-severity'"></kbn-vis>
-            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Medium-severity'"></kbn-vis>
-            <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Metric-Low-severity'"></kbn-vis>
-        </div>
+    <div layout="row" layout-align="center stretch" class="height-270">
+        <md-card flex="60" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Top Agents severity</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Top-Agents-severity'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="40" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Affected packages - Top 5</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Top-5-affected-packages'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
 
-        <div layout="row" layout-align="center stretch" class="height-270">
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Alerts severity over time</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-severity-over-time'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
-
-        <div layout="row" layout-align="center stretch" class="height-270">
-            <md-card flex="60" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Top Agents severity</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Top-Agents-severity'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="40" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Affected packages - Top 5</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Top-5-affected-packages'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
-
-        <div layout="row" class="height-570">
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Alerts summary</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-summary'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
-
- 
+    <div layout="row" class="height-570">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Alerts summary</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Overview-VULS-Alerts-summary'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
 
 </md-content>

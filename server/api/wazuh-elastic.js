@@ -343,7 +343,7 @@ module.exports = (server, options) => {
         }
     }
 
-    const deleteVis = async (req,res) => {
+    const deleteVis = async (req, res) => {
         try {
             const tmp = await elasticRequest.callWithInternalUser('deleteByQuery', {
                 index: '.kibana',
@@ -354,49 +354,47 @@ module.exports = (server, options) => {
             })
 
             await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
-            return res({aknowledge: true , output: tmp});
+            return res({acknowledge: true , output: tmp});
             
         } catch(error){
-            console.log(error.message || error)
             return res({error:error.message || error}).code(500);
         }
     }
 
     /**
-     * Replaces our visualizations main fields to fit our pattern needs.
-     * @param {*} app_objects Object with the visualizations raw content.
-     * @param {*} id Eg: 'wazuh-alerts'
+     * Replaces visualizations main fields to fit a certain pattern.
+     * @param {*} app_objects Object containing raw visualizations.
+     * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
+     * @param {*} timestamp Milliseconds timestamp used to identify visualizations batch.
      */
-    const buildVisualizationsBulk = (app_objects,id,timestamp) => {
+    const buildVisualizationsBulk = (app_objects, id, timestamp) => {
         try{
             let body = '';
             for (let element of app_objects) {
-                body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-'+timestamp+'" } }\n';
-               
+            	// Bulk action (you define index, doc and id)
+                body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-' + timestamp + '" } }\n';
 
-                let temp = {};
-                let aux = JSON.stringify(element._source);
-                aux = aux.replace("wazuh-alerts", id);
-                aux = JSON.parse(aux);
-                temp[element._type] = aux;
-    
-                if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
-                    temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
-                }
+                // Stringify and replace index-pattern for visualizations
+                let aux_source = JSON.stringify(element._source);
+                aux_source = aux_source.replace("wazuh-alerts", id);
+                aux_source = JSON.parse(aux_source);
+
+                // Bulk source
+                let bulk_content = {};
+                bulk_content[element._type] = aux_source;
                 
-                temp["type"] = element._type;
-                temp.visualization.description = timestamp;
+                bulk_content["type"] = element._type;
+                bulk_content.visualization.description = timestamp;
                 
-                body += JSON.stringify(temp) + "\n";
+                body += JSON.stringify(bulk_content) + "\n";
             }
             return body;
         } catch (error) {
-            console.log(error.message || error)
+            return (error.message || error);
         }
-
     }
 
-    const createVis = async (req,res) => {
+    const createVis = async (req, res) => {
         try {
             if(!req.params.pattern || 
                !req.params.tab || 
@@ -411,16 +409,12 @@ module.exports = (server, options) => {
             await elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: bulkBody });
 
             await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
-            return res({aknowledge: true});
+            return res({acknowledge: true});
             
         } catch(error){
-            console.log(error.message || error)
             return res({error:error.message || error}).code(500);
         }
     }
-
-
-
 
     // Get index patterns list
     server.route({
