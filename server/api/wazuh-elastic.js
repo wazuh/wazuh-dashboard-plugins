@@ -362,12 +362,19 @@ module.exports = (server, options) => {
             if(!req.params.pattern || 
                !req.params.tab || 
                !req.params.timestamp || 
-               (req.params.tab && !req.params.tab.includes('overview') && !req.params.tab.includes('agents'))
+               (req.params.tab && !req.params.tab.includes('manager') && !req.params.tab.includes('overview') && !req.params.tab.includes('agents'))
             ) {
                 throw new Error('Missing parameters');
             }
-            const tabPrefix = req.params.tab.includes('overview') ? 'overview' : 'agents';
-            const file = require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
+            const tabPrefix = req.params.tab.includes('overview') ? 
+                              'overview' : req.params.tab.includes('manager') ? 
+                              'manager' : 
+                              'agents';
+
+            const file = tabPrefix === 'manager' ? 
+                         require(`../integration-files/visualizations/ruleset/${req.params.tab.split('manager-')[1]}`) :
+                         require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
+
             const bulkBody = buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
             await elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: bulkBody });
 
