@@ -167,32 +167,6 @@ module.exports = (server, options) => {
     }
 
     /**
-     * Replaces our visualizations main fields to fit our pattern needs.
-     * @param {*} app_objects Object with the visualizations raw content.
-     * @param {*} id Eg: 'wazuh-alerts'
-     */
-    const buildVisualizationsBulk = (app_objects,id) => {
-        let body = '';
-        for (let element of app_objects) {
-            body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '" } }\n';
-
-            let temp = {};
-            let aux = JSON.stringify(element._source);
-            aux = aux.replace("wazuh-alerts", id);
-            aux = JSON.parse(aux);
-            temp[element._type] = aux;
-
-            if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
-                temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
-            }
-
-            temp["type"] = element._type;
-            body += JSON.stringify(temp) + "\n";
-        }
-        return body;
-    }
-
-    /**
      * Importing Wazuh app visualizations and dashboards
      * @param {*} id Eg: 'wazuh-alerts'
      * @param {*} firstTime Optional, if true it means that is the very first time of execution.
@@ -230,22 +204,6 @@ module.exports = (server, options) => {
             server.log([blueWazuh, 'initialize', 'info'], 'Importing/Updating index pattern known fields...');
             await updateKibanaIndexWithKnownFields(patternId)
 
-            log('initialize.js importAppObjects', 'Importing/Updating Wazuh app visualizations...','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Importing/Updating Wazuh app visualizations...');
-    
-            try {
-                app_objects = require(APP_OBJECTS_FILE);
-            } catch (e) {
-                log('initialize.js importAppObjects', e.message || e)
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
-                server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + APP_OBJECTS_FILE);
-                server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-            }
-    
-            
-            const body = buildVisualizationsBulk(app_objects,id);
-    
-            await elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: body });
             await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana', index_pattern]})
                 
             log('initialize.js importAppObjects', 'Wazuh app visualizations were successfully installed. App ready to be used.','info')
@@ -278,7 +236,7 @@ module.exports = (server, options) => {
             });
             log('initialize.js createIndexPattern', `Created index pattern: ${index_pattern}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
-            return importAppObjects(index_pattern,true);
+
         } catch (error){
             log('initialize.js createIndexPattern', error.message || error);
             server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
@@ -473,37 +431,6 @@ module.exports = (server, options) => {
 
             server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated version information');
         
-            // We search for the currently applied pattern in the visualizations
-            const data = await elasticRequest.callWithInternalUser('search', {
-                index: '.kibana',
-                type: 'doc',
-                q: `visualization.title:"Wazuh App Overview General Metric alerts"`
-            })
-
-
-            await elasticRequest.callWithInternalUser('deleteByQuery', {
-                index: '.kibana',
-                body: {
-                    'query': {
-                        'bool': {
-                            'must': {
-                                'match': {
-                                    "visualization.title": 'Wazuh App*'
-                                }
-                            },
-                            'must_not': {
-                                "match": {
-                                    "visualization.title": 'Wazuh App Overview General Agents status'
-                                }
-                            }
-                        }
-                    }
-                }
-            })
-
-            // Update the visualizations
-            return importAppObjects(JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index);
-           
         } catch (error) {
             return Promise.reject(error);
         }
