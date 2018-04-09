@@ -36,8 +36,8 @@ app.directive('wzMenu',function(){
                     let filtered = false;
                     // If there is no current pattern, fetch it
                     if(!appState.getCurrentPattern()) {
-                        const currentPattern = await genericReq.request('GET', '/api/wazuh-elastic/current-pattern');
-                        appState.setCurrentPattern(currentPattern.data.data);
+                        const currentPattern = await genericReq.request('GET', '/get-list');
+                        appState.setCurrentPattern(currentPattern.data.data[0].id);
                     } else {
 
                         // If there is current pattern, check if there is some pattern

@@ -222,22 +222,6 @@ module.exports = (server, options) => {
         }
     };
 
-    const getCurrentlyAppliedPattern = async (req, reply) => {
-        try{
-            ///////////// TEMPORARY HACK ///////////////////////
-                return reply({
-                    statusCode: 200,
-                    data      : 'wazuh-alerts-3.x-*'
-                });
-            ///////////// END OF TEMPORARY HACK ////////////////
-
-        } catch (error) {
-            return (error && error.message && error.message === 'no_visualization') ?
-                   reply('kibana_index_pattern_error').code(500) :
-                   reply('elasticsearch_down').code(500);
-        }
-    };
-
     module.exports = getConfig;
 
     const filterAllowedIndexPatternList = async (list,req) => {
@@ -414,17 +398,6 @@ module.exports = (server, options) => {
         method: 'GET',
         path: '/api/wazuh-elastic/delete-vis/{timestamp}',
         handler: deleteVis
-    });
-
-    /*
-     * GET /api/wazuh-elastic/current-pattern
-     * Returns the currently applied pattern
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/current-pattern',
-        handler: getCurrentlyAppliedPattern
     });
 
     /*
