@@ -6,7 +6,6 @@ const yml = require('js-yaml');
 const path = require('path');
 const { log } = require('./logger');
 
-const APP_OBJECTS_FILE = './integration-files/app-objects-file-alerts';
 const KIBANA_TEMPLATE = './integration-files/kibana-template';
 const knownFields = require('./integration-files/known-fields')
 
