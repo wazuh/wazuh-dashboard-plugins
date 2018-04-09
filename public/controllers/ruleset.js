@@ -1,6 +1,12 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoComplete, errorHandler) {
+app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoComplete, errorHandler, genericReq, appState) {
+    // Timestamp for visualizations at controller's startup
+    if(!$rootScope.visTimestamp) {
+        $rootScope.visTimestamp = new Date().getTime();
+        if(!$rootScope.$$phase) $rootScope.$digest();
+    }
+
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
     
     //Initialization
@@ -52,6 +58,12 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
 
     const load = async () => {
         try {
+            await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+        
+            // Render visualizations
+            $rootScope.$broadcast('updateVis');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+
             await Promise.all([
                 $scope.rules.nextPage(),
                 $scope.rulesAutoComplete.nextPage()
@@ -94,7 +106,14 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders,DecodersAutoComplete, errorHandler) {
+app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders,DecodersAutoComplete, errorHandler, genericReq, appState) {
+    // Timestamp for visualizations at controller's startup
+    if(!$rootScope.visTimestamp) {
+        $rootScope.visTimestamp = new Date().getTime();
+        if(!$rootScope.$$phase) $rootScope.$digest();
+    }
+
+
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
     
     //Initialization
@@ -183,15 +202,22 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
 
     const load = async () => {
         try {
+            await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+        
+            // Render visualizations
+            $rootScope.$broadcast('updateVis');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+
             await Promise.all([
                 $scope.decoders.nextPage(),
                 $scope.decodersAutoComplete.nextPage()
             ]);
+
             $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle('Unexpected exception loading controller','Ruleset');
+            errorHandler.handle(error,'Ruleset');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
