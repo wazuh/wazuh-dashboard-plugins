@@ -112,11 +112,9 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                     if (currentCompleted >= 100) {
 
-                        if ($rootScope.visTimestamp && !visTitle !== 'Wazuh App Overview General Agents status') {
-                            genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`)
-                            .then(() => {
-                                $rootScope.visTimestamp = null;
-                            });
+                        if ($rootScope.visTimestamp) {
+                            genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`).catch(console.error)
+                            $rootScope.visTimestamp = null;
                         }
 
                         if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
