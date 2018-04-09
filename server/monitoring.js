@@ -168,61 +168,6 @@ module.exports = (server, options) => {
         }
     };
 
-    // Importing Wazuh app visualizations and dashboards
-    const importAppObjects = async id => {
-        try {
-            log('monitoring.js importAppObjects','Importing Wazuh app visualizations...','info');
-            server.log([blueWazuh, 'monitoring', 'info'], 'Importing Wazuh app visualizations...');
-    
-            try {
-                app_objects = require(APP_OBJECTS_FILE);
-            } catch (error) {
-                log('monitoring.js importAppObjects', error.message || error);
-                server.log([blueWazuh, 'monitoring', 'error'], 'Could not read the objects file.');
-                server.log([blueWazuh, 'monitoring', 'error'], 'Path: ' + APP_OBJECTS_FILE);
-                server.log([blueWazuh, 'monitoring', 'error'], 'Exception: ' + error.message || error);
-            }
-    
-            let body = '';
-            for(let element of app_objects){
-                body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + 
-                '"_id": "' + element._type + ':' + element._id + '" } }\n';
-    
-                let temp = {};
-                let aux  = JSON.stringify(element._source);
-                aux      = aux.replace("wazuh-monitoring", id);
-                aux      = JSON.parse(aux);
-                temp[element._type] = aux;
-                
-                if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
-                    temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
-                }
-                
-                temp["type"] = element._type;
-                body        += JSON.stringify(temp) + "\n";
-            }
-    
-            await elasticRequest.callWithInternalUser('bulk', {
-                index: '.kibana',
-                body:  body
-            })
-
-            await elasticRequest.callWithInternalUser('indices.refresh', {
-                index: ['.kibana', index_pattern]
-            })
-
-  
-            log('monitoring.js importAppObjects', 'Wazuh app visualizations were successfully installed. App ready to be used.', 'info');
-            server.log([blueWazuh, 'monitoring', 'info'], 'Wazuh app visualizations were successfully installed. App ready to be used.');
-
-            return;
-
-        } catch (error) {
-            log('monitoring.js importAppObjects',error.message || error);
-            server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch. Bulk request failed.' + error.message || error);
-        }
-    };
-
     // fetchAgents on demand
     const fetchAgents = async () => {
         try {
@@ -255,7 +200,7 @@ module.exports = (server, options) => {
             })
             log('monitoring.js configureKibana', `Created index pattern: ${index_pattern}`, 'info');
             server.log([blueWazuh, 'monitoring', 'info'], `Created index pattern: ${index_pattern}`);
-            await importAppObjects(index_pattern);
+
             return;
         } catch(error) {
             log('monitoring.js configureKibana',error.message || error);
