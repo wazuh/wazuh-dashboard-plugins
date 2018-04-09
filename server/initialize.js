@@ -166,7 +166,7 @@ module.exports = (server, options) => {
     }
 
     /**
-     * Importing Wazuh app visualizations and dashboards
+     * Create index pattern for wazuh alerts
      * @param {*} id Eg: 'wazuh-alerts'
      * @param {*} firstTime Optional, if true it means that is the very first time of execution.
      */
@@ -180,8 +180,8 @@ module.exports = (server, options) => {
             let indexPatternList = await searchIndexPatternById(id);
 
             if (!firstTime && indexPatternList.hits.total < 1) {  
-                log('initialize.js importAppObjects', 'Visualizations pattern not found. Creating it...','info')
-                server.log([blueWazuh, 'initialize', 'info'], 'Visualizations pattern not found. Creating it...');              
+                log('initialize.js importAppObjects', 'Wazuh alerts index pattern not found. Creating it...','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh alerts index pattern not found. Creating it...');              
                 id = await createCustomPattern(patternId,id)
                 firstTime = true;
             }
@@ -205,8 +205,8 @@ module.exports = (server, options) => {
 
             await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana', index_pattern]})
                 
-            log('initialize.js importAppObjects', 'Wazuh app visualizations were successfully installed. App ready to be used.','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Wazuh app visualizations were successfully installed. App ready to be used.');
+            log('initialize.js importAppObjects', 'App ready to be used.','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
 
             return;
         } catch (error){
@@ -413,7 +413,7 @@ module.exports = (server, options) => {
                 await configureKibana("install");
             }
 
-            server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information and visualizations...');
+            server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information...');
             
             await elasticRequest.callWithInternalUser('update', { 
                 index: '.wazuh-version', 
