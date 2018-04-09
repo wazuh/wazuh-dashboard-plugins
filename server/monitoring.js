@@ -7,8 +7,6 @@ const getPath   = require('../util/get-path');
 const colors    = require('ansicolors');
 const blueWazuh = colors.blue('wazuh');
 
-const APP_OBJECTS_FILE = './integration-files/app-objects-file-monitoring';
-
 const { log } = require('./logger');
 
 module.exports = (server, options) => {
