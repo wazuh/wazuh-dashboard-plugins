@@ -4,8 +4,10 @@ import $ from 'jquery';
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, metricService) {
 
     // Timestamp for visualizations at controller's startup
-    if(!$rootScope.visTimestamp) $rootScope.visTimestamp = new Date().getTime();
-    if(!$rootScope.$$phase) $rootScope.$digest
+    if(!$rootScope.visTimestamp) {
+        $rootScope.visTimestamp = new Date().getTime();
+        if(!$rootScope.$$phase) $rootScope.$digest();
+    }
 
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
