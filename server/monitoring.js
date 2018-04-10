@@ -272,7 +272,6 @@ module.exports = (server, options) => {
     const createWazuhMonitoring = async () => {
         try{
             
-            const patternId = 'index-pattern:' + index_pattern;
             try{
                 await elasticRequest.callWithInternalUser('delete', { 
                     index: '.kibana', 
