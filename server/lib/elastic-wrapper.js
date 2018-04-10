@@ -34,6 +34,23 @@ class ElasticWrapper{
     }
 
     /**
+     * Search any index by name
+     * @param {*} name 
+     */
+    async searchIndexByName(name) {
+        try {
+            if(!name) return Promise.reject(new Error('No valid name given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('search', { index: name });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
      * This function creates a new index pattern.
      * @param {*} title Eg: 'wazuh-alerts-3.x-*'
      * @param {*} id Optional.
@@ -61,6 +78,37 @@ class ElasticWrapper{
             return Promise.reject(error);
         }
     } 
+
+    /**
+     * Special function to create the wazuh-monitoring index pattern,
+     * do not use for any other creation, use the right function instead.
+     * @param {*} title 
+     * @param {*} id 
+     */
+    async createMonitoringIndexPattern(title,id) {
+        try {
+            if(!title) return Promise.reject(new Error('No valid title for create index pattern'))
+
+            const data = await this.elasticRequest.callWithInternalUser('create', { 
+                index: '.kibana', 
+                type: 'doc', 
+                id: id ? id : 'index-pattern:' + title,
+                body: {
+                    "type": 'index-pattern', 
+                    "index-pattern": { 
+                        "fields":'[{"name":"@timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"dateAdd.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"lastKeepAlive.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.arch.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"version.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true}]',
+                        "title": title, 
+                        "timeFieldName": '@timestamp' 
+                    } 
+                } 
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 
     /**
      * Creates the .wazuh-version index with a custom configuration.
@@ -451,6 +499,27 @@ class ElasticWrapper{
     }
 
     /**
+     * Make a bulk request to update any index
+     * @param {*} bulk 
+     */
+    async pushBulkAnyIndex(index,bulk) {
+        try {
+            if(!bulk || !index) return Promise.reject(new Error('No valid parameters given given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('bulk', {
+                index: index,
+                type:  'agent',
+                body:  bulk
+            })
+
+            return data;
+    
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
      * Useful to search elements with "wazuh" as type giving an index as parameter
      * @param {*} req 
      * @param {*} index 
@@ -470,6 +539,145 @@ class ElasticWrapper{
             return Promise.reject(error);
         }
     }
+
+    /**
+     * Check if an index exists
+     * @param {*} index 
+     */
+    async checkIfIndexExists(index) {
+        try {
+            if(!index) return Promise.reject(new Error('No valid index given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('indices.exists', { index: index });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Get a template by name
+     * @param {*} name 
+     */
+    async getTemplateByName(name) {
+        try {
+           if(!name) return Promise.reject(new Error('No valid name given'))
+
+           const data = await this.elasticRequest.callWithInternalUser('indices.getTemplate', { name: name });
+           
+           return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Creates the .kibana index with minimum content
+     */
+    async createEmptyKibanaIndex(){
+        try {
+            const data = await this.elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
+            
+            return data;
+ 
+         } catch (error) {
+             return Promise.reject(error);
+         }
+    }
+
+    async createIndexByName(name) {
+        try {
+            if(!name) return Promise.reject(new Error('No valid name given'));
+            
+            const data = await this.elasticRequest.callWithInternalUser('indices.create', { index: name });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+    
+    /**
+     * Deletes an Elasticsearch index by its name
+     * @param {} name 
+     */
+    async deleteIndexByName(name) {
+        try {
+            if(!name) return Promise.reject(new Error('No valid name given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('indices.delete', { index: name })
+            
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Deletes wazuh monitoring index pattern
+     */
+    async deleteMonitoring(){
+        try {
+            const data = await this.elasticRequest.callWithInternalUser('delete', { 
+                index: '.kibana', 
+                type: 'doc',
+                id: 'index-pattern:wazuh-monitoring-*' 
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Get an index pattern by name and/or id
+     * @param {*} id Could be id and/or title
+     */
+    async getIndexPatternUsingGet(id){
+        try {
+            if(!id) return Promise.reject(new Error('No valid id given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('get', {
+                index: '.kibana',
+                type:  'doc',
+                id: id.includes('index-pattern:') ? id : 'index-pattern:' + id
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Inserts the wazuh-agent template
+     * @param {*} template 
+     */
+    async putMonitoringTemplate(template) {
+        try {
+            if(!template) return Promise.reject(new Error('No valid template given'))
+
+            const data = await elasticRequest.callWithInternalUser('indices.putTemplate', {
+                name  : 'wazuh-agent',
+                body  : template
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+
+    }
+
 }
 
 module.exports = ElasticWrapper;
