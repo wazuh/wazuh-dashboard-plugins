@@ -227,10 +227,6 @@ module.exports = (server, options) => {
 
             const tmp = await wzWrapper.deleteVisualizationByDescription(req.params.timestamp);
 
-            ///// TEMPORARY HACK /////////////////////////////////////////////////////////////
-            await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
-            //////////////////////////////////////////////////////////////////////////////////
-
             return res({acknowledge: true , output: tmp});
             
         } catch(error){
@@ -291,10 +287,6 @@ module.exports = (server, options) => {
 
             const bulkBody = buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
             await wzWrapper.pushBulkToKibanaIndex(bulkBody);
-
-            ///// TEMPORARY HACK /////////////////////////////////////////////////////////////
-            await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
-            //////////////////////////////////////////////////////////////////////////////////
 
             return res({acknowledge: true});
             
