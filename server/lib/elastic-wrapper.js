@@ -380,6 +380,96 @@ class ElasticWrapper{
             return Promise.reject(error);
         }
     };
+
+    /**
+     * Same as curling the templates from Elasticsearch
+     */
+    async getTemplates() {
+        try {
+
+            const data = await this.elasticRequest.callWithInternalUser('cat.templates', {});
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+        /**
+     * Same as curling the plugins from Elasticsearch
+     */
+    async getPlugins() {
+        try {
+
+            const data = await this.elasticRequest.callWithInternalUser('cat.plugins', { });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Used to delete all visualizations with the given description
+     * @param {*} description 
+     */
+    async deleteVisualizationByDescription(description) {
+        try {
+            if(!description) return Promise.reject(new Error('No description given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('deleteByQuery', {
+                index: '.kibana',
+                body: {
+                    query: { bool: { must: { match: { 'visualization.description': description } } } },
+                    size : 9999
+                }
+            });
+
+            return data; 
+            
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Make a bulk request to update the .kibana index
+     * @param {*} bulk 
+     */
+    async pushBulkToKibanaIndex(bulk) {
+        try {
+            if(!bulk) return Promise.reject(new Error('No bulk given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: bulk });
+
+            return data;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Useful to search elements with "wazuh" as type giving an index as parameter
+     * @param {*} req 
+     * @param {*} index 
+     */
+    async searchWazuhElementsByIndexWithRequest(req, index) {
+        try {
+            if(!req || !index) return Promise.reject(new Error('No valid parameters given'))
+
+            const data = await elasticRequest.callWithRequest(req,'search', {
+                index: index,
+                type : 'wazuh'
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 }
 
 module.exports = ElasticWrapper;
