@@ -459,7 +459,7 @@ class ElasticWrapper{
         try {
             if(!req || !index) return Promise.reject(new Error('No valid parameters given'))
 
-            const data = await elasticRequest.callWithRequest(req,'search', {
+            const data = await this.elasticRequest.callWithRequest(req,'search', {
                 index: index,
                 type : 'wazuh'
             });
