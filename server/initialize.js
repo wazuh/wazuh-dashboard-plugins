@@ -23,14 +23,14 @@ module.exports = (server, options) => {
     let packageJSON = {};
     let configurationFile = {};
     let pattern = null;
-
+    let forceDefaultPattern = true;
     // Read config from package.json and config.yml
     try {
         configurationFile = yml.load(fs.readFileSync(path.join(__dirname, '../config.yml'), { encoding: 'utf-8' }));
 
         global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
-
+        forceDefaultPattern = (configurationFile && typeof configurationFile['force.default'] !== 'undefined') ? configurationFile['force.default'] : true;
         packageJSON = require('../package.json');
     } catch (e) {
         log('initialize.js', e.message || e);
@@ -53,7 +53,7 @@ module.exports = (server, options) => {
         return true;
     }
 
-    let index_pattern = pattern || "wazuh-alerts-3.x-*";
+    const defaultIndexPattern = pattern || "wazuh-alerts-3.x-*";
 
     /**
      * This function creates a new index pattern with a custom ID.
@@ -166,61 +166,104 @@ module.exports = (server, options) => {
     }
 
     /**
-     * Create index pattern for wazuh alerts
-     * @param {*} id Eg: 'wazuh-alerts'
-     * @param {*} firstTime Optional, if true it means that is the very first time of execution.
+     * Refresh known fields for all valid index patterns.
+     * Optionally forces the wazuh-alerts-3.x-* creation.
      */
-    const importAppObjects = async (id,firstTime) => {
+    const checkKnownFields = async () => {
         try {
             const xpack = await elasticRequest.callWithInternalUser('cat.plugins', { });
-            log('initialize.js importAppObjects', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
+            log('initialize.js checkKnownFields', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
-            
-            let patternId        = 'index-pattern:' + id;
-            let indexPatternList = await searchIndexPatternById(id);
+                    
+            const indexPatternList = await elasticRequest.callWithInternalUser('search', {
+                index: '.kibana',
+                type: 'doc',
+                body: {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                "match": {
+                                    "type": "index-pattern"
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "size": 999
+                }
+            })
+            log('initialize.js checkKnownFields', `Found ${indexPatternList.hits.total} index patterns`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Found ${indexPatternList.hits.total} index patterns`);
+            let list = [];
+            if(indexPatternList && indexPatternList.hits && indexPatternList.hits.hits){
+                const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+               
+                if(indexPatternList.hits.hits.length === 0) throw new Error('There is no index pattern');
+                for(const index of indexPatternList.hits.hits){   
+                    let valid, parsed;        
+                    try{
+                        parsed = JSON.parse(index._source['index-pattern'].fields)
+                    } catch (error){
+                        continue;
+                    }     
+                    
+                    valid = parsed.filter(item => minimum.includes(item.name));
+                    if(valid.length === 4){
+                        list.push({
+                            id   : index._id.split('index-pattern:')[1],
+                            title: index._source['index-pattern'].title
+                        })
+                    }
+           
+                }
+            } 
+            log('initialize.js checkKnownFields', `Found ${list.length} valid index patterns for Wazuh alerts`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Found ${list.length} valid index patterns for Wazuh alerts`);
 
-            if (!firstTime && indexPatternList.hits.total < 1) {  
-                log('initialize.js importAppObjects', 'Wazuh alerts index pattern not found. Creating it...','info')
-                server.log([blueWazuh, 'initialize', 'info'], 'Wazuh alerts index pattern not found. Creating it...');              
-                id = await createCustomPattern(patternId,id)
-                firstTime = true;
-            }
-            patternId = 'index-pattern:' + id;
+            const defaultExists = list.filter(item => item.id === defaultIndexPattern);            
 
-            if(firstTime && indexPatternList.hits.total < 1){
-                log('initialize.js importAppObjects', 'Waiting for index pattern creation to complete...','info')
-                server.log([blueWazuh, 'initialize', 'info'], 'Waiting for index pattern creation to complete...');   
+            if(defaultExists.length === 0 && forceDefaultPattern){
+                log('initialize.js checkKnownFields', `Default index pattern not found, creating it...`,'info')
+                server.log([blueWazuh, 'initialize', 'info'], `Default index pattern not found, creating it...`);
+                await createIndexPattern();
+                log('initialize.js checkKnownFields', 'Waiting for default index pattern creation to complete...','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Waiting for default index pattern creation to complete...');   
                 let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 while(waitTill > new Date()){
-                    indexPatternList = await searchIndexPatternById(id);
+                    indexPatternList = await searchIndexPatternById(defaultIndexPattern);
                     if(indexPatternList.hits.total >= 1) break;
                     else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 }
                 server.log([blueWazuh, 'initialize', 'info'], 'Index pattern created...');
+
+            } else {
+                log('initialize.js checkKnownFields', `Default index pattern found`,'info')
+                server.log([blueWazuh, 'initialize', 'info'], `Default index pattern found`);
             }
 
-            log('initialize.js importAppObjects', 'Importing/Updating index pattern known fields...','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Importing/Updating index pattern known fields...');
-            await updateKibanaIndexWithKnownFields(patternId)
+            for(const item of list){
+                log('initialize.js checkKnownFields', `Refreshing known fields for "index-pattern:${item.title}"`,'info')
+                server.log([blueWazuh, 'initialize', 'info'], `Refreshing known fields for "index-pattern:${item.title}"`);
+                await updateKibanaIndexWithKnownFields('index-pattern:' + item.id);
+            }
 
-            await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana', index_pattern]})
-                
-            log('initialize.js importAppObjects', 'App ready to be used.','info')
+            log('initialize.js checkKnownFields', 'App ready to be used.','info')
             server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
 
             return;
         } catch (error){
-            log('initialize.js importAppObjects', error.message || error);
+            log('initialize.js checkKnownFields', error.message || error);
             server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch.' +  error.message || error);
         }
     };
 
-    // Create index pattern TODO: remove hardcoded index-patterns ids
+    // Creates the default index pattern 
     const createIndexPattern = async () => {        
         try {
-            log('initialize.js createIndexPattern', `Creating index pattern: ${index_pattern}`,'info')
-            server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${index_pattern}`);
-            let patternId = 'index-pattern:' + index_pattern;
+            log('initialize.js createIndexPattern', `Creating index pattern: ${defaultIndexPattern}`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${defaultIndexPattern}`);
+            let patternId = 'index-pattern:' + defaultIndexPattern;
             await elasticRequest.callWithInternalUser('create', {
                 index: '.kibana',
                 type: 'doc',
@@ -228,13 +271,13 @@ module.exports = (server, options) => {
                 body: {
                     type: 'index-pattern',
                     'index-pattern': {
-                        title: index_pattern,
+                        title: defaultIndexPattern,
                         timeFieldName: '@timestamp'
                     }
                 }
             });
-            log('initialize.js createIndexPattern', `Created index pattern: ${index_pattern}`,'info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
+            log('initialize.js createIndexPattern', `Created index pattern: ${defaultIndexPattern}`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + defaultIndexPattern);
 
         } catch (error){
             log('initialize.js createIndexPattern', error.message || error);
@@ -249,7 +292,7 @@ module.exports = (server, options) => {
                 const data = await elasticRequest.callWithInternalUser('search', {
                     index: '.kibana',
                     type: 'doc',
-                    q: `index-pattern.title:"${index_pattern}"`
+                    q: `index-pattern.title:"${defaultIndexPattern}"`
                 })
   
                 if (data.hits.total >= 1) {
@@ -331,6 +374,8 @@ module.exports = (server, options) => {
 
     const checkWazuhIndex = async () => {
             try{
+                log('initialize.js init', 'Checking .wazuh index.','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh index.');
                 const result = await elasticRequest.callWithInternalUser('indices.exists', {
                     index: '.wazuh'
                 })
@@ -398,6 +443,8 @@ module.exports = (server, options) => {
 
     const checkWazuhVersionIndex = async () => {
         try {
+            log('initialize.js init', 'Checking .wazuh-version index.','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh-version index.');
             try{
                 await elasticRequest.callWithInternalUser('get', {
                     index: ".wazuh-version",
@@ -409,7 +456,7 @@ module.exports = (server, options) => {
                 server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
     
                 // Save Setup Info
-                await saveConfiguration(index_pattern);
+                await saveConfiguration(defaultIndexPattern);
                 await configureKibana("install");
             }
 
@@ -428,7 +475,7 @@ module.exports = (server, options) => {
                 } 
             });
 
-            server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated version information');
+            server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated .wazuh-version index');
         
         } catch (error) {
             return Promise.reject(error);
@@ -440,7 +487,8 @@ module.exports = (server, options) => {
         try {
             await Promise.all([
                 checkWazuhIndex(),
-                checkWazuhVersionIndex()
+                checkWazuhVersionIndex(),
+                checkKnownFields()
             ]);
         } catch (error){
             log('initialize.js init()', error.message || error);
@@ -757,5 +805,4 @@ module.exports = (server, options) => {
     // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
     checkStatus();
 
-    module.exports = importAppObjects;
 };
