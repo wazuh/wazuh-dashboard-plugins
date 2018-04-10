@@ -9,9 +9,11 @@ const blueWazuh = colors.blue('wazuh');
 
 const { log } = require('./logger');
 
+const ElasticWrapper = require('./lib/elastic-wrapper');
+
 module.exports = (server, options) => {
     // Elastic JS Client
-    const elasticRequest = server.plugins.elasticsearch.getCluster('admin');
+    const wzWrapper = new ElasticWrapper(server);
 
     // Initialize
     let agentsArray   = [];
@@ -141,10 +143,7 @@ module.exports = (server, options) => {
     // Get API configuration from elastic and callback to loadCredentials
     const getConfig = async () => {
         try {
-            const data = await elasticRequest.callWithInternalUser('search', {
-                index: '.wazuh',
-                type: 'wazuh-configuration'
-            })
+            const data = await wzWrapper.getWazuhAPIEntries();
             
             if (data.hits.total > 0) {
                 return data.hits;
@@ -181,20 +180,8 @@ module.exports = (server, options) => {
             log('monitoring.js configureKibana', `Creating index pattern: ${index_pattern}`, 'info');
             server.log([blueWazuh, 'monitoring', 'info'], `Creating index pattern: ${index_pattern}`);
     
-            let patternId = 'index-pattern:' + index_pattern;
-            await elasticRequest.callWithInternalUser('create', { 
-                index: '.kibana', 
-                type: 'doc', 
-                id: patternId, 
-                body: {
-                    "type": 'index-pattern', 
-                    "index-pattern": { 
-                        "fields":'[{"name":"@timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"dateAdd.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"lastKeepAlive.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.arch.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"version.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true}]',
-                        "title": index_pattern, 
-                        "timeFieldName": '@timestamp' 
-                    } 
-                } 
-            })
+            await wzWrapper.createMonitoringIndexPattern(index_pattern);
+
             log('monitoring.js configureKibana', `Created index pattern: ${index_pattern}`, 'info');
             server.log([blueWazuh, 'monitoring', 'info'], `Created index pattern: ${index_pattern}`);
 
@@ -208,7 +195,7 @@ module.exports = (server, options) => {
     // Creating wazuh-monitoring index
     const createIndex = async todayIndex => {
         try {
-            await elasticRequest.callWithInternalUser('indices.create', { index: todayIndex });
+            await wzWrapper.createIndexByName(todayIndex);
             log('monitoring.js createIndex', 'Successfully created today index.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Successfully created today index.');
             await insertDocument(todayIndex);
@@ -236,11 +223,7 @@ module.exports = (server, options) => {
     
                 if (body === '') return;
     
-                const response = await elasticRequest.callWithInternalUser('bulk', {
-                    index: todayIndex,
-                    type:  'agent',
-                    body:  body
-                })
+                const response = await wzWrapper.pushBulkAnyIndex(todayIndex,body);
 
                 agentsArray.length = 0;
             }
@@ -257,8 +240,8 @@ module.exports = (server, options) => {
             fDate      = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
             todayIndex = index_prefix + fDate;
     
-            const result = await elasticRequest.callWithInternalUser('indices.exists', { index: todayIndex })
-            
+            const result = await wzWrapper.checkIfIndexExists(todayIndex);
+
             result ? await insertDocument(todayIndex) : await createIndex(todayIndex);
 
             return;
@@ -273,11 +256,8 @@ module.exports = (server, options) => {
         try{
             
             try{
-                await elasticRequest.callWithInternalUser('delete', { 
-                    index: '.kibana', 
-                    type: 'doc',
-                    id: 'index-pattern:wazuh-monitoring-*' 
-                })
+                await wzWrapper.deleteMonitoring();
+
                 log('monitoring.js init', 'Successfully deleted old wazuh-monitoring pattern.', 'info');
                 server.log([blueWazuh, 'monitoring', 'info'], "Successfully deleted old wazuh-monitoring pattern.");
             } catch (error) {
@@ -297,10 +277,7 @@ module.exports = (server, options) => {
             log('monitoring.js checkTemplate', 'Updating wazuh-monitoring template...', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], "Updating wazuh-monitoring template...");
             const monitoringTemplate = require('./integration-files/monitoring-template');
-            const data = await elasticRequest.callWithInternalUser('indices.putTemplate', {
-                name  : 'wazuh-agent',
-                body  : monitoringTemplate
-            });
+            const data = await wzWrapper.putMonitoringTemplate(monitoringTemplate);
             return;
         } catch(error){
             log('monitoring.js checkTemplate', 'Something went wrong updating wazuh-monitoring template...' + error.message || error);
@@ -328,11 +305,7 @@ module.exports = (server, options) => {
             try{
                 log('monitoring.js init', 'Checking if wazuh-monitoring pattern exists...', 'info');
                 server.log([blueWazuh, 'monitoring', 'info'], 'Checking if wazuh-monitoring pattern exists...');
-                await elasticRequest.callWithInternalUser('get', {
-                    index: '.kibana',
-                    type:  'doc',
-                    id: patternId
-                });
+                await wzWrapper.getIndexPatternUsingGet(patternId);
             } catch (error) {
                 log('monitoring.js init', 'Didn\'t find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...');
                 server.log([blueWazuh, 'monitoring', 'info'], "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...");
@@ -354,7 +327,8 @@ module.exports = (server, options) => {
     // Check Elasticsearch Server status and .kibana index presence
     const checkElasticsearchServer = async () => {
         try {
-            const data = await elasticRequest.callWithInternalUser('indices.exists', { index: ".kibana" });
+            const data = await wzWrapper.checkIfIndexExists('.kibana');
+
             if (data) {
                 const pluginsData = await server.plugins.elasticsearch.waitUntilReady();
                 return pluginsData;
