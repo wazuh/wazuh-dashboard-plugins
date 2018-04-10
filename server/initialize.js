@@ -8,7 +8,7 @@ const { log } = require('./logger');
 
 const KIBANA_TEMPLATE = './integration-files/kibana-template';
 const knownFields = require('./integration-files/known-fields')
-
+const ElasticWrapper = require('./lib/elastic-wrapper');
 
 module.exports = (server, options) => {
 
@@ -16,7 +16,7 @@ module.exports = (server, options) => {
 
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
-
+    const wzWrapper = new ElasticWrapper(server);
     let objects = {};
     let app_objects = {};
     let kibana_template = {};
@@ -55,86 +55,8 @@ module.exports = (server, options) => {
 
     const defaultIndexPattern = pattern || "wazuh-alerts-3.x-*";
 
-    /**
-     * This function creates a new index pattern with a custom ID.
-     * @param {*} patternId 'index-pattern:' + id;
-     * @param {*} id Eg: 'wazuh-alerts'
-     */
-    const createCustomPattern = async (patternId,id) => {
-        try{
-            if(!id) return Promise.reject(new Error('No valid id for index pattern'));
-            if(!patternId) return Promise.reject(new Error('No valid patternId for index pattern'));
-            
-            const customPatternRegex = new RegExp(/[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}/g);
-            if(id && customPatternRegex.test(id.trim())){
-                server.log([blueWazuh, 'initialize', 'info'], 'Custom id detected for index pattern...');
-                id        = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
-                patternId = 'index-pattern:' + id.trim();
-                server.log([blueWazuh, 'initialize', 'info'], 'Modified values to be default values, now checking if default index pattern exists...');
-                const data = await elasticRequest
-                .callWithInternalUser('search', {
-                    index: '.kibana',
-                    type: 'doc',
-                    body: {
-                        "query": {
-                            "match": {
-                                "_id":"index-pattern:" + id 
-                            }
-                        }
-                    }
-                });
-                if(data && data.hits && data.hits.total > 0) {
-                    server.log([blueWazuh, 'initialize', 'info'], 'Default index pattern exists, skipping its creation...');
-                    return id;
-                }
-            }
 
 
-
-            await elasticRequest
-            .callWithInternalUser('create', {
-                index: '.kibana',
-                type: 'doc',
-                id: patternId,
-                body: {
-                    "type": 'index-pattern',
-                    "index-pattern": {
-                        "title": id,
-                        "timeFieldName": '@timestamp'
-                    }
-                }
-            });
-            return id;
-        }catch(error){
-            return Promise.reject(error)
-        }
-    }
-
-    /**
-     * This function checks if an index pattern exists, 
-     * you should check response.hits.total
-     * @param {*} id Eg: 'wazuh-alerts'
-     */
-    const searchIndexPatternById = async id => {
-        try {
-            if(!id) return Promise.reject(new Error('No valid id for search index pattern'))
-            const data = await elasticRequest
-                        .callWithInternalUser('search', {
-                            index: '.kibana',
-                            type: 'doc',
-                            body: {
-                                "query": {
-                                    "match": {
-                                        "_id":"index-pattern:" + id 
-                                    }
-                                }
-                            }
-                        });        
-            return data;
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
 
     /**
      * Updates .kibana index known fields
@@ -226,7 +148,7 @@ module.exports = (server, options) => {
                 let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 let tmplist = null;
                 while(waitTill > new Date()){
-                    tmplist = await searchIndexPatternById(defaultIndexPattern);
+                    tmplist = await wzWrapper.searchIndexPatternById(defaultIndexPattern);
                     if(tmplist.hits.total >= 1) break;
                     else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 }
