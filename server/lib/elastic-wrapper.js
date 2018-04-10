@@ -347,7 +347,7 @@ class ElasticWrapper{
         try {
             if(!req) return Promise.reject(new Error('No valid request given'))
 
-            const data = await elasticRequest.callWithRequest(req,'search', {
+            const data = await this.elasticRequest.callWithRequest(req,'search', {
                 index: '.wazuh',
                 type : 'wazuh-configuration',
                 q    : 'active:true'
