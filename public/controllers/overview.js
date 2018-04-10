@@ -153,8 +153,13 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
 
+        if(!$rootScope.visTimestamp) {
+            $rootScope.visTimestamp = new Date().getTime();
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+
         // Create current tab visualizations
-        genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+        genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
         .then(() => {
 
             // Render visualizations
@@ -166,9 +171,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
             $location.search('_a', null);
 
         })
-        .catch(error => {
-            errorHandler.handle(error, 'Overview');
-        });
+        .catch(error => errorHandler.handle(error, 'Overview'));
     };
 
     // Watch tabView
