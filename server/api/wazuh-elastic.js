@@ -1,8 +1,8 @@
-const fs   = require('fs');
-const yml  = require('js-yaml');
-const path = require('path');
+const ElasticWrapper = require('../lib/elastic-wrapper');
 
 module.exports = (server, options) => {
+   
+    const wzWrapper = new ElasticWrapper(server);
 
     // Elastic JS Client
     const elasticRequest = server.plugins.elasticsearch.getCluster('data');
@@ -10,10 +10,7 @@ module.exports = (server, options) => {
     const getTimeStamp = async (req,reply) => {
         try {
 
-            const data = await elasticRequest.callWithInternalUser('search', {
-                index: '.wazuh-version',
-                type :  'wazuh-version'
-            })
+            const data = await wzWrapper.getWazuhVersionIndexAsSearch();
 
             if(data.hits && 
                data.hits.hits[0] && 
@@ -38,46 +35,6 @@ module.exports = (server, options) => {
             }).code(500);
         }
     }
-
-    //Handlers
-    const fetchElastic = async (req, payload) => {
-        try {
-            const data = await elasticRequest.callWithInternalUser('search', {
-                index: 'wazuh-alerts-3.x-*',
-                type:  'wazuh',
-                body:  payload
-            });
-
-            return data;
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    };
-
-    const getConfig = async id => {
-        try {
-
-            const data = await elasticRequest.callWithInternalUser('get', {
-                index: '.wazuh',
-                type : 'wazuh-configuration',
-                id
-            });
-
-            return {
-                user        : data._source.api_user,
-                password    : Buffer.from(data._source.api_password, 'base64').toString("ascii"),
-                url         : data._source.url,
-                port        : data._source.api_port,
-                insecure    : data._source.insecure,
-                cluster_info: data._source.cluster_info,
-                extensions  : data._source.extensions
-            };
-
-        } catch (error){
-            return { error: 'no elasticsearch', error_code: 2 };
-        }
-    };
-
 
     const getTemplate = async (req, reply) => {
         try {
@@ -184,7 +141,7 @@ module.exports = (server, options) => {
      
             payload.aggs['2'].terms.field = req.params.field;
 
-            const data = await fetchElastic(req, payload);
+            const data = await wzWrapper.searchWazuhAlertsWithPayload(payload);
 
             return (data.hits.total === 0 || typeof data.aggregations['2'].buckets[0] === 'undefined') ?
                     reply({ statusCode: 200, data: '' }) :
@@ -219,8 +176,6 @@ module.exports = (server, options) => {
             }).code(500);
         }
     };
-
-    module.exports = getConfig;
 
     const filterAllowedIndexPatternList = async (list,req) => {
         let finalList = [];

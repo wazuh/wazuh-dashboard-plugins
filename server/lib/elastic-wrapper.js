@@ -182,6 +182,7 @@ class ElasticWrapper{
      */
     async updateWazuhVersionIndexLastRestart(version,revision) {
         try {
+            if(!version || !revision) return Promise.reject(new Error('No valid version or revision given'));
             
             const data = await this.elasticRequest.callWithInternalUser('update', { 
                 index: '.wazuh-version', 
@@ -202,6 +203,77 @@ class ElasticWrapper{
             return Promise.reject(error);
         }
     }
+
+    /**
+     * Get .wazuh-version index
+     */
+    async getWazuhVersionIndexAsSearch() {
+        try {
+            
+            const data = await this.elasticRequest.callWithInternalUser('search', {
+                index: '.wazuh-version',
+                type :  'wazuh-version'
+            })
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * 
+     * @param {*} payload 
+     */
+    async searchWazuhAlertsWithPayload(payload) {
+        try {
+
+            if(!payload) return Promise.reject(new Error('No valid payload given'));
+
+            const data = await this.elasticRequest.callWithInternalUser('search', {
+                index: 'wazuh-alerts-3.x-*',
+                type:  'wazuh',
+                body:  payload
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    };
+
+    /**
+     * Search for the Wazuh API configuration document using its own id (usually it's a timestamp)
+     * @param {*} id Eg: 12396176723
+     */
+    async getWazuhConfigurationById(id){
+        try {
+
+            if(!id) return Promise.reject(new Error('No valid document id given'));
+
+            const data = await this.elasticRequest.callWithInternalUser('get', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id   : id
+            });
+
+            return {
+                user        : data._source.api_user,
+                password    : Buffer.from(data._source.api_password, 'base64').toString("ascii"),
+                url         : data._source.url,
+                port        : data._source.api_port,
+                insecure    : data._source.insecure,
+                cluster_info: data._source.cluster_info,
+                extensions  : data._source.extensions
+            };
+
+        } catch (error){
+            return { error: 'no elasticsearch', error_code: 2 };
+        }        
+    }
+
 }
 
 module.exports = ElasticWrapper;
