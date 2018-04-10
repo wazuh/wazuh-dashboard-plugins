@@ -401,7 +401,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     $scope.changeIndexPattern = async newIndexPattern => {
         try {
-            const data = await genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${newIndexPattern}`);
             appState.setCurrentPattern(newIndexPattern);
             $scope.$emit('updatePattern', {});
             errorHandler.info('Successfully changed the default index-pattern','Settings');

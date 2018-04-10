@@ -25,7 +25,6 @@ require('ui/modules').get('app/wazuh', [])
         },
         changePattern: async selectedPattern => {
             try {
-                const data = await genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${selectedPattern}`);
                 appState.setCurrentPattern(selectedPattern);
                 return appState.getCurrentPattern();
             } catch (error) {
