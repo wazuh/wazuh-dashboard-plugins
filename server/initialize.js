@@ -15,7 +15,6 @@ module.exports = (server, options) => {
     log('initialize.js', 'Initializing', 'info');
 
     // Elastic JS Client
-    const elasticRequest = server.plugins.elasticsearch.getCluster('data');
     const wzWrapper = new ElasticWrapper(server);
     let objects = {};
     let app_objects = {};
@@ -242,10 +241,7 @@ module.exports = (server, options) => {
                     };
                     
                     try{
-                        await elasticRequest.callWithInternalUser('indices.create', {
-                            index: '.wazuh',
-                            body: configuration
-                        })
+                        await wzWrapper.createWazuhIndex(configuration);
             
                         log('initialize.js init', 'Index .wazuh created.','info')
                         server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
@@ -256,12 +252,8 @@ module.exports = (server, options) => {
 
                 } else { // The .wazuh index exists, we now proceed to check whether it's from an older version
                     try{
-                        await elasticRequest.callWithInternalUser('get', {
-                            index: ".wazuh",
-                            type: "wazuh-setup",
-                            id: "1"
-                        })
-        
+                        await wzWrapper.getOldWazuhSetup();
+
                         // Reindex!
                         return reindexOldVersion();
 
@@ -333,12 +325,7 @@ module.exports = (server, options) => {
             server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + error);
         }
 
-        return elasticRequest.callWithInternalUser('indices.putTemplate',{
-            name  : 'wazuh-kibana',
-            order : 0,
-            create: true,
-            body  : kibana_template
-        });
+        return wzWrapper.putWazuhKibanaTemplate(kibana_template);
     };
 
     // Does .kibana index exist?
@@ -548,7 +535,7 @@ module.exports = (server, options) => {
             };
     
             // Backing up .wazuh index
-            await elasticRequest.callWithInternalUser('reindex', { body: configuration })
+            await wzWrapper.reindexWithCustomConfiguration(configuration);
 
             log('initialize.js reindexOldVersion',  'Successfully backed up .wazuh index','info')  
             // And...this response does not take into acount new index population so...let's wait for it
@@ -586,7 +573,7 @@ module.exports = (server, options) => {
             log('initialize.js swapIndex', 'Reindexing into the new .wazuh','info');
             server.log([blueWazuh, 'reindex', 'info'], 'Reindexing into the new .wazuh');
             // Reindexing from .old-wazuh where the type of document is wazuh-configuration into the new index .wazuh
-            await elasticRequest.callWithInternalUser('reindex', { body: configuration })
+            await wzWrapper.reindexWithCustomConfiguration(configuration);
 
             // Now we need to properly replace the cluster_info into the configuration -> improvement: pagination?
             // And...this response does not take into acount new index population so...let's wait for it
