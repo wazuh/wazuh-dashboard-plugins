@@ -4,7 +4,7 @@ const needle = require('needle');
 
 // External references 
 const fetchAgentsExternal = require('../monitoring');
-const getConfig           = require('./wazuh-elastic');
+const ElasticWrapper      = require('../lib/elastic-wrapper');
 const getPath             = require('../../util/get-path');
 
 // Colors for console logging 
@@ -14,10 +14,11 @@ const blueWazuh = colors.blue('wazuh');
 const fs   = require('fs');
 const yml  = require('js-yaml');
 const path = require('path');
+
 const pciRequirementsFile = '../integration-files/pci-requirements';
 
 module.exports = (server, options) => {
-
+    const wzWrapper = new ElasticWrapper(server);
     // Variables
     let packageInfo;
 
@@ -34,7 +35,7 @@ module.exports = (server, options) => {
         try{
             if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
             // Get config from elasticsearch
-            const wapi_config = await getConfig(req.payload)
+            const wapi_config = await wzWrapper.getWazuhConfigurationById(req.payload)
                 
             if (wapi_config.error_code > 1) {
                 // Can not connect to elasticsearch
@@ -247,7 +248,7 @@ module.exports = (server, options) => {
                 if(!req.headers.id) {
                     return reply(pciRequirements);
                 }
-                let wapi_config = await getConfig(req.headers.id);
+                let wapi_config = await wzWrapper.getWazuhConfigurationById(req.headers.id);
 
                 if (wapi_config.error_code > 1) {
                     // Can not connect to elasticsearch
@@ -324,7 +325,7 @@ module.exports = (server, options) => {
 
     const makeRequest = async (method, path, data, id, reply) => {
         try {
-            const wapi_config = await getConfig(id);
+            const wapi_config = await wzWrapper.getWazuhConfigurationById(id);
 
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
@@ -397,7 +398,7 @@ module.exports = (server, options) => {
         try{
             if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
 
-            const wapi_config = await getConfig(req.payload.id); 
+            const wapi_config = await wzWrapper.getWazuhConfigurationById(req.payload.id); 
     
             if (wapi_config.error_code > 1) {
                 throw new Error('no_elasticsearch');                
