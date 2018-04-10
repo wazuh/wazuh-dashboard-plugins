@@ -245,22 +245,24 @@ module.exports = (server, options) => {
             const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
             const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
             const data = await elasticRequest
-            .callWithInternalUser('search', {
-                    index: '.kibana',
-                    type: 'doc',
-                    body: {
-                        "query":{
-                            "match":{
-                              "type": "index-pattern"
-                            }
-                          }
-                    }
-                    
-            });
+                                .callWithInternalUser('search', {
+                                        index: '.kibana',
+                                        type: 'doc',
+                                        body: {
+                                            "query":{
+                                                "match":{
+                                                "type": "index-pattern"
+                                                }
+                                            }
+                                        }
+                                        
+                                });
+
+            if(data && data.hits && data.hits.hits.length === 0) throw new Error('There is no index pattern');
+                
             if(data && data.hits && data.hits.hits){
                 const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
                 let list = [];
-                if(data.hits.hits.length === 0) throw new Error('There is no index pattern');
                 for(const index of data.hits.hits){   
                     let valid, parsed;        
                     try{
