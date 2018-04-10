@@ -130,6 +130,26 @@ class ElasticWrapper{
         }
     }
 
+    /**
+     * Creates the .wazuh index with a custom configuration.
+     * @param {*} config 
+     */
+    async createWazuhIndex(configuration) {
+        try {
+            if(!configuration) return Promise.reject(new Error('No valid configuration for create .wazuh index'))
+
+            const data = await this.elasticRequest.callWithInternalUser('indices.create', {
+                index: '.wazuh',
+                body : configuration
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
     async insertWazuhVersionConfiguration(configuration) {
         try {
             if(!configuration) return Promise.reject(new Error('No valid configuration for create .wazuh-version index'))
@@ -665,7 +685,7 @@ class ElasticWrapper{
         try {
             if(!template) return Promise.reject(new Error('No valid template given'))
 
-            const data = await elasticRequest.callWithInternalUser('indices.putTemplate', {
+            const data = await this.elasticRequest.callWithInternalUser('indices.putTemplate', {
                 name  : 'wazuh-agent',
                 body  : template
             });
@@ -675,9 +695,71 @@ class ElasticWrapper{
         } catch (error) {
             return Promise.reject(error);
         }
-
     }
 
+    /**
+     * Inserts the wazuh-kibana template.
+     * Reindex purposes.
+     * Do not use
+     * @param {*} template 
+     */
+    async putWazuhKibanaTemplate(template) {
+        try {
+            if(!template) return Promise.reject(new Error('No valid template given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('indices.putTemplate',{
+                name  : 'wazuh-kibana',
+                order : 0,
+                create: true,
+                body  : template
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+
+    /**
+     * Check for the wazuh-setup index, only old installations.
+     * Reindex purposes
+     * Do not use
+     */
+    async getOldWazuhSetup(){
+        try {
+            
+            const data = await this.elasticRequest.callWithInternalUser('get', {
+                index: ".wazuh",
+                type: "wazuh-setup",
+                id: "1"
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+    
+    /**
+     * Reindex purposes
+     * Do not use
+     * @param {*} configuration 
+     */
+    async reindexWithCustomConfiguration(configuration){
+        try {
+            if(!configuration) return Promise.reject(new Error('No valid configuration given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('reindex', { body: configuration })
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 }
 
 module.exports = ElasticWrapper;
