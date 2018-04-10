@@ -4,9 +4,6 @@ module.exports = (server, options) => {
    
     const wzWrapper = new ElasticWrapper(server);
 
-    // Elastic JS Client
-    const elasticRequest = server.plugins.elasticsearch.getCluster('data');
-
     const getTimeStamp = async (req,reply) => {
         try {
 
@@ -38,7 +35,7 @@ module.exports = (server, options) => {
 
     const getTemplate = async (req, reply) => {
         try {
-            const data = await elasticRequest.callWithInternalUser('cat.templates', {})
+            const data = await wzWrapper.getTemplates();
 
             if (req.params.pattern == "wazuh-alerts-3.x-*" && data.includes("wazuh-alerts-3.*")) {
                 return reply({
@@ -84,10 +81,7 @@ module.exports = (server, options) => {
 
     const checkPattern = async (req, reply) => {
         try {
-            const response = await elasticRequest.callWithInternalUser('search', { 
-                index: '.kibana', 
-                body : { size:999, query: { bool: { must: { match: { type: 'index-pattern' } } } } } 
-            })
+            const response = await wzWrapper.getAllIndexPatterns();
 
             const filtered = response.hits.hits.filter(item => item._source['index-pattern'].title === req.params.pattern);
 
@@ -158,10 +152,7 @@ module.exports = (server, options) => {
 
     const getSetupInfo = async (req, reply) => {
         try {
-            const data = await elasticRequest.callWithInternalUser('search', {
-                    index: '.wazuh-version',
-                    type : 'wazuh-version'
-            })
+            const data = await wzWrapper.getWazuhVersionIndexAsSearch();
             
             return data.hits.total === 0 ?
                    reply({ statusCode: 200, data: '' }) :
@@ -181,10 +172,7 @@ module.exports = (server, options) => {
         let finalList = [];
         for(let item of list){
             try {
-                const allow = await elasticRequest.callWithRequest(req,'search', {
-                    index: item.title,
-                    type : 'wazuh'
-                });
+                const allow = await wzWrapper.searchWazuhElementsByIndexWithRequest(req, item.title);
                 if(allow && allow.hits && allow.hits.total >= 1) finalList.push(item);
             } catch (error){
                 console.log(`Some user trys to fetch the index pattern ${item.title} without permissions`)
@@ -196,22 +184,11 @@ module.exports = (server, options) => {
 
     const getlist = async (req,res) => {
         try {
-            const xpack          = await elasticRequest.callWithInternalUser('cat.plugins', { });
+            const xpack          = await wzWrapper.getPlugins();
             const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
             const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
-            const data = await elasticRequest
-                                .callWithInternalUser('search', {
-                                        index: '.kibana',
-                                        type: 'doc',
-                                        body: {
-                                            "query":{
-                                                "match":{
-                                                "type": "index-pattern"
-                                                }
-                                            }
-                                        }
-                                        
-                                });
+            
+            const data = await wzWrapper.getAllIndexPatterns();
 
             if(data && data.hits && data.hits.hits.length === 0) throw new Error('There is no index pattern');
                 
@@ -247,15 +224,13 @@ module.exports = (server, options) => {
 
     const deleteVis = async (req, res) => {
         try {
-            const tmp = await elasticRequest.callWithInternalUser('deleteByQuery', {
-                index: '.kibana',
-                body: {
-                    query: { bool: { must: { match: { 'visualization.description': req.params.timestamp } } } },
-                    size : 9999
-                }
-            })
 
+            const tmp = await wzWrapper.deleteVisualizationByDescription(req.params.timestamp);
+
+            ///// TEMPORARY HACK /////////////////////////////////////////////////////////////
             await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
+            //////////////////////////////////////////////////////////////////////////////////
+
             return res({acknowledge: true , output: tmp});
             
         } catch(error){
@@ -315,9 +290,12 @@ module.exports = (server, options) => {
                          require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
 
             const bulkBody = buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
-            await elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: bulkBody });
+            await wzWrapper.pushBulkToKibanaIndex(bulkBody);
 
+            ///// TEMPORARY HACK /////////////////////////////////////////////////////////////
             await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana']})
+            //////////////////////////////////////////////////////////////////////////////////
+
             return res({acknowledge: true});
             
         } catch(error){
