@@ -199,23 +199,24 @@ module.exports = (server, options) => {
             if(indexPatternList && indexPatternList.hits && indexPatternList.hits.hits){
                 const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
                
-                if(indexPatternList.hits.hits.length === 0) throw new Error('There is no index pattern');
-                for(const index of indexPatternList.hits.hits){   
-                    let valid, parsed;        
-                    try{
-                        parsed = JSON.parse(index._source['index-pattern'].fields)
-                    } catch (error){
-                        continue;
-                    }     
-                    
-                    valid = parsed.filter(item => minimum.includes(item.name));
-                    if(valid.length === 4){
-                        list.push({
-                            id   : index._id.split('index-pattern:')[1],
-                            title: index._source['index-pattern'].title
-                        })
+                if(indexPatternList.hits.hits.length > 0) {
+                    for(const index of indexPatternList.hits.hits){   
+                        let valid, parsed;        
+                        try{
+                            parsed = JSON.parse(index._source['index-pattern'].fields)
+                        } catch (error){
+                            continue;
+                        }     
+                        
+                        valid = parsed.filter(item => minimum.includes(item.name));
+                        if(valid.length === 4){
+                            list.push({
+                                id   : index._id.split('index-pattern:')[1],
+                                title: index._source['index-pattern'].title
+                            })
+                        }
+            
                     }
-           
                 }
             } 
             log('initialize.js checkKnownFields', `Found ${list.length} valid index patterns for Wazuh alerts`,'info')
@@ -230,9 +231,10 @@ module.exports = (server, options) => {
                 log('initialize.js checkKnownFields', 'Waiting for default index pattern creation to complete...','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Waiting for default index pattern creation to complete...');   
                 let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
+                let tmplist = null;
                 while(waitTill > new Date()){
-                    indexPatternList = await searchIndexPatternById(defaultIndexPattern);
-                    if(indexPatternList.hits.total >= 1) break;
+                    tmplist = await searchIndexPatternById(defaultIndexPattern);
+                    if(tmplist.hits.total >= 1) break;
                     else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 }
                 server.log([blueWazuh, 'initialize', 'info'], 'Index pattern created...');
@@ -285,29 +287,7 @@ module.exports = (server, options) => {
         }
     };
 
-    // Configure Kibana status: Index pattern, default index pattern, default time, import dashboards.
-    const configureKibana = async type => {
-        try{
-            if (type === 'install') {
-                const data = await elasticRequest.callWithInternalUser('search', {
-                    index: '.kibana',
-                    type: 'doc',
-                    q: `index-pattern.title:"${defaultIndexPattern}"`
-                })
-  
-                if (data.hits.total >= 1) {
-                    log('initialize.js configureKibana', 'Skipping index-pattern creation. Already exists.','info')
-                    server.log([blueWazuh, 'initialize', 'info'], 'Skipping index-pattern creation. Already exists.');
-                } else {
-                    return createIndexPattern();
-                }
-             }
-            return;
-        } catch(error) {
-            log('initialize.js configureKibana', error.message || error);
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not reach elasticsearch.');
-        }
-    };
+
 
     // Save Wazuh App setup
     const saveConfiguration = async () => {
@@ -437,7 +417,6 @@ module.exports = (server, options) => {
             } catch (error) {
                 return Promise.reject(error);
             }
-
     }
 
 
@@ -457,7 +436,6 @@ module.exports = (server, options) => {
     
                 // Save Setup Info
                 await saveConfiguration(defaultIndexPattern);
-                await configureKibana("install");
             }
 
             server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information...');
