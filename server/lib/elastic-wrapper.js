@@ -274,6 +274,112 @@ class ElasticWrapper{
         }        
     }
 
+    /**
+     * Get the Wazuh API entries stored on .wazuh index
+     */
+    async getWazuhAPIEntries() {
+        try {
+
+            const data = await this.elasticRequest.callWithInternalUser('search', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                size : '100'
+            });
+                
+            return data;
+ 
+        } catch(error){
+            return Promise.reject(error);
+        }
+    };
+
+    /**
+     * Usually used to save a new Wazuh API entry
+     * @param {*} doc 
+     */
+    async createWazuhIndexDocument(doc) {
+        try {
+            if(!doc) return Promise.reject(new Error('No valid document given'))
+
+            const data = await this.elasticRequest.callWithRequest(req,'create', {
+                index  : '.wazuh',
+                type   : 'wazuh-configuration',
+                id     : new Date().getTime(),
+                body   : doc,
+                refresh: true
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Updates the a document from the .wazuh index using id and doc content
+     * @param {*} id 
+     * @param {*} doc 
+     */
+    async updateWazuhIndexDocument(id,doc){
+        try {
+            if(!id || !doc) return Promise.reject(new Error('No valid parameters given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('update', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id   : id,
+                body : doc
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Search for active entries on .wazuh index
+     * @param {*} req 
+     */
+    async searchActiveDocumentsWazuhIndex(req){
+        try {
+            if(!req) return Promise.reject(new Error('No valid request given'))
+
+            const data = await elasticRequest.callWithRequest(req,'search', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                q    : 'active:true'
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);   
+        }
+    }
+
+    /**
+     * Delete a Wazuh API entry using incoming request
+     * @param {*} req 
+     */
+    async deleteWazuhAPIEntriesWithRequest(req) {
+        try {
+            if(!req.params || !req.params.id) return Promise.reject(new Error('No API id given'))
+
+            const data = await this.elasticRequest.callWithRequest(req,'delete', {
+                index: '.wazuh',
+                type : 'wazuh-configuration',
+                id   : req.params.id
+            });
+                
+            return data;
+ 
+        } catch(error){
+            return Promise.reject(error);
+        }
+    };
 }
 
 module.exports = ElasticWrapper;
