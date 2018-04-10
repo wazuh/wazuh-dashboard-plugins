@@ -1,5 +1,3 @@
-const importAppObjects = require('../initialize');
-
 const fs   = require('fs');
 const yml  = require('js-yaml');
 const path = require('path');
