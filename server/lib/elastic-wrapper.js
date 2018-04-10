@@ -1,3 +1,5 @@
+const knownFields = require('../integration-files/known-fields');
+
 class ElasticWrapper{
     constructor(server){
         this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
@@ -114,6 +116,84 @@ class ElasticWrapper{
                       },
                     "size": 999
                 }
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Updates .kibana index known fields
+     * @param {*} patternId 'index-pattern:' + id
+     */
+    async updateIndexPatternKnownFields(id) {
+        try {
+            if(!id) return Promise.reject(new Error('No valid index pattern id for update index pattern'));
+
+            const newFields = JSON.stringify(knownFields);
+
+            const data = await this.elasticRequest.callWithInternalUser('update', {
+                index: '.kibana',
+                type: 'doc',
+                id: id,
+                body: {
+                    doc: {
+                        "type": 'index-pattern',
+                        "index-pattern": {  
+                            "fields": newFields,
+                            "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
+                        }
+                     }
+                }
+             });
+
+             return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Get the .wazuh-version index
+     */
+    async getWazuhVersionIndex() {
+        try {
+            const data = await this.elasticRequest.callWithInternalUser('get', {
+                index: ".wazuh-version",
+                type: "wazuh-version",
+                id: "1"
+            });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Updates lastRestart field on .wazuh-version index
+     * @param {*} version 
+     * @param {*} revision 
+     */
+    async updateWazuhVersionIndexLastRestart(version,revision) {
+        try {
+            
+            const data = await this.elasticRequest.callWithInternalUser('update', { 
+                index: '.wazuh-version', 
+                type : 'wazuh-version',
+                id   : 1,
+                body : {
+                    doc: {
+                        'app-version': version,
+                        revision     : revision,
+                        lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
+                    }
+                } 
             });
 
             return data;

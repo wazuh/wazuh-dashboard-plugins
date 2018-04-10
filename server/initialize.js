@@ -56,37 +56,6 @@ module.exports = (server, options) => {
     const defaultIndexPattern = pattern || "wazuh-alerts-3.x-*";
 
 
-
-
-    /**
-     * Updates .kibana index known fields
-     * @param {*} patternId 'index-pattern:' + id
-     */
-    const updateKibanaIndexWithKnownFields = async patternId => {
-        try {
-            if(!patternId) return Promise.reject(new Error('No valid patternId for update index pattern'))
-            const newFields = JSON.stringify(knownFields);
-            await elasticRequest
-            .callWithInternalUser('update', {
-                index: '.kibana',
-                type: 'doc',
-                id: patternId,
-                body: {
-                    doc: {
-                        "type": 'index-pattern',
-                        "index-pattern": {  
-                            "fields": newFields,
-                            "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
-                        }
-                     }
-                }
-             });
-             return;
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
     /**
      * Refresh known fields for all valid index patterns.
      * Optionally forces the wazuh-alerts-3.x-* creation.
@@ -98,7 +67,7 @@ module.exports = (server, options) => {
             server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
                     
             const indexPatternList = await wzWrapper.getAllIndexPatterns();
-            
+
             log('initialize.js checkKnownFields', `Found ${indexPatternList.hits.total} index patterns`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Found ${indexPatternList.hits.total} index patterns`);
             let list = [];
@@ -155,7 +124,7 @@ module.exports = (server, options) => {
             for(const item of list){
                 log('initialize.js checkKnownFields', `Refreshing known fields for "index-pattern:${item.title}"`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Refreshing known fields for "index-pattern:${item.title}"`);
-                await updateKibanaIndexWithKnownFields('index-pattern:' + item.id);
+                await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id);
             }
 
             log('initialize.js checkKnownFields', 'App ready to be used.','info')
@@ -315,12 +284,9 @@ module.exports = (server, options) => {
         try {
             log('initialize.js init', 'Checking .wazuh-version index.','info')
             server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh-version index.');
-            try{
-                await elasticRequest.callWithInternalUser('get', {
-                    index: ".wazuh-version",
-                    type: "wazuh-version",
-                    id: "1"
-                })
+
+            try{                
+                await wzWrapper.getWazuhVersionIndex();
             } catch (error) {
                 log('initialize.js init 6', error.message || error);
                 server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
@@ -331,18 +297,7 @@ module.exports = (server, options) => {
 
             server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information...');
             
-            await elasticRequest.callWithInternalUser('update', { 
-                index: '.wazuh-version', 
-                type : 'wazuh-version',
-                id   : 1,
-                body : {
-                    doc: {
-                        'app-version': packageJSON.version,
-                        revision     : packageJSON.revision,
-                        lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
-                    }
-                } 
-            });
+            await wzWrapper.updateWazuhVersionIndexLastRestart(packageJSON.version,packageJSON.revision);
 
             server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated .wazuh-version index');
         
