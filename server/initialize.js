@@ -62,7 +62,7 @@ module.exports = (server, options) => {
      */
     const checkKnownFields = async () => {
         try {
-            const xpack = await elasticRequest.callWithInternalUser('cat.plugins', { });
+            const xpack = await wzWrapper.getPlugins();
             log('initialize.js checkKnownFields', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
                     
@@ -216,9 +216,8 @@ module.exports = (server, options) => {
             try{
                 log('initialize.js init', 'Checking .wazuh index.','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh index.');
-                const result = await elasticRequest.callWithInternalUser('indices.exists', {
-                    index: '.wazuh'
-                })
+                
+                const result = await wzWrapper.checkIfIndexExists('.wazuh');
 
                 if (!result) {
                     let shards = 1;
@@ -344,9 +343,7 @@ module.exports = (server, options) => {
 
     // Does .kibana index exist?
     const checkKibanaStatus = () => {
-        elasticRequest.callWithInternalUser('indices.exists', {
-            index: ".kibana"
-        })
+        wzWrapper.checkIfIndexExists('.kibana')
             .then(data => {
                 if (data) { // It exists, initialize!
                     init();
@@ -355,15 +352,12 @@ module.exports = (server, options) => {
                     log('initialize.js checkKibanaStatus', 'Didn\'t find .kibana index...','info')
                     server.log([blueWazuh, 'initialize', 'info'], "Didn't find .kibana index...");
 
-                    elasticRequest.callWithInternalUser('indices.getTemplate',
-                        {
-                            name: 'wazuh-kibana'
-                        })
+                    wzWrapper.getTemplateByName('wazuh-kibana')
                         .then(data => {
                             log('initialize.js checkKibanaStatus', 'No need to create the .kibana template, already exists.','info')
                             server.log([blueWazuh, 'initialize', 'info'], 'No need to create the .kibana template, already exists.');
 
-                            elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
+                            wzWrapper.createEmptyKibanaIndex()
                                 .then(data => {
                                     log('initialize.js checkKibanaStatus', 'Successfully created .kibana index.','info')
                                     server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
@@ -383,7 +377,7 @@ module.exports = (server, options) => {
                                     log('initialize.js checkKibanaStatus', 'Successfully created .kibana template.','info')
                                     server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana template.');
 
-                                    elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
+                                    wzWrapper.createEmptyKibanaIndex()
                                         .then(data => {
                                             log('initialize.js checkKibanaStatus', 'Successfully created .kibana index.','info')
                                             server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
@@ -469,24 +463,19 @@ module.exports = (server, options) => {
                                     }
 
                                     // We filled data for the API, let's insert it now
-                                    elasticRequest.callWithInternalUser('update', {
-                                        index: '.wazuh',
-                                        type : 'wazuh-configuration',
-                                        id   : id,
-                                        body: {
-                                            'doc': {
-                                                "api_user"    : wapi_config.api_user,
-                                                "api_password": wapi_config.api_password,
-                                                "url"         : wapi_config.url,
-                                                "api_port"    : wapi_config.api_port,
-                                                "manager"     : wapi_config.manager,
-                                                "cluster_info": {
-                                                    "manager": wapi_config.manager,
-                                                    "node"   : wapi_config.cluster_info.node,
-                                                    "cluster": wapi_config.cluster_info.cluster,
-                                                    "status" : wapi_config.cluster_info.status
-                                                },
-                                            }
+                                    wzWrapper.updateWazuhIndexDocument(id,{
+                                        'doc': {
+                                            "api_user"    : wapi_config.api_user,
+                                            "api_password": wapi_config.api_password,
+                                            "url"         : wapi_config.url,
+                                            "api_port"    : wapi_config.api_port,
+                                            "manager"     : wapi_config.manager,
+                                            "cluster_info": {
+                                                "manager": wapi_config.manager,
+                                                "node"   : wapi_config.cluster_info.node,
+                                                "cluster": wapi_config.cluster_info.cluster,
+                                                "status" : wapi_config.cluster_info.status
+                                            },
                                         }
                                     })
                                         .then(resp => {
@@ -511,34 +500,29 @@ module.exports = (server, options) => {
                     log('initialize.js reachAPI', error.message || error);
                     server.log([blueWazuh, 'reindex', 'info'], 'API is NOT reachable ' + wapi_config.manager);
                     // We weren't able to reach the API, reorganize data and fill with sample node and cluster name information
-                    elasticRequest.callWithInternalUser('update', {
-                        index: '.wazuh',
-                        type: 'wazuh-configuration',
-                        id: id,
-                        body: {
-                            'doc': {
-                                "api_user": wapi_config.api_user,
-                                "api_password": wapi_config.api_password,
-                                "url": wapi_config.url,
-                                "api_port": wapi_config.api_port,
+                    wzWrapper.updateWazuhIndexDocument(id, {
+                        'doc': {
+                            "api_user": wapi_config.api_user,
+                            "api_password": wapi_config.api_password,
+                            "url": wapi_config.url,
+                            "api_port": wapi_config.api_port,
+                            "manager": wapi_config.manager,
+                            "cluster_info": {
                                 "manager": wapi_config.manager,
-                                "cluster_info": {
-                                    "manager": wapi_config.manager,
-                                    "node": "nodata",
-                                    "cluster": "nodata",
-                                    "status": "disabled"
-                                },
-                            }
+                                "node": "nodata",
+                                "cluster": "nodata",
+                                "status": "disabled"
+                            },
                         }
                     })
-                        .then(resp => {
-                            log('initialize.js reachAPI',  'Successfully updated sample cluster information for ' + wapi_config.manager,'info')
-                            server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated sample cluster information for ' + wapi_config.manager);
-                        })
-                        .catch(error => {
-                            log('initialize.js reachAPI', error.message || error);
-                            server.log([blueWazuh, 'reindex', 'error'], 'Could not update sample cluster information for ' + wapi_config.manager + 'due to ' + err);
-                        });
+                    .then(resp => {
+                        log('initialize.js reachAPI',  'Successfully updated sample cluster information for ' + wapi_config.manager,'info')
+                        server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated sample cluster information for ' + wapi_config.manager);
+                    })
+                    .catch(error => {
+                        log('initialize.js reachAPI', error.message || error);
+                        server.log([blueWazuh, 'reindex', 'error'], 'Could not update sample cluster information for ' + wapi_config.manager + 'due to ' + err);
+                    });
                 });
         } else { // 3.x version
             // Nothing to be done, cluster_info is present
@@ -583,7 +567,7 @@ module.exports = (server, options) => {
             log('initialize.js swapIndex', 'Deleting old .wazuh index','info');
             server.log([blueWazuh, 'reindex', 'info'], 'Deleting old .wazuh index.');
 
-            await elasticRequest.callWithInternalUser('indices.delete', { index: ".wazuh" })
+            await wzWrapper.deleteIndexByName('.wazuh');
 
             const configuration = {
                 "source": {
@@ -616,7 +600,8 @@ module.exports = (server, options) => {
 
     const reachAPIs = async () => {
         try{
-            const data = await elasticRequest.callWithInternalUser('search', { index: ".wazuh" });
+            const data = await wzWrapper.searchIndexByName('.wazuh');
+
             for (let item of data.hits.hits) {
                 reachAPI(item);
             }
