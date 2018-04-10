@@ -97,18 +97,8 @@ module.exports = (server, options) => {
             log('initialize.js checkKnownFields', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
                     
-            const indexPatternList = await elasticRequest.callWithInternalUser('search', {
-                index: '.kibana',
-                type: 'doc',
-                body: {
-                    "query":{
-                        "match":{
-                          "type": "index-pattern"
-                        }
-                      },
-                    "size": 999
-                }
-            })
+            const indexPatternList = await wzWrapper.getAllIndexPatterns();
+            
             log('initialize.js checkKnownFields', `Found ${indexPatternList.hits.total} index patterns`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Found ${indexPatternList.hits.total} index patterns`);
             let list = [];
@@ -183,19 +173,9 @@ module.exports = (server, options) => {
         try {
             log('initialize.js createIndexPattern', `Creating index pattern: ${defaultIndexPattern}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${defaultIndexPattern}`);
-            let patternId = 'index-pattern:' + defaultIndexPattern;
-            await elasticRequest.callWithInternalUser('create', {
-                index: '.kibana',
-                type: 'doc',
-                id: patternId,
-                body: {
-                    type: 'index-pattern',
-                    'index-pattern': {
-                        title: defaultIndexPattern,
-                        timeFieldName: '@timestamp'
-                    }
-                }
-            });
+
+            await wzWrapper.createIndexPattern(defaultIndexPattern);
+
             log('initialize.js createIndexPattern', `Created index pattern: ${defaultIndexPattern}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + defaultIndexPattern);
 
@@ -231,10 +211,7 @@ module.exports = (server, options) => {
                 }
             };
     
-            await elasticRequest.callWithInternalUser('indices.create', {
-                index: '.wazuh-version',
-                body : shard_configuration
-            })
+            await wzWrapper.createWazuhVersionIndex(shard_configuration);
 
             const commonDate = new Date().toISOString();
 
@@ -247,12 +224,8 @@ module.exports = (server, options) => {
             };
 
             try{
-                await elasticRequest.callWithInternalUser('create', {
-                    index: '.wazuh-version',
-                    type : 'wazuh-version',
-                    id   : 1,
-                    body : configuration
-                })
+
+                await wzWrapper.insertWazuhVersionConfiguration(configuration);
 
                 log('initialize.js saveConfiguration', 'Wazuh configuration inserted','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
