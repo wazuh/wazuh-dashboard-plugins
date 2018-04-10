@@ -141,7 +141,7 @@ module.exports = (server, options) => {
     
             const settings = buildSettingsObject(req.payload);
     
-            const response = await wzWrapper.createWazuhIndexDocument(settings);
+            const response = await wzWrapper.createWazuhIndexDocument(req,settings);
 
             return reply({ statusCode: 200, message: 'ok', response });
    

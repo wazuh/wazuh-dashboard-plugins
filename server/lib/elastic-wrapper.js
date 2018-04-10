@@ -364,8 +364,9 @@ class ElasticWrapper{
     /**
      * Usually used to save a new Wazuh API entry
      * @param {*} doc 
+     * @param {*} req
      */
-    async createWazuhIndexDocument(doc) {
+    async createWazuhIndexDocument(req,doc) {
         try {
             if(!doc) return Promise.reject(new Error('No valid document given'))
 
