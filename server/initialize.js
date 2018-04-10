@@ -179,17 +179,11 @@ module.exports = (server, options) => {
                 index: '.kibana',
                 type: 'doc',
                 body: {
-                    "query": {
-                        "bool": {
-                            "must": [
-                                {
-                                "match": {
-                                    "type": "index-pattern"
-                                    }
-                                }
-                            ]
+                    "query":{
+                        "match":{
+                          "type": "index-pattern"
                         }
-                    },
+                      },
                     "size": 999
                 }
             })
@@ -207,8 +201,8 @@ module.exports = (server, options) => {
                         } catch (error){
                             continue;
                         }     
-                        
                         valid = parsed.filter(item => minimum.includes(item.name));
+                        
                         if(valid.length === 4){
                             list.push({
                                 id   : index._id.split('index-pattern:')[1],
@@ -221,8 +215,7 @@ module.exports = (server, options) => {
             } 
             log('initialize.js checkKnownFields', `Found ${list.length} valid index patterns for Wazuh alerts`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Found ${list.length} valid index patterns for Wazuh alerts`);
-
-            const defaultExists = list.filter(item => item.id === defaultIndexPattern);            
+            const defaultExists = list.filter(item => item.title === defaultIndexPattern);            
 
             if(defaultExists.length === 0 && forceDefaultPattern){
                 log('initialize.js checkKnownFields', `Default index pattern not found, creating it...`,'info')
@@ -238,7 +231,10 @@ module.exports = (server, options) => {
                     else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 }
                 server.log([blueWazuh, 'initialize', 'info'], 'Index pattern created...');
-
+                list.push({
+                    id   : tmplist.hits.hits[0]._id.split('index-pattern:')[1],
+                    title: tmplist.hits.hits[0]._source['index-pattern'].title
+                })
             } else {
                 log('initialize.js checkKnownFields', `Default index pattern found`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Default index pattern found`);
