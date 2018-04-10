@@ -1,22 +1,20 @@
+const ElasticWrapper = require('../lib/elastic-wrapper');
+
 module.exports = (server, options) => {
+
+    const wzWrapper = new ElasticWrapper(server);
+
     const userRegEx  = new RegExp(/^.{3,100}$/);
     const passRegEx  = new RegExp(/^.{3,100}$/); 
     const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/); 
     const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/); 
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/); 
 
-    // Elastic JS Client
-    const elasticRequest = server.plugins.elasticsearch.getCluster('data');
 
     // Handlers
-
     const getAPIEntries = async (req, reply) => {
         try {
-            const data = await elasticRequest.callWithInternalUser('search', {
-                index: '.wazuh',
-                type : 'wazuh-configuration',
-                size : '100'
-            });
+            const data = await wzWrapper.getWazuhAPIEntries();
                 
             return reply(data.hits.hits);
  
@@ -27,11 +25,7 @@ module.exports = (server, options) => {
 
     const deleteAPIEntries = async (req, reply) => {
         try {
-            const data = await elasticRequest.callWithRequest(req,'delete', {
-                index: '.wazuh',
-                type : 'wazuh-configuration',
-                id   : req.params.id
-            });
+            const data = await wzWrapper.deleteWazuhAPIEntriesWithRequest(req);
                 
             return reply(data);
  
@@ -44,29 +38,13 @@ module.exports = (server, options) => {
         try{
 
             // Searching for previous default
-            const data = await elasticRequest.callWithRequest(req,'search', {
-                index: '.wazuh',
-                type : 'wazuh-configuration',
-                q    : 'active:true'
-            });
+            const data = await wzWrapper.searchActiveDocumentsWazuhIndex(req);
     
             if (data.hits.total === 1) {
-                // Setting off previous default
-                await elasticRequest.callWithInternalUser('update', {
-                    index: '.wazuh',
-                    type : 'wazuh-configuration',
-                    id   : data.hits.hits[0]._id,
-                    body : { doc: { active: 'false' } }
-                });
+                await wzWrapper.updateWazuhIndexDocument(data.hits.hits[0]._id, { doc: { active: 'false' } });
             } 
 
-            // Set new default
-            await elasticRequest.callWithInternalUser('update', {
-                index: '.wazuh',
-                type : 'wazuh-configuration',
-                id   : req.params.id,
-                body : { doc: { active: 'true' } }
-            });
+            await wzWrapper.updateWazuhIndexDocument(req.params.id, { doc: { active: 'true' } });
 
             return reply({ statusCode: 200, message:    'ok' });
 
@@ -81,11 +59,10 @@ module.exports = (server, options) => {
 
     const getExtensions = async (req, reply) => {
         try{
-            const data = await elasticRequest.callWithInternalUser('search', {
-                index: '.wazuh',
-                type :  'wazuh-configuration'
-            });
+            const data = await wzWrapper.getWazuhAPIEntries();
+
             return reply(data.hits.hits);
+        
         } catch(error){
             return reply(error);
         }
@@ -97,12 +74,7 @@ module.exports = (server, options) => {
             let extension = {};
             extension[req.params.extensionName] = (req.params.extensionValue === 'true');
 
-            await elasticRequest.callWithInternalUser('update', {
-                index: '.wazuh',
-                type : 'wazuh-configuration',
-                id   : req.params.id,
-                body : { doc: { extensions: extension } }
-            })
+            await wzWrapper.updateWazuhIndexDocument(req.params.id, { doc: { extensions: extension }});
 
             return reply({ statusCode: 200, message: 'ok' });
 
@@ -169,13 +141,7 @@ module.exports = (server, options) => {
     
             const settings = buildSettingsObject(req.payload);
     
-            const response = await elasticRequest.callWithRequest(req,'create', {
-                index  : '.wazuh',
-                type   : 'wazuh-configuration',
-                id     : new Date().getTime(),
-                body   : settings,
-                refresh: true
-            });
+            const response = await wzWrapper.createWazuhIndexDocument(settings);
 
             return reply({ statusCode: 200, message: 'ok', response });
    
@@ -190,12 +156,8 @@ module.exports = (server, options) => {
 
     const updateAPIHostname = async (req, reply) => {
         try {
-            await elasticRequest.callWithInternalUser('update', {
-                index: '.wazuh',
-                type : 'wazuh-configuration',
-                id   : req.params.id,
-                body : { doc: { cluster_info: req.payload.cluster_info } }
-            });
+
+            await wzWrapper.updateWazuhIndexDocument(req.params.id,{ doc: { cluster_info: req.payload.cluster_info }});
 
             return reply({ statusCode: 200, message: 'ok' });
         
@@ -223,12 +185,7 @@ module.exports = (server, options) => {
     
             const settings = buildSettingsObject(req.payload);
     
-            await elasticRequest.callWithInternalUser('update', {
-                index: '.wazuh',
-                type : 'wazuh-configuration',
-                id   : req.payload.id,
-                body : { doc: settings }
-            });
+            await wzWrapper.updateWazuhIndexDocument(req.payload.id, { doc: settings });
 
             return reply({ statusCode: 200, message: 'ok' });
 
