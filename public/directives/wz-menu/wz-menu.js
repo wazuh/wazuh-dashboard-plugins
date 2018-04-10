@@ -4,7 +4,7 @@ const app = require('ui/modules').get('app/wazuh', []);
 
 app.directive('wzMenu',function(){
     return {
-        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler,genericReq) {
+        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler,genericReq,$location) {
 
             $rootScope.showSelector = appState.getPatternSelector();
 
@@ -39,7 +39,7 @@ app.directive('wzMenu',function(){
                         const currentPattern = await genericReq.request('GET', '/get-list');
                         appState.setCurrentPattern(currentPattern.data.data[0].id);
                     } else {
-
+                    
                         // If there is current pattern, check if there is some pattern
                         const patternList = await genericReq.request('GET','/get-list',{});                                
                         if(!patternList.data.data.length){
