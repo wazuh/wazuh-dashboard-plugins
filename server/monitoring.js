@@ -68,8 +68,8 @@ module.exports = (server, options) => {
             return;
 
         } catch (error) {
-            log('monitoring.js', 'Can not access Wazuh API ' + error.message || error);
-            server.log([blueWazuh, 'monitoring', 'error'], 'Can not access Wazuh API ' + error.message || error);
+            log('monitoring.js', error.message || error);
+            server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
         }
     };
 
