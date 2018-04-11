@@ -361,17 +361,13 @@ module.exports = (server, options) => {
     // Save Wazuh App setup
     const saveConfiguration = () => {
 
-        let shards = 1;
-        let replicas = 1;
+        const shards = configurationFile && typeof configurationFile["wazuh-version.shards"] !== 'undefined' ?
+                       configurationFile["wazuh-version.shards"] : 
+                       1;
 
-        if (configurationFile) {
-            if (configurationFile["wazuh-version.shards"]) {
-                shards = configurationFile["wazuh-version.shards"];
-            }
-            if (configurationFile["wazuh-version.replicas"]) {
-                replicas = configurationFile["wazuh-version.replicas"];
-            }
-        }
+        const replicas = configurationFile && typeof configurationFile["wazuh-version.replicas"] !== 'undefined' ?
+                       configurationFile["wazuh-version.replicas"] : 
+                       1;
 
         let shard_configuration = {
             "settings": {
@@ -425,17 +421,13 @@ module.exports = (server, options) => {
         })
         .then(result => {
             if (!result) {
-                let shards = 1;
-                let replicas = 1;
+                const shards = configurationFile && typeof configurationFile["wazuh.shards"] !== 'undefined' ?
+                               configurationFile["wazuh.shards"] : 
+                               1;
 
-                if (configurationFile) {
-                    if (configurationFile["wazuh.shards"]) {
-                        shards = configurationFile["wazuh.shards"];
-                    }
-                    if (configurationFile["wazuh.replicas"]) {
-                        replicas = configurationFile["wazuh.replicas"];
-                    }
-                }
+                const replicas = configurationFile && typeof configurationFile["wazuh.replicas"] !== 'undefined' ?
+                                 configurationFile["wazuh.replicas"] : 
+                                 1;
 
                 let configuration = {
                     "settings": {
