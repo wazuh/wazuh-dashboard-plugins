@@ -37,15 +37,22 @@ app.directive('wzMenu',function(){
                     // If there is no current pattern, fetch it
                     if(!appState.getCurrentPattern()) {
                         const currentPattern = await genericReq.request('GET', '/get-list');
+                        if(!currentPattern.data.data.length){
+                            $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                            $location.search('tab',null);
+                            $location.path('/blank-screen');
+                            return;
+                        }
                         appState.setCurrentPattern(currentPattern.data.data[0].id);
                     } else {
                     
                         // If there is current pattern, check if there is some pattern
-                        const patternList = await genericReq.request('GET','/get-list',{});                                
+                        const patternList = await genericReq.request('GET', '/get-list');
+
                         if(!patternList.data.data.length){
                             $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
                             $location.search('tab',null);
-                            $location.path('/blank-screen');   
+                            $location.path('/blank-screen');
                             return;
                         }
 

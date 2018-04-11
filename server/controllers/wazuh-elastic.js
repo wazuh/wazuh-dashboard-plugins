@@ -1,5 +1,9 @@
 const ElasticWrapper = require('../lib/elastic-wrapper');
 
+const fs   = require('fs');
+const yml  = require('js-yaml');
+const path = require('path');
+
 class WazuhElastic {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
@@ -184,6 +188,28 @@ class WazuhElastic {
         return finalList;
     }
 
+    validateIndexPattern(indexPatternList){
+        const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+        let list = [];
+        for(const index of indexPatternList){   
+            let valid, parsed;        
+            try{
+                parsed = JSON.parse(index._source['index-pattern'].fields)
+            } catch (error){
+                continue;
+            }     
+            
+            valid = parsed.filter(item => minimum.includes(item.name));
+            if(valid.length === 4){
+                list.push({
+                    id   : index._id.split('index-pattern:')[1],
+                    title: index._source['index-pattern'].title
+                })
+            }
+        }
+        return list;
+    }
+
     async getlist (req,res) {
         try {
             const xpack          = await this.wzWrapper.getPlugins();
@@ -195,25 +221,8 @@ class WazuhElastic {
             if(data && data.hits && data.hits.hits.length === 0) throw new Error('There is no index pattern');
                 
             if(data && data.hits && data.hits.hits){
-                const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
-                let list = [];
-                for(const index of data.hits.hits){   
-                    let valid, parsed;        
-                    try{
-                        parsed = JSON.parse(index._source['index-pattern'].fields)
-                    } catch (error){
-                        continue;
-                    }     
-                    
-                    valid = parsed.filter(item => minimum.includes(item.name));
-                    if(valid.length === 4){
-                        list.push({
-                            id   : index._id.split('index-pattern:')[1],
-                            title: index._source['index-pattern'].title
-                        })
-                    }
-           
-                }
+                const list = this.validateIndexPattern(data.hits.hits);
+
                 return res({data: isXpackEnabled && !isSuperUser ? await this.filterAllowedIndexPatternList(list,req) : list});
             }
             

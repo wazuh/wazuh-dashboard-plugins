@@ -195,6 +195,12 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
+                    if(!data.data.data.length){
+                        $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                        $location.search('tab',null);
+                        $location.path('/blank-screen');
+                        return;
+                    }
                     currentPattern = data.data.data[0].id;
                     appState.setCurrentPattern(currentPattern);
                 }
