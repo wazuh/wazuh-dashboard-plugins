@@ -23,6 +23,6 @@ module.exports = server => {
     }
 
  
-    cron.schedule('* * */1 * * *',clean, true);
+    cron.schedule('0 0 * * * *',clean, true);
 
 }
