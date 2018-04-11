@@ -336,7 +336,7 @@ function discoverController(
               let agentsIncluded = [];
               // Get all filters related to agent.id and store them on an array
               queryFilter.getFilters().filter(item => {
-                  if(typeof item.query.match['agent.id'] !== 'undefined') agentsIncluded.push(item);
+                  if(item && item.query && item.query.match && typeof item.query.match['agent.id'] !== 'undefined') agentsIncluded.push(item);
               });
               // If the array has a length greater than 1 it means that there are more than one agent.id filter
               if(agentsIncluded.length > 1) {
