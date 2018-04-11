@@ -17,25 +17,26 @@ const path = require('path');
 
 const pciRequirementsFile = '../integration-files/pci-requirements';
 
-module.exports = (server, options) => {
-    const wzWrapper = new ElasticWrapper(server);
-    // Variables
-    let packageInfo;
+let packageInfo;
 
-    // Read Wazuh app package file
-    try {
-        packageInfo = require('../../package.json');
-    } catch (e) {
-        server.log([blueWazuh, 'initialize', 'error'], 'Could not read the Wazuh package file.');
+// Read Wazuh app package file
+try {
+    packageInfo = require('../../package.json');
+} catch (e) {
+    console.log('Could not read the Wazuh package file.');
+}
+
+
+class WazuhApi {
+    constructor(server){
+        this.wzWrapper = new ElasticWrapper(server);
     }
-    
- 
 
-    const checkStoredAPI = async (req, reply) => {
+    async checkStoredAPI (req, reply) {
         try{
             if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
             // Get config from elasticsearch
-            const wapi_config = await wzWrapper.getWazuhConfigurationById(req.payload)
+            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
                 
             if (wapi_config.error_code > 1) {
                 // Can not connect to elasticsearch
@@ -128,33 +129,33 @@ module.exports = (server, options) => {
                 });
             }
         }
-    };
+    }
 
-    const validateCheckApiParams = payload =>  {
+    validateCheckApiParams (payload)  {
         if (!('user' in payload)) {
-            return genericErrorBuilder(400,3,'Missing param: API USER');
+            return this.genericErrorBuilder(400,3,'Missing param: API USER');
         } 
 
         if (!('password' in payload)) {
-            return genericErrorBuilder(400,4,'Missing param: API PASSWORD');
+            return this.genericErrorBuilder(400,4,'Missing param: API PASSWORD');
         } 
         
         if (!('url' in payload)) {
-            return genericErrorBuilder(400,5,'Missing param: API URL');
+            return this.genericErrorBuilder(400,5,'Missing param: API URL');
         } 
         
         if (!('port' in payload)) {
-            return genericErrorBuilder(400,6,'Missing param: API PORT');
+            return this.genericErrorBuilder(400,6,'Missing param: API PORT');
         } 
         
         if (!(payload.url.includes('https://')) && !(payload.url.includes('http://'))) {
-            return genericErrorBuilder(200,1,'protocol_error');
+            return this.genericErrorBuilder(200,1,'protocol_error');
         } 
 
         return false;
     }
 
-    const genericErrorBuilder = (status,code,message) => {
+    genericErrorBuilder (status,code,message) {
         return {
             statusCode: status,
             error     : code,
@@ -162,10 +163,10 @@ module.exports = (server, options) => {
         };
     }
 
-    const checkAPI = async (req, reply) => {
+    async checkAPI (req, reply) {
         try {
-            const notValid = validateCheckApiParams(req.payload);
-            if(notValid) return genericErrorBuilder(valid);
+            const notValid = this.validateCheckApiParams(req.payload);
+            if(notValid) return this.genericErrorBuilder(valid);
 
             req.payload.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
         
@@ -178,7 +179,7 @@ module.exports = (server, options) => {
     
             // Check wrong credentials
             if(parseInt(response.statusCode) === 401){
-                return reply(genericErrorBuilder(500,10401,'wrong_credentials')).code(500);
+                return reply(this.genericErrorBuilder(500,10401,'wrong_credentials')).code(500);
             }
     
             if (parseInt(response.body.error) === 0 && response.body.data) {
@@ -233,14 +234,14 @@ module.exports = (server, options) => {
             throw new Error(response.body.message)
 
         } catch(error) {
-            return reply(genericErrorBuilder(500,5,error.message || error)).code(500);
+            return reply(this.genericErrorBuilder(500,5,error.message || error)).code(500);
         }
-    };
+    }
 
-    const getPciRequirement = async (req, reply) => {
+    async getPciRequirement (req, reply) {
         try {
             
-            if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
+            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
             const pciRequirements = require(pciRequirementsFile);
             let pci_description = '';
 
@@ -248,7 +249,7 @@ module.exports = (server, options) => {
                 if(!req.headers.id) {
                     return reply(pciRequirements);
                 }
-                let wapi_config = await wzWrapper.getWazuhConfigurationById(req.headers.id);
+                let wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.headers.id);
 
                 if (wapi_config.error_code > 1) {
                     // Can not connect to elasticsearch
@@ -295,9 +296,9 @@ module.exports = (server, options) => {
             });
         }
 
-    };
+    }
 
-    const errorControl = (error, response) => {
+    errorControl(error, response) {
         if (error) {
             return {
                 isError: true,
@@ -321,11 +322,11 @@ module.exports = (server, options) => {
         }
 
         return ({ isError: false });
-    };
+    }
 
-    const makeRequest = async (method, path, data, id, reply) => {
+    async makeRequest (method, path, data, id, reply) {
         try {
-            const wapi_config = await wzWrapper.getWazuhConfigurationById(id);
+            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
 
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
@@ -359,7 +360,7 @@ module.exports = (server, options) => {
 
             const fullUrl   = getPath(wapi_config) + path;
             const response  = await needle(method, fullUrl, data, options);
-            const errorData = errorControl(false, response);
+            const errorData = this.errorControl(false, response);
 
             if (errorData.isError) {
                 return reply(errorData.body).code(500);
@@ -373,10 +374,10 @@ module.exports = (server, options) => {
                 data      : error.message || error
             }).code(500);
         }
-    };
+    }
 
-    const requestApi = (req, reply) => {
-        if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
+    requestApi (req, reply) {
+        if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
         if (!req.payload.method) {
             return reply({
                 statusCode: 400,
@@ -390,15 +391,15 @@ module.exports = (server, options) => {
                 message   : 'Missing param: Path'
             }).code(400);
         } else {
-            return makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
+            return this.makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
         }
-    };
+    }
 
-    const getApiSettings = async (req, reply) => {
+    async getApiSettings (req, reply) {
         try{
-            if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
+            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
 
-            const wapi_config = await wzWrapper.getWazuhConfigurationById(req.payload.id); 
+            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id); 
     
             if (wapi_config.error_code > 1) {
                 throw new Error('no_elasticsearch');                
@@ -421,17 +422,17 @@ module.exports = (server, options) => {
     };
 
     // Fetch agent status and insert it directly on demand
-    const fetchAgents = (req, reply) => {
-        if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
+    fetchAgents (req, reply) {
+        if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
         fetchAgentsExternal();
         return reply({
             'statusCode': 200,
             'error':      '0',
             'data':       ''
         });
-    };
+    }
 
-    const postErrorLog = (req, reply) => {
+    postErrorLog (req, reply) {
 
         if (!req.payload.message) {
             server.log([blueWazuh, 'server', 'error'], 'Error logging failed:');
@@ -452,9 +453,9 @@ module.exports = (server, options) => {
 
             return reply({ statusCode: 200, message: 'Error logged succesfully' });
         }
-    };
+    }
 
-    const getConfigurationFile = (req,reply) => {
+    getConfigurationFile (req,reply) {
         try{
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
   
@@ -469,11 +470,11 @@ module.exports = (server, options) => {
             });
 
         } catch (error) {
-            return reply(genericErrorBuilder(500,6,error.message || error)).code(500)
+            return reply(this.genericErrorBuilder(500,6,error.message || error)).code(500)
         }
     }
 
-    const login = (req,reply) => {
+    login(req,reply) {
         try{
             
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
@@ -483,9 +484,9 @@ module.exports = (server, options) => {
             }
 
             if(!req.payload.password) {
-                return reply(genericErrorBuilder(401,7,'Please give me a password.')).code(401)
+                return reply(this.genericErrorBuilder(401,7,'Please give me a password.')).code(401)
             } else if(req.payload.password !== configFile['login.password']){
-                return reply(genericErrorBuilder(401,7,'Wrong password, please try again.')).code(401)
+                return reply(this.genericErrorBuilder(401,7,'Wrong password, please try again.')).code(401)
             }
 
             const code = (new Date()-1) + 'wazuhapp';
@@ -498,96 +499,9 @@ module.exports = (server, options) => {
             return reply({ statusCode: 200, error: 0, code });
 
         } catch (error) {
-            return reply(genericErrorBuilder(500,6,error.message || error)).code(500)
+            return reply(this.genericErrorBuilder(500,6,error.message || error)).code(500)
         }
     }
+}
 
-
-
-    //Server routes
-
-    /*
-     * GET /api/wazuh-api/test
-     * Returns if the wazuh-api configuration is working
-     *
-     **/
-    server.route({
-        method:  'POST',
-        path:    '/api/wazuh-api/checkStoredAPI',
-        handler: checkStoredAPI
-    });
-
-    /*
-     * POST /api/wazuh-api/test
-     * Check if credentials on POST connect to Wazuh API. Not storing them!
-     * Returns if the wazuh-api configuration received in the POST body will work
-     *
-     **/
-    server.route({
-        method:  'POST',
-        path:    '/api/wazuh-api/checkAPI',
-        handler: checkAPI
-    });
-
-    /*
-     * POST /api/wazuh-api/request
-     * Returns the request result (With error control)
-     *
-     **/
-    server.route({
-        method:  'POST',
-        path:    '/api/wazuh-api/request',
-        handler: requestApi
-    });
-
-    /*
-     * GET /api/wazuh-api/settings
-     * Get Wazuh-API settings from elasticsearch index
-     *
-     **/
-    server.route({
-        method:  'GET',
-        path:    '/api/wazuh-api/settings',
-        handler: getApiSettings
-    });
-
-    /*
-     * GET /api/wazuh-api/pci/requirement
-     * Return a PCI requirement description
-     *
-     **/
-    server.route({
-        method:  'GET',
-        path:    '/api/wazuh-api/pci/{requirement}',
-        handler: getPciRequirement
-    });
-
-    /*
-     * POST /api/wazuh/debug
-     * Write in debug log
-     *
-     **/
-    server.route({
-        method:  'POST',
-        path:    '/api/wazuh/errlog',
-        handler: postErrorLog
-    });
-
-    server.route({
-        method:  'GET',
-        path:    '/api/wazuh-api/fetchAgents',
-        handler: fetchAgents
-    });
-
-    server.route({
-        method:  'GET',
-        path:    '/api/wazuh-api/configuration',
-        handler: getConfigurationFile
-    });
-
-    server.route({
-        method:  'POST',
-        path:    '/api/wazuh-api/wlogin',
-        handler: login
-    });
-};
+module.exports = WazuhApi;

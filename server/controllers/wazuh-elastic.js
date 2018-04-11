@@ -1,13 +1,14 @@
 const ElasticWrapper = require('../lib/elastic-wrapper');
 
-module.exports = (server, options) => {
-   
-    const wzWrapper = new ElasticWrapper(server);
+class WazuhElastic {
+    constructor(server){
+        this.wzWrapper = new ElasticWrapper(server);
+    }
 
-    const getTimeStamp = async (req,reply) => {
+    async getTimeStamp(req,reply) {
         try {
 
-            const data = await wzWrapper.getWazuhVersionIndexAsSearch();
+            const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
 
             if(data.hits && 
                data.hits.hits[0] && 
@@ -33,9 +34,9 @@ module.exports = (server, options) => {
         }
     }
 
-    const getTemplate = async (req, reply) => {
+    async getTemplate(req, reply) {
         try {
-            const data = await wzWrapper.getTemplates();
+            const data = await this.wzWrapper.getTemplates();
 
             if (req.params.pattern == "wazuh-alerts-3.x-*" && data.includes("wazuh-alerts-3.*")) {
                 return reply({
@@ -77,11 +78,11 @@ module.exports = (server, options) => {
                 message   : `Could not retrieve templates from Elasticsearch due to ${error.message || error}`
             }).code(500);
         }
-    };
+    }
 
-    const checkPattern = async (req, reply) => {
+    async checkPattern (req, reply) {
         try {
-            const response = await wzWrapper.getAllIndexPatterns();
+            const response = await this.wzWrapper.getAllIndexPatterns();
 
             const filtered = response.hits.hits.filter(item => item._source['index-pattern'].title === req.params.pattern);
 
@@ -96,9 +97,10 @@ module.exports = (server, options) => {
                 message   : `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message || error}`
             }).code(500);
         }
-    };
+    }
 
-    const getFieldTop = async (req, reply) => {
+
+    async getFieldTop (req, reply) {
         try{
             // Top field payload
             let payload = {
@@ -135,7 +137,7 @@ module.exports = (server, options) => {
      
             payload.aggs['2'].terms.field = req.params.field;
 
-            const data = await wzWrapper.searchWazuhAlertsWithPayload(payload);
+            const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
 
             return (data.hits.total === 0 || typeof data.aggregations['2'].buckets[0] === 'undefined') ?
                     reply({ statusCode: 200, data: '' }) :
@@ -148,11 +150,11 @@ module.exports = (server, options) => {
                 message   : error.message || error
             }).code(500);
         }
-    };
+    }
 
-    const getSetupInfo = async (req, reply) => {
+    async getSetupInfo (req, reply) {
         try {
-            const data = await wzWrapper.getWazuhVersionIndexAsSearch();
+            const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
             
             return data.hits.total === 0 ?
                    reply({ statusCode: 200, data: '' }) :
@@ -166,13 +168,13 @@ module.exports = (server, options) => {
                 message   : `Could not get data from elasticsearch due to ${error.message || error}`
             }).code(500);
         }
-    };
+    }
 
-    const filterAllowedIndexPatternList = async (list,req) => {
+    async filterAllowedIndexPatternList (list,req) {
         let finalList = [];
         for(let item of list){
             try {
-                const allow = await wzWrapper.searchWazuhElementsByIndexWithRequest(req, item.title);
+                const allow = await this.wzWrapper.searchWazuhElementsByIndexWithRequest(req, item.title);
                 if(allow && allow.hits && allow.hits.total >= 1) finalList.push(item);
             } catch (error){
                 console.log(`Some user trys to fetch the index pattern ${item.title} without permissions`)
@@ -182,13 +184,13 @@ module.exports = (server, options) => {
         return finalList;
     }
 
-    const getlist = async (req,res) => {
+    async getlist (req,res) {
         try {
-            const xpack          = await wzWrapper.getPlugins();
+            const xpack          = await this.wzWrapper.getPlugins();
             const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
             const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
             
-            const data = await wzWrapper.getAllIndexPatterns();
+            const data = await this.wzWrapper.getAllIndexPatterns();
 
             if(data && data.hits && data.hits.hits.length === 0) throw new Error('There is no index pattern');
                 
@@ -212,7 +214,7 @@ module.exports = (server, options) => {
                     }
            
                 }
-                return res({data: isXpackEnabled && !isSuperUser ? await filterAllowedIndexPatternList(list,req) : list});
+                return res({data: isXpackEnabled && !isSuperUser ? await this.filterAllowedIndexPatternList(list,req) : list});
             }
             
             throw new Error('The Elasticsearch request didn\'t fetch the expected data');
@@ -222,10 +224,10 @@ module.exports = (server, options) => {
         }
     }
 
-    const deleteVis = async (req, res) => {
+    async deleteVis (req, res) {
         try {
 
-            const tmp = await wzWrapper.deleteVisualizationByDescription(req.params.timestamp);
+            const tmp = await this.wzWrapper.deleteVisualizationByDescription(req.params.timestamp);
 
             return res({acknowledge: true , output: tmp});
             
@@ -240,7 +242,7 @@ module.exports = (server, options) => {
      * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
      * @param {*} timestamp Milliseconds timestamp used to identify visualizations batch.
      */
-    const buildVisualizationsBulk = (app_objects, id, timestamp) => {
+    buildVisualizationsBulk (app_objects, id, timestamp) {
         try{
             let body = '';
             for (let element of app_objects) {
@@ -267,7 +269,7 @@ module.exports = (server, options) => {
         }
     }
 
-    const createVis = async (req, res) => {
+    async createVis (req, res) {
         try {
             if(!req.params.pattern || 
                !req.params.tab || 
@@ -285,8 +287,8 @@ module.exports = (server, options) => {
                          require(`../integration-files/visualizations/ruleset/${req.params.tab.split('manager-')[1]}`) :
                          require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
 
-            const bulkBody = buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
-            await wzWrapper.pushBulkToKibanaIndex(bulkBody);
+            const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
+            await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
 
             return res({acknowledge: true});
             
@@ -295,85 +297,8 @@ module.exports = (server, options) => {
         }
     }
 
-    // Get index patterns list
-    server.route({
-        method:  'GET',
-        path:    '/get-list',
-        handler: getlist
-    });
-    //Server routes
+}
 
-    /*
-     * GET /api/wazuh-elastic/create-vis/{tab}/{timestamp}/{pattern}
-     * Create visualizations specified in 'tab' parameter with the 'timestamp' sufix and applying to 'pattern'
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/create-vis/{tab}/{timestamp}/{pattern}',
-        handler: createVis
-    });
-
-    /*
-     * GET /api/wazuh-elastic/delete-vis/{tab}
-     * Delete visualizations specified in 'tab' parameter
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/delete-vis/{timestamp}',
-        handler: deleteVis
-    });
-
-    /*
-     * GET /api/wazuh-elastic/template/{pattern}
-     * Returns whether a correct template is being applied for the index-pattern
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/template/{pattern}',
-        handler: getTemplate
-    });
-
-    /*
-     * GET /api/wazuh-elastic/pattern/{pattern}
-     * Returns whether the pattern exists or not
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/pattern/{pattern}',
-        handler: checkPattern
-    });
+module.exports = WazuhElastic;
 
 
-
-    /*
-     * GET /api/wazuh-elastic/top/{cluster}/{field}/{time?}
-     * Returns the agent with most alerts
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/top/{mode}/{cluster}/{field}',
-        handler: getFieldTop
-    });
-
-    /*
-     * GET /api/wazuh-elastic/setup
-     * Return Wazuh Appsetup info
-     *
-     **/
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/setup',
-        handler: getSetupInfo
-    });
-
-    server.route({
-        method: 'GET',
-        path: '/api/wazuh-elastic/timestamp',
-        handler: getTimeStamp
-    });
-};
