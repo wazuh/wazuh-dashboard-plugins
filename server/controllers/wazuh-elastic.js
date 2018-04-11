@@ -235,6 +235,7 @@ class WazuhElastic {
 
     async deleteVis (req, res) {
         try {
+            await this.wzWrapper.refreshIndexByName('.kibana');
 
             const tmp = await this.wzWrapper.deleteVisualizationByDescription(req.params.timestamp);
 
@@ -298,8 +299,8 @@ class WazuhElastic {
 
             const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
             const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
-            const refreshingKibana = await this.wzWrapper.refreshIndexByName('.kibana');
-            return res({acknowledge: true, output: output, kibanaIndex: refreshingKibana });
+            //const refreshingKibana = await this.wzWrapper.refreshIndexByName('.kibana');
+            return res({acknowledge: true, output: output });
             
         } catch(error){
             return res({error:error.message || error}).code(500);

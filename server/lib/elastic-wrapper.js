@@ -521,6 +521,29 @@ class ElasticWrapper{
     }
 
     /**
+     * Used to get all visualizations with the given description
+     * @param {*} description 
+     */
+    async getVisualizationByDescription(description) {
+        try {
+            if(!description) return Promise.reject(new Error('No description given'))
+
+            const data = await this.elasticRequest.callWithInternalUser('search', {
+                index: '.kibana',
+                body: {
+                    query: { bool: { must: { match: { 'visualization.description': description } } } },
+                    size : 9999
+                }
+            });
+
+            return data; 
+            
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
      * Make a bulk request to update the .kibana index
      * @param {*} bulk 
      */
