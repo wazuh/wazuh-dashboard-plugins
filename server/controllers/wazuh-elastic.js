@@ -288,9 +288,9 @@ class WazuhElastic {
                          require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
 
             const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
-            await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
-
-            return res({acknowledge: true});
+            const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
+            const refreshingKibana = await this.wzWrapper.refreshIndexByName('.kibana');
+            return res({acknowledge: true, output: output, kibanaIndex: refreshingKibana });
             
         } catch(error){
             return res({error:error.message || error}).code(500);

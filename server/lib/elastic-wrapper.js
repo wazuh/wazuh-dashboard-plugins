@@ -226,6 +226,23 @@ class ElasticWrapper{
     }
 
     /**
+     * Force refreshing an index
+     * @param {*} name 
+     */
+    async refreshIndexByName(name){
+        try {
+            if(!name) return Promise.reject(new Error('No valid name given'));
+
+            const data = await this.elasticRequest.callWithInternalUser('indices.refresh', { index: name });
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
      * Get the .wazuh-version index
      */
     async getWazuhVersionIndex() {
@@ -761,6 +778,8 @@ class ElasticWrapper{
             return Promise.reject(error);
         }
     }
+
+
 }
 
 module.exports = ElasticWrapper;
