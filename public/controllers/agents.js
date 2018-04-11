@@ -42,10 +42,10 @@ app.controller('agentsController',
 
         // Metrics Vulnerability Detector
         const metricsVulnerability = {
-            vulnCritical: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]',
-            vulnHigh    : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"]',
-            vulnMedium  : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"]',
-            vulnLow     : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
+            vulnCritical: '[vis-id="\'Wazuh-App-Agents-VULS-Metric-Critical-severity\'"]',
+            vulnHigh    : '[vis-id="\'Wazuh-App-Agents-VULS-Metric-High-severity\'"]',
+            vulnMedium  : '[vis-id="\'Wazuh-App-Agents-VULS-Metric-Medium-severity\'"]',
+            vulnLow     : '[vis-id="\'Wazuh-App-Agents-VULS-Metric-Low-severity\'"]'
         }
 
         // Metrics Scap
@@ -57,9 +57,9 @@ app.controller('agentsController',
 
         // Metrics Virustotal
         const metricsVirustotal = {
-            virusMalicious: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Malicious\'"]',
-            virusPositives: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Positives\'"]',
-            virusTotal    : '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
+            virusMalicious: '[vis-id="\'Wazuh-App-Agents-Virustotal-Total-Malicious\'"]',
+            virusPositives: '[vis-id="\'Wazuh-App-Agents-Virustotal-Total-Positives\'"]',
+            virusTotal    : '[vis-id="\'Wazuh-App-Agents-Virustotal-Total\'"]'
         }
 
         $rootScope.tabVisualizations = {
