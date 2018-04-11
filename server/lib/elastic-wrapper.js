@@ -501,16 +501,22 @@ class ElasticWrapper{
      * Used to delete all visualizations with the given description
      * @param {*} description 
      */
-    async deleteVisualizationByDescription(description) {
+    async deleteVisualizationByDescription(description,retroactive) {
         try {
             if(!description) return Promise.reject(new Error('No description given'))
 
             const data = await this.elasticRequest.callWithInternalUser('deleteByQuery', {
                 index: '.kibana',
-                body: {
-                    query: { bool: { must: { match: { 'visualization.description': description } } } },
-                    size : 9999
-                }
+                body: 
+                    retroactive ? 
+                    {
+                        query: { range: { 'visualization.description': { lte: description } } },
+                        size : 9999
+                    } :
+                    {
+                        query: { bool: { must: { match: { 'visualization.description': description } } } },
+                        size : 9999
+                    }
             });
 
             return data; 
