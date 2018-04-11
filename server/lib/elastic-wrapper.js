@@ -206,7 +206,7 @@ class ElasticWrapper{
             const data = await this.elasticRequest.callWithInternalUser('update', {
                 index: '.kibana',
                 type: 'doc',
-                id: id,
+                id: id.includes('index-pattern:') ? id : 'index-pattern:' + id,
                 body: {
                     doc: {
                         "type": 'index-pattern',
