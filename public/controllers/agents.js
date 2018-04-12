@@ -126,10 +126,6 @@ app.controller('agentsController',
                     $rootScope.$broadcast('updateVis');
         
                     checkMetrics($scope.tab, 'panels');
-        
-                    // Deleting app state traces in the url
-                    $location.search('_a', null);
-        
                 })
                 .catch(error => errorHandler.handle(error, 'Agents'));
             } else {

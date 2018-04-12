@@ -155,15 +155,9 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
             .then(() => {
-    
                 // Render visualizations
                 $rootScope.$broadcast('updateVis');
-    
                 checkMetrics($scope.tab, 'panels');
-    
-                // Deleting app state traces in the url
-                $location.search('_a', null);
-    
             })
             .catch(error => errorHandler.handle(error, 'Overview'));
         } else {
