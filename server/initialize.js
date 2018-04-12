@@ -384,135 +384,177 @@ module.exports = (server, options) => {
             await server.plugins.elasticsearch.waitUntilReady();
             return checkKibanaStatus();
         } catch (error){
-            log('[initialize] checkStatus',error.message || error);
+            log('[initialize][checkStatus]',error.message || error);
             server.log([blueWazuh, 'initialize', 'info'], 'Waiting for elasticsearch plugin to be ready...');
             setTimeout(() => checkStatus(), 3000);
         }
     };
 
-    const reachAPI = (wapi_config) => {
-        // Now, let's see whether they have a 2.x or 3.x version
-        let id = wapi_config._id;
-        wapi_config = wapi_config._source;
-        log('[initialize] reachAPI', 'Reaching ' + wapi_config.manager,'info')
-        server.log([blueWazuh, 'reindex', 'info'], 'Reaching ' + wapi_config.manager);
-        let decoded_password = Buffer.from(wapi_config.api_password, 'base64').toString("ascii");
-        if (wapi_config.cluster_info === undefined) { // No cluster_info in the API configuration data -> 2.x version
-            needle('get', `${wapi_config.url}:${wapi_config.api_port}/version`, {}, {
-                username: wapi_config.api_user,
-                password: decoded_password,
-                rejectUnauthorized: !wapi_config.insecure
+    const updateClusterInformation = async config => {
+        try {
+            await wzWrapper.updateWazuhIndexDocument(config.id,{
+                'doc': {
+                    "api_user"    : config.api_user,
+                    "api_password": config.api_password,
+                    "url"         : config.url,
+                    "api_port"    : config.api_port,
+                    "manager"     : config.manager,
+                    "cluster_info": {
+                        "manager": config.manager,
+                        "node"   : config.cluster_info.node,
+                        "cluster": config.cluster_info.cluster,
+                        "status" : config.cluster_info.status
+                    },
+                }
             })
-                .then(response => {
-                    log('[initialize] reachAPI', 'API is reachable ' + wapi_config.manager,'info')
-                    server.log([blueWazuh, 'reindex', 'info'], 'API is reachable ' + wapi_config.manager);
-                    if (parseInt(response.body.error) === 0 && response.body.data) {
-                        needle('get', `${wapi_config.url}:${wapi_config.api_port}/cluster/status`, {}, { // Checking the cluster status
-                            username: wapi_config.api_user,
-                            password: decoded_password,
-                            rejectUnauthorized: !wapi_config.insecure
-                        })
-                            .then((response) => {
-                                if (!response.body.error) {
-                                    if (response.body.data.enabled === 'yes') { // If cluster mode is active
-                                        needle('get', `${wapi_config.url}:${wapi_config.api_port}/cluster/node`, {}, {
-                                            username: wapi_config.api_user,
-                                            password: decoded_password,
-                                            rejectUnauthorized: !wapi_config.insecure
-                                        })
-                                            .then((response) => {
-                                                if (!response.body.error) {
-                                                    wapi_config.cluster_info = {};
-                                                    wapi_config.cluster_info.status = 'enabled';
-                                                    wapi_config.cluster_info.manager = wapi_config.manager;
-                                                    wapi_config.cluster_info.node = response.body.data.node;
-                                                    wapi_config.cluster_info.cluster = response.body.data.cluster;
-                                                } else if (response.body.error) {
-                                                    log('[initialize] reachAPI', response.body.error || response.body);
-                                                    server.log([blueWazuh, 'reindex', 'error'], 'Could not get cluster/node information for ', wapi_config.manager);
-                                                }
-                                            });
-                                    }
-                                    else { // Cluster mode is not active
-                                        wapi_config.cluster_info = {};
-                                        wapi_config.cluster_info.status = 'disabled';
-                                        wapi_config.cluster_info.cluster = 'Disabled';
-                                        wapi_config.cluster_info.manager = wapi_config.manager;
-                                    }
 
-                                    // We filled data for the API, let's insert it now
-                                    wzWrapper.updateWazuhIndexDocument(id,{
-                                        'doc': {
-                                            "api_user"    : wapi_config.api_user,
-                                            "api_password": wapi_config.api_password,
-                                            "url"         : wapi_config.url,
-                                            "api_port"    : wapi_config.api_port,
-                                            "manager"     : wapi_config.manager,
-                                            "cluster_info": {
-                                                "manager": wapi_config.manager,
-                                                "node"   : wapi_config.cluster_info.node,
-                                                "cluster": wapi_config.cluster_info.cluster,
-                                                "status" : wapi_config.cluster_info.status
-                                            },
-                                        }
-                                    })
-                                        .then(resp => {
-                                            log('[initialize] reachAPI', 'Successfully updated proper cluster information for ' + wapi_config.manager,'info')
-                                            server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated proper cluster information for ' + wapi_config.manager);
-                                        })
-                                        .catch(error => {
-                                            log('[initialize] reachAPI', error.message || error);
-                                            server.log([blueWazuh, 'reindex', 'error'], 'Could not update proper cluster information for ' + wapi_config.manager + 'due to ' + err);
-                                        });
-                                } else {
-                                    log('[initialize] reachAPI', 'Could not get cluster/status information for ' + wapi_config.manager)
-                                    server.log([blueWazuh, 'reindex', 'error'], 'Could not get cluster/status information for ' + wapi_config.manager);
-                                }
-                            });
-                    } else {
-                        log('[initialize] reachAPI', 'The API responded with some kind of error for ' + wapi_config.manager)
-                        server.log([blueWazuh, 'reindex', 'error'], 'The API responded with some kind of error for ' + wapi_config.manager);
-                    }
-                })
-                .catch(error => {
-                    log('[initialize] reachAPI', error.message || error);
-                    server.log([blueWazuh, 'reindex', 'info'], 'API is NOT reachable ' + wapi_config.manager);
-                    // We weren't able to reach the API, reorganize data and fill with sample node and cluster name information
-                    wzWrapper.updateWazuhIndexDocument(id, {
-                        'doc': {
-                            "api_user": wapi_config.api_user,
-                            "api_password": wapi_config.api_password,
-                            "url": wapi_config.url,
-                            "api_port": wapi_config.api_port,
-                            "manager": wapi_config.manager,
-                            "cluster_info": {
-                                "manager": wapi_config.manager,
-                                "node": "nodata",
-                                "cluster": "nodata",
-                                "status": "disabled"
-                            },
-                        }
-                    })
-                    .then(resp => {
-                        log('[initialize] reachAPI',  'Successfully updated sample cluster information for ' + wapi_config.manager,'info')
-                        server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated sample cluster information for ' + wapi_config.manager);
-                    })
-                    .catch(error => {
-                        log('[initialize] reachAPI', error.message || error);
-                        server.log([blueWazuh, 'reindex', 'error'], 'Could not update sample cluster information for ' + wapi_config.manager + 'due to ' + err);
-                    });
-                });
-        } else { // 3.x version
-            // Nothing to be done, cluster_info is present
-            log('[initialize] reachAPI',  'Nothing to be done for ' + wapi_config.manager + ' as it is already a 3.x version.' + wapi_config.manager,'info')   
-            server.log([blueWazuh, 'reindex', 'info'], 'Nothing to be done for ' + wapi_config.manager + ' as it is already a 3.x version.');
+            log('[initialize][updateClusterInformation]', `Successfully updated proper cluster information for ${config.manager}`,'info')
+            server.log([blueWazuh, 'updateClusterInformation', 'info'], `Successfully updated proper cluster information for ${config.manager}`);
+
+            return;
+
+        } catch (error) {
+            return Promise.reject(new Error(`Could not update proper cluster information for ${config.manager} due to ${error.message || error}`))
+        }
+    }
+
+    const updateSingleHostInformation = async config => {
+        try {
+            await wzWrapper.updateWazuhIndexDocument(config.id, {
+                'doc': {
+                    "api_user"    : config.api_user,
+                    "api_password": config.api_password,
+                    "url"         : config.url,
+                    "api_port"    : config.api_port,
+                    "manager"     : config.manager,
+                    "cluster_info": {
+                        "manager": config.manager,
+                        "node"   : "nodata",
+                        "cluster": "nodata",
+                        "status" : "disabled"
+                    },
+                }
+            })
+
+            log('[initialize][updateSingleHostInformation]', `Successfully updated proper single host information for ${config.manager}`,'info')
+            server.log([blueWazuh, 'updateSingleHostInformation', 'info'], `Successfully updated proper single host information for ${config.manager}`);
+
+            return;
+
+        } catch (error) {
+            return Promise.reject(new Error(`Could not update proper single host information for ${config.manager} due to ${error.message || error}`))
+        }
+    }
+
+    const getNodeInformation = async config => {
+        try {
+            const response = await needle('get', `${config.url}:${config.api_port}/cluster/node`, {}, {
+                username: config.api_user,
+                password:  Buffer.from(config.api_password, 'base64').toString("ascii"),
+                rejectUnauthorized: !config.insecure
+            })
+
+            if (!response.body.error) {
+                config.cluster_info = {};
+                config.cluster_info.status = 'enabled';
+                config.cluster_info.manager = config.manager;
+                config.cluster_info.node = response.body.data.node;
+                config.cluster_info.cluster = response.body.data.cluster;
+            } else if (response.body.error) {
+                log('[initialize][getNodeInformation]', response.body.error || response.body);
+                server.log([blueWazuh, 'reindex', 'error'], `Could not get cluster/node information for ${config.manager}`);
+            }
+
+            return;
+                
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
+    const getClusterStatus = async config => {
+        try {
+            const response = await needle('get', `${config.url}:${config.api_port}/cluster/status`, {}, { // Checking the cluster status
+                username: config.api_user,
+                password: Buffer.from(config.api_password, 'base64').toString("ascii"),
+                rejectUnauthorized: !config.insecure
+            })
+
+            if (!response.body.error) {
+                if (response.body.data.enabled === 'yes') { // If cluster mode is active
+                    return getNodeInformation(config)
+                }
+                else { // Cluster mode is not active
+                    config.cluster_info = {};
+                    config.cluster_info.status = 'disabled';
+                    config.cluster_info.cluster = 'Disabled';
+                    config.cluster_info.manager = config.manager;
+                }
+
+                // We filled data for the API, let's insert it now
+                return updateClusterInformation(config)
+            } else {
+                log('[initialize][getClusterStatus]', `Could not get cluster/status information for ${config.manager}`)
+                server.log([blueWazuh, 'reindex', 'error'], `Could not get cluster/status information for ${config.manager}`);
+                return;
+            }
+         
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    const checkVersion = async config => {
+        try {
+            const response = await needle('get', `${config.url}:${config.api_port}/version`, {}, {
+                username: config.api_user,
+                password: Buffer.from(config.api_password, 'base64').toString("ascii"),
+                rejectUnauthorized: !config.insecure
+            })
+
+            log('[initialize][checkVersion]', `API is reachable ${config.manager}`,'info')
+            server.log([blueWazuh, 'reindex', 'info'], `API is reachable ${config.manager}`);
+            if (parseInt(response.body.error) === 0 && response.body.data) {
+                return getClusterStatus(config)
+            } else {
+                log('[initialize][checkVersion]', `The API responded with some kind of error for ${config.manager}`)
+                server.log([blueWazuh, 'reindex', 'error'], `The API responded with some kind of error for ${config.manager}`);
+                return;
+            }
+        } catch (error) {
+            log('[initialize][checkVersion]', error.message || error);
+            server.log([blueWazuh, 'reindex', 'info'], `API is NOT reachable ${config.manager}`);
+            // We weren't able to reach the API, reorganize data and fill with sample node and cluster name information
+            return updateSingleHostInformation(config);
+        }
+    }
+
+    const reachAPI = async config => {
+        try {
+            config = config._source;
+
+            log('[initialize][reachAPI]', `Reaching ${config.manager}`,'info')
+            server.log([blueWazuh, 'reindex', 'info'], `Reaching ${config.manager}`);
+
+            if (config.cluster_info === undefined) { 
+                // No cluster_info in the API configuration data -> 2.x version
+                await checkVersion(config)
+            } else { // 3.x version
+                // Nothing to be done, cluster_info is present
+                log('[initialize][reachAPI]', `Nothing to be done for ${config.manager} as it is already a 3.x version.`,'info')   
+                server.log([blueWazuh, 'reindex', 'info'], `Nothing to be done for ${config.manager} as it is already a 3.x version.`);
+            }
+
+            return;
+        } catch (error) {
+            return Promise.reject(error);
         }
     };
 
     // Reindex a .wazuh index from 2.x-5.x or 3.x-5.x to .wazuh and .wazuh-version in 3.x-6.x
     const reindexOldVersion = async () => {
         try {
-            log('[initialize] reindexOldVersion',  `Old version detected. Proceeding to reindex.`,'info')  
+            log('[initialize][reindexOldVersion]',  `Old version detected. Proceeding to reindex.`,'info')  
             server.log([blueWazuh, 'reindex', 'info'], `Old version detected. Proceeding to reindex.`);
     
             const configuration = {
@@ -528,13 +570,13 @@ module.exports = (server, options) => {
             // Backing up .wazuh index
             await wzWrapper.reindexWithCustomConfiguration(configuration);
 
-            log('[initialize] reindexOldVersion',  'Successfully backed up .wazuh index','info')  
+            log('[initialize][reindexOldVersion]',  'Successfully backed up .wazuh index','info')  
             // And...this response does not take into acount new index population so...let's wait for it
             server.log([blueWazuh, 'reindex', 'info'], 'Successfully backed up .wazuh index');
             setTimeout(() => swapIndex(), 3000);
 
         } catch(error) {
-            log('[initialize] reindexOldVersion', error.message || error);
+            log('[initialize][reindexOldVersion]', error.message || error);
             server.log([blueWazuh, 'reindex', 'error'], 'Could not begin the reindex process: ' + error.message || error);
         }
     };
@@ -579,10 +621,11 @@ module.exports = (server, options) => {
     const reachAPIs = async () => {
         try{
             const data = await wzWrapper.searchIndexByName('.wazuh');
-
+            const promises = [];
             for (let item of data.hits.hits) {
-                reachAPI(item);
+                promises.push(reachAPI(item));
             }
+            await Promise.all(promises);
         } catch(error){
             log('[initialize][reachAPIs]', error.message || error);
             server.log([blueWazuh, 'reindex', 'error'], 'Something happened while getting old API configuration data: ' + error.message || error);
