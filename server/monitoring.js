@@ -302,7 +302,7 @@ module.exports = (server, options) => {
                 server.log([blueWazuh, 'monitoring', 'info'], 'Checking if wazuh-monitoring pattern exists...');
                 await wzWrapper.getIndexPatternUsingGet(patternId);
             } catch (error) {
-                log('[monitoring][init]', 'Didn\'t find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...');
+                log('[monitoring][init]', 'Didn\'t find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...','info');
                 server.log([blueWazuh, 'monitoring', 'info'], "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...");
                 return createWazuhMonitoring();
             }
