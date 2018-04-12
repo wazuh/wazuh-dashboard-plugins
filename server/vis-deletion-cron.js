@@ -6,6 +6,7 @@ module.exports = server => {
     let abort = 0;
     const wzWrapper = new ElasticWrapper(server);
 
+    // Deletes all visualizations older than one hour ago
     const clean = async () => {
         try {
             if(abort < 3) {
@@ -21,7 +22,7 @@ module.exports = server => {
         }
     }
 
- 
+    // Runs clean function each hour
     cron.schedule('0 0 * * * *',clean, true);
 
 }

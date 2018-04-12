@@ -62,11 +62,3 @@
 # Defines if the user is allowed to change the selected index pattern
 # directly from the Wazuh App top menu. Default: yes
 #ip.selector: true
-#
-#
-#--------------------- Index pattern default creation -----------------------------
-#
-# Defines if the initialize process should create the default index pattern.
-# The the default index pattern is the index pattern from this file or wazuh-alerts-3.x-*
-# Default: yes
-#force.default: true

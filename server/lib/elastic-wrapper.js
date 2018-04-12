@@ -150,6 +150,10 @@ class ElasticWrapper{
         }
     }
 
+    /**
+     * Inserts configuration on .wazuh-version index
+     * @param {*} configuration 
+     */
     async insertWazuhVersionConfiguration(configuration) {
         try {
             if(!configuration) return Promise.reject(new Error('No valid configuration for create .wazuh-version index'))

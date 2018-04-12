@@ -1,3 +1,4 @@
+// Imports all modules
 module.exports = (server, options) => {
     require('./server/initialize')(server, options);
     require('./server/routes/wazuh-elastic')(server, options);
