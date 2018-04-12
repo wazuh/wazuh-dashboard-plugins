@@ -1,10 +1,9 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.2.2 - Kibana v6.2.2/v6.2.3 - Revision 388
+## Wazuh v3.2.1/v3.2.2 - Kibana v6.2.3 - Revision 388
 ### Added
-- Support for Wazuh v3.2.2.
-- Support for Elastic Stack v6.2.2/v6.2.3.
+- Support for Wazuh v3.2.1/v3.2.2.
 - Added the `errorHandler` service to the `dataHandler` factory ([#340](https://github.com/wazuh/wazuh-kibana-app/pull/340)).
 - Added Syscollector section to *Manager/Agents Configuration* tabs ([#359](https://github.com/wazuh/wazuh-kibana-app/pull/359)).
 
