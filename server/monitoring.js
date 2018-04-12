@@ -1,15 +1,12 @@
-// External libraries
-const cron      = require('node-cron');
-const needle    = require('needle');
-const getPath   = require('../util/get-path');
-
-// Colors for console logging 
-const colors    = require('ansicolors');
-const blueWazuh = colors.blue('wazuh');
-
-const { log } = require('./logger');
-
+const cron           = require('node-cron');
+const needle         = require('needle');
+const getPath        = require('../util/get-path');
+const colors         = require('ansicolors');
+const blueWazuh      = colors.blue('wazuh');
+const { log }        = require('./logger');
 const ElasticWrapper = require('./lib/elastic-wrapper');
+const index_pattern  = "wazuh-monitoring-3.x-*";
+const index_prefix   = "wazuh-monitoring-3.x-";
 
 module.exports = (server, options) => {
     // Elastic JS Client
@@ -17,8 +14,7 @@ module.exports = (server, options) => {
 
     // Initialize
     let agentsArray   = [];
-    let index_pattern = "wazuh-monitoring-3.x-*";
-    let index_prefix  = "wazuh-monitoring-3.x-";
+
     let fDate         = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
     let todayIndex    = index_prefix + fDate;
     let packageJSON   = {};
@@ -27,7 +23,7 @@ module.exports = (server, options) => {
     try {
         packageJSON = require('../package.json');
     } catch (error) {
-        log('monitoring.js', error.message || error);
+        log('[monitoring]', error.message || error);
         server.log([blueWazuh, 'monitoring', 'error'], 'Could not read the Wazuh package file due to ' + error.message || error);
     }
 
@@ -68,7 +64,7 @@ module.exports = (server, options) => {
             return;
 
         } catch (error) {
-            log('monitoring.js', error.message || error);
+            log('[monitoring][checkStatus]', error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
         }
     };
@@ -95,12 +91,12 @@ module.exports = (server, options) => {
             if (!response.error && response.body.data && response.body.data.totalItems) {
                 checkStatus(apiEntry, response.body.data.totalItems);
             } else {
-                log('monitoring.js', 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
+                log('[monitoring][checkAndSaveStatus]', 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
                 server.log([blueWazuh, 'monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
             }
             return;
         } catch(error){
-            log('monitoring.js',error.message || error);
+            log('[monitoring][checkAndSaveStatus]',error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
         }   
     };
@@ -128,14 +124,14 @@ module.exports = (server, options) => {
                     'insecure': element._source.insecure
                 };
                 if (apiEntry.error) {
-                    log('monitoring.js loadCredentials', apiEntry.error || apiEntry);
+                    log('[monitoring][loadCredentials]', apiEntry.error || apiEntry);
                     server.log([blueWazuh, 'monitoring', 'error'], `Error getting wazuh-api data: ${apiEntry.error}`);
                     break;
                 }
                 await checkAndSaveStatus(apiEntry);
             }
         } catch(error){
-            log('monitoring.js',error.message || error);
+            log('[monitoring][loadCredentials]',error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
         }
     };
@@ -149,14 +145,14 @@ module.exports = (server, options) => {
                 return data.hits;
             }
 
-            log('monitoring.js getConfig','no credentials');
+            log('[monitoring][getConfig]','no credentials');
             return {
                 error     : 'no credentials',
                 error_code: 1
             };
             
         } catch (error){
-            log('monitoring.js getConfig',error.message || error);
+            log('[monitoring][getConfig]',error.message || error);
             return {
                 error     : 'no elasticsearch',
                 error_code: 2
@@ -177,17 +173,17 @@ module.exports = (server, options) => {
     // Configure Kibana patterns.
     const configureKibana = async () => {
         try {
-            log('monitoring.js configureKibana', `Creating index pattern: ${index_pattern}`, 'info');
+            log('[monitoring][configureKibana]', `Creating index pattern: ${index_pattern}`, 'info');
             server.log([blueWazuh, 'monitoring', 'info'], `Creating index pattern: ${index_pattern}`);
     
             await wzWrapper.createMonitoringIndexPattern(index_pattern);
 
-            log('monitoring.js configureKibana', `Created index pattern: ${index_pattern}`, 'info');
+            log('[monitoring][configureKibana]', `Created index pattern: ${index_pattern}`, 'info');
             server.log([blueWazuh, 'monitoring', 'info'], `Created index pattern: ${index_pattern}`);
 
             return;
         } catch(error) {
-            log('monitoring.js configureKibana',error.message || error);
+            log('[monitoring][configureKibana]',error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], 'Error creating index-pattern due to ' + error);
         }
     };
@@ -196,12 +192,12 @@ module.exports = (server, options) => {
     const createIndex = async todayIndex => {
         try {
             await wzWrapper.createIndexByName(todayIndex);
-            log('monitoring.js createIndex', 'Successfully created today index.', 'info');
+            log('[monitoring][createIndex]', 'Successfully created today index.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Successfully created today index.');
             await insertDocument(todayIndex);
             return;
         } catch (error) {
-            log('monitoring.js createIndex', error.message || error);
+            log('[monitoring][createIndex]', error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], `Could not create ${todayIndex} index on elasticsearch due to ` + error.message || error);
         }
     };
@@ -220,7 +216,6 @@ module.exports = (server, options) => {
                     element["host"]       = managerName;
                     body                 += JSON.stringify(element) + "\n";
                 }
-    
                 if (body === '') return;
     
                 const response = await wzWrapper.pushBulkAnyIndex(todayIndex,body);
@@ -229,7 +224,7 @@ module.exports = (server, options) => {
             }
             return;
         } catch (error) {
-            log('monitoring.js insertDocument', error.message || error);
+            log('[monitoring][insertDocument]', error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], 'Error inserting agent data into elasticsearch. Bulk request failed due to ' + error.message || error);
         }
     };
@@ -247,7 +242,7 @@ module.exports = (server, options) => {
             return;
            
         } catch (error) {
-            log('monitoring.js saveStatus', `Could not check if the index ${todayIndex} exists due to ${error.message || error}`);
+            log('[monitoring][saveStatus]', `Could not check if the index ${todayIndex} exists due to ${error.message || error}`);
             server.log([blueWazuh, 'monitoring', 'error'], `Could not check if the index ${todayIndex} exists due to ` + error);
         }
     };
@@ -258,10 +253,10 @@ module.exports = (server, options) => {
             try{
                 await wzWrapper.deleteMonitoring();
 
-                log('monitoring.js init', 'Successfully deleted old wazuh-monitoring pattern.', 'info');
+                log('[monitoring][createWazuhMonitoring]', 'Successfully deleted old wazuh-monitoring pattern.', 'info');
                 server.log([blueWazuh, 'monitoring', 'info'], "Successfully deleted old wazuh-monitoring pattern.");
             } catch (error) {
-                log('monitoring.js init', 'No need to delete old wazuh-monitoring pattern.', 'info');
+                log('[monitoring][createWazuhMonitoring]', 'No need to delete old wazuh-monitoring pattern.', 'info');
                 server.log([blueWazuh, 'monitoring', 'info'], "No need to delete  old wazuh-monitoring pattern.");
             }
 
@@ -274,13 +269,13 @@ module.exports = (server, options) => {
 
     const checkTemplate = async () => {
         try {
-            log('monitoring.js checkTemplate', 'Updating wazuh-monitoring template...', 'info');
+            log('[monitoring][checkTemplate]', 'Updating wazuh-monitoring template...', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], "Updating wazuh-monitoring template...");
             const monitoringTemplate = require('./integration-files/monitoring-template');
             const data = await wzWrapper.putMonitoringTemplate(monitoringTemplate);
             return;
         } catch(error){
-            log('monitoring.js checkTemplate', 'Something went wrong updating wazuh-monitoring template...' + error.message || error);
+            log('[monitoring][checkTemplate]', 'Something went wrong updating wazuh-monitoring template...' + error.message || error);
             server.log([blueWazuh, 'monitoring', 'info'], "Something went wrong updating wazuh-monitoring template..." + error.message || error);
             return Promise.reject(error);
         }
@@ -291,10 +286,10 @@ module.exports = (server, options) => {
     const init = async () => {
         try {
 
-            log('monitoring.js init', 'Creating/Updating wazuh-agent template...', 'info');
+            log('[monitoring][init]', 'Creating/Updating wazuh-agent template...', 'info');
             await checkTemplate();
 
-            log('monitoring.js init', 'Creating today index...', 'info');
+            log('[monitoring][init]', 'Creating today index...', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Creating today index...');
             
             await saveStatus();
@@ -303,23 +298,23 @@ module.exports = (server, options) => {
 
             // Checks if wazuh-monitoring index pattern is already created, if it fails create it
             try{
-                log('monitoring.js init', 'Checking if wazuh-monitoring pattern exists...', 'info');
+                log('[monitoring][init]', 'Checking if wazuh-monitoring pattern exists...', 'info');
                 server.log([blueWazuh, 'monitoring', 'info'], 'Checking if wazuh-monitoring pattern exists...');
                 await wzWrapper.getIndexPatternUsingGet(patternId);
             } catch (error) {
-                log('monitoring.js init', 'Didn\'t find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...');
+                log('[monitoring][init]', 'Didn\'t find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...');
                 server.log([blueWazuh, 'monitoring', 'info'], "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...");
                 return createWazuhMonitoring();
             }
 
-            log('monitoring.js init', 'Skipping wazuh-monitoring pattern creation. Already exists.', 'info');
+            log('[monitoring][init]', 'Skipping wazuh-monitoring pattern creation. Already exists.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Skipping wazuh-monitoring creation. Already exists.');
             
             return;
  
         } catch (error) {
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
-            log('monitoring.js init', error.message || error);
+            log('[monitoring][init]', error.message || error);
             return;
         }
     };
@@ -335,7 +330,7 @@ module.exports = (server, options) => {
             }
             return Promise.reject(data);
         } catch(error){
-            log('monitoring.js checkElasticsearchServer',error.message || error);
+            log('[monitoring][checkElasticsearchServer]',error.message || error);
             return Promise.reject(error);
         }
     }
@@ -343,13 +338,13 @@ module.exports = (server, options) => {
     // Wait until Kibana server is ready
     const checkKibanaStatus = async () => {
         try {
-            log('monitoring.js checkKibanaStatus','Waiting for Kibana and Elasticsearch servers to be ready...','info');
+            log('[monitoring][checkKibanaStatus]','Waiting for Kibana and Elasticsearch servers to be ready...','info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Waiting for Kibana and Elasticsearch servers to be ready...');
             await checkElasticsearchServer();
             await init();
             return;
         } catch(error) {
-            log('monitoring.js checkKibanaStatus',error.message || error);
+            log('[monitoring][checkKibanaStatus]',error.message || error);
             server.log([blueWazuh, 'monitoring', 'info'], 'Waiting for Kibana and Elasticsearch servers to be ready...','info');
             setTimeout(() => checkKibanaStatus(), 3000);
         }
@@ -358,16 +353,20 @@ module.exports = (server, options) => {
     // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
     checkKibanaStatus();
 
+    const cronTask = async () => {
+        try {
+            agentsArray = [];
+            const data = await getConfig();
+            await loadCredentials(data);
+            return;
+        } catch (error) {
+            log('[monitoring][cronTask]',error.message || error);
+            server.log([blueWazuh, 'monitoring [cronTask]', 'error'], error.message || error)
+        }
+    }
+    cronTask()
     // Cron tab for getting agent status.
-    cron.schedule('0 */10 * * * *', () => {
-        agentsArray.length = 0;
-        getConfig()
-        .then(data => loadCredentials(data))
-        .catch(error => {
-            log('monitoring.js',error.message || error);
-            server.log([blueWazuh, 'monitoring', 'error'], error.message || error)
-        });
-    }, true);
+    cron.schedule('0 */10 * * * *', cronTask, true);
 
     module.exports = fetchAgents;
 };
