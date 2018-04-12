@@ -964,7 +964,7 @@ function discoverController(
 
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
-    loadFilters();
+
     if ($location.search().tabView !=  $scope.tabView) { // No need to change the filters
       if ($scope.tabView !== "discover") { // Should do this the first time, to avoid the squeezing of the visualization
         $scope.updateQueryAndFetch($state.query);
@@ -973,17 +973,12 @@ function discoverController(
     }
     if ($location.search().tab !=  $scope.tab) { // Changing filters
       $scope.tab = $location.search().tab;
-      //queryFilter.removeAll();
-      //loadFilters();
     }
     
     if ($location.search().agent !=  $scope.agentId) { // Changing filters
-
       $scope.agentId = $location.search().agent;
-
-      //queryFilter.removeAll();
-      //loadFilters();
     }
+    if ($location.search().tabView ===  $scope.tabView) loadFilters();
   });
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

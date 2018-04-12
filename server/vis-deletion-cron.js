@@ -3,7 +3,6 @@ const cron           = require('node-cron');
 const { log }        = require('./logger');
 
 module.exports = server => {
-    console.log('Hello')
     let abort = 0;
     const wzWrapper = new ElasticWrapper(server);
 
