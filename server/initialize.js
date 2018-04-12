@@ -12,7 +12,7 @@ const ElasticWrapper = require('./lib/elastic-wrapper');
 
 module.exports = (server, options) => {
 
-    log('initialize.js', 'Initializing', 'info');
+    log('[initialize]', 'Initializing', 'info');
 
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
@@ -32,7 +32,7 @@ module.exports = (server, options) => {
         forceDefaultPattern = (configurationFile && typeof configurationFile['force.default'] !== 'undefined') ? configurationFile['force.default'] : true;
         packageJSON = require('../package.json');
     } catch (e) {
-        log('initialize.js', e.message || e);
+        log('[initialize]', e.message || e);
         server.log([blueWazuh, 'initialize', 'error'], 'Something went wrong while reading the configuration.' + e.message);
     }
 
@@ -62,12 +62,12 @@ module.exports = (server, options) => {
     const checkKnownFields = async () => {
         try {
             const xpack = await wzWrapper.getPlugins();
-            log('initialize.js checkKnownFields', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
+            log('[initialize][checkKnownFields]', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
                     
             const indexPatternList = await wzWrapper.getAllIndexPatterns();
 
-            log('initialize.js checkKnownFields', `Found ${indexPatternList.hits.total} index patterns`,'info')
+            log('[initialize][checkKnownFields]', `Found ${indexPatternList.hits.total} index patterns`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Found ${indexPatternList.hits.total} index patterns`);
             let list = [];
             if(indexPatternList && indexPatternList.hits && indexPatternList.hits.hits){
@@ -93,15 +93,15 @@ module.exports = (server, options) => {
                     }
                 }
             } 
-            log('initialize.js checkKnownFields', `Found ${list.length} valid index patterns for Wazuh alerts`,'info')
+            log('[initialize][checkKnownFields]', `Found ${list.length} valid index patterns for Wazuh alerts`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Found ${list.length} valid index patterns for Wazuh alerts`);
             const defaultExists = list.filter(item => item.title === defaultIndexPattern);            
 
             if(defaultExists.length === 0 && forceDefaultPattern){
-                log('initialize.js checkKnownFields', `Default index pattern not found, creating it...`,'info')
+                log('[initialize][checkKnownFields]', `Default index pattern not found, creating it...`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Default index pattern not found, creating it...`);
                 await createIndexPattern();
-                log('initialize.js checkKnownFields', 'Waiting for default index pattern creation to complete...','info')
+                log('[initialize][checkKnownFields]', 'Waiting for default index pattern creation to complete...','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Waiting for default index pattern creation to complete...');   
                 let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 let tmplist = null;
@@ -116,22 +116,22 @@ module.exports = (server, options) => {
                     title: tmplist.hits.hits[0]._source['index-pattern'].title
                 })
             } else {
-                log('initialize.js checkKnownFields', `Default index pattern found`,'info')
+                log('[initialize][checkKnownFields]', `Default index pattern found`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Default index pattern found`);
             }
 
             for(const item of list){
-                log('initialize.js checkKnownFields', `Refreshing known fields for "index-pattern:${item.title}"`,'info')
+                log('[initialize][checkKnownFields]', `Refreshing known fields for "index-pattern:${item.title}"`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Refreshing known fields for "index-pattern:${item.title}"`);
                 await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id);
             }
 
-            log('initialize.js checkKnownFields', 'App ready to be used.','info')
+            log('[initialize][checkKnownFields]', 'App ready to be used.','info')
             server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
 
             return;
         } catch (error){
-            log('initialize.js checkKnownFields', error.message || error);
+            log('[initialize][checkKnownFields]', error.message || error);
             server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch.' +  error.message || error);
         }
     };
@@ -139,16 +139,16 @@ module.exports = (server, options) => {
     // Creates the default index pattern 
     const createIndexPattern = async () => {        
         try {
-            log('initialize.js createIndexPattern', `Creating index pattern: ${defaultIndexPattern}`,'info')
+            log('[initialize][createIndexPattern]', `Creating index pattern: ${defaultIndexPattern}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${defaultIndexPattern}`);
 
             await wzWrapper.createIndexPattern(defaultIndexPattern);
 
-            log('initialize.js createIndexPattern', `Created index pattern: ${defaultIndexPattern}`,'info')
+            log('[initialize][createIndexPattern]', `Created index pattern: ${defaultIndexPattern}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + defaultIndexPattern);
 
         } catch (error){
-            log('initialize.js createIndexPattern', error.message || error);
+            log('[initialize][createIndexPattern]', error.message || error);
             server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
         }
     };
@@ -192,25 +192,25 @@ module.exports = (server, options) => {
 
                 await wzWrapper.insertWazuhVersionConfiguration(configuration);
 
-                log('initialize.js saveConfiguration', 'Wazuh configuration inserted','info')
+                log('[initialize][saveConfiguration]', 'Wazuh configuration inserted','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
      
             } catch (error){
-                log('initialize.js saveConfiguration', error.message || error);
+                log('[initialize][saveConfiguration]', error.message || error);
                 server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh configuration');
             }
             
             return;
 
         } catch (error){
-            log('initialize.js saveConfiguration', error.message || error);
+            log('[initialize][saveConfiguration]', error.message || error);
             server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh-version.');
         }
     };
 
     const checkWazuhIndex = async () => {
             try{
-                log('initialize.js init', 'Checking .wazuh index.','info')
+                log('[initialize][checkWazuhIndex]', 'Checking .wazuh index.','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh index.');
                 
                 const result = await wzWrapper.checkIfIndexExists('.wazuh');
@@ -236,7 +236,7 @@ module.exports = (server, options) => {
                     try{
                         await wzWrapper.createWazuhIndex(configuration);
             
-                        log('initialize.js init', 'Index .wazuh created.','info')
+                        log('[initialize][checkWazuhIndex]', 'Index .wazuh created.','info')
                         server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
                     
                     } catch(error) {
@@ -266,13 +266,13 @@ module.exports = (server, options) => {
 
     const checkWazuhVersionIndex = async () => {
         try {
-            log('initialize.js init', 'Checking .wazuh-version index.','info')
+            log('[initialize][checkWazuhVersionIndex]', 'Checking .wazuh-version index.','info')
             server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh-version index.');
 
             try{                
                 await wzWrapper.getWazuhVersionIndex();
             } catch (error) {
-                log('initialize.js init 6', error.message || error);
+                log('[initialize][checkWazuhVersionIndex]', error.message || error);
                 server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
     
                 // Save Setup Info
@@ -299,85 +299,83 @@ module.exports = (server, options) => {
                 checkKnownFields()
             ]);
         } catch (error){
-            log('initialize.js init()', error.message || error);
-            server.log([blueWazuh, 'initialize.js init()', 'error'], error.message || error);
+            log('[initialize][init]', error.message || error);
+            server.log([blueWazuh, '[initialize][init]', 'error'], error.message || error);
             return Promise.reject(error)
         }
     };
 
     const createKibanaTemplate = () => {
-        log('initialize.js createKibanaTemplate', 'Creating template for .kibana.','info')
+        log('[initialize][createKibanaTemplate]', 'Creating template for .kibana.','info')
         server.log([blueWazuh, 'initialize', 'info'], 'Creating template for .kibana.');
 
         try {
             kibana_template = require(KIBANA_TEMPLATE);
         } catch (error) {
-            log('initialize.js init 6', error.message || error);
+            log('[initialize][createKibanaTemplate]', error.message || error);
             server.log([blueWazuh, 'initialize', 'error'], 'Could not read the .kibana template file.');
-            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_TEMPLATE);
-            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + error);
+            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + error.message || error);
         }
 
         return wzWrapper.putWazuhKibanaTemplate(kibana_template);
     };
 
+
+
+    const createEmptyKibanaIndex = async () => {
+        try {
+            await wzWrapper.createEmptyKibanaIndex()
+            log('[initialize][checkKibanaStatus]', 'Successfully created .kibana index.','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
+            await init();
+            return;
+        } catch (error) {
+            return Promise.reject(new Error(`Error creating .kibana index due to ${error.message || error}`))
+        }
+    }
+
+    const fixKibanaTemplate = async () => {
+        try {
+            await createKibanaTemplate();
+            log('[initialize][checkKibanaStatus]', 'Successfully created .kibana template.','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana template.');
+            await createEmptyKibanaIndex();
+            return;
+        } catch (error) {
+            return Promise.reject(new Error(`Error creating template for .kibana due to ${error.message || error}`))
+        }
+    }
+
+    const getTemplateByName = async () => {
+        try {
+            await wzWrapper.getTemplateByName('wazuh-kibana')
+            log('[initialize][checkKibanaStatus]', 'No need to create the .kibana template, already exists.','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'No need to create the .kibana template, already exists.');
+            await createEmptyKibanaIndex();
+            return;
+        } catch (error) {
+            log('[initialize][checkKibanaStatus]', error.message || error);
+            return fixKibanaTemplate();
+        }
+    }
+
     // Does .kibana index exist?
-    const checkKibanaStatus = () => {
-        wzWrapper.checkIfIndexExists('.kibana')
-            .then(data => {
-                if (data) { // It exists, initialize!
-                    init();
-                }
-                else { // No .kibana index created...
-                    log('initialize.js checkKibanaStatus', 'Didn\'t find .kibana index...','info')
-                    server.log([blueWazuh, 'initialize', 'info'], "Didn't find .kibana index...");
-
-                    wzWrapper.getTemplateByName('wazuh-kibana')
-                        .then(data => {
-                            log('initialize.js checkKibanaStatus', 'No need to create the .kibana template, already exists.','info')
-                            server.log([blueWazuh, 'initialize', 'info'], 'No need to create the .kibana template, already exists.');
-
-                            wzWrapper.createEmptyKibanaIndex()
-                                .then(data => {
-                                    log('initialize.js checkKibanaStatus', 'Successfully created .kibana index.','info')
-                                    server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
-                                    init();
-                                })
-                                .catch(error => {
-                                    log('initialize.js checkKibanaStatus',error.message || error);
-                                    server.log([blueWazuh, 'initialize', 'error'], 'Error creating .kibana index due to ' + error);
-                                });
-                        })
-                        .catch(error => {
-                            log('initialize.js checkKibanaStatus',
-                                error.message || error
-                            );
-                            createKibanaTemplate()
-                                .then(data => {
-                                    log('initialize.js checkKibanaStatus', 'Successfully created .kibana template.','info')
-                                    server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana template.');
-
-                                    wzWrapper.createEmptyKibanaIndex()
-                                        .then(data => {
-                                            log('initialize.js checkKibanaStatus', 'Successfully created .kibana index.','info')
-                                            server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
-                                            init();
-                                        })
-                                        .catch(error => {
-                                            log('initialize.js checkKibanaStatus',error.message || error);
-                                            server.log([blueWazuh, 'initialize', 'error'], 'Error creating .kibana index due to ' + error);
-                                        });
-                                }).catch(error => {
-                                    log('initialize.js checkKibanaStatus',error.message || error);
-                                    server.log([blueWazuh, 'initialize', 'error'], 'Error creating template for .kibana due to ' + error);
-                                });
-                        });
-                }
-            })
-            .catch(error => {
-                log('initialize.js checkKibanaStatus',error.message || error);
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not check .kibana index due to ' + error);
-            });
+    const checkKibanaStatus = async () => {
+        try {
+            const data = await wzWrapper.checkIfIndexExists('.kibana');
+            if (data) { 
+                // It exists, initialize!
+                await init();
+            } else { 
+                // No .kibana index created...
+                log('[initialize][checkKibanaStatus]', 'Didn\'t find .kibana index...','info')
+                server.log([blueWazuh, 'initialize', 'info'], "Didn't find .kibana index...");
+                await getTemplateByName();
+            }
+        } catch (error) {
+            log('[initialize][checkKibanaStatus]',error.message || error);
+            server.log([blueWazuh, 'initialize (checkKibanaStatus)', 'error'], error.message || error);
+        }
     };
 
     // Wait until Elasticsearch js is ready
@@ -386,7 +384,7 @@ module.exports = (server, options) => {
             await server.plugins.elasticsearch.waitUntilReady();
             return checkKibanaStatus();
         } catch (error){
-            log('initialize.js checkStatus',error.message || error);
+            log('[initialize] checkStatus',error.message || error);
             server.log([blueWazuh, 'initialize', 'info'], 'Waiting for elasticsearch plugin to be ready...');
             setTimeout(() => checkStatus(), 3000);
         }
@@ -396,7 +394,7 @@ module.exports = (server, options) => {
         // Now, let's see whether they have a 2.x or 3.x version
         let id = wapi_config._id;
         wapi_config = wapi_config._source;
-        log('initialize.js reachAPI', 'Reaching ' + wapi_config.manager,'info')
+        log('[initialize] reachAPI', 'Reaching ' + wapi_config.manager,'info')
         server.log([blueWazuh, 'reindex', 'info'], 'Reaching ' + wapi_config.manager);
         let decoded_password = Buffer.from(wapi_config.api_password, 'base64').toString("ascii");
         if (wapi_config.cluster_info === undefined) { // No cluster_info in the API configuration data -> 2.x version
@@ -406,7 +404,7 @@ module.exports = (server, options) => {
                 rejectUnauthorized: !wapi_config.insecure
             })
                 .then(response => {
-                    log('initialize.js reachAPI', 'API is reachable ' + wapi_config.manager,'info')
+                    log('[initialize] reachAPI', 'API is reachable ' + wapi_config.manager,'info')
                     server.log([blueWazuh, 'reindex', 'info'], 'API is reachable ' + wapi_config.manager);
                     if (parseInt(response.body.error) === 0 && response.body.data) {
                         needle('get', `${wapi_config.url}:${wapi_config.api_port}/cluster/status`, {}, { // Checking the cluster status
@@ -430,7 +428,7 @@ module.exports = (server, options) => {
                                                     wapi_config.cluster_info.node = response.body.data.node;
                                                     wapi_config.cluster_info.cluster = response.body.data.cluster;
                                                 } else if (response.body.error) {
-                                                    log('initialize.js reachAPI', response.body.error || response.body);
+                                                    log('[initialize] reachAPI', response.body.error || response.body);
                                                     server.log([blueWazuh, 'reindex', 'error'], 'Could not get cluster/node information for ', wapi_config.manager);
                                                 }
                                             });
@@ -459,25 +457,25 @@ module.exports = (server, options) => {
                                         }
                                     })
                                         .then(resp => {
-                                            log('initialize.js reachAPI', 'Successfully updated proper cluster information for ' + wapi_config.manager,'info')
+                                            log('[initialize] reachAPI', 'Successfully updated proper cluster information for ' + wapi_config.manager,'info')
                                             server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated proper cluster information for ' + wapi_config.manager);
                                         })
                                         .catch(error => {
-                                            log('initialize.js reachAPI', error.message || error);
+                                            log('[initialize] reachAPI', error.message || error);
                                             server.log([blueWazuh, 'reindex', 'error'], 'Could not update proper cluster information for ' + wapi_config.manager + 'due to ' + err);
                                         });
                                 } else {
-                                    log('initialize.js reachAPI', 'Could not get cluster/status information for ' + wapi_config.manager)
+                                    log('[initialize] reachAPI', 'Could not get cluster/status information for ' + wapi_config.manager)
                                     server.log([blueWazuh, 'reindex', 'error'], 'Could not get cluster/status information for ' + wapi_config.manager);
                                 }
                             });
                     } else {
-                        log('initialize.js reachAPI', 'The API responded with some kind of error for ' + wapi_config.manager)
+                        log('[initialize] reachAPI', 'The API responded with some kind of error for ' + wapi_config.manager)
                         server.log([blueWazuh, 'reindex', 'error'], 'The API responded with some kind of error for ' + wapi_config.manager);
                     }
                 })
                 .catch(error => {
-                    log('initialize.js reachAPI', error.message || error);
+                    log('[initialize] reachAPI', error.message || error);
                     server.log([blueWazuh, 'reindex', 'info'], 'API is NOT reachable ' + wapi_config.manager);
                     // We weren't able to reach the API, reorganize data and fill with sample node and cluster name information
                     wzWrapper.updateWazuhIndexDocument(id, {
@@ -496,17 +494,17 @@ module.exports = (server, options) => {
                         }
                     })
                     .then(resp => {
-                        log('initialize.js reachAPI',  'Successfully updated sample cluster information for ' + wapi_config.manager,'info')
+                        log('[initialize] reachAPI',  'Successfully updated sample cluster information for ' + wapi_config.manager,'info')
                         server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated sample cluster information for ' + wapi_config.manager);
                     })
                     .catch(error => {
-                        log('initialize.js reachAPI', error.message || error);
+                        log('[initialize] reachAPI', error.message || error);
                         server.log([blueWazuh, 'reindex', 'error'], 'Could not update sample cluster information for ' + wapi_config.manager + 'due to ' + err);
                     });
                 });
         } else { // 3.x version
             // Nothing to be done, cluster_info is present
-            log('initialize.js reachAPI',  'Nothing to be done for ' + wapi_config.manager + ' as it is already a 3.x version.' + wapi_config.manager,'info')   
+            log('[initialize] reachAPI',  'Nothing to be done for ' + wapi_config.manager + ' as it is already a 3.x version.' + wapi_config.manager,'info')   
             server.log([blueWazuh, 'reindex', 'info'], 'Nothing to be done for ' + wapi_config.manager + ' as it is already a 3.x version.');
         }
     };
@@ -514,7 +512,7 @@ module.exports = (server, options) => {
     // Reindex a .wazuh index from 2.x-5.x or 3.x-5.x to .wazuh and .wazuh-version in 3.x-6.x
     const reindexOldVersion = async () => {
         try {
-            log('initialize.js reindexOldVersion',  `Old version detected. Proceeding to reindex.`,'info')  
+            log('[initialize] reindexOldVersion',  `Old version detected. Proceeding to reindex.`,'info')  
             server.log([blueWazuh, 'reindex', 'info'], `Old version detected. Proceeding to reindex.`);
     
             const configuration = {
@@ -530,13 +528,13 @@ module.exports = (server, options) => {
             // Backing up .wazuh index
             await wzWrapper.reindexWithCustomConfiguration(configuration);
 
-            log('initialize.js reindexOldVersion',  'Successfully backed up .wazuh index','info')  
+            log('[initialize] reindexOldVersion',  'Successfully backed up .wazuh index','info')  
             // And...this response does not take into acount new index population so...let's wait for it
             server.log([blueWazuh, 'reindex', 'info'], 'Successfully backed up .wazuh index');
             setTimeout(() => swapIndex(), 3000);
 
         } catch(error) {
-            log('initialize.js reindexOldVersion', error.message || error);
+            log('[initialize] reindexOldVersion', error.message || error);
             server.log([blueWazuh, 'reindex', 'error'], 'Could not begin the reindex process: ' + error.message || error);
         }
     };
@@ -544,7 +542,7 @@ module.exports = (server, options) => {
     const swapIndex = async () => {
         try {
             // Deleting old .wazuh index
-            log('initialize.js swapIndex', 'Deleting old .wazuh index','info');
+            log('[initialize][swapIndex]', 'Deleting old .wazuh index','info');
             server.log([blueWazuh, 'reindex', 'info'], 'Deleting old .wazuh index.');
 
             await wzWrapper.deleteIndexByName('.wazuh');
@@ -563,7 +561,7 @@ module.exports = (server, options) => {
                 }
             };
 
-            log('initialize.js swapIndex', 'Reindexing into the new .wazuh','info');
+            log('[initialize][swapIndex]', 'Reindexing into the new .wazuh','info');
             server.log([blueWazuh, 'reindex', 'info'], 'Reindexing into the new .wazuh');
             // Reindexing from .old-wazuh where the type of document is wazuh-configuration into the new index .wazuh
             await wzWrapper.reindexWithCustomConfiguration(configuration);
@@ -573,7 +571,7 @@ module.exports = (server, options) => {
             setTimeout(() => reachAPIs(), 3000);
 
         } catch(error) {
-            log('initialize.js swapIndex', error.message || error);
+            log('[initialize][swapIndex]', error.message || error);
             server.log([blueWazuh, 'reindex', 'error'], 'Could not reindex the new .wazuh: ' + error.message || error);
         }
     };
@@ -586,7 +584,7 @@ module.exports = (server, options) => {
                 reachAPI(item);
             }
         } catch(error){
-            log('initialize.js reachAPIs', error.message || error);
+            log('[initialize][reachAPIs]', error.message || error);
             server.log([blueWazuh, 'reindex', 'error'], 'Something happened while getting old API configuration data: ' + error.message || error);
         }
     };
