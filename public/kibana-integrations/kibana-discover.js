@@ -333,6 +333,8 @@ function discoverController(
 
             /** Start of "Prevents from double agent" */
             if($rootScope.agentsAutoCompleteFired){
+              $rootScope.agentsAutoCompleteFired = false;
+              if(!$rootScope.$$phase) $rootScope.$digest();
               let agentsIncluded = [];
               // Get all filters related to agent.id and store them on an array
               queryFilter.getFilters().filter(item => {
@@ -349,8 +351,6 @@ function discoverController(
                   // Clear the temporary array
                   agentsIncluded = [];
               }
-              $rootScope.agentsAutoCompleteFired = false;
-              if(!$rootScope.$$phase) $rootScope.$digest();
             }
             /** End of "Prevents from double agent" */
 
@@ -950,7 +950,15 @@ function discoverController(
           );
         }
       }
-      queryFilter.addFilters(implicitFilter);
+      const cleaned = [];
+      for(const filter of implicitFilter){
+        const tmp = queryFilter.getFilters().filter(item => item.meta.params.query === filter.meta.params.query && 
+                                                item.meta.params.type === filter.meta.params.type &&
+                                                item.meta.key === filter.meta.key );
+        if(!tmp.length) cleaned.push(filter);
+      }
+
+      queryFilter.addFilters(cleaned);
     }
   }
 
