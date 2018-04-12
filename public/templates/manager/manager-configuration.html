@@ -87,6 +87,24 @@
             </md-card>
             <!-- END ROOTCHECK -->
 
+            <!-- SYSCOLLECTOR -->
+            <md-card flex class="no-margin-left wz-md-card" ng-show="managerConfiguration.syscollector">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('syscollector')" tooltip="Click to see more details" tooltip-placement="right">Syscollector</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.disabled">
+                        <span flex>Disabled</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.syscollector.disabled}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.scan_on_start">
+                        <span flex>Scan on start</span>
+                        <span flex class="wz-text-right color-grey">{{managerConfiguration.syscollector.scan_on_start}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END SYSCOLLECTOR -->
+
             <!-- LOGCOLLECTOR -->
             <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.logcollector">
                 <md-card-content>
@@ -529,6 +547,41 @@
                 </md-card-content>
             </md-card>
             <!-- END RULESET -->
+
+            <!-- SYSCOLLECTOR -->
+            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'syscollector'">
+                <md-card-content>
+                    <!-- Section title -->
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-laptop"></i> Syscollector</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <!-- Main settings -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.disabled">
+                        <span flex="25">Disabled</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.disabled}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.interval">
+                        <span flex="25">Interval</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.interval}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.scan_on_start">
+                        <span flex="25">Scan on start</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.scan_on_start}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.hardware">
+                        <span flex="25">Hardware</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.hardware}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.os">
+                        <span flex="25">OS</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.os}}</span>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.packages">
+                        <span flex="25">Packages</span>
+                        <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.packages}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- END SYSCOLLECTOR -->
 
             <!-- LOGCOLLECTOR -->
             <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'logcollector'">
