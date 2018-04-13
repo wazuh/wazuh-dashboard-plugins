@@ -1,5 +1,5 @@
 require('ui/modules').get('app/wazuh', [])
-.service('patternHandler', function ($rootScope, $route, $location, genericReq, courier, appState, errorHandler) {
+.service('patternHandler', function ($rootScope, $location, genericReq, appState, errorHandler) {
     return {
         getPatternList: async () => {
             try {
