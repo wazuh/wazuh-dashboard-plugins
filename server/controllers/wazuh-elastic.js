@@ -235,7 +235,7 @@ class WazuhElastic {
 
     async deleteVis (req, res) {
         try {
-            await this.wzWrapper.refreshIndexByName('.kibana');
+            await this.wzWrapper.refreshIndexByName(this.wzWrapper.WZ_KIBANA_INDEX);
 
             const tmp = await this.wzWrapper.deleteVisualizationByDescription(req.params.timestamp);
 
@@ -257,7 +257,7 @@ class WazuhElastic {
             let body = '';
             for (let element of app_objects) {
             	// Bulk action (you define index, doc and id)
-                body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-' + timestamp + '" } }\n';
+                body += '{ "index":  { "_index": "' + this.wzWrapper.WZ_KIBANA_INDEX + '", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-' + timestamp + '" } }\n';
 
                 // Stringify and replace index-pattern for visualizations
                 let aux_source = JSON.stringify(element._source);
@@ -299,7 +299,6 @@ class WazuhElastic {
 
             const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
             const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
-            //const refreshingKibana = await this.wzWrapper.refreshIndexByName('.kibana');
             return res({acknowledge: true, output: output });
             
         } catch(error){

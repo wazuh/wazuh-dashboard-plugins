@@ -319,10 +319,10 @@ module.exports = (server, options) => {
         }
     };
 
-    // Check Elasticsearch Server status and .kibana index presence
+    // Check Elasticsearch Server status and Kibana index presence
     const checkElasticsearchServer = async () => {
         try {
-            const data = await wzWrapper.checkIfIndexExists('.kibana');
+            const data = await wzWrapper.checkIfIndexExists(wzWrapper.WZ_KIBANA_INDEX);
 
             if (data) {
                 const pluginsData = await server.plugins.elasticsearch.waitUntilReady();

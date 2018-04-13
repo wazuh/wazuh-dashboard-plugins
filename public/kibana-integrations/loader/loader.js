@@ -78,7 +78,7 @@ const VisualizeLoaderProvider = ($compile, $rootScope, savedVisualizations) => {
      * @param {Element} element The DOM element to render the visualization into.
      *    You can alternatively pass a jQuery element instead.
      * @param {String} id The id of the saved visualization. This is the id of the
-     *    saved object that is stored in the .kibana index.
+     *    saved object that is stored in the Kibana index.
      * @param {VisualizeLoaderParams} params A list of parameters that will influence rendering.
      *
      * @return {Promise.<EmbeddedVisualizeHandler>} A promise that resolves to the

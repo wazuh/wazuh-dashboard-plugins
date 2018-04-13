@@ -3,6 +3,13 @@ const knownFields = require('../integration-files/known-fields');
 class ElasticWrapper{
     constructor(server){
         this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
+        this.WZ_KIBANA_INDEX = server && 
+                               server.registrations && 
+                               server.registrations.kibana &&
+                               server.registrations.kibana.options &&
+                               server.registrations.kibana.options.index ?
+                               server.registrations.kibana.options.index :
+                               '.kibana'
     }
 
     /**
@@ -15,7 +22,7 @@ class ElasticWrapper{
             if(!id) return Promise.reject(new Error('No valid id for search index pattern'))
             
             const data = await this.elasticRequest.callWithInternalUser('search', {
-                index: '.kibana',
+                index: this.WZ_KIBANA_INDEX,
                 type: 'doc',
                 body: {
                     "query": {
@@ -60,7 +67,7 @@ class ElasticWrapper{
             if(!title) return Promise.reject(new Error('No valid title for create index pattern'))
 
             const data = await this.elasticRequest.callWithInternalUser('create', {
-                index: '.kibana',
+                index: this.WZ_KIBANA_INDEX,
                 type: 'doc',
                 id: id ? id : 'index-pattern:' + title,
                 body: {
@@ -90,7 +97,7 @@ class ElasticWrapper{
             if(!title) return Promise.reject(new Error('No valid title for create index pattern'))
 
             const data = await this.elasticRequest.callWithInternalUser('create', { 
-                index: '.kibana', 
+                index: this.WZ_KIBANA_INDEX, 
                 type: 'doc', 
                 id: id ? id : 'index-pattern:' + title,
                 body: {
@@ -173,12 +180,12 @@ class ElasticWrapper{
     }
 
     /**
-     * Get all the index patterns stored on .kibana index
+     * Get all the index patterns 
      */
     async getAllIndexPatterns(){
         try {
             const data = await this.elasticRequest.callWithInternalUser('search', {
-                index: '.kibana',
+                index: this.WZ_KIBANA_INDEX,
                 type: 'doc',
                 body: {
                     "query":{
@@ -198,7 +205,7 @@ class ElasticWrapper{
     }
 
     /**
-     * Updates .kibana index known fields
+     * Updates index-pattern known fields
      * @param {*} patternId 'index-pattern:' + id
      */
     async updateIndexPatternKnownFields(id) {
@@ -208,7 +215,7 @@ class ElasticWrapper{
             const newFields = JSON.stringify(knownFields);
 
             const data = await this.elasticRequest.callWithInternalUser('update', {
-                index: '.kibana',
+                index: this.WZ_KIBANA_INDEX,
                 type: 'doc',
                 id: id.includes('index-pattern:') ? id : 'index-pattern:' + id,
                 body: {
@@ -510,7 +517,7 @@ class ElasticWrapper{
             if(!description) return Promise.reject(new Error('No description given'))
 
             const data = await this.elasticRequest.callWithInternalUser('deleteByQuery', {
-                index: '.kibana',
+                index: this.WZ_KIBANA_INDEX,
                 body: 
                     retroactive ? 
                     {
@@ -539,7 +546,7 @@ class ElasticWrapper{
             if(!description) return Promise.reject(new Error('No description given'))
 
             const data = await this.elasticRequest.callWithInternalUser('search', {
-                index: '.kibana',
+                index: this.WZ_KIBANA_INDEX,
                 body: {
                     query: { bool: { must: { match: { 'visualization.description': description } } } },
                     size : 9999
@@ -554,14 +561,14 @@ class ElasticWrapper{
     }
 
     /**
-     * Make a bulk request to update the .kibana index
+     * Make a bulk request to update the Kibana index
      * @param {*} bulk 
      */
     async pushBulkToKibanaIndex(bulk) {
         try {
             if(!bulk) return Promise.reject(new Error('No bulk given'))
 
-            const data = await this.elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: bulk });
+            const data = await this.elasticRequest.callWithInternalUser('bulk', { index: this.WZ_KIBANA_INDEX, body: bulk });
 
             return data;
         } catch (error) {
@@ -646,11 +653,11 @@ class ElasticWrapper{
     }
 
     /**
-     * Creates the .kibana index with minimum content
+     * Creates the Kibana index with minimum content
      */
     async createEmptyKibanaIndex(){
         try {
-            const data = await this.elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
+            const data = await this.elasticRequest.callWithInternalUser('indices.create', { index: this.WZ_KIBANA_INDEX })
             
             return data;
  
@@ -695,7 +702,7 @@ class ElasticWrapper{
     async deleteMonitoring(){
         try {
             const data = await this.elasticRequest.callWithInternalUser('delete', { 
-                index: '.kibana', 
+                index: this.WZ_KIBANA_INDEX, 
                 type: 'doc',
                 id: 'index-pattern:wazuh-monitoring-*' 
             });
@@ -716,7 +723,7 @@ class ElasticWrapper{
             if(!id) return Promise.reject(new Error('No valid id given'))
 
             const data = await this.elasticRequest.callWithInternalUser('get', {
-                index: '.kibana',
+                index: this.WZ_KIBANA_INDEX,
                 type:  'doc',
                 id: id.includes('index-pattern:') ? id : 'index-pattern:' + id
             });

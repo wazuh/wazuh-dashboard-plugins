@@ -11,11 +11,11 @@ const knownFields = require('./integration-files/known-fields')
 const ElasticWrapper = require('./lib/elastic-wrapper');
 
 module.exports = (server, options) => {
-
-    log('[initialize]', 'Initializing', 'info');
-
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
+    log('[initialize]', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');
+    server.log([blueWazuh, 'initialize', 'info'], `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`);
+
     let objects = {};
     let app_objects = {};
     let kibana_template = {};
@@ -306,14 +306,17 @@ module.exports = (server, options) => {
     };
 
     const createKibanaTemplate = () => {
-        log('[initialize][createKibanaTemplate]', 'Creating template for .kibana.','info')
-        server.log([blueWazuh, 'initialize', 'info'], 'Creating template for .kibana.');
+        log('[initialize][createKibanaTemplate]', `Creating template for ${wzWrapper.WZ_KIBANA_INDEX}`,'info')
+        server.log([blueWazuh, 'initialize', 'info'], `Creating template for ${wzWrapper.WZ_KIBANA_INDEX}`);
 
         try {
             kibana_template = require(KIBANA_TEMPLATE);
+            console.log(kibana_template.template)
+            kibana_template.template = wzWrapper.WZ_KIBANA_INDEX + '*'
+            console.log(kibana_template.template)
         } catch (error) {
             log('[initialize][createKibanaTemplate]', error.message || error);
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the .kibana template file.');
+            server.log([blueWazuh, 'initialize', 'error'], `Could not read the ${wzWrapper.WZ_KIBANA_INDEX} template file.`);
             server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + error.message || error);
         }
 
@@ -325,32 +328,32 @@ module.exports = (server, options) => {
     const createEmptyKibanaIndex = async () => {
         try {
             await wzWrapper.createEmptyKibanaIndex()
-            log('[initialize][checkKibanaStatus]', 'Successfully created .kibana index.','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
+            log('[initialize][checkKibanaStatus]', `Successfully created ${wzWrapper.WZ_KIBANA_INDEX} index.`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Successfully created ${wzWrapper.WZ_KIBANA_INDEX} index.`);
             await init();
             return;
         } catch (error) {
-            return Promise.reject(new Error(`Error creating .kibana index due to ${error.message || error}`))
+            return Promise.reject(new Error(`Error creating ${wzWrapper.WZ_KIBANA_INDEX} index due to ${error.message || error}`))
         }
     }
 
     const fixKibanaTemplate = async () => {
         try {
             await createKibanaTemplate();
-            log('[initialize][checkKibanaStatus]', 'Successfully created .kibana template.','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana template.');
+            log('[initialize][checkKibanaStatus]', `Successfully created ${wzWrapper.WZ_KIBANA_INDEX} template.`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Successfully created ${wzWrapper.WZ_KIBANA_INDEX} template.`);
             await createEmptyKibanaIndex();
             return;
         } catch (error) {
-            return Promise.reject(new Error(`Error creating template for .kibana due to ${error.message || error}`))
+            return Promise.reject(new Error(`Error creating template for ${wzWrapper.WZ_KIBANA_INDEX} due to ${error.message || error}`))
         }
     }
 
     const getTemplateByName = async () => {
         try {
             await wzWrapper.getTemplateByName('wazuh-kibana')
-            log('[initialize][checkKibanaStatus]', 'No need to create the .kibana template, already exists.','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'No need to create the .kibana template, already exists.');
+            log('[initialize][checkKibanaStatus]', `No need to create the ${wzWrapper.WZ_KIBANA_INDEX} template, already exists.`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `No need to create the ${wzWrapper.WZ_KIBANA_INDEX} template, already exists.`);
             await createEmptyKibanaIndex();
             return;
         } catch (error) {
@@ -359,17 +362,17 @@ module.exports = (server, options) => {
         }
     }
 
-    // Does .kibana index exist?
+    // Does Kibana index exist?
     const checkKibanaStatus = async () => {
         try {
-            const data = await wzWrapper.checkIfIndexExists('.kibana');
+            const data = await wzWrapper.checkIfIndexExists(wzWrapper.WZ_KIBANA_INDEX);
             if (data) { 
                 // It exists, initialize!
                 await init();
             } else { 
-                // No .kibana index created...
-                log('[initialize][checkKibanaStatus]', 'Didn\'t find .kibana index...','info')
-                server.log([blueWazuh, 'initialize', 'info'], "Didn't find .kibana index...");
+                // No Kibana index created...
+                log('[initialize][checkKibanaStatus]', 'Didn\'t find ' + wzWrapper.WZ_KIBANA_INDEX + ' index...','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Didn\'t find ' + wzWrapper.WZ_KIBANA_INDEX + ' index...');
                 await getTemplateByName();
             }
         } catch (error) {
