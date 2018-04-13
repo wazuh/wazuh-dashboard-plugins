@@ -7,6 +7,9 @@ module.exports = (server, options) => {
     // Get index patterns list
     server.route({ method: 'GET', path: '/get-list', handler: (req,res) => ctrl.getlist(req,res) });
 
+    // Refresh known fields for specific index pattern
+    server.route({ method: 'GET', path: '/refresh-fields/{pattern}', handler: (req,res) => ctrl.refreshIndex(req,res) });
+
     // Create visualizations specified in 'tab' parameter with the 'timestamp' sufix and applying to 'pattern'
     server.route({ method: 'GET', path: '/api/wazuh-elastic/create-vis/{tab}/{timestamp}/{pattern}', handler: (req,res) => ctrl.createVis(req,res) });
 

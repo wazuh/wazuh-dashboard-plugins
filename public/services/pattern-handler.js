@@ -26,6 +26,7 @@ require('ui/modules').get('app/wazuh', [])
         changePattern: async selectedPattern => {
             try {
                 appState.setCurrentPattern(selectedPattern);
+                await genericReq.request('GET',`/refresh-fields/${selectedPattern}`,{})
                 return appState.getCurrentPattern();
             } catch (error) {
                 errorHandler.handle(error,'Pattern Handler (changePattern)');

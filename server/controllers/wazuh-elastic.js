@@ -306,6 +306,19 @@ class WazuhElastic {
         }
     }
 
+    async refreshIndex (req,res) {
+        try {
+            if(!req.params.pattern) throw new Error('Missing parameters');
+
+            const output = await this.wzWrapper.updateIndexPatternKnownFields(req.params.pattern);
+            
+            return res({acknowledge: true, output: output });
+
+        } catch(error){
+            return res({error:error.message || error}).code(500);
+        }
+    }
+
 }
 
 module.exports = WazuhElastic;
