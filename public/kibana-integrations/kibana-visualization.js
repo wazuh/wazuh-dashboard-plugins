@@ -9,7 +9,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, $location, savedVisualizations, genericReq) {
+            controller: function VisController($scope, $rootScope, $location, savedVisualizations, genericReq, errorHandler) {
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
@@ -70,6 +70,12 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                                     
                                     $rootScope.ownHandlers.push(visHandler);
                                     visHandler.addRenderCompleteListener(renderComplete);
+                                }).catch(error => {
+                                    if(error && error.message && error.message.includes('not locate that index-pattern-field')){
+                                        errorHandler.handle(`${error.message}, please restart Kibana and refresh this page once done`,'Visualize')
+                                    } else {
+                                        errorHandler.handle(error,'Visualize')
+                                    }
                                 });     
                             }
                         } else if (rendered) { // There's a visualization object -> just update its filters
