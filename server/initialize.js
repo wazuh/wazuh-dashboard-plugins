@@ -121,6 +121,7 @@ module.exports = (server, options) => {
             }
 
             for(const item of list){
+                if(item.title.includes('wazuh-monitoring-*') || item.id.includes('wazuh-monitoring-*')) continue;
                 log('[initialize][checkKnownFields]', `Refreshing known fields for "index-pattern:${item.title}"`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Refreshing known fields for "index-pattern:${item.title}"`);
                 await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id);
@@ -534,8 +535,9 @@ module.exports = (server, options) => {
 
     const reachAPI = async config => {
         try {
+            const id = config._id;
             config = config._source;
-
+            config.id = id;
             log('[initialize][reachAPI]', `Reaching ${config.manager}`,'info')
             server.log([blueWazuh, 'reindex', 'info'], `Reaching ${config.manager}`);
 
