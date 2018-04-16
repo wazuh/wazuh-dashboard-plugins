@@ -12,8 +12,8 @@ module.exports = server => {
             if(abort < 3) {
                 const date = new Date();
                 date.setTime(date.getTime() - (60 * 60 * 1000))
-                await wzWrapper.deleteVisualizationByDescription(date.getTime(),true);
-                log('vis-deletion-cron.js',`Deleted visualizations with a timestamp lower than ${date.getTime()}`,'info');
+                const output = await wzWrapper.deleteVisualizationByDescription(date.getTime(),true);
+                if(output && output.deleted > 0) log('vis-deletion-cron.js',`Deleted ${output.deleted} visualizations with a timestamp lower than ${date.getTime()}`,'info');
                 return;
             } 
         } catch (error) {
@@ -21,7 +21,6 @@ module.exports = server => {
             log('vis-deletion-cron.js', error.message || error);
         }
     }
-
     // Runs clean function each hour
     cron.schedule('0 0 * * * *',clean, true);
 
