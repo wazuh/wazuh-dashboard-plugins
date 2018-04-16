@@ -188,16 +188,21 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
             perPage: 10000
         })
         .then(({ savedObjects }) => {
-
-            let currentPattern = '';
-
-            genericReq.request('GET', '/api/wazuh-elastic/current-pattern')
+            
+            genericReq.request('GET', '/get-list')
             .then(data => {
+                let currentPattern = '';
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
-                    currentPattern = data.data.data;
-                    appState.setCurrentPattern(data.data.data);
+                    if(!data.data.data.length){
+                        $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                        $location.search('tab',null);
+                        $location.path('/blank-screen');
+                        return;
+                    }
+                    currentPattern = data.data.data[0].id;
+                    appState.setCurrentPattern(currentPattern);
                 }
 
                 const onlyWazuhAlerts = savedObjects.filter(element => element.id === currentPattern);

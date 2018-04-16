@@ -1,3 +1,9 @@
+/* -------------------------------------------------------------------------- */
+/* ------------------------- Wazuh table stylesheet ------------------------- */
+/* -------------------------------------------------------------------------- */
+
+/* Layout */
+
 .wz-table-no-padding {
     padding: 0px;
 }
@@ -10,65 +16,12 @@
     padding-top: 10px;
 }
 
-.wz-table-size {
-    min-height: 34px;
-    height: auto;
-    align-items: center;
-}
-
-.wz-table-common {
-    height: auto;
-    min-height: 34px;
-    line-height: 20px;
-    padding-top: 0px;
-    padding-left: 15px;
-    align-items: center;
-    box-shadow: 0 1px 0px 2px rgba(0, 0, 0, 0.1);
-}
-
-.wz-table-common:hover {
-    background-color: rgb(0,121,165);
-    color: white;
-}
-
-.wz-table-scroll {
-    overflow: auto;
-    height: 400px;
-}
-
-.wz-table-even {
-    background-color: #fafafa;
-}
-
-.wz-table-odd {
-    background-color: white;
-}
-
-.wz-table-cursor-pointer {
-    cursor: pointer;
-}
-
-.wz-table-active {
-    background-color: rgb(0,121,165);
-    color: white;
-}
-
-.wz-table-ruleset-card-info {
-    background-color: rgb(0,121,165);
-    height: 100%;
-    padding: 0px;
-}
-
 .wz-padding-right-14 {
     padding-right: 14px !important;
 }
 
 .wz-padding-bottom-14 {
     padding-bottom: 14px !important;
-}
-
-.wz-cursor-default {
-    cursor: default !important;
 }
 
 .no-lateral-padding .md-padding {
@@ -81,17 +34,65 @@
     overflow: hidden;
 }
 
-.wz-table-card-active {
-    background-color: rgb(0,121,165) !important;
-    color: white !important;
-}
-
 .wz-table-agents {
     min-height: 34px;
     height: auto;
     padding-top: 10px;
 }
 
+.wz-table-scroll {
+    overflow: auto;
+    height: 400px;
+}
+
+.wz-table-size {
+    min-height: 34px;
+    height: auto;
+    align-items: center;
+}
+
+/* Table styles */
+
+.wz-table-common {
+    height: auto;
+    min-height: 34px;
+    line-height: 20px;
+    padding-top: 0px;
+    padding-left: 15px;
+    align-items: center;
+    box-shadow: 0 1px 0px 2px rgba(0, 0, 0, 0.1);
+}
+
+.wz-table-active,
+.wz-table-common:hover {
+    background-color: rgb(228, 242, 245) !important;
+    color: rgba(0, 0, 0, 0.87);
+}
+
+.wz-table-even {
+    background-color: #fafafa;
+}
+
+.wz-table-odd {
+    background-color: white;
+}
+
+/* Others */
+
+.wz-table-cursor-pointer {
+    cursor: pointer;
+}
+
+.wz-cursor-default {
+    cursor: default !important;
+}
+
+/* Class to indicate the currently active button on Ruleset */
+.wz-ruleset-active {
+    background-color: rgb(0,121,165) !important;
+}
+
+/* Special fix to avoid flex issues on Firefox */
 @-moz-document url-prefix() {
     .mozilla-table-size-85 {max-height: 85vh !important;}
     .mozilla-table-size-99 {max-height: 99vh !important;}

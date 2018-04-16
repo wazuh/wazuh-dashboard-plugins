@@ -330,13 +330,15 @@ function discoverController(
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
-            
+
             /** Start of "Prevents from double agent" */
             if($rootScope.agentsAutoCompleteFired){
+              $rootScope.agentsAutoCompleteFired = false;
+              if(!$rootScope.$$phase) $rootScope.$digest();
               let agentsIncluded = [];
               // Get all filters related to agent.id and store them on an array
               queryFilter.getFilters().filter(item => {
-                  if(typeof item.query.match['agent.id'] !== 'undefined') agentsIncluded.push(item);
+                  if(item && item.query && item.query.match && typeof item.query.match['agent.id'] !== 'undefined') agentsIncluded.push(item);
               });
               // If the array has a length greater than 1 it means that there are more than one agent.id filter
               if(agentsIncluded.length > 1) {
@@ -349,8 +351,6 @@ function discoverController(
                   // Clear the temporary array
                   agentsIncluded = [];
               }
-              $rootScope.agentsAutoCompleteFired = false;
-              if(!$rootScope.$$phase) $rootScope.$digest();
             }
             /** End of "Prevents from double agent" */
 
@@ -950,8 +950,15 @@ function discoverController(
           );
         }
       }
+      const cleaned = [];
+      for(const filter of implicitFilter){
+        const tmp = queryFilter.getFilters().filter(item => item.meta.params.query === filter.meta.params.query && 
+                                                item.meta.params.type === filter.meta.params.type &&
+                                                item.meta.key === filter.meta.key );
+        if(!tmp.length) cleaned.push(filter);
+      }
 
-      queryFilter.addFilters(implicitFilter);
+      queryFilter.addFilters(cleaned);
     }
   }
 
@@ -965,6 +972,7 @@ function discoverController(
 
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
+
     if ($location.search().tabView !=  $scope.tabView) { // No need to change the filters
       if ($scope.tabView !== "discover") { // Should do this the first time, to avoid the squeezing of the visualization
         $scope.updateQueryAndFetch($state.query);
@@ -972,19 +980,13 @@ function discoverController(
       $scope.tabView = $location.search().tabView;
     }
     if ($location.search().tab !=  $scope.tab) { // Changing filters
-
       $scope.tab = $location.search().tab;
-      //queryFilter.removeAll();
-      loadFilters();
     }
     
     if ($location.search().agent !=  $scope.agentId) { // Changing filters
-
       $scope.agentId = $location.search().agent;
-
-      //queryFilter.removeAll();
-      loadFilters();
     }
+    if ($location.search().tabView ===  $scope.tabView) loadFilters();
   });
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -785,9 +785,32 @@
                             <span flex="25">Timeout</span>
                             <span class="wz-text-right color-grey">{{item.timeout}}</span>
                         </div>
-                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id">
-                            <span flex="25">Rules ID(s)</span>
+
+                        <!-- Only one rule -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id && item.rule">
+                            <span flex="25">Rule ID</span>
                             <span class="wz-text-right color-grey">{{item.rules_id}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id && item.rule">
+                            <span flex="25">{{item.rule.file}}</span>
+                            <span class="wz-text-right color-grey">{{item.rule.description}}</span>
+                        </div>
+                        <!-- End only one rule -->
+
+                        <!-- More than one rule -->
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id && item.rules">
+                            <span flex="25">Rules IDs</span>
+                            <span class="wz-text-right color-grey">{{item.rules_id}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id && item.rules"  ng-repeat="rule in item.rules">
+                            <span flex="25">{{rule.file}}</span>
+                            <span class="wz-text-right color-grey">{{rule.description}}</span>
+                        </div>
+                        <!-- End More than one rule -->
+
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_group">
+                            <span flex="25">Rules group</span>
+                            <span class="wz-text-right color-grey">{{item.rules_group}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.repeated_offenders">
                             <span flex="25">Repeated offenders</span>

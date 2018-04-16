@@ -2,6 +2,13 @@ const app = require('ui/modules').get('app/wazuh', []);
 import $ from 'jquery';
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, metricService) {
+
+    // Timestamp for visualizations at controller's startup
+    if(!$rootScope.visTimestamp) {
+        $rootScope.visTimestamp = new Date().getTime();
+        if(!$rootScope.$$phase) $rootScope.$digest();
+    }
+
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
@@ -58,7 +65,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         awsRevoked       :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
     }
 
-    // Check the url hash and retrieve the tabView information
+    // Check the url hash and retrieve tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
     } else { // If tabView doesn't exist, default it to 'panels'
@@ -66,7 +73,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $location.search('tabView', 'panels');
     }
 
-    // Check the url hash and retrivew the tab information
+    // Check the url hash and retrieve tab information
     if ($location.search().tab) {
         $scope.tab = $location.search().tab;
     } else { // If tab doesn't exist, default it to 'general'
@@ -135,26 +142,55 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if(!$rootScope.$$phase) $rootScope.$digest();
     }
     
-    checkMetrics($scope.tab, $scope.tabView);
-
     // Switch subtab
     $scope.switchSubtab = subtab => {
         if ($scope.tabView === subtab) return;
 
-        checkMetrics($scope.tab, subtab); 
+        if(subtab === 'panels'){
+            if(!$rootScope.visTimestamp) {
+                $rootScope.visTimestamp = new Date().getTime();
+                if(!$rootScope.$$phase) $rootScope.$digest();
+            }
+    
+            // Create current tab visualizations
+            genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+            .then(() => {
+                // Render visualizations
+                $rootScope.$broadcast('updateVis');
+                checkMetrics($scope.tab, 'panels');
+            })
+            .catch(error => errorHandler.handle(error, 'Overview'));
+        } else {
+            checkMetrics($scope.tab, subtab); 
+        }
     }
 
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-        checkMetrics(tab, 'panels');
 
-        // Deleting app state traces in the url
-        $location.search('_a', null);
+        if(!$rootScope.visTimestamp) {
+            $rootScope.visTimestamp = new Date().getTime();
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+
+        // Create current tab visualizations
+        genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+        .then(() => {
+
+            // Render visualizations
+            $rootScope.$broadcast('updateVis');
+
+            checkMetrics(tab, 'panels');
+
+            // Deleting app state traces in the url
+            $location.search('_a', null);
+
+        })
+        .catch(error => errorHandler.handle(error, 'Overview'));
     };
 
-    // Watchers
-
+    // Watch tabView
     $scope.$watch('tabView', () => {
         $location.search('tabView', $scope.tabView);
 
@@ -168,6 +204,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.loadedVisualizations = [];
     });
 
+    // Watch tab
     $scope.$watch('tab', () => {
 
         $location.search('tab', $scope.tab);
@@ -199,6 +236,19 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if(metricService.hasItems()) metricService.destroyWatchers();
 
         $rootScope.ownHandlers = [];
+    });
+
+    // Create visualizations for controller's first execution
+    genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+    .then(() => {
+
+        // Render visualizations
+        $rootScope.$broadcast('updateVis');
+
+        checkMetrics($scope.tab, $scope.tabView);
+    })
+    .catch(error => {
+        errorHandler.handle(error, 'Overview');
     });
 
     //PCI tab

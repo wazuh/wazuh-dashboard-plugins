@@ -15,7 +15,7 @@
     <div layout="column" layout-align="start stretch">
 
         <!-- First-time welcome card -->
-        <md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api' && apiEntries.length == 0">
+        <md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api' && !load && apiEntries.length == 0">
             <md-card-content>
                 <span class="wz-headline-title">Welcome to the Wazuh App for Kibana 6</span>
                 <md-divider class="wz-margin-top-10"></md-divider>

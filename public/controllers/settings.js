@@ -129,11 +129,11 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         try {
             const patternList = await genericReq.request('GET','/get-list',{});
             $scope.indexPatterns = patternList.data.data;
-             
+
             if(!patternList.data.data.length){
                 $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
                 $location.search('tab',null);
-                $location.path('/blank-screen');   
+                $location.path('/blank-screen');
                 return;
             }
             const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
@@ -248,7 +248,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                     extensions  : tmpData.extensions
                 }
             };
-            console.log($scope.apiEntries)
             $scope.apiEntries.push(newEntry);
             $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
 
@@ -402,7 +401,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     $scope.changeIndexPattern = async newIndexPattern => {
         try {
-            const data = await genericReq.request('GET', `/api/wazuh-elastic/updatePattern/${newIndexPattern}`);
             appState.setCurrentPattern(newIndexPattern);
             $scope.$emit('updatePattern', {});
             errorHandler.info('Successfully changed the default index-pattern','Settings');

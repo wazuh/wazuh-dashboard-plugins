@@ -50,7 +50,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 text = `There seem to be a problem with Wazuh app visualizations in Kibana, please reinstall the Wazuh app.`;
                 break;
             case 'elasticsearch_down':
-                text = `Could not find .kibana index on Elasticsearch or maybe Elasticsearch is down.<br>Please check it and try again.`;
+                text = `Could not find Kibana index on Elasticsearch or maybe Elasticsearch is down.<br>Please check it and try again.`;
                 break;
             case 'no_elasticsearch':
                 text = `Could not connect with elasticsearch, maybe it's down.`;
