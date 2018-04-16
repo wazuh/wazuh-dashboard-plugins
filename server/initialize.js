@@ -273,7 +273,7 @@ module.exports = (server, options) => {
             try{                
                 await wzWrapper.getWazuhVersionIndex();
             } catch (error) {
-                log('[initialize][checkWazuhVersionIndex]', error.message || error);
+                log('[initialize][checkWazuhVersionIndex]','.wazuh-version document does not exist. Initializating configuration...','info');
                 server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
     
                 // Save Setup Info
