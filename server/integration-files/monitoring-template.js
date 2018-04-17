@@ -25,6 +25,13 @@ module.exports = {
                 },
                 "id": {
                     "type": "keyword"
+                },
+                "cluster": {
+                    "properties": {
+                        "name": {
+                            "type": "keyword"
+                        }
+                    }
                 }
             }
         }
