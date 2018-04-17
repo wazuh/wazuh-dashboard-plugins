@@ -337,6 +337,7 @@ module.exports = (server, options) => {
                     index: '.kibana',
                     type: 'doc',
                     body: {
+                        "size": 999,
                         "query":{
                             "match":{
                               "type": "index-pattern"
