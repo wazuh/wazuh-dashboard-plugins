@@ -208,12 +208,12 @@ module.exports = (server, options) => {
             let body = '';
             if (agentsArray.length > 0) {
                 let managerName = agentsArray[0].name;
-    
                 for(let element of agentsArray) {
                     body += '{ "index":  { "_index": "' + todayIndex + '", "_type": "wazuh-agent" } }\n';
                     let date              = new Date(Date.now()).toISOString();
-                    element["@timestamp"] = date;
-                    element["host"]       = managerName;
+                    element['@timestamp'] = date;
+                    element.host          = managerName;
+                    element.cluster       = { name: element.cluster && element.cluster.name ? element.cluster.name : 'disabled' } ;
                     body                 += JSON.stringify(element) + "\n";
                 }
                 if (body === '') return;
