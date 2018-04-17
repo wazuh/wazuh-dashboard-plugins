@@ -275,8 +275,6 @@ class WazuhElastic {
                 
                 bulk_content["type"] = element._type;
                 bulk_content.visualization.description = timestamp;
-                if(clusterName && element._source.title.toLowerCase().includes('agents status')){
-                }
                 body += JSON.stringify(bulk_content) + "\n";
             }
             return body;
