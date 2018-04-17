@@ -252,10 +252,15 @@ class WazuhElastic {
      * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
      * @param {*} timestamp Milliseconds timestamp used to identify visualizations batch.
      */
-    buildVisualizationsBulk (app_objects, id, timestamp) {
+    buildVisualizationsBulk (app_objects, id, timestamp,clusterName) {
         try{
             let body = '';
             for (let element of app_objects) {
+                if(clusterName && clusterName.toLowerCase() !== 'disabled' && element._source.title.toLowerCase().includes('agents status')){
+                    if(element._source.kibanaSavedObjectMeta && element._source.kibanaSavedObjectMeta.searchSourceJSON){
+                        element._source.kibanaSavedObjectMeta.searchSourceJSON = `{\"index\":\"wazuh-monitoring-3.x-*\",\"filter\":[{\"meta\":{\"index\":\"wazuh-monitoring-3.x-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"cluster.name\",\"value\":\"${clusterName}\",\"params\":{\"query\":\"${clusterName}\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"cluster.name\":{\"query\":\"${clusterName}\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"language\":\"lucene\",\"query\":\"cluster.name:\\\"${clusterName}\\\"\"}}`
+                    }
+                }
             	// Bulk action (you define index, doc and id)
                 body += '{ "index":  { "_index": "' + this.wzWrapper.WZ_KIBANA_INDEX + '", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-' + timestamp + '" } }\n';
 
@@ -270,7 +275,8 @@ class WazuhElastic {
                 
                 bulk_content["type"] = element._type;
                 bulk_content.visualization.description = timestamp;
-                
+                if(clusterName && element._source.title.toLowerCase().includes('agents status')){
+                }
                 body += JSON.stringify(bulk_content) + "\n";
             }
             return body;
@@ -288,6 +294,9 @@ class WazuhElastic {
             ) {
                 throw new Error('Missing parameters');
             }
+
+            const apiConfig = (req.headers && req.headers.id) ? await this.wzWrapper.getWazuhConfigurationById(req.headers.id) : false;
+            const clusterName = apiConfig && apiConfig.cluster_info ? apiConfig.cluster_info.cluster : false;
             const tabPrefix = req.params.tab.includes('overview') ? 
                               'overview' : req.params.tab.includes('manager') ? 
                               'manager' : 
@@ -297,7 +306,7 @@ class WazuhElastic {
                          require(`../integration-files/visualizations/ruleset/${req.params.tab.split('manager-')[1]}`) :
                          require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
 
-            const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
+            const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp,clusterName);
             const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
             return res({acknowledge: true, output: output });
             
