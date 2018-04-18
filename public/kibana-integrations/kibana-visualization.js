@@ -9,7 +9,7 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, $location, savedVisualizations, genericReq, errorHandler) {
+            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler,Private) {
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
@@ -20,14 +20,16 @@ var app = require('ui/modules').get('apps/webinar_app', [])
                 let visHandler             = null;
                 let renderInProgress       = false;
 
-                const myRender = (query,filters) => {
-                    if (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ) { // There are pending updates from the discover (which is the one who owns the true app state)
+                const myRender = raw => {
+                   
+                    if (raw && (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ) ) { // There are pending updates from the discover (which is the one who owns the true app state)
                         
                         if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
                             renderInProgress = true;
 
                             if ($rootScope.visTimestamp) {
-                                savedVisualizations.get($scope.visID + "-" + $rootScope.visTimestamp).then(savedObj => {
+                                const rawVis = raw.filter(item => item.id === $scope.visID + "-" + $rootScope.visTimestamp);
+                                wzsavedVisualizations.get($scope.visID + "-" + $rootScope.visTimestamp,rawVis[0]).then(savedObj => {
                                     originalImplicitFilter = savedObj.searchSource.get('query')['query'];
                                     visTitle = savedObj.vis.title;
                                     visualization = savedObj;
@@ -105,7 +107,8 @@ var app = require('ui/modules').get('apps/webinar_app', [])
 
                 // Listen for changes
                 $rootScope.$on('updateVis', function (event, query, filters) {
-                    myRender();
+                    if(!$rootScope.$$phase) $rootScope.$digest();
+                    myRender($rootScope.rawVisualizations);
                 });
 
                 var renderComplete = function() {
