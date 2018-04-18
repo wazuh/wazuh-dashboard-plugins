@@ -279,6 +279,42 @@ class WazuhElastic {
         }
     }
 
+    /**
+     * Replaces visualizations main fields to fit a certain pattern.
+     * @param {*} app_objects Object containing raw visualizations.
+     * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
+     * @param {*} timestamp Milliseconds timestamp used to identify visualizations batch.
+     */
+    buildVisualizationsRaw (app_objects, id, timestamp) {
+        try{
+            let visArray = [],bulk_content = {};
+            for (let element of app_objects) {
+            	// Stringify and replace index-pattern for visualizations
+                let aux_source = JSON.stringify(element._source);
+                aux_source = aux_source.replace("wazuh-alerts", id);
+                aux_source = JSON.parse(aux_source);
+
+                // Bulk source
+                bulk_content = {};
+                bulk_content[element._type] = aux_source;
+                
+
+                bulk_content.visualization.description = timestamp;
+                visArray.push({
+                    attributes: bulk_content.visualization,
+                    type:element._type,
+                    id: element._id + '-' + timestamp,
+                    _version: bulk_content.visualization.version
+                });
+                
+                
+            }
+            return visArray;
+        } catch (error) {
+            return (error.message || error);
+        }
+    }
+
     async createVis (req, res) {
         try {
             if(!req.params.pattern || 
@@ -297,9 +333,10 @@ class WazuhElastic {
                          require(`../integration-files/visualizations/ruleset/${req.params.tab.split('manager-')[1]}`) :
                          require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
 
-            const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
-            const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
-            return res({acknowledge: true, output: output });
+            //const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
+            //const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
+            const raw      = await this.buildVisualizationsRaw(file,req.params.pattern,req.params.timestamp);
+            return res({acknowledge: true, raw: raw });
             
         } catch(error){
             return res({error:error.message || error}).code(500);
