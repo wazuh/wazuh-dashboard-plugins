@@ -228,7 +228,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     });
 
     $scope.$on('$destroy', () => {
-
+        $rootScope.rawVisualizations = null;
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();

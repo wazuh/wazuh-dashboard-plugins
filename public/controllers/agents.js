@@ -113,6 +113,7 @@ app.controller('agentsController',
         $scope.switchSubtab = subtab => {
             if($scope.tabView === subtab) return;
             if(subtab === 'panels' && $scope.tab !== 'configuration'){
+                $rootScope.rawVisualizations = null;
                 if(!$rootScope.visTimestamp) {
                     $rootScope.visTimestamp = new Date().getTime();
                     if(!$rootScope.$$phase) $rootScope.$digest();
@@ -120,8 +121,8 @@ app.controller('agentsController',
         
                 // Create current tab visualizations
                 genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-                .then(() => {
-        
+                .then(data => {
+                    $rootScope.rawVisualizations = data.data.raw;
                     // Render visualizations
                     $rootScope.$broadcast('updateVis');
         
@@ -142,10 +143,11 @@ app.controller('agentsController',
                 if(!$rootScope.$$phase) $rootScope.$digest();
             }
             if(tab !== 'configuration') {
+                $rootScope.rawVisualizations = null;
                 // Create current tab visualizations
                 genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-                .then(() => {
-        
+                .then(data => {
+                    $rootScope.rawVisualizations = data.data.raw;
                     // Render visualizations
                     $rootScope.$broadcast('updateVis');
         
@@ -360,6 +362,7 @@ app.controller('agentsController',
 
         //Destroy
         $scope.$on("$destroy", () => {
+            $rootScope.rawVisualizations = null;
             $scope.agentsAutoComplete.reset();
             if($rootScope.ownHandlers) {
                 for(let h of $rootScope.ownHandlers){
@@ -468,10 +471,11 @@ app.controller('agentsController',
         }
         /** End of agent configuration */
         if($scope.tab !== 'configuration'){
+            $rootScope.rawVisualizations = null;
             // Create visualizations for controller's first execution
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-            .then(() => {
-
+            .then(data => {
+                $rootScope.rawVisualizations = data.data.raw;
                 // Render visualizations
                 $rootScope.$broadcast('updateVis');
         

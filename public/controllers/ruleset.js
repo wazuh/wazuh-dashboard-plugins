@@ -58,8 +58,9 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
 
     const load = async () => {
         try {
-            await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-        
+            $rootScope.rawVisualizations = null;
+            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+            $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');
             if(!$rootScope.$$phase) $rootScope.$digest();
@@ -96,6 +97,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
 
     //Destroy
     $scope.$on('$destroy', () => {
+        $rootScope.rawVisualizations = null;
         $scope.rules.reset();
         if($rootScope.ownHandlers){
             for(let h of $rootScope.ownHandlers){
@@ -202,8 +204,9 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
 
     const load = async () => {
         try {
-            await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-        
+            $rootScope.rawVisualizations = null;
+            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+            $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');
             if(!$rootScope.$$phase) $rootScope.$digest();
