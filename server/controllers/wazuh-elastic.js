@@ -1,5 +1,4 @@
-const ElasticWrapper = require('../lib/elastic-wrapper');
-
+import { ElasticWrapper } from '../lib/elastic-wrapper';
 const fs   = require('fs');
 const yml  = require('js-yaml');
 const path = require('path');

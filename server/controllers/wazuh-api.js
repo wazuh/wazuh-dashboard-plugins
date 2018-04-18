@@ -4,7 +4,7 @@ const needle = require('needle');
 
 // External references 
 const fetchAgentsExternal = require('../monitoring');
-const ElasticWrapper      = require('../lib/elastic-wrapper');
+import { ElasticWrapper } from '../lib/elastic-wrapper';
 const getPath             = require('../../util/get-path');
 
 // Colors for console logging 
@@ -15,7 +15,7 @@ const fs   = require('fs');
 const yml  = require('js-yaml');
 const path = require('path');
 
-const pciRequirementsFile = '../integration-files/pci-requirements';
+import pciRequirementsFile from '../integration-files/pci-requirements';
 
 let packageInfo;
 
@@ -242,12 +242,12 @@ class WazuhApi {
         try {
             
             if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
-            const pciRequirements = require(pciRequirementsFile);
+
             let pci_description = '';
 
             if (req.params.requirement === 'all') {
                 if(!req.headers.id) {
-                    return reply(pciRequirements);
+                    return reply(pciRequirementsFile);
                 }
                 let wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.headers.id);
 
@@ -268,7 +268,7 @@ class WazuhApi {
                 if(response.body.data && response.body.data.items){
                     let PCIobject = {};
                     for(let item of response.body.data.items){
-                        if(typeof pciRequirements[item] !== 'undefined') PCIobject[item] = pciRequirements[item];
+                        if(typeof pciRequirementsFile[item] !== 'undefined') PCIobject[item] = pciRequirementsFile[item];
                     }
                     return reply(PCIobject);
                 } else {
@@ -276,8 +276,8 @@ class WazuhApi {
                 }
               
             } else {
-                if (typeof pciRequirements[req.params.requirement] !== 'undefined'){
-                    pci_description = pciRequirements[req.params.requirement];
+                if (typeof pciRequirementsFile[req.params.requirement] !== 'undefined'){
+                    pci_description = pciRequirementsFile[req.params.requirement];
                 }
                 
                 return reply({

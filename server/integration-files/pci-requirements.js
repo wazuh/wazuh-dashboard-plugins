@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	"1.1.1": "A formal process for approving and testing all network connections and changes to the firewall and router configurations",
 	"1.3.4": "Do not allow unauthorized outbound traffic from the cardholder data environment to the Internet.",
 	"1.4": "Install personal firewall software or equivalent functionality on any portable computing devices (including company and/or employee-owned) that connect to the Internet when outside the network (for example, laptops used by employees), and which are also used to access the CDE. Firewall (or equivalent) configurations include:<br><ul><li>Specific configuration settings are defined.</li><li>Personal firewall (or equivalent functionality) is actively running.</li><li>Personal firewall (or equivalent functionality) is not alterable by users of the portable computing devices.</li></ul>",

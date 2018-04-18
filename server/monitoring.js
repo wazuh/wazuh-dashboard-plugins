@@ -4,7 +4,7 @@ const getPath        = require('../util/get-path');
 const colors         = require('ansicolors');
 const blueWazuh      = colors.blue('wazuh');
 const { log }        = require('./logger');
-const ElasticWrapper = require('./lib/elastic-wrapper');
+import { ElasticWrapper } from './lib/elastic-wrapper';
 const index_pattern  = "wazuh-monitoring-3.x-*";
 const index_prefix   = "wazuh-monitoring-3.x-";
 

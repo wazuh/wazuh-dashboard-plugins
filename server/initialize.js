@@ -7,8 +7,8 @@ const path = require('path');
 const { log } = require('./logger');
 
 const KIBANA_TEMPLATE = './integration-files/kibana-template';
-const knownFields = require('./integration-files/known-fields')
-const ElasticWrapper = require('./lib/elastic-wrapper');
+import knownFields from './integration-files/known-fields';
+import { ElasticWrapper } from './lib/elastic-wrapper';
 
 module.exports = (server, options) => {
     // Elastic JS Client
