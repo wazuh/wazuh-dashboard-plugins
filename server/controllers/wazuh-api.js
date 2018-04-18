@@ -116,7 +116,7 @@ class WazuhApi {
                 });
             }
         } catch(error){
-            server.log([blueWazuh, 'wazuh-api', 'error'], error.message || error);
+            console.log(error.message || error);
             if(error.code === 'ECONNREFUSED'){
                 wapi_config.password = '****'
                 wapi_config.apiIsDown = true;
@@ -435,9 +435,8 @@ class WazuhApi {
     postErrorLog (req, reply) {
 
         if (!req.payload.message) {
-            server.log([blueWazuh, 'server', 'error'], 'Error logging failed:');
-            server.log([blueWazuh, 'server', 'error'], 
-                       'You must provide at least one error message to log');
+            console.log('Error logging failed:');
+            console.log('You must provide at least one error message to log');
 
             return reply({
                 'statusCode': 500,
@@ -446,9 +445,9 @@ class WazuhApi {
         
         } else {
             
-            server.log([blueWazuh, 'client', 'error'], req.payload.message);
+            console.log( req.payload.message);
             if (req.payload.details) {
-                server.log([blueWazuh, 'client', 'error'], req.payload.details);
+                console.log( req.payload.details);
             }
 
             return reply({ statusCode: 200, message: 'Error logged succesfully' });
