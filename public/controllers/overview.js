@@ -2,7 +2,7 @@ const app = require('ui/modules').get('app/wazuh', []);
 import $ from 'jquery';
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, metricService) {
-
+    $rootScope.rawVisualizations = null;
     // Timestamp for visualizations at controller's startup
     if(!$rootScope.visTimestamp) {
         $rootScope.visTimestamp = new Date().getTime();
@@ -147,6 +147,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if ($scope.tabView === subtab) return;
 
         if(subtab === 'panels'){
+            $rootScope.rawVisualizations = null;
             if(!$rootScope.visTimestamp) {
                 $rootScope.visTimestamp = new Date().getTime();
                 if(!$rootScope.$$phase) $rootScope.$digest();
@@ -154,7 +155,8 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-            .then(() => {
+            .then(data => {
+                $rootScope.rawVisualizations = data.data.raw;
                 // Render visualizations
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
@@ -168,7 +170,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-
+        $rootScope.rawVisualizations = null;
         if(!$rootScope.visTimestamp) {
             $rootScope.visTimestamp = new Date().getTime();
             if(!$rootScope.$$phase) $rootScope.$digest();
@@ -176,8 +178,8 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
         // Create current tab visualizations
         genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-        .then(() => {
-
+        .then(data => {
+            $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');
 
@@ -240,8 +242,8 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     // Create visualizations for controller's first execution
     genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-    .then(() => {
-
+    .then(data => {
+        $rootScope.rawVisualizations = data.data.raw;
         // Render visualizations
         $rootScope.$broadcast('updateVis');
 
