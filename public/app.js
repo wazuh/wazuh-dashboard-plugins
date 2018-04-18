@@ -33,6 +33,7 @@ require('ui/chrome');
 require('plugins/wazuh/kibana-integrations/kibana-visualization.js');
 require('plugins/wazuh/kibana-integrations/kibana-filter-bar.js');
 require('plugins/wazuh/kibana-integrations/kibana-discover.js');
+require('plugins/wazuh/kibana-integrations/saved-visualizations.js');
 
 // Require services
 require('plugins/wazuh/services/error-handler.js');
