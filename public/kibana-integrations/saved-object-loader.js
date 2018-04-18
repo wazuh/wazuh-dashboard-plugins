@@ -1,0 +1,164 @@
+import _ from 'lodash'
+import { Scanner } from 'ui/utils/scanner';
+import { StringUtils } from 'ui/utils/string_utils';
+import { SavedObjectsClient } from 'ui/saved_objects';
+import { SavedObjectProvider } from './saved-objects';
+import { SavedObject } from './saved-object-class';
+export class SavedObjectLoader {
+  constructor(SavedObjectClass, kbnIndex, kbnUrl, $http, chrome ) {
+    this.type = SavedObjectClass.type;
+    this.Class = SavedObjectClass;
+    this.lowercaseType = this.type.toLowerCase();
+    this.kbnIndex = kbnIndex;
+    this.kbnUrl = kbnUrl;
+    this.chrome = chrome;
+
+    this.scanner = new Scanner($http, {
+      index: kbnIndex,
+      type: this.lowercaseType
+    });
+
+    this.loaderProperties = {
+      name: `${ this.lowercaseType }s`,
+      noun: StringUtils.upperFirst(this.type),
+      nouns: `${ this.lowercaseType }s`,
+    };
+
+    this.savedObjectsClient = new SavedObjectsClient({
+      $http
+    });
+  }
+
+  async processFunc (newSavedObject) {
+      return newSavedObject;
+  } 
+
+  /**
+   * Retrieve a saved object by id. Returns a promise that completes when the object finishes
+   * initializing.
+   * @param id
+   * @returns {Promise<SavedObject>}
+   */
+  get(id,raw) {
+
+    const newSavedObject = new SavedObject(raw.id,raw.type,raw._version,raw.attributes);
+    const instance = new this.Class(id);
+    instance.init = _.once(() => {
+        // ensure that the esType is defined
+       
+        return Promise.resolve()
+          .then(() => {
+            // If there is not id, then there is no document to fetch from elasticsearch
+            if (!instance.id) {
+              // just assign the defaults and be done
+              _.assign(instance, instance.defaults);
+              return instance.hydrateIndexPattern().then(() => {
+                return afterESResp.call(instance);
+              });
+            }
+  
+            // fetch the object from ES
+            //return this.savedObjectsClient.get('visualization', instance.id)
+            return this.processFunc(newSavedObject)
+              .then(resp => {
+  
+                return {
+                  _id: newSavedObject.id,
+                  _type: newSavedObject.type,
+                  _source: _.cloneDeep(newSavedObject.attributes),
+                  found: newSavedObject._version ? true : false
+                };
+              })
+              .then(instance.applyESResp)
+              .catch(instance.applyEsResp);
+          })
+          //.then(() => customInit.call(instance))
+          .then(() => instance);
+      })
+    const object = instance.init();
+    return object;
+  }
+
+  urlFor(id) {
+    return this.kbnUrl.eval(`#/${ this.lowercaseType }/{{id}}`, { id: id });
+  }
+
+  delete(ids) {
+    ids = !Array.isArray(ids) ? [ids] : ids;
+
+    const deletions = ids.map(id => {
+      const savedObject = new this.Class(id);
+      return savedObject.delete();
+    });
+
+    return Promise.all(deletions).then(() => {
+      if (this.chrome) {
+        this.chrome.untrackNavLinksForDeletedSavedObjects(ids);
+      }
+    });
+  }
+
+  /**
+   * Updates source to contain an id and url field, and returns the updated
+   * source object.
+   * @param source
+   * @param id
+   * @returns {source} The modified source object, with an id and url field.
+   */
+  mapHitSource(source, id) {
+    source.id = id;
+    source.url = this.urlFor(id);
+    return source;
+  }
+
+  scanAll(queryString, pageSize = 1000) {
+    return this.scanner.scanAndMap(queryString, {
+      pageSize,
+      docCount: Infinity
+    });
+  }
+
+  /**
+   * Updates hit.attributes to contain an id and url field, and returns the updated
+   * attributes object.
+   * @param hit
+   * @returns {hit.attributes} The modified hit.attributes object, with an id and url field.
+   */
+  mapSavedObjectApiHits(hit) {
+    return this.mapHitSource(hit.attributes, hit.id);
+  }
+
+  /**
+   * TODO: Rather than use a hardcoded limit, implement pagination. See
+   * https://github.com/elastic/kibana/issues/8044 for reference.
+   *
+   * @param searchString
+   * @param size
+   * @returns {Promise}
+   */
+  findAll(search = '', size = 100) {
+    return this.savedObjectsClient.find(
+      {
+        type: this.lowercaseType,
+        search: search ? `${search}*` : undefined,
+        perPage: size,
+        page: 1,
+        searchFields: ['title^3', 'description']
+      }).then((resp) => {
+      return {
+        total: resp.total,
+        hits: resp.savedObjects
+          .map((savedObject) => this.mapSavedObjectApiHits(savedObject))
+      };
+    });
+  }
+
+  find(search = '', size = 100) {
+    return this.findAll(search, size).then(resp => {
+      return {
+        total: resp.total,
+        hits: resp.hits.filter(savedObject => !savedObject.error)
+      };
+    });
+  }
+}
