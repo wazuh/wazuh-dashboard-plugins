@@ -3,7 +3,6 @@ import { Scanner } from 'ui/utils/scanner';
 import { StringUtils } from 'ui/utils/string_utils';
 import { SavedObjectsClient } from 'ui/saved_objects';
 import { SavedObjectProvider } from './saved-objects';
-import { SavedObject } from './saved-object-class';
 export class SavedObjectLoader {
   constructor(SavedObjectClass, kbnIndex, kbnUrl, $http, chrome ) {
     this.type = SavedObjectClass.type;
@@ -29,8 +28,9 @@ export class SavedObjectLoader {
     });
   }
 
-  async processFunc (newSavedObject) {
-      return newSavedObject;
+  // Fake async function, only to resolve a promise
+  async processFunc () {
+      return;
   } 
 
   /**
@@ -40,9 +40,8 @@ export class SavedObjectLoader {
    * @returns {Promise<SavedObject>}
    */
   get(id,raw) {
-
-    const newSavedObject = new SavedObject(raw.id,raw.type,raw._version,raw.attributes);
     const instance = new this.Class(id);
+
     instance.init = _.once(() => {
         // ensure that the esType is defined
        
@@ -56,23 +55,19 @@ export class SavedObjectLoader {
                 return afterESResp.call(instance);
               });
             }
-  
-            // fetch the object from ES
-            //return this.savedObjectsClient.get('visualization', instance.id)
-            return this.processFunc(newSavedObject)
-              .then(resp => {
+              return this.processFunc()
+              .then(() => {
   
                 return {
-                  _id: newSavedObject.id,
-                  _type: newSavedObject.type,
-                  _source: _.cloneDeep(newSavedObject.attributes),
-                  found: newSavedObject._version ? true : false
+                  _id: raw.id,
+                  _type: raw.type,
+                  _source: _.cloneDeep(raw.attributes),
+                  found: raw._version ? true : false
                 };
               })
               .then(instance.applyESResp)
               .catch(instance.applyEsResp);
           })
-          //.then(() => customInit.call(instance))
           .then(() => instance);
       })
     const object = instance.init();
