@@ -312,9 +312,7 @@ module.exports = (server, options) => {
 
         try {
             kibana_template = require(KIBANA_TEMPLATE);
-            console.log(kibana_template.template)
             kibana_template.template = wzWrapper.WZ_KIBANA_INDEX + '*'
-            console.log(kibana_template.template)
         } catch (error) {
             log('[initialize][createKibanaTemplate]', error.message || error);
             server.log([blueWazuh, 'initialize', 'error'], `Could not read the ${wzWrapper.WZ_KIBANA_INDEX} template file.`);
