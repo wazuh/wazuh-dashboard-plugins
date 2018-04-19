@@ -897,28 +897,7 @@ function discoverController(
 
       // Build the full query using the implicit filter
       if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
-        if ($rootScope.currentImplicitFilter === "pci_dss") {
-          implicitFilter.push(
-            {
-              "meta":{
-                "removable":false,
-                "index":$scope.indexPattern.id,
-                "negate":false,
-                "disabled":false,
-                "alias":null,
-                "type":"exists",
-                "key":"rule.pci_dss",
-                "value":"exists"
-              },
-              "exists":{
-                "field":"rule.pci_dss"
-              },
-              "$state":{
-                "store":"appState"
-              }
-            }
-          );
-        } else {
+        if ($rootScope.currentImplicitFilter !== "pci_dss") {
           implicitFilter.push(
             {
               "meta":{
@@ -964,7 +943,7 @@ function discoverController(
         if(!tmp.length) cleaned.push(filter);
       }
 
-      queryFilter.addFilters(cleaned);
+      if(cleaned.length) queryFilter.addFilters(cleaned);
     }
   }
 
