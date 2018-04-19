@@ -2,7 +2,7 @@ const app        = require('ui/modules').get('app/wazuh', []);
 const beautifier = require('plugins/wazuh/utils/json-beautifier');
 
 app.controller('agentsController',
-    function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, metricService) {
+    function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler) {
         // Timestamp for visualizations at controller's startup
         if(!$rootScope.visTimestamp) {
             $rootScope.visTimestamp = new Date().getTime();
@@ -86,22 +86,44 @@ app.controller('agentsController',
             virustotal: { group: 'virustotal' }
         };
 
-        const checkMetrics = (tab, subtab) => {
-            metricService.destroyWatchers();
+        const generateMetric = id => {
+            let html = $(id).html();
+            if (typeof html !== 'undefined' && html.includes('<span')) {
+                if(typeof html.split('<span>')[1] !== 'undefined'){
+                    return html.split('<span>')[1].split('</span')[0];
+                } else if(html.includes('table') && html.includes('cell-hover')){
+                    let nonB = html.split('ng-non-bindable')[1];
+                    if(nonB && 
+                        nonB.split('>')[1] && 
+                        nonB.split('>')[1].split('</')[0]
+                    ) {
+                        return nonB.split('>')[1].split('</')[0];
+                    }
+                }
+            }
+            return '';
+        }
+        
+        const createMetrics = metricsObject => {
+            for(let key in metricsObject) {
+                $scope[key] = () => generateMetric(metricsObject[key]);
+            }
+        }
 
+        const checkMetrics = (tab, subtab) => {
             if(subtab === 'panels'){
                 switch (tab) {
                     case 'audit':
-                        metricService.createWatchers(metricsAudit);
+                        createMetrics(metricsAudit);
                         break;
                     case 'vuls':
-                        metricService.createWatchers(metricsVulnerability);
+                        createMetrics(metricsVulnerability);
                         break;
                     case 'oscap':
-                        metricService.createWatchers(metricsScap);
+                        createMetrics(metricsScap);
                         break;
                     case 'virustotal':
-                        metricService.createWatchers(metricsVirustotal);
+                        createMetrics(metricsVirustotal);
                         break;
                 }
             }
@@ -327,7 +349,6 @@ app.controller('agentsController',
                     h._scope.$destroy();
                 }
             }
-            if(metricService.hasItems()) metricService.destroyWatchers();
             $rootScope.ownHandlers = [];
             $rootScope.comeFrom    = 'agents';
             $location.search('_a',null);
@@ -369,7 +390,6 @@ app.controller('agentsController',
                     h._scope.$destroy();
                 }
             }
-            if(metricService.hasItems()) metricService.destroyWatchers();
             $rootScope.ownHandlers = [];
         });
 

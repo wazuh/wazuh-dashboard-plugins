@@ -44,7 +44,6 @@ require('plugins/wazuh/services/data-handler.js');
 require('plugins/wazuh/services/app-state.js');
 require('plugins/wazuh/services/api-tester.js');
 require('plugins/wazuh/services/pattern-handler.js');
-require('plugins/wazuh/services/wz-metric-service.js');
 
 // Set up routes and views
 require('plugins/wazuh/services/routes.js');
