@@ -55,17 +55,21 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Upgrade
 
-Remove the App using kibana-plugin tool
+Remove the App using kibana-plugin tool:
 
-```/usr/share/kibana/bin/kibana-plugin remove wazuh ```
+```bash
+/usr/share/kibana/bin/kibana-plugin remove wazuh
+```
 
-Install the App
+Install the App:
 
-```/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.x.x_6.x.x.zip ```
+```bash
+/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.x.x_6.x.x.zip
+```
 
 ## Contribute
 
-If you want to contribute to our project please don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/wazuh), by sending an email to [wazuh+subscribe@googlegroups.com](mailto:wazuh+subscribe@googlegroups.com), to ask questions and participate in discussions.
+If you want to contribute to our project please read our [contribution guidelines](CONTRIBUTING.md) for this project, and don't hesitate to send a pull request. You can also join our users [mailing list](https://groups.google.com/d/forum/wazuh), by sending an email to [wazuh+subscribe@googlegroups.com](mailto:wazuh+subscribe@googlegroups.com), to ask questions and participate in discussions.
 
 ## Software and libraries used
 
