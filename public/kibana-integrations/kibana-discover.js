@@ -950,21 +950,8 @@ function discoverController(
           );
         }
       }
-      const cleaned = [];
-      for(const filter of implicitFilter){
-        const tmp = queryFilter
-                    .getFilters()
-                    .filter(item => 
-                            item.meta && item.meta.params && item.meta.params.query &&
-                            filter.meta && filter.meta.params && filter.meta.params.query &&
-                            item.meta.params.query === filter.meta.params.query && 
-                            item.meta.params.type  === filter.meta.params.type &&
-                            item.meta.key          === filter.meta.key 
-                    );
-        if(!tmp.length) cleaned.push(filter);
-      }
 
-      queryFilter.addFilters(cleaned);
+      queryFilter.addFilters(implicitFilter);
     }
   }
 
