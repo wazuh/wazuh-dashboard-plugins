@@ -82,7 +82,7 @@ app.controller('agentsController',
             vuls      : { group: 'vulnerability-detector' },
             oscap     : { group: 'oscap' },
             audit     : { group: 'audit' },
-            pci       : { group: 'pci_dss' },
+            pci       : { group: '' },
             virustotal: { group: 'virustotal' }
         };
 

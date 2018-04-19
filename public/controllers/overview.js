@@ -105,7 +105,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         vuls      : { group: 'vulnerability-detector' },
         oscap     : { group: 'oscap' },
         audit     : { group: 'audit' },
-        pci       : { group: 'pci_dss' },
+        pci       : { group: '' },
         aws       : { group: 'amazon' },
         virustotal: { group: 'virustotal' }
     };
