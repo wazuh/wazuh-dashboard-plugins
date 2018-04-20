@@ -152,8 +152,8 @@
                             <div layout="row" class="wz-table-padding-top-10" ng-repeat="(detailk, detailv) in decoder.details">
                                 <span flex ng-if="((detailk !== 'regex') && (detailk !== 'order')) || (detailk === 'regex') || (detailk === 'regex')">{{detailk}}</span>
                                 <span flex class="wz-text-right color-grey" ng-if="(detailk !== 'regex') && (detailk !== 'order')">{{detailv}}</span>
-                                <span flex class="wz-text-right color-grey" ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)">{{colorRegex(detailv)}}</span>
-                                <span flex class="wz-text-right color-grey" ng-if="(detailk === 'regex')" ng-bind-html="colorOrder(detailv)">{{colorOrder(detailv)}}</span>
+                                <span flex class="wz-text-right color-grey" ng-if="(detailk === 'regex')" ng-bind-html="colorRegex(detailv)"></span>
+                                <span flex class="wz-text-right color-grey" ng-if="(detailk === 'order')" ng-bind-html="colorOrder(detailv)"></span>
                             </div>
                         </md-card-content>
                     </md-card>
