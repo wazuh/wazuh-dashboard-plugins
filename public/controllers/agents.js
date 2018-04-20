@@ -285,6 +285,9 @@ app.controller('agentsController',
                 if($scope.tab === 'configuration'){
                     return $scope.getAgentConfig(newAgentId);
                 }
+
+                // Deleting app state traces in the url
+                $location.search('_a', null);
                 let id = null;
 
                 // They passed an id
