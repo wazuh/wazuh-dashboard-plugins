@@ -118,9 +118,7 @@ class WazuhApi {
         } catch(error){
             console.log(error.message || error);
             if(error.code === 'ECONNREFUSED'){
-                wapi_config.password = '****'
-                wapi_config.apiIsDown = true;
-                return reply({ statusCode: 200, data: wapi_config });
+                return reply({ statusCode: 200, data: {password: '****', apiIsDown: true } });
             } else {
                 return reply({
                     statusCode: 500,
