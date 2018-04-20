@@ -48,7 +48,8 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
         let fromElastic = false;
         if (parseInt(data.data.error) === 2){
             errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
-        } else if(data.data.data && data.data.data.apiIsDown){
+        } else if((data.data && (data.data.apiIsDown || data.data.message === 'socket hang up')) || 
+                  (data.data.data && (data.data.data.apiIsDown || data.data.data.message === 'socket hang up'))){
             $rootScope.apiIsDown = "down";
             errorHandler.handle('Wazuh RESTful API seems to be down.','Routes');
         } else {
