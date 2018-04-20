@@ -46,7 +46,7 @@
                 Decoders
             </md-button>
             <div flex="20" layout="column" class="height-41 wz-select-input">
-                <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="decoders.toggleOnlyParents(typeFilter == 'all')" aria-label="Filter by type" ng-init="'All'">
                     <option value="all">All</option>
                     <option value="parents">Parents only</option>
                 </select>
