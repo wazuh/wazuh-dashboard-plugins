@@ -14,7 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed validation regex to accept URLs with non-numeric format ([#353](https://github.com/wazuh/wazuh-kibana-app/pull/353)).
 - Changed visualization removal cron task to avoid excesive log messages when there weren't removed visualizations ([#361](https://github.com/wazuh/wazuh-kibana-app/pull/361)).
 - Changed filters comparison for a safer access ([#383](https://github.com/wazuh/wazuh-kibana-app/pull/383)).
-- Replaced some `server.log` messages to `console.log` to avoid performance errors ([#384](https://github.com/wazuh/wazuh-kibana-app/pull/384)).
+- Removed some `server.log` messages to avoid performance errors ([#384](https://github.com/wazuh/wazuh-kibana-app/pull/384)).
 
 ### Fixed
 - Fixed a bug where several `agent.id` filters were created at the same time when navigating between *Agents* and *Groups* with different selected agents ([#342](https://github.com/wazuh/wazuh-kibana-app/pull/342)).
