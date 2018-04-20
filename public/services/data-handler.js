@@ -13,6 +13,13 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             this.regularBatch = 15;
             this.busy         = false;
             this.end          = false;
+            this.onlyParents  = false;
+        }
+
+        toggleOnlyParents(value){
+            this.onlyParents = !value;
+            this.reset();
+            return this.nextPage();
         }
 
         nextPage () {
@@ -50,7 +57,8 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                 deferred.resolve(true);
                 return;
             }
-            apiReq.request('GET', this.path, requestData)
+            const path = this.onlyParents ? this.path + '/parents' : this.path;
+            apiReq.request('GET', path, requestData)
             .then(data => {
                 if (data.data.data === 0){
                     this.busy = false;
@@ -99,7 +107,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                 name:  filterName,
                 value: value
             });
-            return this.search();
+            return this.search();           
         }
 
         ///////////////////////////////////////////////////////////////
