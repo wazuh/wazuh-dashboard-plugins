@@ -14,7 +14,6 @@ All notable changes to the Wazuh app project will be documented in this file.
   - Also, we've added some changes when using the X-Pack plugin:
     - Better management of users and roles in order to use the app capabilities.
     - Prevents app loading if the currently logged user has no access to any index pattern.
-    - Removed Elasticsearch requests using the internal user, now they use the client.
 - Added the `errorHandler` service to the `dataHandler` factory ([#340](https://github.com/wazuh/wazuh-kibana-app/pull/340)).
 - Added Syscollector section to *Manager/Agents Configuration* tabs ([#359](https://github.com/wazuh/wazuh-kibana-app/pull/359)).
 - Added `cluster.name` field to the `wazuh-monitoring` index ([#377](https://github.com/wazuh/wazuh-kibana-app/pull/377)).
