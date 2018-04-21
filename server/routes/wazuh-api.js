@@ -1,4 +1,4 @@
-import { WazuhApi} from '../controllers/wazuh-api';
+import { WazuhApi } from '../controllers/wazuh-api';
 
 export default (server, options) => {
     const ctrl = new WazuhApi(server);

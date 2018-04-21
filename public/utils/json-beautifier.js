@@ -17,4 +17,4 @@ const prettyPrint = obj => {
         .replace(jsonLine, replacer);
 };
 
-module.exports = { replacer, prettyPrint };
+export default { replacer, prettyPrint };

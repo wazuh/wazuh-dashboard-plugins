@@ -1,4 +1,6 @@
-require('ui/modules').get('app/wazuh', [])
+import * as modules from 'ui/modules'
+
+modules.get('app/wazuh', [])
 .config(function ($mdThemingProvider) {
 
     let kibanaWhiteBlack = {

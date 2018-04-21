@@ -1,5 +1,5 @@
 // Require routes
-let routes = require('ui/routes');
+import routes from 'ui/routes';
 
 // Kibana dependencies to load index-patterns and saved searches
 import { StateProvider } from 'ui/state_management/state';

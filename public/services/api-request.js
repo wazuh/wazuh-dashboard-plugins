@@ -1,6 +1,8 @@
-import chrome from 'ui/chrome';
+import chrome       from 'ui/chrome';
+import * as modules from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
+
 app.service('apiReq', function ($q, $http, genericReq, appState, $location, $rootScope) {
     return {
         request: (method, path, body) => {

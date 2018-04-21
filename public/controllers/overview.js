@@ -1,5 +1,7 @@
-const app = require('ui/modules').get('app/wazuh', []);
-import $ from 'jquery';
+import $            from 'jquery';
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler) {
     $rootScope.rawVisualizations = null;

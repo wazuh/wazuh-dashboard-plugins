@@ -1,4 +1,6 @@
-require('ui/modules').get('app/wazuh', [])
+import * as modules from 'ui/modules'
+
+modules.get('app/wazuh', [])
 .service('patternHandler', function ($rootScope, $location, genericReq, appState, errorHandler) {
     return {
         getPatternList: async () => {

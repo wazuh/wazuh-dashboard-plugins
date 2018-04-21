@@ -1,4 +1,7 @@
-require('ui/modules').get('app/wazuh', []).service('appState', function ($cookies, $window) {
+import * as modules from 'ui/modules'
+
+modules.get('app/wazuh', [])
+.service('appState', function ($cookies, $window) {
     return {
         getExtensions: () => {
             const data = {

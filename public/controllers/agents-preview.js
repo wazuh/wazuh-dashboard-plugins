@@ -1,4 +1,6 @@
-let app = require('ui/modules').get('app/wazuh', []);
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 app.controller('agentsPreviewController', function ($scope, $rootScope, $routeParams, genericReq, apiReq, appState, Agents, $location, errorHandler) {
     $scope.loading     = true;

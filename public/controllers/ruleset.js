@@ -1,4 +1,6 @@
-let app = require('ui/modules').get('app/wazuh', []);
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoComplete, errorHandler, genericReq, appState) {
     // Timestamp for visualizations at controller's startup

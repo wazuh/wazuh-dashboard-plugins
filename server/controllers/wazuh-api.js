@@ -1,21 +1,15 @@
 
 // Require some libraries
-const needle = require('needle');
-
-// External references 
-const fetchAgentsExternal = require('../monitoring');
-import { ElasticWrapper } from '../lib/elastic-wrapper';
-const getPath             = require('../../util/get-path');
-
-// Colors for console logging 
-const colors    = require('ansicolors');
-const blueWazuh = colors.blue('wazuh');
-
-const fs   = require('fs');
-const yml  = require('js-yaml');
-const path = require('path');
-
+import needle              from 'needle';
+import fs                  from 'fs';
+import yml                 from 'js-yaml';
+import path                from 'path';
+import colors              from 'ansicolors';
 import pciRequirementsFile from '../integration-files/pci-requirements';
+import { ElasticWrapper }  from '../lib/elastic-wrapper';
+import getPath             from '../../util/get-path';
+
+const blueWazuh = colors.blue('wazuh');
 
 let packageInfo;
 
@@ -30,6 +24,7 @@ try {
 export class WazuhApi {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
+        this.fetchAgentsExternal = require('../monitoring')(server,{disableCron:true})
     }
 
     async checkStoredAPI (req, reply) {
@@ -420,14 +415,23 @@ export class WazuhApi {
     };
 
     // Fetch agent status and insert it directly on demand
-    fetchAgents (req, reply) {
-        if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
-        fetchAgentsExternal();
-        return reply({
-            'statusCode': 200,
-            'error':      '0',
-            'data':       ''
-        });
+    async fetchAgents (req, reply) {
+        try{
+            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
+            const output = await this.fetchAgentsExternal();
+            return reply({
+                'statusCode': 200,
+                'error':      '0',
+                'data':       '',
+                output
+            });
+        } catch(error){
+            return reply({
+                statusCode: 200,
+                error     : '1',
+                data      : error.message || error
+            }); 
+        }
     }
 
     postErrorLog (req, reply) {

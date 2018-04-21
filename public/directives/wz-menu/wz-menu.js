@@ -1,6 +1,7 @@
 import menuTemplate from './wz-menu.html'
+import * as modules from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);;
 
 app.directive('wzMenu',function(){
     return {

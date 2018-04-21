@@ -1,5 +1,7 @@
-let app = require('ui/modules').get('app/wazuh', []);
-const beautifier = require('plugins/wazuh/utils/json-beautifier');
+import beautifier   from 'plugins/wazuh/utils/json-beautifier';
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController', 

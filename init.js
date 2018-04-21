@@ -9,6 +9,6 @@ export default (server, options) => {
     initialize(server, options);
     wazuhElastic(server, options);
     wazuhApiElastic(server, options);
-    monitoring(server, options);
+    monitoring(server, false);
     wazuhApi(server, options);
 };

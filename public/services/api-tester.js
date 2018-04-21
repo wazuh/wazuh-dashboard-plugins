@@ -1,5 +1,7 @@
-import chrome from 'ui/chrome';
-const app = require('ui/modules').get('app/wazuh', []);
+import chrome       from 'ui/chrome';
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 app.service('testAPI', function ($http, $location, $rootScope, appState, genericReq) {
     return {

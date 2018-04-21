@@ -1,4 +1,5 @@
 import { ElasticWrapper } from '../lib/elastic-wrapper';
+
 const userRegEx  = new RegExp(/^.{3,100}$/);
 const passRegEx  = new RegExp(/^.{3,100}$/); 
 const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/); 

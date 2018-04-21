@@ -1,4 +1,6 @@
-const app = require('ui/modules').get('app/wazuh', []);
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location, Notifier, courier, genericReq, apiReq, appState, testAPI,errorHandler) {
     const checks = {

@@ -1,5 +1,7 @@
-const app        = require('ui/modules').get('app/wazuh', []);
-const beautifier = require('plugins/wazuh/utils/json-beautifier');
+import beautifier   from 'plugins/wazuh/utils/json-beautifier';
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 app.controller('agentsController',
     function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler) {

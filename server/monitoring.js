@@ -1,14 +1,15 @@
-const cron           = require('node-cron');
-const needle         = require('needle');
-const getPath        = require('../util/get-path');
-const colors         = require('ansicolors');
-const blueWazuh      = colors.blue('wazuh');
-import log from './logger';
+import cron               from 'node-cron';
+import needle             from 'needle';
+import getPath            from'../util/get-path';
+import colors             from 'ansicolors';
+import log                from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
-const index_pattern  = "wazuh-monitoring-3.x-*";
-const index_prefix   = "wazuh-monitoring-3.x-";
 
 export default (server, options) => {
+    const blueWazuh      = colors.blue('wazuh');
+    const index_pattern  = "wazuh-monitoring-3.x-*";
+    const index_prefix   = "wazuh-monitoring-3.x-";
+    
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
 
@@ -130,6 +131,7 @@ export default (server, options) => {
                 }
                 await checkAndSaveStatus(apiEntry);
             }
+            return { result: 'ok' }
         } catch(error){
             log('[monitoring][loadCredentials]',error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
@@ -161,7 +163,7 @@ export default (server, options) => {
     };
 
     // fetchAgents on demand
-    const fetchAgents = async () => {
+    const fetchAgentsExternal = async () => {
         try {
             const data = await getConfig();
             return loadCredentials(data);
@@ -351,7 +353,7 @@ export default (server, options) => {
     };
 
     // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
-    checkKibanaStatus();
+    if(!options) checkKibanaStatus();
 
     const cronTask = async () => {
         try {
@@ -364,9 +366,8 @@ export default (server, options) => {
             server.log([blueWazuh, 'monitoring [cronTask]', 'error'], error.message || error)
         }
     }
-    cronTask()
+    if(!options) cronTask()
     // Cron tab for getting agent status.
-    cron.schedule('0 */10 * * * *', cronTask, true);
-
-    module.exports = fetchAgents;
+    if(!options) cron.schedule('0 */10 * * * *', cronTask, true);
+    return fetchAgentsExternal;
 };

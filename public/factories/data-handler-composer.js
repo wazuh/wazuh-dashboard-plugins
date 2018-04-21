@@ -1,4 +1,6 @@
-const app = require('ui/modules').get('app/wazuh', []);
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 /**
  * Main function to build a data handler factory.

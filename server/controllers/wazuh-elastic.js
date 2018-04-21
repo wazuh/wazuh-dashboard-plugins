@@ -1,7 +1,7 @@
 import { ElasticWrapper } from '../lib/elastic-wrapper';
-const fs   = require('fs');
-const yml  = require('js-yaml');
-const path = require('path');
+import fs                 from 'fs';
+import yml                from 'js-yaml';
+import path               from 'path';
 
 export class WazuhElastic {
     constructor(server){

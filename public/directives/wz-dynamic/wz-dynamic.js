@@ -1,4 +1,7 @@
-const app = require('ui/modules').get('app/wazuh', []);
+import * as modules  from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
+
 app.directive('wzDynamic', function($compile) {
     return {
         restrict: 'A',

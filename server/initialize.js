@@ -1,16 +1,16 @@
-const needle = require('needle');
-const colors = require('ansicolors');
-const blueWazuh = colors.blue('wazuh');
-const fs = require('fs');
-const yml = require('js-yaml');
-const path = require('path');
-import log from './logger';
-
-const KIBANA_TEMPLATE = './integration-files/kibana-template';
-import knownFields from './integration-files/known-fields';
+import needle             from 'needle';
+import colors             from 'ansicolors';
+import fs                 from 'fs';
+import yml                from'js-yaml';
+import path               from'path';
+import log                from './logger';
+import knownFields        from './integration-files/known-fields';
 import { ElasticWrapper } from './lib/elastic-wrapper';
 
 export default (server, options) => {
+    const blueWazuh = colors.blue('wazuh');
+    const KIBANA_TEMPLATE = './integration-files/kibana-template';
+
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
     log('[initialize]', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');

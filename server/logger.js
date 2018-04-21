@@ -1,7 +1,9 @@
-const winston = require('winston');
-const fs      = require('fs');
-const path    = require('path');
-let allowed   = false;
+import winston from 'winston';
+import fs      from 'fs';
+import path    from 'path';
+
+let allowed = false;
+
 /** 
  * Checks if ../../wazuh-logs exists. If it doesn't exist, it will be created.
  */
