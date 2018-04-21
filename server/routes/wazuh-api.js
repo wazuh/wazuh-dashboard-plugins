@@ -1,6 +1,6 @@
-const WazuhApi = require('../controllers/wazuh-api');
+import { WazuhApi} from '../controllers/wazuh-api';
 
-module.exports = (server, options) => {
+export default (server, options) => {
     const ctrl = new WazuhApi(server);
 
     // Returns if the wazuh-api configuration is working

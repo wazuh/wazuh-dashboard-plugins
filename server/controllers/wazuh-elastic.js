@@ -3,7 +3,7 @@ const fs   = require('fs');
 const yml  = require('js-yaml');
 const path = require('path');
 
-class WazuhElastic {
+export class WazuhElastic {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
     }
@@ -331,9 +331,7 @@ class WazuhElastic {
             const file = tabPrefix === 'manager' ? 
                          require(`../integration-files/visualizations/ruleset/${req.params.tab.split('manager-')[1]}`) :
                          require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
-
-            //const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp);
-            //const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
+            
             const raw      = await this.buildVisualizationsRaw(file,req.params.pattern,req.params.timestamp);
             return res({acknowledge: true, raw: raw });
             
@@ -356,7 +354,3 @@ class WazuhElastic {
     }
 
 }
-
-module.exports = WazuhElastic;
-
-

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   "order": 0,
   "template": ".kibana*",
   "settings": {

@@ -1,4 +1,4 @@
-module.exports = config => {
+export default config => {
     let path = config.url;
     let protocol;
     if (config.url.startsWith("https://")) {

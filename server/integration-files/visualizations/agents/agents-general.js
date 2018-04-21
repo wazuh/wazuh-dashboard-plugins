@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
 		"_id": "Wazuh-App-Agents-Overview-Top-5-alerts",
 		"_source": {

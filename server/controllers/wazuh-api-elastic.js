@@ -5,7 +5,7 @@ const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/);
 const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/); 
 const portRegEx  = new RegExp(/^[0-9]{2,5}$/); 
 
-class WazuhApiElastic {
+export class WazuhApiElastic {
     constructor(server) {
         this.wzWrapper = new ElasticWrapper(server);
     }
@@ -196,5 +196,3 @@ class WazuhApiElastic {
         }
     }
 }
-
-module.exports = WazuhApiElastic;

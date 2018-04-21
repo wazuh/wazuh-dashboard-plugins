@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     "order": 0,
     "template": "wazuh-monitoring-3.x-*",
     "settings": {

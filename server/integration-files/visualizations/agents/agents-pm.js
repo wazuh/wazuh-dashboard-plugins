@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
 		"_id": "Wazuh-App-Agents-PM-Alerts-over-time",
 		"_source": {

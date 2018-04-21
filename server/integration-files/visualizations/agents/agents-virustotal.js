@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
 		"_id": "Wazuh-App-Agents-Virustotal-Last-Files-Pie",
 		"_type": "visualization",

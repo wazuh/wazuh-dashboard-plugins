@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
 		"_id": "Wazuh-App-Overview-PM-Events-over-time",
 		"_type": "visualization",

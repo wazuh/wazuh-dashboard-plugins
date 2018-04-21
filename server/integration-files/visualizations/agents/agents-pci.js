@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
 	    "_id": "Wazuh-App-Agents-PCI-Requirements",
 	    "_source": {

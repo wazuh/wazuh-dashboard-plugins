@@ -27,7 +27,7 @@ try {
 }
 
 
-class WazuhApi {
+export class WazuhApi {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
     }
@@ -500,5 +500,3 @@ class WazuhApi {
         }
     }
 }
-
-module.exports = WazuhApi;

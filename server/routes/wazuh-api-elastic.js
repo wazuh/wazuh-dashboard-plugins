@@ -1,6 +1,6 @@
-const WazuhApiElastic = require('../controllers/wazuh-api-elastic');
+import { WazuhApiElastic } from '../controllers/wazuh-api-elastic';
 
-module.exports = (server, options) => {  
+export default (server, options) => {  
     const ctrl = new WazuhApiElastic(server);
 
     // Save the given API into elasticsearch

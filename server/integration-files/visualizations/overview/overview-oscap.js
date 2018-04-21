@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
 		"_id": "Wazuh-App-Overview-OSCAP-Last-score",
 		"_source": {

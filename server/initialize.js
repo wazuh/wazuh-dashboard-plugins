@@ -4,13 +4,13 @@ const blueWazuh = colors.blue('wazuh');
 const fs = require('fs');
 const yml = require('js-yaml');
 const path = require('path');
-const { log } = require('./logger');
+import log from './logger';
 
 const KIBANA_TEMPLATE = './integration-files/kibana-template';
 import knownFields from './integration-files/known-fields';
 import { ElasticWrapper } from './lib/elastic-wrapper';
 
-module.exports = (server, options) => {
+export default (server, options) => {
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
     log('[initialize]', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');

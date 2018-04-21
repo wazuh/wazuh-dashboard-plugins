@@ -1,4 +1,4 @@
-module.exports = [
+export default [
 	{
 		"_id": "Wazuh-App-Manager-Ruleset-Decoders-Top-24h-Decoder-name",
 			"_source": {

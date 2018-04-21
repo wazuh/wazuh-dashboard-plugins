@@ -79,7 +79,7 @@ const checkFiles = () => {
  * @param {*} message Message to show
  * @param {*} level Optional, default is 'error'
  */
-const log = (location, message, level) => {
+export default (location, message, level) => {
     initDirectory();
     if(allowed){
         checkFiles();
@@ -91,5 +91,3 @@ const log = (location, message, level) => {
         });
     }
 };
-
-module.exports = { log }

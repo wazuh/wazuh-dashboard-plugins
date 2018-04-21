@@ -1,4 +1,6 @@
-module.exports = (kibana) => new kibana.Plugin({
+import init from './init';
+
+export default kibana => new kibana.Plugin({
     id:      'wazuh',
     name:    'wazuh',
     require: ['kibana', 'elasticsearch'],
@@ -23,5 +25,5 @@ module.exports = (kibana) => new kibana.Plugin({
             }
         }
     },
-    init: require('./init.js')
+    init
 });

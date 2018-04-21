@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
 		"_id": "Wazuh-App-Manager-Ruleset-Rules-Top-24h-Groups",
 		"_source": {

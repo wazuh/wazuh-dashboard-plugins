@@ -3,12 +3,12 @@ const needle         = require('needle');
 const getPath        = require('../util/get-path');
 const colors         = require('ansicolors');
 const blueWazuh      = colors.blue('wazuh');
-const { log }        = require('./logger');
+import log from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
 const index_pattern  = "wazuh-monitoring-3.x-*";
 const index_prefix   = "wazuh-monitoring-3.x-";
 
-module.exports = (server, options) => {
+export default (server, options) => {
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
 

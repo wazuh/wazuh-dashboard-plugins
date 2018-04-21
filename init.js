@@ -1,8 +1,14 @@
 // Imports all modules
-module.exports = (server, options) => {
-    require('./server/initialize')(server, options);
-    require('./server/routes/wazuh-elastic')(server, options);
-    require('./server/routes/wazuh-api-elastic')(server, options);
-    require('./server/monitoring')(server, options);
-    require('./server/routes/wazuh-api')(server, options);
+import initialize      from './server/initialize';
+import wazuhElastic    from './server/routes/wazuh-elastic';
+import wazuhApiElastic from './server/routes/wazuh-api-elastic';
+import monitoring      from './server/monitoring';
+import wazuhApi        from './server/routes/wazuh-api';
+
+export default (server, options) => {
+    initialize(server, options);
+    wazuhElastic(server, options);
+    wazuhApiElastic(server, options);
+    monitoring(server, options);
+    wazuhApi(server, options);
 };

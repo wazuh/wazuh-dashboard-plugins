@@ -1,4 +1,4 @@
-module.exports = err => {
+export default err => {
 
     if(err.data && err.data === 'request_timeout_genericreq' && err.url){
         err['html'] = `The request to ${err.url} took too long and was aborted.`;

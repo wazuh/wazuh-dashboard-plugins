@@ -1,6 +1,6 @@
-const WazuhElastic = require('../controllers/wazuh-elastic');
+import { WazuhElastic } from '../controllers/wazuh-elastic';
 
-module.exports = (server, options) => {
+export default (server, options) => {
     
     const ctrl = new WazuhElastic(server);
 

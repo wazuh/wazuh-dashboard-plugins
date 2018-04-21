@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
 		"_id": "Wazuh-App-Overview-VULS-Alerts-severity-over-time",
 		"_type": "visualization",
