@@ -1,8 +1,8 @@
 // Require CSS
 import 'plugins/wazuh/less/loader';
-
+import * as modules from 'ui/modules'
 // Set up Wazuh app
-const app = require('ui/modules').get('app/wazuh', ['ngCookies', 'ngMaterial']);
+const app = modules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
 app.config(['$compileProvider', function ($compileProvider) {
   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);

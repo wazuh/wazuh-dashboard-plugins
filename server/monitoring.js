@@ -4,6 +4,7 @@ import getPath            from'../util/get-path';
 import colors             from 'ansicolors';
 import log                from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
+import monitoringTemplate from './integration-files/monitoring-template';
 
 export default (server, options) => {
     const blueWazuh      = colors.blue('wazuh');
@@ -273,7 +274,6 @@ export default (server, options) => {
         try {
             log('[monitoring][checkTemplate]', 'Updating wazuh-monitoring template...', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], "Updating wazuh-monitoring template...");
-            const monitoringTemplate = require('./integration-files/monitoring-template');
             const data = await wzWrapper.putMonitoringTemplate(monitoringTemplate);
             return;
         } catch(error){

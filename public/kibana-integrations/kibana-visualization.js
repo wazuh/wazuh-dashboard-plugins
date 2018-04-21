@@ -1,7 +1,8 @@
-import $ from 'jquery';
-const ownLoader = require('./loader/loader-import');
+import $              from 'jquery';
+import * as modules   from 'ui/modules'
+import * as ownLoader from './loader/loader-import'
 
-var app = require('ui/modules').get('apps/webinar_app', [])
+const app = modules.get('apps/webinar_app', [])
     .directive('kbnVis', [function () {
         return {
             restrict: 'E',

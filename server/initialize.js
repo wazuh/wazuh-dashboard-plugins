@@ -1,8 +1,8 @@
 import needle             from 'needle';
 import colors             from 'ansicolors';
 import fs                 from 'fs';
-import yml                from'js-yaml';
-import path               from'path';
+import yml                from 'js-yaml';
+import path               from 'path';
 import log                from './logger';
 import knownFields        from './integration-files/known-fields';
 import { ElasticWrapper } from './lib/elastic-wrapper';
