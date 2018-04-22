@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Kibana plugin definition module
+ * Wazuh app - Module for Kibana plugin definition
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

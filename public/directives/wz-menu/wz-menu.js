@@ -1,3 +1,15 @@
+/*
+ * Wazuh app - Top nav bar directive
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
 import menuTemplate from './wz-menu.html'
 
 const app = require('ui/modules').get('app/wazuh', []);
@@ -45,7 +57,7 @@ app.directive('wzMenu',function(){
                         }
                         appState.setCurrentPattern(currentPattern.data.data[0].id);
                     } else {
-                    
+
                         // If there is current pattern, check if there is some pattern
                         const patternList = await genericReq.request('GET', '/get-list');
 
@@ -60,7 +72,7 @@ app.directive('wzMenu',function(){
                         filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
                         if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
                     }
-                    
+
                     const data = filtered ? filtered : await courier.indexPatterns.get(appState.getCurrentPattern());
                     $scope.theresPattern = true;
                     $scope.currentPattern = data.title;
