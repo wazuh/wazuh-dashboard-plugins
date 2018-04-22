@@ -1,10 +1,22 @@
+/*
+ * Wazuh app - Class for Wazuh-API-Elastic functions
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
 const ElasticWrapper = require('../lib/elastic-wrapper');
 
 const userRegEx  = new RegExp(/^.{3,100}$/);
-const passRegEx  = new RegExp(/^.{3,100}$/); 
-const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/); 
-const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/); 
-const portRegEx  = new RegExp(/^[0-9]{2,5}$/); 
+const passRegEx  = new RegExp(/^.{3,100}$/);
+const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/);
+const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
+const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
 class WazuhApiElastic {
     constructor(server) {
@@ -14,9 +26,9 @@ class WazuhApiElastic {
     async getAPIEntries (req, reply) {
         try {
             const data = await this.wzWrapper.getWazuhAPIEntries();
-                
+
             return reply(data.hits.hits);
- 
+
         } catch(error){
             return reply(error);
         }
@@ -25,9 +37,9 @@ class WazuhApiElastic {
     async deleteAPIEntries (req, reply) {
         try {
             const data = await this.wzWrapper.deleteWazuhAPIEntriesWithRequest(req);
-                
+
             return reply(data);
- 
+
         } catch(error){
             return reply(error);
         }
@@ -38,10 +50,10 @@ class WazuhApiElastic {
 
             // Searching for previous default
             const data = await this.wzWrapper.searchActiveDocumentsWazuhIndex(req);
-    
+
             if (data.hits.total === 1) {
                 await this.wzWrapper.updateWazuhIndexDocument(data.hits.hits[0]._id, { doc: { active: 'false' } });
-            } 
+            }
 
             await this.wzWrapper.updateWazuhIndexDocument(req.params.id, { doc: { active: 'true' } });
 
@@ -61,7 +73,7 @@ class WazuhApiElastic {
             const data = await this.wzWrapper.getWazuhAPIEntries();
 
             return reply(data.hits.hits);
-        
+
         } catch(error){
             return reply(error);
         }
@@ -81,7 +93,7 @@ class WazuhApiElastic {
             return reply({
                 statusCode: 500,
                 error     : 8,
-                message   : `Could not save data in elasticsearch due to ${error.message || error}` 
+                message   : `Could not save data in elasticsearch due to ${error.message || error}`
             }).code(500);
         }
     }
@@ -134,16 +146,16 @@ class WazuhApiElastic {
                     message   : 'Missing data'
                 }).code(400);
             }
-    
+
             const valid = this.validateData(req.payload);
             if(valid) return reply(valid).code(400);
-    
+
             const settings = this.buildSettingsObject(req.payload);
-    
+
             const response = await this.wzWrapper.createWazuhIndexDocument(req,settings);
 
             return reply({ statusCode: 200, message: 'ok', response });
-   
+
         } catch (error){
             return reply({
                 statusCode: 500,
@@ -159,7 +171,7 @@ class WazuhApiElastic {
             await this.wzWrapper.updateWazuhIndexDocument(req.params.id,{ doc: { cluster_info: req.payload.cluster_info }});
 
             return reply({ statusCode: 200, message: 'ok' });
-        
+
         } catch (error) {
             return reply({
                 statusCode: 500,
@@ -178,12 +190,12 @@ class WazuhApiElastic {
                     message   : 'Missing data'
                 }).code(400);
             }
-    
+
             const valid = this.validateData(req.payload);
             if(valid) return reply(valid).code(400);
-    
+
             const settings = this.buildSettingsObject(req.payload);
-    
+
             await this.wzWrapper.updateWazuhIndexDocument(req.payload.id, { doc: settings });
 
             return reply({ statusCode: 200, message: 'ok' });
