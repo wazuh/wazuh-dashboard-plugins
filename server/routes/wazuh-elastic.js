@@ -1,4 +1,4 @@
-import { WazuhElastic } from '../controllers/wazuh-elastic';
+import WazuhElastic from '../controllers/wazuh-elastic';
 
 export default (server, options) => {
     

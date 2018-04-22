@@ -1,9 +1,9 @@
-import { ElasticWrapper } from '../lib/elastic-wrapper';
+import ElasticWrapper     from '../lib/elastic-wrapper';
 import fs                 from 'fs';
 import yml                from 'js-yaml';
 import path               from 'path';
 
-export class WazuhElastic {
+export default class WazuhElastic {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
     }

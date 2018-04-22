@@ -1,30 +1,22 @@
 
 // Require some libraries
-import needle              from 'needle';
-import fs                  from 'fs';
-import yml                 from 'js-yaml';
-import path                from 'path';
-import colors              from 'ansicolors';
-import pciRequirementsFile from '../integration-files/pci-requirements';
-import { ElasticWrapper }  from '../lib/elastic-wrapper';
-import getPath             from '../../util/get-path';
+import needle              from 'needle'
+import fs                  from 'fs'
+import yml                 from 'js-yaml'
+import path                from 'path'
+import colors              from 'ansicolors'
+import pciRequirementsFile from '../integration-files/pci-requirements'
+import ElasticWrapper      from '../lib/elastic-wrapper'
+import getPath             from '../../util/get-path'
+import packageInfo         from '../../package.json'
+import monitoring          from '../monitoring'
 
 const blueWazuh = colors.blue('wazuh');
 
-let packageInfo;
-
-// Read Wazuh app package file
-try {
-    packageInfo = require('../../package.json');
-} catch (e) {
-    console.log('Could not read the Wazuh package file.');
-}
-
-
-export class WazuhApi {
+export default class WazuhApi {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
-        this.fetchAgentsExternal = require('../monitoring')(server,{disableCron:true})
+        this.fetchAgentsExternal = monitoring(server,{disableCron:true})
     }
 
     async checkStoredAPI (req, reply) {

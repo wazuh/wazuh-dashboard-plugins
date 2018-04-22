@@ -1,15 +1,16 @@
-import needle             from 'needle';
-import colors             from 'ansicolors';
-import fs                 from 'fs';
-import yml                from 'js-yaml';
-import path               from 'path';
-import log                from './logger';
-import knownFields        from './integration-files/known-fields';
-import { ElasticWrapper } from './lib/elastic-wrapper';
+import needle             from 'needle'
+import colors             from 'ansicolors'
+import fs                 from 'fs'
+import yml                from 'js-yaml'
+import path               from 'path'
+import log                from './logger'
+import knownFields        from './integration-files/known-fields'
+import ElasticWrapper     from './lib/elastic-wrapper'
+import packageJSON        from '../package.json'
+import kibana_template    from './integration-files/kibana-template'
 
 export default (server, options) => {
     const blueWazuh = colors.blue('wazuh');
-    const KIBANA_TEMPLATE = './integration-files/kibana-template';
 
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
@@ -18,8 +19,6 @@ export default (server, options) => {
 
     let objects = {};
     let app_objects = {};
-    let kibana_template = {};
-    let packageJSON = {};
     let configurationFile = {};
     let pattern = null;
     let forceDefaultPattern = true;
@@ -30,7 +29,7 @@ export default (server, options) => {
         global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
         forceDefaultPattern = (configurationFile && typeof configurationFile['force.default'] !== 'undefined') ? configurationFile['force.default'] : true;
-        packageJSON = require('../package.json');
+
     } catch (e) {
         log('[initialize]', e.message || e);
         server.log([blueWazuh, 'initialize', 'error'], 'Something went wrong while reading the configuration.' + e.message);
@@ -311,7 +310,6 @@ export default (server, options) => {
         server.log([blueWazuh, 'initialize', 'info'], `Creating template for ${wzWrapper.WZ_KIBANA_INDEX}`);
 
         try {
-            kibana_template = require(KIBANA_TEMPLATE);
             kibana_template.template = wzWrapper.WZ_KIBANA_INDEX + '*'
         } catch (error) {
             log('[initialize][createKibanaTemplate]', error.message || error);

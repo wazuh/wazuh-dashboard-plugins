@@ -1,6 +1,6 @@
 import knownFields from '../integration-files/known-fields';
 
-export class ElasticWrapper{
+export default class ElasticWrapper {
     constructor(server){
         this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
         this.WZ_KIBANA_INDEX = server && 

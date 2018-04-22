@@ -1,10 +1,11 @@
-import cron               from 'node-cron';
-import needle             from 'needle';
-import getPath            from'../util/get-path';
-import colors             from 'ansicolors';
-import log                from './logger';
-import { ElasticWrapper } from './lib/elastic-wrapper';
-import monitoringTemplate from './integration-files/monitoring-template';
+import cron               from 'node-cron'
+import needle             from 'needle'
+import getPath            from'../util/get-path'
+import colors             from 'ansicolors'
+import log                from './logger'
+import ElasticWrapper     from './lib/elastic-wrapper'
+import monitoringTemplate from './integration-files/monitoring-template'
+import packageJSON        from '../package.json'
 
 export default (server, options) => {
     const blueWazuh      = colors.blue('wazuh');
@@ -19,15 +20,6 @@ export default (server, options) => {
 
     let fDate         = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
     let todayIndex    = index_prefix + fDate;
-    let packageJSON   = {};
-    
-    // Read Wazuh App package file
-    try {
-        packageJSON = require('../package.json');
-    } catch (error) {
-        log('[monitoring]', error.message || error);
-        server.log([blueWazuh, 'monitoring', 'error'], 'Could not read the Wazuh package file due to ' + error.message || error);
-    }
 
     // Check status and get agent status array
     const checkStatus = async (apiEntry, maxSize, offset) => {

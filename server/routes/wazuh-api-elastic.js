@@ -1,4 +1,4 @@
-import { WazuhApiElastic } from '../controllers/wazuh-api-elastic';
+import WazuhApiElastic from '../controllers/wazuh-api-elastic';
 
 export default (server, options) => {  
     const ctrl = new WazuhApiElastic(server);
