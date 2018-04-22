@@ -28,6 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the way of handling the index patterns list ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
 - Rewritten some false error-level logs to just information-level ones ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
 - Changed some files from JSON to CommonJS for performance improvements ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
+- Replaced some code on the `kibana-discover` directive with a much cleaner statement to avoid issues on the *Agents* tab ([#394](https://github.com/wazuh/wazuh-kibana-app/pull/394)).
 
 ### Fixed
 - Fixed a bug where several `agent.id` filters were created at the same time when navigating between *Agents* and *Groups* with different selected agents ([#342](https://github.com/wazuh/wazuh-kibana-app/pull/342)).
@@ -37,6 +38,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a bug in the shards and replicas settings when the user sets the value to zero (0) ([#358](https://github.com/wazuh/wazuh-kibana-app/pull/358)).
 - Fixed several bugs related to the upgrade process from Wazuh 2.x to the new refactored server ([#363](https://github.com/wazuh/wazuh-kibana-app/pull/363)).
 - Fixed a bug in *Discover/Agents VirusTotal* tabs to avoid conflicts with the `agent.name` field ([#379](https://github.com/wazuh/wazuh-kibana-app/pull/379)).
+- Fixed a bug on the implicit filter in *Discover/Agents PCI* tabs ([#393](https://github.com/wazuh/wazuh-kibana-app/pull/393)).
 
 ### Removed
 - Removed clear API password on `checkPattern` response ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
