@@ -26,34 +26,6 @@
     <!-- Rest of Decoder information -->
     <div layout="column" layout-align="start">
 
-        <!-- Groups section -->
-        <md-card ng-if="currentDecoder.groups.length > 0" flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> Groups</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" layout-align="start start">
-                    <md-button class="md-primary wz-text-link" tooltip="Filter by this group" tooltip-placement="bottom" ng-repeat="item in currentDecoder.groups">
-                        {{item}}
-                    </md-button>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End groups section -->
-
-        <!-- PCI section -->
-        <md-card ng-if="currentDecoder.pci.length > 0" flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> PCI</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" layout-align="start start">
-                    <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentDecoder.pci">
-                        {{item}}
-                    </md-button>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End PCI section -->
-
         <!-- Details section -->
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
