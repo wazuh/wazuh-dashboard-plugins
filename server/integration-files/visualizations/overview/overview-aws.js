@@ -11,6 +11,20 @@
  */
 export default [
     {
+		"_id": "Wazuh-App-Overview-AWS-Metric-Authorize-security",
+		"_source": {
+			"title": "Wazuh App Overview AWS Metric Authorize security",
+			"visState": "{\"title\":\"Wazuh App Overview AWS Metric Authorize security\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":20}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Authorized security groups\"}}]}",
+			"uiStateJSON": "{}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon AND rule.description: *AuthorizeSecurity*\",\"language\":\"lucene\"}}"
+			}
+		},
+		"_type": "visualization"
+	},
+    {
         "_id": "Wazuh-App-Overview-AWS-Metric-Revoke-security",
         "_source": {
             "title": "Wazuh App Overview AWS Metric Revoke security",

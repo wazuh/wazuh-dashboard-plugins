@@ -11,6 +11,22 @@
  */
 export default [
     {
+		"_id": "Wazuh-App-Overview-OSCAP-Last-score",
+		"_source": {
+			"title": "Wazuh App Overview OSCAP Last score",
+			"visState":
+				"{\"title\":\"Wazuh App Overview OSCAP Last score\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"@timestamp\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"data.oscap.scan.score\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+			"uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON":
+					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+			}
+		},
+		"_type": "visualization"
+	},
+    {
         "_id": "Wazuh-App-Overview-OSCAP-Last-agent-scanned",
         "_source": {
             "title": "Wazuh App Overview OSCAP Last agent scanned",

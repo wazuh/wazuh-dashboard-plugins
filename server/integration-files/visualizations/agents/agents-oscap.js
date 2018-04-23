@@ -11,6 +11,22 @@
  */
 export default [
     {
+		"_id": "Wazuh-App-Agents-OSCAP-Higher-score-metric",
+		"_source": {
+			"title": "Wazuh App Agents OSCAP Higher score metric",
+			"visState":
+				"{\"title\":\"Wazuh App Agents OSCAP Higher score metric\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"gauge\",\"gauge\":{\"verticalSplit\":false,\"autoExtend\":false,\"percentageMode\":false,\"gaugeType\":\"Metric\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"None\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":true,\"color\":\"black\"},\"scale\":{\"show\":false,\"labels\":false,\"color\":\"#333\",\"width\":2},\"type\":\"simple\",\"style\":{\"fontSize\":20,\"bgColor\":false,\"labelColor\":false,\"subText\":\"\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"data.oscap.scan.score\",\"customLabel\":\"Higher score\"}}]}",
+			"uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON":
+					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+			}
+		},
+		"_type": "visualization"
+	},
+    {
         "_id": "Wazuh-App-Agents-OSCAP-Lower-score-metric",
         "_source": {
             "title": "Wazuh App Agents OSCAP Lower score metric",

@@ -11,6 +11,21 @@
  */
 export default [
     {
+		"_id": "Wazuh-App-Overview-FIM-Added",
+		"_source": {
+			"title": "Wazuh App Overview FIM Added",
+			"visState": "{\"title\":\"Wazuh App Overview FIM Added\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"colorSchema\":\"Green to Red\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":true,\"color\":\"black\"},\"style\":{\"fontSize\":20,\"bgColor\":false,\"labelColor\":false,\"subText\":\"\"},\"metricColorMode\":\"None\"}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Added\"}}]}",
+			"uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON":
+					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: \\\"syscheck\\\" AND syscheck.event: (added OR readded)\",\"language\":\"lucene\"}}"
+			}
+		},
+		"_type": "visualization"
+	},
+    {
         "_id": "Wazuh-App-Overview-FIM-Modified",
         "_source": {
             "title": "Wazuh App Overview FIM Modified",

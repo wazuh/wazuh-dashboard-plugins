@@ -11,6 +11,22 @@
  */
 export default [
     {
+		"_id": "Wazuh-App-Agents-FIM-Users",
+		"_source": {
+			"title": "Wazuh App Agents FIM Users",
+			"visState":
+				"{\"title\":\"Wazuh App Agents FIM Users\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"syscheck.uname_after\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+			"uiStateJSON": "{}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON":
+					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: syscheck\",\"language\":\"lucene\"}}"
+			}
+		},
+		"_type": "visualization"
+	},
+    {
         "_id": "Wazuh-App-Agents-FIM-Groups",
         "_source": {
             "title": "Wazuh App Agents FIM Groups",

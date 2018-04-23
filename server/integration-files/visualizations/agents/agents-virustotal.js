@@ -11,6 +11,20 @@
  */
 export default [
     {
+		"_id": "Wazuh-App-Agents-Virustotal-Last-Files-Pie",
+		"_type": "visualization",
+		"_source": {
+		  "title": "Wazuh App Agents Virustotal Last Files Pie",
+		  "visState": "{\"title\":\"Wazuh App Agents Virustotal Last Files Pie\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Files\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"data.virustotal.source.file\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+		  "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
+		  "description": "",
+		  "version": 1,
+		  "kibanaSavedObjectMeta": {
+			"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+		  }
+		}
+    },
+    {
         "_id": "Wazuh-App-Agents-Virustotal-Files-Table",
         "_type": "visualization",
         "_source": {
