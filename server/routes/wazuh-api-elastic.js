@@ -9,10 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import WazuhApiElastic from '../controllers/wazuh-api-elastic';
 
-const WazuhApiElastic = require('../controllers/wazuh-api-elastic');
-
-module.exports = (server, options) => {
+export default (server, options) => {  
     const ctrl = new WazuhApiElastic(server);
 
     // Save the given API into elasticsearch

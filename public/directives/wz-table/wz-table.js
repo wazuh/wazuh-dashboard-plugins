@@ -11,8 +11,9 @@
  */
 
 import tableTemplate from './wz-table.html'
+import * as modules  from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
 const colors = [
     '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6

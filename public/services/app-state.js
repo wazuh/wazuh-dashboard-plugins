@@ -9,8 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-require('ui/modules').get('app/wazuh', []).service('appState', function ($cookies, $window) {
+modules.get('app/wazuh', [])
+.service('appState', function ($cookies, $window) {
     return {
         getExtensions: () => {
             const data = {

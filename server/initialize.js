@@ -9,20 +9,20 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import needle             from 'needle'
+import colors             from 'ansicolors'
+import fs                 from 'fs'
+import yml                from 'js-yaml'
+import path               from 'path'
+import log                from './logger'
+import knownFields        from './integration-files/known-fields'
+import ElasticWrapper     from './lib/elastic-wrapper'
+import packageJSON        from '../package.json'
+import kibana_template    from './integration-files/kibana-template'
 
-const needle = require('needle');
-const colors = require('ansicolors');
-const blueWazuh = colors.blue('wazuh');
-const fs = require('fs');
-const yml = require('js-yaml');
-const path = require('path');
-const { log } = require('./logger');
+export default (server, options) => {
+    const blueWazuh = colors.blue('wazuh');
 
-const KIBANA_TEMPLATE = './integration-files/kibana-template';
-const knownFields = require('./integration-files/known-fields')
-const ElasticWrapper = require('./lib/elastic-wrapper');
-
-module.exports = (server, options) => {
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
     log('[initialize]', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');
@@ -30,8 +30,6 @@ module.exports = (server, options) => {
 
     let objects = {};
     let app_objects = {};
-    let kibana_template = {};
-    let packageJSON = {};
     let configurationFile = {};
     let pattern = null;
     let forceDefaultPattern = true;
@@ -42,7 +40,7 @@ module.exports = (server, options) => {
         global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
         forceDefaultPattern = (configurationFile && typeof configurationFile['force.default'] !== 'undefined') ? configurationFile['force.default'] : true;
-        packageJSON = require('../package.json');
+
     } catch (e) {
         log('[initialize]', e.message || e);
         server.log([blueWazuh, 'initialize', 'error'], 'Something went wrong while reading the configuration.' + e.message);
@@ -323,10 +321,7 @@ module.exports = (server, options) => {
         server.log([blueWazuh, 'initialize', 'info'], `Creating template for ${wzWrapper.WZ_KIBANA_INDEX}`);
 
         try {
-            kibana_template = require(KIBANA_TEMPLATE);
-            console.log(kibana_template.template)
             kibana_template.template = wzWrapper.WZ_KIBANA_INDEX + '*'
-            console.log(kibana_template.template)
         } catch (error) {
             log('[initialize][createKibanaTemplate]', error.message || error);
             server.log([blueWazuh, 'initialize', 'error'], `Could not read the ${wzWrapper.WZ_KIBANA_INDEX} template file.`);

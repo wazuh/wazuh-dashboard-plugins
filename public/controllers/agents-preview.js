@@ -9,8 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-let app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
 app.controller('agentsPreviewController', function ($scope, $rootScope, $routeParams, genericReq, apiReq, appState, Agents, $location, errorHandler) {
     $scope.loading     = true;

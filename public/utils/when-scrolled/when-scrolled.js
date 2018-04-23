@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-var app = require('ui/modules').get('app/wazuh', []);
+import * as modules from 'ui/modules';
+const app = modules.get('app/wazuh', []);
 
 app.directive('whenScrolled', function() {
     return function(scope, elm, attr) {

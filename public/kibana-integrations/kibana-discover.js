@@ -1,12 +1,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////       WAZUH             //////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+import * as modules from 'ui/modules'
+import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html'
 
-require('ui/modules').get('app/wazuh', []).directive('kbnDis', [function() {
+modules.get('app/wazuh', []).directive('kbnDis', [function() {
     return {
         restrict: 'E',
         scope: {},
-        template: require('../templates/kibana-template/kibana-discover-template.html')
+        template: discoverTemplate
     }
 }]);
 
@@ -27,15 +29,15 @@ import 'plugins/kibana/discover/styles/main.less';
 import 'ui/doc_table/components/table_row';
 
 // Research added (further checks needed)
-require('ui/doc_table/doc_table.js');
-require('ui/styles/sidebar.less');
-require('ui/styles/table.less');
-require('ui/doc_viewer/doc_viewer.js');
-require('ui/doc_title/doc_title.js');
-require('ui/style_compile/style_compile.js');
-require('ui/registry/doc_views.js');
-require('plugins/kbn_doc_views/kbn_doc_views.js');
-require('ui/tooltip/tooltip.js');
+import 'ui/doc_table/doc_table.js';
+import 'ui/styles/sidebar.less';
+import 'ui/styles/table.less';
+import 'ui/doc_viewer/doc_viewer.js';
+import 'ui/doc_title/doc_title.js';
+import 'ui/style_compile/style_compile.js';
+import 'ui/registry/doc_views.js';
+import 'plugins/kbn_doc_views/kbn_doc_views.js';
+import 'ui/tooltip/tooltip.js';
 import moment from 'moment';
 import rison from 'rison-node';
 import 'ui/pager_control';
@@ -133,29 +135,7 @@ function discoverController(
   $scope.intervalEnabled = function (interval) {
     return interval.val !== 'custom';
   };
-/*
-  $scope.topNavMenu = [{
-    key: 'new',
-    description: 'New Search',
-    run: function () { kbnUrl.change('/discover'); },
-    testId: 'discoverNewButton',
-  }, {
-    key: 'save',
-    description: 'Save Search',
-    template: require('plugins/kibana/discover/partials/save_search.html'),
-    testId: 'discoverSaveButton',
-  }, {
-    key: 'open',
-    description: 'Open Saved Search',
-    template: require('plugins/kibana/discover/partials/load_search.html'),
-    testId: 'discoverOpenButton',
-  }, {
-    key: 'share',
-    description: 'Share Search',
-    template: require('plugins/kibana/discover/partials/share_search.html'),
-    testId: 'discoverShareButton',
-  }];
-  */
+
   $scope.timefilter = timefilter;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

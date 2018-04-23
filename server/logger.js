@@ -9,12 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import winston from 'winston';
+import fs      from 'fs';
+import path    from 'path';
 
-const winston = require('winston');
-const fs      = require('fs');
-const path    = require('path');
-let allowed   = false;
-/**
+let allowed = false;
+
+/** 
  * Checks if ../../wazuh-logs exists. If it doesn't exist, it will be created.
  */
 const initDirectory = () => {
@@ -91,7 +92,7 @@ const checkFiles = () => {
  * @param {*} message Message to show
  * @param {*} level Optional, default is 'error'
  */
-const log = (location, message, level) => {
+export default (location, message, level) => {
     initDirectory();
     if(allowed){
         checkFiles();
@@ -103,5 +104,3 @@ const log = (location, message, level) => {
         });
     }
 };
-
-module.exports = { log }

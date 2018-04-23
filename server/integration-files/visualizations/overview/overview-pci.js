@@ -9,21 +9,21 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-module.exports = [{
-        "_id": "Wazuh-App-Overview-PCI-DSS-Requirements-heatmap",
-        "_source": {
-            "title": "Wazuh App Overview PCI DSS Requirements heatmap",
-            "visState": "{\"title\":\"Wazuh App Overview PCI DSS Requirements heatmap\",\"type\":\"heatmap\",\"params\":{\"type\":\"heatmap\",\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":4,\"colorSchema\":\"Reds\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"linear\",\"defaultYExtents\":false},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"agent.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agents\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"rule.pci_dss\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"PCI DSS Requirements\"}}]}",
-            "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 60\":\"rgb(255,245,240)\",\"60 - 120\":\"rgb(252,187,161)\",\"120 - 180\":\"rgb(251,106,74)\",\"180 - 240\":\"rgb(203,24,29)\"}}}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
-            }
-        },
-        "_type": "visualization"
-    },
+export default [
+    {
+		"_id": "Wazuh-App-Overview-PCI-DSS-Requirements-heatmap",
+		"_source": {
+			"title": "Wazuh App Overview PCI DSS Requirements heatmap",
+			"visState": "{\"title\":\"Wazuh App Overview PCI DSS Requirements heatmap\",\"type\":\"heatmap\",\"params\":{\"type\":\"heatmap\",\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":4,\"colorSchema\":\"Reds\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"linear\",\"defaultYExtents\":false},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"agent.name\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"Agents\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"rule.pci_dss\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"PCI DSS Requirements\"}}]}",
+			"uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 60\":\"rgb(255,245,240)\",\"60 - 120\":\"rgb(252,187,161)\",\"120 - 180\":\"rgb(251,106,74)\",\"180 - 240\":\"rgb(203,24,29)\"}}}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"}}"
+			}
+		},
+		"_type": "visualization"
+	},
     {
         "_id": "Wazuh-App-Overview-PCI-DSS-requirements",
         "_source": {

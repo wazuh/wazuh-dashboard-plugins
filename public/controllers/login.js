@@ -9,10 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
-app.controller('loginController', function ($scope, $rootScope, $location, appState, genericReq, $window) {
+app.controller('loginController', function ($scope, $location, appState, genericReq) {
     $scope.submit = password => {
         genericReq.request('POST', '/api/wazuh-api/wlogin', {password: password})
         .then(data => {

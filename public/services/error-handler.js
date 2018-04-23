@@ -9,8 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
 app.service('errorHandler', function ( Notifier, appState, $location) {
     const notify = new Notifier();

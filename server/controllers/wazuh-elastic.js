@@ -9,14 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import ElasticWrapper     from '../lib/elastic-wrapper';
+import fs                 from 'fs';
+import yml                from 'js-yaml';
+import path               from 'path';
 
-const ElasticWrapper = require('../lib/elastic-wrapper');
+import { AgentsVisualizations, OverviewVisualizations, RulesetVisualizations }  from '../integration-files/visualizations/index'
 
-const fs   = require('fs');
-const yml  = require('js-yaml');
-const path = require('path');
-
-class WazuhElastic {
+export default class WazuhElastic {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
     }
@@ -262,36 +262,31 @@ class WazuhElastic {
      * Replaces visualizations main fields to fit a certain pattern.
      * @param {*} app_objects Object containing raw visualizations.
      * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
-     * @param {*} timestamp Milliseconds timestamp used to identify visualizations batch.
      */
-    buildVisualizationsBulk (app_objects, id, timestamp,clusterName) {
+    buildVisualizationsRaw (app_objects, id) {
         try{
-            let body = '';
+            const visArray = [];
+            let aux_source, bulk_content;
             for (let element of app_objects) {
-                if(clusterName && clusterName.toLowerCase() !== 'disabled' && element._source.title.toLowerCase().includes('agents status')){
-                    if(element._source.kibanaSavedObjectMeta && element._source.kibanaSavedObjectMeta.searchSourceJSON){
-                        element._source.kibanaSavedObjectMeta.searchSourceJSON = `{\"index\":\"wazuh-monitoring-3.x-*\",\"filter\":[{\"meta\":{\"index\":\"wazuh-monitoring-3.x-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"cluster.name\",\"value\":\"${clusterName}\",\"params\":{\"query\":\"${clusterName}\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"cluster.name\":{\"query\":\"${clusterName}\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"language\":\"lucene\",\"query\":\"cluster.name:\\\"${clusterName}\\\"\"}}`
-                    }
-                }
-            	// Bulk action (you define index, doc and id)
-                body += '{ "index":  { "_index": "' + this.wzWrapper.WZ_KIBANA_INDEX + '", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-' + timestamp + '" } }\n';
-
-                // Stringify and replace index-pattern for visualizations
-                let aux_source = JSON.stringify(element._source);
+            	// Stringify and replace index-pattern for visualizations
+                aux_source = JSON.stringify(element._source);
                 aux_source = aux_source.replace("wazuh-alerts", id);
                 aux_source = JSON.parse(aux_source);
 
                 // Bulk source
-                let bulk_content = {};
+                bulk_content = {};
                 bulk_content[element._type] = aux_source;
 
-                bulk_content["type"] = element._type;
-                bulk_content.visualization.description = timestamp;
-                body += JSON.stringify(bulk_content) + "\n";
+                visArray.push({
+                    attributes: bulk_content.visualization,
+                    type      : element._type,
+                    id        : element._id,
+                    _version  : bulk_content.visualization.version
+                });
             }
-            return body;
+            return visArray;
         } catch (error) {
-            return (error.message || error);
+            return Promise.reject(error)
         }
     }
 
@@ -299,8 +294,7 @@ class WazuhElastic {
         try {
             if(!req.params.pattern ||
                !req.params.tab ||
-               !req.params.timestamp ||
-               (req.params.tab && !req.params.tab.includes('manager') && !req.params.tab.includes('overview') && !req.params.tab.includes('agents'))
+               (req.params.tab && !req.params.tab.includes('manager-') && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-'))
             ) {
                 throw new Error('Missing parameters');
             }
@@ -312,14 +306,18 @@ class WazuhElastic {
                               'manager' :
                               'agents';
 
+            const tabSplit = req.params.tab.split('-');
+            const tabSufix = tabPrefix === 'manager' ? tabSplit[2] : tabSplit[1];
+
             const file = tabPrefix === 'manager' ?
-                         require(`../integration-files/visualizations/ruleset/${req.params.tab.split('manager-')[1]}`) :
-                         require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
-
-            const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp,clusterName);
-            const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
-            return res({acknowledge: true, output: output });
-
+                         RulesetVisualizations[tabSufix] :
+                         tabPrefix === 'overview' ?
+                         OverviewVisualizations[tabSufix] :
+                         AgentsVisualizations[tabSufix];
+           
+            const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
+            return res({acknowledge: true, raw: raw });
+            
         } catch(error){
             return res({error:error.message || error}).code(500);
         }
@@ -339,5 +337,3 @@ class WazuhElastic {
     }
 
 }
-
-module.exports = WazuhElastic;

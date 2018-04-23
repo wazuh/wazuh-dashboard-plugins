@@ -9,15 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-let app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoComplete, errorHandler, genericReq, appState) {
-    // Timestamp for visualizations at controller's startup
-    if(!$rootScope.visTimestamp) {
-        $rootScope.visTimestamp = new Date().getTime();
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    }
+app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAutoComplete, errorHandler, genericReq, appState) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
@@ -70,8 +66,9 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
 
     const load = async () => {
         try {
-            await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-
+            $rootScope.rawVisualizations = null;
+            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${appState.getCurrentPattern()}`)
+            $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');
             if(!$rootScope.$$phase) $rootScope.$digest();
@@ -108,6 +105,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
 
     //Destroy
     $scope.$on('$destroy', () => {
+        $rootScope.rawVisualizations = null;
         $scope.rules.reset();
         if($rootScope.ownHandlers){
             for(let h of $rootScope.ownHandlers){
@@ -118,14 +116,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders,DecodersAutoComplete, errorHandler, genericReq, appState) {
-    // Timestamp for visualizations at controller's startup
-    if(!$rootScope.visTimestamp) {
-        $rootScope.visTimestamp = new Date().getTime();
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    }
-
-
+app.controller('decodersController', function ($scope, $rootScope, Decoders, DecodersAutoComplete, errorHandler, genericReq, appState) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
@@ -183,8 +174,9 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
 
     const load = async () => {
         try {
-            await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-
+            $rootScope.rawVisualizations = null;
+            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${appState.getCurrentPattern()}`)
+            $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');
             if(!$rootScope.$$phase) $rootScope.$digest();

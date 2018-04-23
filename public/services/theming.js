@@ -9,9 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-require('ui/modules').get('app/wazuh', [])
-    .config(function($mdThemingProvider) {
+modules.get('app/wazuh', [])
+.config(function ($mdThemingProvider) {
 
         let kibanaWhiteBlack = {
             '50': '#ffffff',

@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-module.exports = config => {
+export default config => {
     let path = config.url;
     let protocol;
     if (config.url.startsWith("https://")) {

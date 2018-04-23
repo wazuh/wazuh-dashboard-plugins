@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-const ElasticWrapper = require('../lib/elastic-wrapper');
+import ElasticWrapper from '../lib/elastic-wrapper';
 
 const userRegEx  = new RegExp(/^.{3,100}$/);
 const passRegEx  = new RegExp(/^.{3,100}$/);
@@ -18,7 +18,7 @@ const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9]{1,300}$/);
 const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
 const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
-class WazuhApiElastic {
+export default class WazuhApiElastic {
     constructor(server) {
         this.wzWrapper = new ElasticWrapper(server);
     }
@@ -209,5 +209,3 @@ class WazuhApiElastic {
         }
     }
 }
-
-module.exports = WazuhApiElastic;

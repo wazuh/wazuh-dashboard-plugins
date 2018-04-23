@@ -9,17 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import $            from 'jquery';
+import * as modules from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
-import $ from 'jquery';
+const app = modules.get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler) {
     $rootScope.rawVisualizations = null;
-    // Timestamp for visualizations at controller's startup
-    if(!$rootScope.visTimestamp) {
-        $rootScope.visTimestamp = new Date().getTime();
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    }
 
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
@@ -181,14 +177,12 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         if ($scope.tabView === subtab) return;
 
         if(subtab === 'panels'){
-            if(!$rootScope.visTimestamp) {
-                $rootScope.visTimestamp = new Date().getTime();
-                if(!$rootScope.$$phase) $rootScope.$digest();
-            }
+            $rootScope.rawVisualizations = null;
 
             // Create current tab visualizations
-            genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-            .then(() => {
+            genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
+            .then(data => {
+                $rootScope.rawVisualizations = data.data.raw;
                 // Render visualizations
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
@@ -202,16 +196,12 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-
-        if(!$rootScope.visTimestamp) {
-            $rootScope.visTimestamp = new Date().getTime();
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        }
+        $rootScope.rawVisualizations = null;
 
         // Create current tab visualizations
-        genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-        .then(() => {
-
+        genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${appState.getCurrentPattern()}`)
+        .then(data => {
+            $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');
 
@@ -260,7 +250,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     });
 
     $scope.$on('$destroy', () => {
-
+        $rootScope.rawVisualizations = null;
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
@@ -271,9 +261,9 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     });
 
     // Create visualizations for controller's first execution
-    genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
-    .then(() => {
-
+    genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
+    .then(data => {
+        $rootScope.rawVisualizations = data.data.raw;
         // Render visualizations
         $rootScope.$broadcast('updateVis');
 
