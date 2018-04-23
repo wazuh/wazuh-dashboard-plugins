@@ -14,11 +14,6 @@ import * as modules from 'ui/modules'
 const app = modules.get('app/wazuh', []);
 
 app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoComplete, errorHandler, genericReq, appState) {
-    // Timestamp for visualizations at controller's startup
-    if(!$rootScope.visTimestamp) {
-        $rootScope.visTimestamp = new Date().getTime();
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    }
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
@@ -72,7 +67,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
     const load = async () => {
         try {
             $rootScope.rawVisualizations = null;
-            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${appState.getCurrentPattern()}`)
             $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');
@@ -122,13 +117,6 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
 });
 
 app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders,DecodersAutoComplete, errorHandler, genericReq, appState) {
-    // Timestamp for visualizations at controller's startup
-    if(!$rootScope.visTimestamp) {
-        $rootScope.visTimestamp = new Date().getTime();
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    }
-
-
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
@@ -187,7 +175,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
     const load = async () => {
         try {
             $rootScope.rawVisualizations = null;
-            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${appState.getCurrentPattern()}`)
             $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');

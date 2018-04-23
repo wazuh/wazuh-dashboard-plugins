@@ -16,11 +16,6 @@ const app = modules.get('app/wazuh', []);
 
 app.controller('agentsController',
     function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler) {
-        // Timestamp for visualizations at controller's startup
-        if(!$rootScope.visTimestamp) {
-            $rootScope.visTimestamp = new Date().getTime();
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        }
 
         $rootScope.page = 'agents';
         $scope.extensions = appState.getExtensions().extensions;
@@ -149,13 +144,9 @@ app.controller('agentsController',
             if($scope.tabView === subtab) return;
             if(subtab === 'panels' && $scope.tab !== 'configuration'){
                 $rootScope.rawVisualizations = null;
-                if(!$rootScope.visTimestamp) {
-                    $rootScope.visTimestamp = new Date().getTime();
-                    if(!$rootScope.$$phase) $rootScope.$digest();
-                }
 
                 // Create current tab visualizations
-                genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+                genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
                 .then(data => {
                     $rootScope.rawVisualizations = data.data.raw;
                     // Render visualizations
@@ -173,14 +164,10 @@ app.controller('agentsController',
         $scope.switchTab = tab => {
             if ($scope.tab === tab) return;
 
-            if(!$rootScope.visTimestamp) {
-                $rootScope.visTimestamp = new Date().getTime();
-                if(!$rootScope.$$phase) $rootScope.$digest();
-            }
             if(tab !== 'configuration') {
                 $rootScope.rawVisualizations = null;
                 // Create current tab visualizations
-                genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+                genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${appState.getCurrentPattern()}`)
                 .then(data => {
                     $rootScope.rawVisualizations = data.data.raw;
                     // Render visualizations
@@ -509,7 +496,7 @@ app.controller('agentsController',
         if($scope.tab !== 'configuration'){
             $rootScope.rawVisualizations = null;
             // Create visualizations for controller's first execution
-            genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+            genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 $rootScope.rawVisualizations = data.data.raw;
                 // Render visualizations
