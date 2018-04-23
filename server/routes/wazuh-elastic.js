@@ -24,9 +24,6 @@ export default (server, options) => {
     // Create visualizations specified in 'tab' parameter with the 'timestamp' sufix and applying to 'pattern'
     server.route({ method: 'GET', path: '/api/wazuh-elastic/create-vis/{tab}/{timestamp}/{pattern}', handler: (req,res) => ctrl.createVis(req,res) });
 
-    // Delete visualizations specified in 'tab' parameter
-    server.route({ method: 'GET', path: '/api/wazuh-elastic/delete-vis/{timestamp}', handler: (req,res) => ctrl.deleteVis(req,res) });
-
     // Returns whether a correct template is being applied for the index-pattern
     server.route({ method: 'GET', path: '/api/wazuh-elastic/template/{pattern}', handler: (req,res) => ctrl.getTemplate(req,res) });
 
