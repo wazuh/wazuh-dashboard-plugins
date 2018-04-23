@@ -47,27 +47,27 @@
     <md-chips readonly="true" ng-show="rules.hasFilter('level') || rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('group') || rules.hasFilter('pci')">
         <md-chip class="wz-chip" ng-if="rules.hasFilter('search') && rules.getFilter('search')">
             <span>Search: {{rules.getFilter('search')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('search', true)" tooltip="Remove this filter" tooltip-placement="bottom"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('search', true)"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-if="rules.hasFilter('file')">
             <span>File: {{rules.getFilter('file')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('file', true)" tooltip="Remove this filter" tooltip-placement="bottom"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('file', true)"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-if="rules.hasFilter('level')">
             <span>Level: {{rules.getFilter('level')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('level', true)" tooltip="Remove this filter" tooltip-placement="bottom"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('level', true)"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-if="rules.hasFilter('group')">
             <span>Group: {{rules.getFilter('group')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('group', true)" tooltip="Remove this filter" tooltip-placement="bottom"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('group', true)"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-if="rules.hasFilter('pci')">
             <span>PCI control: {{rules.getFilter('pci')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('pci', true)" tooltip="Remove this filter" tooltip-placement="bottom"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('pci', true)"></i>
             </span>
         </md-chip>
     </md-chips>
