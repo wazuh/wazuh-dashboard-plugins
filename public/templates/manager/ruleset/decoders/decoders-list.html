@@ -39,19 +39,19 @@
     </div>
 
     <md-chips readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file') || decoders.hasFilter('path')">
-        <md-chip class="wz-chip" ng-click="decoders.removeFilter('search', true)" ng-if="decoders.hasFilter('search') && decoders.getFilter('search')">
+        <md-chip class="wz-chip" ng-if="decoders.hasFilter('search') && decoders.getFilter('search')">
             <span>Search: {{decoders.getFilter('search')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="decoders.removeFilter('search', true)" tooltip="Remove this filter" tooltip-placement="bottom"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-click="decoders.removeFilter('file', true)" ng-if="decoders.hasFilter('file');">
+        <md-chip class="wz-chip" ng-if="decoders.hasFilter('file');">
             <span>File: {{decoders.getFilter('file')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="decoders.removeFilter('file', true)" tooltip="Remove this filter" tooltip-placement="bottom"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-click="decoders.removeFilter('path', true)" ng-if="decoders.hasFilter('path');">
+        <md-chip class="wz-chip" ng-if="decoders.hasFilter('path');">
             <span>Path: {{decoders.getFilter('path')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="decoders.removeFilter('path', true)" tooltip="Remove this filter" tooltip-placement="bottom"></i>
             </span>
         </md-chip>
     </md-chips>
