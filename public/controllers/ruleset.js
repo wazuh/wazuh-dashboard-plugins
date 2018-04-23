@@ -64,6 +64,32 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
     };
 
     /**
+     * This function takes back to the list but adding a group filter
+     */
+    $scope.addGroupFilter = (name) => {
+        // Clear the autocomplete component
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+
+        // Add the filter and go back to the list
+        $scope.rules.addFilter('group', name);
+        $scope.closeDetailView();
+    }
+
+    /**
+     * This function takes back to the list but adding a PCI filter
+     */
+    $scope.addPciFilter = (name) => {
+        // Clear the autocomplete component
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+
+        // Add the filter and go back to the list
+        $scope.rules.addFilter('pci', name);
+        $scope.closeDetailView();
+    }
+
+    /**
      * This function changes to the detail view
      */
     $scope.openDetailView = (rule) => {
