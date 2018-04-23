@@ -1,24 +1,50 @@
 # Change Log
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.2.1/v3.2.2 - Kibana v6.2.3 - Revision 388
+## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 388
 ### Added
-- Support for Wazuh v3.2.1/v3.2.2.
+- Support for Elastic Stack v6.2.4.
+- App server fully refactored ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)):
+  - New added classes, reduced the amount of code, removed unused functions, and several optimizations.
+  - Now the app follows a more ES6 code style on multiple modules.
+  - *Overview/Agents* visualizations have been splitted into separated files and folders.
+  - Now the app can use the default index defined on the `/ect/kibana/kibana.yml` file.
+  - Better error handling for the visualizations directive.
+  - Added a cron job to delete remaining visualizations on the `.kibana` index if so.
+  - Also, we've added some changes when using the X-Pack plugin:
+    - Better management of users and roles in order to use the app capabilities.
+    - Prevents app loading if the currently logged user has no access to any index pattern.
 - Added the `errorHandler` service to the `dataHandler` factory ([#340](https://github.com/wazuh/wazuh-kibana-app/pull/340)).
 - Added Syscollector section to *Manager/Agents Configuration* tabs ([#359](https://github.com/wazuh/wazuh-kibana-app/pull/359)).
+- Added `cluster.name` field to the `wazuh-monitoring` index ([#377](https://github.com/wazuh/wazuh-kibana-app/pull/377)).
 
 ### Changed
 - Increased the query size when fetching the index pattern list ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
+- Changed active colour for all app tables ([#347](https://github.com/wazuh/wazuh-kibana-app/pull/347)).
 - Changed validation regex to accept URLs with non-numeric format ([#353](https://github.com/wazuh/wazuh-kibana-app/pull/353)).
+- Changed visualization removal cron task to avoid excesive log messages when there weren't removed visualizations ([#361](https://github.com/wazuh/wazuh-kibana-app/pull/361)).
+- Changed filters comparison for a safer access ([#383](https://github.com/wazuh/wazuh-kibana-app/pull/383)).
+- Removed some `server.log` messages to avoid performance errors ([#384](https://github.com/wazuh/wazuh-kibana-app/pull/384)).
+- Changed the way of handling the index patterns list ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
+- Rewritten some false error-level logs to just information-level ones ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
+- Changed some files from JSON to CommonJS for performance improvements ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
+- Replaced some code on the `kibana-discover` directive with a much cleaner statement to avoid issues on the *Agents* tab ([#394](https://github.com/wazuh/wazuh-kibana-app/pull/394)).
 
 ### Fixed
 - Fixed a bug where several `agent.id` filters were created at the same time when navigating between *Agents* and *Groups* with different selected agents ([#342](https://github.com/wazuh/wazuh-kibana-app/pull/342)).
 - Fixed logic on the index-pattern selector which wasn't showing the currently selected pattern the very first time a user opened the app ([#345](https://github.com/wazuh/wazuh-kibana-app/pull/345)).
 - Fixed a bug on the `errorHandler` service who was preventing a proper output of some Elastic-related backend error messages ([#346](https://github.com/wazuh/wazuh-kibana-app/pull/346)).
+- Fixed panels flickering in the *Settings* tab ([#348](https://github.com/wazuh/wazuh-kibana-app/pull/348)).
 - Fixed a bug in the shards and replicas settings when the user sets the value to zero (0) ([#358](https://github.com/wazuh/wazuh-kibana-app/pull/358)).
+- Fixed several bugs related to the upgrade process from Wazuh 2.x to the new refactored server ([#363](https://github.com/wazuh/wazuh-kibana-app/pull/363)).
+- Fixed a bug in *Discover/Agents VirusTotal* tabs to avoid conflicts with the `agent.name` field ([#379](https://github.com/wazuh/wazuh-kibana-app/pull/379)).
+- Fixed a bug on the implicit filter in *Discover/Agents PCI* tabs ([#393](https://github.com/wazuh/wazuh-kibana-app/pull/393)).
 
 ### Removed
 - Removed clear API password on `checkPattern` response ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
+- Removed old dashboard visualizations to reduce loading times ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
+- Removed some unused dependencies due to the server refactoring ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
+- Removed completely `metricService` from the app ([#389](https://github.com/wazuh/wazuh-kibana-app/pull/389)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.2/v6.2.3 - Revision 387
 ### Added

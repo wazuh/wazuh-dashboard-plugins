@@ -103,7 +103,6 @@ export default class WazuhApi {
                 });
             }
         } catch(error){
-            console.log(error.message || error);
             if(error.code === 'ECONNREFUSED'){
                 return reply({ statusCode: 200, data: {password: '****', apiIsDown: true } });
             } else {
@@ -429,8 +428,6 @@ export default class WazuhApi {
     postErrorLog (req, reply) {
 
         if (!req.payload.message) {
-            console.log('Error logging failed:');
-            console.log('You must provide at least one error message to log');
 
             return reply({
                 'statusCode': 500,
@@ -438,12 +435,6 @@ export default class WazuhApi {
             });
         
         } else {
-            
-            console.log( req.payload.message);
-            if (req.payload.details) {
-                console.log( req.payload.details);
-            }
-
             return reply({ statusCode: 200, message: 'Error logged succesfully' });
         }
     }

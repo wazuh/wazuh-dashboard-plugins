@@ -25,6 +25,13 @@ export default {
                 },
                 "id": {
                     "type": "keyword"
+                },
+                "cluster": {
+                    "properties": {
+                        "name": {
+                            "type": "keyword"
+                        }
+                    }
                 }
             }
         }

@@ -49,7 +49,7 @@ export default (server, options) => {
                 if ((payload.limit + payload.offset) < maxSize) {
                     return checkStatus(apiEntry, response.body.data.totalItems, payload.limit + payload.offset);
                 } else {
-                    await saveStatus();
+                    await saveStatus(apiEntry.clusterName);
                 }
             } else {
                 throw new Error('Can not access Wazuh API')
@@ -81,7 +81,16 @@ export default (server, options) => {
             };
     
             const response = await needle('get', `${getPath(apiEntry)}/agents`, payload, options)
-     
+            
+            const isCluster   = await needle('get',`${getPath(apiEntry)}/cluster/status`,{},options)
+            const clusterName = (isCluster && isCluster.body && isCluster.body.data && isCluster.body.data.enabled === 'yes') ? 
+                                await needle('get',`${getPath(apiEntry)}/cluster/node`,{},options) :
+                                false;
+
+            apiEntry.clusterName = clusterName && clusterName.body && clusterName.body.data && clusterName.body.data.cluster ?
+                                   clusterName.body.data.cluster :
+                                   false;
+
             if (!response.error && response.body.data && response.body.data.totalItems) {
                 checkStatus(apiEntry, response.body.data.totalItems);
             } else {
@@ -184,12 +193,12 @@ export default (server, options) => {
     };
 
     // Creating wazuh-monitoring index
-    const createIndex = async todayIndex => {
+    const createIndex = async (todayIndex,clusterName) => {
         try {
             await wzWrapper.createIndexByName(todayIndex);
             log('[monitoring][createIndex]', 'Successfully created today index.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Successfully created today index.');
-            await insertDocument(todayIndex);
+            await insertDocument(todayIndex,clusterName);
             return;
         } catch (error) {
             log('[monitoring][createIndex]', error.message || error);
@@ -198,17 +207,17 @@ export default (server, options) => {
     };
 
     // Inserting one document per agent into Elastic. Bulk.
-    const insertDocument = async todayIndex => {
+    const insertDocument = async (todayIndex,clusterName) => {
         try {
             let body = '';
             if (agentsArray.length > 0) {
-                let managerName = agentsArray[0].name;
-    
+                const managerName = agentsArray[0].name;
                 for(let element of agentsArray) {
                     body += '{ "index":  { "_index": "' + todayIndex + '", "_type": "wazuh-agent" } }\n';
                     let date              = new Date(Date.now()).toISOString();
-                    element["@timestamp"] = date;
-                    element["host"]       = managerName;
+                    element['@timestamp'] = date;
+                    element.host          = managerName;
+                    element.cluster       = { name: clusterName ? clusterName : 'disabled' } ;
                     body                 += JSON.stringify(element) + "\n";
                 }
                 if (body === '') return;
@@ -225,14 +234,14 @@ export default (server, options) => {
     };
 
     // Save agent status into elasticsearch, create index and/or insert document
-    const saveStatus = async () => {
+    const saveStatus = async clusterName => {
         try {
             fDate      = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
             todayIndex = index_prefix + fDate;
     
             const result = await wzWrapper.checkIfIndexExists(todayIndex);
 
-            result ? await insertDocument(todayIndex) : await createIndex(todayIndex);
+            result ? await insertDocument(todayIndex,clusterName) : await createIndex(todayIndex,clusterName);
 
             return;
            
