@@ -134,7 +134,6 @@ const app = modules.get('apps/webinar_app', [])
                     if (currentCompleted >= 100) {
 
                         if ($rootScope.visTimestamp) {
-                            genericReq.request('GET',`/api/wazuh-elastic/delete-vis/${$rootScope.visTimestamp}`).catch(console.error)
                             $rootScope.visTimestamp = null;
                         }
 
