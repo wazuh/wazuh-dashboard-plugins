@@ -262,46 +262,8 @@ export default class WazuhElastic {
      * Replaces visualizations main fields to fit a certain pattern.
      * @param {*} app_objects Object containing raw visualizations.
      * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
-     * @param {*} timestamp Milliseconds timestamp used to identify visualizations batch.
      */
-    buildVisualizationsBulk (app_objects, id, timestamp,clusterName) {
-        try{
-            let body = '';
-            for (let element of app_objects) {
-                if(clusterName && clusterName.toLowerCase() !== 'disabled' && element._source.title.toLowerCase().includes('agents status')){
-                    if(element._source.kibanaSavedObjectMeta && element._source.kibanaSavedObjectMeta.searchSourceJSON){
-                        element._source.kibanaSavedObjectMeta.searchSourceJSON = `{\"index\":\"wazuh-monitoring-3.x-*\",\"filter\":[{\"meta\":{\"index\":\"wazuh-monitoring-3.x-*\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"cluster.name\",\"value\":\"${clusterName}\",\"params\":{\"query\":\"${clusterName}\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"cluster.name\":{\"query\":\"${clusterName}\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"language\":\"lucene\",\"query\":\"cluster.name:\\\"${clusterName}\\\"\"}}`
-                    }
-                }
-            	// Bulk action (you define index, doc and id)
-                body += '{ "index":  { "_index": "' + this.wzWrapper.WZ_KIBANA_INDEX + '", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '-' + timestamp + '" } }\n';
-
-                // Stringify and replace index-pattern for visualizations
-                let aux_source = JSON.stringify(element._source);
-                aux_source = aux_source.replace("wazuh-alerts", id);
-                aux_source = JSON.parse(aux_source);
-
-                // Bulk source
-                let bulk_content = {};
-                bulk_content[element._type] = aux_source;
-
-                bulk_content["type"] = element._type;
-                bulk_content.visualization.description = timestamp;
-                body += JSON.stringify(bulk_content) + "\n";
-            }
-            return body;
-        } catch (error) {
-            return (error.message || error);
-        }
-    }
-
-    /**
-     * Replaces visualizations main fields to fit a certain pattern.
-     * @param {*} app_objects Object containing raw visualizations.
-     * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
-     * @param {*} timestamp Milliseconds timestamp used to identify visualizations batch.
-     */
-    buildVisualizationsRaw (app_objects, id, timestamp) {
+    buildVisualizationsRaw (app_objects, id) {
         try{
             const visArray = [];
             let aux_source, bulk_content;
@@ -314,19 +276,17 @@ export default class WazuhElastic {
                 // Bulk source
                 bulk_content = {};
                 bulk_content[element._type] = aux_source;
-                
 
-                bulk_content.visualization.description = timestamp;
                 visArray.push({
                     attributes: bulk_content.visualization,
-                    type:element._type,
-                    id: element._id + '-' + timestamp,
-                    _version: bulk_content.visualization.version
+                    type      : element._type,
+                    id        : element._id,
+                    _version  : bulk_content.visualization.version
                 });
             }
             return visArray;
         } catch (error) {
-            return (error.message || error);
+            return Promise.reject(error)
         }
     }
 
@@ -334,7 +294,6 @@ export default class WazuhElastic {
         try {
             if(!req.params.pattern ||
                !req.params.tab ||
-               !req.params.timestamp ||
                (req.params.tab && !req.params.tab.includes('manager-') && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-'))
             ) {
                 throw new Error('Missing parameters');
@@ -356,7 +315,7 @@ export default class WazuhElastic {
                          OverviewVisualizations[tabSufix] :
                          AgentsVisualizations[tabSufix];
            
-            const raw = await this.buildVisualizationsRaw(file,req.params.pattern,req.params.timestamp);
+            const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
             return res({acknowledge: true, raw: raw });
             
         } catch(error){

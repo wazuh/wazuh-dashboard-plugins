@@ -21,8 +21,8 @@ export default (server, options) => {
     // Refresh known fields for specific index pattern
     server.route({ method: 'GET', path: '/refresh-fields/{pattern}', handler: (req,res) => ctrl.refreshIndex(req,res) });
 
-    // Create visualizations specified in 'tab' parameter with the 'timestamp' sufix and applying to 'pattern'
-    server.route({ method: 'GET', path: '/api/wazuh-elastic/create-vis/{tab}/{timestamp}/{pattern}', handler: (req,res) => ctrl.createVis(req,res) });
+    // Create visualizations specified in 'tab' parameter and applying to 'pattern'
+    server.route({ method: 'GET', path: '/api/wazuh-elastic/create-vis/{tab}/{pattern}', handler: (req,res) => ctrl.createVis(req,res) });
 
     // Returns whether a correct template is being applied for the index-pattern
     server.route({ method: 'GET', path: '/api/wazuh-elastic/template/{pattern}', handler: (req,res) => ctrl.getTemplate(req,res) });
