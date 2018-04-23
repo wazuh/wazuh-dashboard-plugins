@@ -76,7 +76,7 @@
 	<!-- View: Discover -->
     <kbn-dis ng-show="tab != 'configuration'"></kbn-dis>
 
-    <div class="wazuh-loading" layout="column" layout-aling="center center" ng-show="resultState === 'ready' && tabView === 'panels' && tab !== 'configuration' && !rendered">
+    <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && tabView === 'panels' && tab !== 'configuration' && !rendered">
         <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>

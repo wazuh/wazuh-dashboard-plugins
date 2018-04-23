@@ -3,7 +3,6 @@
 /* -------------------------------------------------------------------------- */
 
 /* Apply the Open Sans font in the whole app */
-
 html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
     font-family: "Open Sans", Helvetica, Arial, sans-serif !important;
 }
@@ -77,13 +76,12 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
 }
 
 /* Class for linkable text elements */
-
 .wz-text-link {
-    cursor: pointer;
-    color: rgb(0, 121, 165);
+    cursor: pointer !important;
+    color: rgb(0, 121, 165) !important;
 
     &:hover {
-        text-decoration: underline;
+        text-decoration: underline !important;
     }
 }
 
@@ -91,4 +89,10 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
     color: rgb(0, 121, 165);
     font-weight: bold;
     text-decoration: underline;
+}
+
+/* Special fix for text in navbars */
+
+.md-button {
+    text-transform: none !important;
 }
