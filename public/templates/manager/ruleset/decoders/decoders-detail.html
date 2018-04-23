@@ -29,7 +29,7 @@
         <!-- Groups section -->
         <md-card ng-if="currentDecoder.groups.length > 0" flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Groups</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> Groups</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" layout-align="start start">
                     <md-button class="md-primary wz-text-link" tooltip="Filter by this group" tooltip-placement="bottom" ng-repeat="item in currentDecoder.groups">
@@ -43,7 +43,7 @@
         <!-- PCI section -->
         <md-card ng-if="currentDecoder.pci.length > 0" flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">PCI</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> PCI</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" layout-align="start start">
                     <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentDecoder.pci">
@@ -57,7 +57,7 @@
         <!-- Details section -->
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Details</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-if="currentDecoder.details.status" layout="row" class="wz-padding-top-10">
                     <span flex="20">Status</span>
@@ -134,7 +134,7 @@
         <!-- Match section -->
         <md-card flex class="wz-md-card" ng-if="currentDecoder.details.match.isArray()">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Match</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Match</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentDecoder.details.match">
                     <div layout="row" class="wz-padding-top-10">
@@ -148,7 +148,7 @@
         <!-- Prematch section -->
         <md-card flex class="wz-md-card" ng-if="currentDecoder.details.prematch.isArray()">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Prematch</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Prematch</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentDecoder.details.prematch">
                     <div layout="row" class="wz-padding-top-10">
