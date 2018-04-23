@@ -1,33 +1,20 @@
-/*
- * Wazuh app - Module for Base64 encryption
- * Copyright (C) 2018 Wazuh, Inc.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Find more information about this on the LICENSE file.
- */
+export default { 
+    encode: text => {
 
-module.exports = {
-    encode: function(text) {
-
-        if (/([^\u0000-\u00ff])/.test(text)) {
+        if (/([^\u0000-\u00ff])/.test(text)){
             throw new Error("Can't base64 encode non-ASCII characters.");
-        }
+        } 
 
-        var digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
-            i = 0,
-            cur, prev, byteNum,
-            result = [];
+        const digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        
+        let i = 0, cur, prev, byteNum, result=[];      
 
-        while (i < text.length) {
+        while(i < text.length){
 
             cur = text.charCodeAt(i);
             byteNum = i % 3;
 
-            switch (byteNum) {
+            switch(byteNum){
                 case 0: //first byte
                     result.push(digits.charAt(cur >> 2));
                     break;
@@ -46,38 +33,36 @@ module.exports = {
             i++;
         }
 
-        if (byteNum == 0) {
+        if (byteNum == 0){
             result.push(digits.charAt((prev & 3) << 4));
             result.push("==");
-        } else if (byteNum == 1) {
+        } else if (byteNum == 1){
             result.push(digits.charAt((prev & 0x0f) << 2));
             result.push("=");
         }
 
         return result.join("");
     },
-    decode: function(text) {
+    decode: text => {
 
-        text = text.replace(/\s/g, "");
+        text = text.replace(/\s/g,"");
 
-        if (!(/^[a-z0-9\-_\s]+\={0,2}$/i.test(text)) || text.length % 4 > 0) {
+        if(!(/^[a-z0-9\-_\s]+\={0,2}$/i.test(text)) || text.length % 4 > 0){
             throw new Error("Not a base64-encoded string.");
-        }
+        }   
 
         //local variables
-        var digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
-            cur, prev, digitNum,
-            i = 0,
-            result = [];
+        const digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let cur, prev, digitNum, i=0, result = [];
 
         text = text.replace(/=/g, "");
 
-        while (i < text.length) {
+        while(i < text.length){
 
             cur = digits.indexOf(text.charAt(i));
             digitNum = i % 4;
 
-            switch (digitNum) {
+            switch(digitNum){
 
                 //case 0: first digit - do nothing, not enough info to work with
 
@@ -101,3 +86,4 @@ module.exports = {
         return result.join("");
     }
 };
+

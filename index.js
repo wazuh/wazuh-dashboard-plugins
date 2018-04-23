@@ -9,10 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import init from './init';
 
-module.exports = (kibana) => new kibana.Plugin({
-    id: 'wazuh',
-    name: 'wazuh',
+export default kibana => new kibana.Plugin({
+    id:      'wazuh',
+    name:    'wazuh',
     require: ['kibana', 'elasticsearch'],
     uiExports: {
         app: {
@@ -35,5 +36,5 @@ module.exports = (kibana) => new kibana.Plugin({
             }
         }
     },
-    init: require('./init.js')
+    init
 });

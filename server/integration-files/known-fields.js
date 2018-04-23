@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-module.exports = [
+export default [
     {
         "name": "@timestamp",
         "type": "date",

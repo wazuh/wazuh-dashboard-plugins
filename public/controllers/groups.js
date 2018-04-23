@@ -9,13 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import beautifier   from 'plugins/wazuh/utils/json-beautifier';
+import * as modules from 'ui/modules'
 
-let app = require('ui/modules').get('app/wazuh', []);
-const beautifier = require('plugins/wazuh/utils/json-beautifier');
+const app = modules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',
-function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler) {
+function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler) {
     const reloadWatcher = $rootScope.$watch('groupsIsReloaded',() => {
         delete $rootScope.groupsIsReloaded;
         $scope.lookingGroup = false;

@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-// Require config
-let app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
 app.controller('managerController', function ($scope, $rootScope, $routeParams, $location, apiReq, errorHandler) {
     $scope.submenuNavItem  = 'status';
@@ -107,8 +107,9 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
 
 });
 
-const beautifier = require('plugins/wazuh/utils/json-beautifier');
-app.controller('managerConfigurationController', function ($scope,$rootScope, errorHandler, apiReq) {
+import beautifier from 'plugins/wazuh/utils/json-beautifier';
+
+app.controller('managerConfigurationController', function ($scope, $rootScope, errorHandler, apiReq) {
     //Initialization
     $scope.load    = true;
     $scope.isArray = angular.isArray;

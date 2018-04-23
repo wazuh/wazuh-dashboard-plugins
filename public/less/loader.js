@@ -13,9 +13,9 @@
 /* ------------------------ Wazuh stylesheets loader ------------------------ */
 /* -------------------------------------------------------------------------- */
 
-require('plugins/wazuh/less/common.less');
-require('plugins/wazuh/less/layout.less');
-require('plugins/wazuh/less/height.less');
-require('plugins/wazuh/less/typography.less');
-require('plugins/wazuh/less/media-queries.less');
+import 'plugins/wazuh/less/common.less';
+import 'plugins/wazuh/less/layout.less';
+import 'plugins/wazuh/less/height.less';
+import 'plugins/wazuh/less/typography.less';
+import 'plugins/wazuh/less/media-queries.less';
 import 'ui/styles/theme.less';

@@ -9,21 +9,23 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-module.exports = [{
-        "_id": "Wazuh-App-Agents-Overview-Top-5-alerts",
-        "_source": {
-            "title": "Wazuh App Agents Overview Top 5 alerts",
-            "visState": "{\"title\":\"Wazuh App Agents Overview Top 5 alerts\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"rule.description\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
-            "uiStateJSON": "{}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
-            }
-        },
-        "_type": "visualization"
-    },
+export default [
+    {
+		"_id": "Wazuh-App-Agents-Overview-Top-5-alerts",
+		"_source": {
+			"title": "Wazuh App Agents Overview Top 5 alerts",
+			"visState":
+				"{\"title\":\"Wazuh App Agents Overview Top 5 alerts\",\"type\":\"pie\",\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"rule.description\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+			"uiStateJSON": "{}",
+			"description": "",
+			"version": 1,
+			"kibanaSavedObjectMeta": {
+				"searchSourceJSON":
+					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
+			}
+		},
+		"_type": "visualization"
+	},
     {
         "_id": "Wazuh-App-Agents-Overview-Top-5-groups",
         "_source": {

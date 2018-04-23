@@ -9,10 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import WazuhApi from '../controllers/wazuh-api';
 
-const WazuhApi = require('../controllers/wazuh-api');
-
-module.exports = (server, options) => {
+export default (server, options) => {
     const ctrl = new WazuhApi(server);
 
     // Returns if the wazuh-api configuration is working

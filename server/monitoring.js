@@ -9,18 +9,20 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import cron               from 'node-cron'
+import needle             from 'needle'
+import getPath            from'../util/get-path'
+import colors             from 'ansicolors'
+import log                from './logger'
+import ElasticWrapper     from './lib/elastic-wrapper'
+import monitoringTemplate from './integration-files/monitoring-template'
+import packageJSON        from '../package.json'
 
-const cron           = require('node-cron');
-const needle         = require('needle');
-const getPath        = require('../util/get-path');
-const colors         = require('ansicolors');
-const blueWazuh      = colors.blue('wazuh');
-const { log }        = require('./logger');
-const ElasticWrapper = require('./lib/elastic-wrapper');
-const index_pattern  = "wazuh-monitoring-3.x-*";
-const index_prefix   = "wazuh-monitoring-3.x-";
-
-module.exports = (server, options) => {
+export default (server, options) => {
+    const blueWazuh      = colors.blue('wazuh');
+    const index_pattern  = "wazuh-monitoring-3.x-*";
+    const index_prefix   = "wazuh-monitoring-3.x-";
+    
     // Elastic JS Client
     const wzWrapper = new ElasticWrapper(server);
 
@@ -29,15 +31,6 @@ module.exports = (server, options) => {
 
     let fDate         = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
     let todayIndex    = index_prefix + fDate;
-    let packageJSON   = {};
-
-    // Read Wazuh App package file
-    try {
-        packageJSON = require('../package.json');
-    } catch (error) {
-        log('[monitoring]', error.message || error);
-        server.log([blueWazuh, 'monitoring', 'error'], 'Could not read the Wazuh package file due to ' + error.message || error);
-    }
 
     // Check status and get agent status array
     const checkStatus = async (apiEntry, maxSize, offset) => {
@@ -151,6 +144,7 @@ module.exports = (server, options) => {
                 }
                 await checkAndSaveStatus(apiEntry);
             }
+            return { result: 'ok' }
         } catch(error){
             log('[monitoring][loadCredentials]',error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
@@ -182,7 +176,7 @@ module.exports = (server, options) => {
     };
 
     // fetchAgents on demand
-    const fetchAgents = async () => {
+    const fetchAgentsExternal = async () => {
         try {
             const data = await getConfig();
             return loadCredentials(data);
@@ -292,7 +286,6 @@ module.exports = (server, options) => {
         try {
             log('[monitoring][checkTemplate]', 'Updating wazuh-monitoring template...', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], "Updating wazuh-monitoring template...");
-            const monitoringTemplate = require('./integration-files/monitoring-template');
             const data = await wzWrapper.putMonitoringTemplate(monitoringTemplate);
             return;
         } catch(error){
@@ -372,7 +365,7 @@ module.exports = (server, options) => {
     };
 
     // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
-    checkKibanaStatus();
+    if(!options) checkKibanaStatus();
 
     const cronTask = async () => {
         try {
@@ -385,9 +378,8 @@ module.exports = (server, options) => {
             server.log([blueWazuh, 'monitoring [cronTask]', 'error'], error.message || error)
         }
     }
-    cronTask()
+    if(!options) cronTask()
     // Cron tab for getting agent status.
-    cron.schedule('0 */10 * * * *', cronTask, true);
-
-    module.exports = fetchAgents;
+    if(!options) cron.schedule('0 */10 * * * *', cronTask, true);
+    return fetchAgentsExternal;
 };

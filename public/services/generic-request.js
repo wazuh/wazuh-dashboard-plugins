@@ -9,11 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import prepError    from 'plugins/wazuh/services/prep-error';
+import chrome       from 'ui/chrome';
+import * as modules from 'ui/modules'
 
-const prepError = require('plugins/wazuh/services/prep-error');
-import chrome from 'ui/chrome';
-
-require('ui/modules').get('app/wazuh', []).service('genericReq', function ($q, $http, $location, $rootScope, appState,errorHandler) {
+modules.get('app/wazuh', [])
+.service('genericReq', function ($q, $http, $location, $rootScope, appState,errorHandler) {
 
     const _request = (method, url, payload = null) => {
         let defered = $q.defer();

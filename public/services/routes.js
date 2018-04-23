@@ -11,7 +11,7 @@
  */
 
 // Require routes
-let routes = require('ui/routes');
+import routes from 'ui/routes';
 
 // Kibana dependencies to load index-patterns and saved searches
 import { StateProvider } from 'ui/state_management/state';
@@ -272,17 +272,28 @@ const getSavedSearch = (courier, $q, $window, $rootScope, savedSearches, $route)
     }
 };
 
+// HTML templates
+import healthCheckTemplate from 'plugins/wazuh/templates/health-check/health-check.html'
+import agentsTemplate      from 'plugins/wazuh/templates/agents/agents.jade'
+import agentsPrevTemplate  from 'plugins/wazuh/templates/agents-prev/agents-prev.jade'
+import managerTemplate     from 'plugins/wazuh/templates/manager/manager.jade'
+import overviewTemplate    from 'plugins/wazuh/templates/overview/overview.jade'
+import discoverTemplate    from 'plugins/wazuh/templates/discover/discover.jade'
+import settingsTemplate    from 'plugins/wazuh/templates/settings/settings.html'
+import loginTemplate       from 'plugins/wazuh/templates/auth/login.html'
+import blankScreenTemplate from 'plugins/wazuh/templates/error-handler/blank-screen.html'
+
 //Routes
 routes.enable();
 routes
     .when('/health-check', {
-        template: require('plugins/wazuh/templates/health-check/health-check.html'),
+        template: healthCheckTemplate,
         resolve: {
             "checkAPI": settingsWizard
         }
     })
     .when('/agents/:id?/:tab?/:view?', {
-        template: require('plugins/wazuh/templates/agents/agents.jade'),
+        template: agentsTemplate,
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
@@ -290,13 +301,13 @@ routes
         }
     })
     .when('/agents-preview/:tab?/', {
-        template: require('plugins/wazuh/templates/agents-prev/agents-prev.jade'),
+        template: agentsPrevTemplate,
         resolve: {
             "checkAPI": settingsWizard
         }
     })
     .when('/manager/:tab?/', {
-        template: require('plugins/wazuh/templates/manager/manager.jade'),
+        template: managerTemplate,
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
@@ -304,7 +315,7 @@ routes
         }
     })
     .when('/overview/', {
-        template: require('plugins/wazuh/templates/overview/overview.jade'),
+        template: overviewTemplate,
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
@@ -312,7 +323,7 @@ routes
         }
     })
     .when('/wazuh-discover/', {
-        template: require('plugins/wazuh/templates/discover/discover.jade'),
+        template: discoverTemplate,
         resolve: {
             "checkAPI": settingsWizard,
             "ip": getIp,
@@ -320,7 +331,7 @@ routes
         }
     })
     .when('/settings/:tab?/', {
-        template: require('plugins/wazuh/templates/settings/settings.html'),
+        template: settingsTemplate,
     })
     .when('/visualize/create?', {
         redirectTo: function () {},
@@ -341,10 +352,10 @@ routes
         }
     })
     .when('/wlogin', {
-        template: require('plugins/wazuh/templates/auth/login.html')
+        template: loginTemplate
     })
     .when('/blank-screen', {
-        template: require('plugins/wazuh/templates/error-handler/blank-screen.html')
+        template: blankScreenTemplate
     })
     .when('/', {
         redirectTo: '/overview/'

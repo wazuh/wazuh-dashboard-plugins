@@ -9,15 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import base64       from 'plugins/wazuh/utils/base64.js';
+import chrome       from 'ui/chrome';
+import * as modules from 'ui/modules'
 
-// Require utils
-let base64 = require('plugins/wazuh/utils/base64.js');
-import chrome from 'ui/chrome';
+const app = modules.get('app/wazuh', []);
 
-// Require App
-const app = require('ui/modules').get('app/wazuh', []);
-
-app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, courier, errorHandler) {
+app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler) {
     $rootScope.page = "settings";
 
     if ($rootScope.comeFromWizard) {

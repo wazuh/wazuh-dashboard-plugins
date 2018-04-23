@@ -9,10 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import chrome       from 'ui/chrome';
+import * as modules from 'ui/modules'
 
-import chrome from 'ui/chrome';
+const app = modules.get('app/wazuh', []);
 
-const app = require('ui/modules').get('app/wazuh', []);
 app.service('apiReq', function ($q, $http, genericReq, appState, $location, $rootScope) {
     return {
         request: (method, path, body) => {

@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-module.exports = {
+export default {
   "order": 0,
   "template": ".kibana*",
   "settings": {

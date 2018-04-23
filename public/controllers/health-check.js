@@ -9,10 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
-app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location, Notifier, courier, genericReq, apiReq, appState, testAPI,errorHandler) {
+app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location, courier, genericReq, apiReq, appState, testAPI, errorHandler) {
     const checks = {
         api     : true,
         pattern : true,
@@ -20,7 +21,6 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
         template: true
     };
 
-    const notify           = new Notifier();
     $scope.errors          = [];
     $scope.processedChecks = 0;
     $scope.totalChecks     = 0;

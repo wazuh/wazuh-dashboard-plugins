@@ -9,10 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import knownFields from '../integration-files/known-fields';
 
-const knownFields = require('../integration-files/known-fields');
-
-class ElasticWrapper{
+export default class ElasticWrapper {
     constructor(server){
         this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
         this.WZ_KIBANA_INDEX = server &&
@@ -833,5 +832,3 @@ class ElasticWrapper{
 
 
 }
-
-module.exports = ElasticWrapper;

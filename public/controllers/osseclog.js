@@ -9,11 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import * as modules from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq,errorHandler) {
+app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler) {
     $scope.searchTerm  = '';
     $scope.loading     = true;
     $scope.logs        = Logs;
