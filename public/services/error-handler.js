@@ -1,8 +1,20 @@
+/*
+ * Wazuh app - Error handler service
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
 const app = require('ui/modules').get('app/wazuh', []);
 
 app.service('errorHandler', function ( Notifier, appState, $location) {
     const notify = new Notifier();
-    
+
     const extractMessage = error => {
         if(error.data && error.data.errorData && error.data.errorData.message) return error.data.errorData.message;
         if(error.errorData && error.errorData.message) return error.errorData.message;
@@ -22,7 +34,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
     const isHttps        = error => (typeof error.https !== 'undefined' && error.https);
     const isBadRequest   = error => (error.status && error.status === 400);
     const isAPIUnauthorized = error => (error && error.data && parseInt(error.data.statusCode) === 500 && parseInt(error.data.error) === 7 && error.data.message === '401 Unauthorized');
-    
+
     const info = (message,location) => {
         if(typeof message === 'string') {
             message = location ? location + '. ' + message : message;

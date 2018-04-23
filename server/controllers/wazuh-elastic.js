@@ -1,3 +1,15 @@
+/*
+ * Wazuh app - Class for Wazuh-Elastic functions
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
 const ElasticWrapper = require('../lib/elastic-wrapper');
 
 const fs   = require('fs');
@@ -14,12 +26,12 @@ class WazuhElastic {
 
             const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
 
-            if(data.hits && 
-               data.hits.hits[0] && 
-               data.hits.hits[0]._source && 
-               data.hits.hits[0]._source.installationDate && 
+            if(data.hits &&
+               data.hits.hits[0] &&
+               data.hits.hits[0]._source &&
+               data.hits.hits[0]._source.installationDate &&
                data.hits.hits[0]._source.lastRestart){
-                
+
                     return reply({
                         installationDate: data.hits.hits[0]._source.installationDate,
                         lastRestart     : data.hits.hits[0]._source.lastRestart
@@ -47,7 +59,7 @@ class WazuhElastic {
                     statusCode: 200,
                     status    : true,
                     data      : `Template found for ${req.params.pattern}`
-                });   
+                });
             } else {
 
                 const lastChar = req.params.pattern[req.params.pattern.length -1];
@@ -64,7 +76,7 @@ class WazuhElastic {
                             statusCode: 200,
                             status    : true,
                             data      : `Template found for ${req.params.pattern}`
-                        });    
+                        });
                     }
                 }
 
@@ -72,7 +84,7 @@ class WazuhElastic {
                     statusCode: 200,
                     status    : false,
                     data      : `No template found for ${req.params.pattern}`
-                });     
+                });
             }
 
         } catch (error){
@@ -93,7 +105,7 @@ class WazuhElastic {
             return filtered.length >= 1 ?
                    reply({ statusCode: 200, status: true, data: 'Index pattern found' }) :
                    reply({ statusCode: 500, status: false, error:10020, message: 'Index pattern not found' });
-        
+
         } catch (error) {
             return reply({
                 statusCode: 500,
@@ -120,7 +132,7 @@ class WazuhElastic {
                         terms: {
                             field: '',
                             size : 1,
-                            order: { _count: 'desc' } 
+                            order: { _count: 'desc' }
                         }
                     }
                 }
@@ -138,7 +150,7 @@ class WazuhElastic {
                 { match: { 'cluster.name': req.params.cluster } } :
                 { match: { 'manager.name': req.params.cluster } }
             );
-     
+
             payload.aggs['2'].terms.field = req.params.field;
 
             const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
@@ -159,12 +171,12 @@ class WazuhElastic {
     async getSetupInfo (req, reply) {
         try {
             const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-            
+
             return data.hits.total === 0 ?
                    reply({ statusCode: 200, data: '' }) :
                    reply({ statusCode: 200, data: data.hits.hits[0]._source });
-                
-            
+
+
         } catch (error) {
             return reply({
                 statusCode: 500,
@@ -191,14 +203,14 @@ class WazuhElastic {
     validateIndexPattern(indexPatternList){
         const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
         let list = [];
-        for(const index of indexPatternList){   
-            let valid, parsed;        
+        for(const index of indexPatternList){
+            let valid, parsed;
             try{
                 parsed = JSON.parse(index._source['index-pattern'].fields)
             } catch (error){
                 continue;
-            }     
-            
+            }
+
             valid = parsed.filter(item => minimum.includes(item.name));
             if(valid.length === 4){
                 list.push({
@@ -215,17 +227,17 @@ class WazuhElastic {
             const xpack          = await this.wzWrapper.getPlugins();
             const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
             const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
-            
+
             const data = await this.wzWrapper.getAllIndexPatterns();
 
             if(data && data.hits && data.hits.hits.length === 0) throw new Error('There is no index pattern');
-                
+
             if(data && data.hits && data.hits.hits){
                 const list = this.validateIndexPattern(data.hits.hits);
 
                 return res({data: isXpackEnabled && !isSuperUser ? await this.filterAllowedIndexPatternList(list,req) : list});
             }
-            
+
             throw new Error('The Elasticsearch request didn\'t fetch the expected data');
 
         } catch(error){
@@ -240,7 +252,7 @@ class WazuhElastic {
             const tmp = await this.wzWrapper.deleteVisualizationByDescription(req.params.timestamp);
 
             return res({acknowledge: true , output: tmp});
-            
+
         } catch(error){
             return res({error:error.message || error}).code(500);
         }
@@ -272,7 +284,7 @@ class WazuhElastic {
                 // Bulk source
                 let bulk_content = {};
                 bulk_content[element._type] = aux_source;
-                
+
                 bulk_content["type"] = element._type;
                 bulk_content.visualization.description = timestamp;
                 body += JSON.stringify(bulk_content) + "\n";
@@ -285,9 +297,9 @@ class WazuhElastic {
 
     async createVis (req, res) {
         try {
-            if(!req.params.pattern || 
-               !req.params.tab || 
-               !req.params.timestamp || 
+            if(!req.params.pattern ||
+               !req.params.tab ||
+               !req.params.timestamp ||
                (req.params.tab && !req.params.tab.includes('manager') && !req.params.tab.includes('overview') && !req.params.tab.includes('agents'))
             ) {
                 throw new Error('Missing parameters');
@@ -295,19 +307,19 @@ class WazuhElastic {
 
             const apiConfig = (req.headers && req.headers.id) ? await this.wzWrapper.getWazuhConfigurationById(req.headers.id) : false;
             const clusterName = apiConfig && apiConfig.cluster_info ? apiConfig.cluster_info.cluster : false;
-            const tabPrefix = req.params.tab.includes('overview') ? 
-                              'overview' : req.params.tab.includes('manager') ? 
-                              'manager' : 
+            const tabPrefix = req.params.tab.includes('overview') ?
+                              'overview' : req.params.tab.includes('manager') ?
+                              'manager' :
                               'agents';
 
-            const file = tabPrefix === 'manager' ? 
+            const file = tabPrefix === 'manager' ?
                          require(`../integration-files/visualizations/ruleset/${req.params.tab.split('manager-')[1]}`) :
                          require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
 
             const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp,clusterName);
             const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
             return res({acknowledge: true, output: output });
-            
+
         } catch(error){
             return res({error:error.message || error}).code(500);
         }
@@ -318,7 +330,7 @@ class WazuhElastic {
             if(!req.params.pattern) throw new Error('Missing parameters');
 
             const output = await this.wzWrapper.updateIndexPatternKnownFields(req.params.pattern);
-            
+
             return res({acknowledge: true, output: output });
 
         } catch(error){
@@ -329,5 +341,3 @@ class WazuhElastic {
 }
 
 module.exports = WazuhElastic;
-
-
