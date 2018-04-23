@@ -5,41 +5,10 @@
         <div></div>
     </div>
 
-    <div ng-show="!loading" layout="row" layout-align="start stretch" layout-align="center start" class="manager-ruleset-rules-top-row">
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 24h - Rule ID</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Rule-ID'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 24h - Groups</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Groups'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 24h - PCI DSS requirements</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-PCI-DSS-requirements'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 24h - Level</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Manager-Ruleset-Rules-Top-24h-Level'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-    </div>
-
     <div ng-show="!loading" flex layout="column">
         <div id="content" layout="row" layout-align="start start">
             <span layout="row" flex layout-align="space-between center">
-                <md-autocomplete flex class="wz-autocomplete"
+                <md-autocomplete flex class="wz-autocomplete wz-select-input wz-margin-right-15"
                 id="Auto"
                 md-input-id="autocomplete"
                 md-select-on-match="true"
@@ -53,7 +22,7 @@
                 md-no-asterisk="false"
                 md-menu-class="autocomplete-custom-agents-bar"
                 md-search-text-change="analizeRules(searchTerm)"
-                placeholder="Search..."
+                placeholder="Search rules..."
                 lazy-load-data="rulesAutoComplete.nextPage()"
                 md-autofocus=""
                 wz-enter="checkEnter(searchTerm)">
@@ -72,11 +41,11 @@
                 </md-autocomplete>
             </span>
 
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'wz-ruleset-active' : ''"
+            <md-button ng-class="(globalsubmenuNavItem2 == 'rules') ? 'wz-ruleset-active' : ''"
                 ng-click="setRulesTab('rules')" class="wazuh-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
                 Rules
             </md-button>
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'wz-ruleset-active' : ''"
+            <md-button ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'wz-ruleset-active' : ''"
                 ng-click="setRulesTab('decoders')" class="wazuh-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
                 Decoders
             </md-button>
