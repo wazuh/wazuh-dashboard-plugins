@@ -14,7 +14,7 @@ import * as modules from 'ui/modules'
 const app = modules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq,errorHandler) {
+app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler) {
     $scope.searchTerm  = '';
     $scope.loading     = true;
     $scope.logs        = Logs;

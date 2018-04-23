@@ -13,7 +13,7 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoComplete, errorHandler, genericReq, appState) {
+app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAutoComplete, errorHandler, genericReq, appState) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
@@ -116,7 +116,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders,DecodersAutoComplete, errorHandler, genericReq, appState) {
+app.controller('decodersController', function ($scope, $rootScope, Decoders, DecodersAutoComplete, errorHandler, genericReq, appState) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization

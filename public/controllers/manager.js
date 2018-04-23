@@ -109,7 +109,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
 
 import beautifier from 'plugins/wazuh/utils/json-beautifier';
 
-app.controller('managerConfigurationController', function ($scope,$rootScope, errorHandler, apiReq) {
+app.controller('managerConfigurationController', function ($scope, $rootScope, errorHandler, apiReq) {
     //Initialization
     $scope.load    = true;
     $scope.isArray = angular.isArray;

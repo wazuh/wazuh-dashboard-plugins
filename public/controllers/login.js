@@ -13,7 +13,7 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('loginController', function ($scope, $rootScope, $location, appState, genericReq, $window) {
+app.controller('loginController', function ($scope, $location, appState, genericReq) {
     $scope.submit = password => {
         genericReq.request('POST', '/api/wazuh-api/wlogin', {password: password})
         .then(data => {

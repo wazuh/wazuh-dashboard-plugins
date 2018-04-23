@@ -16,7 +16,7 @@ const app = modules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',
-function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler) {
+function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler) {
     const reloadWatcher = $rootScope.$watch('groupsIsReloaded',() => {
         delete $rootScope.groupsIsReloaded;
         $scope.lookingGroup = false;
