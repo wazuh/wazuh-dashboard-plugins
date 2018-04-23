@@ -138,6 +138,12 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
 
         }
 
+        removeAllFilters () {
+            for(let filter of this.filters){
+                this.removeFilter(filter.name, true);
+            }
+        }
+
         delete (name, index) {
             apiReq.request('DELETE', this.path, {})
             .then(function (data) {

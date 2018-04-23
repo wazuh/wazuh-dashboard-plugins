@@ -67,6 +67,22 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
         }
     };
 
+    /**
+     * This function changes to the detail view
+     */
+    $scope.openDetailView = (rule) => {
+        $scope.currentRule = rule;
+        $scope.viewingDetail = true;
+    }
+
+    /**
+     * This function changes to the list view
+     */
+    $scope.closeDetailView = () => {
+        $scope.viewingDetail = false;
+        $scope.currentRule = false;
+        if(!$scope.$$phase) $scope.$digest();
+    }
 
     const load = async () => {
         try {
@@ -179,6 +195,23 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
             errorHandler.handle(error,'Ruleset');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
+    }
+
+    /**
+     * This function changes to the detail view
+     */
+    $scope.openDetailView = (decoder) => {
+        $scope.currentDecoder = decoder;
+        $scope.viewingDetail = true;
+    }
+
+    /**
+     * This function changes to the list view
+     */
+    $scope.closeDetailView = () => {
+        $scope.viewingDetail = false;
+        $scope.currentDecoder = false;
+        if(!$scope.$$phase) $scope.$digest();
     }
 
     const load = async () => {

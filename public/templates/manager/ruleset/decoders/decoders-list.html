@@ -1,6 +1,6 @@
-<div ng-show="!loading" flex layout="column">
+<div ng-show="!loading && !viewingDetail" flex layout="column">
     <div id="content" layout="row" layout-align="start start">
-        <span layout="row" flex layout-align="space-between center">
+        <span flex layout="row" layout-align="space-between center">
             <md-autocomplete flex id="Auto" class="wz-autocomplete wz-select-input wz-margin-right-16" md-input-id="autocomplete" md-select-on-match="true" md-no-cache="noCache" md-selected-item="filter"
                 md-selected-item-change="decoders.addFilter('search', filter.name)" md-search-text="searchTerm" md-items="decoder in analizeDecoders(searchTerm)"
                 md-item-text="decoder.name +' '+ decoder.file" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
@@ -20,20 +20,20 @@
             </md-autocomplete>
         </span>
 
-        <div flex="20" layout="column" class="height-40 wz-select-input wz-margin-right-8">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="decoders.toggleOnlyParents(typeFilter == 'all')" aria-label="Filter by type" ng-init="'All'">
-                <option value="all">All</option>
-                <option value="parents">Parents only</option>
+        <div flex="15" layout="column" class="height-40 wz-select-input wz-margin-right-8">
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="decoders.toggleOnlyParents(typeFilter == 'all')" aria-label="Filter by type" ng-init="'All decoders'">
+                <option value="all">All decoders</option>
+                <option value="parents">Parent decoders</option>
             </select>
         </div>
 
         <md-button ng-class="(globalsubmenuNavItem2 == 'rules') ? 'wz-ruleset-active' : ''" ng-click="setRulesTab('rules')"
             class="wazuh-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
-            Rules
+            <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
         </md-button>
         <md-button ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'wz-ruleset-active' : ''" ng-click="setRulesTab('decoders')"
             class="wazuh-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
-            Decoders
+            <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
         </md-button>
 
     </div>
@@ -69,7 +69,7 @@
     <wz-table
         layout="column"
         flex
-        func="closeOther(decoder.name+decoder.file+decoder.position)"
+        func="openDetailView(decoder)"
         data="decoders"
         full="'decoder'"
         activeitem="activeItem"
@@ -79,6 +79,7 @@
             {col:'details.order',size:40},
             {col:'file',size:20}
         ]"
+        isruleset="true"
         isdecoders="true"
         class="no-lateral-padding">
     </wz-table>

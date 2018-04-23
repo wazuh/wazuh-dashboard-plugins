@@ -29,8 +29,50 @@
     </div>
 </div>
 
+<!-- Manager/Ruleset tables section -->
+<div flex ng-if="isruleset" layout="column" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+    <!-- Manager/Ruleset/Rules table -->
+    <div ng-if="!noscroll && !isdecoders" flex class="wz-table-scroll" when-scrolled="data.nextPage('')">
+        <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data.items | filter : searchTerm" class="wz-table-common" ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' " ng-click="clickAction(full ? item : $index)">
+            <div class="wz-text-truncatable" ng-repeat="key in keys" flex="{{key.size || ''}}">
+                <span>{{parseItem(item,key) || '---'}}</span>
+            </div>
+        </div>
+    </div>
+    <!-- End Manager/Ruleset/Rules table -->
+
+    <!-- Manager/Ruleset/Decoders table -->
+    <div ng-if="!noscroll && isdecoders" flex class="wz-table-scroll" when-scrolled="data.nextPage('')">
+        <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data.items | filter : searchTerm" class="wz-table-common" ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' " ng-click="clickAction(full ? item : $index)">
+            <div class="wz-text-truncatable" ng-repeat="key in keys" flex="{{key.size || ''}}">
+                <span>{{parseItem(item,key) || '---'}}</span>
+            </div>
+        </div>
+    </div>
+    <!-- End Manager/Ruleset/Decoders table -->
+</div>
+<!-- End Manager/Ruleset tables section -->
+
+<!-- Progress bar -->
+<div layout="row">
+    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="data.busy || loading || load"></md-progress-linear>
+</div>
+<!-- End progress bar -->
+
+<!-- No results section -->
+<div flex layout="row" layout-align="start start" ng-show="!data.busy && ((!noscroll && data.items && data.items.length === 0) || (noscroll && !data))">
+    <md-card class="wz-md-card" flex layout="column">
+        <md-card-content class="wz-text-center">
+            <i class="fa fa-frown-o"></i> No results found
+        </md-card-content>
+    </md-card>
+</div>
+<!-- End no results section -->
+
+<!-- LEGACY TABLES (WILL BE REMOVED) -->
+
 <!-- Manager/Ruleset/Rules tab -->
-<div flex ng-if="isruleset" layout="column" class="wz-table-no-padding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+<!-- <div flex ng-if="isruleset" layout="column" class="wz-table-no-padding" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-if="!noscroll" flex class="wz-table-scroll" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data.items | filter : searchTerm"
             class="wz-table-common" ng-class="!nopointer && activeitem !== item.id ? 'wz-table-cursor-pointer' : !nopointer && activeitem === item.id ? 'wz-table-cursor-pointer wz-table-active' : ''"
@@ -107,10 +149,10 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Manager/Ruleset/Decoders tab -->
-<div flex ng-if="isdecoders" layout="column" class="md-padding wz-table-no-padding wz-table-no-padding-bottom" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
+<!-- <div flex ng-if="isdecoders" layout="column" class="md-padding wz-table-no-padding wz-table-no-padding-bottom" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
     <div ng-if="!noscroll" flex class="wz-table-scroll" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="decoder in data.items | filter : searchTerm"
             class="wz-table-common" ng-class="!nopointer && activeitem !== decoder.name+decoder.file+decoder.position ? 'wz-table-cursor-pointer' : !nopointer && activeitem === decoder.name+decoder.file+decoder.position ? 'wz-table-cursor-pointer wz-table-active' : ''"
@@ -161,14 +203,4 @@
             </div>
         </div>
     </div>
-</div>
-<div layout="row">
-    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="data.busy || loading || load"></md-progress-linear>
-</div>
-<div flex layout="row" layout-align="start start" ng-show="!data.busy && ((!noscroll && data.items && data.items.length === 0) || (noscroll && !data))">
-    <md-card class="wz-md-card" flex layout="column">
-        <md-card-content class="wz-text-center">
-            <i class="fa fa-frown-o"></i> No results found
-        </md-card-content>
-    </md-card>
-</div>
+</div> -->
