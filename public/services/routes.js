@@ -1,3 +1,15 @@
+/*
+ * Wazuh app - File for routes definition
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
 // Require routes
 import routes from 'ui/routes';
 
@@ -48,7 +60,7 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
         let fromElastic = false;
         if (parseInt(data.data.error) === 2){
             errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
-        } else if((data.data && (data.data.apiIsDown || data.data.message === 'socket hang up')) || 
+        } else if((data.data && (data.data.apiIsDown || data.data.message === 'socket hang up')) ||
                   (data.data.data && (data.data.data.apiIsDown || data.data.data.message === 'socket hang up'))){
             $rootScope.apiIsDown = "down";
             errorHandler.handle('Wazuh RESTful API seems to be down.','Routes');
@@ -189,7 +201,7 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
             perPage: 10000
         })
         .then(({ savedObjects }) => {
-            
+
             genericReq.request('GET', '/get-list')
             .then(data => {
                 let currentPattern = '';

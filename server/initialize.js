@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Module for app initialization
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import needle             from 'needle'
 import colors             from 'ansicolors'
 import fs                 from 'fs'
@@ -62,8 +73,8 @@ export default (server, options) => {
         try {
             const xpack = await wzWrapper.getPlugins();
             log('[initialize][checkKnownFields]', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
-            server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
-                    
+            server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);
+
             const indexPatternList = await wzWrapper.getAllIndexPatterns();
 
             log('[initialize][checkKnownFields]', `Found ${indexPatternList.hits.total} index patterns`,'info')
@@ -71,37 +82,37 @@ export default (server, options) => {
             let list = [];
             if(indexPatternList && indexPatternList.hits && indexPatternList.hits.hits){
                 const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
-               
+
                 if(indexPatternList.hits.hits.length > 0) {
-                    for(const index of indexPatternList.hits.hits){   
-                        let valid, parsed;        
+                    for(const index of indexPatternList.hits.hits){
+                        let valid, parsed;
                         try{
                             parsed = JSON.parse(index._source['index-pattern'].fields)
                         } catch (error){
                             continue;
-                        }     
+                        }
                         valid = parsed.filter(item => minimum.includes(item.name));
-                        
+
                         if(valid.length === 4){
                             list.push({
                                 id   : index._id.split('index-pattern:')[1],
                                 title: index._source['index-pattern'].title
                             })
                         }
-            
+
                     }
                 }
-            } 
+            }
             log('[initialize][checkKnownFields]', `Found ${list.length} valid index patterns for Wazuh alerts`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Found ${list.length} valid index patterns for Wazuh alerts`);
-            const defaultExists = list.filter(item => item.title === defaultIndexPattern);            
+            const defaultExists = list.filter(item => item.title === defaultIndexPattern);
 
             if(defaultExists.length === 0 && forceDefaultPattern){
                 log('[initialize][checkKnownFields]', `Default index pattern not found, creating it...`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Default index pattern not found, creating it...`);
                 await createIndexPattern();
                 log('[initialize][checkKnownFields]', 'Waiting for default index pattern creation to complete...','info')
-                server.log([blueWazuh, 'initialize', 'info'], 'Waiting for default index pattern creation to complete...');   
+                server.log([blueWazuh, 'initialize', 'info'], 'Waiting for default index pattern creation to complete...');
                 let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 let tmplist = null;
                 while(waitTill > new Date()){
@@ -136,8 +147,8 @@ export default (server, options) => {
         }
     };
 
-    // Creates the default index pattern 
-    const createIndexPattern = async () => {        
+    // Creates the default index pattern
+    const createIndexPattern = async () => {
         try {
             log('[initialize][createIndexPattern]', `Creating index pattern: ${defaultIndexPattern}`,'info')
             server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${defaultIndexPattern}`);
@@ -159,14 +170,14 @@ export default (server, options) => {
     const saveConfiguration = async () => {
         try{
             const shards = configurationFile && typeof configurationFile["wazuh-version.shards"] !== 'undefined' ?
-                           configurationFile["wazuh-version.shards"] : 
+                           configurationFile["wazuh-version.shards"] :
                            1;
 
             const replicas = configurationFile && typeof configurationFile["wazuh-version.replicas"] !== 'undefined' ?
-                             configurationFile["wazuh-version.replicas"] : 
+                             configurationFile["wazuh-version.replicas"] :
                              1;
 
-    
+
             const shard_configuration = {
                 settings: {
                     index: {
@@ -175,7 +186,7 @@ export default (server, options) => {
                     }
                 }
             };
-    
+
             await wzWrapper.createWazuhVersionIndex(shard_configuration);
 
             const commonDate = new Date().toISOString();
@@ -194,12 +205,12 @@ export default (server, options) => {
 
                 log('[initialize][saveConfiguration]', 'Wazuh configuration inserted','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
-     
+
             } catch (error){
                 log('[initialize][saveConfiguration]', error.message || error);
                 server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh configuration');
             }
-            
+
             return;
 
         } catch (error){
@@ -212,16 +223,16 @@ export default (server, options) => {
             try{
                 log('[initialize][checkWazuhIndex]', 'Checking .wazuh index.','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh index.');
-                
+
                 const result = await wzWrapper.checkIfIndexExists('.wazuh');
 
                 if (!result) {
                     const shards = configurationFile && typeof configurationFile["wazuh.shards"] !== 'undefined' ?
-                                   configurationFile["wazuh.shards"] : 
+                                   configurationFile["wazuh.shards"] :
                                    1;
 
                     const replicas = configurationFile && typeof configurationFile["wazuh.replicas"] !== 'undefined' ?
-                                     configurationFile["wazuh.replicas"] : 
+                                     configurationFile["wazuh.replicas"] :
                                      1;
 
                     let configuration = {
@@ -232,13 +243,13 @@ export default (server, options) => {
                             }
                         }
                     };
-                    
+
                     try{
                         await wzWrapper.createWazuhIndex(configuration);
-            
+
                         log('[initialize][checkWazuhIndex]', 'Index .wazuh created.','info')
                         server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
-                    
+
                     } catch(error) {
                         throw new Error('Error creating index .wazuh.');
                     }
@@ -269,22 +280,22 @@ export default (server, options) => {
             log('[initialize][checkWazuhVersionIndex]', 'Checking .wazuh-version index.','info')
             server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh-version index.');
 
-            try{                
+            try{
                 await wzWrapper.getWazuhVersionIndex();
             } catch (error) {
                 log('[initialize][checkWazuhVersionIndex]','.wazuh-version document does not exist. Initializating configuration...','info');
                 server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
-    
+
                 // Save Setup Info
                 await saveConfiguration(defaultIndexPattern);
             }
 
             server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information...');
-            
+
             await wzWrapper.updateWazuhVersionIndexLastRestart(packageJSON.version,packageJSON.revision);
 
             server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated .wazuh-version index');
-        
+
         } catch (error) {
             return Promise.reject(error);
         }
@@ -363,10 +374,10 @@ export default (server, options) => {
     const checkKibanaStatus = async () => {
         try {
             const data = await wzWrapper.checkIfIndexExists(wzWrapper.WZ_KIBANA_INDEX);
-            if (data) { 
+            if (data) {
                 // It exists, initialize!
                 await init();
-            } else { 
+            } else {
                 // No Kibana index created...
                 log('[initialize][checkKibanaStatus]', 'Didn\'t find ' + wzWrapper.WZ_KIBANA_INDEX + ' index...','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Didn\'t find ' + wzWrapper.WZ_KIBANA_INDEX + ' index...');
@@ -466,7 +477,7 @@ export default (server, options) => {
             }
 
             return;
-                
+
         } catch (error) {
             return Promise.reject(error)
         }
@@ -498,7 +509,7 @@ export default (server, options) => {
                 server.log([blueWazuh, 'reindex', 'error'], `Could not get cluster/status information for ${config.manager}`);
                 return;
             }
-         
+
         } catch (error) {
             return Promise.reject(error);
         }
@@ -537,12 +548,12 @@ export default (server, options) => {
             log('[initialize][reachAPI]', `Reaching ${config.manager}`,'info')
             server.log([blueWazuh, 'reindex', 'info'], `Reaching ${config.manager}`);
 
-            if (config.cluster_info === undefined) { 
+            if (config.cluster_info === undefined) {
                 // No cluster_info in the API configuration data -> 2.x version
                 await checkVersion(config)
             } else { // 3.x version
                 // Nothing to be done, cluster_info is present
-                log('[initialize][reachAPI]', `Nothing to be done for ${config.manager} as it is already a 3.x version.`,'info')   
+                log('[initialize][reachAPI]', `Nothing to be done for ${config.manager} as it is already a 3.x version.`,'info')
                 server.log([blueWazuh, 'reindex', 'info'], `Nothing to be done for ${config.manager} as it is already a 3.x version.`);
             }
 
@@ -555,9 +566,9 @@ export default (server, options) => {
     // Reindex a .wazuh index from 2.x-5.x or 3.x-5.x to .wazuh and .wazuh-version in 3.x-6.x
     const reindexOldVersion = async () => {
         try {
-            log('[initialize][reindexOldVersion]',  `Old version detected. Proceeding to reindex.`,'info')  
+            log('[initialize][reindexOldVersion]',  `Old version detected. Proceeding to reindex.`,'info')
             server.log([blueWazuh, 'reindex', 'info'], `Old version detected. Proceeding to reindex.`);
-    
+
             const configuration = {
                 source: {
                     index: '.wazuh',
@@ -567,11 +578,11 @@ export default (server, options) => {
                     index: '.old-wazuh'
                 }
             };
-    
+
             // Backing up .wazuh index
             await wzWrapper.reindexWithCustomConfiguration(configuration);
 
-            log('[initialize][reindexOldVersion]',  'Successfully backed up .wazuh index','info')  
+            log('[initialize][reindexOldVersion]',  'Successfully backed up .wazuh index','info')
             // And...this response does not take into acount new index population so...let's wait for it
             server.log([blueWazuh, 'reindex', 'info'], 'Successfully backed up .wazuh index');
             setTimeout(() => swapIndex(), 3000);

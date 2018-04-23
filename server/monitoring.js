@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Module for agent info fetching functions
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import cron               from 'node-cron'
 import needle             from 'needle'
 import getPath            from'../util/get-path'
@@ -27,12 +38,12 @@ export default (server, options) => {
             if (!maxSize) {
                 throw new Error('You must provide a max size')
             }
-    
+
             const payload = {
                 offset: offset ? offset: 0,
                 limit : (250 < maxSize) ? 250 : maxSize
             };
-    
+
             const options = {
                 headers: {
                     'wazuh-app-version': packageJSON.version
@@ -41,7 +52,7 @@ export default (server, options) => {
                 password:           apiEntry.password,
                 rejectUnauthorized: !apiEntry.insecure
             };
-    
+
             const response = await needle('get', `${getPath(apiEntry)}/agents`, payload, options);
 
             if (!response.error && response.body.data.items) {
@@ -54,7 +65,7 @@ export default (server, options) => {
             } else {
                 throw new Error('Can not access Wazuh API')
             }
-            
+
             return;
 
         } catch (error) {
@@ -70,7 +81,7 @@ export default (server, options) => {
                 'offset': 0,
                 'limit':  1
             };
-    
+
             const options = {
                 headers: {
                     'wazuh-app-version': packageJSON.version
@@ -79,11 +90,11 @@ export default (server, options) => {
                 password: apiEntry.password,
                 rejectUnauthorized: !apiEntry.insecure
             };
-    
+
             const response = await needle('get', `${getPath(apiEntry)}/agents`, payload, options)
-            
+
             const isCluster   = await needle('get',`${getPath(apiEntry)}/cluster/status`,{},options)
-            const clusterName = (isCluster && isCluster.body && isCluster.body.data && isCluster.body.data.enabled === 'yes') ? 
+            const clusterName = (isCluster && isCluster.body && isCluster.body.data && isCluster.body.data.enabled === 'yes') ?
                                 await needle('get',`${getPath(apiEntry)}/cluster/node`,{},options) :
                                 false;
 
@@ -101,7 +112,7 @@ export default (server, options) => {
         } catch(error){
             log('[monitoring][checkAndSaveStatus]',error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
-        }   
+        }
     };
 
     // Load Wazuh API credentials from Elasticsearch document
@@ -111,13 +122,13 @@ export default (server, options) => {
 
             const filteredApis = apiEntries.hits.filter((element, index, self) =>
                 index === self.findIndex((t) => (
-                    t._source.api_user === element._source.api_user && 
+                    t._source.api_user === element._source.api_user &&
                     t._source.api_password === element._source.api_password &&
-                    t._source.url === element._source.url && 
+                    t._source.url === element._source.url &&
                     t._source.api_port === element._source.api_port
                 ))
             );
-    
+
             for(let element of filteredApis) {
                 let apiEntry = {
                     'user':     element._source.api_user,
@@ -144,7 +155,7 @@ export default (server, options) => {
     const getConfig = async () => {
         try {
             const data = await wzWrapper.getWazuhAPIEntries();
-            
+
             if (data.hits.total > 0) {
                 return data.hits;
             }
@@ -154,7 +165,7 @@ export default (server, options) => {
                 error     : 'no credentials',
                 error_code: 1
             };
-            
+
         } catch (error){
             log('[monitoring][getConfig]',error.message || error);
             return {
@@ -179,7 +190,7 @@ export default (server, options) => {
         try {
             log('[monitoring][configureKibana]', `Creating index pattern: ${index_pattern}`, 'info');
             server.log([blueWazuh, 'monitoring', 'info'], `Creating index pattern: ${index_pattern}`);
-    
+
             await wzWrapper.createMonitoringIndexPattern(index_pattern);
 
             log('[monitoring][configureKibana]', `Created index pattern: ${index_pattern}`, 'info');
@@ -221,7 +232,7 @@ export default (server, options) => {
                     body                 += JSON.stringify(element) + "\n";
                 }
                 if (body === '') return;
-    
+
                 const response = await wzWrapper.pushBulkAnyIndex(todayIndex,body);
 
                 agentsArray.length = 0;
@@ -238,13 +249,13 @@ export default (server, options) => {
         try {
             fDate      = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
             todayIndex = index_prefix + fDate;
-    
+
             const result = await wzWrapper.checkIfIndexExists(todayIndex);
 
             result ? await insertDocument(todayIndex,clusterName) : await createIndex(todayIndex,clusterName);
 
             return;
-           
+
         } catch (error) {
             log('[monitoring][saveStatus]', `Could not check if the index ${todayIndex} exists due to ${error.message || error}`);
             server.log([blueWazuh, 'monitoring', 'error'], `Could not check if the index ${todayIndex} exists due to ` + error);
@@ -253,7 +264,7 @@ export default (server, options) => {
 
     const createWazuhMonitoring = async () => {
         try{
-            
+
             try{
                 await wzWrapper.deleteMonitoring();
 
@@ -294,9 +305,9 @@ export default (server, options) => {
 
             log('[monitoring][init]', 'Creating today index...', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Creating today index...');
-            
+
             await saveStatus();
-    
+
             const patternId = 'index-pattern:' + index_pattern;
 
             // Checks if wazuh-monitoring index pattern is already created, if it fails create it
@@ -312,9 +323,9 @@ export default (server, options) => {
 
             log('[monitoring][init]', 'Skipping wazuh-monitoring pattern creation. Already exists.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Skipping wazuh-monitoring creation. Already exists.');
-            
+
             return;
- 
+
         } catch (error) {
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
             log('[monitoring][init]', error.message || error);

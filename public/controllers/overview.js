@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Overview controller
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import $            from 'jquery';
 import * as modules from 'ui/modules'
 
@@ -119,8 +130,8 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                 return html.split('<span>')[1].split('</span')[0];
             } else if(html.includes('table') && html.includes('cell-hover')){
                 let nonB = html.split('ng-non-bindable')[1];
-                if(nonB && 
-                    nonB.split('>')[1] && 
+                if(nonB &&
+                    nonB.split('>')[1] &&
                     nonB.split('>')[1].split('</')[0]
                 ) {
                     return nonB.split('>')[1].split('</')[0];
@@ -129,7 +140,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         }
         return '';
     }
-    
+
     const createMetrics = metricsObject => {
         for(let key in metricsObject) {
             $scope[key] = () => generateMetric(metricsObject[key]);
@@ -162,10 +173,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                     break;
             }
         }
-        
+
         if(!$rootScope.$$phase) $rootScope.$digest();
     }
-    
+
     // Switch subtab
     $scope.switchSubtab = subtab => {
         if ($scope.tabView === subtab) return;
@@ -176,7 +187,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                 $rootScope.visTimestamp = new Date().getTime();
                 if(!$rootScope.$$phase) $rootScope.$digest();
             }
-    
+
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
             .then(data => {
@@ -187,7 +198,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
             })
             .catch(error => errorHandler.handle(error, 'Overview'));
         } else {
-            checkMetrics($scope.tab, subtab); 
+            checkMetrics($scope.tab, subtab);
         }
     }
 

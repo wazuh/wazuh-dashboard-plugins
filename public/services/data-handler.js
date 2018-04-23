@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Data handler service
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
@@ -73,7 +84,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                     this.items[i].selected = false;
                 }
                 this.offset += items.length;
-                if (this.offset >= this.totalItems) this.end = true; 
+                if (this.offset >= this.totalItems) this.end = true;
                 if (data.data.data !== 0){
                     this.busy = false;
                     if(this.path === '/agents/groups'){
@@ -94,7 +105,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
 
         getFilter (filterName) {
             let filtered = this.filters.filter(element => element.name === filterName);
-            return (filtered.length !== 0) ? filtered[0].value : null;           
+            return (filtered.length !== 0) ? filtered[0].value : null;
         }
 
         hasFilter (filterName) {
@@ -109,7 +120,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                 name:  filterName,
                 value: value
             });
-            return this.search();           
+            return this.search();
         }
 
         ///////////////////////////////////////////////////////////////
@@ -123,7 +134,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         removeFilter (filterName, search) {
             if(search) this.filters = this.filters.filter(filter => filterName !== filter.name && filter.value !== search);
             else       this.filters = this.filters.filter(filter => filterName !== filter.name);
-            
+
             if (search) this.search();
 
         }

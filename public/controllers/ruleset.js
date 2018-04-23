@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Ruleset controllers
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
@@ -10,7 +21,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
     }
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
-    
+
     //Initialization
     $scope.loading = true;
     $scope.rules   = Rules;
@@ -20,7 +31,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
     $scope.analizeRules = async search => {
         try {
             $scope.rulesAutoComplete.filters = [];
-    
+
             if(search.startsWith('group:') && search.split('group:')[1].trim()) {
                 await $scope.rulesAutoComplete.addFilter('group',search.split('group:')[1].trim());
             } else if(search.startsWith('level:') && search.split('level:')[1].trim()) {
@@ -32,7 +43,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules,RulesAutoC
             } else {
                 await $scope.rulesAutoComplete.addFilter('search',search);
             }
-    
+
             if(!$scope.$$phase) $scope.$digest();
             return $scope.rulesAutoComplete.items;
         } catch (error){
@@ -119,7 +130,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
 
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
-    
+
     //Initialization
     $scope.loading  = true;
     $scope.decoders = Decoders;
@@ -156,7 +167,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
     $scope.analizeDecoders = async search => {
         try {
             $scope.decodersAutoComplete.filters = [];
-    
+
             if(search.startsWith('path:') && search.split('path:')[1].trim()) {
                 await $scope.decodersAutoComplete.addFilter('path',search.split('path:')[1].trim());
             } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
@@ -164,7 +175,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
             } else {
                 await $scope.decodersAutoComplete.addFilter('search',search);
             }
-    
+
             if(!$scope.$$phase) $scope.$digest();
             return $scope.decodersAutoComplete.items;
         } catch (error){

@@ -1,17 +1,28 @@
+/*
+ * Wazuh app - Groups controller
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import beautifier   from 'plugins/wazuh/utils/json-beautifier';
 import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
 // Groups preview controller
-app.controller('groupsPreviewController', 
+app.controller('groupsPreviewController',
 function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler) {
     const reloadWatcher = $rootScope.$watch('groupsIsReloaded',() => {
         delete $rootScope.groupsIsReloaded;
         $scope.lookingGroup = false;
         if(!$scope.$$phase) $scope.$digest();
     });
-    
+
     $scope.searchTerm      = '';
     $scope.searchTermAgent = '';
     $scope.searchTermFile  = '';
@@ -41,14 +52,14 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
                     $scope.groups.items = filtered;
                     // Load that our group
                     $scope.loadGroup(0,true);
-                    $scope.lookingGroup=true    
+                    $scope.lookingGroup=true
                 }
                 // Clean $rootScope
                 delete $rootScope.globalAgent;
                 delete $rootScope.comeFrom;
                 // Get more groups to fill the md-content with more items
                 await $scope.groups.nextPage();
-                    
+
                 // If our group was not found  we need to call loadGroup after load some groups
                 if(!len) {
                     $scope.loadGroup(0,true);
@@ -61,7 +72,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
                 await $scope.groups.nextPage();
                 $scope.loadGroup(0,true);
             }
-            
+
             $scope.load = false;
 
             if(!$scope.$$phase) $scope.$digest();
@@ -87,14 +98,14 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         $scope.fileViewer = false;
         $scope.groupAgents.reset();
         $scope.groupAgents.path = `/agents/groups/${$scope.groups.items[index].name}`;
-        $scope.groupAgents.nextPage('');        
+        $scope.groupAgents.nextPage('');
     };
 
     $scope.showAgent = agent => {
         $rootScope.globalAgent = agent.id;
         $rootScope.comeFrom    = 'groups';
         $location.search('tab', null);
-        $location.path('/agents');        
+        $location.path('/agents');
     };
 
     $scope.loadGroup = (index,firstTime) => {
@@ -142,18 +153,18 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
             if($scope.filename) $scope.filename = '';
             let filename = $scope.groupFiles.items[index].filename;
             if(filename === '../ar.conf') filename = 'ar.conf';
-       
+
             $scope.fileViewer = true;
-    
+
             const tmpName = `/agents/groups/${$scope.groups.items[$scope.selectedGroup].name}`+
                           `/files/${filename}`;
-       
-    
+
+
             const data = await apiReq.request('GET', tmpName, {})
 
             $scope.file = beautifier.prettyPrint(data.data.data);
             $scope.filename = filename;
-            
+
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
@@ -181,7 +192,7 @@ function ($scope, $timeout, $rootScope,$mdSidenav, $location, apiReq, Groups, Gr
         $rootScope.ownHandlers = [];
         reloadWatcher();
     });
-   
+
 
     $scope.$watch('lookingGroup',value => {
         if(!value){

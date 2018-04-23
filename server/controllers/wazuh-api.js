@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Class for Wazuh-API functions
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 
 // Require some libraries
 import needle              from 'needle'
@@ -24,11 +35,11 @@ export default class WazuhApi {
             if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
             // Get config from elasticsearch
             const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
-                
+
             if (wapi_config.error_code > 1) {
                 // Can not connect to elasticsearch
                 return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
-                
+
             } else if (wapi_config.error_code > 0) {
                 // Credentials not found
                 return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
@@ -42,7 +53,7 @@ export default class WazuhApi {
 
             if (parseInt(response.body.error) === 0 && response.body.data) {
                 // Checking the cluster status
-                response = await needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/status`, {}, { 
+                response = await needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/status`, {}, {
                     username          : wapi_config.user,
                     password          : wapi_config.password,
                     rejectUnauthorized: !wapi_config.insecure
@@ -50,13 +61,13 @@ export default class WazuhApi {
 
                 if (!response.body.error) {
                     // If cluster mode is active
-                    if (response.body.data.enabled === 'yes') { 
+                    if (response.body.data.enabled === 'yes') {
                         response = await needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/node`, {}, {
                             username          : wapi_config.user,
                             password          : wapi_config.password,
                             rejectUnauthorized: !wapi_config.insecure
                         })
-             
+
                         if (!response.body.error) {
                             let managerName = wapi_config.cluster_info.manager;
                             delete wapi_config.cluster_info;
@@ -75,7 +86,7 @@ export default class WazuhApi {
                                 message   :    response.body.message
                             }).code(500);
                         }
-          
+
                     } else { // Cluster mode is not active
                         let managerName = wapi_config.cluster_info.manager;
                         delete wapi_config.cluster_info;
@@ -94,7 +105,7 @@ export default class WazuhApi {
                         message   : 'Error occurred'
                     }).code(500);
                 }
-             
+
             } else {
                 return reply({
                     statusCode: 500,
@@ -118,23 +129,23 @@ export default class WazuhApi {
     validateCheckApiParams (payload)  {
         if (!('user' in payload)) {
             return this.genericErrorBuilder(400,3,'Missing param: API USER');
-        } 
+        }
 
         if (!('password' in payload)) {
             return this.genericErrorBuilder(400,4,'Missing param: API PASSWORD');
-        } 
-        
+        }
+
         if (!('url' in payload)) {
             return this.genericErrorBuilder(400,5,'Missing param: API URL');
-        } 
-        
+        }
+
         if (!('port' in payload)) {
             return this.genericErrorBuilder(400,6,'Missing param: API PORT');
-        } 
-        
+        }
+
         if (!(payload.url.includes('https://')) && !(payload.url.includes('http://'))) {
             return this.genericErrorBuilder(200,1,'protocol_error');
-        } 
+        }
 
         return false;
     }
@@ -153,30 +164,30 @@ export default class WazuhApi {
             if(notValid) return this.genericErrorBuilder(valid);
 
             req.payload.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
-        
+
             let response = await needle('get', `${req.payload.url}:${req.payload.port}/version`, {}, {
                 username          : req.payload.user,
                 password          : req.payload.password,
                 rejectUnauthorized: !req.payload.insecure
             })
-            
-    
+
+
             // Check wrong credentials
             if(parseInt(response.statusCode) === 401){
                 return reply(this.genericErrorBuilder(500,10401,'wrong_credentials')).code(500);
             }
-    
+
             if (parseInt(response.body.error) === 0 && response.body.data) {
-                    
+
                 response = await needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
                     username          : req.payload.user,
                     password          : req.payload.password,
                     rejectUnauthorized: !req.payload.insecure
                 })
-      
+
                 if (!response.body.error) {
                     const managerName = response.body.data.name;
-                    
+
                     response = await needle('get', `${req.payload.url}:${req.payload.port}/cluster/status`, {}, { // Checking the cluster status
                         username          : req.payload.user,
                         password          : req.payload.password,
@@ -184,8 +195,8 @@ export default class WazuhApi {
                     })
 
                     if (!response.body.error) {
-                        if (response.body.data.enabled === 'yes') { 
-                            
+                        if (response.body.data.enabled === 'yes') {
+
                             // If cluster mode is active
                             response = await needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
                                 username          : req.payload.user,
@@ -200,10 +211,10 @@ export default class WazuhApi {
                                     cluster: response.body.data.cluster,
                                     status : 'enabled'
                                 });
-                            } 
-                            
-                        } else { 
-                            
+                            }
+
+                        } else {
+
                             // Cluster mode is not active
                             return reply({
                                 manager: managerName,
@@ -213,8 +224,8 @@ export default class WazuhApi {
                         }
                     }
                 }
-            } 
-              
+            }
+
             throw new Error(response.body.message)
 
         } catch(error) {
@@ -224,7 +235,7 @@ export default class WazuhApi {
 
     async getPciRequirement (req, reply) {
         try {
-            
+
             if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
 
             let pci_description = '';
@@ -242,13 +253,13 @@ export default class WazuhApi {
                     // Credentials not found
                     return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
                 }
-    
+
                 const response = await needle('get', `${wapi_config.url}:${wapi_config.port}/rules/pci`, {}, {
                     username          : wapi_config.user,
                     password          : wapi_config.password,
                     rejectUnauthorized: !wapi_config.insecure
                 })
-        
+
                 if(response.body.data && response.body.data.items){
                     let PCIobject = {};
                     for(let item of response.body.data.items){
@@ -258,12 +269,12 @@ export default class WazuhApi {
                 } else {
                     return reply({ statusCode: 400, error: '9998', data: 'An error occurred trying to parse PCI DSS requirements' });
                 }
-              
+
             } else {
                 if (typeof pciRequirementsFile[req.params.requirement] !== 'undefined'){
                     pci_description = pciRequirementsFile[req.params.requirement];
                 }
-                
+
                 return reply({
                     pci: {
                         requirement: req.params.requirement,
@@ -273,10 +284,10 @@ export default class WazuhApi {
             }
         } catch (error) {
 
-            return reply({ 
-                statusCode: 400, 
-                error     : '9999', 
-                data      : `An error occurred trying to obtain PCI DSS requirements due to ${error.message || error}` 
+            return reply({
+                statusCode: 400,
+                error     : '9999',
+                data      : `An error occurred trying to obtain PCI DSS requirements due to ${error.message || error}`
             });
         }
 
@@ -319,7 +330,7 @@ export default class WazuhApi {
                     error     : 2,
                     message   : 'Could not connect with elasticsearch'
                 }).code(404);
-                
+
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
                 return reply({
@@ -348,10 +359,10 @@ export default class WazuhApi {
 
             if (errorData.isError) {
                 return reply(errorData.body).code(500);
-            } 
+            }
 
             return reply(response.body);
-            
+
         } catch (error) {
             return reply({
                 statusCode: 500,
@@ -383,24 +394,24 @@ export default class WazuhApi {
         try{
             if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
 
-            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id); 
-    
+            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id);
+
             if (wapi_config.error_code > 1) {
-                throw new Error('no_elasticsearch');                
+                throw new Error('no_elasticsearch');
             } else if (wapi_config.error_code > 0) {
-                throw new Error('no_credentials');            
+                throw new Error('no_credentials');
             }
             return reply({
                 statusCode: 200,
                 data      : ''
             });
-            
+
         } catch(error){
             return reply({
                 statusCode: 200,
                 error     : '1',
                 data      : error.message || error
-            }); 
+            });
         }
 
     };
@@ -433,7 +444,7 @@ export default class WazuhApi {
                 'statusCode': 500,
                 'message':    'You must provide at least one error message to log'
             });
-        
+
         } else {
             return reply({ statusCode: 200, message: 'Error logged succesfully' });
         }
@@ -442,11 +453,11 @@ export default class WazuhApi {
     getConfigurationFile (req,reply) {
         try{
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
-  
+
             if(configFile && configFile['login.password']){
                 delete configFile['login.password'];
             }
-            
+
             return reply({
                 statusCode: 200,
                 error     : 0,
@@ -460,7 +471,7 @@ export default class WazuhApi {
 
     login(req,reply) {
         try{
-            
+
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
 
             if(!configFile){

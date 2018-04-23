@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - Agents controller
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import beautifier   from 'plugins/wazuh/utils/json-beautifier';
 import * as modules from 'ui/modules'
 
@@ -95,8 +106,8 @@ app.controller('agentsController',
                     return html.split('<span>')[1].split('</span')[0];
                 } else if(html.includes('table') && html.includes('cell-hover')){
                     let nonB = html.split('ng-non-bindable')[1];
-                    if(nonB && 
-                        nonB.split('>')[1] && 
+                    if(nonB &&
+                        nonB.split('>')[1] &&
                         nonB.split('>')[1].split('</')[0]
                     ) {
                         return nonB.split('>')[1].split('</')[0];
@@ -105,7 +116,7 @@ app.controller('agentsController',
             }
             return '';
         }
-        
+
         const createMetrics = metricsObject => {
             for(let key in metricsObject) {
                 $scope[key] = () => generateMetric(metricsObject[key]);
@@ -142,19 +153,19 @@ app.controller('agentsController',
                     $rootScope.visTimestamp = new Date().getTime();
                     if(!$rootScope.$$phase) $rootScope.$digest();
                 }
-        
+
                 // Create current tab visualizations
                 genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
                 .then(data => {
                     $rootScope.rawVisualizations = data.data.raw;
                     // Render visualizations
                     $rootScope.$broadcast('updateVis');
-        
+
                     checkMetrics($scope.tab, 'panels');
                 })
                 .catch(error => errorHandler.handle(error, 'Agents'));
             } else {
-                checkMetrics($scope.tab, subtab); 
+                checkMetrics($scope.tab, subtab);
             }
         }
 
@@ -174,12 +185,12 @@ app.controller('agentsController',
                     $rootScope.rawVisualizations = data.data.raw;
                     // Render visualizations
                     $rootScope.$broadcast('updateVis');
-        
+
                     checkMetrics(tab, 'panels');
-        
+
                     // Deleting app state traces in the url
                     $location.search('_a', null);
-        
+
                 })
                 .catch(error => errorHandler.handle(error, 'Agents'));
             }
@@ -503,7 +514,7 @@ app.controller('agentsController',
                 $rootScope.rawVisualizations = data.data.raw;
                 // Render visualizations
                 $rootScope.$broadcast('updateVis');
-        
+
                 checkMetrics($scope.tab,'panels');
             })
             .catch(error => errorHandler.handle(error, 'Agents'));
