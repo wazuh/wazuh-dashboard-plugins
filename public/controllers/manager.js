@@ -112,6 +112,28 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, er
             const data = await apiReq.request('GET', '/manager/configuration', {});
 
             $scope.managerConfiguration = data.data.data;
+
+            if($scope.managerConfiguration && $scope.managerConfiguration['active-response']){
+                for(let i=0,len = $scope.managerConfiguration['active-response'].length; i<len; i++){
+                    let rule = '';
+                    const rulesArray = $scope.managerConfiguration['active-response'][i].rules_id ? 
+                                       $scope.managerConfiguration['active-response'][i].rules_id.split(',') :
+                                       [];
+                    if($scope.managerConfiguration['active-response'][i].rules_id && rulesArray.length > 1){
+                        let tmp = [];
+                        for(let id of rulesArray){
+                            rule = await apiReq.request('GET',`/rules/${id}`,{});
+                            tmp.push(rule.data.data.items[0]);
+                        }
+
+                        $scope.managerConfiguration['active-response'][i].rules = tmp;
+                    } else if($scope.managerConfiguration['active-response'][i].rules_id){
+                        rule = await apiReq.request('GET',`/rules/${$scope.managerConfiguration['active-response'][i].rules_id}`,{});
+                        $scope.managerConfiguration['active-response'][i].rule = rule.data.data.items[0];
+                    } 
+                }
+            }
+
             $scope.raw = beautifier.prettyPrint(data.data.data);
             $scope.load                 = false;
             if(!$scope.$$phase) $scope.$digest();

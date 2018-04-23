@@ -3,10 +3,17 @@ const fs      = require('fs');
 const path    = require('path');
 let allowed   = false;
 /** 
- * Checks if /var/log/wazuh exists on linux systems. If it doesn't exist, it will be created.
+ * Checks if ../../wazuh-logs exists. If it doesn't exist, it will be created.
  */
 const initDirectory = () => {
     try{
+        if(!path.join(__dirname).includes('/usr/share/kibana') &&
+            path.join(__dirname).includes('plugins') && 
+            path.join(__dirname).includes('kibana')){
+
+            throw new Error('Kibana is out of /usr/share/kibana path and the Wazuh App is inside plugins directory')
+            
+        }
         if (!fs.existsSync(path.join(__dirname, '../../wazuh-logs'))) {
             fs.mkdirSync(path.join(__dirname, '../../wazuh-logs'));
         }
@@ -14,7 +21,7 @@ const initDirectory = () => {
         return;
     } catch (error) {
         allowed = false;
-        console.error('Cannot create the logs directory');
+        console.error(`Cannot create the logs directory due to:\n${error.message || error}`);
     }
 }
 

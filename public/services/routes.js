@@ -48,7 +48,8 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
         let fromElastic = false;
         if (parseInt(data.data.error) === 2){
             errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
-        } else if(data.data.data && data.data.data.apiIsDown){
+        } else if((data.data && (data.data.apiIsDown || data.data.message === 'socket hang up')) || 
+                  (data.data.data && (data.data.data.apiIsDown || data.data.data.message === 'socket hang up'))){
             $rootScope.apiIsDown = "down";
             errorHandler.handle('Wazuh RESTful API seems to be down.','Routes');
         } else {
@@ -188,16 +189,21 @@ const getIp = (Promise, courier, config, $q, $rootScope, $window, $location, Pri
             perPage: 10000
         })
         .then(({ savedObjects }) => {
-
-            let currentPattern = '';
-
-            genericReq.request('GET', '/api/wazuh-elastic/current-pattern')
+            
+            genericReq.request('GET', '/get-list')
             .then(data => {
+                let currentPattern = '';
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
-                    currentPattern = data.data.data;
-                    appState.setCurrentPattern(data.data.data);
+                    if(!data.data.data.length){
+                        $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                        $location.search('tab',null);
+                        $location.path('/blank-screen');
+                        return;
+                    }
+                    currentPattern = data.data.data[0].id;
+                    appState.setCurrentPattern(currentPattern);
                 }
 
                 const onlyWazuhAlerts = savedObjects.filter(element => element.id === currentPattern);

@@ -1,6 +1,6 @@
 let app = require('ui/modules').get('app/wazuh', []);
 
-app.factory('DataHandler', function ($q, apiReq) {
+app.factory('DataHandler', function ($q, apiReq,errorHandler) {
     class DataHandler {
         constructor() {
             this.items        = [];
@@ -13,6 +13,13 @@ app.factory('DataHandler', function ($q, apiReq) {
             this.regularBatch = 15;
             this.busy         = false;
             this.end          = false;
+            this.onlyParents  = false;
+        }
+
+        toggleOnlyParents(value){
+            this.onlyParents = !value;
+            this.reset();
+            return this.nextPage();
         }
 
         nextPage () {
@@ -50,7 +57,8 @@ app.factory('DataHandler', function ($q, apiReq) {
                 deferred.resolve(true);
                 return;
             }
-            apiReq.request('GET', this.path, requestData)
+            const path = this.onlyParents ? this.path + '/parents' : this.path;
+            apiReq.request('GET', path, requestData)
             .then(data => {
                 if (data.data.data === 0){
                     this.busy = false;
@@ -74,7 +82,10 @@ app.factory('DataHandler', function ($q, apiReq) {
                     deferred.resolve(true);
                 }
             })
-            .catch(err => this.busy = false);
+            .catch(error => {
+                this.busy = false;
+                errorHandler.handle(error,'Datahandler factory');
+            });
 
             return deferred.promise;
         }
@@ -96,7 +107,7 @@ app.factory('DataHandler', function ($q, apiReq) {
                 name:  filterName,
                 value: value
             });
-            return this.search();
+            return this.search();           
         }
 
         ///////////////////////////////////////////////////////////////
@@ -120,7 +131,7 @@ app.factory('DataHandler', function ($q, apiReq) {
             .then(function (data) {
                 this.items.splice(index, 1);
             }.bind(this))
-            .catch(console.error);
+            .catch(error => errorHandler.handle(error,'Datahandler factory'));
         }
 
         search () {
@@ -161,7 +172,7 @@ app.factory('DataHandler', function ($q, apiReq) {
                 this.offset = items.length;
                 deferred.resolve(true);
             })
-            .catch(console.error);
+            .catch(error => errorHandler.handle(error,'Datahandler factory'));
 
             return deferred.promise;
         }

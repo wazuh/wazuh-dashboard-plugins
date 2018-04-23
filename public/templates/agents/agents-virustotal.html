@@ -1,22 +1,22 @@
-<md-content flex layout="column" ng-if="tab === 'virustotal'" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'virustotal' && tabView === 'panels'" ng-show="resultState === 'ready'" layout-align="start">
 
     <!-- View: Panels -->
-    <div ng-if="resultState === 'ready' && tabView === 'panels'">
+   
 
         <div layout="row">
             <md-card flex class="wz-metric-color wz-md-card">
                 <md-card-content layout="row" class="wz-padding-metric">
-                    <div flex>Total malicious: <span class="wz-text-bold">{{virusMalicious}}</span></div>
-                    <div flex>Total positives: <span class="wz-text-bold">{{virusPositives}}</span></div>
-                    <div flex>Total: <span class="wz-text-bold">{{virusTotal}}</span></div>                    
+                    <div flex>Total malicious: <span class="wz-text-bold" ng-bind="virusMalicious()"></span></div>
+                    <div flex>Total positives: <span class="wz-text-bold" ng-bind="virusPositives()"></span></div>
+                    <div flex>Total: <span class="wz-text-bold" ng-bind="virusTotal()"></span></div>                    
                 </md-card-content>
             </md-card>
         </div>
 
         <div class="wz-no-display">
-            <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total-Malicious'"></kbn-vis>
-            <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total-Positives'"></kbn-vis>
-            <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Total'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-Virustotal-Total-Malicious'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-Virustotal-Total-Positives'"></kbn-vis>
+            <kbn-vis vis-id="'Wazuh-App-Agents-Virustotal-Total'"></kbn-vis>
         </div>
 
         <div layout="row" class="height-250">
@@ -24,14 +24,14 @@
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Last scanned files</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Last-Files-Pie'"></kbn-vis>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Virustotal-Last-Files-Pie'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Malicious files alerts Evolution</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Malicious-Evolution'"></kbn-vis>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Virustotal-Malicious-Evolution'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
@@ -40,11 +40,11 @@
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Last files</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Files-Table'"></kbn-vis>
+                    <kbn-vis vis-id="'Wazuh-App-Agents-Virustotal-Files-Table'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
 
-    </div>
+   
 
 </md-content>

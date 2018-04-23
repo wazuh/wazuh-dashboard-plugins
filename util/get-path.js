@@ -1,18 +1,18 @@
-module.exports = (wapiConfig) => {
-    let path = wapiConfig.url;
+module.exports = config => {
+    let path = config.url;
     let protocol;
-    if (wapiConfig.url.startsWith("https://")) {
+    if (config.url.startsWith("https://")) {
         protocol = "https://";
-    } else if (wapiConfig.url.startsWith("http://")) {
+    } else if (config.url.startsWith("http://")) {
         protocol = "http://";
     }
 
     if (path.lastIndexOf("/") > protocol.length) {
         path = path.substr(0, path.substr(protocol.length).indexOf("/") + protocol.length) +
-               ":" + wapiConfig.port + 
+               ":" + config.port + 
                path.substr(path.substr(protocol.length).indexOf("/") + protocol.length);
     } else {
-        path = `${wapiConfig.url}:${wapiConfig.port}`;
+        path = `${config.url}:${config.port}`;
     }
     return path;
 };

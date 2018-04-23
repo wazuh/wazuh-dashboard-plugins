@@ -2,7 +2,13 @@ const app        = require('ui/modules').get('app/wazuh', []);
 const beautifier = require('plugins/wazuh/utils/json-beautifier');
 
 app.controller('agentsController',
-    function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, metricService) {
+    function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler) {
+        // Timestamp for visualizations at controller's startup
+        if(!$rootScope.visTimestamp) {
+            $rootScope.visTimestamp = new Date().getTime();
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+
         $rootScope.page = 'agents';
         $scope.extensions = appState.getExtensions().extensions;
         $scope.agentsAutoComplete = AgentsAutoComplete;
@@ -36,10 +42,10 @@ app.controller('agentsController',
 
         // Metrics Vulnerability Detector
         const metricsVulnerability = {
-            vulnCritical: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]',
-            vulnHigh    : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"]',
-            vulnMedium  : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"]',
-            vulnLow     : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
+            vulnCritical: '[vis-id="\'Wazuh-App-Agents-VULS-Metric-Critical-severity\'"]',
+            vulnHigh    : '[vis-id="\'Wazuh-App-Agents-VULS-Metric-High-severity\'"]',
+            vulnMedium  : '[vis-id="\'Wazuh-App-Agents-VULS-Metric-Medium-severity\'"]',
+            vulnLow     : '[vis-id="\'Wazuh-App-Agents-VULS-Metric-Low-severity\'"]'
         }
 
         // Metrics Scap
@@ -51,9 +57,9 @@ app.controller('agentsController',
 
         // Metrics Virustotal
         const metricsVirustotal = {
-            virusMalicious: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Malicious\'"]',
-            virusPositives: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Positives\'"]',
-            virusTotal    : '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
+            virusMalicious: '[vis-id="\'Wazuh-App-Agents-Virustotal-Total-Malicious\'"]',
+            virusPositives: '[vis-id="\'Wazuh-App-Agents-Virustotal-Total-Positives\'"]',
+            virusTotal    : '[vis-id="\'Wazuh-App-Agents-Virustotal-Total\'"]'
         }
 
         $rootScope.tabVisualizations = {
@@ -80,22 +86,44 @@ app.controller('agentsController',
             virustotal: { group: 'virustotal' }
         };
 
-        const checkMetrics = (tab, subtab) => {
-            metricService.destroyWatchers();
+        const generateMetric = id => {
+            let html = $(id).html();
+            if (typeof html !== 'undefined' && html.includes('<span')) {
+                if(typeof html.split('<span>')[1] !== 'undefined'){
+                    return html.split('<span>')[1].split('</span')[0];
+                } else if(html.includes('table') && html.includes('cell-hover')){
+                    let nonB = html.split('ng-non-bindable')[1];
+                    if(nonB && 
+                        nonB.split('>')[1] && 
+                        nonB.split('>')[1].split('</')[0]
+                    ) {
+                        return nonB.split('>')[1].split('</')[0];
+                    }
+                }
+            }
+            return '';
+        }
+        
+        const createMetrics = metricsObject => {
+            for(let key in metricsObject) {
+                $scope[key] = () => generateMetric(metricsObject[key]);
+            }
+        }
 
+        const checkMetrics = (tab, subtab) => {
             if(subtab === 'panels'){
                 switch (tab) {
                     case 'audit':
-                        metricService.createWatchers(metricsAudit);
+                        createMetrics(metricsAudit);
                         break;
                     case 'vuls':
-                        metricService.createWatchers(metricsVulnerability);
+                        createMetrics(metricsVulnerability);
                         break;
                     case 'oscap':
-                        metricService.createWatchers(metricsScap);
+                        createMetrics(metricsScap);
                         break;
                     case 'virustotal':
-                        metricService.createWatchers(metricsVirustotal);
+                        createMetrics(metricsVirustotal);
                         break;
                 }
             }
@@ -103,22 +131,54 @@ app.controller('agentsController',
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
 
-        checkMetrics($scope.tab,$scope.tabView);
-
         // Switch subtab
         $scope.switchSubtab = subtab => {
             if($scope.tabView === subtab) return;
-
-            checkMetrics($scope.tab, subtab);
+            if(subtab === 'panels' && $scope.tab !== 'configuration'){
+                if(!$rootScope.visTimestamp) {
+                    $rootScope.visTimestamp = new Date().getTime();
+                    if(!$rootScope.$$phase) $rootScope.$digest();
+                }
+        
+                // Create current tab visualizations
+                genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+                .then(() => {
+        
+                    // Render visualizations
+                    $rootScope.$broadcast('updateVis');
+        
+                    checkMetrics($scope.tab, 'panels');
+                })
+                .catch(error => errorHandler.handle(error, 'Agents'));
+            } else {
+                checkMetrics($scope.tab, subtab); 
+            }
         }
 
         // Switch tab
         $scope.switchTab = tab => {
-            if($scope.tab === tab) return;
-            checkMetrics(tab, 'panels');
+            if ($scope.tab === tab) return;
 
-            // Deleting app state traces in the url
-            $location.search('_a', null);
+            if(!$rootScope.visTimestamp) {
+                $rootScope.visTimestamp = new Date().getTime();
+                if(!$rootScope.$$phase) $rootScope.$digest();
+            }
+            if(tab !== 'configuration') {
+                // Create current tab visualizations
+                genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+                .then(() => {
+        
+                    // Render visualizations
+                    $rootScope.$broadcast('updateVis');
+        
+                    checkMetrics(tab, 'panels');
+        
+                    // Deleting app state traces in the url
+                    $location.search('_a', null);
+        
+                })
+                .catch(error => errorHandler.handle(error, 'Agents'));
+            }
         };
 
         // Watchers
@@ -225,6 +285,9 @@ app.controller('agentsController',
                 if($scope.tab === 'configuration'){
                     return $scope.getAgentConfig(newAgentId);
                 }
+
+                // Deleting app state traces in the url
+                $location.search('_a', null);
                 let id = null;
 
                 // They passed an id
@@ -287,9 +350,9 @@ app.controller('agentsController',
                     h._scope.$destroy();
                 }
             }
-            if(metricService.hasItems()) metricService.destroyWatchers();
             $rootScope.ownHandlers = [];
             $rootScope.comeFrom    = 'agents';
+            $location.search('_a',null);
             $location.search('tab', 'groups');
             $location.path('/manager');
         };
@@ -327,7 +390,6 @@ app.controller('agentsController',
                     h._scope.$destroy();
                 }
             }
-            if(metricService.hasItems()) metricService.destroyWatchers();
             $rootScope.ownHandlers = [];
         });
 
@@ -428,4 +490,16 @@ app.controller('agentsController',
             }
         }
         /** End of agent configuration */
+        if($scope.tab !== 'configuration'){
+            // Create visualizations for controller's first execution
+            genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${$rootScope.visTimestamp}/${appState.getCurrentPattern()}`)
+            .then(() => {
+
+                // Render visualizations
+                $rootScope.$broadcast('updateVis');
+        
+                checkMetrics($scope.tab,'panels');
+            })
+            .catch(error => errorHandler.handle(error, 'Agents'));
+        }
     });

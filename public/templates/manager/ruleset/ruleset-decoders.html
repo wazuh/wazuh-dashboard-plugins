@@ -37,16 +37,16 @@
                 </md-autocomplete>
             </span>
 
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'wz-table-card-active' : ''" ng-click="setRulesTab('rules')"
+            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'rules') ? 'wz-ruleset-active' : ''" ng-click="setRulesTab('rules')"
                 class="wazuh-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
                 Rules
             </md-button>
-            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'wz-table-card-active' : ''" ng-click="setRulesTab('decoders')"
+            <md-button flex="10" ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'wz-ruleset-active' : ''" ng-click="setRulesTab('decoders')"
                 class="wazuh-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
                 Decoders
             </md-button>
             <div flex="20" layout="column" class="height-41 wz-select-input">
-                <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="applyFilter(typeFilter)" aria-label="Filter by type" ng-init="'All'">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="decoders.toggleOnlyParents(typeFilter == 'all')" aria-label="Filter by type" ng-init="'All'">
                     <option value="all">All</option>
                     <option value="parents">Parents only</option>
                 </select>

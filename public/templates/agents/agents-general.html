@@ -1,6 +1,6 @@
-<md-content flex layout="column" ng-if="tab === 'general'" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'general' && tabView === 'panels'" ng-show="resultState === 'ready'" layout-align="start">
 
-    <div ng-if="resultState === 'ready' && tabView === 'panels'">
+
 
         <div layout="row">
             <md-card flex class="wz-metric-color wz-md-card">
@@ -55,10 +55,10 @@
             </md-card>
         </div>
 
-    </div>
+ 
 
     <!-- View: Panels -->
-    <div ng-if="resultState === 'ready' && tabView === 'panels'">
+
 
         <div layout="row" class="height-230">
             <md-card flex="33" class="wz-md-card">
@@ -118,6 +118,6 @@
             </md-card>
         </div>
 
-    </div>
+
 
 </md-content>

@@ -18,8 +18,8 @@ module.exports = (kibana) => new kibana.Plugin({
               'spyModes',
               'fieldFormats',
             ],
-            injectVars: (server) => {
-              return server.plugins.kibana.injectVars(server);
+            injectVars: server => {
+                return server.plugins.kibana.injectVars(server);
             }
         }
     },

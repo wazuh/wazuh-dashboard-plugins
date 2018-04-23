@@ -1,7 +1,9 @@
+// Imports all modules
 module.exports = (server, options) => {
-    require('./server/initialize.js')(server, options);
-    require('./server/api/wazuh-elastic.js')(server, options);
-    require('./server/api/wazuh-api-elastic.js')(server, options);
-    require('./server/monitoring.js')(server, options);
-    require('./server/api/wazuh-api.js')(server, options);
+    require('./server/initialize')(server, options);
+    require('./server/routes/wazuh-elastic')(server, options);
+    require('./server/routes/wazuh-api-elastic')(server, options);
+    require('./server/monitoring')(server, options);
+    require('./server/vis-deletion-cron')(server);
+    require('./server/routes/wazuh-api')(server, options);
 };

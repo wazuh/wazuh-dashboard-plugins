@@ -330,29 +330,6 @@ function discoverController(
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
-            
-            /** Start of "Prevents from double agent" */
-            if($rootScope.agentsAutoCompleteFired){
-              let agentsIncluded = [];
-              // Get all filters related to agent.id and store them on an array
-              queryFilter.getFilters().filter(item => {
-                  if(typeof item.query.match['agent.id'] !== 'undefined') agentsIncluded.push(item);
-              });
-              // If the array has a length greater than 1 it means that there are more than one agent.id filter
-              if(agentsIncluded.length > 1) {
-                  // Keep safe the last agent.id filter
-                  const lastAgent = agentsIncluded.pop();
-                  // Remove all the agent.id filters
-                  agentsIncluded.filter(item => queryFilter.removeFilter(item));
-                  // Add the safe kept agent.id filter
-                  queryFilter.addFilters(lastAgent);
-                  // Clear the temporary array
-                  agentsIncluded = [];
-              }
-              $rootScope.agentsAutoCompleteFired = false;
-              if(!$rootScope.$$phase) $rootScope.$digest();
-            }
-            /** End of "Prevents from double agent" */
 
             $rootScope.discoverPendingUpdates = [];
             $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
@@ -965,6 +942,7 @@ function discoverController(
 
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
+
     if ($location.search().tabView !=  $scope.tabView) { // No need to change the filters
       if ($scope.tabView !== "discover") { // Should do this the first time, to avoid the squeezing of the visualization
         $scope.updateQueryAndFetch($state.query);
@@ -972,19 +950,13 @@ function discoverController(
       $scope.tabView = $location.search().tabView;
     }
     if ($location.search().tab !=  $scope.tab) { // Changing filters
-
       $scope.tab = $location.search().tab;
-      //queryFilter.removeAll();
-      loadFilters();
     }
     
     if ($location.search().agent !=  $scope.agentId) { // Changing filters
-
       $scope.agentId = $location.search().agent;
-
-      //queryFilter.removeAll();
-      loadFilters();
     }
+    if ($location.search().tabView ===  $scope.tabView) loadFilters();
   });
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

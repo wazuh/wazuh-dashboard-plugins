@@ -6,18 +6,15 @@ const yml = require('js-yaml');
 const path = require('path');
 const { log } = require('./logger');
 
-const OBJECTS_FILE = './integration-files/objects-file.json';
-const APP_OBJECTS_FILE = './integration-files/app-objects-file-alerts.json';
-const KIBANA_TEMPLATE = './integration-files/kibana-template.json';
+const KIBANA_TEMPLATE = './integration-files/kibana-template';
 const knownFields = require('./integration-files/known-fields')
-
+const ElasticWrapper = require('./lib/elastic-wrapper');
 
 module.exports = (server, options) => {
-
-    log('initialize.js', 'Initializing', 'info');
-
     // Elastic JS Client
-    const elasticRequest = server.plugins.elasticsearch.getCluster('data');
+    const wzWrapper = new ElasticWrapper(server);
+    log('[initialize]', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');
+    server.log([blueWazuh, 'initialize', 'info'], `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`);
 
     let objects = {};
     let app_objects = {};
@@ -25,17 +22,17 @@ module.exports = (server, options) => {
     let packageJSON = {};
     let configurationFile = {};
     let pattern = null;
-
+    let forceDefaultPattern = true;
     // Read config from package.json and config.yml
     try {
         configurationFile = yml.load(fs.readFileSync(path.join(__dirname, '../config.yml'), { encoding: 'utf-8' }));
 
         global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
-
+        forceDefaultPattern = (configurationFile && typeof configurationFile['force.default'] !== 'undefined') ? configurationFile['force.default'] : true;
         packageJSON = require('../package.json');
     } catch (e) {
-        log('initialize.js', e.message || e);
+        log('[initialize]', e.message || e);
         server.log([blueWazuh, 'initialize', 'error'], 'Something went wrong while reading the configuration.' + e.message);
     }
 
@@ -55,338 +52,133 @@ module.exports = (server, options) => {
         return true;
     }
 
-    let index_pattern = pattern || "wazuh-alerts-3.x-*";
+    const defaultIndexPattern = pattern || "wazuh-alerts-3.x-*";
 
-    // Importing Wazuh built-in visualizations and dashboards
-    const importObjects = (id) => {
-        log('initialize.js importObjects', 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...','info');
-        server.log([blueWazuh, 'initialize', 'info'], 'Importing objects (Searches, visualizations and dashboards) into Elasticsearch...');
-
-        try {
-            objects = require(OBJECTS_FILE);
-        } catch (e) {
-            log('initialize.js', e.message || e);
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
-            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + OBJECTS_FILE);
-            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
-        }
-
-        let body = '';
-        for (let element of objects) {
-            body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' +
-                '"_id": "' + element._type + ':' + element._id + '" } }\n';
-
-            let temp = {};
-            let aux = JSON.stringify(element._source);
-            aux = aux.replace("wazuh-alerts", id);
-            aux = JSON.parse(aux);
-            temp[element._type] = aux;
-
-            if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
-                temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
-            }
-
-            temp["type"] = element._type;
-            body += JSON.stringify(temp) + "\n";
-        }
-
-        elasticRequest.callWithInternalUser('bulk', {
-            index: '.kibana',
-            body: body
-        })
-            .then(() => elasticRequest.callWithInternalUser('indices.refresh', {
-                index: ['.kibana', index_pattern]
-            }))
-            .then(() => {
-                log('initialize.js importObjects', 'Templates, mappings, index patterns, visualizations, searches and dashboards were successfully installed. App ready to be used.','info');
-                server.log([blueWazuh, 'initialize', 'info'], 'Templates, mappings, index patterns, visualizations, searches and dashboards were successfully installed. App ready to be used.');
-            })
-            .catch(error => {
-                log('initialize.js importObjects', error.message || error);
-                server.log([blueWazuh, 'server', 'error'], 'DEBUG Error importing objects into elasticsearch. Bulk request failed.');
-            });
-    };
 
     /**
-     * This function creates a new index pattern with a custom ID.
-     * @param {*} patternId 'index-pattern:' + id;
-     * @param {*} id Eg: 'wazuh-alerts'
+     * Refresh known fields for all valid index patterns.
+     * Optionally forces the wazuh-alerts-3.x-* creation.
      */
-    const createCustomPattern = async (patternId,id) => {
-        try{
-            if(!id) return Promise.reject(new Error('No valid id for index pattern'));
-            if(!patternId) return Promise.reject(new Error('No valid patternId for index pattern'));
+    const checkKnownFields = async () => {
+        try {
+            const xpack = await wzWrapper.getPlugins();
+            log('[initialize][checkKnownFields]', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
+                    
+            const indexPatternList = await wzWrapper.getAllIndexPatterns();
+
+            log('[initialize][checkKnownFields]', `Found ${indexPatternList.hits.total} index patterns`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Found ${indexPatternList.hits.total} index patterns`);
+            let list = [];
+            if(indexPatternList && indexPatternList.hits && indexPatternList.hits.hits){
+                const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
+               
+                if(indexPatternList.hits.hits.length > 0) {
+                    for(const index of indexPatternList.hits.hits){   
+                        let valid, parsed;        
+                        try{
+                            parsed = JSON.parse(index._source['index-pattern'].fields)
+                        } catch (error){
+                            continue;
+                        }     
+                        valid = parsed.filter(item => minimum.includes(item.name));
+                        
+                        if(valid.length === 4){
+                            list.push({
+                                id   : index._id.split('index-pattern:')[1],
+                                title: index._source['index-pattern'].title
+                            })
+                        }
             
-            const customPatternRegex = new RegExp(/[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}/g);
-            if(id && customPatternRegex.test(id.trim())){
-                server.log([blueWazuh, 'initialize', 'info'], 'Custom id detected for index pattern...');
-                id        = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
-                patternId = 'index-pattern:' + id.trim();
-                server.log([blueWazuh, 'initialize', 'info'], 'Modified values to be default values, now checking if default index pattern exists...');
-                const data = await elasticRequest
-                .callWithInternalUser('search', {
-                    index: '.kibana',
-                    type: 'doc',
-                    body: {
-                        "query": {
-                            "match": {
-                                "_id":"index-pattern:" + id 
-                            }
-                        }
-                    }
-                });
-                if(data && data.hits && data.hits.total > 0) {
-                    server.log([blueWazuh, 'initialize', 'info'], 'Default index pattern exists, skipping its creation...');
-                    return id;
-                }
-            }
-
-
-
-            await elasticRequest
-            .callWithInternalUser('create', {
-                index: '.kibana',
-                type: 'doc',
-                id: patternId,
-                body: {
-                    "type": 'index-pattern',
-                    "index-pattern": {
-                        "title": id,
-                        "timeFieldName": '@timestamp'
                     }
                 }
-            });
-            return id;
-        }catch(error){
-            return Promise.reject(error)
-        }
-    }
+            } 
+            log('[initialize][checkKnownFields]', `Found ${list.length} valid index patterns for Wazuh alerts`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Found ${list.length} valid index patterns for Wazuh alerts`);
+            const defaultExists = list.filter(item => item.title === defaultIndexPattern);            
 
-    /**
-     * This function checks if an index pattern exists, 
-     * you should check response.hits.total
-     * @param {*} id Eg: 'wazuh-alerts'
-     */
-    const searchIndexPatternById = async id => {
-        try {
-            if(!id) return Promise.reject(new Error('No valid id for search index pattern'))
-            const data = await elasticRequest
-                        .callWithInternalUser('search', {
-                            index: '.kibana',
-                            type: 'doc',
-                            body: {
-                                "query": {
-                                    "match": {
-                                        "_id":"index-pattern:" + id 
-                                    }
-                                }
-                            }
-                        });        
-            return data;
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    /**
-     * Updates .kibana index known fields
-     * @param {*} patternId 'index-pattern:' + id
-     */
-    const updateKibanaIndexWithKnownFields = async patternId => {
-        try {
-            if(!patternId) return Promise.reject(new Error('No valid patternId for update index pattern'))
-            const newFields = JSON.stringify(knownFields);
-            await elasticRequest
-            .callWithInternalUser('update', {
-                index: '.kibana',
-                type: 'doc',
-                id: patternId,
-                body: {
-                    doc: {
-                        "type": 'index-pattern',
-                        "index-pattern": {  
-                            "fields": newFields,
-                            "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
-                        }
-                     }
-                }
-             });
-             return;
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    /**
-     * Replaces our visualizations main fields to fit our pattern needs.
-     * @param {*} app_objects Object with the visualizations raw content.
-     * @param {*} id Eg: 'wazuh-alerts'
-     */
-    const buildVisualizationsBulk = (app_objects,id) => {
-        let body = '';
-        for (let element of app_objects) {
-            body += '{ "index":  { "_index": ".kibana", "_type": "doc", ' + '"_id": "' + element._type + ':' + element._id + '" } }\n';
-
-            let temp = {};
-            let aux = JSON.stringify(element._source);
-            aux = aux.replace("wazuh-alerts", id);
-            aux = JSON.parse(aux);
-            temp[element._type] = aux;
-
-            if (temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index) {
-                temp[element._type].kibanaSavedObjectMeta.searchSourceJSON.index = id;
-            }
-
-            temp["type"] = element._type;
-            body += JSON.stringify(temp) + "\n";
-        }
-        return body;
-    }
-
-    /**
-     * Importing Wazuh app visualizations and dashboards
-     * @param {*} id Eg: 'wazuh-alerts'
-     * @param {*} firstTime Optional, if true it means that is the very first time of execution.
-     */
-    const importAppObjects = async (id,firstTime) => {
-        try {
-            let patternId        = 'index-pattern:' + id;
-            let indexPatternList = await searchIndexPatternById(id);
-
-            if (!firstTime && indexPatternList.hits.total < 1) {  
-                log('initialize.js importAppObjects', 'Visualizations pattern not found. Creating it...','info')
-                server.log([blueWazuh, 'initialize', 'info'], 'Visualizations pattern not found. Creating it...');              
-                id = await createCustomPattern(patternId,id)
-                firstTime = true;
-            }
-            patternId = 'index-pattern:' + id;
-
-            if(firstTime && indexPatternList.hits.total < 1){
-                log('initialize.js importAppObjects', 'Waiting for index pattern creation to complete...','info')
-                server.log([blueWazuh, 'initialize', 'info'], 'Waiting for index pattern creation to complete...');   
+            if(defaultExists.length === 0 && forceDefaultPattern){
+                log('[initialize][checkKnownFields]', `Default index pattern not found, creating it...`,'info')
+                server.log([blueWazuh, 'initialize', 'info'], `Default index pattern not found, creating it...`);
+                await createIndexPattern();
+                log('[initialize][checkKnownFields]', 'Waiting for default index pattern creation to complete...','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Waiting for default index pattern creation to complete...');   
                 let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
+                let tmplist = null;
                 while(waitTill > new Date()){
-                    indexPatternList = await searchIndexPatternById(id);
-                    if(indexPatternList.hits.total >= 1) break;
+                    tmplist = await wzWrapper.searchIndexPatternById(defaultIndexPattern);
+                    if(tmplist.hits.total >= 1) break;
                     else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
                 }
                 server.log([blueWazuh, 'initialize', 'info'], 'Index pattern created...');
+                list.push({
+                    id   : tmplist.hits.hits[0]._id.split('index-pattern:')[1],
+                    title: tmplist.hits.hits[0]._source['index-pattern'].title
+                })
+            } else {
+                log('[initialize][checkKnownFields]', `Default index pattern found`,'info')
+                server.log([blueWazuh, 'initialize', 'info'], `Default index pattern found`);
             }
 
-            log('initialize.js importAppObjects', 'Importing/Updating index pattern known fields...','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Importing/Updating index pattern known fields...');
-            await updateKibanaIndexWithKnownFields(patternId)
-
-            log('initialize.js importAppObjects', 'Importing/Updating Wazuh app visualizations...','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Importing/Updating Wazuh app visualizations...');
-    
-            try {
-                app_objects = require(APP_OBJECTS_FILE);
-            } catch (e) {
-                log('initialize.js importAppObjects', e.message || e)
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not read the objects file.');
-                server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + APP_OBJECTS_FILE);
-                server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + e);
+            for(const item of list){
+                if(item.title.includes('wazuh-monitoring-*') || item.id.includes('wazuh-monitoring-*')) continue;
+                log('[initialize][checkKnownFields]', `Refreshing known fields for "index-pattern:${item.title}"`,'info')
+                server.log([blueWazuh, 'initialize', 'info'], `Refreshing known fields for "index-pattern:${item.title}"`);
+                await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id);
             }
-    
-            
-            const body = buildVisualizationsBulk(app_objects,id);
-    
-            await elasticRequest.callWithInternalUser('bulk', { index: '.kibana', body: body });
-            await elasticRequest.callWithInternalUser('indices.refresh', { index: ['.kibana', index_pattern]})
-                
-            log('initialize.js importAppObjects', 'Wazuh app visualizations were successfully installed. App ready to be used.','info')
-            server.log([blueWazuh, 'initialize', 'info'], 'Wazuh app visualizations were successfully installed. App ready to be used.');
+
+            log('[initialize][checkKnownFields]', 'App ready to be used.','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
 
             return;
         } catch (error){
-            log('initialize.js importAppObjects', error.message || error);
+            log('[initialize][checkKnownFields]', error.message || error);
             server.log([blueWazuh, 'server', 'error'], 'Error importing objects into elasticsearch.' +  error.message || error);
         }
     };
 
-    // Create index pattern TODO: remove hardcoded index-patterns ids
-    const createIndexPattern = () => {        
-        log('initialize.js createIndexPattern', `Creating index pattern: ${index_pattern}`,'info')
-        server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${index_pattern}`);
+    // Creates the default index pattern 
+    const createIndexPattern = async () => {        
+        try {
+            log('[initialize][createIndexPattern]', `Creating index pattern: ${defaultIndexPattern}`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Creating index pattern: ${defaultIndexPattern}`);
 
-        let patternId = 'index-pattern:' + index_pattern;
-        elasticRequest.callWithInternalUser('create', {
-            index: '.kibana',
-            type: 'doc',
-            id: patternId,
-            body: {
-                "type": 'index-pattern',
-                "index-pattern": {
-                    "title": index_pattern,
-                    "timeFieldName": '@timestamp'
-                }
-            }
-        })
-            .then(resp => {
-                log('initialize.js createIndexPattern', `Created index pattern: ${index_pattern}`,'info')
-                server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + index_pattern);
-                // Import objects (dashboards and visualizations)
-                importObjects(index_pattern);
-                importAppObjects(index_pattern,true);
-            })
-            .catch(error => {
-                log('initialize.js createIndexPattern', error.message || error);
-                server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
-            });
-    };
+            await wzWrapper.createIndexPattern(defaultIndexPattern);
 
-    // Configure Kibana status: Index pattern, default index pattern, default time, import dashboards.
-    const configureKibana = (type) => {
-        if (type === "install") {
-            elasticRequest.callWithInternalUser('search', {
-                index: '.kibana',
-                type: 'doc',
-                q: `index-pattern.title:"${index_pattern}"`
-            })
-                .then(data => {
-                    if (data.hits.total >= 1) {
-                        log('initialize.js configureKibana', 'Skipping index-pattern creation. Already exists.','info')
-                        server.log([blueWazuh, 'initialize', 'info'], 'Skipping index-pattern creation. Already exists.');
-                    }
-                    else createIndexPattern();
-                })
-                .catch(error => {
-                    log('initialize.js configureKibana', error.message || error);
-                    server.log([blueWazuh, 'initialize', 'error'], 'Could not reach elasticsearch.');
-                });
+            log('[initialize][createIndexPattern]', `Created index pattern: ${defaultIndexPattern}`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Created index pattern: ' + defaultIndexPattern);
+
+        } catch (error){
+            log('[initialize][createIndexPattern]', error.message || error);
+            server.log([blueWazuh, 'initialize', 'error'], 'Error creating index-pattern.');
         }
     };
+
+
 
     // Save Wazuh App setup
-    const saveConfiguration = () => {
+    const saveConfiguration = async () => {
+        try{
+            const shards = configurationFile && typeof configurationFile["wazuh-version.shards"] !== 'undefined' ?
+                           configurationFile["wazuh-version.shards"] : 
+                           1;
 
-        let shards = 1;
-        let replicas = 1;
+            const replicas = configurationFile && typeof configurationFile["wazuh-version.replicas"] !== 'undefined' ?
+                             configurationFile["wazuh-version.replicas"] : 
+                             1;
 
-        if (configurationFile) {
-            if (configurationFile["wazuh-version.shards"]) {
-                shards = configurationFile["wazuh-version.shards"];
-            }
-            if (configurationFile["wazuh-version.replicas"]) {
-                replicas = configurationFile["wazuh-version.replicas"];
-            }
-        }
-
-        let shard_configuration = {
-            "settings": {
-                "index": {
-                    "number_of_shards": shards,
-                    "number_of_replicas": replicas
+    
+            const shard_configuration = {
+                settings: {
+                    index: {
+                        number_of_shards  : shards,
+                        number_of_replicas: replicas
+                    }
                 }
-            }
-        };
+            };
+    
+            await wzWrapper.createWazuhVersionIndex(shard_configuration);
 
-        elasticRequest.callWithInternalUser('indices.create', {
-            index: '.wazuh-version',
-            body: shard_configuration
-        })
-        .then(() => {
             const commonDate = new Date().toISOString();
 
             const configuration = {
@@ -397,478 +189,455 @@ module.exports = (server, options) => {
                 lastRestart     : commonDate
             };
 
-            elasticRequest.callWithInternalUser('create', {
-                index: ".wazuh-version",
-                type:  'wazuh-version',
-                id:    1,
-                body:  configuration
-            })
-            .then(() => {
-                log('initialize.js saveConfiguration', 'Wazuh configuration inserted','info')
+            try{
+
+                await wzWrapper.insertWazuhVersionConfiguration(configuration);
+
+                log('[initialize][saveConfiguration]', 'Wazuh configuration inserted','info')
                 server.log([blueWazuh, 'initialize', 'info'], 'Wazuh configuration inserted');
-            })
-            .catch(error => {
-                log('initialize.js saveConfiguration', error.message || error);
+     
+            } catch (error){
+                log('[initialize][saveConfiguration]', error.message || error);
                 server.log([blueWazuh, 'initialize', 'error'], 'Could not insert Wazuh configuration');
-            });
-        })
-        .catch(error => {
-            log('initialize.js saveConfiguration', error.message || error);
+            }
+            
+            return;
+
+        } catch (error){
+            log('[initialize][saveConfiguration]', error.message || error);
             server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh-version.');
-        });
+        }
     };
 
-    // Init function. Check for "wazuh-version" document existance.
-    const init = () => {
-        elasticRequest.callWithInternalUser('indices.exists', {
-            index: '.wazuh'
-        })
-        .then(result => {
-            if (!result) {
-                let shards = 1;
-                let replicas = 1;
+    const checkWazuhIndex = async () => {
+            try{
+                log('[initialize][checkWazuhIndex]', 'Checking .wazuh index.','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh index.');
+                
+                const result = await wzWrapper.checkIfIndexExists('.wazuh');
 
-                if (configurationFile) {
-                    if (configurationFile["wazuh.shards"]) {
-                        shards = configurationFile["wazuh.shards"];
+                if (!result) {
+                    const shards = configurationFile && typeof configurationFile["wazuh.shards"] !== 'undefined' ?
+                                   configurationFile["wazuh.shards"] : 
+                                   1;
+
+                    const replicas = configurationFile && typeof configurationFile["wazuh.replicas"] !== 'undefined' ?
+                                     configurationFile["wazuh.replicas"] : 
+                                     1;
+
+                    let configuration = {
+                        "settings": {
+                            "index": {
+                                "number_of_shards": shards,
+                                "number_of_replicas": replicas
+                            }
+                        }
+                    };
+                    
+                    try{
+                        await wzWrapper.createWazuhIndex(configuration);
+            
+                        log('[initialize][checkWazuhIndex]', 'Index .wazuh created.','info')
+                        server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
+                    
+                    } catch(error) {
+                        throw new Error('Error creating index .wazuh.');
                     }
-                    if (configurationFile["wazuh.replicas"]) {
-                        replicas = configurationFile["wazuh.replicas"];
+
+                } else { // The .wazuh index exists, we now proceed to check whether it's from an older version
+                    try{
+                        await wzWrapper.getOldWazuhSetup();
+
+                        // Reindex!
+                        return reindexOldVersion();
+
+                    } catch(error) {
+                        if (error.message && error.message !== 'Not Found') {
+                            throw new Error(error.message || error);
+                        }
+                        server.log([blueWazuh, 'initialize', 'info'], 'No older .wazuh index found -> no need to reindex.');
                     }
                 }
 
-                let configuration = {
-                    "settings": {
-                        "index": {
-                            "number_of_shards": shards,
-                            "number_of_replicas": replicas
-                        }
-                    }
-                };
-
-                elasticRequest.callWithInternalUser('indices.create', {
-                    index: '.wazuh',
-                    body: configuration
-                })
-                    .then(() => {
-                        log('initialize.js init', 'Index .wazuh created.','info')
-                        server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
-                    })
-                    .catch(error => {
-                        server.log([blueWazuh, 'initialize', 'error'], 'Error creating index .wazuh.');
-                    });
-            } else { // The .wazuh index exists, we now proceed to check whether it's from an older version
-                elasticRequest.callWithInternalUser('get', {
-                    index: ".wazuh",
-                    type: "wazuh-setup",
-                    id: "1"
-                })
-                    .then(data => {
-                        // Reindex!
-                        reindexOldVersion();
-                    })
-                    .catch(error => {
-                        if (error.message && error.message !== 'Not Found') {
-                            log('initialize.js init 1', error.message || error);
-                        }
-                        log('initialize.js init', 'No older .wazuh index found -> no need to reindex.','info')
-                        server.log([blueWazuh, 'initialize', 'info'], 'No older .wazuh index found -> no need to reindex.');
-                    });
+            } catch (error) {
+                return Promise.reject(error);
             }
-        })
-        .catch(error => {
-            log('initialize.js init 2', error.message || error);
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not check if .wazuh index exists due to ' + error);
-        });
+    }
 
-        elasticRequest.callWithInternalUser('get', {
-            index: ".wazuh-version",
-            type: "wazuh-version",
-            id: "1"
-        })
-        .then(data => {
-            server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information and visualizations...');
+
+    const checkWazuhVersionIndex = async () => {
+        try {
+            log('[initialize][checkWazuhVersionIndex]', 'Checking .wazuh-version index.','info')
+            server.log([blueWazuh, 'initialize', 'info'], 'Checking .wazuh-version index.');
+
+            try{                
+                await wzWrapper.getWazuhVersionIndex();
+            } catch (error) {
+                log('[initialize][checkWazuhVersionIndex]','.wazuh-version document does not exist. Initializating configuration...','info');
+                server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
+    
+                // Save Setup Info
+                await saveConfiguration(defaultIndexPattern);
+            }
+
+            server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document already exists. Updating version information...');
             
-            elasticRequest.callWithInternalUser('update', { 
-                index: '.wazuh-version', 
-                type : 'wazuh-version',
-                id   : 1,
-                body : {
-                    doc: {
-                        'app-version': packageJSON.version,
-                        revision     : packageJSON.revision,
-                        lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
-                    }
-                } 
-            })
-            .then((response) => {
-                server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated version information');
-            })
-            .catch((error) => {
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not update version information due to ' + error);
-            });
+            await wzWrapper.updateWazuhVersionIndexLastRestart(packageJSON.version,packageJSON.revision);
 
-            // We search for the currently applied pattern in the visualizations
-            elasticRequest.callWithInternalUser('search', {
-                index: '.kibana',
-                type: 'doc',
-                q: `visualization.title:"Wazuh App Overview General Metric alerts"`
-            })
-            .then(data => {
+            server.log([blueWazuh, 'initialize', 'info'], 'Successfully updated .wazuh-version index');
+        
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 
-                elasticRequest.callWithInternalUser('deleteByQuery', {
-                    index: '.kibana',
-                    body: {
-                        'query': {
-                            'bool': {
-                                'must': {
-                                    'match': {
-                                        "visualization.title": 'Wazuh App*'
-                                    }
-                                },
-                                'must_not': {
-                                    "match": {
-                                        "visualization.title": 'Wazuh App Overview General Agents status'
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
-                .then((response) => {
-                    // Update the visualizations
-                    importAppObjects(JSON.parse(data.hits.hits[0]._source.visualization.kibanaSavedObjectMeta.searchSourceJSON).index);
-                })
-                .catch(error => {
-                    log('initialize.js init 4', error.message || error);
-                    server.log([blueWazuh, 'initialize', 'error'], 'Could not update visualizations due to ' + error);
-                });
-
-            })
-            .catch(error => {
-                log('initialize.js init 5', error.message || error);
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not get a sample for the pattern due to ' + error);
-            });
-        })
-        .catch(error => {
-            log('initialize.js init 6', error.message || error);
-            server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
-
-            // Save Setup Info
-            saveConfiguration(index_pattern);
-            configureKibana("install");
-        });
+    // Init function. Check for "wazuh-version" document existance.
+    const init = async () => {
+        try {
+            await Promise.all([
+                checkWazuhIndex(),
+                checkWazuhVersionIndex(),
+                checkKnownFields()
+            ]);
+        } catch (error){
+            log('[initialize][init]', error.message || error);
+            server.log([blueWazuh, '[initialize][init]', 'error'], error.message || error);
+            return Promise.reject(error)
+        }
     };
 
     const createKibanaTemplate = () => {
-        log('initialize.js createKibanaTemplate', 'Creating template for .kibana.','info')
-        server.log([blueWazuh, 'initialize', 'info'], 'Creating template for .kibana.');
+        log('[initialize][createKibanaTemplate]', `Creating template for ${wzWrapper.WZ_KIBANA_INDEX}`,'info')
+        server.log([blueWazuh, 'initialize', 'info'], `Creating template for ${wzWrapper.WZ_KIBANA_INDEX}`);
 
         try {
             kibana_template = require(KIBANA_TEMPLATE);
+            console.log(kibana_template.template)
+            kibana_template.template = wzWrapper.WZ_KIBANA_INDEX + '*'
+            console.log(kibana_template.template)
         } catch (error) {
-            log('initialize.js init 6', error.message || error);
-            server.log([blueWazuh, 'initialize', 'error'], 'Could not read the .kibana template file.');
-            server.log([blueWazuh, 'initialize', 'error'], 'Path: ' + KIBANA_TEMPLATE);
-            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + error);
+            log('[initialize][createKibanaTemplate]', error.message || error);
+            server.log([blueWazuh, 'initialize', 'error'], `Could not read the ${wzWrapper.WZ_KIBANA_INDEX} template file.`);
+            server.log([blueWazuh, 'initialize', 'error'], 'Exception: ' + error.message || error);
         }
 
-        return elasticRequest.callWithInternalUser('indices.putTemplate',
-            {
-                name: 'wazuh-kibana',
-                order: 0,
-                create: true,
-                body: kibana_template
-            });
+        return wzWrapper.putWazuhKibanaTemplate(kibana_template);
     };
 
-    // Does .kibana index exist?
-    const checkKibanaStatus = () => {
-        elasticRequest.callWithInternalUser('indices.exists', {
-            index: ".kibana"
-        })
-            .then(data => {
-                if (data) { // It exists, initialize!
-                    init();
-                }
-                else { // No .kibana index created...
-                    log('initialize.js checkKibanaStatus', 'Didn\'t find .kibana index...','info')
-                    server.log([blueWazuh, 'initialize', 'info'], "Didn't find .kibana index...");
 
-                    elasticRequest.callWithInternalUser('indices.getTemplate',
-                        {
-                            name: 'wazuh-kibana'
-                        })
-                        .then(data => {
-                            log('initialize.js checkKibanaStatus', 'No need to create the .kibana template, already exists.','info')
-                            server.log([blueWazuh, 'initialize', 'info'], 'No need to create the .kibana template, already exists.');
 
-                            elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
-                                .then(data => {
-                                    log('initialize.js checkKibanaStatus', 'Successfully created .kibana index.','info')
-                                    server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
-                                    init();
-                                })
-                                .catch(error => {
-                                    log('initialize.js checkKibanaStatus',error.message || error);
-                                    server.log([blueWazuh, 'initialize', 'error'], 'Error creating .kibana index due to ' + error);
-                                });
-                        })
-                        .catch(error => {
-                            log('initialize.js checkKibanaStatus',
-                                error.message || error
-                            );
-                            createKibanaTemplate()
-                                .then(data => {
-                                    log('initialize.js checkKibanaStatus', 'Successfully created .kibana template.','info')
-                                    server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana template.');
+    const createEmptyKibanaIndex = async () => {
+        try {
+            await wzWrapper.createEmptyKibanaIndex()
+            log('[initialize][checkKibanaStatus]', `Successfully created ${wzWrapper.WZ_KIBANA_INDEX} index.`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Successfully created ${wzWrapper.WZ_KIBANA_INDEX} index.`);
+            await init();
+            return;
+        } catch (error) {
+            return Promise.reject(new Error(`Error creating ${wzWrapper.WZ_KIBANA_INDEX} index due to ${error.message || error}`))
+        }
+    }
 
-                                    elasticRequest.callWithInternalUser('indices.create', { index: '.kibana' })
-                                        .then(data => {
-                                            log('initialize.js checkKibanaStatus', 'Successfully created .kibana index.','info')
-                                            server.log([blueWazuh, 'initialize', 'info'], 'Successfully created .kibana index.');
-                                            init();
-                                        })
-                                        .catch(error => {
-                                            log('initialize.js checkKibanaStatus',error.message || error);
-                                            server.log([blueWazuh, 'initialize', 'error'], 'Error creating .kibana index due to ' + error);
-                                        });
-                                }).catch(error => {
-                                    log('initialize.js checkKibanaStatus',error.message || error);
-                                    server.log([blueWazuh, 'initialize', 'error'], 'Error creating template for .kibana due to ' + error);
-                                });
-                        });
-                }
-            })
-            .catch(error => {
-                log('initialize.js checkKibanaStatus',error.message || error);
-                server.log([blueWazuh, 'initialize', 'error'], 'Could not check .kibana index due to ' + error);
-            });
+    const fixKibanaTemplate = async () => {
+        try {
+            await createKibanaTemplate();
+            log('[initialize][checkKibanaStatus]', `Successfully created ${wzWrapper.WZ_KIBANA_INDEX} template.`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `Successfully created ${wzWrapper.WZ_KIBANA_INDEX} template.`);
+            await createEmptyKibanaIndex();
+            return;
+        } catch (error) {
+            return Promise.reject(new Error(`Error creating template for ${wzWrapper.WZ_KIBANA_INDEX} due to ${error.message || error}`))
+        }
+    }
+
+    const getTemplateByName = async () => {
+        try {
+            await wzWrapper.getTemplateByName('wazuh-kibana')
+            log('[initialize][checkKibanaStatus]', `No need to create the ${wzWrapper.WZ_KIBANA_INDEX} template, already exists.`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `No need to create the ${wzWrapper.WZ_KIBANA_INDEX} template, already exists.`);
+            await createEmptyKibanaIndex();
+            return;
+        } catch (error) {
+            log('[initialize][checkKibanaStatus]', error.message || error);
+            return fixKibanaTemplate();
+        }
+    }
+
+    // Does Kibana index exist?
+    const checkKibanaStatus = async () => {
+        try {
+            const data = await wzWrapper.checkIfIndexExists(wzWrapper.WZ_KIBANA_INDEX);
+            if (data) { 
+                // It exists, initialize!
+                await init();
+            } else { 
+                // No Kibana index created...
+                log('[initialize][checkKibanaStatus]', 'Didn\'t find ' + wzWrapper.WZ_KIBANA_INDEX + ' index...','info')
+                server.log([blueWazuh, 'initialize', 'info'], 'Didn\'t find ' + wzWrapper.WZ_KIBANA_INDEX + ' index...');
+                await getTemplateByName();
+            }
+        } catch (error) {
+            log('[initialize][checkKibanaStatus]',error.message || error);
+            server.log([blueWazuh, 'initialize (checkKibanaStatus)', 'error'], error.message || error);
+        }
     };
 
     // Wait until Elasticsearch js is ready
-    const checkStatus = () => {
-        server.plugins.elasticsearch.waitUntilReady().then(data => { checkKibanaStatus() })
-            .catch(error => {
-                log('initialize.js checkStatus',error.message || error);
-                server.log([blueWazuh, 'initialize', 'info'], 'Waiting for elasticsearch plugin to be ready...');
-                setTimeout(() => checkStatus(), 3000);
-            });
+    const checkStatus = async () => {
+        try{
+            await server.plugins.elasticsearch.waitUntilReady();
+            return checkKibanaStatus();
+        } catch (error){
+            log('[initialize][checkStatus]',error.message || error);
+            server.log([blueWazuh, 'initialize', 'info'], 'Waiting for elasticsearch plugin to be ready...');
+            setTimeout(() => checkStatus(), 3000);
+        }
     };
 
-    const reachAPI = (wapi_config) => {
-        // Now, let's see whether they have a 2.x or 3.x version
-        let id = wapi_config._id;
-        wapi_config = wapi_config._source;
-        log('initialize.js reachAPI', 'Reaching ' + wapi_config.manager,'info')
-        server.log([blueWazuh, 'reindex', 'info'], 'Reaching ' + wapi_config.manager);
-        let decoded_password = Buffer.from(wapi_config.api_password, 'base64').toString("ascii");
-        if (wapi_config.cluster_info === undefined) { // No cluster_info in the API configuration data -> 2.x version
-            needle('get', `${wapi_config.url}:${wapi_config.api_port}/version`, {}, {
-                username: wapi_config.api_user,
-                password: decoded_password,
-                rejectUnauthorized: !wapi_config.insecure
+    const updateClusterInformation = async config => {
+        try {
+            await wzWrapper.updateWazuhIndexDocument(config.id,{
+                'doc': {
+                    "api_user"    : config.api_user,
+                    "api_password": config.api_password,
+                    "url"         : config.url,
+                    "api_port"    : config.api_port,
+                    "manager"     : config.manager,
+                    "cluster_info": {
+                        "manager": config.manager,
+                        "node"   : config.cluster_info.node,
+                        "cluster": config.cluster_info.cluster,
+                        "status" : config.cluster_info.status
+                    },
+                }
             })
-                .then(response => {
-                    log('initialize.js reachAPI', 'API is reachable ' + wapi_config.manager,'info')
-                    server.log([blueWazuh, 'reindex', 'info'], 'API is reachable ' + wapi_config.manager);
-                    if (parseInt(response.body.error) === 0 && response.body.data) {
-                        needle('get', `${wapi_config.url}:${wapi_config.api_port}/cluster/status`, {}, { // Checking the cluster status
-                            username: wapi_config.api_user,
-                            password: decoded_password,
-                            rejectUnauthorized: !wapi_config.insecure
-                        })
-                            .then((response) => {
-                                if (!response.body.error) {
-                                    if (response.body.data.enabled === 'yes') { // If cluster mode is active
-                                        needle('get', `${wapi_config.url}:${wapi_config.api_port}/cluster/node`, {}, {
-                                            username: wapi_config.api_user,
-                                            password: decoded_password,
-                                            rejectUnauthorized: !wapi_config.insecure
-                                        })
-                                            .then((response) => {
-                                                if (!response.body.error) {
-                                                    wapi_config.cluster_info = {};
-                                                    wapi_config.cluster_info.status = 'enabled';
-                                                    wapi_config.cluster_info.manager = wapi_config.manager;
-                                                    wapi_config.cluster_info.node = response.body.data.node;
-                                                    wapi_config.cluster_info.cluster = response.body.data.cluster;
-                                                } else if (response.body.error) {
-                                                    log('initialize.js reachAPI', response.body.error || response.body);
-                                                    server.log([blueWazuh, 'reindex', 'error'], 'Could not get cluster/node information for ', wapi_config.manager);
-                                                }
-                                            });
-                                    }
-                                    else { // Cluster mode is not active
-                                        wapi_config.cluster_info = {};
-                                        wapi_config.cluster_info.status = 'disabled';
-                                        wapi_config.cluster_info.cluster = 'Disabled';
-                                        wapi_config.cluster_info.manager = wapi_config.manager;
-                                    }
 
-                                    // We filled data for the API, let's insert it now
-                                    elasticRequest.callWithInternalUser('update', {
-                                        index: '.wazuh',
-                                        type: 'wazuh-configuration',
-                                        id: id,
-                                        body: {
-                                            'doc': {
-                                                "api_user": wapi_config.api_user,
-                                                "api_password": wapi_config.api_password,
-                                                "url": wapi_config.url,
-                                                "api_port": wapi_config.api_port,
-                                                "manager": wapi_config.manager,
-                                                "cluster_info": {
-                                                    "manager": wapi_config.manager,
-                                                    "node": wapi_config.cluster_info.node,
-                                                    "cluster": wapi_config.cluster_info.cluster,
-                                                    "status": wapi_config.cluster_info.status
-                                                },
-                                            }
-                                        }
-                                    })
-                                        .then(resp => {
-                                            log('initialize.js reachAPI', 'Successfully updated proper cluster information for ' + wapi_config.manager,'info')
-                                            server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated proper cluster information for ' + wapi_config.manager);
-                                        })
-                                        .catch(error => {
-                                            log('initialize.js reachAPI', error.message || error);
-                                            server.log([blueWazuh, 'reindex', 'error'], 'Could not update proper cluster information for ' + wapi_config.manager + 'due to ' + err);
-                                        });
-                                } else {
-                                    log('initialize.js reachAPI', 'Could not get cluster/status information for ' + wapi_config.manager)
-                                    server.log([blueWazuh, 'reindex', 'error'], 'Could not get cluster/status information for ' + wapi_config.manager);
-                                }
-                            });
-                    } else {
-                        log('initialize.js reachAPI', 'The API responded with some kind of error for ' + wapi_config.manager)
-                        server.log([blueWazuh, 'reindex', 'error'], 'The API responded with some kind of error for ' + wapi_config.manager);
-                    }
-                })
-                .catch(error => {
-                    log('initialize.js reachAPI', error.message || error);
-                    server.log([blueWazuh, 'reindex', 'info'], 'API is NOT reachable ' + wapi_config.manager);
-                    // We weren't able to reach the API, reorganize data and fill with sample node and cluster name information
-                    elasticRequest.callWithInternalUser('update', {
-                        index: '.wazuh',
-                        type: 'wazuh-configuration',
-                        id: id,
-                        body: {
-                            'doc': {
-                                "api_user": wapi_config.api_user,
-                                "api_password": wapi_config.api_password,
-                                "url": wapi_config.url,
-                                "api_port": wapi_config.api_port,
-                                "manager": wapi_config.manager,
-                                "cluster_info": {
-                                    "manager": wapi_config.manager,
-                                    "node": "nodata",
-                                    "cluster": "nodata",
-                                    "status": "disabled"
-                                },
-                            }
-                        }
-                    })
-                        .then(resp => {
-                            log('initialize.js reachAPI',  'Successfully updated sample cluster information for ' + wapi_config.manager,'info')
-                            server.log([blueWazuh, 'reindex', 'info'], 'Successfully updated sample cluster information for ' + wapi_config.manager);
-                        })
-                        .catch(error => {
-                            log('initialize.js reachAPI', error.message || error);
-                            server.log([blueWazuh, 'reindex', 'error'], 'Could not update sample cluster information for ' + wapi_config.manager + 'due to ' + err);
-                        });
-                });
-        } else { // 3.x version
-            // Nothing to be done, cluster_info is present
-            log('initialize.js reachAPI',  'Nothing to be done for ' + wapi_config.manager + ' as it is already a 3.x version.' + wapi_config.manager,'info')   
-            server.log([blueWazuh, 'reindex', 'info'], 'Nothing to be done for ' + wapi_config.manager + ' as it is already a 3.x version.');
+            log('[initialize][updateClusterInformation]', `Successfully updated proper cluster information for ${config.manager}`,'info')
+            server.log([blueWazuh, 'updateClusterInformation', 'info'], `Successfully updated proper cluster information for ${config.manager}`);
+
+            return;
+
+        } catch (error) {
+            return Promise.reject(new Error(`Could not update proper cluster information for ${config.manager} due to ${error.message || error}`))
+        }
+    }
+
+    const updateSingleHostInformation = async config => {
+        try {
+            await wzWrapper.updateWazuhIndexDocument(config.id, {
+                'doc': {
+                    "api_user"    : config.api_user,
+                    "api_password": config.api_password,
+                    "url"         : config.url,
+                    "api_port"    : config.api_port,
+                    "manager"     : config.manager,
+                    "cluster_info": {
+                        "manager": config.manager,
+                        "node"   : "nodata",
+                        "cluster": "nodata",
+                        "status" : "disabled"
+                    },
+                }
+            })
+
+            log('[initialize][updateSingleHostInformation]', `Successfully updated proper single host information for ${config.manager}`,'info')
+            server.log([blueWazuh, 'updateSingleHostInformation', 'info'], `Successfully updated proper single host information for ${config.manager}`);
+
+            return;
+
+        } catch (error) {
+            return Promise.reject(new Error(`Could not update proper single host information for ${config.manager} due to ${error.message || error}`))
+        }
+    }
+
+    const getNodeInformation = async config => {
+        try {
+            const response = await needle('get', `${config.url}:${config.api_port}/cluster/node`, {}, {
+                username: config.api_user,
+                password:  Buffer.from(config.api_password, 'base64').toString("ascii"),
+                rejectUnauthorized: !config.insecure
+            })
+
+            if (!response.body.error) {
+                config.cluster_info = {};
+                config.cluster_info.status = 'enabled';
+                config.cluster_info.manager = config.manager;
+                config.cluster_info.node = response.body.data.node;
+                config.cluster_info.cluster = response.body.data.cluster;
+            } else if (response.body.error) {
+                log('[initialize][getNodeInformation]', response.body.error || response.body);
+                server.log([blueWazuh, 'reindex', 'error'], `Could not get cluster/node information for ${config.manager}`);
+            }
+
+            return;
+                
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
+    const getClusterStatus = async config => {
+        try {
+            const response = await needle('get', `${config.url}:${config.api_port}/cluster/status`, {}, { // Checking the cluster status
+                username: config.api_user,
+                password: Buffer.from(config.api_password, 'base64').toString("ascii"),
+                rejectUnauthorized: !config.insecure
+            })
+
+            if (!response.body.error) {
+                if (response.body.data.enabled === 'yes') { // If cluster mode is active
+                    return getNodeInformation(config)
+                }
+                else { // Cluster mode is not active
+                    config.cluster_info = {};
+                    config.cluster_info.status = 'disabled';
+                    config.cluster_info.cluster = 'Disabled';
+                    config.cluster_info.manager = config.manager;
+                }
+
+                // We filled data for the API, let's insert it now
+                return updateClusterInformation(config)
+            } else {
+                log('[initialize][getClusterStatus]', `Could not get cluster/status information for ${config.manager}`)
+                server.log([blueWazuh, 'reindex', 'error'], `Could not get cluster/status information for ${config.manager}`);
+                return;
+            }
+         
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    const checkVersion = async config => {
+        try {
+            const response = await needle('get', `${config.url}:${config.api_port}/version`, {}, {
+                username: config.api_user,
+                password: Buffer.from(config.api_password, 'base64').toString("ascii"),
+                rejectUnauthorized: !config.insecure
+            })
+
+            log('[initialize][checkVersion]', `API is reachable ${config.manager}`,'info')
+            server.log([blueWazuh, 'reindex', 'info'], `API is reachable ${config.manager}`);
+            if (parseInt(response.body.error) === 0 && response.body.data) {
+                return getClusterStatus(config)
+            } else {
+                log('[initialize][checkVersion]', `The API responded with some kind of error for ${config.manager}`)
+                server.log([blueWazuh, 'reindex', 'error'], `The API responded with some kind of error for ${config.manager}`);
+                return;
+            }
+        } catch (error) {
+            log('[initialize][checkVersion]', error.message || error);
+            server.log([blueWazuh, 'reindex', 'info'], `API is NOT reachable ${config.manager}`);
+            // We weren't able to reach the API, reorganize data and fill with sample node and cluster name information
+            return updateSingleHostInformation(config);
+        }
+    }
+
+    const reachAPI = async config => {
+        try {
+            const id = config._id;
+            config = config._source;
+            config.id = id;
+            log('[initialize][reachAPI]', `Reaching ${config.manager}`,'info')
+            server.log([blueWazuh, 'reindex', 'info'], `Reaching ${config.manager}`);
+
+            if (config.cluster_info === undefined) { 
+                // No cluster_info in the API configuration data -> 2.x version
+                await checkVersion(config)
+            } else { // 3.x version
+                // Nothing to be done, cluster_info is present
+                log('[initialize][reachAPI]', `Nothing to be done for ${config.manager} as it is already a 3.x version.`,'info')   
+                server.log([blueWazuh, 'reindex', 'info'], `Nothing to be done for ${config.manager} as it is already a 3.x version.`);
+            }
+
+            return;
+        } catch (error) {
+            return Promise.reject(error);
         }
     };
 
     // Reindex a .wazuh index from 2.x-5.x or 3.x-5.x to .wazuh and .wazuh-version in 3.x-6.x
-    const reindexOldVersion = () => {
-        log('initialize.js reindexOldVersion',  `Old version detected. Proceeding to reindex.`,'info')  
-        server.log([blueWazuh, 'reindex', 'info'], `Old version detected. Proceeding to reindex.`);
-
-        let configuration = {
-            "source": {
-                "index": ".wazuh",
-                "type": "wazuh-configuration"
-            },
-            "dest": {
-                "index": ".old-wazuh"
-            }
-        };
-
-        // Backing up .wazuh index
-        elasticRequest.callWithInternalUser('reindex', { body: configuration })
-            .then(result => {
-                log('initialize.js reindexOldVersion',  'Successfully backed up .wazuh index','info')  
-                // And...this response does not take into acount new index population so...let's wait for it
-                server.log([blueWazuh, 'reindex', 'info'], 'Successfully backed up .wazuh index');
-                setTimeout(() => swapIndex(), 3000);
-            })
-            .catch(error => {
-                log('initialize.js reindexOldVersion', error.message || error);
-                server.log([blueWazuh, 'reindex', 'error'], 'Could not begin the reindex process: ' + error);
-            });
-    };
-
-    const swapIndex = () => {
-        // Deleting old .wazuh index
-        log('initialize.js swapIndex', 'Deleting old .wazuh index','info');
-        server.log([blueWazuh, 'reindex', 'info'], 'Deleting old .wazuh index.');
-
-        elasticRequest.callWithInternalUser('indices.delete', { index: ".wazuh" })
-            .then(data => {
-                let configuration = {
-                    "source": {
-                        "index": ".old-wazuh",
-                        "type": "wazuh-configuration"
-                    },
-                    "dest": {
-                        "index": ".wazuh"
-                    },
-                    "script": {
-                        "source": "ctx._id = new Date().getTime()",
-                        "lang": "painless"
-                    }
-                };
-                log('initialize.js swapIndex', 'Reindexing into the new .wazuh','info');
-                server.log([blueWazuh, 'reindex', 'info'], 'Reindexing into the new .wazuh');
-                // Reindexing from .old-wazuh where the type of document is wazuh-configuration into the new index .wazuh
-                elasticRequest.callWithInternalUser('reindex', { body: configuration })
-                    .then((result) => {
-                        // Now we need to properly replace the cluster_info into the configuration -> improvement: pagination?
-                        // And...this response does not take into acount new index population so...let's wait for it
-                        setTimeout(() => reachAPIs(), 3000);
-                    })
-                    .catch(error => {
-                        log('initialize.js swapIndex', error.message || error);
-                        server.log([blueWazuh, 'reindex', 'error'], 'Could not reindex the new .wazuh: ' + error);
-                    });
-            })
-            .catch(error => {
-                log('initialize.js swapIndex', error.message || error);
-                server.log([blueWazuh, 'reindex', 'error'], 'Could not delete the old .wazuh index: ' + error);
-            });
-    };
-
-    const reachAPIs = () => {
-        elasticRequest.callWithInternalUser('search', { index: ".wazuh" })
-            .then(data => {
-                for (var i = 0; i < data.hits.hits.length; i++) {
-                    reachAPI(data.hits.hits[i]);
+    const reindexOldVersion = async () => {
+        try {
+            log('[initialize][reindexOldVersion]',  `Old version detected. Proceeding to reindex.`,'info')  
+            server.log([blueWazuh, 'reindex', 'info'], `Old version detected. Proceeding to reindex.`);
+    
+            const configuration = {
+                source: {
+                    index: '.wazuh',
+                    type : 'wazuh-configuration'
+                },
+                dest: {
+                    index: '.old-wazuh'
                 }
-            })
-            .catch(error => {
-                log('initialize.js reachAPIs', error.message || error);
-                server.log([blueWazuh, 'reindex', 'error'], 'Something happened while getting old API configuration data: ' + error);
-            });
+            };
+    
+            // Backing up .wazuh index
+            await wzWrapper.reindexWithCustomConfiguration(configuration);
+
+            log('[initialize][reindexOldVersion]',  'Successfully backed up .wazuh index','info')  
+            // And...this response does not take into acount new index population so...let's wait for it
+            server.log([blueWazuh, 'reindex', 'info'], 'Successfully backed up .wazuh index');
+            setTimeout(() => swapIndex(), 3000);
+
+        } catch(error) {
+            log('[initialize][reindexOldVersion]', error.message || error);
+            server.log([blueWazuh, 'reindex', 'error'], 'Could not begin the reindex process: ' + error.message || error);
+        }
+    };
+
+    const swapIndex = async () => {
+        try {
+            // Deleting old .wazuh index
+            log('[initialize][swapIndex]', 'Deleting old .wazuh index','info');
+            server.log([blueWazuh, 'reindex', 'info'], 'Deleting old .wazuh index.');
+
+            await wzWrapper.deleteIndexByName('.wazuh');
+
+            const configuration = {
+                "source": {
+                    "index": ".old-wazuh",
+                    "type": "wazuh-configuration"
+                },
+                "dest": {
+                    "index": ".wazuh"
+                },
+                "script": {
+                    "source": "ctx._id = new Date().getTime()",
+                    "lang": "painless"
+                }
+            };
+
+            log('[initialize][swapIndex]', 'Reindexing into the new .wazuh','info');
+            server.log([blueWazuh, 'reindex', 'info'], 'Reindexing into the new .wazuh');
+            // Reindexing from .old-wazuh where the type of document is wazuh-configuration into the new index .wazuh
+            await wzWrapper.reindexWithCustomConfiguration(configuration);
+
+            // Now we need to properly replace the cluster_info into the configuration -> improvement: pagination?
+            // And...this response does not take into acount new index population so...let's wait for it
+            setTimeout(() => reachAPIs(), 3000);
+
+        } catch(error) {
+            log('[initialize][swapIndex]', error.message || error);
+            server.log([blueWazuh, 'reindex', 'error'], 'Could not reindex the new .wazuh: ' + error.message || error);
+        }
+    };
+
+    const reachAPIs = async () => {
+        try{
+            const data = await wzWrapper.searchIndexByName('.wazuh');
+            const promises = [];
+            for (let item of data.hits.hits) {
+                promises.push(reachAPI(item));
+            }
+            await Promise.all(promises);
+        } catch(error){
+            log('[initialize][reachAPIs]', error.message || error);
+            server.log([blueWazuh, 'reindex', 'error'], 'Something happened while getting old API configuration data: ' + error.message || error);
+        }
     };
 
     // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
     checkStatus();
 
-    module.exports = importAppObjects;
 };

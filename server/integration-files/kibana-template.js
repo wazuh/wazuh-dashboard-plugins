@@ -1,4 +1,4 @@
-{
+module.exports = {
   "order": 0,
   "template": ".kibana*",
   "settings": {

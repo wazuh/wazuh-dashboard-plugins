@@ -7,8 +7,8 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         if(error.data && error.data.errorData && error.data.errorData.message) return error.data.errorData.message;
         if(error.errorData && error.errorData.message) return error.errorData.message;
         if(error.data && typeof error.data === 'string') return error.data;
-        if(error.data && error.data.message && error.data.message === 'string') return error.data.message;
-        if(error.data && error.data.message && error.data.message.msg && error.data.message.msg === 'string') return error.data.message.msg;
+        if(error.data && error.data.message && typeof error.data.message === 'string') return error.data.message;
+        if(error.data && error.data.message && error.data.message.msg && typeof error.data.message.msg === 'string') return error.data.message.msg;
         if(error.data && error.data.data && typeof error.data.data === 'string') return error.data.data;
         if(typeof error.message === 'string') return error.message;
         if(error.message && error.message.msg) return error.message.msg;
@@ -50,7 +50,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
                 text = `There seem to be a problem with Wazuh app visualizations in Kibana, please reinstall the Wazuh app.`;
                 break;
             case 'elasticsearch_down':
-                text = `Could not find .kibana index on Elasticsearch or maybe Elasticsearch is down.<br>Please check it and try again.`;
+                text = `Could not find Kibana index on Elasticsearch or maybe Elasticsearch is down.<br>Please check it and try again.`;
                 break;
             case 'no_elasticsearch':
                 text = `Could not connect with elasticsearch, maybe it's down.`;
