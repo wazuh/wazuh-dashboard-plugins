@@ -14,6 +14,8 @@ import fs                 from 'fs';
 import yml                from 'js-yaml';
 import path               from 'path';
 
+import { AgentsVisualizations, OverviewVisualizations, RulesetVisualizations }  from '../integration-files/visualizations/index'
+
 export default class WazuhElastic {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
@@ -301,10 +303,11 @@ export default class WazuhElastic {
      */
     buildVisualizationsRaw (app_objects, id, timestamp) {
         try{
-            let visArray = [],bulk_content = {};
+            const visArray = [];
+            let aux_source, bulk_content;
             for (let element of app_objects) {
             	// Stringify and replace index-pattern for visualizations
-                let aux_source = JSON.stringify(element._source);
+                aux_source = JSON.stringify(element._source);
                 aux_source = aux_source.replace("wazuh-alerts", id);
                 aux_source = JSON.parse(aux_source);
 
@@ -320,8 +323,6 @@ export default class WazuhElastic {
                     id: element._id + '-' + timestamp,
                     _version: bulk_content.visualization.version
                 });
-                
-                
             }
             return visArray;
         } catch (error) {
@@ -334,7 +335,7 @@ export default class WazuhElastic {
             if(!req.params.pattern ||
                !req.params.tab ||
                !req.params.timestamp ||
-               (req.params.tab && !req.params.tab.includes('manager') && !req.params.tab.includes('overview') && !req.params.tab.includes('agents'))
+               (req.params.tab && !req.params.tab.includes('manager-') && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-'))
             ) {
                 throw new Error('Missing parameters');
             }
@@ -346,11 +347,16 @@ export default class WazuhElastic {
                               'manager' :
                               'agents';
 
+            const tabSplit = req.params.tab.split('-');
+            const tabSufix = tabPrefix === 'manager' ? tabSplit[2] : tabSplit[1];
+
             const file = tabPrefix === 'manager' ?
-                         require(`../integration-files/visualizations/ruleset/${req.params.tab.split('manager-')[1]}`) :
-                         require(`../integration-files/visualizations/${tabPrefix}/${req.params.tab}`);
-            
-            const raw      = await this.buildVisualizationsRaw(file,req.params.pattern,req.params.timestamp);
+                         RulesetVisualizations[tabSufix] :
+                         tabPrefix === 'overview' ?
+                         OverviewVisualizations[tabSufix] :
+                         AgentsVisualizations[tabSufix];
+           
+            const raw = await this.buildVisualizationsRaw(file,req.params.pattern,req.params.timestamp);
             return res({acknowledge: true, raw: raw });
             
         } catch(error){
