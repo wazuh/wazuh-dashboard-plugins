@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import knownFields from '../integration-files/known-fields';
+import needle      from 'needle'
 
 export default class ElasticWrapper {
     constructor(server){
@@ -504,15 +505,35 @@ export default class ElasticWrapper {
         }
     }
 
-        /**
+    /**
      * Same as curling the plugins from Elasticsearch
      */
     async getPlugins() {
         try {
 
             const data = await this.elasticRequest.callWithInternalUser('cat.plugins', { });
+            const usingCredentials = await this.usingCredentials();
+ 
+            return usingCredentials ? data : false;
 
-            return data;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async usingCredentials() {
+        try {
+            const response = await needle('get', `${this.elasticRequest._config.url}/_xpack`, {}, {
+                username: this.elasticRequest._config.username,
+                password:  this.elasticRequest._config.password
+            })
+
+
+            return response && 
+                   response.body && 
+                   response.body.features && 
+                   response.body.features.security && 
+                   response.body.features.security.enabled;
 
         } catch (error) {
             return Promise.reject(error);
@@ -621,7 +642,7 @@ export default class ElasticWrapper {
                 index: index,
                 type : 'wazuh'
             });
-
+            
             return data;
 
         } catch (error) {
