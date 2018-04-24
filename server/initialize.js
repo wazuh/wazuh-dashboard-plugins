@@ -62,8 +62,8 @@ module.exports = (server, options) => {
     const checkKnownFields = async () => {
         try {
             const xpack = await wzWrapper.getPlugins();
-            log('[initialize][checkKnownFields]', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
-            server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
+            log('[initialize][checkKnownFields]', `x-pack enabled and using security: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info')
+            server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled and using security: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
                     
             const indexPatternList = await wzWrapper.getAllIndexPatterns();
 
@@ -312,9 +312,7 @@ module.exports = (server, options) => {
 
         try {
             kibana_template = require(KIBANA_TEMPLATE);
-            console.log(kibana_template.template)
             kibana_template.template = wzWrapper.WZ_KIBANA_INDEX + '*'
-            console.log(kibana_template.template)
         } catch (error) {
             log('[initialize][createKibanaTemplate]', error.message || error);
             server.log([blueWazuh, 'initialize', 'error'], `Could not read the ${wzWrapper.WZ_KIBANA_INDEX} template file.`);

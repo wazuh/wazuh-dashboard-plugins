@@ -214,7 +214,11 @@ class WazuhElastic {
         try {
             const xpack          = await this.wzWrapper.getPlugins();
             const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
-            const isSuperUser    = isXpackEnabled && req.auth.credentials.roles.includes('superuser');
+            const isSuperUser    = isXpackEnabled && 
+                                   req.auth && 
+                                   req.auth.credentials && 
+                                   req.auth.credentials.roles && 
+                                   req.auth.credentials.roles.includes('superuser');
             
             const data = await this.wzWrapper.getAllIndexPatterns();
 
@@ -222,7 +226,7 @@ class WazuhElastic {
                 
             if(data && data.hits && data.hits.hits){
                 const list = this.validateIndexPattern(data.hits.hits);
-
+                
                 return res({data: isXpackEnabled && !isSuperUser ? await this.filterAllowedIndexPatternList(list,req) : list});
             }
             
