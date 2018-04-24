@@ -2,6 +2,27 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 389
+
+### Added
+
+-   Refactoring on visualizations use and management ([#397](https://github.com/wazuh/wazuh-kibana-app/pull/397)):
+    -   Visualizations are no longer stored on an index, they're built and loaded on demand when needed to render the interface.
+    -   Refactoring on the whole app source code to use the _import/export_ paradigm.
+    -   Removed old functions and variables from the old visualization management logic.
+    -   Removed cron task to clean remaining visualizations since it's no longer needed.
+    -   Some Kibana functions and modules have been overriden in order to make this refactorign work.
+        -   This change is not intrusive in any case.
+-   Added copyright notice to the whole app source code ([#395](https://github.com/wazuh/wazuh-kibana-app/pull/395)).
+-   Updated `.gitignore` with the _Node_ template ([#395](https://github.com/wazuh/wazuh-kibana-app/pull/395)).
+
+### Changed
+
+-   Small minor enhancements to the user interface ([#396](https://github.com/wazuh/wazuh-kibana-app/pull/396)):
+    -   Reduced Wazuh app logo size.
+    -   Changed buttons text to not use all-capitalized letters.
+    -   Minor typos found on the HTML/CSS code have been fixed.
+
 ## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 388
 
 ### Added
