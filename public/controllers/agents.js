@@ -11,6 +11,7 @@
  */
 import beautifier   from 'plugins/wazuh/utils/json-beautifier';
 import * as modules from 'ui/modules'
+import rison        from 'rison'
 
 const app = modules.get('app/wazuh', []);
 
@@ -288,8 +289,21 @@ app.controller('agentsController',
                     return $scope.getAgentConfig(newAgentId);
                 }
 
-                // Deleting app state traces in the url
-                $location.search('_a', null);
+                try {
+                    // Try to parse the _a trace and detect if there is any agent.id filter
+                    // in order to delete it from the _a trace
+                    const str = $location.search()._a;
+                    if(str){
+                        const decoded   = rison.decode(str);
+                        const tmp       = decoded.filters.filter(item => !item.query.match['agent.id']);
+                        decoded.filters = tmp;
+                        const encoded   = rison.encode(decoded);
+                        $location.search('_a', encoded)
+                    }
+                } catch (error) {
+                    // If some rison.js related error is generated we simply clean the _a trace
+                    $location.search('_a', null)
+                }
                 let id = null;
 
                 // They passed an id
