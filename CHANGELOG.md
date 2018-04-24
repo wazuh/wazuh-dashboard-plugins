@@ -29,9 +29,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 -   Support for Elastic Stack v6.2.4.
 -   App server fully refactored ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)):
-    -   New added classes, reduced the amount of code, removed unused functions, and several optimizations.
+    -   Added new classes, reduced the amount of code, removed unused functions, and several optimizations.
     -   Now the app follows a more ES6 code style on multiple modules.
-    -   _Overview/Agents_ visualizations have been splitted into separated files and folders.
+    -   _Overview/Agents_ visualizations have been ordered into separated files and folders.
     -   Now the app can use the default index defined on the `/ect/kibana/kibana.yml` file.
     -   Better error handling for the visualizations directive.
     -   Added a cron job to delete remaining visualizations on the `.kibana` index if so.
@@ -47,7 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Increased the query size when fetching the index pattern list ([#339](https://github.com/wazuh/wazuh-kibana-app/pull/339)).
 -   Changed active colour for all app tables ([#347](https://github.com/wazuh/wazuh-kibana-app/pull/347)).
 -   Changed validation regex to accept URLs with non-numeric format ([#353](https://github.com/wazuh/wazuh-kibana-app/pull/353)).
--   Changed visualization removal cron task to avoid excesive log messages when there weren't removed visualizations ([#361](https://github.com/wazuh/wazuh-kibana-app/pull/361)).
+-   Changed visualization removal cron task to avoid excessive log messages when there weren't removed visualizations ([#361](https://github.com/wazuh/wazuh-kibana-app/pull/361)).
 -   Changed filters comparison for a safer access ([#383](https://github.com/wazuh/wazuh-kibana-app/pull/383)).
 -   Removed some `server.log` messages to avoid performance errors ([#384](https://github.com/wazuh/wazuh-kibana-app/pull/384)).
 -   Changed the way of handling the index patterns list ([#360](https://github.com/wazuh/wazuh-kibana-app/pull/360)).
@@ -65,7 +65,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Fixed several bugs related to the upgrade process from Wazuh 2.x to the new refactored server ([#363](https://github.com/wazuh/wazuh-kibana-app/pull/363)).
 -   Fixed a bug in _Discover/Agents VirusTotal_ tabs to avoid conflicts with the `agent.name` field ([#379](https://github.com/wazuh/wazuh-kibana-app/pull/379)).
 -   Fixed a bug on the implicit filter in _Discover/Agents PCI_ tabs ([#393](https://github.com/wazuh/wazuh-kibana-app/pull/393)).
--   Fixed a bug on the app initialization when using X-Pack with the security plugin disabled ([#401](https://github.com/wazuh/wazuh-kibana-app/pull/401)).
+-   Fixed a bug in the app initialization when using X-Pack with the security plugin disabled ([#401](https://github.com/wazuh/wazuh-kibana-app/pull/401)).
 
 ### Removed
 
