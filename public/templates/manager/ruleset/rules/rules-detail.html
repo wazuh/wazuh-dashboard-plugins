@@ -71,13 +71,9 @@
                     <span flex="20">No alert</span>
                     <span class="wz-text-right color-grey">{{currentRule.details.noalert}}</span>
                 </div>
-                <div ng-if="currentRule.details.regex" layout="row" class="wz-padding-top-10">
+                <div ng-if="currentRule.details.regex && !isArray(currentRule.details.regex)" layout="row" class="wz-padding-top-10">
                     <span flex="20">Regex</span>
                     <span class="wz-text-right color-grey">{{currentRule.details.regex}}</span>
-                </div>
-                <div ng-if="currentRule.details.order" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Order</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.order}}</span>
                 </div>
                 <div ng-if="currentRule.details.parent" layout="row" class="wz-padding-top-10">
                     <span flex="20">Parent</span>
@@ -103,6 +99,10 @@
                     <span flex="20">Options</span>
                     <span class="wz-text-right color-grey">{{currentRule.details.options}}</span>
                 </div>
+                <div ng-if="currentRule.details.type" layout="row" class="wz-padding-top-10">
+                    <span flex="20">Type</span>
+                    <span class="wz-text-right color-grey">{{currentRule.details.type}}</span>
+                </div>
                 <div ng-if="currentRule.details.if_sid" layout="row" class="wz-padding-top-10">
                     <span flex="20">If SID</span>
                     <span class="wz-text-right color-grey">{{currentRule.details.if_sid}}</span>
@@ -115,13 +115,13 @@
                     <span flex="20">ID</span>
                     <span class="wz-text-right color-grey">{{currentRule.details.id}}</span>
                 </div>
-                <div ng-if="currentRule.details.match && !currentRule.details.match.isArray()" layout="row" class="wz-padding-top-10">
+                <div ng-if="currentRule.details.match && !isArray(currentRule.details.match)" layout="row" class="wz-padding-top-10">
                     <span flex="20">Match</span>
                     <span class="wz-text-right color-grey">{{currentRule.details.match}}</span>
                 </div>
-                <div ng-if="currentDecoder.details.prematch && !currentDecoder.details.prematch.isArray()" layout="row" class="wz-padding-top-10">
+                <div ng-if="currentRule.details.prematch && !isArray(currentRule.details.prematch)" layout="row" class="wz-padding-top-10">
                     <span flex="20">Prematch</span>
-                    <span class="wz-text-right color-grey">{{currentDecoder.details.prematch}}</span>
+                    <span class="wz-text-right color-grey">{{currentRule.details.prematch}}</span>
                 </div>
                 <div ng-if="currentRule.details.decoded_as" layout="row" class="wz-padding-top-10">
                     <span flex="20">Decoded as</span>
@@ -131,8 +131,22 @@
         </md-card>
         <!-- End details section -->
 
+        <!-- Regex section -->
+        <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.regex)">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Regex</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div ng-repeat="item in currentRule.details.regex">
+                    <div layout="row" class="wz-padding-top-10">
+                        <span class="wz-text-right color-grey">{{item}}</span>
+                    </div>
+                </div>
+            </md-card-content>
+        </md-card>
+        <!-- End regex section -->
+
         <!-- Match section -->
-        <md-card flex class="wz-md-card" ng-if="currentRule.details.match.isArray()">
+        <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.match)">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Match</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -146,11 +160,11 @@
         <!-- End match section -->
 
         <!-- Prematch section -->
-        <md-card flex class="wz-md-card" ng-if="currentDecoder.details.prematch.isArray()">
+        <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.prematch)">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Prematch</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div ng-repeat="item in currentDecoder.details.prematch">
+                <div ng-repeat="item in currentRule.details.prematch">
                     <div layout="row" class="wz-padding-top-10">
                         <span class="wz-text-right color-grey">{{item}}</span>
                     </div>
