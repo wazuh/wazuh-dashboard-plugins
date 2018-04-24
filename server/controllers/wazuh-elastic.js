@@ -306,6 +306,7 @@ class WazuhElastic {
 
             const bulkBody = this.buildVisualizationsBulk(file,req.params.pattern,req.params.timestamp,clusterName);
             const output = await this.wzWrapper.pushBulkToKibanaIndex(bulkBody);
+            await this.wzWrapper.refreshIndexByName(this.wzWrapper.WZ_KIBANA_INDEX);
             return res({acknowledge: true, output: output });
             
         } catch(error){
