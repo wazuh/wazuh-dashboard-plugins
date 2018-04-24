@@ -500,8 +500,24 @@ class ElasticWrapper{
         try {
 
             const data = await this.elasticRequest.callWithInternalUser('cat.plugins', { });
+            const usingCredentials = await this.usingCredentials();
+ 
+            return usingCredentials ? data : false;
 
-            return data;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async usingCredentials() {
+        try {
+            const data = await this.elasticRequest.callWithInternalUser('cluster.getSettings', { includeDefaults: true });
+
+            return data && 
+                   data.defaults && 
+                   data.defaults.xpack && 
+                   data.defaults.xpack.security && 
+                   data.defaults.xpack.security.enabled;
 
         } catch (error) {
             return Promise.reject(error);
