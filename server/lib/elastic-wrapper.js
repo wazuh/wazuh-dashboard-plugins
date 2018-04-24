@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import knownFields from '../integration-files/known-fields';
-import needle      from 'needle'
 
 export default class ElasticWrapper {
     constructor(server){
@@ -523,17 +522,13 @@ export default class ElasticWrapper {
 
     async usingCredentials() {
         try {
-            const response = await needle('get', `${this.elasticRequest._config.url}/_xpack`, {}, {
-                username: this.elasticRequest._config.username,
-                password:  this.elasticRequest._config.password
-            })
+            const data = await this.elasticRequest.callWithInternalUser('cluster.getSettings', { includeDefaults: true });
 
-
-            return response && 
-                   response.body && 
-                   response.body.features && 
-                   response.body.features.security && 
-                   response.body.features.security.enabled;
+            return data && 
+                   data.defaults && 
+                   data.defaults.xpack && 
+                   data.defaults.xpack.security && 
+                   data.defaults.xpack.security.enabled;
 
         } catch (error) {
             return Promise.reject(error);
