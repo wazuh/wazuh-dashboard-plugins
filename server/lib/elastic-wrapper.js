@@ -1,5 +1,5 @@
 const knownFields = require('../integration-files/known-fields');
-const needle      = require('needle');
+
 class ElasticWrapper{
     constructor(server){
         this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
@@ -493,35 +493,15 @@ class ElasticWrapper{
         }
     }
 
-    /**
+        /**
      * Same as curling the plugins from Elasticsearch
      */
     async getPlugins() {
         try {
 
             const data = await this.elasticRequest.callWithInternalUser('cat.plugins', { });
-            const usingCredentials = await this.usingCredentials();
- 
-            return usingCredentials ? data : false;
 
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    async usingCredentials() {
-        try {
-            const response = await needle('get', `${this.elasticRequest._config.url}/_xpack`, {}, {
-                username: this.elasticRequest._config.username,
-                password:  this.elasticRequest._config.password
-            })
-
-
-            return response && 
-                   response.body && 
-                   response.body.features && 
-                   response.body.features.security && 
-                   response.body.features.security.enabled;
+            return data;
 
         } catch (error) {
             return Promise.reject(error);
@@ -630,7 +610,7 @@ class ElasticWrapper{
                 index: index,
                 type : 'wazuh'
             });
-            
+
             return data;
 
         } catch (error) {
