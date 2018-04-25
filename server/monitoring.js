@@ -160,7 +160,7 @@ export default (server, options) => {
                 return data.hits;
             }
 
-            log('[monitoring][getConfig]','no credentials');
+            log('[monitoring][getConfig]','There is no Wazuh API entries yet','info');
             return {
                 error     : 'no credentials',
                 error_code: 1
@@ -212,8 +212,8 @@ export default (server, options) => {
             await insertDocument(todayIndex,clusterName);
             return;
         } catch (error) {
-            log('[monitoring][createIndex]', error.message || error);
-            server.log([blueWazuh, 'monitoring', 'error'], `Could not create ${todayIndex} index on elasticsearch due to ` + error.message || error);
+            log('[monitoring][createIndex]', `Could not create ${todayIndex} index on elasticsearch due to ${error.message || error}`);
+            server.log([blueWazuh, 'monitoring', 'error'], `Could not create ${todayIndex} index on elasticsearch due to ${error.message || error}`);
         }
     };
 
@@ -239,8 +239,8 @@ export default (server, options) => {
             }
             return;
         } catch (error) {
-            log('[monitoring][insertDocument]', error.message || error);
-            server.log([blueWazuh, 'monitoring', 'error'], 'Error inserting agent data into elasticsearch. Bulk request failed due to ' + error.message || error);
+            log('[monitoring][insertDocument]', `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message || error}`);
+            server.log([blueWazuh, 'monitoring', 'error'], `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message || error}`);
         }
     };
 
@@ -258,7 +258,7 @@ export default (server, options) => {
 
         } catch (error) {
             log('[monitoring][saveStatus]', `Could not check if the index ${todayIndex} exists due to ${error.message || error}`);
-            server.log([blueWazuh, 'monitoring', 'error'], `Could not check if the index ${todayIndex} exists due to ` + error);
+            server.log([blueWazuh, 'monitoring', 'error'], `Could not check if the index ${todayIndex} exists due to ${error.message || error}`);
         }
     };
 
@@ -289,8 +289,8 @@ export default (server, options) => {
             const data = await wzWrapper.putMonitoringTemplate(monitoringTemplate);
             return;
         } catch(error){
-            log('[monitoring][checkTemplate]', 'Something went wrong updating wazuh-monitoring template...' + error.message || error);
-            server.log([blueWazuh, 'monitoring', 'info'], "Something went wrong updating wazuh-monitoring template..." + error.message || error);
+            log('[monitoring][checkTemplate]', `Something went wrong updating wazuh-monitoring template... ${error.message || error}`);
+            server.log([blueWazuh, 'monitoring', 'error'], `Something went wrong updating wazuh-monitoring template... ${error.message || error}`);
             return Promise.reject(error);
         }
     }
@@ -358,7 +358,7 @@ export default (server, options) => {
             await init();
             return;
         } catch(error) {
-            log('[monitoring][checkKibanaStatus]',error.message || error);
+            log('[monitoring][checkKibanaStatus]','Waiting for Kibana and Elasticsearch servers to be ready...','info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Waiting for Kibana and Elasticsearch servers to be ready...','info');
             setTimeout(() => checkKibanaStatus(), 3000);
         }
