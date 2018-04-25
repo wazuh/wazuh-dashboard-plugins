@@ -369,9 +369,24 @@ export default (server, options) => {
 
     const cronTask = async () => {
         try {
-            agentsArray = [];
-            const data = await getConfig();
-            await loadCredentials(data);
+            const template = await wzWrapper.getTemplateByName('wazuh-agent');
+
+            // Prevents to insert monitoring indices without the proper template inserted
+            if(typeof template === 'object' && 
+               typeof template['wazuh-agent'] !== 'undefined' && 
+               typeof template['wazuh-agent'].index_patterns !== 'undefined'){
+
+                agentsArray = [];
+                const data = await getConfig();
+                await loadCredentials(data);
+            
+            } else {
+
+                log('[monitoring][cronTask]','No wazuh-agent template found, not inserting monitoring data','info');
+                server.log([blueWazuh, 'monitoring [cronTask]', 'info'], 'No wazuh-agent template found, not inserting monitoring data')
+
+            }
+
             return;
         } catch (error) {
             log('[monitoring][cronTask]',error.message || error);
