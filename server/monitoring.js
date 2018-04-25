@@ -364,13 +364,13 @@ module.exports = (server, options) => {
 
     const cronTask = async () => {
         try {
-            const templates = await wzWrapper.getTemplates();
+            const template = await wzWrapper.getTemplateByName('wazuh-agent');
 
             // Prevents to insert monitoring indices without the proper template inserted
-            if(typeof templates === 'string' && 
-               templates.includes('wazuh-agent') && 
-               templates.includes('wazuh-monitoring')){
-                   
+            if(typeof template === 'object' && 
+               typeof template['wazuh-agent'] !== 'undefined' && 
+               typeof template['wazuh-agent'].index_patterns !== 'undefined'){
+
                 agentsArray = [];
                 const data = await getConfig();
                 await loadCredentials(data);
