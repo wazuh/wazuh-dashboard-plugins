@@ -35,6 +35,10 @@
                     <span flex="20">Status</span>
                     <span class="wz-text-right color-grey">{{currentDecoder.details.status}}</span>
                 </div>
+                <div ng-if="currentDecoder.details.program_name" layout="row" class="wz-padding-top-10">
+                    <span flex="20">Program name</span>
+                    <span class="wz-text-right color-grey">{{currentDecoder.details.program_name}}</span>
+                </div>
                 <div ng-if="currentDecoder.details.category" layout="row" class="wz-padding-top-10">
                     <span flex="20">Category</span>
                     <span class="wz-text-right color-grey">{{currentDecoder.details.category}}</span>
