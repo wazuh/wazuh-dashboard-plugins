@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 389
+## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 390
 
 ### Added
 
@@ -22,6 +22,17 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   Reduced Wazuh app logo size.
     -   Changed buttons text to not use all-capitalized letters.
     -   Minor typos found on the HTML/CSS code have been fixed.
+
+## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 389
+
+### Changed
+
+-   Changed severity and verbosity to some log messages ([#412](https://github.com/wazuh/wazuh-kibana-app/pull/412)).
+
+### Fixed
+
+-   Fixed a bug when using the X-Pack plugin without security capabilities enabled ([#403](https://github.com/wazuh/wazuh-kibana-app/pull/403)).
+-   Fixed a bug when the app was trying to create `wazuh-monitoring` indices without checking the existence of the proper template ([#412](https://github.com/wazuh/wazuh-kibana-app/pull/412)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 388
 
