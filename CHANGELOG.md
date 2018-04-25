@@ -76,7 +76,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Fixed several bugs related to the upgrade process from Wazuh 2.x to the new refactored server ([#363](https://github.com/wazuh/wazuh-kibana-app/pull/363)).
 -   Fixed a bug in _Discover/Agents VirusTotal_ tabs to avoid conflicts with the `agent.name` field ([#379](https://github.com/wazuh/wazuh-kibana-app/pull/379)).
 -   Fixed a bug on the implicit filter in _Discover/Agents PCI_ tabs ([#393](https://github.com/wazuh/wazuh-kibana-app/pull/393)).
--   Fixed a bug on the app initialization when using X-Pack with the security plugin disabled ([#401](https://github.com/wazuh/wazuh-kibana-app/pull/401)).
 
 ### Removed
 
