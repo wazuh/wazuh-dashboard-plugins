@@ -40,5 +40,7 @@ export default (server, options) => {
     server.route({ method: 'GET', path: '/api/wazuh-api/configuration', handler: (req,res) => ctrl.getConfigurationFile(req,res) });
 
     // COMMENT HERE
-    server.route({ method: 'POST',path: '/api/wazuh-api/wlogin', handler: (req,res) => ctrl.login(req,res) });
+    server.route({ method: 'POST', path: '/api/wazuh-api/wlogin', handler: (req,res) => ctrl.login(req,res) });
+
+    server.route({ method: 'POST', path: '/api/wazuh-api/csv', handler: (req,res) => ctrl.csv(req,res)})
 };
