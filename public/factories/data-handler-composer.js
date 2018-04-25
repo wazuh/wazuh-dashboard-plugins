@@ -41,6 +41,7 @@ app
     .factory('Rules', rules)
     .factory('RulesAutoComplete', rules)
     .factory('Decoders', decoders)
+    .factory('DecodersRelated', simple)
     .factory('DecodersAutoComplete', decoders)
     .directive('lazyLoadData', function($compile) {
         return {

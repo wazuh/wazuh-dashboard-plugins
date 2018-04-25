@@ -97,6 +97,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
     $scope.openDetailView = (rule) => {
         $scope.currentRule = rule;
         $scope.viewingDetail = true;
+        if(!$scope.$$phase) $scope.$digest();
     }
 
     /**
@@ -253,6 +254,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
     $scope.openDetailView = (decoder) => {
         $scope.currentDecoder = decoder;
         $scope.viewingDetail = true;
+        if(!$scope.$$phase) $scope.$digest();
     }
 
     /**

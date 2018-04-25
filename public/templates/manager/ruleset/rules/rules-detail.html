@@ -15,9 +15,9 @@
             <md-card-content layout="row" class="wz-padding-metric">
                 <div ng-if="currentRule.id" class="wz-text-truncatable" flex>ID: <span class="wz-text-bold">{{currentRule.id}}</span></div>
                 <div ng-if="currentRule.level || currentRule.level == 0" class="wz-text-truncatable" flex>Level: <span class="wz-text-bold">{{currentRule.level}}</span></div>
-                <div ng-if="currentRule.position" class="wz-text-truncatable" flex>Position: <span class="wz-text-bold">{{currentRule.position}}</span></div>
                 <div ng-if="currentRule.file" class="wz-text-truncatable" flex>File: <span class="wz-text-bold">{{currentRule.file}}</span></div>
                 <div ng-if="currentRule.path" class="wz-text-truncatable" flex>Path: <span class="wz-text-bold">{{currentRule.path}}</span></div>
+                <div ng-if="currentRule.status" class="wz-text-truncatable" flex>Path: <span class="wz-text-bold">{{currentRule.status}}</span></div>
             </md-card-content>
         </md-card>
     </div>
