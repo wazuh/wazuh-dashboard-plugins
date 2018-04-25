@@ -189,13 +189,20 @@ export default class WazuhElastic {
     async filterAllowedIndexPatternList (list,req) {
         let finalList = [];
         for(let item of list){
+            let results = false, forbidden = false;
             try {
-                const allow = await this.wzWrapper.searchWazuhElementsByIndexWithRequest(req, item.title);
-                if(allow && allow.hits && allow.hits.total >= 1) finalList.push(item);
+                results = await this.wzWrapper.searchWazuhElementsByIndexWithRequest(req, item.title);
             } catch (error){
-                console.log(`Some user trys to fetch the index pattern ${item.title} without permissions`)
+                forbidden = true;
+                console.log(`Some user tried to fetch the index pattern ${item.title} without permissions.`)
             }
-
+            if((results && results.hits && results.hits.total >= 1) ||
+               (!forbidden && results && results.hits && results.hits.total === 0)
+            ) {
+               
+                finalList.push(item);
+            
+            }
         }
         return finalList;
     }
