@@ -160,7 +160,7 @@
                 <div layout="column" class="wz-padding-top-10">
                     <wz-table-header
                         layout="row"
-                        data="decoders"
+                        data="decodersRelated"
                         keys="[
                             {name:'Name',sortValue:'name',size:20},
                             {name:'Program name',size:20},
@@ -171,9 +171,9 @@
                     <wz-table
                         layout="column"
                         flex
-                        func="openDetailView(decoder)"
-                        data="decoders"
-                        full="'decoder'"
+                        func="openDetailView(decoderRelated)"
+                        data="decodersRelated"
+                        full="'decoderRelated'"
                         activeitem="activeItem"
                         keys="[
                             {col:'name',size:20},

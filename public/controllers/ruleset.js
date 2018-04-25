@@ -92,7 +92,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
     }
 
     /**
-     * This function changes to the detail view
+     * This function changes to the rule detail view
      */
     $scope.openDetailView = (rule) => {
         $scope.currentRule = rule;
@@ -101,7 +101,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
     }
 
     /**
-     * This function changes to the list view
+     * This function changes to the rules list view
      */
     $scope.closeDetailView = () => {
         $scope.viewingDetail = false;
@@ -150,8 +150,9 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
 
     //Destroy
     $scope.$on('$destroy', () => {
-        $rootScope.rawVisualizations = null;
         $scope.rules.reset();
+        $scope.rulesAutoComplete.reset();
+        $rootScope.rawVisualizations = null;
         if($rootScope.ownHandlers){
             for(let h of $rootScope.ownHandlers){
                 h._scope.$destroy();
@@ -161,12 +162,13 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersAutoComplete, errorHandler, genericReq, appState) {
+app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
     $scope.loading  = true;
     $scope.decoders = Decoders;
+    $scope.decodersRelated = DecodersRelated;
     $scope.decodersAutoComplete = DecodersAutoComplete;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
@@ -249,16 +251,19 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
     }
 
     /**
-     * This function changes to the detail view
+     * This function changes to the decoder detail view
      */
     $scope.openDetailView = (decoder) => {
         $scope.currentDecoder = decoder;
+        $scope.decodersRelated.reset();
+        $scope.decodersRelated.path = `/decoders/${$scope.currentDecoder.name}`;
+        $scope.decodersRelated.nextPage('');
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }
 
     /**
-     * This function changes to the list view
+     * This function changes to the decoders list view
      */
     $scope.closeDetailView = () => {
         $scope.viewingDetail = false;
@@ -295,6 +300,9 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
     //Destroy
     $scope.$on("$destroy", () => {
         $scope.decoders.reset();
+        $scope.decodersRelated.reset();
+        $scope.decodersAutoComplete.reset();
+        $rootScope.rawVisualizations = null;
         if($rootScope.ownHandlers){
             for(let h of $rootScope.ownHandlers){
                 h._scope.$destroy();
