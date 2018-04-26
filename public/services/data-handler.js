@@ -27,6 +27,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             this.busy         = false;
             this.end          = false;
             this.onlyParents  = false;
+            this.decoderPosition = null;
         }
 
         toggleOnlyParents(value){
@@ -92,6 +93,13 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                             (t) => {return (t.merged_sum === elem.merged_sum)}) === index);
                         if(filtered.length !== this.items.length) this.items = filtered;
                     }
+
+                    // Remove the current decoder (by its position) from the list of related decoders
+                    if (this.decoderPosition || this.decoderPosition === 0) {
+                        const filteredDecoders = this.items.filter(item => item.position !== this.decoderPosition);
+                        this.items = filteredDecoders;
+                    }
+
                     deferred.resolve(true);
                 }
             })
@@ -210,6 +218,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             this.initial   = true;
             this.end       = false;
             this.busy      = false;
+            this.decoderPosition = null;
         }
     }
 

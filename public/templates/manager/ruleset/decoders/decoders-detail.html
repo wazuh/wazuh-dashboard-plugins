@@ -13,10 +13,10 @@
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div ng-if="currentDecoder.position || currentDecoder.position == 0" class="wz-text-truncatable" flex>Level: <span class="wz-text-bold">{{currentDecoder.position}}</span></div>
-                <div ng-if="currentDecoder.file" class="wz-text-truncatable" flex>File: <span class="wz-text-bold">{{currentDecoder.file}}</span></div>
-                <div ng-if="currentDecoder.path" class="wz-text-truncatable" flex>Path: <span class="wz-text-bold">{{currentDecoder.path}}</span></div>
-                <div ng-if="currentDecoder.status" class="wz-text-truncatable" flex>Path: <span class="wz-text-bold">{{currentDecoder.status}}</span></div>
+                <div flex ng-if="currentDecoder.file" class="wz-text-truncatable">File: <span class="wz-text-bold">{{currentDecoder.file}}</span></div>
+                <div flex ng-if="currentDecoder.path" class="wz-text-truncatable">Path: <span class="wz-text-bold">{{currentDecoder.path}}</span></div>
+                <div flex="10" ng-if="currentDecoder.status" class="wz-text-truncatable">Status: <span class="wz-text-bold">{{currentDecoder.status}}</span></div>
+                <div flex="10" ng-if="currentDecoder.position || currentDecoder.position == 0" class="wz-text-truncatable">Position: <span class="wz-text-bold">{{currentDecoder.position}}</span></div>
             </md-card-content>
         </md-card>
     </div>

@@ -255,9 +255,12 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
      */
     $scope.openDetailView = (decoder) => {
         $scope.currentDecoder = decoder;
+
         $scope.decodersRelated.reset();
         $scope.decodersRelated.path = `/decoders/${$scope.currentDecoder.name}`;
+        $scope.decodersRelated.decoderPosition = $scope.currentDecoder.position;
         $scope.decodersRelated.nextPage('');
+
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }
