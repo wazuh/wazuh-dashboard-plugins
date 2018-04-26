@@ -225,13 +225,18 @@ export default class WazuhElastic {
     async getlist (req,res) {
         try {
             const xpack          = await this.wzWrapper.getPlugins();
-            const isXpackEnabled = typeof xpack === 'string' && xpack.includes('x-pack');
+
+            const isXpackEnabled = typeof XPACK_RBAC_ENABLED !== 'undefined' && 
+                                   XPACK_RBAC_ENABLED && 
+                                   typeof xpack === 'string' && 
+                                   xpack.includes('x-pack');
+            
             const isSuperUser    = isXpackEnabled && 
                                    req.auth && 
                                    req.auth.credentials && 
                                    req.auth.credentials.roles && 
                                    req.auth.credentials.roles.includes('superuser');
-            
+
             const data = await this.wzWrapper.getAllIndexPatterns();
 
             if(data && data.hits && data.hits.hits.length === 0) throw new Error('There is no index pattern');
