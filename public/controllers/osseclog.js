@@ -13,8 +13,35 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
+
 // Logs controller
-app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler) {
+app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler, csvReq, appState, $window) {
+
+    function CsvGenerator(dataArray, fileName) {
+        this.dataArray = dataArray;
+        this.fileName = fileName;
+        
+    
+        this.getLinkElement = function (linkText) {
+            return this.linkElement = this.linkElement || $('<a>' + (linkText || '') + '</a>', {
+                href: 'data:attachment/csv;base64,' + encodeURI($window.btoa(this.dataArray)),
+                target: '_blank',
+                download: this.fileName
+            });
+        };
+    
+        // call with removeAfterDownload = true if you want the link to be removed after downloading
+        this.download = function (removeAfterDownload) {
+            this.getLinkElement().css('display', 'none').appendTo('body');
+            this.getLinkElement()[0].click();
+            if (removeAfterDownload) {
+                this.getLinkElement().remove();
+            }
+        };
+    }
+
+
+
     $scope.searchTerm  = '';
     $scope.loading     = true;
     $scope.logs        = Logs;
@@ -48,8 +75,14 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
         if(!$scope.$$phase) $scope.$digest();
     }
 
+    $scope.downloadCsv = async () => {
+        const output = await csvReq.fetch('/manager/logs',JSON.parse(appState.getCurrentAPI()).id)
+        let csvGenerator = new CsvGenerator(output.csv, 'my_table.csv');
+        csvGenerator.download(true);
+    }
+
     const initialize = async () => {
-        try{
+        try{            
             await $scope.logs.nextPage();
             const data = await apiReq.request('GET', '/manager/logs/summary', {});
             $scope.summary = data.data.data;

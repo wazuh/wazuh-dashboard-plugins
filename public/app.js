@@ -56,6 +56,7 @@ import 'plugins/wazuh/services/data-handler.js';
 import 'plugins/wazuh/services/app-state.js';
 import 'plugins/wazuh/services/api-tester.js';
 import 'plugins/wazuh/services/pattern-handler.js';
+import 'plugins/wazuh/services/csv-request.js';
 
 // Set up routes and views
 import 'plugins/wazuh/services/routes.js';

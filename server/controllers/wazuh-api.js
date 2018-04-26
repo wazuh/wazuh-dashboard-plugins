@@ -528,12 +528,12 @@ export default class WazuhApi {
             if(output && output.body && output.body.data && output.body.data.totalItems) {
                 const fields = Object.keys(output.body.data.items[0]);
                 const data   = output.body.data.items;
-                
+
                 const json2csvParser = new Parser({ fields });
     
                 const csv = json2csvParser.parse(data);
     
-                return res(new Buffer(csv));
+                return res({ csv });
     
             } else if (output && output.body && output.body.data && !output.body.data.totalItems) {
                
