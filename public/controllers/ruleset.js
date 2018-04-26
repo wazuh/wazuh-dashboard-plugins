@@ -13,13 +13,14 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAutoComplete, errorHandler, genericReq, appState) {
+app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
     $scope.loading = true;
     $scope.rules   = Rules;
+    $scope.rulesRelated = RulesRelated;
     $scope.rulesAutoComplete = RulesAutoComplete;
     $scope.setRulesTab('rules');
     $rootScope.tabVisualizations = { ruleset: 4 };
@@ -96,6 +97,11 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
      */
     $scope.openDetailView = (rule) => {
         $scope.currentRule = rule;
+
+        $scope.rulesRelated.reset();
+        $scope.rulesRelated.ruleID = $scope.currentRule.id;
+        $scope.rulesRelated.addFilter('file', $scope.currentRule.file);
+
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }
@@ -106,6 +112,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
     $scope.closeDetailView = () => {
         $scope.viewingDetail = false;
         $scope.currentRule = false;
+        $scope.rulesRelated.reset();
         if(!$scope.$$phase) $scope.$digest();
     }
 
@@ -271,6 +278,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
     $scope.closeDetailView = () => {
         $scope.viewingDetail = false;
         $scope.currentDecoder = false;
+        $scope.decodersRelated.reset();
         if(!$scope.$$phase) $scope.$digest();
     }
 

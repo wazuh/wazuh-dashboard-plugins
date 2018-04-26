@@ -16,17 +16,18 @@ const app = modules.get('app/wazuh', []);
 app.factory('DataHandler', function ($q, apiReq,errorHandler) {
     class DataHandler {
         constructor() {
-            this.items        = [];
-            this.filters      = [];
-            this.path         = '';
-            this.offset       = 0;
-            this.sortValue    = '';
-            this.initial      = true;
-            this.initialBatch = 40;
-            this.regularBatch = 15;
-            this.busy         = false;
-            this.end          = false;
-            this.onlyParents  = false;
+            this.items           = [];
+            this.filters         = [];
+            this.path            = '';
+            this.offset          = 0;
+            this.sortValue       = '';
+            this.initial         = true;
+            this.initialBatch    = 40;
+            this.regularBatch    = 15;
+            this.busy            = false;
+            this.end             = false;
+            this.onlyParents     = false;
+            this.ruleID          = null;
             this.decoderPosition = null;
         }
 
@@ -196,6 +197,13 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                 if(isUnknown){
                     this.items = this.items.filter(item => typeof item.os === 'undefined');
                 }
+
+                // Remove the current rule (by its ID) from the list of related rules
+                if (this.ruleID) {
+                    const filteredRules = this.items.filter(item => item.id !== this.ruleID);
+                    this.items = filteredRules;
+                }
+
                 this.offset = items.length;
                 deferred.resolve(true);
             })
@@ -211,13 +219,14 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         reset() {
-            this.items     = [];
-            this.filters   = [];
-            this.offset    = 0;
-            this.sortValue = '';
-            this.initial   = true;
-            this.end       = false;
-            this.busy      = false;
+            this.items           = [];
+            this.filters         = [];
+            this.offset          = 0;
+            this.sortValue       = '';
+            this.initial         = true;
+            this.end             = false;
+            this.busy            = false;
+            this.ruleID          = null;
             this.decoderPosition = null;
         }
     }
