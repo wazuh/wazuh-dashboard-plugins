@@ -10,38 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
+import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
-
 // Logs controller
-app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler, csvReq, appState, $window) {
-
-    function CsvGenerator(dataArray, fileName) {
-        this.dataArray = dataArray;
-        this.fileName = fileName;
-        
-    
-        this.getLinkElement = function (linkText) {
-            return this.linkElement = this.linkElement || $('<a>' + (linkText || '') + '</a>', {
-                href: 'data:attachment/csv;base64,' + encodeURI($window.btoa(this.dataArray)),
-                target: '_blank',
-                download: this.fileName
-            });
-        };
-    
-        // call with removeAfterDownload = true if you want the link to be removed after downloading
-        this.download = function (removeAfterDownload) {
-            this.getLinkElement().css('display', 'none').appendTo('body');
-            this.getLinkElement()[0].click();
-            if (removeAfterDownload) {
-                this.getLinkElement().remove();
-            }
-        };
-    }
-
-
-
+app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler, csvReq, appState) {
     $scope.searchTerm  = '';
     $scope.loading     = true;
     $scope.logs        = Logs;
@@ -76,9 +50,15 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
     }
 
     $scope.downloadCsv = async () => {
-        const output = await csvReq.fetch('/manager/logs',JSON.parse(appState.getCurrentAPI()).id)
-        let csvGenerator = new CsvGenerator(output.csv, 'my_table.csv');
-        csvGenerator.download(true);
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/manager/logs',currentApi);
+            const csvGenerator = new CsvGenerator(output.csv, 'my_table.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
     }
 
     const initialize = async () => {
