@@ -23,7 +23,7 @@
     </div>
     <!-- End Rule information ribbon -->
 
-    <!-- Rest of Rule information -->
+    <!-- Rest of rule information -->
     <div layout="column" layout-align="start">
 
         <!-- Groups section -->
@@ -174,46 +174,43 @@
         <!-- End prematch section -->
 
         <!-- Related rules section -->
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="column" class="wz-padding-top-10">
-                    <wz-table-header
-                        layout="row"
-                        data="rulesRelated"
-                        keys="[
-                            {name:'ID',sortValue:'id',size:5},
-                            {name:'File',sortValue:'file',size:15},
-                            {name:'Description',sortValue:'description',size:35},
-                            {name:'Groups',size:25},
-                            {name:'Requirement',size:15},
-                            {name:'Level',sortValue:'level',size:5}
-                        ]">
-                    </wz-table-header>
-                    <wz-table
-                        layout="column"
-                        flex
-                        func="openDetailView(ruleRelated)"
-                        data="rulesRelated"
-                        full="'ruleRelated'"
-                        activeitem="activeItem"
-                        keys="[
-                            {col:'id',size:5},
-                            {col:'file',size:15},
-                            {col:'description',size:35},
-                            {col:'groups',size:25},
-                            {col:'pci',size:15},
-                            {col:'level',size:5}
-                        ]"
-                        isruleset="true"
-                        isdecoders="false"
-                        class="no-lateral-padding">
-                    </wz-table>
-                </div>
-            </md-card-content>
-        </md-card>
+        <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
+        <md-divider class="wz-margin-top-10"></md-divider>
+        <wz-table-header
+            class="wz-side-margin-8"
+            layout="row"
+            data="rulesRelated"
+            keys="[
+                {name:'ID',sortValue:'id',size:5},
+                {name:'File',sortValue:'file',size:15},
+                {name:'Description',sortValue:'description',size:35},
+                {name:'Groups',size:25},
+                {name:'Requirement',size:15},
+                {name:'Level',sortValue:'level',size:5}
+            ]">
+        </wz-table-header>
+        <wz-table
+            layout="column"
+            flex
+            func="openDetailView(ruleRelated)"
+            data="rulesRelated"
+            full="'ruleRelated'"
+            activeitem="activeItem"
+            keys="[
+                {col:'id',size:5},
+                {col:'file',size:15},
+                {col:'description',size:35},
+                {col:'groups',size:25},
+                {col:'pci',size:15},
+                {col:'level',size:5}
+            ]"
+            isruleset="true"
+            isdecoders="false"
+            class="no-lateral-padding wz-side-margin-8">
+        </wz-table>
         <!-- End related rules section -->
+
     </div>
+    <!-- End rest of rule information -->
 
 </div>
