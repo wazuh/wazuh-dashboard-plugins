@@ -28,18 +28,19 @@ export default (server, options) => {
     log('[initialize]', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');
     server.log([blueWazuh, 'initialize', 'info'], `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`);
 
+    log('[initialize]', `App revision: ${packageJSON.revision || 'missing revision'}`, 'info');
+
     let objects = {};
     let app_objects = {};
     let configurationFile = {};
     let pattern = null;
-    let forceDefaultPattern = true;
     // Read config from package.json and config.yml
     try {
         configurationFile = yml.load(fs.readFileSync(path.join(__dirname, '../config.yml'), { encoding: 'utf-8' }));
 
         global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
-        forceDefaultPattern = (configurationFile && typeof configurationFile['force.default'] !== 'undefined') ? configurationFile['force.default'] : true;
+        global.XPACK_RBAC_ENABLED = (configurationFile && typeof configurationFile['xpack.rbac.enabled'] !== 'undefined') ? configurationFile['xpack.rbac.enabled'] : true;
 
     } catch (e) {
         log('[initialize]', e.message || e);
@@ -107,7 +108,7 @@ export default (server, options) => {
             server.log([blueWazuh, 'initialize', 'info'], `Found ${list.length} valid index patterns for Wazuh alerts`);
             const defaultExists = list.filter(item => item.title === defaultIndexPattern);
 
-            if(defaultExists.length === 0 && forceDefaultPattern){
+            if(defaultExists.length === 0){
                 log('[initialize][checkKnownFields]', `Default index pattern not found, creating it...`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Default index pattern not found, creating it...`);
                 await createIndexPattern();
