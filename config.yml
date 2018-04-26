@@ -61,3 +61,9 @@
 # Defines if the user is allowed to change the selected index
 # pattern directly from the Wazuh app top menu. Default: yes
 #ip.selector:            true
+#
+#---------------------------- RBAC X-Pack -------------------------------------
+#
+# Custom setting to enable/disable RBAC capabilities included on X-Pack (security)
+# Default: enabled
+#xpack.rbac.enabled:     true
