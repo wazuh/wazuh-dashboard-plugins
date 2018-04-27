@@ -13,8 +13,18 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   Removed cron task to clean remaining visualizations since it's no longer needed.
     -   Some Kibana functions and modules have been overriden in order to make this refactorign work.
         -   This change is not intrusive in any case.
+-   New redesign for the _Manager/Ruleset_ tab ([#420](https://github.com/wazuh/wazuh-kibana-app/pull/420)):
+    -   Rules and decoders list now divided in two different sections: _List view_ and _Detail view_.
+    -   Removed old expandable tables to move the rule/decoder information into a new space.
+    -   Enable different filters on the detail view for a better search on the list view.
+    -   New table for related rules or decoders.
+    -   And finally, a bunch of minor design enhancements to the whole app.
 -   Added copyright notice to the whole app source code ([#395](https://github.com/wazuh/wazuh-kibana-app/pull/395)).
 -   Updated `.gitignore` with the _Node_ template ([#395](https://github.com/wazuh/wazuh-kibana-app/pull/395)).
+-   Added new module to the `package.json` file, [`rison`](https://www.npmjs.com/package/rison) ([#404](https://github.com/wazuh/wazuh-kibana-app/pull/404)).
+-   Added the `errorHandler` service to the blank screen scenario ([#413](https://github.com/wazuh/wazuh-kibana-app/pull/413)):
+    -   Now the exact error message will be shown to the user, instead of raw JSON content.
+-   Added new option on the `config.yml` file to disable the new X-Pack RBAC capabilities to filter index-patterns ([#417](https://github.com/wazuh/wazuh-kibana-app/pull/417)).
 
 ### Changed
 
@@ -22,6 +32,13 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   Reduced Wazuh app logo size.
     -   Changed buttons text to not use all-capitalized letters.
     -   Minor typos found on the HTML/CSS code have been fixed.
+-   Now the app log stores the package revision ([#417](https://github.com/wazuh/wazuh-kibana-app/pull/417)).
+
+### Fixed
+
+-   Fixed bug where the _Agents_ tab didn't preserve the filters after reloading the page ([#404](https://github.com/wazuh/wazuh-kibana-app/pull/404)).
+-   Fixed a bug when using X-Pack that sometimes throwed an error of false _"Not enough privileges"_ scenario ([#415](https://github.com/wazuh/wazuh-kibana-app/pull/415)).
+-   Fixed a bug where the Kibana Discover auto-refresh functionality was still working when viewing the _Agent configuration_ tab ([#419](https://github.com/wazuh/wazuh-kibana-app/pull/419)).
 
 ## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 389
 
