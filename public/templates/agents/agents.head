@@ -13,7 +13,7 @@
 				</div>
 
 				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
-					<md-autocomplete id="agentsAutocomplete" flex
+					<md-autocomplete id="agentsAutocomplete" flex class="wz-autocomplete wz-select-input"
 					md-no-cache="true"
 					md-select-on-match="false"
 					md-selected-item="_swpagent"

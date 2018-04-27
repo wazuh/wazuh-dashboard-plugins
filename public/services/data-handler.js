@@ -16,17 +16,19 @@ const app = modules.get('app/wazuh', []);
 app.factory('DataHandler', function ($q, apiReq,errorHandler) {
     class DataHandler {
         constructor() {
-            this.items        = [];
-            this.filters      = [];
-            this.path         = '';
-            this.offset       = 0;
-            this.sortValue    = '';
-            this.initial      = true;
-            this.initialBatch = 40;
-            this.regularBatch = 15;
-            this.busy         = false;
-            this.end          = false;
-            this.onlyParents  = false;
+            this.items           = [];
+            this.filters         = [];
+            this.path            = '';
+            this.offset          = 0;
+            this.sortValue       = '';
+            this.initial         = true;
+            this.initialBatch    = 40;
+            this.regularBatch    = 15;
+            this.busy            = false;
+            this.end             = false;
+            this.onlyParents     = false;
+            this.ruleID          = null;
+            this.decoderPosition = null;
         }
 
         toggleOnlyParents(value){
@@ -92,6 +94,13 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                             (t) => {return (t.merged_sum === elem.merged_sum)}) === index);
                         if(filtered.length !== this.items.length) this.items = filtered;
                     }
+
+                    // Remove the current decoder (by its position) from the list of related decoders
+                    if (this.decoderPosition || this.decoderPosition === 0) {
+                        const filteredDecoders = this.items.filter(item => item.position !== this.decoderPosition);
+                        this.items = filteredDecoders;
+                    }
+
                     deferred.resolve(true);
                 }
             })
@@ -139,6 +148,12 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
 
         }
 
+        removeAllFilters () {
+            for(let filter of this.filters){
+                this.removeFilter(filter.name, true);
+            }
+        }
+
         delete (name, index) {
             apiReq.request('DELETE', this.path, {})
             .then(function (data) {
@@ -182,6 +197,13 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                 if(isUnknown){
                     this.items = this.items.filter(item => typeof item.os === 'undefined');
                 }
+
+                // Remove the current rule (by its ID) from the list of related rules
+                if (this.ruleID) {
+                    const filteredRules = this.items.filter(item => item.id !== this.ruleID);
+                    this.items = filteredRules;
+                }
+
                 this.offset = items.length;
                 deferred.resolve(true);
             })
@@ -197,13 +219,15 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         reset() {
-            this.items     = [];
-            this.filters   = [];
-            this.offset    = 0;
-            this.sortValue = '';
-            this.initial   = true;
-            this.end       = false;
-            this.busy      = false;
+            this.items           = [];
+            this.filters         = [];
+            this.offset          = 0;
+            this.sortValue       = '';
+            this.initial         = true;
+            this.end             = false;
+            this.busy            = false;
+            this.ruleID          = null;
+            this.decoderPosition = null;
         }
     }
 
