@@ -20,6 +20,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         if(error.data && error.data.errorData && error.data.errorData.message) return error.data.errorData.message;
         if(error.errorData && error.errorData.message) return error.errorData.message;
         if(error.data && typeof error.data === 'string') return error.data;
+        if(error.data && error.data.error && typeof error.data.error === 'string') return error.data.error;
         if(error.data && error.data.message && typeof error.data.message === 'string') return error.data.message;
         if(error.data && error.data.message && error.data.message.msg && typeof error.data.message.msg === 'string') return error.data.message.msg;
         if(error.data && error.data.data && typeof error.data.data === 'string') return error.data.data;
@@ -119,7 +120,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         if(error.extraMessage) text = error.extraMessage;
         text = location ? location + '. ' + text : text;
         if(!silent){
-            if(isWarning) notify.warning(text);
+            if(isWarning || (text && typeof text === 'string' && text.toLowerCase().includes('no results'))) notify.warning(text);
             else          notify.error(text);
         }
         if(goSettings) $location.path('/settings');
