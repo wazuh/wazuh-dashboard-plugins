@@ -13,6 +13,7 @@ import ElasticWrapper     from '../lib/elastic-wrapper';
 import fs                 from 'fs';
 import yml                from 'js-yaml';
 import path               from 'path';
+import ErrorResponse      from './error-response'
 
 import { AgentsVisualizations, OverviewVisualizations, RulesetVisualizations }  from '../integration-files/visualizations/index'
 
@@ -42,11 +43,7 @@ export default class WazuhElastic {
             }
 
         } catch (err) {
-            return reply({
-                statusCode: 500,
-                error     : 99,
-                message   : err.message || 'Could not fetch .wazuh-version index'
-            }).code(500);
+            return ErrorResponse(error.message || 'Could not fetch .wazuh-version index', 4001, 500, reply);
         }
     }
 
@@ -88,11 +85,7 @@ export default class WazuhElastic {
             }
 
         } catch (error){
-            return reply({
-                statusCode: 500,
-                error     : 10000,
-                message   : `Could not retrieve templates from Elasticsearch due to ${error.message || error}`
-            }).code(500);
+            return ErrorResponse(`Could not retrieve templates from Elasticsearch due to ${error.message || error}`, 4002, 500, reply);
         }
     }
 
@@ -107,11 +100,7 @@ export default class WazuhElastic {
                    reply({ statusCode: 500, status: false, error:10020, message: 'Index pattern not found' });
 
         } catch (error) {
-            return reply({
-                statusCode: 500,
-                error     : 10000,
-                message   : `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message || error}`
-            }).code(500);
+            return ErrorResponse(`Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message || error}`, 4003, 500, reply);
         }
     }
 
@@ -160,11 +149,7 @@ export default class WazuhElastic {
                     reply({ statusCode: 200, data: data.aggregations['2'].buckets[0].key });
 
         } catch (error) {
-            return reply({
-                statusCode: 500,
-                error     : 9,
-                message   : error.message || error
-            }).code(500);
+            return ErrorResponse(error.message || error, 4004, 500, reply);
         }
     }
 
@@ -176,13 +161,8 @@ export default class WazuhElastic {
                    reply({ statusCode: 200, data: '' }) :
                    reply({ statusCode: 200, data: data.hits.hits[0]._source });
 
-
         } catch (error) {
-            return reply({
-                statusCode: 500,
-                error     : 9,
-                message   : `Could not get data from elasticsearch due to ${error.message || error}`
-            }).code(500);
+            return ErrorResponse(`Could not get data from elasticsearch due to ${error.message || error}`, 4005, 500, reply);
         }
     }
 
@@ -257,20 +237,7 @@ export default class WazuhElastic {
             throw new Error('The Elasticsearch request didn\'t fetch the expected data');
 
         } catch(error){
-            return res({error: error.message || error}).code(500)
-        }
-    }
-
-    async deleteVis (req, res) {
-        try {
-            await this.wzWrapper.refreshIndexByName(this.wzWrapper.WZ_KIBANA_INDEX);
-
-            const tmp = await this.wzWrapper.deleteVisualizationByDescription(req.params.timestamp);
-
-            return res({acknowledge: true , output: tmp});
-
-        } catch(error){
-            return res({error:error.message || error}).code(500);
+            return ErrorResponse(error.message || error, 4006, 500, reply);
         }
     }
 
@@ -335,7 +302,7 @@ export default class WazuhElastic {
             return res({acknowledge: true, raw: raw });
             
         } catch(error){
-            return res({error:error.message || error}).code(500);
+            return ErrorResponse(error.message || error, 4007, 500, reply);
         }
     }
 
@@ -348,7 +315,7 @@ export default class WazuhElastic {
             return res({acknowledge: true, output: output });
 
         } catch(error){
-            return res({error:error.message || error}).code(500);
+            return ErrorResponse(error.message || error, 4008, 500, reply);
         }
     }
 
