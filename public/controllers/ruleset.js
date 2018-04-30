@@ -70,12 +70,15 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
      * This function takes back to the list but adding a group filter
      */
     $scope.addGroupFilter = (name) => {
+        // Remove all previous filters and then add it
+        $scope.rules.removeAllFilters();
+        $scope.rules.addFilter('group', name);
+
         // Clear the autocomplete component
         $scope.searchTerm = '';
         angular.element(document.querySelector('#autocomplete')).blur();
 
-        // Add the filter and go back to the list
-        $scope.rules.addFilter('group', name);
+        // Go back to the list
         $scope.closeDetailView();
     }
 
@@ -83,12 +86,15 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
      * This function takes back to the list but adding a PCI filter
      */
     $scope.addPciFilter = (name) => {
+        // Remove all previous filters and then add it
+        $scope.rules.removeAllFilters();
+        $scope.rules.addFilter('pci', name);
+
         // Clear the autocomplete component
         $scope.searchTerm = '';
         angular.element(document.querySelector('#autocomplete')).blur();
 
-        // Add the filter and go back to the list
-        $scope.rules.addFilter('pci', name);
+        // Go back to the list
         $scope.closeDetailView();
     }
 
@@ -96,12 +102,16 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
      * This function changes to the rule detail view
      */
     $scope.openDetailView = (rule) => {
+        // Clear current rule variable and assign the new one
+        $scope.currentRule = false;
         $scope.currentRule = rule;
 
+        // Create the related rules list, resetting it in first place
         $scope.rulesRelated.reset();
         $scope.rulesRelated.ruleID = $scope.currentRule.id;
         $scope.rulesRelated.addFilter('file', $scope.currentRule.file);
 
+        // Enable the Detail view
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }
@@ -158,6 +168,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     //Destroy
     $scope.$on('$destroy', () => {
         $scope.rules.reset();
+        $scope.rulesRelated.reset();
         $scope.rulesAutoComplete.reset();
         $rootScope.rawVisualizations = null;
         if($rootScope.ownHandlers){
@@ -261,13 +272,17 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
      * This function changes to the decoder detail view
      */
     $scope.openDetailView = (decoder) => {
+        // Clear current decoder variable and assign the new one
+        $scope.currentDecoder = false;
         $scope.currentDecoder = decoder;
 
+        // Create the related decoders list, resetting it in first place
         $scope.decodersRelated.reset();
         $scope.decodersRelated.path = `/decoders/${$scope.currentDecoder.name}`;
         $scope.decodersRelated.decoderPosition = $scope.currentDecoder.position;
         $scope.decodersRelated.nextPage('');
 
+        // Enable the Detail view
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }
