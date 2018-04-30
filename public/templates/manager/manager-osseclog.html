@@ -18,7 +18,7 @@
                 <option value="warning">Warning</option>
             </select>
         </div>
-        <md-button flex="20" id="btnDownload" ng-click="downloadCsv()" value="download csv">DOWNLOAD CSV</md-button>
+
         <span flex></span>
         <md-button ng-if="!realtime" class="wazuh-button md-raised md-primary manager-log-buttonplay" ng-click="playRealtime()" aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
@@ -84,5 +84,9 @@
             nopointer="true"
             noheight="true">
         </wz-table>
+        <div layout="row" class="wz-margin-top-10">
+            <span flex></span>
+            <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+        </div>
     </div>
 </div>

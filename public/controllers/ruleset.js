@@ -10,10 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
+import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAutoComplete, errorHandler, genericReq, appState) {
+app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAutoComplete, errorHandler, genericReq, csvReq, appState) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
@@ -63,6 +64,17 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
         }
     };
 
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/rules',currentApi);
+            const csvGenerator = new CsvGenerator(output.csv, 'rules.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
 
     const load = async () => {
         try {
@@ -116,7 +128,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, Decoders, DecodersAutoComplete, errorHandler, genericReq, appState) {
+app.controller('decodersController', function ($scope, $rootScope, Decoders, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
@@ -168,6 +180,18 @@ app.controller('decodersController', function ($scope, $rootScope, Decoders, Dec
             return $scope.decodersAutoComplete.items;
         } catch (error){
             errorHandler.handle(error,'Ruleset');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
+
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/decoders',currentApi);
+            const csvGenerator = new CsvGenerator(output.csv, 'decoders.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
