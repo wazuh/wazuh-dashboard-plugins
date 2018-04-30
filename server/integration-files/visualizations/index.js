@@ -11,6 +11,5 @@
  */
 import * as AgentsVisualizations   from './agents/index'
 import * as OverviewVisualizations from './overview/index'
-import * as RulesetVisualizations  from './ruleset/index'
 
-export { AgentsVisualizations, OverviewVisualizations, RulesetVisualizations }
+export { AgentsVisualizations, OverviewVisualizations }
