@@ -509,6 +509,10 @@ export default class WazuhApi {
             if(!req.payload || !req.payload.path) throw new Error('Field path is required')
             if(!req.payload.id) throw new Error('Field id is required')
 
+            const filters = req.payload && req.payload.filters && Array.isArray(req.payload.filters) ?
+                            req.payload.filters :
+                            [];
+            
             const config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id)
 
             let path = req.payload.path;
@@ -518,8 +522,17 @@ export default class WazuhApi {
             }
            
             if(!path) throw new Error('An error occurred parsing path field')
+            
+            const params = { limit: 99999 };
 
-            const output = await needle('get', `${config.url}:${config.port}/${path}`, { limit:99999 }, {
+            if(filters.length) {
+                for(const filter of filters) {
+                    if(!filter.name || !filter.value) continue;
+                    params[filter.name] = filter.value;
+                }
+            }
+
+            const output = await needle('get', `${config.url}:${config.port}/${path}`, params, {
                 username          : config.user,
                 password          : config.password,
                 rejectUnauthorized: !config.insecure
