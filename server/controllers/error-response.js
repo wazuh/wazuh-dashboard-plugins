@@ -18,8 +18,23 @@
  * unknown           1000
  */
 export default (message = null, code = null, statusCode = null, res) => {
+    let filteredMessage = '';
+    if(code) {
+        if(typeof message === 'string' && message === 'socket hang up' && code === 3005) {
+            filteredMessage = 'Wrong protocol being used to connect to the Wazuh API'
+        } else if(typeof message === 'string' && message.includes('ENOTFOUND') && code === 3005) {
+            filteredMessage = 'Wrong URL being used to connect to the Wazuh API'
+        } else if(typeof message === 'string' && message.includes('ECONNREFUSED') && code === 3005) {
+            filteredMessage = 'Wrong port being used to connect to the Wazuh API'
+        }
+
+    }
+
     return res({
-        message: typeof message === 'string' ? `${code ? code : 1000} - ${message}` : `${code ? code : 1000} - Unexpected error`,
+        message: filteredMessage ? filteredMessage :
+                 typeof message === 'string' ? 
+                 `${code ? code : 1000} - ${message}` : 
+                 `${code ? code : 1000} - Unexpected error`,
         code   : code ? code : 1000,
         statusCode: statusCode ? statusCode : 500
     })
