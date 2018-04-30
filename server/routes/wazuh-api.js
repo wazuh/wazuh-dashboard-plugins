@@ -24,9 +24,6 @@ export default (server, options) => {
     // Returns the request result (With error control)
     server.route({ method: 'POST', path: '/api/wazuh-api/request', handler: (req,res) => ctrl.requestApi(req,res) });
 
-    // Get Wazuh-API settings from elasticsearch index
-    server.route({ method: 'GET', path: '/api/wazuh-api/settings', handler: (req,res) => ctrl.getApiSettings(req,res) });
-
     // Return a PCI requirement description
     server.route({ method: 'GET', path: '/api/wazuh-api/pci/{requirement}', handler: (req,res) => ctrl.getPciRequirement(req,res) });
 

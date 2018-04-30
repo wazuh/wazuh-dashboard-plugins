@@ -293,32 +293,6 @@ export default class WazuhApi {
 
     }
 
-    errorControl(error, response) {
-        if (error) {
-            return {
-                isError: true,
-                body: {
-                    statusCode  : 500,
-                    error       : 5,
-                    message     : 'Request error',
-                    errorMessage: error.message || error
-                }
-            };
-        } else if (!error && response.body.error) {
-            return {
-                isError: true,
-                body: {
-                    statusCode: 500,
-                    error     : 6,
-                    message   : 'Wazuh api error',
-                    errorData : response.body
-                }
-            };
-        }
-
-        return ({ isError: false });
-    }
-
     async makeRequest (method, path, data, id, reply) {
         try {
             const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
@@ -355,14 +329,15 @@ export default class WazuhApi {
 
             const fullUrl   = getPath(wapi_config) + path;
             const response  = await needle(method, fullUrl, data, options);
-            const errorData = this.errorControl(false, response);
 
-            if (errorData.isError) {
-                return reply(errorData.body).code(500);
+            if(response && response.body && !response.body.error && response.body.data) {
+                return reply(response.body)
             }
 
-            return reply(response.body);
-
+            throw response && response.body && response.body.error && response.body.message ?
+                  new Error(response.body.message) :
+                  new Error('Unexpected error fetching data from the Wazuh API')
+            
         } catch (error) {
             return reply({
                 statusCode: 500,
@@ -390,32 +365,6 @@ export default class WazuhApi {
         }
     }
 
-    async getApiSettings (req, reply) {
-        try{
-            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
-
-            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id);
-
-            if (wapi_config.error_code > 1) {
-                throw new Error('no_elasticsearch');
-            } else if (wapi_config.error_code > 0) {
-                throw new Error('no_credentials');
-            }
-            return reply({
-                statusCode: 200,
-                data      : ''
-            });
-
-        } catch(error){
-            return reply({
-                statusCode: 200,
-                error     : '1',
-                data      : error.message || error
-            });
-        }
-
-    };
-
     // Fetch agent status and insert it directly on demand
     async fetchAgents (req, reply) {
         try{
@@ -428,11 +377,7 @@ export default class WazuhApi {
                 output
             });
         } catch(error){
-            return reply({
-                statusCode: 200,
-                error     : '1',
-                data      : error.message || error
-            }); 
+            return reply(this.genericErrorBuilder(500,6,error.message || error)).code(500)
         }
     }
 
