@@ -141,7 +141,7 @@
                                 <p class="color-f9">{{messageErrorUpdate}}</p>
                             </div>
                             <div layout="row" layout-align="center center">
-                                <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Update API button">
+                                <md-button type="submit" class="wazuh-button md-raised md-primary" aria-label="Update API button">
                                     <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Update API
                                 </md-button>
                             </div>
@@ -151,7 +151,7 @@
 
                 <!-- Add API button container -->
                 <div ng-show="!isUpdating()" layout="row" layout-align="center center" class="wz-padding-top-10">
-                    <md-button flex="15" ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="wazuh-button md-raised md-primary"
+                    <md-button ng-click="$parent.addManagerContainer = !$parent.addManagerContainer" type="submit" class="wazuh-button md-raised md-primary"
                         aria-label="Add new API button">
                         <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new API
                     </md-button>
@@ -182,7 +182,7 @@
                         <p class="color-f9">{{messageError}}</p>
                     </div>
                     <div layout="row" layout-align="center center">
-                        <md-button flex="15" type="submit" class="wazuh-button md-raised md-primary" aria-label="Save API button">
+                        <md-button type="submit" class="wazuh-button md-raised md-primary" aria-label="Save API button">
                             <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save API
                         </md-button>
                     </div>
@@ -282,7 +282,7 @@
                     <strong>Warning:</strong>&nbsp;modifying the index-pattern will change it to ALL of the users.
                 </div>
 
-                <div flex="20" layout="column" class="height-41 md-block wz-margin-top-17 wz-margin-right-15 wz-select-input">
+                <div flex="20" layout="column" class="height-40 md-block wz-margin-top-17 wz-margin-right-15 wz-select-input">
                     <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
                         <option ng-repeat="indexPattern in indexPatterns" value="{{indexPattern.id}}">{{indexPattern.title}}</option>
                     </select>

@@ -1,6 +1,17 @@
-module.exports = err => {
+/*
+ * Wazuh app - Module for error messages
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+export default err => {
 
-    if(err.data && err.data === 'request_timeout_genericreq' && err.url){
+    if (err.data && err.data === 'request_timeout_genericreq' && err.url) {
         err['html'] = `The request to ${err.url} took too long and was aborted.`;
         err.message = `The request to ${err.url} took too long and was aborted.`;
     } else if (parseInt(err.error) < 0) {
@@ -29,9 +40,9 @@ module.exports = err => {
     } else if (parseInt(err.error) === 7) {
         err['html'] = `Unexpected error filtering the data. Error <b>${err.message}</b>.`;
         err.message = `Unexpected error filtering the data. Error ${err.message}.`;
-    } else if(err.message) {
+    } else if (err.message) {
         err['html'] = err.message;
-    } 
-    
+    }
+
     return err;
 };

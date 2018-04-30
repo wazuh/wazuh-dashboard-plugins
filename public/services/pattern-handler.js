@@ -1,4 +1,17 @@
-require('ui/modules').get('app/wazuh', [])
+/*
+ * Wazuh app - Pattern handler service
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+import * as modules from 'ui/modules'
+
+modules.get('app/wazuh', [])
 .service('patternHandler', function ($rootScope, $location, genericReq, appState, errorHandler) {
     return {
         getPatternList: async () => {
@@ -8,8 +21,8 @@ require('ui/modules').get('app/wazuh', [])
                 if(!patternList.data.data.length){
                     $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
                     $location.search('tab',null);
-                    $location.path('/blank-screen'); 
-                    return;  
+                    $location.path('/blank-screen');
+                    return;
                 }
 
                 if(appState.getCurrentPattern()){

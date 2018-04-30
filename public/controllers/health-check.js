@@ -1,6 +1,19 @@
-const app = require('ui/modules').get('app/wazuh', []);
+/*
+ * Wazuh app - Heakthcheck controller
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+import * as modules from 'ui/modules'
 
-app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location, Notifier, courier, genericReq, apiReq, appState, testAPI,errorHandler) {
+const app = modules.get('app/wazuh', []);
+
+app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location, courier, genericReq, apiReq, appState, testAPI, errorHandler) {
     const checks = {
         api     : true,
         pattern : true,
@@ -8,7 +21,6 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
         template: true
     };
 
-    const notify           = new Notifier();
     $scope.errors          = [];
     $scope.processedChecks = 0;
     $scope.totalChecks     = 0;
@@ -54,9 +66,9 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
 
                 if (data.data.error || data.data.data.apiIsDown) {
                     $scope.errors.push("Error connecting to the API.");
-                } else { 
+                } else {
                     $scope.processedChecks++;
-        
+
                     if(checks.setup) {
                         const versionData = await apiReq.request('GET', '/version', {});
                         const apiVersion  = versionData.data.data;
@@ -92,13 +104,13 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
             const configuration = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
             appState.setPatternSelector(typeof configuration.data.data['ip.selector'] !== 'undefined' ? configuration.data.data['ip.selector'] : true)
             if('data' in configuration.data &&
-               'timeout' in configuration.data.data && 
-               Number.isInteger(configuration.data.data.timeout) && 
+               'timeout' in configuration.data.data &&
+               Number.isInteger(configuration.data.data.timeout) &&
                configuration.data.data.timeout >= 1500
             ) {
-                $rootScope.userTimeout = configuration.data.data.timeout;   
+                $rootScope.userTimeout = configuration.data.data.timeout;
             }
-            
+
             if('data' in configuration.data) {
                 checks.pattern  = typeof configuration.data.data['checks.pattern']  !== 'undefined' ? configuration.data.data['checks.pattern']  : true;
                 checks.template = typeof configuration.data.data['checks.template'] !== 'undefined' ? configuration.data.data['checks.template'] : true;

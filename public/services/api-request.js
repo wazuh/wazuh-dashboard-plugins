@@ -1,6 +1,19 @@
-import chrome from 'ui/chrome';
+/*
+ * Wazuh app - API request service
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+import chrome       from 'ui/chrome';
+import * as modules from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
+
 app.service('apiReq', function ($q, $http, genericReq, appState, $location, $rootScope) {
     return {
         request: (method, path, body) => {
@@ -19,7 +32,7 @@ app.service('apiReq', function ($q, $http, genericReq, appState, $location, $roo
                     error:   -3,
                     message: 'No API selected.'
                 });
-            
+
             let id = JSON.parse(appState.getCurrentAPI()).id;
             let requestData = { method, path, body, id };
 

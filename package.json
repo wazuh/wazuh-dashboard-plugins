@@ -1,39 +1,40 @@
 {
-  "name": "wazuh",
-  "version": "3.2.1",
-  "revision": "0389",
-  "kibana": {
-    "version": "6.2.4"
-  },
-  "description": "Wazuh App",
-  "main": "index.js",
-  "keywords": [
-    "kibana",
-    "wazuh",
-    "ossec"
-  ],
-  "author": "Wazuh, Inc",
-  "license": "GPL-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wazuh/wazuh-kibana-app.git"
-  },
-  "bugs": {
-    "url": "https://github.com/wazuh/wazuh-kibana-app/issues"
-  },
-  "homepage": "https://www.wazuh.com/",
-  "dependencies": {
-    "angular-animate": "1.6.5",
-    "angular-aria": "1.6.5",
-    "angular-cookies": "1.6.5",
-    "angular-material": "1.1.1",
-    "angular-md5": "^0.1.10",
-    "ansicolors": "^0.3.2",
-    "install": "^0.10.1",
-    "js-yaml": "3.10.0",
-    "lodash": "3.10.1",
-    "needle": "^2.0.1",
-    "node-cron": "^1.1.2",
-    "winston": "3.0.0-rc1"
-  }
+    "name": "wazuh",
+    "version": "3.2.2",
+    "revision": "0390",
+    "kibana": {
+        "version": "6.2.4"
+    },
+    "description": "Wazuh app",
+    "main": "index.js",
+    "keywords": [
+        "kibana",
+        "wazuh",
+        "ossec"
+    ],
+    "author": "Wazuh, Inc",
+    "license": "GPL-2.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wazuh/wazuh-kibana-app.git"
+    },
+    "bugs": {
+        "url": "https://github.com/wazuh/wazuh-kibana-app/issues"
+    },
+    "homepage": "https://www.wazuh.com/",
+    "dependencies": {
+        "angular-animate": "1.6.5",
+        "angular-aria": "1.6.5",
+        "angular-cookies": "1.6.5",
+        "angular-material": "1.1.1",
+        "angular-md5": "^0.1.10",
+        "ansicolors": "^0.3.2",
+        "install": "^0.10.1",
+        "js-yaml": "3.10.0",
+        "lodash": "3.10.1",
+        "needle": "^2.0.1",
+        "node-cron": "^1.1.2",
+        "rison": "^0.1.1",
+        "winston": "3.0.0-rc1"
+    }
 }

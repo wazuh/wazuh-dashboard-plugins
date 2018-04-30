@@ -1,5 +1,17 @@
-// Require config
-let app = require('ui/modules').get('app/wazuh', []);
+/*
+ * Wazuh app - Manager controllers
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+import * as modules from 'ui/modules'
+
+const app = modules.get('app/wazuh', []);
 
 app.controller('managerController', function ($scope, $rootScope, $routeParams, $location, apiReq, errorHandler) {
     $scope.submenuNavItem  = 'status';
@@ -95,8 +107,9 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
 
 });
 
-const beautifier = require('plugins/wazuh/utils/json-beautifier');
-app.controller('managerConfigurationController', function ($scope,$rootScope, errorHandler, apiReq) {
+import beautifier from 'plugins/wazuh/utils/json-beautifier';
+
+app.controller('managerConfigurationController', function ($scope, $rootScope, errorHandler, apiReq) {
     //Initialization
     $scope.load    = true;
     $scope.isArray = angular.isArray;
@@ -116,7 +129,7 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, er
             if($scope.managerConfiguration && $scope.managerConfiguration['active-response']){
                 for(let i=0,len = $scope.managerConfiguration['active-response'].length; i<len; i++){
                     let rule = '';
-                    const rulesArray = $scope.managerConfiguration['active-response'][i].rules_id ? 
+                    const rulesArray = $scope.managerConfiguration['active-response'][i].rules_id ?
                                        $scope.managerConfiguration['active-response'][i].rules_id.split(',') :
                                        [];
                     if($scope.managerConfiguration['active-response'][i].rules_id && rulesArray.length > 1){
@@ -130,7 +143,7 @@ app.controller('managerConfigurationController', function ($scope,$rootScope, er
                     } else if($scope.managerConfiguration['active-response'][i].rules_id){
                         rule = await apiReq.request('GET',`/rules/${$scope.managerConfiguration['active-response'][i].rules_id}`,{});
                         $scope.managerConfiguration['active-response'][i].rule = rule.data.data.items[0];
-                    } 
+                    }
                 }
             }
 

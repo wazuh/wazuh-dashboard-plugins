@@ -1,10 +1,21 @@
-const knownFields = require('../integration-files/known-fields');
+/*
+ * Wazuh app - Class for the Elastic wrapper
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+import knownFields from '../integration-files/known-fields';
 
-class ElasticWrapper{
+export default class ElasticWrapper {
     constructor(server){
         this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
-        this.WZ_KIBANA_INDEX = server && 
-                               server.registrations && 
+        this.WZ_KIBANA_INDEX = server &&
+                               server.registrations &&
                                server.registrations.kibana &&
                                server.registrations.kibana.options &&
                                server.registrations.kibana.options.index ?
@@ -13,25 +24,25 @@ class ElasticWrapper{
     }
 
     /**
-     * This function checks if an index pattern exists, 
+     * This function checks if an index pattern exists,
      * you should check response.hits.total
      * @param {*} id Eg: 'wazuh-alerts'
      */
     async searchIndexPatternById(id){
         try {
             if(!id) return Promise.reject(new Error('No valid id for search index pattern'))
-            
+
             const data = await this.elasticRequest.callWithInternalUser('search', {
                 index: this.WZ_KIBANA_INDEX,
                 type: 'doc',
                 body: {
                     "query": {
                         "match": {
-                            "_id": "index-pattern:" + id 
+                            "_id": "index-pattern:" + id
                         }
                     }
                 }
-            });     
+            });
 
             return data;
 
@@ -42,7 +53,7 @@ class ElasticWrapper{
 
     /**
      * Search any index by name
-     * @param {*} name 
+     * @param {*} name
      */
     async searchIndexByName(name) {
         try {
@@ -84,30 +95,30 @@ class ElasticWrapper{
         } catch (error) {
             return Promise.reject(error);
         }
-    } 
+    }
 
     /**
      * Special function to create the wazuh-monitoring index pattern,
      * do not use for any other creation, use the right function instead.
-     * @param {*} title 
-     * @param {*} id 
+     * @param {*} title
+     * @param {*} id
      */
     async createMonitoringIndexPattern(title,id) {
         try {
             if(!title) return Promise.reject(new Error('No valid title for create index pattern'))
 
-            const data = await this.elasticRequest.callWithInternalUser('create', { 
-                index: this.WZ_KIBANA_INDEX, 
-                type: 'doc', 
+            const data = await this.elasticRequest.callWithInternalUser('create', {
+                index: this.WZ_KIBANA_INDEX,
+                type: 'doc',
                 id: id ? id : 'index-pattern:' + title,
                 body: {
-                    "type": 'index-pattern', 
-                    "index-pattern": { 
+                    "type": 'index-pattern',
+                    "index-pattern": {
                         "fields":'[{"name":"@timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"dateAdd.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"lastKeepAlive.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.arch.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"version.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true}]',
-                        "title": title, 
-                        "timeFieldName": '@timestamp' 
-                    } 
-                } 
+                        "title": title,
+                        "timeFieldName": '@timestamp'
+                    }
+                }
             });
 
             return data;
@@ -119,7 +130,7 @@ class ElasticWrapper{
 
     /**
      * Creates the .wazuh-version index with a custom configuration.
-     * @param {*} config 
+     * @param {*} config
      */
     async createWazuhVersionIndex(configuration) {
         try {
@@ -139,7 +150,7 @@ class ElasticWrapper{
 
     /**
      * Creates the .wazuh index with a custom configuration.
-     * @param {*} config 
+     * @param {*} config
      */
     async createWazuhIndex(configuration) {
         try {
@@ -159,7 +170,7 @@ class ElasticWrapper{
 
     /**
      * Inserts configuration on .wazuh-version index
-     * @param {*} configuration 
+     * @param {*} configuration
      */
     async insertWazuhVersionConfiguration(configuration) {
         try {
@@ -180,7 +191,7 @@ class ElasticWrapper{
     }
 
     /**
-     * Get all the index patterns 
+     * Get all the index patterns
      */
     async getAllIndexPatterns(){
         try {
@@ -221,7 +232,7 @@ class ElasticWrapper{
                 body: {
                     doc: {
                         "type": 'index-pattern',
-                        "index-pattern": {  
+                        "index-pattern": {
                             "fields": newFields,
                             "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
                         }
@@ -238,7 +249,7 @@ class ElasticWrapper{
 
     /**
      * Force refreshing an index
-     * @param {*} name 
+     * @param {*} name
      */
     async refreshIndexByName(name){
         try {
@@ -273,15 +284,15 @@ class ElasticWrapper{
 
     /**
      * Updates lastRestart field on .wazuh-version index
-     * @param {*} version 
-     * @param {*} revision 
+     * @param {*} version
+     * @param {*} revision
      */
     async updateWazuhVersionIndexLastRestart(version,revision) {
         try {
             if(!version || !revision) return Promise.reject(new Error('No valid version or revision given'));
-            
-            const data = await this.elasticRequest.callWithInternalUser('update', { 
-                index: '.wazuh-version', 
+
+            const data = await this.elasticRequest.callWithInternalUser('update', {
+                index: '.wazuh-version',
                 type : 'wazuh-version',
                 id   : 1,
                 body : {
@@ -290,7 +301,7 @@ class ElasticWrapper{
                         revision     : revision,
                         lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
                     }
-                } 
+                }
             });
 
             return data;
@@ -305,7 +316,7 @@ class ElasticWrapper{
      */
     async getWazuhVersionIndexAsSearch() {
         try {
-            
+
             const data = await this.elasticRequest.callWithInternalUser('search', {
                 index: '.wazuh-version',
                 type :  'wazuh-version'
@@ -319,8 +330,8 @@ class ElasticWrapper{
     }
 
     /**
-     * 
-     * @param {*} payload 
+     *
+     * @param {*} payload
      */
     async searchWazuhAlertsWithPayload(payload) {
         try {
@@ -367,7 +378,7 @@ class ElasticWrapper{
 
         } catch (error){
             return { error: 'no elasticsearch', error_code: 2 };
-        }        
+        }
     }
 
     /**
@@ -381,9 +392,9 @@ class ElasticWrapper{
                 type : 'wazuh-configuration',
                 size : '100'
             });
-                
+
             return data;
- 
+
         } catch(error){
             return Promise.reject(error);
         }
@@ -391,7 +402,7 @@ class ElasticWrapper{
 
     /**
      * Usually used to save a new Wazuh API entry
-     * @param {*} doc 
+     * @param {*} doc
      * @param {*} req
      */
     async createWazuhIndexDocument(req,doc) {
@@ -415,8 +426,8 @@ class ElasticWrapper{
 
     /**
      * Updates the a document from the .wazuh index using id and doc content
-     * @param {*} id 
-     * @param {*} doc 
+     * @param {*} id
+     * @param {*} doc
      */
     async updateWazuhIndexDocument(id,doc){
         try {
@@ -438,7 +449,7 @@ class ElasticWrapper{
 
     /**
      * Search for active entries on .wazuh index
-     * @param {*} req 
+     * @param {*} req
      */
     async searchActiveDocumentsWazuhIndex(req){
         try {
@@ -453,13 +464,13 @@ class ElasticWrapper{
             return data;
 
         } catch (error) {
-            return Promise.reject(error);   
+            return Promise.reject(error);
         }
     }
 
     /**
      * Delete a Wazuh API entry using incoming request
-     * @param {*} req 
+     * @param {*} req
      */
     async deleteWazuhAPIEntriesWithRequest(req) {
         try {
@@ -470,9 +481,9 @@ class ElasticWrapper{
                 type : 'wazuh-configuration',
                 id   : req.params.id
             });
-                
+
             return data;
- 
+
         } catch(error){
             return Promise.reject(error);
         }
@@ -493,7 +504,7 @@ class ElasticWrapper{
         }
     }
 
-        /**
+    /**
      * Same as curling the plugins from Elasticsearch
      */
     async getPlugins() {
@@ -526,7 +537,7 @@ class ElasticWrapper{
 
     /**
      * Used to delete all visualizations with the given description
-     * @param {*} description 
+     * @param {*} description
      */
     async deleteVisualizationByDescription(description,retroactive) {
         try {
@@ -534,8 +545,8 @@ class ElasticWrapper{
 
             const data = await this.elasticRequest.callWithInternalUser('deleteByQuery', {
                 index: this.WZ_KIBANA_INDEX,
-                body: 
-                    retroactive ? 
+                body:
+                    retroactive ?
                     {
                         query: { range: { 'visualization.description': { lte: description } } },
                         size : 9999
@@ -546,8 +557,8 @@ class ElasticWrapper{
                     }
             });
 
-            return data; 
-            
+            return data;
+
         } catch (error) {
             return Promise.reject(error);
         }
@@ -555,7 +566,7 @@ class ElasticWrapper{
 
     /**
      * Used to get all visualizations with the given description
-     * @param {*} description 
+     * @param {*} description
      */
     async getVisualizationByDescription(description) {
         try {
@@ -569,8 +580,8 @@ class ElasticWrapper{
                 }
             });
 
-            return data; 
-            
+            return data;
+
         } catch (error) {
             return Promise.reject(error);
         }
@@ -578,7 +589,7 @@ class ElasticWrapper{
 
     /**
      * Make a bulk request to update the Kibana index
-     * @param {*} bulk 
+     * @param {*} bulk
      */
     async pushBulkToKibanaIndex(bulk) {
         try {
@@ -594,7 +605,7 @@ class ElasticWrapper{
 
     /**
      * Make a bulk request to update any index
-     * @param {*} bulk 
+     * @param {*} bulk
      */
     async pushBulkAnyIndex(index,bulk) {
         try {
@@ -607,7 +618,7 @@ class ElasticWrapper{
             })
 
             return data;
-    
+
         } catch (error) {
             return Promise.reject(error);
         }
@@ -615,8 +626,8 @@ class ElasticWrapper{
 
     /**
      * Useful to search elements with "wazuh" as type giving an index as parameter
-     * @param {*} req 
-     * @param {*} index 
+     * @param {*} req
+     * @param {*} index
      */
     async searchWazuhElementsByIndexWithRequest(req, index) {
         try {
@@ -626,7 +637,7 @@ class ElasticWrapper{
                 index: index,
                 type : 'wazuh'
             });
-
+            
             return data;
 
         } catch (error) {
@@ -636,7 +647,7 @@ class ElasticWrapper{
 
     /**
      * Check if an index exists
-     * @param {*} index 
+     * @param {*} index
      */
     async checkIfIndexExists(index) {
         try {
@@ -653,14 +664,14 @@ class ElasticWrapper{
 
     /**
      * Get a template by name
-     * @param {*} name 
+     * @param {*} name
      */
     async getTemplateByName(name) {
         try {
            if(!name) return Promise.reject(new Error('No valid name given'))
 
            const data = await this.elasticRequest.callWithInternalUser('indices.getTemplate', { name: name });
-           
+
            return data;
 
         } catch (error) {
@@ -674,9 +685,9 @@ class ElasticWrapper{
     async createEmptyKibanaIndex(){
         try {
             const data = await this.elasticRequest.callWithInternalUser('indices.create', { index: this.WZ_KIBANA_INDEX })
-            
+
             return data;
- 
+
          } catch (error) {
              return Promise.reject(error);
          }
@@ -685,7 +696,7 @@ class ElasticWrapper{
     async createIndexByName(name) {
         try {
             if(!name) return Promise.reject(new Error('No valid name given'));
-            
+
             const data = await this.elasticRequest.callWithInternalUser('indices.create', { index: name });
 
             return data;
@@ -694,17 +705,17 @@ class ElasticWrapper{
             return Promise.reject(error);
         }
     }
-    
+
     /**
      * Deletes an Elasticsearch index by its name
-     * @param {} name 
+     * @param {} name
      */
     async deleteIndexByName(name) {
         try {
             if(!name) return Promise.reject(new Error('No valid name given'))
 
             const data = await this.elasticRequest.callWithInternalUser('indices.delete', { index: name })
-            
+
             return data;
 
         } catch (error) {
@@ -717,10 +728,10 @@ class ElasticWrapper{
      */
     async deleteMonitoring(){
         try {
-            const data = await this.elasticRequest.callWithInternalUser('delete', { 
-                index: this.WZ_KIBANA_INDEX, 
+            const data = await this.elasticRequest.callWithInternalUser('delete', {
+                index: this.WZ_KIBANA_INDEX,
                 type: 'doc',
-                id: 'index-pattern:wazuh-monitoring-*' 
+                id: 'index-pattern:wazuh-monitoring-*'
             });
 
             return data;
@@ -753,7 +764,7 @@ class ElasticWrapper{
 
     /**
      * Inserts the wazuh-agent template
-     * @param {*} template 
+     * @param {*} template
      */
     async putMonitoringTemplate(template) {
         try {
@@ -775,7 +786,7 @@ class ElasticWrapper{
      * Inserts the wazuh-kibana template.
      * Reindex purposes.
      * Do not use
-     * @param {*} template 
+     * @param {*} template
      */
     async putWazuhKibanaTemplate(template) {
         try {
@@ -803,7 +814,7 @@ class ElasticWrapper{
      */
     async getOldWazuhSetup(){
         try {
-            
+
             const data = await this.elasticRequest.callWithInternalUser('get', {
                 index: ".wazuh",
                 type: "wazuh-setup",
@@ -816,11 +827,11 @@ class ElasticWrapper{
             return Promise.reject(error);
         }
     }
-    
+
     /**
      * Reindex purposes
      * Do not use
-     * @param {*} configuration 
+     * @param {*} configuration
      */
     async reindexWithCustomConfiguration(configuration){
         try {
@@ -837,5 +848,3 @@ class ElasticWrapper{
 
 
 }
-
-module.exports = ElasticWrapper;

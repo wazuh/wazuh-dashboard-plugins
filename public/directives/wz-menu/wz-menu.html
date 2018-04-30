@@ -5,7 +5,7 @@
         <div class="md-toolbar-tools wz-menu-content">
 
             <!-- Wazuh app logo -->
-            <a class="wz-margin-right-20 cursor-pointer" href="#/"><img aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png"></img></a>
+            <a class="cursor-pointer wz-logo-container wz-margin-right-15" href="#/"><img class="wz-responsive-img" aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png"></img></a>
 
             <!-- Main Wazuh app navigation buttons -->
             <md-button class="wz-menu-button" ng-href="#/overview" ng-class="{'wz-menu-active': menuNavItem == 'overview' }" aria-label="Overview tab">
@@ -29,17 +29,17 @@
 
             <!-- API/Index pattern section -->
             <!-- Case 1a - There's API -->
-            <span ng-show="theresAPI" tooltip="Selected API" tooltip-placement="bottom">
+            <span ng-show="theresAPI" class="wz-ip-selector" tooltip="Selected API" tooltip-placement="bottom">
                 <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
             </span>
 
             <!-- Case 1b - There's no API -->
-            <span ng-show="!theresAPI" tooltip="No API credentials inserted" tooltip-placement="bottom">
+            <span ng-show="!theresAPI" class="wz-ip-selector" tooltip="No API credentials inserted" tooltip-placement="bottom">
                 No API<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
             </span>
 
             <!-- Case 2a - There's pattern and there's more than one -->
-            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" tooltip="Selected index pattern" tooltip-placement="bottom">
+            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" class="wz-ip-selector" tooltip="Selected index pattern" tooltip-placement="bottom">
                 <select class="wz-menu-select" ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" aria-label="Index pattern selector" placeholder="Index pattern">
                     <option class="wz-menu-select-option" ng-repeat="pattern in patternList" value="{{pattern.id}}">
                         {{pattern.title}}
@@ -48,7 +48,7 @@
             </span>
 
             <!-- Case 2b - There's pattern and there's only one-->
-            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" tooltip="Selected index pattern" tooltip-placement="bottom">
+            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" class="wz-ip-selector" tooltip="Selected index pattern" tooltip-placement="bottom">
                 {{patternList[0].title}}
             </span>
 
