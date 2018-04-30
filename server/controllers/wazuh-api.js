@@ -436,20 +436,6 @@ export default class WazuhApi {
         }
     }
 
-    postErrorLog (req, reply) {
-
-        if (!req.payload.message) {
-
-            return reply({
-                'statusCode': 500,
-                'message':    'You must provide at least one error message to log'
-            });
-
-        } else {
-            return reply({ statusCode: 200, message: 'Error logged succesfully' });
-        }
-    }
-
     getConfigurationFile (req,reply) {
         try{
             const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));

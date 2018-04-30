@@ -30,9 +30,6 @@ export default (server, options) => {
     // Return a PCI requirement description
     server.route({ method: 'GET', path: '/api/wazuh-api/pci/{requirement}', handler: (req,res) => ctrl.getPciRequirement(req,res) });
 
-    // Write in debug log
-    server.route({ method: 'POST', path: '/api/wazuh/errlog', handler: (req,res) => ctrl.postErrorLog(req,res) });
-
     // COMMENT HERE
     server.route({ method: 'GET', path: '/api/wazuh-api/fetchAgents', handler: (req,res) => ctrl.fetchAgents(req,res) });
 
