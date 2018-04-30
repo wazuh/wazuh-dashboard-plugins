@@ -62,6 +62,8 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
             $scope.rules.addFilter('pci',search.split('pci:')[1].trim());
         } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
             $scope.rules.addFilter('file',search.split('file:')[1].trim());
+        } else if(search.startsWith('path:') && search.split('path:')[1].trim()) {
+            $scope.rules.addFilter('path',search.split('path:')[1].trim());
         } else {
             $scope.rules.addFilter('search',search.trim());
         }
@@ -80,28 +82,12 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     }
 
     /**
-     * This function takes back to the list but adding a group filter
+     * This function takes back to the list but adding a filter from the detail view
      */
-    $scope.addGroupFilter = (name) => {
+    $scope.addDetailFilter = (name, value) => {
         // Remove all previous filters and then add it
         $scope.rules.removeAllFilters();
-        $scope.rules.addFilter('group', name);
-
-        // Clear the autocomplete component
-        $scope.searchTerm = '';
-        angular.element(document.querySelector('#autocomplete')).blur();
-
-        // Go back to the list
-        $scope.closeDetailView();
-    }
-
-    /**
-     * This function takes back to the list but adding a PCI filter
-     */
-    $scope.addPciFilter = (name) => {
-        // Remove all previous filters and then add it
-        $scope.rules.removeAllFilters();
-        $scope.rules.addFilter('pci', name);
+        $scope.rules.addFilter(name, value);
 
         // Clear the autocomplete component
         $scope.searchTerm = '';
@@ -291,6 +277,22 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
             errorHandler.handle(error,'Download CSV');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
+    }
+
+    /**
+     * This function takes back to the list but adding a filter from the detail view
+     */
+    $scope.addDetailFilter = (name, value) => {
+        // Remove all previous filters and then add it
+        $scope.decoders.removeAllFilters();
+        $scope.decoders.addFilter(name, value);
+
+        // Clear the autocomplete component
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+
+        // Go back to the list
+        $scope.closeDetailView();
     }
 
     /**
