@@ -56,10 +56,10 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, generic
             } catch (error) {
                 if(error.status && error.status === -1){
                     $rootScope.apiIsDown = true;
-                    return Promise.reject({data: 'request_timeout_checkstored'});
-                } else {
-                    return Promise.reject(error);
-                }
+                } 
+                
+                return Promise.reject(error);
+                
             }
         },
         check: async data => {
@@ -77,19 +77,7 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, generic
                 return response;
 
             } catch(error) {
-                if(error.data && error.data.message && error.data.message.includes('ENOTFOUND')) {
-                    return Promise.reject({data: 'invalid_url'});
-                } else if(error.data && error.data.message && error.data.message.includes('ECONNREFUSED')) {
-                    return Promise.reject({data: 'invalid_port'});
-                } else if(error.status && error.status === -1){
-                    return Promise.reject({data: 'request_timeout_checkapi'});
-                } else if (error.data && error.data.message && error.data.message === 'wrong_credentials') {
-                    return Promise.reject({data: 'wrong_credentials'});
-                } else if(error.data && ((error.data.message && error.data.message === 'socket hang up') || (parseInt(error.data.error) === 5))) {
-                    return Promise.reject({data:'socket_hang_up',extraMessage: `Wazuh API throws ${error.data.message}`, https: (data.url && data.url.includes('https'))});
-                } else {
-                    return Promise.reject(error);
-                }
+                return Promise.reject(error);
             }
         }
     };
