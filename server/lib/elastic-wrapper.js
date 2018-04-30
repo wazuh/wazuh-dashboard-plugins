@@ -248,23 +248,6 @@ export default class ElasticWrapper {
     }
 
     /**
-     * Force refreshing an index
-     * @param {*} name
-     */
-    async refreshIndexByName(name){
-        try {
-            if(!name) return Promise.reject(new Error('No valid name given'));
-
-            const data = await this.elasticRequest.callWithInternalUser('indices.refresh', { index: name });
-
-            return data;
-
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    /**
      * Get the .wazuh-version index
      */
     async getWazuhVersionIndex() {
@@ -530,74 +513,6 @@ export default class ElasticWrapper {
                    data.defaults.xpack.security && 
                    data.defaults.xpack.security.enabled;
 
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    /**
-     * Used to delete all visualizations with the given description
-     * @param {*} description
-     */
-    async deleteVisualizationByDescription(description,retroactive) {
-        try {
-            if(!description) return Promise.reject(new Error('No description given'))
-
-            const data = await this.elasticRequest.callWithInternalUser('deleteByQuery', {
-                index: this.WZ_KIBANA_INDEX,
-                body:
-                    retroactive ?
-                    {
-                        query: { range: { 'visualization.description': { lte: description } } },
-                        size : 9999
-                    } :
-                    {
-                        query: { bool: { must: { match: { 'visualization.description': description } } } },
-                        size : 9999
-                    }
-            });
-
-            return data;
-
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    /**
-     * Used to get all visualizations with the given description
-     * @param {*} description
-     */
-    async getVisualizationByDescription(description) {
-        try {
-            if(!description) return Promise.reject(new Error('No description given'))
-
-            const data = await this.elasticRequest.callWithInternalUser('search', {
-                index: this.WZ_KIBANA_INDEX,
-                body: {
-                    query: { bool: { must: { match: { 'visualization.description': description } } } },
-                    size : 9999
-                }
-            });
-
-            return data;
-
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    /**
-     * Make a bulk request to update the Kibana index
-     * @param {*} bulk
-     */
-    async pushBulkToKibanaIndex(bulk) {
-        try {
-            if(!bulk) return Promise.reject(new Error('No bulk given'))
-
-            const data = await this.elasticRequest.callWithInternalUser('bulk', { index: this.WZ_KIBANA_INDEX, body: bulk });
-
-            return data;
         } catch (error) {
             return Promise.reject(error);
         }
