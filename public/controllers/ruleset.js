@@ -23,7 +23,6 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     $scope.rulesRelated = RulesRelated;
     $scope.rulesAutoComplete = RulesAutoComplete;
     $scope.setRulesTab('rules');
-    $rootScope.tabVisualizations = { ruleset: 4 };
     $scope.isArray = angular.isArray;
 
     $scope.analizeRules = async search => {
@@ -118,13 +117,6 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
 
     const load = async () => {
         try {
-            $rootScope.rawVisualizations = null;
-            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${appState.getCurrentPattern()}`)
-            $rootScope.rawVisualizations = data.data.raw;
-            // Render visualizations
-            $rootScope.$broadcast('updateVis');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-
             await Promise.all([
                 $scope.rules.nextPage(),
                 $scope.rulesAutoComplete.nextPage()
@@ -159,13 +151,6 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     $scope.$on('$destroy', () => {
         $scope.rules.reset();
         $scope.rulesAutoComplete.reset();
-        $rootScope.rawVisualizations = null;
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
     });
 });
 
@@ -179,7 +164,6 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
     $scope.decodersAutoComplete = DecodersAutoComplete;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
-    $rootScope.tabVisualizations = { ruleset: 1 };
     $scope.isArray = angular.isArray;
 
     const colors = [
@@ -284,13 +268,6 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
 
     const load = async () => {
         try {
-            $rootScope.rawVisualizations = null;
-            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${appState.getCurrentPattern()}`)
-            $rootScope.rawVisualizations = data.data.raw;
-            // Render visualizations
-            $rootScope.$broadcast('updateVis');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-
             await Promise.all([
                 $scope.decoders.nextPage(),
                 $scope.decodersAutoComplete.nextPage()
@@ -313,12 +290,5 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         $scope.decoders.reset();
         $scope.decodersRelated.reset();
         $scope.decodersAutoComplete.reset();
-        $rootScope.rawVisualizations = null;
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
     });
 });
