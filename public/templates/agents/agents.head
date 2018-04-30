@@ -13,7 +13,7 @@
 				</div>
 
 				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
-					<md-autocomplete id="agentsAutocomplete" flex
+					<md-autocomplete id="agentsAutocomplete" flex class="wz-autocomplete wz-select-input"
 					md-no-cache="true"
 					md-select-on-match="false"
 					md-selected-item="_swpagent"
@@ -74,7 +74,7 @@
     <!-- <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear> -->
 
 	<!-- View: Discover -->
-    <kbn-dis ng-show="tab != 'configuration'"></kbn-dis>
+    <kbn-dis ng-if="tab != 'configuration'"></kbn-dis>
 
     <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && tabView === 'panels' && tab !== 'configuration' && !rendered">
         <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>

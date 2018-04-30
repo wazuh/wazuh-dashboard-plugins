@@ -28,18 +28,19 @@ export default (server, options) => {
     log('[initialize]', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');
     server.log([blueWazuh, 'initialize', 'info'], `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`);
 
+    log('[initialize]', `App revision: ${packageJSON.revision || 'missing revision'}`, 'info');
+
     let objects = {};
     let app_objects = {};
     let configurationFile = {};
     let pattern = null;
-    let forceDefaultPattern = true;
     // Read config from package.json and config.yml
     try {
         configurationFile = yml.load(fs.readFileSync(path.join(__dirname, '../config.yml'), { encoding: 'utf-8' }));
 
         global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
-        forceDefaultPattern = (configurationFile && typeof configurationFile['force.default'] !== 'undefined') ? configurationFile['force.default'] : true;
+        global.XPACK_RBAC_ENABLED = (configurationFile && typeof configurationFile['xpack.rbac.enabled'] !== 'undefined') ? configurationFile['xpack.rbac.enabled'] : true;
 
     } catch (e) {
         log('[initialize]', e.message || e);
@@ -107,7 +108,7 @@ export default (server, options) => {
             server.log([blueWazuh, 'initialize', 'info'], `Found ${list.length} valid index patterns for Wazuh alerts`);
             const defaultExists = list.filter(item => item.title === defaultIndexPattern);
 
-            if(defaultExists.length === 0 && forceDefaultPattern){
+            if(defaultExists.length === 0){
                 log('[initialize][checkKnownFields]', `Default index pattern not found, creating it...`,'info')
                 server.log([blueWazuh, 'initialize', 'info'], `Default index pattern not found, creating it...`);
                 await createIndexPattern();
@@ -395,7 +396,7 @@ export default (server, options) => {
             await server.plugins.elasticsearch.waitUntilReady();
             return checkKibanaStatus();
         } catch (error){
-            log('[initialize][checkStatus]',error.message || error);
+            log('[initialize][checkStatus]','Waiting for elasticsearch plugin to be ready...','info');
             server.log([blueWazuh, 'initialize', 'info'], 'Waiting for elasticsearch plugin to be ready...');
             setTimeout(() => checkStatus(), 3000);
         }
@@ -472,7 +473,7 @@ export default (server, options) => {
                 config.cluster_info.node = response.body.data.node;
                 config.cluster_info.cluster = response.body.data.cluster;
             } else if (response.body.error) {
-                log('[initialize][getNodeInformation]', response.body.error || response.body);
+                log('[initialize][getNodeInformation]', `Could not get cluster/node information for ${config.manager} due to ${response.body.error || response.body}`);
                 server.log([blueWazuh, 'reindex', 'error'], `Could not get cluster/node information for ${config.manager}`);
             }
 
@@ -533,7 +534,7 @@ export default (server, options) => {
                 return;
             }
         } catch (error) {
-            log('[initialize][checkVersion]', error.message || error);
+            log('[initialize][checkVersion]', `API is NOT reachable ${config.manager} due to ${error.message || error}`);
             server.log([blueWazuh, 'reindex', 'info'], `API is NOT reachable ${config.manager}`);
             // We weren't able to reach the API, reorganize data and fill with sample node and cluster name information
             return updateSingleHostInformation(config);
@@ -588,8 +589,8 @@ export default (server, options) => {
             setTimeout(() => swapIndex(), 3000);
 
         } catch(error) {
-            log('[initialize][reindexOldVersion]', error.message || error);
-            server.log([blueWazuh, 'reindex', 'error'], 'Could not begin the reindex process: ' + error.message || error);
+            log('[initialize][reindexOldVersion]', `Could not begin the reindex process due to ${error.message || error}`);
+            server.log([blueWazuh, 'reindex', 'error'], `Could not begin the reindex process due to ${error.message || error}`);
         }
     };
 
@@ -625,8 +626,8 @@ export default (server, options) => {
             setTimeout(() => reachAPIs(), 3000);
 
         } catch(error) {
-            log('[initialize][swapIndex]', error.message || error);
-            server.log([blueWazuh, 'reindex', 'error'], 'Could not reindex the new .wazuh: ' + error.message || error);
+            log('[initialize][swapIndex]', `Could not reindex the new .wazuh due to ${error.message || error}`);
+            server.log([blueWazuh, 'reindex', 'error'], `Could not reindex the new .wazuh due to ${error.message || error}`);
         }
     };
 
@@ -639,8 +640,8 @@ export default (server, options) => {
             }
             await Promise.all(promises);
         } catch(error){
-            log('[initialize][reachAPIs]', error.message || error);
-            server.log([blueWazuh, 'reindex', 'error'], 'Something happened while getting old API configuration data: ' + error.message || error);
+            log('[initialize][reachAPIs]',`Something happened while getting old API configuration data due to ${error.message || error}`);
+            server.log([blueWazuh, 'reindex', 'error'], `Something happened while getting old API configuration data due to ${error.message || error}`);
         }
     };
 

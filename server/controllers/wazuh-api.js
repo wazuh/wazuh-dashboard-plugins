@@ -32,7 +32,7 @@ export default class WazuhApi {
 
     async checkStoredAPI (req, reply) {
         try{
-            if(!protectedRoute(req)) return reply(genericErrorBuilder(401,7,'Session expired.')).code(401);
+            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
             // Get config from elasticsearch
             const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
 
@@ -154,7 +154,7 @@ export default class WazuhApi {
         return {
             statusCode: status,
             error     : code,
-            message   :message || 'Error ocurred'
+            message   : message || 'Error ocurred'
         };
     }
 

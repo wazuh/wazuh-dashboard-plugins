@@ -14,16 +14,19 @@ import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAutoComplete, errorHandler, genericReq, csvReq, appState) {
+app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
     $scope.loading = true;
     $scope.rules   = Rules;
+    $scope.rulesRelated = RulesRelated;
     $scope.rulesAutoComplete = RulesAutoComplete;
     $scope.setRulesTab('rules');
     $rootScope.tabVisualizations = { ruleset: 4 };
+    $scope.isArray = angular.isArray;
+
     $scope.analizeRules = async search => {
         try {
             $scope.rulesAutoComplete.filters = [];
@@ -76,6 +79,56 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
         }
     }
 
+    /**
+     * This function takes back to the list but adding a group filter
+     */
+    $scope.addGroupFilter = (name) => {
+        // Clear the autocomplete component
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+
+        // Add the filter and go back to the list
+        $scope.rules.addFilter('group', name);
+        $scope.closeDetailView();
+    }
+
+    /**
+     * This function takes back to the list but adding a PCI filter
+     */
+    $scope.addPciFilter = (name) => {
+        // Clear the autocomplete component
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+
+        // Add the filter and go back to the list
+        $scope.rules.addFilter('pci', name);
+        $scope.closeDetailView();
+    }
+
+    /**
+     * This function changes to the rule detail view
+     */
+    $scope.openDetailView = (rule) => {
+        $scope.currentRule = rule;
+
+        $scope.rulesRelated.reset();
+        $scope.rulesRelated.ruleID = $scope.currentRule.id;
+        $scope.rulesRelated.addFilter('file', $scope.currentRule.file);
+
+        $scope.viewingDetail = true;
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
+    /**
+     * This function changes to the rules list view
+     */
+    $scope.closeDetailView = () => {
+        $scope.viewingDetail = false;
+        $scope.currentRule = false;
+        $scope.rulesRelated.reset();
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
     const load = async () => {
         try {
             $rootScope.rawVisualizations = null;
@@ -117,8 +170,9 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
 
     //Destroy
     $scope.$on('$destroy', () => {
-        $rootScope.rawVisualizations = null;
         $scope.rules.reset();
+        $scope.rulesAutoComplete.reset();
+        $rootScope.rawVisualizations = null;
         if($rootScope.ownHandlers){
             for(let h of $rootScope.ownHandlers){
                 h._scope.$destroy();
@@ -128,16 +182,48 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesAuto
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, Decoders, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
+app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
     $scope.loading  = true;
     $scope.decoders = Decoders;
+    $scope.decodersRelated = DecodersRelated;
     $scope.decodersAutoComplete = DecodersAutoComplete;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
     $rootScope.tabVisualizations = { ruleset: 1 };
+    $scope.isArray = angular.isArray;
+
+    const colors = [
+        '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6
+        '#508642', '#CCA300', '#447EBC', '#C15C17', '#890F02', '#0A437C', '#6D1F62', '#584477', //2
+        '#629E51', '#E5AC0E', '#64B0C8', '#E0752D', '#BF1B00', '#0A50A1', '#962D82', '#614D93', //4
+        '#7EB26D', '#EAB839', '#6ED0E0', '#EF843C', '#E24D42', '#1F78C1', '#BA43A9', '#705DA0', // Normal
+        '#9AC48A', '#F2C96D', '#65C5DB', '#F9934E', '#EA6460', '#5195CE', '#D683CE', '#806EB7', //5
+        '#B7DBAB', '#F4D598', '#70DBED', '#F9BA8F', '#F29191', '#82B5D8', '#E5A8E2', '#AEA2E0', //3
+        '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7' //7
+    ];
+
+    $scope.colorRegex = regex => {
+        regex = regex.toString();
+        let valuesArray   = regex.match(/\(((?!<\/span>).)*?\)(?!<\/span>)/gmi);
+        let coloredString = regex;
+        for (let i = 0, len = valuesArray.length; i < len; i++) {
+            coloredString = coloredString.replace(/\(((?!<\/span>).)*?\)(?!<\/span>)/mi, '<span style="color: ' + colors[i] + ' ">' + valuesArray[i] + '</span>');
+        }
+        return $sce.trustAsHtml(coloredString);
+    };
+
+    $scope.colorOrder = order => {
+        order = order.toString();
+        let valuesArray   = order.split(',');
+        let coloredString = order;
+        for (let i = 0, len = valuesArray.length; i < len; i++) {
+            coloredString = coloredString.replace(valuesArray[i], '<span style="color: ' + colors[i] + ' ">' + valuesArray[i] + '</span>');
+        }
+        return $sce.trustAsHtml(coloredString);
+    };
 
     let timesOpened = 0;
     let lastName = false;
@@ -195,6 +281,31 @@ app.controller('decodersController', function ($scope, $rootScope, Decoders, Dec
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
+    
+    /**
+     * This function changes to the decoder detail view
+     */
+    $scope.openDetailView = (decoder) => {
+        $scope.currentDecoder = decoder;
+
+        $scope.decodersRelated.reset();
+        $scope.decodersRelated.path = `/decoders/${$scope.currentDecoder.name}`;
+        $scope.decodersRelated.decoderPosition = $scope.currentDecoder.position;
+        $scope.decodersRelated.nextPage('');
+
+        $scope.viewingDetail = true;
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
+    /**
+     * This function changes to the decoders list view
+     */
+    $scope.closeDetailView = () => {
+        $scope.viewingDetail = false;
+        $scope.currentDecoder = false;
+        $scope.decodersRelated.reset();
+        if(!$scope.$$phase) $scope.$digest();
+    }
 
     const load = async () => {
         try {
@@ -225,6 +336,9 @@ app.controller('decodersController', function ($scope, $rootScope, Decoders, Dec
     //Destroy
     $scope.$on("$destroy", () => {
         $scope.decoders.reset();
+        $scope.decodersRelated.reset();
+        $scope.decodersAutoComplete.reset();
+        $rootScope.rawVisualizations = null;
         if($rootScope.ownHandlers){
             for(let h of $rootScope.ownHandlers){
                 h._scope.$destroy();
