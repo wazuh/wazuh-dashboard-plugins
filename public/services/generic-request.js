@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import prepError    from 'plugins/wazuh/services/prep-error';
 import chrome       from 'ui/chrome';
 import * as modules from 'ui/modules'
 
@@ -53,13 +52,7 @@ modules.get('app/wazuh', [])
                 defered.resolve(data);
             }
         })
-        .catch(error => {
-            if(error.status && error.status === -1){
-                defered.reject({data: 'request_timeout_genericreq', url });
-            }else {
-                defered.reject(error);
-            }
-        });
+        .catch(defered.reject);
 
         return defered.promise;
     };
@@ -77,14 +70,8 @@ modules.get('app/wazuh', [])
             }
 
             _request(method, path, payload)
-            .then((data) => defered.resolve(data))
-            .catch(error => {
-                if(error.status && error.status === 401){
-                    defered.reject(error);
-                } else {
-                    defered.reject(prepError(error));
-                }
-            });
+            .then(defered.resolve)
+            .catch(defered.reject);
 
             return defered.promise;
         }
