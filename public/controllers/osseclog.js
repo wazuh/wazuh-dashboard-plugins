@@ -52,7 +52,7 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
     $scope.downloadCsv = async () => {
         try {
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/manager/logs',currentApi);
+            const output       = await csvReq.fetch('/manager/logs', currentApi, $scope.logs ? $scope.logs.filters : null);
             const csvGenerator = new CsvGenerator(output.csv, 'logs.csv');
             csvGenerator.download(true);
         } catch (error) {
