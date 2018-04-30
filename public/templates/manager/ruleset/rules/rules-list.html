@@ -44,7 +44,7 @@
         </md-button>
     </div>
 
-    <md-chips readonly="true" ng-show="rules.hasFilter('level') || rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('group') || rules.hasFilter('pci')">
+    <md-chips readonly="true" ng-show="rules.hasFilter('level') || rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('path') || rules.hasFilter('group') || rules.hasFilter('pci')">
         <md-chip class="wz-chip" ng-if="rules.hasFilter('search') && rules.getFilter('search')">
             <span>Search: {{rules.getFilter('search')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('search', true)"></i>
@@ -53,6 +53,11 @@
         <md-chip class="wz-chip" ng-if="rules.hasFilter('file')">
             <span>File: {{rules.getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('file', true)"></i>
+            </span>
+        </md-chip>
+        <md-chip class="wz-chip" ng-if="rules.hasFilter('path')">
+            <span>File: {{rules.getFilter('path')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('path', true)"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-if="rules.hasFilter('level')">

@@ -13,10 +13,9 @@
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div flex ng-if="currentDecoder.file" class="wz-text-truncatable">File: <span class="wz-text-bold">{{currentDecoder.file}}</span></div>
-                <div flex ng-if="currentDecoder.path" class="wz-text-truncatable">Path: <span class="wz-text-bold">{{currentDecoder.path}}</span></div>
-                <div flex="10" ng-if="currentDecoder.status" class="wz-text-truncatable">Status: <span class="wz-text-bold">{{currentDecoder.status}}</span></div>
-                <div flex="10" ng-if="currentDecoder.position || currentDecoder.position == 0" class="wz-text-truncatable">Position: <span class="wz-text-bold">{{currentDecoder.position}}</span></div>
+                <div flex="20" ng-if="currentDecoder.position || currentDecoder.position == 0" class="wz-text-truncatable">Position: <span class="wz-text-bold">{{currentDecoder.position}}</span></div>
+                <div flex="40" ng-if="currentDecoder.file" class="wz-text-truncatable">File: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('file', currentRule.file)" tooltip="Filter by this file" tooltip-placement="bottom">{{currentDecoder.file}}</span></div>
+                <div flex="40" ng-if="currentDecoder.path" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('path', currentRule.path)" tooltip="Filter by this path" tooltip-placement="bottom">{{currentDecoder.path}}</span></div>
             </md-card-content>
         </md-card>
     </div>
