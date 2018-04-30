@@ -70,7 +70,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     $scope.downloadCsv = async () => {
         try {
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/rules',currentApi);
+            const output       = await csvReq.fetch('/rules', currentApi, $scope.rules ? $scope.rules.filters : null);
             const csvGenerator = new CsvGenerator(output.csv, 'rules.csv');
             csvGenerator.download(true);
         } catch (error) {
@@ -273,7 +273,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
     $scope.downloadCsv = async () => {
         try {
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/decoders',currentApi);
+            const output       = await csvReq.fetch('/decoders', currentApi, $scope.decoders ? $scope.decoders.filters : null);
             const csvGenerator = new CsvGenerator(output.csv, 'decoders.csv');
             csvGenerator.download(true);
         } catch (error) {
@@ -281,7 +281,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }
-    
+
     /**
      * This function changes to the decoder detail view
      */
