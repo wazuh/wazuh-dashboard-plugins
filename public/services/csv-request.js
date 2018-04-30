@@ -15,9 +15,9 @@ const app = modules.get('app/wazuh', []);
 
 app.service('csvReq', function (genericReq) {
     return {
-        fetch: async (path,id) => {
+        fetch: async (path, id, filters = null) => {
             try {
-                const output = await genericReq.request('POST','/api/wazuh-api/csv',{ path, id });
+                const output = await genericReq.request('POST','/api/wazuh-api/csv',{ path, id, filters });
                 return output.data;
             } catch (error) {
                return Promise.reject(error);  
