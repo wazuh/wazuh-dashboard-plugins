@@ -15,7 +15,7 @@ import yml                from 'js-yaml';
 import path               from 'path';
 import ErrorResponse      from './error-response'
 
-import { AgentsVisualizations, OverviewVisualizations, RulesetVisualizations }  from '../integration-files/visualizations/index'
+import { AgentsVisualizations, OverviewVisualizations }  from '../integration-files/visualizations/index'
 
 export default class WazuhElastic {
     constructor(server){
@@ -277,7 +277,7 @@ export default class WazuhElastic {
         try {
             if(!req.params.pattern ||
                !req.params.tab ||
-               (req.params.tab && !req.params.tab.includes('manager-') && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-'))
+               (req.params.tab && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-'))
             ) {
                 throw new Error('Missing parameters');
             }
@@ -285,16 +285,13 @@ export default class WazuhElastic {
             const apiConfig = (req.headers && req.headers.id) ? await this.wzWrapper.getWazuhConfigurationById(req.headers.id) : false;
             const clusterName = apiConfig && apiConfig.cluster_info ? apiConfig.cluster_info.cluster : false;
             const tabPrefix = req.params.tab.includes('overview') ?
-                              'overview' : req.params.tab.includes('manager') ?
-                              'manager' :
+                              'overview' :
                               'agents';
 
             const tabSplit = req.params.tab.split('-');
-            const tabSufix = tabPrefix === 'manager' ? tabSplit[2] : tabSplit[1];
+            const tabSufix = tabSplit[1];
 
-            const file = tabPrefix === 'manager' ?
-                         RulesetVisualizations[tabSufix] :
-                         tabPrefix === 'overview' ?
+            const file = tabPrefix === 'overview' ?
                          OverviewVisualizations[tabSufix] :
                          AgentsVisualizations[tabSufix];
            
