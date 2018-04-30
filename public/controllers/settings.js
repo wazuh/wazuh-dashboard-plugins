@@ -80,10 +80,11 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             await genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`);
             $scope.apiEntries.splice(index, 1);
             $rootScope.apiIsDown = null;
+            errorHandler.info('The API was removed successfully','Settings');
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch(error) {
-            errorHandler.handle('Could not remove manager','Settings');
+            errorHandler.handle('Could not remove the API','Settings');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
