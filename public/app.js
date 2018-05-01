@@ -100,3 +100,6 @@ import 'plugins/wazuh/controllers/settings.js';
 
 // Health check
 import 'plugins/wazuh/controllers/health-check.js';
+
+// Wazuh dev tools
+import 'plugins/wazuh/controllers/dev-tools.js';

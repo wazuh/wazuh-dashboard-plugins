@@ -1,0 +1,15 @@
+<div flex ng-controller="devToolsController" layout="column">
+
+    <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
+    <md-content flex layout="column" layout-align="start">
+        <h1>Dev Tools</h1>
+        <textarea id="devBox" rows="2" ng-model="requestText"></textarea>
+        <md-divider></md-divider>
+        <md-button ng-click="send()" class="wazuh-button md-raised md-primary" aria-label="Update API button">
+            <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Send
+        </md-button>
+        <md-divider></md-divider>
+        <pre flex class="wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="output"></code></pre>
+                 
+    </md-content>
+</div>
