@@ -146,7 +146,7 @@ export default class WazuhApi {
     async checkAPI (req, reply) {
         try {
             const notValid = this.validateCheckApiParams(req.payload);
-            if(notValid) return ErrorResponse(notValid, 3003, 500, reply); // UPDATE CODE
+            if(notValid) return ErrorResponse(notValid, 3003, 500, reply); 
 
             req.payload.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
 
@@ -236,10 +236,10 @@ export default class WazuhApi {
 
                 if (wapi_config.error_code > 1) {
                     // Can not connect to elasticsearch
-                    return ErrorResponse('Elasticsearch unexpected error or cannot connect', 3007, 400, reply); // UPDATE CODE
+                    return ErrorResponse('Elasticsearch unexpected error or cannot connect', 3007, 400, reply); 
                 } else if (wapi_config.error_code > 0) {
                     // Credentials not found
-                    return ErrorResponse('Credentials does not exists', 3008, 400, reply); // UPDATE CODE
+                    return ErrorResponse('Credentials does not exists', 3008, 400, reply); 
                 }
 
                 const response = await needle('get', `${wapi_config.url}:${wapi_config.port}/rules/pci`, {}, {
@@ -255,7 +255,7 @@ export default class WazuhApi {
                     }
                     return reply(PCIobject);
                 } else {
-                    return ErrorResponse('An error occurred trying to parse PCI DSS requirements', 3009, 400, reply); // UPDATE CODE
+                    return ErrorResponse('An error occurred trying to parse PCI DSS requirements', 3009, 400, reply); 
                 }
 
             } else {
@@ -271,7 +271,7 @@ export default class WazuhApi {
                 });
             }
         } catch (error) {
-            return ErrorResponse(error.message || error, 3010, 400, reply); // UPDATE CODE
+            return ErrorResponse(error.message || error, 3010, 400, reply); 
         }
 
     }
@@ -282,10 +282,10 @@ export default class WazuhApi {
 
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
-                return ErrorResponse('Could not connect with elasticsearch', 3011, 404, reply); // UPDATE CODE
+                return ErrorResponse('Could not connect with elasticsearch', 3011, 404, reply); 
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
-                return ErrorResponse('Credentials does not exists', 3012, 404, reply); // UPDATE CODE
+                return ErrorResponse('Credentials does not exists', 3012, 404, reply); 
             }
 
             if (!data) {
@@ -313,16 +313,16 @@ export default class WazuhApi {
                   new Error('Unexpected error fetching data from the Wazuh API')
             
         } catch (error) {
-            return ErrorResponse(error.message || error, 3013, 500, reply); // UPDATE CODE
+            return ErrorResponse(error.message || error, 3013, 500, reply); 
         }
     }
 
     requestApi (req, reply) {
         if(!protectedRoute(req)) return ErrorResponse('Session expired', 3014, 401, reply);
         if (!req.payload.method) {
-            return ErrorResponse('Missing param: method', 3015, 400, reply); // UPDATE CODE
+            return ErrorResponse('Missing param: method', 3015, 400, reply); 
         } else if (!req.payload.path) {
-            return ErrorResponse('Missing param: path', 3016, 400, reply);   // UPDATE CODE
+            return ErrorResponse('Missing param: path', 3016, 400, reply);   
         } else {
             return this.makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
         }
@@ -340,7 +340,7 @@ export default class WazuhApi {
                 output
             });
         } catch(error){
-            return ErrorResponse(error.message || error, 3018, 500, reply); // UPDATE CODE
+            return ErrorResponse(error.message || error, 3018, 500, reply); 
         }
     }
 
@@ -359,7 +359,7 @@ export default class WazuhApi {
             });
 
         } catch (error) {
-            return ErrorResponse(error.message || error, 3019, 500, reply); // UPDATE CODE
+            return ErrorResponse(error.message || error, 3019, 500, reply); 
         }
     }
 
@@ -373,9 +373,9 @@ export default class WazuhApi {
             }
 
             if(!req.payload.password) {
-                return ErrorResponse('Please give me a password.', 3020, 401, reply); // UPDATE CODE
+                return ErrorResponse('Please give me a password.', 3020, 401, reply); 
             } else if(req.payload.password !== configFile['login.password']){
-                return ErrorResponse('Wrong password, please try again.', 3021, 401, reply); // UPDATE CODE
+                return ErrorResponse('Wrong password, please try again.', 3021, 401, reply); 
             }
 
             const code = (new Date()-1) + 'wazuhapp';
@@ -388,7 +388,7 @@ export default class WazuhApi {
             return reply({ statusCode: 200, error: 0, code });
 
         } catch (error) {
-            return ErrorResponse(error.message || error, 3022, 500, reply); // UPDATE CODE
+            return ErrorResponse(error.message || error, 3022, 500, reply); 
         }
     }
 }

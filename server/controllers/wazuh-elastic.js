@@ -42,7 +42,7 @@ export default class WazuhElastic {
                 throw new Error('Could not fetch .wazuh-version index');
             }
 
-        } catch (err) {
+        } catch (error) {
             return ErrorResponse(error.message || 'Could not fetch .wazuh-version index', 4001, 500, reply);
         }
     }
@@ -209,7 +209,7 @@ export default class WazuhElastic {
         return list;
     }
 
-    async getlist (req,res) {
+    async getlist (req,reply) {
         try {
             const xpack          = await this.wzWrapper.getPlugins();
 
@@ -231,7 +231,7 @@ export default class WazuhElastic {
             if(data && data.hits && data.hits.hits){
                 const list = this.validateIndexPattern(data.hits.hits);
                 
-                return res({data: isXpackEnabled && !isSuperUser ? await this.filterAllowedIndexPatternList(list,req) : list});
+                return reply({data: isXpackEnabled && !isSuperUser ? await this.filterAllowedIndexPatternList(list,req) : list});
             }
 
             throw new Error('The Elasticsearch request didn\'t fetch the expected data');
@@ -273,13 +273,13 @@ export default class WazuhElastic {
         }
     }
 
-    async createVis (req, res) {
+    async createVis (req, reply) {
         try {
             if(!req.params.pattern ||
                !req.params.tab ||
                (req.params.tab && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-'))
             ) {
-                throw new Error('Missing parameters');
+                throw new Error('Missing parameters creating visualizations');
             }
 
             const apiConfig = (req.headers && req.headers.id) ? await this.wzWrapper.getWazuhConfigurationById(req.headers.id) : false;
@@ -296,20 +296,20 @@ export default class WazuhElastic {
                          AgentsVisualizations[tabSufix];
            
             const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
-            return res({acknowledge: true, raw: raw });
+            return reply({acknowledge: true, raw: raw });
             
         } catch(error){
             return ErrorResponse(error.message || error, 4007, 500, reply);
         }
     }
 
-    async refreshIndex (req,res) {
+    async refreshIndex (req,reply) {
         try {
             if(!req.params.pattern) throw new Error('Missing parameters');
 
             const output = await this.wzWrapper.updateIndexPatternKnownFields(req.params.pattern);
 
-            return res({acknowledge: true, output: output });
+            return reply({acknowledge: true, output: output });
 
         } catch(error){
             return ErrorResponse(error.message || error, 4008, 500, reply);

@@ -40,8 +40,8 @@ const checkTimestamp = async (appState,genericReq,errorHandler,$rootScope,$locat
             $location.path('/blank-screen');
         }
         return;
-    } catch (err){
-        $rootScope.blankScreenError = err.message || err;
+    } catch (error){
+        $rootScope.blankScreenError = error.message || error;
         $location.search('tab',null);
         $location.path('/blank-screen');
     }

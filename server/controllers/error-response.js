@@ -17,7 +17,7 @@
  * wazuh-elastic     40XX
  * unknown           1000
  */
-export default (message = null, code = null, statusCode = null, res) => {
+export default (message = null, code = null, statusCode = null, reply) => {
     let filteredMessage = '';
     if(code) {
         if(typeof message === 'string' && message === 'socket hang up' && code === 3005) {
@@ -30,7 +30,7 @@ export default (message = null, code = null, statusCode = null, res) => {
 
     }
 
-    return res({
+    return reply({
         message: filteredMessage ? filteredMessage :
                  typeof message === 'string' ? 
                  `${code ? code : 1000} - ${message}` : 

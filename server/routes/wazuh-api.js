@@ -15,24 +15,24 @@ export default (server, options) => {
     const ctrl = new WazuhApi(server);
 
     // Returns if the wazuh-api configuration is working
-    server.route({ method: 'POST', path: '/api/wazuh-api/checkStoredAPI', handler: (req,res) => ctrl.checkStoredAPI(req,res) });
+    server.route({ method: 'POST', path: '/api/wazuh-api/checkStoredAPI', handler: (req, reply) => ctrl.checkStoredAPI(req, reply) });
 
     // Check if credentials on POST connect to Wazuh API. Not storing them!
     // Returns if the wazuh-api configuration received in the POST body will work
-    server.route({ method: 'POST', path: '/api/wazuh-api/checkAPI', handler: (req,res) => ctrl.checkAPI(req,res) });
+    server.route({ method: 'POST', path: '/api/wazuh-api/checkAPI', handler: (req, reply) => ctrl.checkAPI(req, reply) });
 
     // Returns the request result (With error control)
-    server.route({ method: 'POST', path: '/api/wazuh-api/request', handler: (req,res) => ctrl.requestApi(req,res) });
+    server.route({ method: 'POST', path: '/api/wazuh-api/request', handler: (req, reply) => ctrl.requestApi(req, reply) });
 
     // Return a PCI requirement description
-    server.route({ method: 'GET', path: '/api/wazuh-api/pci/{requirement}', handler: (req,res) => ctrl.getPciRequirement(req,res) });
+    server.route({ method: 'GET', path: '/api/wazuh-api/pci/{requirement}', handler: (req, reply) => ctrl.getPciRequirement(req, reply) });
 
     // COMMENT HERE
-    server.route({ method: 'GET', path: '/api/wazuh-api/fetchAgents', handler: (req,res) => ctrl.fetchAgents(req,res) });
+    server.route({ method: 'GET', path: '/api/wazuh-api/fetchAgents', handler: (req, reply) => ctrl.fetchAgents(req, reply) });
 
     // COMMENT HERE
-    server.route({ method: 'GET', path: '/api/wazuh-api/configuration', handler: (req,res) => ctrl.getConfigurationFile(req,res) });
+    server.route({ method: 'GET', path: '/api/wazuh-api/configuration', handler: (req, reply) => ctrl.getConfigurationFile(req, reply) });
 
     // COMMENT HERE
-    server.route({ method: 'POST',path: '/api/wazuh-api/wlogin', handler: (req,res) => ctrl.login(req,res) });
+    server.route({ method: 'POST',path: '/api/wazuh-api/wlogin', handler: (req, reply) => ctrl.login(req, reply) });
 };
