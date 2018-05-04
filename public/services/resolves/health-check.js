@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for routes definition
+ * Wazuh app - Module to check health check executed status
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
