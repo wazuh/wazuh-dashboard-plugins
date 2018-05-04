@@ -142,6 +142,6 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
 
         return deferred.promise;
     } catch (error) {
-        console.log(error.message || error)
+        errorHandler.handle(error,'Routes');
     }
 };
