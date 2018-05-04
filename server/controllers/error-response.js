@@ -17,7 +17,7 @@
  * wazuh-elastic     40XX
  * unknown           1000
  */
-export default (message = null, code = null, statusCode = null, res) => {
+export default (message = null, code = null, statusCode = null, reply) => {
     let filteredMessage = '';
     if(code) {
         if(typeof message === 'string' && message === 'socket hang up' && code === 3005) {
@@ -26,12 +26,14 @@ export default (message = null, code = null, statusCode = null, res) => {
             filteredMessage = 'Wrong URL being used to connect to the Wazuh API'
         } else if(typeof message === 'string' && message.includes('ECONNREFUSED') && code === 3005) {
             filteredMessage = 'Wrong port being used to connect to the Wazuh API'
+        } else if(typeof message === 'string' && message.toLowerCase().includes('not found') && code === 3002) {
+            filteredMessage = 'Wazuh API entry not found'
         }
 
     }
 
-    return res({
-        message: filteredMessage ? filteredMessage :
+    return reply({
+        message: filteredMessage ? `${code ? code : 1000} - ${filteredMessage}` :
                  typeof message === 'string' ? 
                  `${code ? code : 1000} - ${message}` : 
                  `${code ? code : 1000} - Unexpected error`,

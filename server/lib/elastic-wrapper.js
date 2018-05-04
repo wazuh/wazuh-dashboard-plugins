@@ -360,7 +360,7 @@ export default class ElasticWrapper {
             };
 
         } catch (error){
-            return { error: 'no elasticsearch', error_code: 2 };
+            return Promise.reject(error)
         }
     }
 

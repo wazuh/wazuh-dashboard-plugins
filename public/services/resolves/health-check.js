@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module to export all the visualizations raw content
+ * Wazuh app - File for routes definition
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,7 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as AgentsVisualizations   from './agents'
-import * as OverviewVisualizations from './overview'
-
-export { AgentsVisualizations, OverviewVisualizations }
+export default ($window, $rootScope) => {
+    if (!$window.sessionStorage.getItem('healthCheck')) { // New session, execute health check
+        $window.sessionStorage.setItem('healthCheck', 'executed');
+        return true;
+    } else {
+        return false;
+    }
+}

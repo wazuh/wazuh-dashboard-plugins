@@ -35,7 +35,7 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, generic
 
                     appState.setPatternSelector(typeof configuration.data.data['ip.selector'] !== 'undefined' ? configuration.data.data['ip.selector'] : true)
 
-                    return 'cookies_outdated';
+                    return 'cookies_outdated'
                     /** End of checks for outdated cookies */
 
                 } else {
@@ -57,7 +57,6 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, generic
                 if(error.status && error.status === -1){
                     $rootScope.apiIsDown = true;
                 } 
-                
                 return Promise.reject(error);
                 
             }
