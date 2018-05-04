@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import WazuhApi from '../controllers/wazuh-api';
+import { WazuhApi } from '../controllers';
 
 export default (server, options) => {
     const ctrl = new WazuhApi(server);

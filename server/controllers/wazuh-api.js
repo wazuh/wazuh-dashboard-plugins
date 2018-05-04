@@ -36,7 +36,6 @@ export default class WazuhApi {
             if(!protectedRoute(req)) return ErrorResponse('Session expired', 3001, 401, reply);
             // Get config from elasticsearch
             const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
-            console.log(wapi_config)
             if (wapi_config.error_code > 1) {
                 throw new Error(`Could not find Wazuh API entry on Elasticsearch.`)
             } else if (wapi_config.error_code > 0) {

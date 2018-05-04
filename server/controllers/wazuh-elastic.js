@@ -15,7 +15,7 @@ import yml                from 'js-yaml';
 import path               from 'path';
 import ErrorResponse      from './error-response'
 
-import { AgentsVisualizations, OverviewVisualizations }  from '../integration-files/visualizations/index'
+import { AgentsVisualizations, OverviewVisualizations }  from '../integration-files/visualizations'
 
 export default class WazuhElastic {
     constructor(server){
