@@ -36,7 +36,13 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler,a
         try {
             $scope.validJSON = true;
             const tmpCopy = JSON.parse($scope.requestTextJson);
-            $scope.requestTextJson = JSON.stringify(tmpCopy, null, 4)
+  
+            if(typeof tmpCopy === 'object' && !Object.keys(tmpCopy).length) {
+                $scope.requestTextJson = '{\n\n}'
+            } else {
+                $scope.requestTextJson = JSON.stringify(tmpCopy, null, 4)
+            }
+
         } catch (error) {
             $scope.validJSON = false;
         }
