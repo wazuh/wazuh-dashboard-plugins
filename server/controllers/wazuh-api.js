@@ -36,13 +36,11 @@ export default class WazuhApi {
             if(!protectedRoute(req)) return ErrorResponse('Session expired', 3001, 401, reply);
             // Get config from elasticsearch
             const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
-
+            console.log(wapi_config)
             if (wapi_config.error_code > 1) {
-                // Can not connect to elasticsearch
-                throw new Error(`Could not connect with elasticsearch, maybe it's down.`)
+                throw new Error(`Could not find Wazuh API entry on Elasticsearch.`)
             } else if (wapi_config.error_code > 0) {
-                // Credentials not found
-                throw new Error('Valid credentials not found in elasticsearch. It seems the credentials were not saved.')
+                throw new Error('Valid credentials not found in Elasticsearch. It seems the credentials were not saved.')
             }
 
             let response = await needle('get', `${wapi_config.url}:${wapi_config.port}/version`, {}, {

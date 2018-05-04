@@ -127,7 +127,14 @@ const settingsWizard = ($rootScope, $location, $q, $window, testAPI, appState, g
                 }
             }
         })
-        .catch(error => errorHandler.handle(error,'Routes'));
+        .catch(error => {
+            appState.removeCurrentAPI();
+            errorHandler.handle(error,'Routes');
+            errorHandler.handle('Wazuh App: please add a new API.','Routes',true);
+            $location.search('_a', null);
+            $location.search('tab', 'api');
+            $location.path('/settings');
+        });
     }
 
     if (!$location.path().includes("/health-check") && healthCheck($window, $rootScope)) {
