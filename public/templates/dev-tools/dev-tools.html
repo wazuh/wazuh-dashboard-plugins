@@ -1,15 +1,18 @@
 <div flex ng-controller="devToolsController" layout="column">
 
     <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
-    <md-content flex layout="column" layout-align="start">
-        <h1>Dev Tools</h1>
-        <textarea id="devBox" rows="2" ng-model="requestText"></textarea>
-        <md-divider></md-divider>
-        <md-button ng-click="send()" class="wazuh-button md-raised md-primary" aria-label="Update API button">
-            <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Send
-        </md-button>
-        <md-divider></md-divider>
-        <pre flex class="wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="output"></code></pre>
-                 
+    <md-content flex layout="column" class="md-padding" layout-align="start">
+        <div layout="row" flex>
+            <div flex layout="column">  
+
+                <span style="padding-bottom: 10px" class="wz-headline-title">Console <i ng-click="send()" class="fa fa-play wz-theader-sort-icon pull-right fa-fw" aria-hidden="true"></i></span>
+                <textarea style="resize: none" class="json-beautifier wz-dev-box" id="devBox1" rows="1" ng-model="requestText"></textarea>
+                <textarea flex style="resize: none" class="json-beautifier wz-dev-box" id="devBox2" ng-change="myFunc()" ng-model="requestTextJson"></textarea>
+            </div>
+            <div flex layout="column" style="padding-top: 25px">
+                <pre flex class="wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="output"></code></pre>
+            </div>
+        </div>
     </md-content>
+    
 </div>

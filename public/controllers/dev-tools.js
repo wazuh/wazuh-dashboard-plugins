@@ -10,13 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
-import beautifier from 'plugins/wazuh/utils/json-beautifier';
+import beautifier   from 'plugins/wazuh/utils/json-beautifier'
+
 const app = modules.get('app/wazuh', []);
 
 // Logs controller
 app.controller('devToolsController', function($scope, $rootScope, errorHandler,apiReq) {
-    $scope.requestText = ''
-    $scope.output = 'Waiting for data'
+    $scope.validJSON = true;
+    $scope.requestText = 'GET /agents'
+    $scope.output = beautifier.prettyPrint({})
+    $scope.requestTextJson = JSON.stringify({
+        limit: 1
+    }, null, 4)
 
     const parseParams = req => {
         const result = {};
@@ -27,18 +32,49 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler,a
         return result;
     }
 
+    $scope.myFunc = () => {
+        try {
+            $scope.validJSON = true;
+            const tmpCopy = JSON.parse($scope.requestTextJson);
+            $scope.requestTextJson = JSON.stringify(tmpCopy, null, 4)
+        } catch (error) {
+            $scope.validJSON = false;
+        }
+    }
+
     $scope.send = async () => {
         try {
-            const req = $scope.requestText ?
-                        $scope.requestText.startsWith('/') ? 
-                        $scope.requestText :  
-                        `/${$scope.requestText}` :
+            const method = $scope.requestText.startsWith('GET') ? 
+                           'GET' :
+                           $scope.requestText.startsWith('POST') ?
+                           'POST' :
+                           $scope.requestText.startsWith('PUT') ?
+                           'PUT' :
+                           $scope.requestText.startsWith('DELETE') ?
+                           'DELETE' :
+                           'GET';
+
+            const requestCopy = $scope.requestText.includes(method) ?
+                                $scope.requestText.split(method)[1].trim() :
+                                $scope.requestText;
+
+            const req = requestCopy ?
+                        requestCopy.startsWith('/') ? 
+                        requestCopy :  
+                        `/${requestCopy}` :
                         '/';
+
+            let validJSON = true, JSONraw = {};
+            try {
+                JSONraw = JSON.parse($scope.requestTextJson);
+            } catch(error) {
+                validJSON = false;
+            }
 
             const path   = req.includes('?') ? req.split('?')[0] : req;
             const params = req.includes('?') ? parseParams(req.split('?')[1]) : {}
 
-            const output = await apiReq.request('GET', path, params)
+            const output = await apiReq.request(method, path, validJSON && !req.includes('?') ? JSONraw : params)
             
             $scope.output = beautifier.prettyPrint(output.data.data);
             if(!$scope.$$phase) $scope.$digest();
@@ -49,4 +85,6 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler,a
         }
 
     }
+
+    $scope.send();
 });
