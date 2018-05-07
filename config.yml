@@ -82,9 +82,9 @@
 #---------------------------- wazuh-monitoring --------------------------------
 # Custom setting to enable/disable wazuh-monitoring indices.
 # Default: enabled
-wazuh.monitoring.enabled: true
+#wazuh.monitoring.enabled: true
 #
 # Custom setting to set the frequency for wazuh-monitoring indices cron task.
 # Default: 3600 (s)
-wazuh.monitoring.frequency: 3600
+#wazuh.monitoring.frequency: 3600
 #
