@@ -15,14 +15,14 @@ import beautifier   from 'plugins/wazuh/utils/json-beautifier'
 const app = modules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('devToolsController', function($scope, $rootScope, errorHandler,apiReq) {
+app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window) {
     $scope.validJSON = true;
     $scope.requestText = 'GET /agents'
     $scope.output = beautifier.prettyPrint({})
     $scope.requestTextJson = JSON.stringify({
-        limit: 1
+        limit: "1"
     }, null, 4)
-
+    let oldCopy = JSON.parse($scope.requestTextJson);
     const parseParams = req => {
         const result = {};
         req.split('&').forEach(part => {
@@ -36,13 +36,13 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler,a
         try {
             $scope.validJSON = true;
             const tmpCopy = JSON.parse($scope.requestTextJson);
-  
+            if(oldCopy && JSON.stringify(oldCopy) === JSON.stringify(tmpCopy)) return;
             if(typeof tmpCopy === 'object' && !Object.keys(tmpCopy).length) {
                 $scope.requestTextJson = '{\n\n}'
             } else {
                 $scope.requestTextJson = JSON.stringify(tmpCopy, null, 4)
             }
-
+            oldCopy = JSON.parse($scope.requestTextJson);
         } catch (error) {
             $scope.validJSON = false;
         }
@@ -90,6 +90,10 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler,a
             if(!$scope.$$phase) $scope.$digest();
         }
 
+    }
+
+    $scope.help = () => {
+        $window.open('https://documentation.wazuh.com/current/user-manual/api/reference.html');
     }
 
     $scope.send();

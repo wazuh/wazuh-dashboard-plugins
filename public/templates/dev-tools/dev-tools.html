@@ -9,7 +9,8 @@
                 <textarea style="resize: none" class="json-beautifier wz-dev-box" id="devBox1" rows="1" ng-model="requestText"></textarea>
                 <textarea flex style="resize: none" class="json-beautifier wz-dev-box" id="devBox2" ng-change="myFunc()" ng-model="requestTextJson"></textarea>
             </div>
-            <div flex layout="column" style="padding-top: 25px">
+            <div flex layout="column">
+                <span style="padding-bottom: 10px" class="wz-headline-title"><i ng-click="help()" class="fa fa-question wz-theader-sort-icon pull-right fa-fw" aria-hidden="true"></i></span>
                 <pre flex class="wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="output"></code></pre>
             </div>
         </div>
