@@ -174,39 +174,41 @@
         <!-- End prematch section -->
 
         <!-- Related rules section -->
-        <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
-        <wz-table-header
-            class="wz-side-margin-8"
-            layout="row"
-            data="rulesRelated"
-            keys="[
-                {name:'ID',sortValue:'id',size:5},
-                {name:'File',sortValue:'file',size:15},
-                {name:'Description',sortValue:'description',size:35},
-                {name:'Groups',size:25},
-                {name:'Requirement',size:15},
-                {name:'Level',sortValue:'level',size:5}
-            ]">
-        </wz-table-header>
-        <wz-table
-            layout="column"
-            flex
-            func="openDetailView(ruleRelated)"
-            data="rulesRelated"
-            full="'ruleRelated'"
-            activeitem="activeItem"
-            keys="[
-                {col:'id',size:5},
-                {col:'file',size:15},
-                {col:'description',size:35},
-                {col:'groups',size:25},
-                {col:'pci',size:15},
-                {col:'level',size:5}
-            ]"
-            isruleset="true"
-            isdecoders="false"
-            class="no-lateral-padding wz-side-margin-8">
-        </wz-table>
+        <div ng-show="(rulesRelated.items && rulesRelated.items.length > 0)">
+            <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
+            <wz-table-header
+                class="wz-side-margin-8"
+                layout="row"
+                data="rulesRelated"
+                keys="[
+                    {name:'ID',sortValue:'id',size:5},
+                    {name:'File',sortValue:'file',size:15},
+                    {name:'Description',sortValue:'description',size:35},
+                    {name:'Groups',size:25},
+                    {name:'Requirement',size:15},
+                    {name:'Level',sortValue:'level',size:5}
+                ]">
+            </wz-table-header>
+            <wz-table
+                layout="column"
+                flex
+                func="openDetailView(ruleRelated)"
+                data="rulesRelated"
+                full="'ruleRelated'"
+                activeitem="activeItem"
+                keys="[
+                    {col:'id',size:5},
+                    {col:'file',size:15},
+                    {col:'description',size:35},
+                    {col:'groups',size:25},
+                    {col:'pci',size:15},
+                    {col:'level',size:5}
+                ]"
+                isruleset="true"
+                isdecoders="false"
+                class="no-lateral-padding wz-side-margin-8">
+            </wz-table>
+        </div>
         <!-- End related rules section -->
 
     </div>
