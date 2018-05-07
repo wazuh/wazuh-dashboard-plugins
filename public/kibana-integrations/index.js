@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module to export all the visualizations raw content
+ * Wazuh app - File for app requirements and set up
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as AgentsVisualizations   from './agents'
-import * as OverviewVisualizations from './overview'
-
-export { AgentsVisualizations, OverviewVisualizations }
+import 'plugins/wazuh/kibana-integrations/kibana-visualization.js';
+import 'plugins/wazuh/kibana-integrations/kibana-filter-bar.js';
+import 'plugins/wazuh/kibana-integrations/kibana-discover.js';
+import 'plugins/wazuh/kibana-integrations/saved-visualizations.js';

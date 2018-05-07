@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import WazuhElastic from '../controllers/wazuh-elastic';
+import { WazuhElastic } from '../controllers';
 
 export default (server, options) => {
     
