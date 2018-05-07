@@ -9,11 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import ElasticWrapper     from '../lib/elastic-wrapper';
-import fs                 from 'fs';
-import yml                from 'js-yaml';
-import path               from 'path';
-import ErrorResponse      from './error-response'
+import ElasticWrapper from '../lib/elastic-wrapper';
+import ErrorResponse  from './error-response'
 
 import { AgentsVisualizations, OverviewVisualizations }  from '../integration-files/visualizations'
 
