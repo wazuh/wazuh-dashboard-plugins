@@ -33,12 +33,15 @@ export default (server, options) => {
     // Write in debug log
     server.route({ method: 'POST', path: '/api/wazuh/errlog', handler: (req,res) => ctrl.postErrorLog(req,res) });
 
-    // COMMENT HERE
+    // Force fetch data to be inserted on wazuh-monitoring indices
     server.route({ method: 'GET', path: '/api/wazuh-api/fetchAgents', handler: (req,res) => ctrl.fetchAgents(req,res) });
 
-    // COMMENT HERE
+    // Returns the config.yml file parsed
     server.route({ method: 'GET', path: '/api/wazuh-api/configuration', handler: (req,res) => ctrl.getConfigurationFile(req,res) });
 
-    // COMMENT HERE
-    server.route({ method: 'POST',path: '/api/wazuh-api/wlogin', handler: (req,res) => ctrl.login(req,res) });
+    // Experimental feature to simulate a login system
+    server.route({ method: 'POST', path: '/api/wazuh-api/wlogin', handler: (req,res) => ctrl.login(req,res) });
+
+    // Returns data from the Wazuh API on CSV readable format
+    server.route({ method: 'POST', path: '/api/wazuh-api/csv', handler: (req,res) => ctrl.csv(req,res)})
 };

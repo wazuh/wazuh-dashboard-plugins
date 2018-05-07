@@ -10,10 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
+import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState) {
+app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
@@ -65,6 +66,18 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
             $scope.rules.addFilter('search',search.trim());
         }
     };
+
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/rules', currentApi, $scope.rules ? $scope.rules.filters : null);
+            const csvGenerator = new CsvGenerator(output.csv, 'rules.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
 
     /**
      * This function takes back to the list but adding a group filter
@@ -169,7 +182,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState) {
+app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
@@ -253,6 +266,18 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
             return $scope.decodersAutoComplete.items;
         } catch (error){
             errorHandler.handle(error,'Ruleset');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
+
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/decoders', currentApi, $scope.decoders ? $scope.decoders.filters : null);
+            const csvGenerator = new CsvGenerator(output.csv, 'decoders.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     }

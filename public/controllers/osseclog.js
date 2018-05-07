@@ -10,11 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
+import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler) {
+app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler, csvReq, appState) {
     $scope.searchTerm  = '';
     $scope.loading     = true;
     $scope.logs        = Logs;
@@ -48,8 +49,20 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
         if(!$scope.$$phase) $scope.$digest();
     }
 
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/manager/logs', currentApi, $scope.logs ? $scope.logs.filters : null);
+            const csvGenerator = new CsvGenerator(output.csv, 'logs.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
+
     const initialize = async () => {
-        try{
+        try{            
             await $scope.logs.nextPage();
             const data = await apiReq.request('GET', '/manager/logs/summary', {});
             $scope.summary = data.data.data;
