@@ -18,13 +18,14 @@ import ElasticWrapper     from './lib/elastic-wrapper'
 import monitoringTemplate from './integration-files/monitoring-template'
 import packageJSON        from '../package.json'
 import getConfiguration   from './lib/get-configuration'
+import parseCron          from './lib/parse-cron'
 
 export default (server, options) => {
     const blueWazuh = colors.blue('wazuh');
 
     let ENABLED   = true;
     let FREQUENCY = 3600;
-
+    let CRON_FREQ = '0 1 * * * *';
     try { 
         const configFile = getConfiguration();
 
@@ -35,11 +36,13 @@ export default (server, options) => {
                     configFile['wazuh.monitoring.frequency'] : 
                     FREQUENCY;
 
+        CRON_FREQ = parseCron(FREQUENCY);
+
         !options && log('[monitoring][configuration]', `wazuh.monitoring.enabled: ${ENABLED}`,'info');
         !options && server.log([blueWazuh, 'monitoring', 'info'], `wazuh.monitoring.enabled: ${ENABLED}`);
 
-        !options && log('[monitoring][configuration]', `wazuh.monitoring.frequency: ${FREQUENCY}`,'info');
-        !options && server.log([blueWazuh, 'monitoring', 'info'], `wazuh.monitoring.frequency: ${FREQUENCY}`);
+        !options && log('[monitoring][configuration]', `wazuh.monitoring.frequency: ${FREQUENCY} (${CRON_FREQ}) `,'info');
+        !options && server.log([blueWazuh, 'monitoring', 'info'], `wazuh.monitoring.frequency: ${FREQUENCY} (${CRON_FREQ})`);
 
     } catch (error) {
         log('[monitoring][configuration]', error.message || error);
@@ -423,6 +426,6 @@ export default (server, options) => {
     }
     if(!options && ENABLED) cronTask()
     // Cron tab for getting agent status.
-    if(!options && ENABLED) cron.schedule('0 */10 * * * *', cronTask, true);
+    if(!options && ENABLED) cron.schedule(CRON_FREQ, cronTask, true);
     return fetchAgentsExternal;
 };
