@@ -19,10 +19,11 @@ app.directive('wzSearchBar', function() {
     return {
         restrict: 'E',
         scope: {
-            data: '=data',
-            term: '=term',
-            placetext: '=placetext',
-            height: '=height'
+            data      : '=data',
+            term      : '=term',
+            placetext : '=placetext',
+            height    : '=height',
+            isdisabled: '=isdisabled'
         },
         link: function(scope, ele, attrs) {
 

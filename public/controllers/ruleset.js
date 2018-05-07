@@ -10,10 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
+import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState) {
+app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
@@ -60,34 +61,38 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
             $scope.rules.addFilter('pci',search.split('pci:')[1].trim());
         } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
             $scope.rules.addFilter('file',search.split('file:')[1].trim());
+        } else if(search.startsWith('path:') && search.split('path:')[1].trim()) {
+            $scope.rules.addFilter('path',search.split('path:')[1].trim());
         } else {
             $scope.rules.addFilter('search',search.trim());
         }
     };
 
-    /**
-     * This function takes back to the list but adding a group filter
-     */
-    $scope.addGroupFilter = (name) => {
-        // Clear the autocomplete component
-        $scope.searchTerm = '';
-        angular.element(document.querySelector('#autocomplete')).blur();
-
-        // Add the filter and go back to the list
-        $scope.rules.addFilter('group', name);
-        $scope.closeDetailView();
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/rules', currentApi, $scope.rules ? $scope.rules.filters : null);
+            const csvGenerator = new CsvGenerator(output.csv, 'rules.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
     }
 
     /**
-     * This function takes back to the list but adding a PCI filter
+     * This function takes back to the list but adding a filter from the detail view
      */
-    $scope.addPciFilter = (name) => {
+    $scope.addDetailFilter = (name, value) => {
+        // Remove all previous filters and then add it
+        $scope.rules.removeAllFilters();
+        $scope.rules.addFilter(name, value);
+
         // Clear the autocomplete component
         $scope.searchTerm = '';
         angular.element(document.querySelector('#autocomplete')).blur();
 
-        // Add the filter and go back to the list
-        $scope.rules.addFilter('pci', name);
+        // Go back to the list
         $scope.closeDetailView();
     }
 
@@ -95,12 +100,16 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
      * This function changes to the rule detail view
      */
     $scope.openDetailView = (rule) => {
+        // Clear current rule variable and assign the new one
+        $scope.currentRule = false;
         $scope.currentRule = rule;
 
+        // Create the related rules list, resetting it in first place
         $scope.rulesRelated.reset();
         $scope.rulesRelated.ruleID = $scope.currentRule.id;
         $scope.rulesRelated.addFilter('file', $scope.currentRule.file);
 
+        // Enable the Detail view
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }
@@ -150,11 +159,12 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     //Destroy
     $scope.$on('$destroy', () => {
         $scope.rules.reset();
+        $scope.rulesRelated.reset();
         $scope.rulesAutoComplete.reset();
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState) {
+app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
@@ -241,17 +251,49 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         }
     }
 
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/decoders', currentApi, $scope.decoders ? $scope.decoders.filters : null);
+            const csvGenerator = new CsvGenerator(output.csv, 'decoders.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
+
+    /**
+     * This function takes back to the list but adding a filter from the detail view
+     */
+    $scope.addDetailFilter = (name, value) => {
+        // Remove all previous filters and then add it
+        $scope.decoders.removeAllFilters();
+        $scope.decoders.addFilter(name, value);
+
+        // Clear the autocomplete component
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+
+        // Go back to the list
+        $scope.closeDetailView();
+    }
+
     /**
      * This function changes to the decoder detail view
      */
     $scope.openDetailView = (decoder) => {
+        // Clear current decoder variable and assign the new one
+        $scope.currentDecoder = false;
         $scope.currentDecoder = decoder;
 
+        // Create the related decoders list, resetting it in first place
         $scope.decodersRelated.reset();
         $scope.decodersRelated.path = `/decoders/${$scope.currentDecoder.name}`;
         $scope.decodersRelated.decoderPosition = $scope.currentDecoder.position;
         $scope.decodersRelated.nextPage('');
 
+        // Enable the Detail view
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }

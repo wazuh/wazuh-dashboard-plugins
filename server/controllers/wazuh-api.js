@@ -22,6 +22,7 @@ import getPath             from '../../util/get-path'
 import packageInfo         from '../../package.json'
 import monitoring          from '../monitoring'
 import ErrorResponse       from './error-response'
+import { Parser }          from 'json2csv';
 
 const blueWazuh = colors.blue('wazuh');
 
@@ -386,6 +387,71 @@ export default class WazuhApi {
 
         } catch (error) {
             return ErrorResponse(error.message || error, 3022, 500, reply); 
+        }
+    }
+
+    /**
+     * Get full data on CSV format from a list Wazuh API endpoint
+     * @param {*} req 
+     * @param {*} res 
+     */
+    async csv(req,res) {
+        try{
+            
+            if(!req.payload || !req.payload.path) throw new Error('Field path is required')
+            if(!req.payload.id) throw new Error('Field id is required')
+
+            const filters = req.payload && req.payload.filters && Array.isArray(req.payload.filters) ?
+                            req.payload.filters :
+                            [];
+            
+            const config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id)
+
+            let path = req.payload.path;
+
+            if(path && typeof path === 'string'){
+                path = path[0] === '/' ? path.substr(1) : path
+            }
+           
+            if(!path) throw new Error('An error occurred parsing path field')
+            
+            const params = { limit: 99999 };
+
+            if(filters.length) {
+                for(const filter of filters) {
+                    if(!filter.name || !filter.value) continue;
+                    params[filter.name] = filter.value;
+                }
+            }
+
+            const output = await needle('get', `${config.url}:${config.port}/${path}`, params, {
+                username          : config.user,
+                password          : config.password,
+                rejectUnauthorized: !config.insecure
+            })
+
+            if(output && output.body && output.body.data && output.body.data.totalItems) {
+                const fields = Object.keys(output.body.data.items[0]);
+                const data   = output.body.data.items;
+
+                const json2csvParser = new Parser({ fields });
+    
+                const csv = json2csvParser.parse(data);
+    
+                return res({ csv });
+    
+            } else if (output && output.body && output.body.data && !output.body.data.totalItems) {
+               
+                throw new Error('No results')
+            
+            } else {
+
+                throw new Error('An error occurred fetching data from the Wazuh API')
+            
+            }
+
+        } catch (error) {
+            return res({ error: error.message || error }).code(500)
         }
     }
 }

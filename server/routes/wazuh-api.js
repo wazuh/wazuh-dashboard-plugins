@@ -27,12 +27,15 @@ export default (server, options) => {
     // Return a PCI requirement description
     server.route({ method: 'GET', path: '/api/wazuh-api/pci/{requirement}', handler: (req, reply) => ctrl.getPciRequirement(req, reply) });
 
-    // COMMENT HERE
+    // Force fetch data to be inserted on wazuh-monitoring indices
     server.route({ method: 'GET', path: '/api/wazuh-api/fetchAgents', handler: (req, reply) => ctrl.fetchAgents(req, reply) });
 
-    // COMMENT HERE
+    // Returns the config.yml file parsed
     server.route({ method: 'GET', path: '/api/wazuh-api/configuration', handler: (req, reply) => ctrl.getConfigurationFile(req, reply) });
 
-    // COMMENT HERE
+    // Experimental feature to simulate a login system
     server.route({ method: 'POST',path: '/api/wazuh-api/wlogin', handler: (req, reply) => ctrl.login(req, reply) });
+  
+    // Returns data from the Wazuh API on CSV readable format
+    server.route({ method: 'POST', path: '/api/wazuh-api/csv', handler: (req,res) => ctrl.csv(req,res)})
 };
