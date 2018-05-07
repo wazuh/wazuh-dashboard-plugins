@@ -12,8 +12,6 @@
 
 // Require some libraries
 import needle              from 'needle'
-import fs                  from 'fs'
-import yml                 from 'js-yaml'
 import path                from 'path'
 import colors              from 'ansicolors'
 import pciRequirementsFile from '../integration-files/pci-requirements'
@@ -23,6 +21,7 @@ import packageInfo         from '../../package.json'
 import monitoring          from '../monitoring'
 import ErrorResponse       from './error-response'
 import { Parser }          from 'json2csv';
+import getConfiguration    from '../lib/get-configuration'
 
 const blueWazuh = colors.blue('wazuh');
 
@@ -344,7 +343,7 @@ export default class WazuhApi {
 
     getConfigurationFile (req,reply) {
         try{
-            const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
+            const configFile = getConfiguration();
 
             if(configFile && configFile['login.password']){
                 delete configFile['login.password'];
@@ -364,7 +363,7 @@ export default class WazuhApi {
     login(req,reply) {
         try{
 
-            const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
+            const configFile = getConfiguration();
 
             if(!configFile){
                 throw new Error('Configuration file not found');
