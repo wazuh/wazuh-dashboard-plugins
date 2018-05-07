@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for routes definition
+ * Wazuh app - Module to execute some checks on most app routes
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
