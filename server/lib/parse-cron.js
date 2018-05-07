@@ -25,7 +25,9 @@ export default interval => {
         const minutes = parseInt(parsed / 60);
 
         const cronstr = `0 */${minutes} * * * *`
-        
+
+        if(!cron.validate(cronstr)) throw new Error('Generated cron expression not valid for node-cron module')
+
         return cronstr;
 
     } catch (error) {
