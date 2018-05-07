@@ -20,11 +20,19 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
 
     //Initialization
     $scope.loading = true;
+    $scope.viewingDetail = false;
     $scope.rules   = Rules;
     $scope.rulesRelated = RulesRelated;
     $scope.rulesAutoComplete = RulesAutoComplete;
     $scope.setRulesTab('rules');
     $scope.isArray = angular.isArray;
+
+    // Reloading watcher initialization
+    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
+        delete $rootScope.rulesetIsReloaded;
+        $scope.viewingDetail = false;
+        if(!$scope.$$phase) $scope.$digest();
+    });
 
     $scope.analizeRules = async search => {
         try {
@@ -161,6 +169,7 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
         $scope.rules.reset();
         $scope.rulesRelated.reset();
         $scope.rulesAutoComplete.reset();
+        reloadWatcher();
     });
 });
 
@@ -169,6 +178,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
 
     //Initialization
     $scope.loading  = true;
+    $scope.viewingDetail = false;
     $scope.decoders = Decoders;
     $scope.decodersRelated = DecodersRelated;
     $scope.decodersAutoComplete = DecodersAutoComplete;
@@ -185,6 +195,13 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         '#B7DBAB', '#F4D598', '#70DBED', '#F9BA8F', '#F29191', '#82B5D8', '#E5A8E2', '#AEA2E0', //3
         '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7' //7
     ];
+
+    // Reloading watcher initialization
+    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
+        delete $rootScope.rulesetIsReloaded;
+        $scope.viewingDetail = false;
+        if(!$scope.$$phase) $scope.$digest();
+    });
 
     $scope.colorRegex = regex => {
         regex = regex.toString();
@@ -332,5 +349,6 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         $scope.decoders.reset();
         $scope.decodersRelated.reset();
         $scope.decodersAutoComplete.reset();
+        reloadWatcher();
     });
 });

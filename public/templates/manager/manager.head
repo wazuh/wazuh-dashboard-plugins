@@ -2,11 +2,11 @@
 
     <wz-menu ng-init="menuNavItem = 'manager'"></wz-menu>
 
-	<div layout="row"  layout-align="center start">
+    <div layout="row" layout-align="center start">
         <md-nav-bar flex class="pading-right-0 wz-md-navbar" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-click="submenuNavItem = 'status'" name="status">Status</md-nav-item>
-			<md-nav-item md-nav-click="submenuNavItem = 'ruleset'" name="ruleset">Ruleset</md-nav-item>
-			<md-nav-item md-nav-click="submenuNavItem = 'configuration'" name="configuration">Configuration</md-nav-item>
+            <md-nav-item md-nav-click="reloadRuleset()" name="ruleset">Ruleset</md-nav-item>
+            <md-nav-item md-nav-click="submenuNavItem = 'configuration'" name="configuration">Configuration</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'logs'" name="logs">Logs</md-nav-item>
             <md-nav-item md-nav-click="reloadGroups()" name="groups">Groups</md-nav-item>
         </md-nav-bar>
