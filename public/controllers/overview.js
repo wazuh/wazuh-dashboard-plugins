@@ -14,11 +14,13 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler) {
+app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq) {
     $rootScope.rawVisualizations = null;
 
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
+
+    $scope.wzMonitoringEnabled = false;
 
     // Metrics General
     const metricsGeneral = {
@@ -292,4 +294,34 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     $scope.tabs = tabs;
     $scope.selectedIndex = 0;
+
+    genericReq.request('GET', '/api/wazuh-api/configuration', {})
+    .then(configuration => {
+        if(configuration && configuration.data && configuration.data.data) {
+            $scope.wzMonitoringEnabled = typeof configuration.data.data['wazuh.monitoring.enabled']  !== 'undefined' ? 
+                                         !!configuration.data.data['wazuh.monitoring.enabled'] : 
+                                         true;
+            if(!$scope.wzMonitoringEnabled){
+                apiReq.request('GET', '/agents/summary', { })
+                .then(data => {
+                    if(data && data.data && data.data.data){
+                        $scope.agentsCountActive         = data.data.data.Active;
+                        $scope.agentsCountDisconnected   = data.data.data.Disconnected;
+                        $scope.agentsCountNeverConnected = data.data.data['Never connected'];
+                        $scope.agentsCountTotal          = data.data.data.Total;
+                        $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
+                    } else {
+                        throw new Error('Error fetching /agents/summary from Wazuh API')
+                    }
+                })
+                .catch(error => {
+                    errorHandler.handle(error, 'Overview - Monitoring');
+                    if (!$rootScope.$$phase) $rootScope.$digest();
+                })
+            }
+        } else {
+            $scope.wzMonitoringEnabled = true;
+        }
+    })
+    .catch(error => {console.log(error.message || error);$scope.wzMonitoringEnabled = true});
 });
