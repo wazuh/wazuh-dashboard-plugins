@@ -2,6 +2,28 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 391
+
+### Added
+
+-   Added confirmation message when the user deletes an API entry on _Settings/API_ ([#428](https://github.com/wazuh/wazuh-kibana-app/pull/428)).
+-   Added CSV exporting button to the app ([#431](https://github.com/wazuh/wazuh-kibana-app/pull/431)):
+    -   Implemented new logic to fetch data from the Wazuh API and download it in CSV format.
+    -   Currently available for the _Groups_, _Ruleset_ and _Logs_ sections on the _Manager_ tab.
+-   Added support for filters on the _Manager/Logs_ tab when realtime is enabled ([#433](https://github.com/wazuh/wazuh-kibana-app/pull/433)).
+-   Added more filter options to the Detail view on _Manager/Ruleset_ ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
+-   More refactoring to the app backend ([#439](https://github.com/wazuh/wazuh-kibana-app/pull/439)):
+    -   Standarized error output from the server side.
+    -   Drastically reduced the error management logic on the client side.
+    -   Applied the _Facade_ pattern when importing/exporting modules.
+    -   Deleted unused/deprecated/useless methods both from server and client side.
+    -   Some optimizations to variable type usages.
+
+### Changed
+
+-   Changed an OSCAP visualization to avoid clipping issues with large agent names ([#429](https://github.com/wazuh/wazuh-kibana-app/pull/429)).
+-   Now the related Rules or Decoders sections on _Manager/Ruleset_ will remain hidden if there isn't any data to show or while it's loading ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
+
 ## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 390
 
 ### Added
