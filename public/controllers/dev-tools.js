@@ -11,58 +11,101 @@
  */
 import * as modules from 'ui/modules'
 import beautifier   from 'plugins/wazuh/utils/json-beautifier'
+import CodeMirror   from 'plugins/wazuh/utils/codemirror/lib/codemirror'
 
 const app = modules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window) {
-    $scope.validJSON = true;
-    $scope.requestText = 'GET /agents'
-    $scope.output = beautifier.prettyPrint({})
-    $scope.requestTextJson = JSON.stringify({
-        limit: "1"
-    }, null, 4)
-    let oldCopy = JSON.parse($scope.requestTextJson);
-    const parseParams = req => {
-        const result = {};
-        req.split('&').forEach(part => {
-            const item = part.split('=');
-            result[item[0]] = decodeURIComponent(item[1]);
-        });
-        return result;
+app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState) {
+    
+    let groups = [];
+    const analyzeGroups = () => {
+        try{
+            const groups = [];
+            const splitted = apiInputBox.getValue().toString().split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
+            let start = 0, end = 0; 
+            let lastElement = null;
+            for(let i=0; i<splitted.length; i++){ 
+                start = lastElement ? lastElement.length + i : i;               
+                const tmp = splitted[i].split('\n');
+                end = start + tmp.length;
+                lastElement = tmp;
+                const tmpRequestText = tmp[0];
+                let tmpRequestTextJson = '';
+                let j=1;
+                for(j=1; j<tmp.length; j++){
+                    if(!!tmp[j]){
+                        tmpRequestTextJson += tmp[j];
+                    }
+                }
+                groups.push({
+                    requestText: tmpRequestText,
+                    requestTextJson: tmpRequestTextJson,
+                    start,
+                    end
+                })
+            }
+            console.log(groups)
+            return groups;
+        } catch(error){
+            return false;
+        }
     }
 
-    $scope.myFunc = () => {
-        try {
-            $scope.validJSON = true;
-            const tmpCopy = JSON.parse($scope.requestTextJson);
-            if(oldCopy && JSON.stringify(oldCopy) === JSON.stringify(tmpCopy)) return;
-            if(typeof tmpCopy === 'object' && !Object.keys(tmpCopy).length) {
-                $scope.requestTextJson = '{\n\n}'
-            } else {
-                $scope.requestTextJson = JSON.stringify(tmpCopy, null, 4)
-            }
-            oldCopy = JSON.parse($scope.requestTextJson);
-        } catch (error) {
-            $scope.validJSON = false;
-        }
+    const apiInputBox = CodeMirror.fromTextArea(document.getElementById('api_input'),{
+        lineNumbers : true,
+        matchBrackets: true,
+        mode:  {name:"javascript",json:true},
+        styleActiveLine: true,
+        theme:'ttcn',
+        foldGutter: true,
+        gutters: ["CodeMirror-foldgutter"]
+    });
+
+    apiInputBox.getDoc().setValue('GET /agents\n' + JSON.stringify({limit:1},null,2));
+    let requestText     = 'GET /agents'
+    let requestTextJson = '{ "limit": 1 }'
+
+    const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{
+        lineNumbers : true,
+        matchBrackes: true,
+        mode:  {name:"javascript",json:true},
+        readOnly: true,
+        lineWrapping: true,
+        styleActiveLine: true,
+        theme:'ttcn',
+        foldGutter: true,
+        gutters: ["CodeMirror-foldgutter"]
+    });
+
+    apiInputBox.setSize('auto','100%')
+    apiOutputBox.setSize('auto','100%')
+
+
+    const calculateWhichGroup = () => {
+        const selection = apiInputBox.getCursor()
+        const desiredGroup = groups.filter(item => item.end >= selection.line && item.start <= selection.line);
+        return desiredGroup ? desiredGroup[0] : null;
     }
 
     $scope.send = async () => {
         try {
-            const method = $scope.requestText.startsWith('GET') ? 
+            groups = analyzeGroups();
+            const desiredGroup = calculateWhichGroup();
+            
+            const method = desiredGroup.requestText.startsWith('GET') ? 
                            'GET' :
-                           $scope.requestText.startsWith('POST') ?
+                           desiredGroup.requestText.startsWith('POST') ?
                            'POST' :
-                           $scope.requestText.startsWith('PUT') ?
+                           desiredGroup.requestText.startsWith('PUT') ?
                            'PUT' :
-                           $scope.requestText.startsWith('DELETE') ?
+                           desiredGroup.requestText.startsWith('DELETE') ?
                            'DELETE' :
                            'GET';
 
-            const requestCopy = $scope.requestText.includes(method) ?
-                                $scope.requestText.split(method)[1].trim() :
-                                $scope.requestText;
+            const requestCopy = desiredGroup.requestText.includes(method) ?
+                                desiredGroup.requestText.split(method)[1].trim() :
+                                desiredGroup.requestText;
 
             const req = requestCopy ?
                         requestCopy.startsWith('/') ? 
@@ -72,20 +115,20 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
 
             let validJSON = true, JSONraw = {};
             try {
-                JSONraw = JSON.parse($scope.requestTextJson);
+                JSONraw = JSON.parse(desiredGroup.requestTextJson);
             } catch(error) {
                 validJSON = false;
             }
 
             const path   = req.includes('?') ? req.split('?')[0] : req;
             const params = req.includes('?') ? parseParams(req.split('?')[1]) : {}
-
+            console.log(method, path, validJSON,!req.includes('?'),JSONraw, params)
             const output = await apiReq.request(method, path, validJSON && !req.includes('?') ? JSONraw : params)
-            
-            $scope.output = beautifier.prettyPrint(output.data.data);
-            if(!$scope.$$phase) $scope.$digest();
+
+            apiOutputBox.setValue(JSON.stringify(output.data.data,null,2))
 
         } catch(error) {
+            console.log(error.message || error)
             $scope.output = beautifier.prettyPrint(error.data);
             if(!$scope.$$phase) $scope.$digest();
         }
@@ -97,4 +140,5 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     }
 
     $scope.send();
+
 });
