@@ -16,13 +16,23 @@ import CodeMirror   from 'plugins/wazuh/utils/codemirror/lib/codemirror'
 const app = modules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState) {
-    
+app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState, $location) {
+    if(!appState.getCurrentAPI()){
+        errorHandler.handle('Wazuh App: Please set up the Wazuh API.','Dev tools',true);
+
+        $location.search('_a', null);
+        $location.search('tab', 'api');
+        $location.path('/settings');
+
+    }
+
     let groups = [];
     const analyzeGroups = () => {
         try{
+            const currentState = apiInputBox.getValue().toString();
+            appState.setCurrentDevTools(currentState)
             const groups = [];
-            const splitted = apiInputBox.getValue().toString().split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
+            const splitted = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
             let start = 0, end = 0; 
             let lastElement = null;
             for(let i=0; i<splitted.length; i++){ 
@@ -61,10 +71,22 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         gutters: ["CodeMirror-foldgutter"]
     });
 
+    apiInputBox.on('change',() => {
+        const currentState = apiInputBox.getValue().toString();
+        appState.setCurrentDevTools(currentState)
+    })
+
     const init = () => {
         apiInputBox.setSize('auto','100%')
         apiOutputBox.setSize('auto','100%')
-        apiInputBox.getDoc().setValue('GET /\n\nGET /agents\n' + JSON.stringify({limit:1},null,2));
+        const currentState = appState.getCurrentDevTools();
+        if(!currentState){
+            const demoStr = 'GET /\n\nGET /agents\n' + JSON.stringify({limit:1},null,2);
+            appState.setCurrentDevTools(demoStr);
+            apiInputBox.getDoc().setValue(demoStr);
+        } else {
+            apiInputBox.getDoc().setValue(currentState)
+        }
     }
 
     const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{

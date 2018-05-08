@@ -106,6 +106,12 @@ modules.get('app/wazuh', [])
         },
         removePatternSelector: () => {
             return $cookies.remove('patternSelector');
+        },
+        setCurrentDevTools: current => {
+            $cookies.putObject('currentDevTools',current);
+        },
+        getCurrentDevTools: () => {
+            return $cookies.getObject('currentDevTools')
         }
     };
 });
