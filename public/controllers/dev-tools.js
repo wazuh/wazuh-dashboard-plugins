@@ -18,39 +18,6 @@ const app = modules.get('app/wazuh', []);
 // Logs controller
 app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState) {
     let groups = [];
-    const analyzeGroups = () => {
-        try{
-            const currentState = apiInputBox.getValue().toString();
-            appState.setCurrentDevTools(currentState)
-            const groups = [];
-            const splitted = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
-            let start = 0, end = 0; 
-            let lastElement = null;
-            for(let i=0; i<splitted.length; i++){ 
-                start = lastElement ? lastElement.length + i : i;               
-                const tmp = splitted[i].split('\n');
-                end = start + tmp.length;
-                lastElement = tmp;
-                const tmpRequestText = tmp[0];
-                let tmpRequestTextJson = '';
-                let j=1;
-                for(j=1; j<tmp.length; j++){
-                    if(!!tmp[j]){
-                        tmpRequestTextJson += tmp[j];
-                    }
-                }
-                groups.push({
-                    requestText: tmpRequestText,
-                    requestTextJson: tmpRequestTextJson,
-                    start,
-                    end
-                })
-            }
-            return groups;
-        } catch(error){
-            return false;
-        }
-    }
 
     const apiInputBox = CodeMirror.fromTextArea(document.getElementById('api_input'),{
         lineNumbers : true,
@@ -62,7 +29,43 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         gutters: ["CodeMirror-foldgutter"]
     });
 
+    const analyzeGroups = () => {
+        try{
+            const currentState = apiInputBox.getValue().toString();
+            appState.setCurrentDevTools(currentState)
+            const tmpgroups = [];
+            const splitted = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
+            let start = 0, end = 0; 
+            let lastElement = null;
+            for(let i=0; i<splitted.length; i++){ 
+                start = lastElement ? lastElement.length + i : i;               
+                const tmp = splitted[i].split('\n');
+                end = start + tmp.length;
+                lastElement = tmp;
+
+                const tmpRequestText = tmp[0];
+                let tmpRequestTextJson = '';
+                let j=1;
+                for(j=1; j<tmp.length; j++){
+                    if(!!tmp[j]){
+                        tmpRequestTextJson += tmp[j];
+                    } 
+                }
+                tmpgroups.push({
+                    requestText: tmpRequestText,
+                    requestTextJson: tmpRequestTextJson,
+                    start,
+                    end
+                })
+            }
+            return tmpgroups;
+        } catch(error){
+            return false;
+        }
+    }
+
     apiInputBox.on('change',() => {
+        groups = analyzeGroups();
         const currentState = apiInputBox.getValue().toString();
         appState.setCurrentDevTools(currentState)
     })
@@ -78,6 +81,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         } else {
             apiInputBox.getDoc().setValue(currentState)
         }
+        groups = analyzeGroups();
     }
 
     const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{
@@ -137,9 +141,9 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             apiOutputBox.setValue(JSON.stringify(output.data.data,null,2))
 
         } catch(error) {
-            console.log(error.message || error)
-            $scope.output = beautifier.prettyPrint(error.data);
-            if(!$scope.$$phase) $scope.$digest();
+            error && error.data ? 
+            apiOutputBox.setValue(JSON.stringify(error.data)) :
+            apiOutputBox.setValue('{ }')
         }
 
     }
