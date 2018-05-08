@@ -61,9 +61,11 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         gutters: ["CodeMirror-foldgutter"]
     });
 
-    apiInputBox.getDoc().setValue('GET /agents\n' + JSON.stringify({limit:1},null,2));
-    let requestText     = 'GET /agents'
-    let requestTextJson = '{ "limit": 1 }'
+    const init = () => {
+        apiInputBox.setSize('auto','100%')
+        apiOutputBox.setSize('auto','100%')
+        apiInputBox.getDoc().setValue('GET /\n\nGET /agents\n' + JSON.stringify({limit:1},null,2));
+    }
 
     const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{
         lineNumbers : true,
@@ -76,10 +78,6 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         foldGutter: true,
         gutters: ["CodeMirror-foldgutter"]
     });
-
-    apiInputBox.setSize('auto','100%')
-    apiOutputBox.setSize('auto','100%')
-
 
     const calculateWhichGroup = () => {
         const selection = apiInputBox.getCursor()
@@ -121,7 +119,6 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
 
             const path   = req.includes('?') ? req.split('?')[0] : req;
             const params = req.includes('?') ? parseParams(req.split('?')[1]) : {}
-            console.log(method, path, validJSON,!req.includes('?'),JSONraw, params)
             const output = await apiReq.request(method, path, validJSON && !req.includes('?') ? JSONraw : params)
 
             apiOutputBox.setValue(JSON.stringify(output.data.data,null,2))
@@ -138,6 +135,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         $window.open('https://documentation.wazuh.com/current/user-manual/api/reference.html');
     }
 
+    init();
     $scope.send();
 
 });
