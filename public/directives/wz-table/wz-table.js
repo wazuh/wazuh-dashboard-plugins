@@ -28,7 +28,6 @@ app.directive('wzTable',function(){
             noheight    : '=noheight',
             isruleset   : '=isruleset',
             isdecoders  : '=isdecoders',
-            activeitem  : '=activeitem',
             isagents    : '=isagents',
             specialfunc : '&'
         },

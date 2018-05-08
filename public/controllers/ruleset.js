@@ -150,20 +150,6 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     //Load
     load();
 
-    let timesOpened = 0;
-    let lastName = false;
-    $scope.closeOther = rule => {
-        const item = rule.id ? rule.id : rule;
-        if(item !== lastName){
-            lastName = item;
-            timesOpened = 0;
-        }
-        timesOpened++;
-        $scope.activeItem = (timesOpened <= 1) ? item : false;
-        if(timesOpened > 1) timesOpened = 0;
-        return true;
-    }
-
     //Destroy
     $scope.$on('$destroy', () => {
         $scope.rules.reset();
@@ -222,19 +208,6 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         }
         return $sce.trustAsHtml(coloredString);
     };
-
-    let timesOpened = 0;
-    let lastName = false;
-    $scope.closeOther = name => {
-        if(name !== lastName){
-            lastName = name;
-            timesOpened = 0;
-        }
-        timesOpened++;
-        $scope.activeItem = (timesOpened <= 1) ? name : false;
-        if(timesOpened > 1) timesOpened = 0;
-        return true;
-    }
 
     $scope.checkEnter = search => {
         $scope.searchTerm = '';
