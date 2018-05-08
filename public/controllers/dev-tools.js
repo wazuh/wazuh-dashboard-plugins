@@ -45,7 +45,6 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     end
                 })
             }
-            console.log(groups)
             return groups;
         } catch(error){
             return false;
