@@ -100,7 +100,10 @@ routes
         template: loginTemplate
     })
     .when('/wazuh-dev', {
-        template: devToolsTemplate
+        template: devToolsTemplate,
+        resolve: {
+            "checkAPI": settingsWizard
+        }
     })
     .when('/blank-screen', {
         template: blankScreenTemplate

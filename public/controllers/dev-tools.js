@@ -16,16 +16,7 @@ import CodeMirror   from 'plugins/wazuh/utils/codemirror/lib/codemirror'
 const app = modules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState, $location) {
-    if(!appState.getCurrentAPI()){
-        errorHandler.handle('Wazuh App: Please set up the Wazuh API.','Dev tools',true);
-
-        $location.search('_a', null);
-        $location.search('tab', 'api');
-        $location.path('/settings');
-
-    }
-
+app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState) {
     let groups = [];
     const analyzeGroups = () => {
         try{
@@ -91,7 +82,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
 
     const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{
         lineNumbers : true,
-        matchBrackes: true,
+        matchBrackets: true,
         mode:  {name:"javascript",json:true},
         readOnly: true,
         lineWrapping: true,
