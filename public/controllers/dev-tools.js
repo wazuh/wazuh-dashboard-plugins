@@ -59,6 +59,16 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     } 
                 }
 
+                if(i === slen-1 && tmpRequestTextJson && typeof tmpRequestTextJson === 'string'){
+                    let rtjlen = tmp.length;
+                    while(rtjlen--){
+                        if(tmp[rtjlen] === '}') break;
+                        if(!tmp[rtjlen]) end -= 1;
+                    }
+                }
+
+                if(tmpRequestTextJson) end--;
+
                 tmpgroups.push({
                     requestText    : tmpRequestText,
                     requestTextJson: tmpRequestTextJson,
