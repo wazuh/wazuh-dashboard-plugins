@@ -64,11 +64,15 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     let rtjlen = tmp.length;
                     while(rtjlen--){
                         if(tmp[rtjlen] === '}') break;
-                        if(tmp[rtjlen] === ' ') end -= 1;
+                        else end -= 1;
                     }
                 }
 
-                if(tmpRequestTextJson) end--;
+                if(i === slen-1 && !tmpRequestTextJson){
+                    if(tmp.length > 1) end -= (tmp.length - 1)
+                }
+
+                end--;
           
                 tmpgroups.push({
                     requestText    : tmpRequestText,
@@ -77,7 +81,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     end
                 })
             }
-
+            
             return tmpgroups;
         } catch(error){
             return false;
