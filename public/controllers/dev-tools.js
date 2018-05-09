@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Blank screen controller
+ * Wazuh app - Dev tools controller
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,13 +20,13 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     let groups = [];
 
     const apiInputBox = CodeMirror.fromTextArea(document.getElementById('api_input'),{
-        lineNumbers    : true,
-        matchBrackets  : true,
-        mode           : { name: "javascript", json: true },
-        styleActiveLine: true,
-        theme          : 'ttcn',
-        foldGutter     : true,
-        gutters        : ["CodeMirror-foldgutter"]
+        lineNumbers      : true,
+        matchBrackets    : true,
+        mode             : { name: "javascript", json: true },
+        theme            : 'ttcn',
+        foldGutter       : true,
+        styleSelectedText: true,
+        gutters          : ["CodeMirror-foldgutter"]
     });
 
     const analyzeGroups = () => {
@@ -58,7 +58,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                         tmpRequestTextJson += tmp[j];
                     } 
                 }
-                console.log(tmpRequestTextJson)
+
                 tmpgroups.push({
                     requestText    : tmpRequestText,
                     requestTextJson: tmpRequestTextJson,
@@ -76,7 +76,29 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     apiInputBox.on('change',() => {
               groups       = analyzeGroups();
         const currentState = apiInputBox.getValue().toString();
-        appState.setCurrentDevTools(currentState)
+        appState.setCurrentDevTools(currentState)        
+    })
+
+    let linesWithClass = [];
+    const highlightGroup = group => {
+        for(const line of linesWithClass){
+            apiInputBox.removeLineClass(line,'background',"CodeMirror-styled-background")
+        }
+        linesWithClass = [];
+        if(group) {
+            if(!group.requestTextJson) {
+                linesWithClass.push(apiInputBox.addLineClass(group.start,'background',"CodeMirror-styled-background"))
+                return;
+            }
+            for(let i=group.start; i<=group.end; i++){
+                linesWithClass.push(apiInputBox.addLineClass(i,'background',"CodeMirror-styled-background"))
+            }                   
+        }
+    }
+
+    apiInputBox.on('cursorActivity',() => {
+        const currentGroup = calculateWhichGroup();
+        highlightGroup(currentGroup);        
     })
 
     const init = () => {
@@ -91,6 +113,8 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             apiInputBox.getDoc().setValue(currentState)
         }
         groups = analyzeGroups();
+        const currentGroup = calculateWhichGroup();
+        highlightGroup(currentGroup);  
     }
 
     const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{

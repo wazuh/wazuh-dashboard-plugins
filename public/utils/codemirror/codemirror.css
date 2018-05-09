@@ -22,7 +22,9 @@
 }
 
 /* GUTTER */
-
+.CodeMirror-styled-background {
+  background-color: #e8f2ff;
+}
 .CodeMirror-gutters {
   border-right: 1px solid #ddd;
   background-color: #f7f7f7;
