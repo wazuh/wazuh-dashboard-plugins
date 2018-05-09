@@ -64,12 +64,12 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     let rtjlen = tmp.length;
                     while(rtjlen--){
                         if(tmp[rtjlen] === '}') break;
-                        else end -= 1;
+                        if(tmp[rtjlen] === ' ') end -= 1;
                     }
                 }
 
                 if(tmpRequestTextJson) end--;
-
+          
                 tmpgroups.push({
                     requestText    : tmpRequestText,
                     requestTextJson: tmpRequestTextJson,
@@ -87,20 +87,43 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     apiInputBox.on('change',() => {
               groups       = analyzeGroups();
         const currentState = apiInputBox.getValue().toString();
-        appState.setCurrentDevTools(currentState)        
+        appState.setCurrentDevTools(currentState)  
+        const currentGroup = calculateWhichGroup();
+        if(currentGroup){
+            const hasWidget = widgets.filter(item => item.start === currentGroup.start)
+            if(hasWidget.length) apiInputBox.removeLineWidget(hasWidget[0].widget)
+        }
     })
 
     let linesWithClass = [], widgets = [];
     const highlightGroup = group => {
+        for(const line of linesWithClass){
+            apiInputBox.removeLineClass(line,'background',"CodeMirror-styled-background")
+        }
+        linesWithClass = [];
+        if(group) {
+            if(!group.requestTextJson) {
+                linesWithClass.push(apiInputBox.addLineClass(group.start,'background',"CodeMirror-styled-background"))
+                return;
+            }
+            for(let i=group.start; i<=group.end; i++){
+                linesWithClass.push(apiInputBox.addLineClass(i,'background',"CodeMirror-styled-background"))
+            }                   
+        }
+    }
+
+    const checkJsonParseError = () => {
+        const affectedGroups = [];
         for(const widget of widgets){
-            apiInputBox.removeLineWidget(widget)
+            apiInputBox.removeLineWidget(widget.widget)
         }
         widgets = [];
         for(const item of groups){
             if(item.requestTextJson){                
                 try {
                     jsonLint.parse(item.requestTextJson)
-                } catch(error) {                
+                } catch(error) { 
+                    affectedGroups.push(item.requestText);               
                     var msg = document.createElement("div");
                     var icon = msg.appendChild(document.createElement("span"));
                     icon.innerHTML = "!";
@@ -115,23 +138,11 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     }
                     msg.appendChild(document.createTextNode('Invalid query'));
                     msg.className = "lint-error";
-                    widgets.push(apiInputBox.addLineWidget(item.start, msg, {coverGutter: false, noHScroll: true}));
+                    widgets.push({start:item.start,widget:apiInputBox.addLineWidget(item.start, msg, {coverGutter: false, noHScroll: true})});
                 }
             }
         }
-        for(const line of linesWithClass){
-            apiInputBox.removeLineClass(line,'background',"CodeMirror-styled-background")
-        }
-        linesWithClass = [];
-        if(group) {
-            if(!group.requestTextJson) {
-                linesWithClass.push(apiInputBox.addLineClass(group.start,'background',"CodeMirror-styled-background"))
-                return;
-            }
-            for(let i=group.start; i<=group.end; i++){
-                linesWithClass.push(apiInputBox.addLineClass(i,'background',"CodeMirror-styled-background"))
-            }                   
-        }
+        return affectedGroups;
     }
 
     apiInputBox.on('cursorActivity',() => {
@@ -173,11 +184,19 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         return desiredGroup ? desiredGroup[0] : null;
     }
 
-    $scope.send = async () => {
+    $scope.send = async (firstTime) => {
         try {
             groups = analyzeGroups();
-            const desiredGroup = calculateWhichGroup();
             
+            const desiredGroup   = calculateWhichGroup();
+            if(!desiredGroup) throw Error('not desired');
+
+            if(!firstTime){
+                const affectedGroups         = checkJsonParseError();
+                const filteredAffectedGroups = affectedGroups.filter(item => item === desiredGroup.requestText);
+                if(filteredAffectedGroups.length) {apiOutputBox.setValue('Error parsing JSON query'); return;}
+            }
+
             const method = desiredGroup.requestText.startsWith('GET') ? 
                            'GET' :
                            desiredGroup.requestText.startsWith('POST') ?
@@ -209,7 +228,11 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             const params = req.includes('?') ? parseParams(req.split('?')[1]) : {}
             const output = await apiReq.request(method, path, validJSON && !req.includes('?') ? JSONraw : params)
 
-            apiOutputBox.setValue(JSON.stringify(output.data.data,null,2))
+            apiOutputBox.setValue(
+                desiredGroup.requestText + '\n' + 
+                desiredGroup.requestTextJson  + '\n\n' + 
+                JSON.stringify(output.data.data,null,2)
+            )
 
         } catch(error) {
             error && error.data ? 
@@ -224,6 +247,6 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     }
 
     init();
-    $scope.send();
+    $scope.send(true);
 
 });
