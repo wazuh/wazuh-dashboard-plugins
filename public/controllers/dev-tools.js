@@ -12,6 +12,7 @@
 import * as modules from 'ui/modules'
 import beautifier   from 'plugins/wazuh/utils/json-beautifier'
 import CodeMirror   from 'plugins/wazuh/utils/codemirror/lib/codemirror'
+import jsonLint     from 'plugins/wazuh/utils/codemirror/json-lint.js'
 
 const app = modules.get('app/wazuh', []);
 
@@ -89,8 +90,35 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         appState.setCurrentDevTools(currentState)        
     })
 
-    let linesWithClass = [];
+    let linesWithClass = [], widgets = [];
     const highlightGroup = group => {
+        for(const widget of widgets){
+            apiInputBox.removeLineWidget(widget)
+        }
+        widgets = [];
+        for(const item of groups){
+            if(item.requestTextJson){                
+                try {
+                    jsonLint.parse(item.requestTextJson)
+                } catch(error) {                
+                    var msg = document.createElement("div");
+                    var icon = msg.appendChild(document.createElement("span"));
+                    icon.innerHTML = "!";
+                    icon.className = "lint-error-icon";
+                    msg.onmouseover = () => {
+                        msg.removeChild(msg.lastChild)
+                        msg.appendChild(document.createTextNode(error.message));
+                    }
+                    msg.onmouseleave = () => {
+                        msg.removeChild(msg.lastChild)
+                        msg.appendChild(document.createTextNode('Invalid query'));
+                    }
+                    msg.appendChild(document.createTextNode('Invalid query'));
+                    msg.className = "lint-error";
+                    widgets.push(apiInputBox.addLineWidget(item.start, msg, {coverGutter: false, noHScroll: true}));
+                }
+            }
+        }
         for(const line of linesWithClass){
             apiInputBox.removeLineClass(line,'background',"CodeMirror-styled-background")
         }
