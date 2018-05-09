@@ -34,11 +34,11 @@ import 'plugins/wazuh/utils/codemirror/codemirror.css'
 import 'plugins/wazuh/utils/codemirror/foldgutter.css'
 import 'plugins/wazuh/utils/codemirror/ttcn.css'
 import 'plugins/wazuh/utils/codemirror/javascript.js'
-import 'plugins/wazuh/utils/codemirror/active-line.js'
 import 'plugins/wazuh/utils/codemirror/brace-fold.js'
 import 'plugins/wazuh/utils/codemirror/foldcode.js'
 import 'plugins/wazuh/utils/codemirror/foldgutter.js'
 import 'plugins/wazuh/utils/codemirror/search-cursor.js'
+import 'plugins/wazuh/utils/codemirror/mark-selection.js'
 
 
 // Material
