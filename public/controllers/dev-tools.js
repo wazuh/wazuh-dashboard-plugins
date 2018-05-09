@@ -64,7 +64,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     let rtjlen = tmp.length;
                     while(rtjlen--){
                         if(tmp[rtjlen] === '}') break;
-                        if(!tmp[rtjlen]) end -= 1;
+                        else end -= 1;
                     }
                 }
 
