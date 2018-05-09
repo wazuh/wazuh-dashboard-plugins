@@ -1,2 +1,2 @@
-<div flex layout="column" ng-if="globalRuleSet == 'ruleset'" class="mozilla-table-size-85">
+<div ng-cloak flex layout="column" ng-if="globalRuleSet == 'ruleset'" class="mozilla-table-size-85">
 	<md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
