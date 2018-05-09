@@ -38,6 +38,7 @@ import 'plugins/wazuh/utils/codemirror/active-line.js'
 import 'plugins/wazuh/utils/codemirror/brace-fold.js'
 import 'plugins/wazuh/utils/codemirror/foldcode.js'
 import 'plugins/wazuh/utils/codemirror/foldgutter.js'
+import 'plugins/wazuh/utils/codemirror/search-cursor.js'
 
 
 // Material
