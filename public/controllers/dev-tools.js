@@ -20,44 +20,53 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     let groups = [];
 
     const apiInputBox = CodeMirror.fromTextArea(document.getElementById('api_input'),{
-        lineNumbers : true,
-        matchBrackets: true,
-        mode:  {name:"javascript",json:true},
+        lineNumbers    : true,
+        matchBrackets  : true,
+        mode           : { name: "javascript", json: true },
         styleActiveLine: true,
-        theme:'ttcn',
-        foldGutter: true,
-        gutters: ["CodeMirror-foldgutter"]
+        theme          : 'ttcn',
+        foldGutter     : true,
+        gutters        : ["CodeMirror-foldgutter"]
     });
 
     const analyzeGroups = () => {
         try{
             const currentState = apiInputBox.getValue().toString();
             appState.setCurrentDevTools(currentState)
-            const tmpgroups = [];
-            const splitted = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
-            let start = 0, end = 0; 
-            let lastElement = null;
-            for(let i=0; i<splitted.length; i++){ 
-                start = lastElement ? lastElement.length + i : i;               
-                const tmp = splitted[i].split('\n');
-                end = start + tmp.length;
-                lastElement = tmp;
 
-                const tmpRequestText = tmp[0];
-                let tmpRequestTextJson = '';
-                let j=1;
-                for(j=1; j<tmp.length; j++){
+            const tmpgroups = [];
+            const splitted  = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
+            let   start     = 0;
+            let   end       = 0;
+
+            const slen = splitted.length;
+            for(let i=0; i < slen; i++){ 
+                const tmp    = splitted[i].split('\n');
+                const cursor = apiInputBox.getSearchCursor(tmp[0])
+
+                if(cursor.findNext()) start = cursor.from().line
+                else return false;
+
+                end = start + tmp.length;
+
+                const tmpRequestText     = tmp[0];
+                let   tmpRequestTextJson = '';
+
+                const tmplen = tmp.length;
+                for(let j = 1; j < tmplen; ++j){
                     if(!!tmp[j]){
                         tmpRequestTextJson += tmp[j];
                     } 
                 }
+                console.log(tmpRequestTextJson)
                 tmpgroups.push({
-                    requestText: tmpRequestText,
+                    requestText    : tmpRequestText,
                     requestTextJson: tmpRequestTextJson,
                     start,
                     end
                 })
             }
+
             return tmpgroups;
         } catch(error){
             return false;
@@ -65,7 +74,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     }
 
     apiInputBox.on('change',() => {
-        groups = analyzeGroups();
+              groups       = analyzeGroups();
         const currentState = apiInputBox.getValue().toString();
         appState.setCurrentDevTools(currentState)
     })
@@ -85,19 +94,19 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     }
 
     const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{
-        lineNumbers : true,
-        matchBrackets: true,
-        mode:  {name:"javascript",json:true},
-        readOnly: true,
-        lineWrapping: true,
+        lineNumbers    : true,
+        matchBrackets  : true,
+        mode           : { name: "javascript", json: true },
+        readOnly       : true,
+        lineWrapping   : true,
         styleActiveLine: true,
-        theme:'ttcn',
-        foldGutter: true,
-        gutters: ["CodeMirror-foldgutter"]
+        theme          : 'ttcn',
+        foldGutter     : true,
+        gutters        : ["CodeMirror-foldgutter"]
     });
 
     const calculateWhichGroup = () => {
-        const selection = apiInputBox.getCursor()
+        const selection    = apiInputBox.getCursor()
         const desiredGroup = groups.filter(item => item.end >= selection.line && item.start <= selection.line);
         return desiredGroup ? desiredGroup[0] : null;
     }
@@ -143,7 +152,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         } catch(error) {
             error && error.data ? 
             apiOutputBox.setValue(JSON.stringify(error.data)) :
-            apiOutputBox.setValue('{ }')
+            apiOutputBox.setValue('Empty')
         }
 
     }
