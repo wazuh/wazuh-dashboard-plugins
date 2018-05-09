@@ -46,7 +46,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                 const cursor = apiInputBox.getSearchCursor(tmp[0])
 
                 if(cursor.findNext()) start = cursor.from().line
-                else return false;
+                else return [];
 
                 end = start + tmp.length;
 
@@ -84,7 +84,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             
             return tmpgroups;
         } catch(error){
-            return false;
+            return [];
         }
     }
 
@@ -96,6 +96,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         if(currentGroup){
             const hasWidget = widgets.filter(item => item.start === currentGroup.start)
             if(hasWidget.length) apiInputBox.removeLineWidget(hasWidget[0].widget)
+            setTimeout(() => checkJsonParseError(),450)
         }
     })
 
@@ -128,20 +129,23 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     jsonLint.parse(item.requestTextJson)
                 } catch(error) { 
                     affectedGroups.push(item.requestText);               
-                    var msg = document.createElement("div");
-                    var icon = msg.appendChild(document.createElement("span"));
-                    icon.innerHTML = "!";
+                    const msg = document.createElement("div");
+                    msg.id = new Date().getTime()/1000;
+                    const icon = msg.appendChild(document.createElement("div"));
+          
                     icon.className = "lint-error-icon";
-                    msg.onmouseover = () => {
-                        msg.removeChild(msg.lastChild)
-                        msg.appendChild(document.createTextNode(error.message));
+                    icon.id = new Date().getTime()/1000;
+                    icon.onmouseover = () => {
+                        const advice = msg.appendChild(document.createElement("span"));
+                        advice.id = new Date().getTime()/1000;
+                        advice.innerText = error.message || 'Error parsing query'
+                        advice.className = 'lint-block-wz'
                     }
-                    msg.onmouseleave = () => {
+
+                    icon.onmouseleave = () => {
                         msg.removeChild(msg.lastChild)
-                        msg.appendChild(document.createTextNode('Invalid query'));
                     }
-                    msg.appendChild(document.createTextNode('Invalid query'));
-                    msg.className = "lint-error";
+
                     widgets.push({start:item.start,widget:apiInputBox.addLineWidget(item.start, msg, {coverGutter: false, noHScroll: true})});
                 }
             }
@@ -194,12 +198,11 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             
             const desiredGroup   = calculateWhichGroup();
             if(!desiredGroup) throw Error('not desired');
-
-            if(!firstTime){
-                const affectedGroups         = checkJsonParseError();
-                const filteredAffectedGroups = affectedGroups.filter(item => item === desiredGroup.requestText);
-                if(filteredAffectedGroups.length) {apiOutputBox.setValue('Error parsing JSON query'); return;}
-            }
+     
+            const affectedGroups         = checkJsonParseError();
+            const filteredAffectedGroups = affectedGroups.filter(item => item === desiredGroup.requestText);
+            if(filteredAffectedGroups.length) {apiOutputBox.setValue('Error parsing JSON query'); return;}
+      
 
             const method = desiredGroup.requestText.startsWith('GET') ? 
                            'GET' :
