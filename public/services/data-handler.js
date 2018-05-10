@@ -41,11 +41,11 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             if(this.totalItems && this.items && this.totalItems > this.items.length){
                 this.end = false;
             }
-            let deferred = $q.defer();
             if (this.busy || this.end) {
-                deferred.resolve(true);
-                return;
+                return Promise.resolve(true);
             }
+            const deferred = $q.defer();
+  
             this.busy = true;
             let requestData;
 
@@ -165,8 +165,11 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         search () {
+            if (this.busy || this.end) {
+                return Promise.resolve(true);
+            }
             this.busy      = true;
-            let deferred = $q.defer();
+            const deferred = $q.defer();
             let requestData;
             this.end       = false;
 
