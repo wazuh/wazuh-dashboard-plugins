@@ -14,7 +14,7 @@ import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
+app.controller('rulesController', function ($timeout, $scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
@@ -28,6 +28,8 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
 
     $scope.analizeRules = async search => {
         try {
+            if(search && search.length <= 1) return $scope.rulesAutoComplete.items;
+            await $timeout(200);
             $scope.rulesAutoComplete.filters = [];
 
             if(search.startsWith('group:') && search.split('group:')[1].trim()) {
@@ -233,6 +235,9 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
 
     $scope.analizeDecoders = async search => {
         try {
+            if(search && search.length <= 1) return $scope.decodersAutoComplete.items;
+            await $timeout(200);
+
             $scope.decodersAutoComplete.filters = [];
 
             if(search.startsWith('path:') && search.split('path:')[1].trim()) {
