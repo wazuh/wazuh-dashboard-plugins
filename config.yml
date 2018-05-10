@@ -54,8 +54,9 @@
 # ---------------------------------- Time out ----------------------------------
 #
 # Defines maximum timeout to be used on the Wazuh app requests.
-# Default value is 8000. It will be ignored if it is bellow 1500.
+# It will be ignored if it is bellow 1500.
 # It means milliseconds before we consider a request as failed.
+# Default: 8000
 #timeout: 8000
 #
 # ------------------------------ Advanced indices ------------------------------
@@ -69,17 +70,19 @@
 #
 # --------------------------- Index pattern selector ---------------------------
 #
-# Defines if the user is allowed to change the selected index
-# pattern directly from the Wazuh app top menu. Default: yes
+# Defines if the user is allowed to change the selected
+# index pattern directly from the Wazuh app top menu.
+# Default: yes
 #ip.selector: true
 #
-#---------------------------- RBAC X-Pack -------------------------------------
+# -------------------------------- X-Pack RBAC ---------------------------------
 #
-# Custom setting to enable/disable RBAC capabilities included on X-Pack (security)
+# Custom setting to enable/disable built-in X-Pack RBAC security capabilities.
 # Default: enabled
 #xpack.rbac.enabled: true
 #
-#---------------------------- wazuh-monitoring --------------------------------
+# ------------------------------ wazuh-monitoring ------------------------------
+#
 # Custom setting to enable/disable wazuh-monitoring indices.
 # Default: enabled
 #wazuh.monitoring.enabled: true

@@ -2,32 +2,55 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 391
+## Wazuh v3.2.2 - Kibana v6.2.4 - Revision 391
 
 ### Added
 
--   Added confirmation message when the user deletes an API entry on _Settings/API_ ([#428](https://github.com/wazuh/wazuh-kibana-app/pull/428)).
+-   Brand-new tab - _Dev tools_ ([#449](https://github.com/wazuh/wazuh-kibana-app/pull/449)):
+    -   Find it on the top navbar, next to _Discover_.
+    -   Execute Wazuh API requests directly from the app.
+    -   This tab uses your currently selected API from _Settings_.
+    -   You can type different API requests on the input window, select one with the cursor, and click on the Play button to execute it.
+    -   You can also type comments on the input window.
+-   New improvements for the _Manager/Ruleset_ tab ([#446](https://github.com/wazuh/wazuh-kibana-app/pull/446)):
+    -   New colour palette for regex, order and rule description arguments.
+    -   Added return to List view on Ruleset button while on Detail view.
+    -   Fixed line height on all table headers.
+    -   Removed unused, old code from Ruleset controllers.
+-   Added option on `config.yml` to enable/disable the `wazuh-monitoring` index ([#441](https://github.com/wazuh/wazuh-kibana-app/pull/441)):
+    -   Configure the time frequency to generate new indices.
+    -   The default time frequency has been increased to 1 hour.
+    -   When disabled, useful metrics will appear on _Overview/General_ replacing the _Agent status_ visualization.
 -   Added CSV exporting button to the app ([#431](https://github.com/wazuh/wazuh-kibana-app/pull/431)):
     -   Implemented new logic to fetch data from the Wazuh API and download it in CSV format.
-    -   Currently available for the _Groups_, _Ruleset_ and _Logs_ sections on the _Manager_ tab.
--   Added support for filters on the _Manager/Logs_ tab when realtime is enabled ([#433](https://github.com/wazuh/wazuh-kibana-app/pull/433)).
--   Added more filter options to the Detail view on _Manager/Ruleset_ ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
+    -   Currently available for the _Ruleset_, _Logs_ and _Groups_ sections on the _Manager_ tab.
 -   More refactoring to the app backend ([#439](https://github.com/wazuh/wazuh-kibana-app/pull/439)):
     -   Standarized error output from the server side.
     -   Drastically reduced the error management logic on the client side.
     -   Applied the _Facade_ pattern when importing/exporting modules.
     -   Deleted unused/deprecated/useless methods both from server and client side.
     -   Some optimizations to variable type usages.
+-   Added confirmation message when the user deletes an API entry on _Settings/API_ ([#428](https://github.com/wazuh/wazuh-kibana-app/pull/428)).
+-   Added support for filters on the _Manager/Logs_ tab when realtime is enabled ([#433](https://github.com/wazuh/wazuh-kibana-app/pull/433)).
+-   Added more filter options to the Detail view on _Manager/Ruleset_ ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
 
 ### Changed
 
--   Changed an OSCAP visualization to avoid clipping issues with large agent names ([#429](https://github.com/wazuh/wazuh-kibana-app/pull/429)).
+-   Changed OSCAP visualization to avoid clipping issues with large agent names ([#429](https://github.com/wazuh/wazuh-kibana-app/pull/429)).
 -   Now the related Rules or Decoders sections on _Manager/Ruleset_ will remain hidden if there isn't any data to show or while it's loading ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
+-   Added a 200ms delay when fetching iterable data from the Wazuh API ([#445](https://github.com/wazuh/wazuh-kibana-app/pull/445) & [#450](https://github.com/wazuh/wazuh-kibana-app/pull/450)).
+-   Fixed several bugs related to Wazuh API timeout/cancelled requests ([#445](https://github.com/wazuh/wazuh-kibana-app/pull/445)).
 
-## Wazuh v3.2.1 - Kibana v6.2.4 - Revision 390
+### Fixed
+
+-   Fixed some performance bugs on the `dataHandler` service ([#442](https://github.com/wazuh/wazuh-kibana-app/pull/442)).
+-   Fixed bug when loading the _Agents preview_ tab on Safari web browser ([#447](https://github.com/wazuh/wazuh-kibana-app/pull/447)).
+
+## Wazuh v3.2.1/v3.2.2 - Kibana v6.2.4 - Revision 390
 
 ### Added
 
+-   Support for Wazuh v3.2.2.
 -   Refactoring on visualizations use and management ([#397](https://github.com/wazuh/wazuh-kibana-app/pull/397)):
     -   Visualizations are no longer stored on an index, they're built and loaded on demand when needed to render the interface.
     -   Refactoring on the whole app source code to use the _import/export_ paradigm.
