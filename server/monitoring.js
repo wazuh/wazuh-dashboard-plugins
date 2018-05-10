@@ -17,9 +17,38 @@ import log                from './logger'
 import ElasticWrapper     from './lib/elastic-wrapper'
 import monitoringTemplate from './integration-files/monitoring-template'
 import packageJSON        from '../package.json'
+import getConfiguration   from './lib/get-configuration'
+import parseCron          from './lib/parse-cron'
 
 export default (server, options) => {
-    const blueWazuh      = colors.blue('wazuh');
+    const blueWazuh = colors.blue('wazuh');
+
+    let ENABLED   = true;
+    let FREQUENCY = 3600;
+    let CRON_FREQ = '0 1 * * * *';
+    try { 
+        const configFile = getConfiguration();
+
+        ENABLED   = configFile && typeof configFile['wazuh.monitoring.enabled'] !== 'undefined' ? 
+                    configFile['wazuh.monitoring.enabled'] : 
+                    ENABLED;
+        FREQUENCY = configFile && typeof configFile['wazuh.monitoring.frequency'] !== 'undefined' ? 
+                    configFile['wazuh.monitoring.frequency'] : 
+                    FREQUENCY;
+
+        CRON_FREQ = parseCron(FREQUENCY);
+
+        !options && log('[monitoring][configuration]', `wazuh.monitoring.enabled: ${ENABLED}`,'info');
+        !options && server.log([blueWazuh, 'monitoring', 'info'], `wazuh.monitoring.enabled: ${ENABLED}`);
+
+        !options && log('[monitoring][configuration]', `wazuh.monitoring.frequency: ${FREQUENCY} (${CRON_FREQ}) `,'info');
+        !options && server.log([blueWazuh, 'monitoring', 'info'], `wazuh.monitoring.frequency: ${FREQUENCY} (${CRON_FREQ})`);
+
+    } catch (error) {
+        log('[monitoring][configuration]', error.message || error);
+        server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
+    }
+
     const index_pattern  = "wazuh-monitoring-3.x-*";
     const index_prefix   = "wazuh-monitoring-3.x-";
     
@@ -206,6 +235,7 @@ export default (server, options) => {
     // Creating wazuh-monitoring index
     const createIndex = async (todayIndex,clusterName) => {
         try {
+            if(!ENABLED) return;
             await wzWrapper.createIndexByName(todayIndex);
             log('[monitoring][createIndex]', 'Successfully created today index.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Successfully created today index.');
@@ -247,6 +277,7 @@ export default (server, options) => {
     // Save agent status into elasticsearch, create index and/or insert document
     const saveStatus = async clusterName => {
         try {
+            if(!ENABLED) return;
             fDate      = new Date().toISOString().replace(/T/, '-').replace(/\..+/, '').replace(/-/g, '.').replace(/:/g, '').slice(0, -7);
             todayIndex = index_prefix + fDate;
 
@@ -393,8 +424,8 @@ export default (server, options) => {
             server.log([blueWazuh, 'monitoring [cronTask]', 'error'], error.message || error)
         }
     }
-    if(!options) cronTask()
+    if(!options && ENABLED) cronTask()
     // Cron tab for getting agent status.
-    if(!options) cron.schedule('0 */10 * * * *', cronTask, true);
+    if(!options && ENABLED) cron.schedule(CRON_FREQ, cronTask, true);
     return fetchAgentsExternal;
 };

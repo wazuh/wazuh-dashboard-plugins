@@ -11,14 +11,12 @@
  */
 import needle             from 'needle'
 import colors             from 'ansicolors'
-import fs                 from 'fs'
-import yml                from 'js-yaml'
-import path               from 'path'
 import log                from './logger'
 import knownFields        from './integration-files/known-fields'
 import ElasticWrapper     from './lib/elastic-wrapper'
 import packageJSON        from '../package.json'
 import kibana_template    from './integration-files/kibana-template'
+import getConfiguration   from './lib/get-configuration'
 
 export default (server, options) => {
     const blueWazuh = colors.blue('wazuh');
@@ -36,7 +34,7 @@ export default (server, options) => {
     let pattern = null;
     // Read config from package.json and config.yml
     try {
-        configurationFile = yml.load(fs.readFileSync(path.join(__dirname, '../config.yml'), { encoding: 'utf-8' }));
+        configurationFile = getConfiguration();
 
         global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';

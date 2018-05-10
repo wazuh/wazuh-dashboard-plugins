@@ -1,6 +1,6 @@
 <div layout="row" flex class="wz-margin-bottom-10">
-    <input ng-if="!isdisabled" flex id="query" placeholder="{{ placetext }}" ng-class="height ? height : ''" type="text" ng-model="term" ng-change="data.addFilter('search', term)"
+    <input ng-if="!isdisabled" flex id="query" placeholder="{{ placetext }}" ng-class="height ? height : ''" type="text" ng-model="term" ng-change="applyDelayAndFilter()"
         class="wz-search-bar-size groupsNoMarginTop input-filter-box wz-width-100" />
-    <input ng-if="isdisabled" disabled flex id="query" placeholder="{{ placetext }}" ng-class="height ? height : ''" type="text" ng-model="term" ng-change="data.addFilter('search', term)"
+    <input ng-if="isdisabled" disabled flex id="query" placeholder="{{ placetext }}" ng-class="height ? height : ''" type="text" ng-model="term" ng-change="applyDelayAndFilter()"
         class="wz-search-bar-size groupsNoMarginTop input-filter-box wz-width-100" />
 </div>
