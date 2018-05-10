@@ -26,6 +26,7 @@ import discoverTemplate    from 'plugins/wazuh/templates/discover/discover.jade'
 import settingsTemplate    from 'plugins/wazuh/templates/settings/settings.html'
 import loginTemplate       from 'plugins/wazuh/templates/auth/login.html'
 import blankScreenTemplate from 'plugins/wazuh/templates/error-handler/blank-screen.html'
+import devToolsTemplate    from 'plugins/wazuh/templates/dev-tools/dev-tools.html'
 
 //Routes
 routes.enable();
@@ -97,6 +98,12 @@ routes
     })
     .when('/wlogin', {
         template: loginTemplate
+    })
+    .when('/wazuh-dev', {
+        template: devToolsTemplate,
+        resolve: {
+            "checkAPI": settingsWizard
+        }
     })
     .when('/blank-screen', {
         template: blankScreenTemplate
