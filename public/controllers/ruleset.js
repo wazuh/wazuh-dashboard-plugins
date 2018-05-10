@@ -183,12 +183,6 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         $scope.rules.reset();
         $scope.rulesRelated.reset();
         $scope.rulesAutoComplete.reset();
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
         reloadWatcher();
     });
 });
@@ -358,12 +352,6 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         $scope.decoders.reset();
         $scope.decodersRelated.reset();
         $scope.decodersAutoComplete.reset();
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
         reloadWatcher();
     });
 });
