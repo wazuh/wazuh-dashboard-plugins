@@ -16,7 +16,7 @@ import rison        from 'rison'
 const app = modules.get('app/wazuh', []);
 
 app.controller('agentsController',
-    function ($scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler) {
+    function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler) {
 
         $rootScope.page = 'agents';
         $scope.extensions = appState.getExtensions().extensions;
@@ -373,8 +373,9 @@ app.controller('agentsController',
             $location.path('/manager');
         };
 
-        $scope.analizeAgents = async search => {
+        $scope.analyzeAgents = async search => {
             try {
+                await $timeout(200);
                 $scope.agentsAutoComplete.filters = [];
                 await $scope.agentsAutoComplete.addFilter('search',search);
 

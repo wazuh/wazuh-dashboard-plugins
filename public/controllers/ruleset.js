@@ -26,7 +26,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, Rules,
     $scope.setRulesTab('rules');
     $scope.isArray = angular.isArray;
 
-    $scope.analizeRules = async search => {
+    $scope.analyzeRules = async search => {
         try {
             if(search && search.length <= 1) return $scope.rulesAutoComplete.items;
             await $timeout(200);
@@ -233,7 +233,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         }
     };
 
-    $scope.analizeDecoders = async search => {
+    $scope.analyzeDecoders = async search => {
         try {
             if(search && search.length <= 1) return $scope.decodersAutoComplete.items;
             await $timeout(200);
