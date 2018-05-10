@@ -59,16 +59,12 @@ modules.get('app/wazuh', [])
 
     return {
         request: (method, path, payload = null) => {
-            let defered = $q.defer();
-
             if (!method || !path) {
-                defered.reject(prepError({
-                    'error': -1,
-                    'message': 'Missing parameters'
-                }));
-                return defered.promise;
+                return Promise.reject(new Error('Missing parameters'));
             }
 
+            const defered = $q.defer();
+            
             _request(method, path, payload)
             .then(defered.resolve)
             .catch(defered.reject);
