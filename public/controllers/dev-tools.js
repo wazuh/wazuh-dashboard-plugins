@@ -63,7 +63,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                 if(i === slen-1 && tmpRequestTextJson && typeof tmpRequestTextJson === 'string'){
                     let rtjlen = tmp.length;
                     while(rtjlen--){
-                        if(tmp[rtjlen] === '}') break;
+                        if(tmp[rtjlen].trim() === '}') break;
                         else end -= 1;
                     }
                 }
