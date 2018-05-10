@@ -43,7 +43,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             const slen = splitted.length;
             for(let i=0; i < slen; i++){ 
                 const tmp    = splitted[i].split('\n');
-                const cursor = apiInputBox.getSearchCursor(tmp[0])
+                const cursor = apiInputBox.getSearchCursor(splitted[i],null,{multiline:true})
 
                 if(cursor.findNext()) start = cursor.from().line
                 else return [];
@@ -237,7 +237,8 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
 
             apiOutputBox.setValue(
                 desiredGroup.requestText + '\n' + 
-                desiredGroup.requestTextJson  + '\n\n' + 
+                (validJSON ? JSON.stringify(JSONraw,null,2) + '\n' : '\n')   + 
+                '\n' + 
                 JSON.stringify(output.data.data,null,2)
             )
 
