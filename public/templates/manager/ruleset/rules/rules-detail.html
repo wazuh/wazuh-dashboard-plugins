@@ -5,7 +5,8 @@
         <!-- Back button -->
         <md-button class="md-icon-button" aria-label="Back to rules list" tooltip="Back" tooltip-placement="bottom" ng-click="closeDetailView()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
         <!-- Rule title -->
-        <h1 class="md-headline wz-headline">{{currentRule.description}}</h1>
+        <h1 class="md-headline wz-headline" ng-bind-html="colorRuleArg(currentRule.description)"></h1>
+
     </div>
     <!-- End back button, title and status indicator -->
 
@@ -138,7 +139,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentRule.details.regex">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -152,7 +153,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentRule.details.match">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -166,7 +167,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentRule.details.prematch">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -195,7 +196,6 @@
                 func="openDetailView(ruleRelated)"
                 data="rulesRelated"
                 full="'ruleRelated'"
-                activeitem="activeItem"
                 keys="[
                     {col:'id',size:5},
                     {col:'file',size:15},

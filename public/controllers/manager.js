@@ -33,6 +33,11 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
         $rootScope.groupsIsReloaded = true;
     }
 
+    $scope.reloadRuleset = () => {
+        $scope.submenuNavItem = 'ruleset';
+        $rootScope.rulesetIsReloaded = true;
+    }
+
     // Watchers
     $scope.$watch('submenuNavItem', () => {
         if($scope.submenuNavItem === 'ruleset') {

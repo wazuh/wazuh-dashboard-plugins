@@ -14,19 +14,54 @@ import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($timeout, $scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
+app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
+    $scope.searchTerm = '';
     $scope.loading = true;
+    $scope.viewingDetail = false;
     $scope.rules   = Rules;
     $scope.rulesRelated = RulesRelated;
     $scope.rulesAutoComplete = RulesAutoComplete;
     $scope.setRulesTab('rules');
     $scope.isArray = angular.isArray;
 
-    $scope.analyzeRules = async search => {
+    const colors = [
+        '#004A65', '#00665F', '#BF4B45', '#BF9037', '#1D8C2E', 'BB3ABF',
+        '#00B1F1', '#00F2E2', '#7F322E', '#7F6025', '#104C19', '7C267F',
+        '#0079A5', '#00A69B', '#FF645C', '#FFC04A', '#2ACC43', 'F94DFF',
+        '#0082B2', '#00B3A7', '#401917', '#403012', '#2DD947', '3E1340',
+        '#00668B', '#008C83', '#E55A53', '#E5AD43', '#25B23B', 'E045E5'
+    ];
+
+    $scope.colorRuleArg = ruleArg => {
+        ruleArg = ruleArg.toString();
+        let valuesArray   = ruleArg.match(/\$\(((?!<\/span>).)*?\)(?!<\/span>)/gmi);
+        let coloredString = ruleArg;
+
+        // If valuesArray is empty, means that the description doesn't have any arguments
+        // In this case, then simply return the string
+        // In other case, then colour the string and return
+        if (valuesArray && valuesArray.length) {
+            for (let i = 0, len = valuesArray.length; i < len; i++) {
+                coloredString = coloredString.replace(/\$\(((?!<\/span>).)*?\)(?!<\/span>)/mi, '<span style="color: ' + colors[i] + ' ">' + valuesArray[i] + '</span>');
+            }
+        }
+
+        return $sce.trustAsHtml(coloredString);
+    };
+
+    // Reloading watcher initialization
+    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
+        delete $rootScope.rulesetIsReloaded;
+        $scope.viewingDetail = false;
+        if(!$scope.$$phase) $scope.$digest();
+    });
+
+    $scope.analizeRules = async search => {
+      
         try {
             if(search && search.length <= 1) return $scope.rulesAutoComplete.items;
             await $timeout(200);
@@ -144,25 +179,12 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, Rules,
     //Load
     load();
 
-    let timesOpened = 0;
-    let lastName = false;
-    $scope.closeOther = rule => {
-        const item = rule.id ? rule.id : rule;
-        if(item !== lastName){
-            lastName = item;
-            timesOpened = 0;
-        }
-        timesOpened++;
-        $scope.activeItem = (timesOpened <= 1) ? item : false;
-        if(timesOpened > 1) timesOpened = 0;
-        return true;
-    }
-
     //Destroy
     $scope.$on('$destroy', () => {
         $scope.rules.reset();
         $scope.rulesRelated.reset();
         $scope.rulesAutoComplete.reset();
+        reloadWatcher();
     });
 });
 
@@ -170,7 +192,9 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
+    $scope.searchTerm = '';
     $scope.loading  = true;
+    $scope.viewingDetail = false;
     $scope.decoders = Decoders;
     $scope.decodersRelated = DecodersRelated;
     $scope.decodersAutoComplete = DecodersAutoComplete;
@@ -179,13 +203,11 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
     $scope.isArray = angular.isArray;
 
     const colors = [
-        '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6
-        '#508642', '#CCA300', '#447EBC', '#C15C17', '#890F02', '#0A437C', '#6D1F62', '#584477', //2
-        '#629E51', '#E5AC0E', '#64B0C8', '#E0752D', '#BF1B00', '#0A50A1', '#962D82', '#614D93', //4
-        '#7EB26D', '#EAB839', '#6ED0E0', '#EF843C', '#E24D42', '#1F78C1', '#BA43A9', '#705DA0', // Normal
-        '#9AC48A', '#F2C96D', '#65C5DB', '#F9934E', '#EA6460', '#5195CE', '#D683CE', '#806EB7', //5
-        '#B7DBAB', '#F4D598', '#70DBED', '#F9BA8F', '#F29191', '#82B5D8', '#E5A8E2', '#AEA2E0', //3
-        '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7' //7
+        '#004A65', '#00665F', '#BF4B45', '#BF9037', '#1D8C2E', 'BB3ABF',
+        '#00B1F1', '#00F2E2', '#7F322E', '#7F6025', '#104C19', '7C267F',
+        '#0079A5', '#00A69B', '#FF645C', '#FFC04A', '#2ACC43', 'F94DFF',
+        '#0082B2', '#00B3A7', '#401917', '#403012', '#2DD947', '3E1340',
+        '#00668B', '#008C83', '#E55A53', '#E5AD43', '#25B23B', 'E045E5'
     ];
 
     $scope.colorRegex = regex => {
@@ -208,18 +230,12 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         return $sce.trustAsHtml(coloredString);
     };
 
-    let timesOpened = 0;
-    let lastName = false;
-    $scope.closeOther = name => {
-        if(name !== lastName){
-            lastName = name;
-            timesOpened = 0;
-        }
-        timesOpened++;
-        $scope.activeItem = (timesOpened <= 1) ? name : false;
-        if(timesOpened > 1) timesOpened = 0;
-        return true;
-    }
+    // Reloading watcher initialization
+    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
+        delete $rootScope.rulesetIsReloaded;
+        $scope.viewingDetail = false;
+        if(!$scope.$$phase) $scope.$digest();
+    });
 
     $scope.checkEnter = search => {
         $scope.searchTerm = '';
@@ -337,5 +353,6 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         $scope.decoders.reset();
         $scope.decodersRelated.reset();
         $scope.decodersAutoComplete.reset();
+        reloadWatcher();
     });
 });
