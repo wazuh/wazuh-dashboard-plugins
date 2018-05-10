@@ -2,4 +2,6 @@
 
     <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
 
-    <div flex layout="column" id="content">
+    <div class='uil-ring-css' ng-show="loading">
+        <div></div>
+    </div>
