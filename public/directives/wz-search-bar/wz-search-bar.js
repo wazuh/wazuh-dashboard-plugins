@@ -26,8 +26,8 @@ app.directive('wzSearchBar', function() {
             isdisabled: '=isdisabled'
         },
         link: function(scope, ele, attrs) {
-            scope.applyDelayAndFilter = () => {
-                setTimeout(() => scope.data.addFilter('search', scope.term),200)
+            scope.applyDelayAndFilter = searchTerm => {
+                setTimeout(() => scope.data.addFilter('search', searchTerm),200)
             }
         },
         template: searchBarTemplate

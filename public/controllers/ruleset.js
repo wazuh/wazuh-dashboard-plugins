@@ -61,6 +61,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
     });
 
     $scope.analizeRules = async search => {
+      
         try {
             if(search && search.length <= 1) return $scope.rulesAutoComplete.items;
             await $timeout(200);
@@ -187,7 +188,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
+app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
@@ -248,7 +249,7 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         }
     };
 
-    $scope.analizeDecoders = async search => {
+    $scope.analyzeDecoders = async search => {
         try {
             if(search && search.length <= 1) return $scope.decodersAutoComplete.items;
             await $timeout(200);

@@ -144,6 +144,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         removeFilter (filterName, search) {
+            this.end = false;
             if(search) this.filters = this.filters.filter(filter => filterName !== filter.name && filter.value !== search);
             else       this.filters = this.filters.filter(filter => filterName !== filter.name);
 
