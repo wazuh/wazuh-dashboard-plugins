@@ -42,7 +42,8 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
 
             const slen = splitted.length;
             for(let i=0; i < slen; i++){ 
-                const tmp    = splitted[i].split('\n');
+                let tmp    = splitted[i].split('\n');
+                if(Array.isArray(tmp)) tmp = tmp.filter(item => !item.includes('#'))
                 const cursor = apiInputBox.getSearchCursor(splitted[i],null,{multiline:true})
 
                 if(cursor.findNext()) start = cursor.from().line
@@ -55,7 +56,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
 
                 const tmplen = tmp.length;
                 for(let j = 1; j < tmplen; ++j){
-                    if(!!tmp[j]){
+                    if(!!tmp[j] && !tmp[j].includes('#')){
                         tmpRequestTextJson += tmp[j];
                     } 
                 }
@@ -163,7 +164,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         apiOutputBox.setSize('auto','100%')
         const currentState = appState.getCurrentDevTools();
         if(!currentState){
-            const demoStr = 'GET /\n\nGET /agents\n' + JSON.stringify({limit:1},null,2);
+            const demoStr = 'GET /\n\n# Comment here\nGET /agents\n' + JSON.stringify({limit:1},null,2);
             appState.setCurrentDevTools(demoStr);
             apiInputBox.getDoc().setValue(demoStr);
         } else {
