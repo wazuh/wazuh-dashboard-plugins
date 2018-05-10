@@ -38,6 +38,9 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         nextPage () {
+            if(this.totalItems && this.items && this.totalItems > this.items.length){
+                this.end = false;
+            }
             let deferred = $q.defer();
             if (this.busy || this.end) {
                 deferred.resolve(true);
@@ -88,7 +91,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                 this.offset += items.length;
                 if (this.offset >= this.totalItems) this.end = true;
                 if (data.data.data !== 0){
-                    this.busy = false;
                     if(this.path === '/agents/groups'){
                         let filtered = this.items.filter((elem, index, self) => self.findIndex(
                             (t) => {return (t.merged_sum === elem.merged_sum)}) === index);
@@ -103,6 +105,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
 
                     deferred.resolve(true);
                 }
+                this.busy = false;
             })
             .catch(error => {
                 this.busy = false;
@@ -149,9 +152,8 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         removeAllFilters () {
-            for(let filter of this.filters){
-                this.removeFilter(filter.name, true);
-            }
+            this.filters = [];
+            return this.search();
         }
 
         delete (name, index) {
@@ -163,12 +165,12 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         search () {
+            this.busy      = true;
             let deferred = $q.defer();
             let requestData;
             this.end       = false;
-            this.busy      = false;
-            //this.sortValue = '';
 
+            //this.sortValue = '';
             requestData = {
                 offset: 0,
                 limit:  this.initialBatch
@@ -206,8 +208,12 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
 
                 this.offset = items.length;
                 deferred.resolve(true);
+                this.busy = false;
             })
-            .catch(error => errorHandler.handle(error,'Datahandler factory'));
+            .catch(error => {
+                this.busy = false;
+                errorHandler.handle(error,'Datahandler factory');
+            });
 
             return deferred.promise;
         }
