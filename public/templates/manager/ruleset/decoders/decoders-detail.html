@@ -116,7 +116,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentDecoder.details.regex">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey" ng-bind-html="colorRegex(item)"></span>
+                        <span ng-bind-html="colorRegex(item)"></span>
                     </div>
                 </div>
             </md-card-content>
@@ -130,7 +130,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentDecoder.details.match">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -144,7 +144,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentDecoder.details.prematch">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
