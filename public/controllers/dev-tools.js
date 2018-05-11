@@ -243,9 +243,6 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             const output = await apiReq.request(method, path, validJSON && !req.includes('?') ? JSONraw : params)
 
             apiOutputBox.setValue(
-                desiredGroup.requestText + '\n' + 
-                (validJSON ? JSON.stringify(JSONraw,null,2) + '\n' : '\n')   + 
-                '\n' + 
                 JSON.stringify(output.data.data,null,2)
             )
 
