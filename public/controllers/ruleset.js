@@ -60,8 +60,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         if(!$scope.$$phase) $scope.$digest();
     });
 
-    $scope.analizeRules = async search => {
-      
+    $scope.analyzeRules = async search => {
+        
         try {
             if(search && search.length <= 1) return $scope.rulesAutoComplete.items;
             await $timeout(200);
