@@ -238,7 +238,8 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             }
 
             const path   = req.includes('?') ? req.split('?')[0] : req;
-            const params = req.includes('?') ? parseParams(req.split('?')[1]) : {}
+            const params = { devTools: true }
+            if(typeof JSONraw === 'object') JSONraw.devTools = true;
             const output = await apiReq.request(method, path, validJSON && !req.includes('?') ? JSONraw : params)
 
             apiOutputBox.setValue(

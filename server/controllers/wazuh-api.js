@@ -321,6 +321,13 @@ export default class WazuhApi {
         } else if (!req.payload.path) {
             return ErrorResponse('Missing param: path', 3016, 400, reply);   
         } else {
+            if(req.payload.method !== 'GET' && req.payload.body && req.payload.body.devTools){
+                const configuration = getConfiguration();
+                if(!configuration || (configuration && !configuration['devtools.allowall'])){
+                    return ErrorResponse('Allowed method: [GET]', 3023, 400, reply);   
+                }
+            }
+            if(req.payload.body.devTools) delete req.payload.body.devTools;
             return this.makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
         }
     }
