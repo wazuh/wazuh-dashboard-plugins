@@ -164,7 +164,7 @@ app.controller('agentsController',
         // Switch tab
         $scope.switchTab = tab => {
             if ($scope.tab === tab) return;
-
+            
             if(tab !== 'configuration') {
                 $rootScope.rawVisualizations = null;
                 // Create current tab visualizations
@@ -175,9 +175,6 @@ app.controller('agentsController',
                     $rootScope.$broadcast('updateVis');
 
                     checkMetrics(tab, 'panels');
-
-                    // Deleting app state traces in the url
-                    $location.search('_a', null);
 
                 })
                 .catch(error => errorHandler.handle(error, 'Agents'));
@@ -201,6 +198,14 @@ app.controller('agentsController',
         });
 
         $scope.$watch('tab', () => {
+            const str = $location.search()._a;
+            if(str){
+                const decoded   = rison.decode(str);
+                const tmp       = decoded.filters.filter(item => !item.query.match['rule.groups']);
+                decoded.filters = tmp;
+                const encoded   = rison.encode(decoded);
+                $location.search('_a', encoded)
+            }
             $location.search('tab', $scope.tab);
 
             $scope.tabView = 'panels';
@@ -302,7 +307,7 @@ app.controller('agentsController',
                     }
                 } catch (error) {
                     // If some rison.js related error is generated we simply clean the _a trace
-                    $location.search('_a', null)
+                    console.log(error.message || error); // not blocking action
                 }
                 let id = null;
 
