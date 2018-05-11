@@ -32,8 +32,8 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         toggleOnlyParents(value){
-            this.onlyParents = !value;
             this.reset();
+            this.onlyParents = !value;
             return this.nextPage();
         }
 
@@ -238,6 +238,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             this.busy            = false;
             this.ruleID          = null;
             this.decoderPosition = null;
+            this.onlyParents     = false;
         }
     }
 
