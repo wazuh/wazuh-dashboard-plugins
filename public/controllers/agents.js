@@ -164,7 +164,7 @@ app.controller('agentsController',
         // Switch tab
         $scope.switchTab = tab => {
             if ($scope.tab === tab) return;
-            
+
             if(tab !== 'configuration') {
                 $rootScope.rawVisualizations = null;
                 // Create current tab visualizations
@@ -201,7 +201,11 @@ app.controller('agentsController',
             const str = $location.search()._a;
             if(str){
                 const decoded   = rison.decode(str);
-                const tmp       = decoded.filters.filter(item => !item.query.match['rule.groups']);
+                const tmp       = decoded.filters.filter(item => !(
+                                        (item.query && item.query.match && item.query.match['rule.groups']) ||
+                                        (item.exists && item.exists.field === 'rule.pci_dss'))
+                                );
+                                
                 decoded.filters = tmp;
                 const encoded   = rison.encode(decoded);
                 $location.search('_a', encoded)
