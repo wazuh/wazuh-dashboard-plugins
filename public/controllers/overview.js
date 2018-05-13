@@ -14,7 +14,8 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq) {
+app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq,$window) {
+
     $rootScope.rawVisualizations = null;
 
     $rootScope.page = 'overview';
@@ -210,7 +211,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
             checkMetrics(tab, 'panels');
 
             // Deleting app state traces in the url
-            $location.search('_a', null);
+            //$location.search('_a', null);
 
         })
         .catch(error => errorHandler.handle(error, 'Overview'));

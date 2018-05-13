@@ -44,7 +44,7 @@ import 'ui/pager_control';
 import 'ui/pager';
 import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
 import { documentationLinks } from 'ui/documentation_links/documentation_links';
-
+import chrome from 'ui/chrome'
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -758,8 +758,26 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   function loadFilters() {
-    if ($scope.tab) {
-      let implicitFilter = [];
+    if($scope.tab !== 'general' && !$rootScope.currentImplicitFilter) {
+      return;
+    }
+
+
+    if ($scope.tab) {      
+      const current = queryFilter.getFilters();
+      const implicitFilter = [];
+      for(const item of current){
+        if((item && item.query && item.query.match && item.query.match['rule.groups']) || 
+           (item && item.query && item.query.match && item.query.match['agent.id']) ||
+           (item && item.query && item.query.match && item.query.match['manager.name']) ||
+           (item && item.exists && item.exists.field && item.exists.field === 'rule.pci_dss'))
+          continue;
+        else 
+          implicitFilter.push(item)
+      }
+
+      queryFilter.removeAll()
+
 
       if (appState.getClusterInfo().status == 'enabled') {
         // The cluster filter
@@ -906,10 +924,13 @@ function discoverController(
             }
           );
         }
-      }
-
-      queryFilter.addFilters(implicitFilter);
-    }
+      }      
+      
+      queryFilter.addFilters(implicitFilter).then(data => {
+        if($rootScope.page === 'agents') $rootScope.wazuhLoadFilters = !$rootScope.wazuhLoadFilters        
+      });
+      
+    } 
   }
 
   // Getting the location from the url
@@ -918,11 +939,10 @@ function discoverController(
   if ($rootScope.page === 'agents') $scope.agentId = $location.search().agent;
 
   // Initial loading of filters
- loadFilters(); 
+  loadFilters(); 
 
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
-
     if ($location.search().tabView !=  $scope.tabView) { // No need to change the filters
       if ($scope.tabView !== "discover") { // Should do this the first time, to avoid the squeezing of the visualization
         $scope.updateQueryAndFetch($state.query);

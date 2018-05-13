@@ -13,10 +13,10 @@ import { FilterBarLibChangeTimeFilterProvider } from 'ui/filter_bar/lib/change_t
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { compareFilters } from 'ui/filter_bar/lib/compare_filters';
 import { uiModules } from 'ui/modules';
-
+import rison from 'rison'
 const module = uiModules.get('kibana');
 
-module.directive('filterBarW', function (Private, Promise, getAppState) {
+module.directive('filterBarW', function (Private, Promise, getAppState,$location, $rootScope) {
   const mapAndFlattenFilters = Private(FilterBarLibMapAndFlattenFiltersProvider);
   const mapFlattenAndWrapFilters = Private(FilterBarLibMapFlattenAndWrapFiltersProvider);
   const extractTimeFilter = Private(FilterBarLibExtractTimeFilterProvider);
@@ -96,8 +96,16 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
 
       // update the scope filter list on filter changes
       $scope.$listen(queryFilter, 'update', function () {
-        updateFilters();
+        if(queryFilter.getFilters().length) updateFilters();
       });
+
+      $scope.$watch('wazuhLoadFilters',() => {
+        if(queryFilter.getFilters().length) updateFilters();
+      })
+
+      $rootScope.$watch('completedAgent',() => {
+        if(queryFilter.getFilters().length) updateFilters();
+      })
 
       // when appState changes, update scope's state
       $scope.$watch(getAppState, function (appState) {
@@ -106,7 +114,7 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
 
       $scope.$watch('state.$newFilters', function (filters) {
         if (!filters) return;
-
+        
         // If filters is not undefined and the length is greater than
         // one we need to set the newFilters attribute and allow the
         // users to decide what they want to apply.
@@ -157,6 +165,7 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
 
       function updateFilters() {
         const filters = queryFilter.getFilters();
+        if(!queryFilter.getFilters().length || ($rootScope.page === 'agents' && !$rootScope.completedAgent)) return;
         mapAndFlattenFilters(filters).then(function (results) {
           // used to display the current filters in the state
           $scope.filters = _.sortBy(results, function (filter) {

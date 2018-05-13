@@ -15,9 +15,10 @@ import rison        from 'rison'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController',
-    function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler) {
-
+app.controller('agentsController', function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, $window) {
+        $window.sessionStorage.setItem('lasta',$location.search()._a)
+        $rootScope.completedAgent = false;
+        $rootScope.wazuhLoadFilters =false;
         $rootScope.page = 'agents';
         $scope.extensions = appState.getExtensions().extensions;
         $scope.agentsAutoComplete = AgentsAutoComplete;
@@ -198,18 +199,6 @@ app.controller('agentsController',
         });
 
         $scope.$watch('tab', () => {
-            const str = $location.search()._a;
-            if(str){
-                const decoded   = rison.decode(str);
-                const tmp       = decoded.filters.filter(item => !(
-                                        (item.query && item.query.match && item.query.match['rule.groups']) ||
-                                        (item.exists && item.exists.field === 'rule.pci_dss'))
-                                );
-                                
-                decoded.filters = tmp;
-                const encoded   = rison.encode(decoded);
-                $location.search('_a', encoded)
-            }
             $location.search('tab', $scope.tab);
 
             $scope.tabView = 'panels';
@@ -226,7 +215,6 @@ app.controller('agentsController',
             // Update the implicit filter
             if (typeof tabFilters[$scope.tab] !== 'undefined' && tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
             else $rootScope.currentImplicitFilter = (typeof tabFilters[$scope.tab] !== 'undefined') ? tabFilters[$scope.tab].group : '';
-
             if($scope.tab === 'configuration'){
                 firstLoad();
             }
@@ -285,48 +273,26 @@ app.controller('agentsController',
 
         /** Prevents from double agent and come from autocomplete */
         let lastAgent = null;
-        const checkDouble = id => {
-            if(lastAgent && lastAgent !== id){
-                $rootScope.agentsAutoCompleteFired = true;
-                if(!$rootScope.$$phase) $rootScope.$digest();
-            }
-        }
+
 
         $scope.getAgent = async (newAgentId,fromAutocomplete) => {
             try {
+                $rootScope.completedAgent = false;
                 if($scope.tab === 'configuration'){
                     return $scope.getAgentConfig(newAgentId);
                 }
 
-                try {
-                    // Try to parse the _a trace and detect if there is any agent.id filter
-                    // in order to delete it from the _a trace
-                    const str = $location.search()._a;
-                    if(str){
-                        const decoded   = rison.decode(str);
-                        const tmp       = decoded.filters.filter(item => !item.query.match['agent.id']);
-                        decoded.filters = tmp;
-                        const encoded   = rison.encode(decoded);
-                        $location.search('_a', encoded)
-                    }
-                } catch (error) {
-                    // If some rison.js related error is generated we simply clean the _a trace
-                    console.log(error.message || error); // not blocking action
-                }
                 let id = null;
 
                 // They passed an id
                 if (newAgentId) {
                     id = newAgentId;
-                    checkDouble(id);
                     $location.search('agent', id);
                 } else {
                     if ($location.search().agent && !$rootScope.globalAgent) { // There's one in the url
                         id = $location.search().agent;
-                        checkDouble(id);
                     } else { // We pick the one in the rootScope
                         id = $rootScope.globalAgent;
-                        checkDouble(id);
                         $location.search('agent', id);
                         delete $rootScope.globalAgent;
                     }
@@ -359,6 +325,7 @@ app.controller('agentsController',
                 $scope.agent.rootcheck = data[2].data.data;
                 validateRootCheck();
 
+                $rootScope.completedAgent = true;
                 if(!$scope.$$phase) $scope.$digest();
                 return;
             } catch (error) {
@@ -377,7 +344,7 @@ app.controller('agentsController',
             }
             $rootScope.ownHandlers = [];
             $rootScope.comeFrom    = 'agents';
-            $location.search('_a',null);
+            //$location.search('_a',null);
             $location.search('tab', 'groups');
             $location.path('/manager');
         };
@@ -464,6 +431,7 @@ app.controller('agentsController',
 
         const firstLoad = async () => {
             try{
+                $rootScope.completedAgent = false;
                 $scope.configurationError = false;
                 $scope.load = true;
                 let id;
@@ -509,6 +477,7 @@ app.controller('agentsController',
                 $scope.isSynchronized = (($scope.agentMergedSum === $scope.groupMergedSum) && !([$scope.agentMergedSum,$scope.groupMergedSum].includes('Unknown')) ) ? true : false;
 
                 $scope.load = false;
+                $rootScope.completedAgent = true;
                 if(!$scope.$$phase) $scope.$digest();
                 return;
             } catch (error){
