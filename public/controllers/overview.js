@@ -15,9 +15,9 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq,$window) {
+app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq,$window) {
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
-    $rootScope.wzCurrentFilters = [];
+
     $rootScope.rawVisualizations = null;
 
     $rootScope.page = 'overview';
@@ -119,31 +119,38 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         aws       : { group: 'amazon' },
         virustotal: { group: 'virustotal' }
     };
-
+    
     let filters = []
 
     const assignFilters = tab => {
-        filters = [];
+        try{
 
-        filters.push(filterHandler.managerQuery(
-            appState.getClusterInfo().status == 'enabled' ? 
-            appState.getClusterInfo().cluster : 
-            appState.getClusterInfo().manager
-        ))
-
-        if(tab !== 'general'){
-            if(tab === 'pci') {
-                filters.push(filterHandler.pciQuery())
-            } else {
-                filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
+            filters = [];
+    
+            filters.push(filterHandler.managerQuery(
+                appState.getClusterInfo().status == 'enabled' ? 
+                appState.getClusterInfo().cluster : 
+                appState.getClusterInfo().manager
+            ))
+    
+            if(tab !== 'general'){
+                if(tab === 'pci') {
+                    filters.push(filterHandler.pciQuery())
+                } else {
+                    filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
+                }
             }
+            $rootScope.$emit('wzEventFilters',{filters});
+            if(!$rootScope.$$listenerCount['wzEventFilters']){
+                $timeout(100)
+                .then(() => assignFilters(tab))
+            }
+        } catch(error) {
+            console.log(error.message || error)
         }
-        
-        $rootScope.wzCurrentFilters = filters;
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
-    assignFilters($scope.tab);
+    assignFilters($location.search().tab || 'general');
 
     const generateMetric = id => {
         let html = $(id).html();
@@ -223,7 +230,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-
+        assignFilters(tab);
         $rootScope.rawVisualizations = null;
 
         // Create current tab visualizations
@@ -271,10 +278,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.ownHandlers = [];
 
         $rootScope.loadedVisualizations = [];
-        assignFilters($scope.tab);
     });
 
     $scope.$on('$destroy', () => {
+        $rootScope.wzEventFilters = [];
         $rootScope.rawVisualizations = null;
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
@@ -283,7 +290,6 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         }
 
         $rootScope.ownHandlers = [];
-        $rootScope.wzCurrentFilters = [];
     });
 
     // Create visualizations for controller's first execution

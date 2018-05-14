@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 import rison from 'rison'
 const module = uiModules.get('kibana');
 
-module.directive('filterBarW', function (Private, Promise, getAppState,$location, $rootScope) {
+module.directive('filterBarW', function ($timeout, Private, Promise, getAppState,$location, $rootScope) {
   const mapAndFlattenFilters = Private(FilterBarLibMapAndFlattenFiltersProvider);
   const mapFlattenAndWrapFilters = Private(FilterBarLibMapFlattenAndWrapFiltersProvider);
   const extractTimeFilter = Private(FilterBarLibExtractTimeFilterProvider);
@@ -96,13 +96,8 @@ module.directive('filterBarW', function (Private, Promise, getAppState,$location
 
       // update the scope filter list on filter changes
       $scope.$listen(queryFilter, 'update', function () {
-        if(queryFilter.getFilters().length) updateFilters();
+        updateFilters();
       });
-
-      $rootScope.$watch('wzWaitForAgent',() => {
-        console.log('Debug wzWaitForAgent')
-        if(queryFilter.getFilters().length) updateFilters();
-      })
 
       // when appState changes, update scope's state
       $scope.$watch(getAppState, function (appState) {
@@ -162,7 +157,6 @@ module.directive('filterBarW', function (Private, Promise, getAppState,$location
 
       function updateFilters() {
         const filters = queryFilter.getFilters();
-        if(!queryFilter.getFilters().length || ($rootScope.page === 'agents' && !$rootScope.completedAgent)) return;
         mapAndFlattenFilters(filters).then(function (results) {
           // used to display the current filters in the state
           $scope.filters = _.sortBy(results, function (filter) {
@@ -170,6 +164,7 @@ module.directive('filterBarW', function (Private, Promise, getAppState,$location
           });
           $scope.$emit('filterbar:updated');
         });
+        
       }
 
       updateFilters();
