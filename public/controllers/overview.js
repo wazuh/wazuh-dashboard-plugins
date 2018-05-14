@@ -92,9 +92,6 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     } else { // If tab doesn't exist, default it to 'general'
         $scope.tab = 'general';
         $location.search('tab', 'general');
-
-        // Now we initialize the implicitFilter
-        $rootScope.currentImplicitFilter = "";
     }
 
     // This object represents the number of visualizations per tab; used to show a progress bar
