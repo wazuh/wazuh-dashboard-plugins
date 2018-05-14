@@ -9,12 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import $            from 'jquery';
-import * as modules from 'ui/modules'
+import $             from 'jquery';
+import * as modules  from 'ui/modules'
+import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq,$window) {
+    const filterHandler = new FilterHandler(appState.getCurrentPattern());
 
     $rootScope.rawVisualizations = null;
 
@@ -121,6 +123,31 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         virustotal: { group: 'virustotal' }
     };
 
+    let filters = []
+
+    const assignFilters = tab => {
+        filters = [];
+
+        filters.push(filterHandler.managerQuery(
+            appState.getClusterInfo().status == 'enabled' ? 
+            appState.getClusterInfo().cluster : 
+            appState.getClusterInfo().manager
+        ))
+
+        if(tab !== 'general'){
+            if(tab === 'pci') {
+                filters.push(filterHandler.pciQuery())
+            } else {
+                filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
+            }
+        }
+        
+        $rootScope.wzCurrentFilters = filters;
+        if(!$rootScope.$$phase) $rootScope.$digest();
+    }
+
+    assignFilters($scope.tab);
+
     const generateMetric = id => {
         let html = $(id).html();
         if (typeof html !== 'undefined' && html.includes('<span')) {
@@ -199,6 +226,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
+        assignFilters(tab);
         $rootScope.rawVisualizations = null;
 
         // Create current tab visualizations
@@ -246,10 +274,6 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.ownHandlers = [];
 
         $rootScope.loadedVisualizations = [];
-
-        // Update the implicit filter
-        if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
-        else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
     });
 
     $scope.$on('$destroy', () => {
