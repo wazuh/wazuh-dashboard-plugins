@@ -214,7 +214,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     // We watch the resultState provided by the discover
     $scope.$watch('tabView', () => {
         $location.search('tabView', $scope.tabView);
-
+        $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();

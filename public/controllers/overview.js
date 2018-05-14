@@ -252,7 +252,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     // Watch tabView
     $scope.$watch('tabView', () => {
         $location.search('tabView', $scope.tabView);
-
+        $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
