@@ -782,7 +782,7 @@ function discoverController(
   });
 
   
-  $scope.tabView = $location.search('tabView')
+  $scope.tabView = $location.search().tabView || 'panels'
   $rootScope.$on('changeTabView',(evt,parameters) => {
     $scope.tabView = parameters.tabView || 'panels'
   })
