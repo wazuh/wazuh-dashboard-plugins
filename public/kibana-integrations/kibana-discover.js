@@ -757,180 +757,24 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  function loadFilters() {
-    if($scope.tab !== 'general' && !$rootScope.currentImplicitFilter) {
-      return;
+  const loadFilters = () => {
+    const filters       = queryFilter.getFilters();
+    const shouldPersist = [];
+    for(const item of filters){
+      if((item && item.query && item.query.match && item.query.match['rule.groups']) || 
+         (item && item.query && item.query.match && item.query.match['agent.id']) ||
+         (item && item.query && item.query.match && item.query.match['manager.name']) ||
+         (item && item.exists && item.exists.field && item.exists.field === 'rule.pci_dss'))
+        continue;
+      else 
+        shouldPersist.push(item)
     }
-
-
-    if ($scope.tab) {      
-      const current = queryFilter.getFilters();
-      const implicitFilter = [];
-      for(const item of current){
-        if((item && item.query && item.query.match && item.query.match['rule.groups']) || 
-           (item && item.query && item.query.match && item.query.match['agent.id']) ||
-           (item && item.query && item.query.match && item.query.match['manager.name']) ||
-           (item && item.exists && item.exists.field && item.exists.field === 'rule.pci_dss'))
-          continue;
-        else 
-          implicitFilter.push(item)
-      }
-
-      queryFilter.removeAll()
-
-
-      if (appState.getClusterInfo().status == 'enabled') {
-        // The cluster filter
-        implicitFilter.push(
-          {
-            "meta":{
-              "removable":false,
-              "index":$scope.indexPattern.id,
-              "negate":false,
-              "disabled":false,
-              "alias":null,
-              "type":"phrase",
-              "key":"cluster.name",
-              "value":appState.getClusterInfo().cluster,
-              "params":{
-                "query":appState.getClusterInfo().cluster,
-                "type":"phrase"}
-            },
-            "query":{
-              "match":{
-                "cluster.name":{
-                  "query":appState.getClusterInfo().cluster,
-                  "type":"phrase"}
-                }
-            },
-            "$state":{
-              "store":"appState"
-            }
-          }
-        );
-      } else {
-        // Manager name filter
-        implicitFilter.push(
-          {
-            "meta":{
-              "removable":false,
-              "index":$scope.indexPattern.id,
-              "negate":false,
-              "disabled":false,
-              "alias":null,
-              "type":"phrase",
-              "key":"manager.name",
-              "value":appState.getClusterInfo().manager,
-              "params":{
-                "query":appState.getClusterInfo().manager,
-                "type":"phrase"}
-            },
-            "query":{
-              "match":{
-                "manager.name":{
-                  "query":appState.getClusterInfo().manager,
-                  "type":"phrase"}
-                }
-            },
-            "$state":{
-              "store":"appState"
-            }
-          }
-        );
-      }
-
-      // Check if we are in the agents page and add the proper agent filter
-      if ($rootScope.page === 'agents' && $location.search().agent !== "" && $location.search().agent !== null && angular.isUndefined($location.search().agent) !== true) {
-        implicitFilter.push(
-          {
-            "meta":{
-              "removable":false,
-              "index":$scope.indexPattern.id,
-              "negate":false,
-              "disabled":false,
-              "alias":null,
-              "type":"phrase",
-              "key":"agent.id",
-              "value":$location.search().agent,
-              "params":{
-                "query":$location.search().agent,
-                "type":"phrase"}
-            },
-            "query":{
-              "match":{
-                "agent.id":{
-                  "query":$location.search().agent,
-                  "type":"phrase"}
-                }
-            },
-            "$state":{
-              "store":"appState"
-            }
-          }
-        );
-      }
-
-      // Build the full query using the implicit filter
-      if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
-        if ($rootScope.currentImplicitFilter === "pci_dss") {
-          implicitFilter.push(
-            {
-              "meta":{
-                "removable":false,
-                "index":$scope.indexPattern.id,
-                "negate":false,
-                "disabled":false,
-                "alias":null,
-                "type":"exists",
-                "key":"rule.pci_dss",
-                "value":"exists"
-              },
-              "exists":{
-                "field":"rule.pci_dss"
-              },
-              "$state":{
-                "store":"appState"
-              }
-            }
-          );
-        } else {
-          implicitFilter.push(
-            {
-              "meta":{
-                "removable":false,
-                "index":$scope.indexPattern.id,
-                "negate":false,
-                "disabled":false,
-                "alias":null,
-                "type":"phrase",
-                "key":"rule.groups",
-                "value":$rootScope.currentImplicitFilter,
-                "params":{
-                    "query":$rootScope.currentImplicitFilter,
-                    "type":"phrase"
-                }
-              },
-              "query":{
-                "match":{
-                  "rule.groups":{
-                    "query":$rootScope.currentImplicitFilter,
-                    "type":"phrase"
-                  }
-                }
-              },
-              "$state":{
-                "store":"appState"
-              }
-            }
-          );
-        }
-      }      
-      
-      queryFilter.addFilters(implicitFilter).then(data => {
-        if($rootScope.page === 'agents') $rootScope.wazuhLoadFilters = !$rootScope.wazuhLoadFilters        
-      });
-      
-    } 
+    queryFilter.removeAll();
+    const currentFilters = $rootScope.wzCurrentFilters;
+    const total = [...currentFilters,...shouldPersist]
+    queryFilter.addFilters(total)
+    .then(() => console.log('filters loaded'))
+    .catch(error => console.log(error.message || error));
   }
 
   // Getting the location from the url
@@ -939,24 +783,14 @@ function discoverController(
   if ($rootScope.page === 'agents') $scope.agentId = $location.search().agent;
 
   // Initial loading of filters
-  loadFilters(); 
+  //loadFilters(); 
 
   // Watch for changes in the location
-  $scope.$on('$routeUpdate', () => {
-    if ($location.search().tabView !=  $scope.tabView) { // No need to change the filters
-      if ($scope.tabView !== "discover") { // Should do this the first time, to avoid the squeezing of the visualization
-        $scope.updateQueryAndFetch($state.query);
-      }
-      $scope.tabView = $location.search().tabView;
-    }
-    if ($location.search().tab !=  $scope.tab) { // Changing filters
-      $scope.tab = $location.search().tab;
-    }
-    
-    if ($location.search().agent !=  $scope.agentId) { // Changing filters
-      $scope.agentId = $location.search().agent;
-    }
-    if ($location.search().tabView ===  $scope.tabView) loadFilters();
+  $rootScope.$watch('wzCurrentFilters', () => {
+    console.log('---------------------------------------')
+    console.log($rootScope.wzCurrentFilters);
+    console.log('---------------------------------------')
+    loadFilters();
   });
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
