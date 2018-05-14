@@ -95,25 +95,32 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
     let filters = []
     const assignFilters = (tab,agent) => {
-        filters = [];
+        try {
+            filters = [];
 
-        filters.push(filterHandler.managerQuery(
-            appState.getClusterInfo().status == 'enabled' ? 
-            appState.getClusterInfo().cluster : 
-            appState.getClusterInfo().manager
-        ))
-
-        if(tab !== 'general'){
-            if(tab === 'pci') {
-                filters.push(filterHandler.pciQuery())
-            } else {
-                filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
+            filters.push(filterHandler.managerQuery(
+                appState.getClusterInfo().status == 'enabled' ? 
+                appState.getClusterInfo().cluster : 
+                appState.getClusterInfo().manager
+            ))
+    
+            if(tab !== 'general'){
+                if(tab === 'pci') {
+                    filters.push(filterHandler.pciQuery())
+                } else {
+                    filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
+                }
             }
+    
+            filters.push(filterHandler.agentQuery(agent));
+            $rootScope.$emit('wzEventFilters',{filters});
+            if(!$rootScope.$$listenerCount['wzEventFilters']){
+                $timeout(100)
+                .then(() => assignFilters(tab,agent))
+            }
+        } catch (error){
+            console.log(error.message || error)
         }
-
-        filters.push(filterHandler.agentQuery(agent));
-        $rootScope.wzCurrentFilters = filters;
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     const generateMetric = id => {
@@ -185,7 +192,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-
+        assignFilters(tab, $scope.agent.id);
         if(tab !== 'configuration') {
             $rootScope.rawVisualizations = null;
             // Create current tab visualizations
@@ -219,6 +226,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     });
 
     $scope.$watch('tab', () => {
+
         $location.search('tab', $scope.tab);
         $scope.tabView = 'panels';
 
@@ -233,14 +241,9 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
         if($scope.tab === 'configuration'){
             firstLoad();
-        } else {
-            if($scope.agent) assignFilters($scope.tab,$scope.agent.id);
         }
-    });
 
-    $scope.$watch('agent',() => {
-        if($scope.agent) assignFilters($scope.tab,$scope.agent.id);
-    })
+    });
 
     // Agent data
     $scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "teal" : "red";
@@ -320,6 +323,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
                 }
             }
 
+
             if (id === '000' && $scope.tab === 'configuration') {
                 $scope.tab = 'general';
                 $scope.switchTab('general');
@@ -348,7 +352,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
             validateRootCheck();
 
             $rootScope.completedAgent = true;
-
+            assignFilters($scope.tab, id);
+            //assignFilters($location.search().tab,$location.search().agent);
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
@@ -358,6 +363,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     };
 
     $scope.goGroups = agent => {
+        $rootScope.wzCurrentFilters = [];
         $rootScope.globalAgent = agent;
         $scope.agentsAutoComplete.reset();
         if($rootScope.ownHandlers) {
@@ -400,6 +406,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
     //Destroy
     $scope.$on("$destroy", () => {
+        delete $rootScope.wzWaitForAgent;
+        $location.search('_a',null)
         $rootScope.rawVisualizations = null;
         $scope.agentsAutoComplete.reset();
         if($rootScope.ownHandlers) {
@@ -447,10 +455,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     }
 
     $scope.goGroup = () => {
+        delete $rootScope.wzWaitForAgent;
         $rootScope.globalAgent = $scope.agent;
         $rootScope.comeFrom    = 'agents';
-        $location.search('tab', 'groups');
-        $location.path('/manager');
+        $location.path('/manager/groups');
     };
 
     const firstLoad = async () => {
@@ -466,6 +474,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
                 $location.search('agent', id);
                 delete $rootScope.globalAgent;
             }
+
             let data         = await apiReq.request('GET', `/agents/${id}`, {});
             $scope.agent     = data.data.data;
             $scope.groupName = $scope.agent.group;

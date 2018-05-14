@@ -115,7 +115,9 @@ function discoverController(
   timefilter,
   appState,
   $rootScope,
-  $location
+  $location,
+  getAppState,
+  globalState
 ) {
 
   const Vis = Private(VisProvider);
@@ -757,52 +759,30 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const loadFilters = () => {
-    const filters       = queryFilter.getFilters();
-    const shouldPersist = [];
-    for(const item of filters){
-      if((item && item.query && item.query.match && item.query.match['rule.groups']) || 
-         (item && item.query && item.query.match && item.query.match['agent.id']) ||
-         (item && item.query && item.query.match && item.query.match['manager.name']) ||
-         (item && item.exists && item.exists.field && item.exists.field === 'rule.pci_dss'))
-        continue;
-      else 
-        shouldPersist.push(item)
+  const loadFilters = wzCurrentFilters => {
+    const appState = getAppState();
+    if(!appState || !globalState){
+      $timeout(100)
+      .then(() => {
+        console.log('Awaiting app state...')
+        return loadFilters(wzCurrentFilters)
+      })
+    } else {
+      $state.filters = [];
+
+      queryFilter.addFilters(wzCurrentFilters)
+      .then(() => console.log('Filters loaded successfully'))
+      .catch(error => console.log(error.message || error));
     }
-    console.log('Debug 1')
-    queryFilter.removeAll();
-    console.log('Debug 2')
-    console.log('should',shouldPersist)
-    const currentFilters = $rootScope.wzCurrentFilters;
-    console.log('current',currentFilters)
-    const total = [...currentFilters,...shouldPersist]
-    console.log('total',total)
-    queryFilter.addFilters(total)
-    .then(() => {
-      if($rootScope.page && $rootScope.page === 'agents'){
-        console.log('Assign random value')
-        $rootScope.wzWaitForAgent = new Date().toISOString();
-      }
-    })
-    .catch(error => console.log(error.message || error));
+
+
   }
 
-  // Getting the location from the url
-  $scope.tabView = $location.search().tabView;
-  $scope.tab = $location.search().tab;
-  if ($rootScope.page === 'agents') $scope.agentId = $location.search().agent;
-
-  // Initial loading of filters
-  //loadFilters(); 
-
   // Watch for changes in the location
-  $rootScope.$watch('wzCurrentFilters', () => {
-    console.log('---------------------------------------')
-    console.log($rootScope.wzCurrentFilters);
-    if(!$rootScope.wzCurrentFilters || !$rootScope.wzCurrentFilters.length) return;
-    console.log('---------------------------------------')
-    loadFilters();
+  $rootScope.$on('wzEventFilters', (evt,parameters) => {
+    loadFilters(parameters.filters);
   });
+
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
