@@ -99,6 +99,11 @@ module.directive('filterBarW', function (Private, Promise, getAppState,$location
         if(queryFilter.getFilters().length) updateFilters();
       });
 
+      $rootScope.$watch('wzWaitForAgent',() => {
+        console.log('Debug wzWaitForAgent')
+        if(queryFilter.getFilters().length) updateFilters();
+      })
+
       // when appState changes, update scope's state
       $scope.$watch(getAppState, function (appState) {
         $scope.state = appState;

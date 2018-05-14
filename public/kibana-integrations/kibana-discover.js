@@ -769,11 +769,21 @@ function discoverController(
       else 
         shouldPersist.push(item)
     }
+    console.log('Debug 1')
     queryFilter.removeAll();
+    console.log('Debug 2')
+    console.log('should',shouldPersist)
     const currentFilters = $rootScope.wzCurrentFilters;
+    console.log('current',currentFilters)
     const total = [...currentFilters,...shouldPersist]
+    console.log('total',total)
     queryFilter.addFilters(total)
-    .then(() => console.log('filters loaded'))
+    .then(() => {
+      if($rootScope.page && $rootScope.page === 'agents'){
+        console.log('Assign random value')
+        $rootScope.wzWaitForAgent = new Date().toISOString();
+      }
+    })
     .catch(error => console.log(error.message || error));
   }
 
@@ -789,6 +799,7 @@ function discoverController(
   $rootScope.$watch('wzCurrentFilters', () => {
     console.log('---------------------------------------')
     console.log($rootScope.wzCurrentFilters);
+    if(!$rootScope.wzCurrentFilters || !$rootScope.wzCurrentFilters.length) return;
     console.log('---------------------------------------')
     loadFilters();
   });

@@ -17,7 +17,7 @@ const app = modules.get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq,$window) {
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
-
+    $rootScope.wzCurrentFilters = [];
     $rootScope.rawVisualizations = null;
 
     $rootScope.page = 'overview';
@@ -223,7 +223,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Switch tab
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
-        assignFilters(tab);
+
         $rootScope.rawVisualizations = null;
 
         // Create current tab visualizations
@@ -271,6 +271,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         $rootScope.ownHandlers = [];
 
         $rootScope.loadedVisualizations = [];
+        assignFilters($scope.tab);
     });
 
     $scope.$on('$destroy', () => {
@@ -282,6 +283,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         }
 
         $rootScope.ownHandlers = [];
+        $rootScope.wzCurrentFilters = [];
     });
 
     // Create visualizations for controller's first execution
