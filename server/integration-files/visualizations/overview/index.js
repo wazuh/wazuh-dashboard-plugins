@@ -15,8 +15,9 @@ import fim        from './overview-fim'
 import general    from './overview-general'
 import oscap      from './overview-oscap'
 import pci        from './overview-pci'
+import gdpr       from './overview-gdpr'
 import pm         from './overview-pm'
 import virustotal from './overview-virustotal'
 import vuls       from './overview-vuls'
 
-export { audit, aws, fim, general, oscap, pci, pm, virustotal, vuls }
+export { audit, aws, fim, general, oscap, pci, gdpr, pm, virustotal, vuls }
