@@ -17,7 +17,7 @@ const app = modules.get('app/wazuh', []);
 
 app.controller('agentsController', function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, $window) {
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
-    
+    $rootScope.wzCurrentFilters = [];
     $rootScope.completedAgent = false;
     $rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
@@ -186,7 +186,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     $scope.switchTab = tab => {
         if ($scope.tab === tab) return;
 
-        assignFilters(tab);
         if(tab !== 'configuration') {
             $rootScope.rawVisualizations = null;
             // Create current tab visualizations
@@ -221,7 +220,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
     $scope.$watch('tab', () => {
         $location.search('tab', $scope.tab);
-
         $scope.tabView = 'panels';
 
         if ($rootScope.ownHandlers) {
@@ -235,8 +233,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
         if($scope.tab === 'configuration'){
             firstLoad();
+        } else {
+            if($scope.agent) assignFilters($scope.tab,$scope.agent.id);
         }
     });
+
+    $scope.$watch('agent',() => {
+        if($scope.agent) assignFilters($scope.tab,$scope.agent.id);
+    })
 
     // Agent data
     $scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "teal" : "red";
@@ -343,7 +347,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
             $scope.agent.rootcheck = data[2].data.data;
             validateRootCheck();
 
-            assignFilters($scope.tab,id)
             $rootScope.completedAgent = true;
 
             if(!$scope.$$phase) $scope.$digest();
@@ -405,6 +408,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
             }
         }
         $rootScope.ownHandlers = [];
+        $rootScope.wzCurrentFilters = [];
     });
 
     //PCI tab
@@ -497,8 +501,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
             $scope.isSynchronized = (($scope.agentMergedSum === $scope.groupMergedSum) && !([$scope.agentMergedSum,$scope.groupMergedSum].includes('Unknown')) ) ? true : false;
 
             $scope.load = false;
-            
-            assignFilters($scope.tab,$scope.agent.id)
+
             $rootScope.completedAgent = true;
 
             if(!$scope.$$phase) $scope.$digest();
