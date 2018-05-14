@@ -528,7 +528,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         .then(data => {
             $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
-            $rootScope.$broadcast('updateVis');
+            //$rootScope.$broadcast('updateVis');
 
             checkMetrics($scope.tab,'panels');
         })

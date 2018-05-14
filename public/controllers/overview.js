@@ -297,7 +297,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     .then(data => {
         $rootScope.rawVisualizations = data.data.raw;
         // Render visualizations
-        $rootScope.$broadcast('updateVis');
+        //$rootScope.$broadcast('updateVis');
 
         checkMetrics($scope.tab, $scope.tabView);
     })
