@@ -55,6 +55,20 @@
         </md-card>
         <!-- End PCI section -->
 
+        <!-- GDPR section -->
+        <md-card ng-if="currentRule.gdpr.length > 0" flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> GDPR</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" layout-align="start start">
+                    <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentRule.gdpr" ng-click="addDetailFilter('gdpr', item)">
+                        {{item}}
+                    </md-button>
+                </div>
+            </md-card-content>
+        </md-card>
+        <!-- End GDPR section -->
+
         <!-- Details section -->
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
@@ -199,9 +213,10 @@
                 keys="[
                     {col:'id',size:5},
                     {col:'file',size:15},
-                    {col:'description',size:35},
+                    {col:'description',size:30},
                     {col:'groups',size:25},
-                    {col:'pci',size:15},
+                    {col:'pci',size:10},
+                    {col:'gdpr',size:10},
                     {col:'level',size:5}
                 ]"
                 isruleset="true"

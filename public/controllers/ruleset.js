@@ -61,7 +61,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
     });
 
     $scope.analyzeRules = async search => {
-        
+
         try {
             if(search && search.length <= 1) return $scope.rulesAutoComplete.items;
             await $timeout(200);
@@ -73,6 +73,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
                 await $scope.rulesAutoComplete.addFilter('level',search.split('level:')[1].trim());
             } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
                 await $scope.rulesAutoComplete.addFilter('pci',search.split('pci:')[1].trim());
+            } else if(search.startsWith('gdpr:') && search.split('gdpr:')[1].trim()) {
+                await $scope.rulesAutoComplete.addFilter('gdpr',search.split('gdpr:')[1].trim());
             } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
                 await $scope.rulesAutoComplete.addFilter('file',search.split('file:')[1].trim());
             } else {
@@ -96,6 +98,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
             $scope.rules.addFilter('level',search.split('level:')[1].trim());
         } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
             $scope.rules.addFilter('pci',search.split('pci:')[1].trim());
+        } else if(search.startsWith('gdpr:') && search.split('gdpr:')[1].trim()) {
+            $scope.rules.addFilter('gdpr',search.split('gdpr:')[1].trim());
         } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
             $scope.rules.addFilter('file',search.split('file:')[1].trim());
         } else if(search.startsWith('path:') && search.split('path:')[1].trim()) {

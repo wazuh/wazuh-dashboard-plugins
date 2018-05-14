@@ -34,6 +34,7 @@
                     <ul>
                         <li>Linux Audit system integration</li>
                         <li>PCI DSS Compliance</li>
+                        <li>GDPR Compliance</li>
                         <li>OpenSCAP security compliance and vulnerability assessments</li>
                         <li>Amazon Web Services (AWS) integration</li>
                         <li>VirusTotal integration</li>
@@ -201,11 +202,7 @@
                 <div class="wz-padding-top-10">
                     <div layout="row" layout-align="space-between center" class="wz-text-bold">PCI DSS</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
-                        The Payment Card Industry Data Security Standard (PCI DSS) is a proprietary information security standard for organizations
-                        that handle branded credit cards from the major card schemes including Visa, MasterCard, American Express,
-                        Discover, and JCB. The PCI Standard is mandated by the card brands and administered by the Payment Card
-                        Industry Security Standards Council. The standard was created to increase controls around cardholder
-                        data to reduce credit card fraud.
+                        The Payment Card Industry Data Security Standard (PCI DSS) is a proprietary information security standard for organizations that handle branded credit cards from the major card schemes including Visa, MasterCard, American Express, Discover, and JCB. The PCI Standard is mandated by the card brands and administered by the Payment Card Industry Security Standards Council. The standard was created to increase controls around cardholder data to reduce credit card fraud.
                     </div>
                     <div layout="row" layout-align="space-between center">
                         <md-switch flex ng-model="extensions.pci" aria-label="extensionsPci" ng-change="toggleExtension('pci',extensions.pci)"></md-switch>
@@ -214,10 +211,22 @@
                 </div>
 
                 <div class="wz-padding-top-10">
+                    <div layout="row" layout-align="space-between center" class="wz-text-bold">GDPR</div>
+                    <div layout="row" class="wz-padding-top-10 wz-line-height">
+                        The General Data Protection Regulation (GDPR) is a regulation in EU law on data protection and privacy for all individuals within the European Union. It also addresses the export of personal data outside the EU. The GDPR aims primarily to give control to citizens and residents over their personal data and to simplify the regulatory environment for international business by unifying the regulation within the EU.
+                    </div>
+                    <div layout="row" layout-align="space-between center">
+                        <md-switch flex ng-model="extensions.gdpr" aria-label="extensionsGdpr" ng-change="toggleExtension('gdpr',extensions.gdpr)"></md-switch>
+                    </div>
+                    <md-divider></md-divider>
+                </div>
+
+                <div class="wz-padding-top-10">
                     <div layout="row" layout-align="space-between center" class="wz-text-bold">OpenSCAP</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
                         OVAL (Open Vulnerability Assessment Language) interpreter used to check system configuration and detect vulnerable applications.
-                        <br> It is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.
+                        <br>
+                        It is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.
                     </div>
                     <div layout="row" layout-align="space-between center">
                         <md-switch flex ng-model="extensions.oscap" aria-label="extensionsOscap" ng-change="toggleExtension('oscap',extensions.oscap)"></md-switch>
@@ -228,9 +237,9 @@
                 <div class="wz-padding-top-10">
                     <div layout="row" layout-align="space-between center" class="wz-text-bold">Audit</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
-                        The Linux Audit system provides a way to track security-relevant information on your system. Based on pre-configured rules,
-                        Audit generates log entries to record as much information about the events that are happening on your
-                        system as possible.
+                        The Linux Audit system provides a way to track security-relevant information on your system.
+                        <br>
+                        Based on pre-configured rules, Audit generates log entries to record as much information about the events that are happening on your system as possible.
                     </div>
                     <div layout="row" layout-align="space-between center">
                         <md-switch flex ng-model="extensions.audit" aria-label="extensionsAudit" ng-change="toggleExtension('audit',extensions.audit)"></md-switch>
@@ -241,10 +250,9 @@
                 <div class="wz-padding-top-10">
                     <div layout="row" class="wz-text-bold">Amazon Web Services (AWS)</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
-                        Wazuh provides a way to collect alerts from your AWS machines and store them to an agent. Once the agent reads the message,
-                        it sends it to the Wazuh manager which analyses it with decoders and rules. When a rule matches, an alert
-                        is triggered if the rule severity is high enough. Wazuh can be used to alert on specific events from
-                        IAM, EC2 and VPC.
+                        Wazuh provides a way to collect alerts from your AWS machines and store them to an agent. Once the agent reads the message, it sends it to the Wazuh manager which analyses it with decoders and rules.
+                        <br>
+                        When a rule matches, an alert is triggered if the rule severity is high enough. Wazuh can be used to alert on specific events from IAM, EC2 and VPC.
                     </div>
                     <div layout="row" layout-align="space-between center">
                         <md-switch flex ng-model="extensions.aws" aria-label="extensionsAWS" ng-change="toggleExtension('aws',extensions.aws)"></md-switch>
@@ -255,9 +263,9 @@
                 <div class="wz-padding-top-10">
                     <div layout="row" layout-align="space-between center" class="wz-text-bold">VirusTotal</div>
                     <div layout="row" class="wz-padding-top-10 wz-line-height">
-                        VirusTotal is an online service that analyzes files and URLs enabling the detection of viruses, worms, trojans and other
-                        kinds of malicious content using antivirus engines and website scanners. It also can be used to detect
-                        false positives.
+                        VirusTotal is an online service that analyzes files and URLs enabling the detection of viruses, worms, trojans and other kinds of malicious content using antivirus engines and website scanners.
+                        <br>
+                        It also can be used to detect false positives.
                     </div>
                     <div layout="row" layout-align="space-between center">
                         <md-switch flex ng-model="extensions.virustotal" aria-label="extensionsVirusTotal" ng-change="toggleExtension('virustotal',extensions.virustotal)"></md-switch>
@@ -310,6 +318,7 @@
                         <ul>
                             <li>Linux Audit system integration</li>
                             <li>PCI DSS Compliance</li>
+                            <li>GDPR Compliance</li>
                             <li>OpenSCAP security compliance and vulnerability assessments</li>
                             <li>Amazon Web Services (AWS) integration</li>
                             <li>VirusTotal integration</li>
