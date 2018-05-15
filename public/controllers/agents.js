@@ -15,8 +15,14 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates) {
+    $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
+    discoverPendingUpdates.removeAll();
+    rawVisualizations.removeAll();
+    tabVisualizations.removeAll();
+    loadedVisualizations.removeAll();
+
     $rootScope.completedAgent = false;
     $rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
@@ -95,6 +101,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     let filters = []
     const assignFilters = (tab,agent) => {
         try {
+            console.log(agent)
             filters = [];
 
             filters.push(filterHandler.managerQuery(
@@ -178,23 +185,20 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         }
         $rootScope.ownHandlers = [];
 
+        discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
+        loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
         $scope.tabView = subtab;
-        $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
-
-        assignFilters($scope.tab, $scope.agent.id);
 
         if(subtab === 'panels' && $scope.tab !== 'configuration'){
-            loadedVisualizations.removeAll();
-
-            rawVisualizations.removeAll();
-
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
+                assignFilters($scope.tab, $scope.agent.id);
+                $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
@@ -215,7 +219,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         if($scope.tab === 'configuration'){
             firstLoad();
         } else {
-            $scope.switchSubtab('panels',force);
+            $scope.switchSubtab('panels', true);
         }
     };
 
@@ -297,7 +301,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
             if (id === '000' && $scope.tab === 'configuration') {
                 $scope.tab = 'general';
-                $scope.switchTab('general');
+                discoverPendingUpdates.removeAll();
+                $scope.switchTab('general', true);
             }
 
             const data = await Promise.all([
@@ -376,10 +381,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
     //Destroy
     $scope.$on("$destroy", () => {
-        $rootScope.discoverPendingUpdates = [];
-        $location.search('_a',null)
+        discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         tabVisualizations.removeAll();
+        loadedVisualizations.removeAll();
         $scope.agentsAutoComplete.reset();
         if($rootScope.ownHandlers) {
             for(let h of $rootScope.ownHandlers){
@@ -455,7 +460,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
                 if($scope.agent.id === '000'){
                     $scope.configurationError = false;
                     $scope.tab = 'general';
-                    $scope.switchTab('general');
+                    $scope.switchTab('general', true);
                 }
                 if(!$scope.$$phase) $scope.$digest();
                 return;
@@ -481,8 +486,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
             $scope.load = false;
 
             $rootScope.completedAgent = true;
-
-            $scope.switchTab($scope.tab, true);
+            if($scope.tab !== 'configuration') $scope.switchTab($scope.tab, true);
             
             if(!$scope.$$phase) $scope.$digest();
             return;

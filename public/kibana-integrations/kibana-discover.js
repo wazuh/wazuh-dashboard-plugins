@@ -117,7 +117,8 @@ function discoverController(
   $location,
   getAppState,
   globalState,
-  loadedVisualizations
+  loadedVisualizations,
+  discoverPendingUpdates
 ) {
 
   const Vis = Private(VisProvider);
@@ -312,8 +313,8 @@ function discoverController(
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
-            $rootScope.discoverPendingUpdates = [];
-            $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
+            discoverPendingUpdates.removeAll()
+            discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
             $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
             if($location.search().tab != 'configuration') {
@@ -477,8 +478,8 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     const filters = queryFilter.getFilters();
     if(!filters || !filters.length) return;
-    $rootScope.discoverPendingUpdates = [];
-    $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
+    discoverPendingUpdates.removeAll()
+    discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
     $rootScope.$broadcast('fetch');
     ////////////////////////////////////////////////////////////////////////////
@@ -760,6 +761,7 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   const loadFilters = wzCurrentFilters => {
+    console.log(wzCurrentFilters)
     const appState = getAppState();
     if(!appState || !globalState){
       $timeout(100)

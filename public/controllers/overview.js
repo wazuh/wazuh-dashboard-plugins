@@ -15,10 +15,13 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations) {
+app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates) {
+    $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
-
+    discoverPendingUpdates.removeAll();
     rawVisualizations.removeAll();
+    tabVisualizations.removeAll();
+    loadedVisualizations.removeAll();
 
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
@@ -206,42 +209,43 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
 
     // Switch subtab
     $scope.switchSubtab = (subtab,force = false) => {
-        console.log($scope.tabView,subtab)
         if ($scope.tabView === subtab && !force) return;
+
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
+                console.log(h._scope)
             }
         }
         $rootScope.ownHandlers = [];
 
+        discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
+        loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
         $scope.tabView = subtab;
-        $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
 
-        assignFilters($scope.tab);
         if(subtab === 'panels'){
-            loadedVisualizations.removeAll();
-
-            rawVisualizations.removeAll();
-
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
+                assignFilters($scope.tab);
+                $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
             .catch(error => errorHandler.handle(error, 'Overview'));
         } else {
+            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
             checkMetrics($scope.tab, subtab);
         }
     }
 
     // Switch tab
     $scope.switchTab = (tab,force = false) => {
+        console.log('Entering switchTab',$scope.tab,tab)
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
 
@@ -252,9 +256,10 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     };
 
     $scope.$on('$destroy', () => {
-        $rootScope.discoverPendingUpdates = [];
+        discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         tabVisualizations.removeAll();
+        loadedVisualizations.removeAll();
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();

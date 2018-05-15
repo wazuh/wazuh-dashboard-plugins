@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Factory to store loaded visualizations
+ * Wazuh app - Factory to store visualization tabs
  * 
  * Copyright (C) 2018 Wazuh, Inc.
  *
