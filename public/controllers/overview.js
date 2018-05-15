@@ -15,7 +15,7 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates) {
+app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     discoverPendingUpdates.removeAll();
@@ -211,14 +211,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     $scope.switchSubtab = (subtab,force = false) => {
         if ($scope.tabView === subtab && !force) return;
 
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-                console.log(h._scope)
-            }
-        }
-        $rootScope.ownHandlers = [];
-
+        visHandlers.removeAll();
         discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
@@ -260,13 +253,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         rawVisualizations.removeAll();
         tabVisualizations.removeAll();
         loadedVisualizations.removeAll();
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-
-        $rootScope.ownHandlers = [];
+        visHandlers.removeAll();
     });
 
     $scope.switchTab($scope.tab,true);

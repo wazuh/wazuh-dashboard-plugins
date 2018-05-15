@@ -21,8 +21,8 @@ const app = modules.get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler, Private, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates) {
-                if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
+            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler, Private, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
+
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
                 let visTitle               = '';
@@ -80,7 +80,7 @@ const app = modules.get('apps/webinar_app', [])
     
                                 visHandler = loader.embedVisualizationWithSavedObject($(`[vis-id="'${$scope.visID}'"]`), visualization, params); 
                                 
-                                $rootScope.ownHandlers.push(visHandler);
+                                visHandlers.addItem(visHandler);
                                 visHandler.addRenderCompleteListener(renderComplete);
                             }).catch(error => {
                                 if(error && error.message && error.message.includes('not locate that index-pattern-field')){

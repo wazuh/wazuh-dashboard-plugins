@@ -53,12 +53,7 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
     $scope.setRulesTab = (tab) => $scope.submenuNavItem2 = tab;
 
     $scope.$on("$destroy", () => {
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 });
 
@@ -102,12 +97,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
     });
 
     $scope.$on("$destroy", () => {
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 
 });
@@ -164,11 +154,6 @@ app.controller('managerConfigurationController', function ($scope, $rootScope, e
 
     load();
     $scope.$on("$destroy", () => {
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 });
