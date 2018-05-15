@@ -275,7 +275,6 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     });
 
     $scope.$on('$destroy', () => {
-        $rootScope.wzEventFilters = [];
         $rootScope.rawVisualizations = null;
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
