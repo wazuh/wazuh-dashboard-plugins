@@ -217,7 +217,6 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 $rootScope.rawVisualizations = data.data.raw;
-                // Render visualizations
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
@@ -239,12 +238,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
             $rootScope.rawVisualizations = data.data.raw;
             // Render visualizations
             $rootScope.$broadcast('updateVis');
-
             checkMetrics(tab, 'panels');
-
-            // Deleting app state traces in the url
-            //$location.search('_a', null);
-
         })
         .catch(error => errorHandler.handle(error, 'Overview'));
     };
@@ -296,10 +290,8 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
     .then(data => {
         $rootScope.rawVisualizations = data.data.raw;
-        // Render visualizations
-        //$rootScope.$broadcast('updateVis');
-
         checkMetrics($scope.tab, $scope.tabView);
+        if($location.search().tab && $location.search().tabView) $rootScope.$emit('updateVis')
     })
     .catch(error => {
         errorHandler.handle(error, 'Overview');
