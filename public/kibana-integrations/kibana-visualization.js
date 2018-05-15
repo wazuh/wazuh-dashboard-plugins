@@ -116,13 +116,17 @@ const app = modules.get('apps/webinar_app', [])
                 };
 
                 // Listen for changes
-                $rootScope.$on('updateVis', () => {
+                const updateVisWatcher = $rootScope.$on('updateVis', () => {
                     if(!$rootScope.$$phase) $rootScope.$digest();
                     const rawVis = rawVisualizations.getList();
                     if(Array.isArray(rawVis) && rawVis.length){
                         myRender(rawVis);
                     }
                 });
+
+                $scope.$on('$destroy',() => {
+                    updateVisWatcher();
+                })
 
                 const renderComplete = () => {
                     rendered = true;

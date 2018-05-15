@@ -761,7 +761,6 @@ function discoverController(
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   const loadFilters = wzCurrentFilters => {
-    console.log(wzCurrentFilters)
     const appState = getAppState();
     if(!appState || !globalState){
       $timeout(100)
