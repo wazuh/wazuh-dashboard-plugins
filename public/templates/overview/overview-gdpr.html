@@ -2,8 +2,8 @@
 
     <div layout="row" layout-align="center stretch">
         <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="gdprReq_tab">
-                <md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
+            <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="gdprReq_tab">
+                <md-tab ng-repeat="tab in gdprTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
                     <div class="md-padding">
                         <span class="wz-headline-title">GDPR Requirement: {{tab.title}}</span>
                         <md-divider class="wz-margin-top-10"></md-divider>

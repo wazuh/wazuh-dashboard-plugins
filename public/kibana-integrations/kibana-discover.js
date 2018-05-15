@@ -410,7 +410,7 @@ function discoverController(
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
-              
+
               prev = current;
             };
           }()));
@@ -624,7 +624,7 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    
+
     $scope.timeRange = {
       from: dateMath.parse(timefilter.time.from),
       to: dateMath.parse(timefilter.time.to, { roundUp: true })
@@ -875,6 +875,28 @@ function discoverController(
               }
             }
           );
+        }
+        else if ($rootScope.currentImplicitFilter === "gdpr") {
+            implicitFilter.push(
+              {
+                "meta":{
+                  "removable":false,
+                  "index":$scope.indexPattern.id,
+                  "negate":false,
+                  "disabled":false,
+                  "alias":null,
+                  "type":"exists",
+                  "key":"rule.gdpr",
+                  "value":"exists"
+                },
+                "exists":{
+                  "field":"rule.gdpr"
+                },
+                "$state":{
+                  "store":"appState"
+                }
+              }
+            );
         } else {
           implicitFilter.push(
             {
@@ -918,7 +940,7 @@ function discoverController(
   if ($rootScope.page === 'agents') $scope.agentId = $location.search().agent;
 
   // Initial loading of filters
- loadFilters(); 
+ loadFilters();
 
   // Watch for changes in the location
   $scope.$on('$routeUpdate', () => {
@@ -932,7 +954,7 @@ function discoverController(
     if ($location.search().tab !=  $scope.tab) { // Changing filters
       $scope.tab = $location.search().tab;
     }
-    
+
     if ($location.search().agent !=  $scope.agentId) { // Changing filters
       $scope.agentId = $location.search().agent;
     }

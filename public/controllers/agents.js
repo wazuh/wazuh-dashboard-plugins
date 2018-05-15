@@ -79,6 +79,7 @@ app.controller('agentsController',
             oscap        : 13,
             audit        : 15,
             pci          : 3,
+            gdpr         : 3,
             virustotal   : 6,
             configuration: 0
         };
@@ -92,6 +93,7 @@ app.controller('agentsController',
             oscap     : { group: 'oscap' },
             audit     : { group: 'audit' },
             pci       : { group: 'pci_dss' },
+            gdpr      : { group: 'gdpr' },
             virustotal: { group: 'virustotal' }
         };
 
@@ -203,9 +205,10 @@ app.controller('agentsController',
                 const decoded   = rison.decode(str);
                 const tmp       = decoded.filters.filter(item => !(
                                         (item.query && item.query.match && item.query.match['rule.groups']) ||
-                                        (item.exists && item.exists.field === 'rule.pci_dss'))
+                                        (item.exists && item.exists.field === 'rule.pci_dss')) ||
+                                        (item.exists && item.exists.field === 'rule.gdpr')
                                 );
-                                
+
                 decoded.filters = tmp;
                 const encoded   = rison.encode(decoded);
                 $location.search('_a', encoded)
@@ -421,11 +424,11 @@ app.controller('agentsController',
         });
 
         //PCI tab
-        let tabs = [];
+        let pciTabs = [];
         genericReq.request('GET', '/api/wazuh-api/pci/all')
             .then((data) => {
                 for(let key in data.data){
-                    tabs.push({
+                    pciTabs.push({
                         "title": key,
                         "content": data.data[key]
                     });
@@ -436,8 +439,27 @@ app.controller('agentsController',
                 if(!$rootScope.$$phase) $rootScope.$digest();
             });
 
-        $scope.tabs          = tabs;
-        $scope.selectedIndex = 0;
+        $scope.pciTabs       = pciTabs;
+        $scope.selectedPciIndex = 0;
+
+        //GDPR tab
+        let gdprTabs = [];
+        genericReq.request('GET', '/api/wazuh-api/gdpr/all')
+            .then((data) => {
+                for(let key in data.data){
+                    gdprTabs.push({
+                        "title": key,
+                        "content": data.data[key]
+                    });
+                }
+            })
+            .catch(error => {
+                errorHandler.handle(error,'Agents');
+                if(!$rootScope.$$phase) $rootScope.$digest();
+            });
+
+        $scope.gdprTabs       = gdprTabs;
+        $scope.selectedGdprIndex = 0;
 
         $scope.isArray = angular.isArray;
 
