@@ -116,7 +116,8 @@ function discoverController(
   $rootScope,
   $location,
   getAppState,
-  globalState
+  globalState,
+  loadedVisualizations
 ) {
 
   const Vis = Private(VisProvider);
@@ -316,7 +317,7 @@ function discoverController(
             $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
             if($location.search().tab != 'configuration') {
-              $rootScope.loadedVisualizations = [];
+              loadedVisualizations.removeAll();
               $rootScope.rendered = false;
               $rootScope.loadingStatus = "Fetching data...";
             }
@@ -618,7 +619,7 @@ function discoverController(
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     if($location.search().tab != 'configuration') {
-      $rootScope.loadedVisualizations = [];
+      loadedVisualizations.removeAll();
       $rootScope.rendered = false;
       $rootScope.loadingStatus = "Fetching data...";
     }

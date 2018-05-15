@@ -21,7 +21,7 @@ const app = modules.get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler, Private, rawVisualizations) {
+            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler, Private, rawVisualizations, loadedVisualizations, tabVisualizations) {
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
@@ -125,10 +125,10 @@ const app = modules.get('apps/webinar_app', [])
 
                 const renderComplete = () => {
                     rendered = true;
-                    
-                    if(typeof $rootScope.loadedVisualizations === 'undefined') $rootScope.loadedVisualizations = [];
-                    $rootScope.loadedVisualizations.push(true);
-                    let currentCompleted = Math.round(($rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100);
+
+                    loadedVisualizations.addItem(true);
+
+                    let currentCompleted = Math.round((loadedVisualizations.getList().length / tabVisualizations.getItem(tabVisualizations.getTab())) * 100);
                     $rootScope.loadingStatus = `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`;
 
                     if (currentCompleted >= 100) {

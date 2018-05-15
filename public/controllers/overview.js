@@ -15,7 +15,7 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations) {
+app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations) {
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
 
     rawVisualizations.removeAll();
@@ -95,17 +95,17 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     }
 
     // This object represents the number of visualizations per tab; used to show a progress bar
-    $rootScope.tabVisualizations = {
+    tabVisualizations.assign({
         general   : 11,
         fim       : 10,
         pm        : 5,
         vuls      : 8,
         oscap     : 14,
         audit     : 15,
-        pci       : 6,
+        pci       : 7,
         aws       : 10,
         virustotal: 7
-    };
+    });
 
     // Object for matching nav items and rules groups
     const tabFilters = {
@@ -223,7 +223,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
 
         assignFilters($scope.tab);
         if(subtab === 'panels'){
-            $rootScope.loadedVisualizations = [];
+            loadedVisualizations.removeAll();
 
             rawVisualizations.removeAll();
 
@@ -242,6 +242,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
 
     // Switch tab
     $scope.switchTab = (tab,force = false) => {
+        tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
 
         $location.search('tab', $scope.tab);
@@ -252,7 +253,8 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
 
     $scope.$on('$destroy', () => {
         $rootScope.discoverPendingUpdates = [];
-        rawVisualizations.removeAll()
+        rawVisualizations.removeAll();
+        tabVisualizations.removeAll();
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
