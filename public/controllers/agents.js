@@ -15,7 +15,7 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, $window) {
+app.controller('agentsController', function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations) {
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     $rootScope.completedAgent = false;
     $rootScope.page = 'agents';
@@ -178,7 +178,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         }
         $rootScope.ownHandlers = [];
 
-        $rootScope.rawVisualizations = null;
+        rawVisualizations.removeAll();
 
         $location.search('tabView', subtab);
         $scope.tabView = subtab;
@@ -189,12 +189,12 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         if(subtab === 'panels' && $scope.tab !== 'configuration'){
             $rootScope.loadedVisualizations = [];
 
-            $rootScope.rawVisualizations = null;
+            rawVisualizations.removeAll();
 
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
-                $rootScope.rawVisualizations = data.data.raw;
+                rawVisualizations.assignItems(data.data.raw);
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
@@ -377,7 +377,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     $scope.$on("$destroy", () => {
         $rootScope.discoverPendingUpdates = [];
         $location.search('_a',null)
-        $rootScope.rawVisualizations = null;
+        rawVisualizations.removeAll();
         $scope.agentsAutoComplete.reset();
         if($rootScope.ownHandlers) {
             for(let h of $rootScope.ownHandlers){

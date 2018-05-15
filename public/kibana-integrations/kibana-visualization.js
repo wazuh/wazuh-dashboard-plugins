@@ -21,7 +21,7 @@ const app = modules.get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler,Private) {
+            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler, Private, rawVisualizations) {
                 if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
@@ -33,7 +33,6 @@ const app = modules.get('apps/webinar_app', [])
                 let renderInProgress       = false;
 
                 const myRender = raw => {
-                    console.log($scope.visID,$rootScope.discoverPendingUpdates)
                     if (raw && (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ) ) { // There are pending updates from the discover (which is the one who owns the true app state)
                         if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
                             renderInProgress = true;
@@ -118,7 +117,10 @@ const app = modules.get('apps/webinar_app', [])
                 // Listen for changes
                 $rootScope.$on('updateVis', () => {
                     if(!$rootScope.$$phase) $rootScope.$digest();
-                    myRender($rootScope.rawVisualizations);
+                    const rawVis = rawVisualizations.getList();
+                    if(Array.isArray(rawVis) && rawVis.length){
+                        myRender(rawVis);
+                    }
                 });
 
                 const renderComplete = () => {
