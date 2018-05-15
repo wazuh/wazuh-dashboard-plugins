@@ -33,7 +33,7 @@ const app = modules.get('apps/webinar_app', [])
                 let renderInProgress       = false;
 
                 const myRender = raw => {
-                   
+                    console.log($scope.visID,$rootScope.discoverPendingUpdates)
                     if (raw && (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ) ) { // There are pending updates from the discover (which is the one who owns the true app state)
                         if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
                             renderInProgress = true;
