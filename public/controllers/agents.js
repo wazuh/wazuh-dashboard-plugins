@@ -15,9 +15,10 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
+    visHandlers.removeAll();
     discoverPendingUpdates.removeAll();
     rawVisualizations.removeAll();
     tabVisualizations.removeAll();
@@ -178,13 +179,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     $scope.switchSubtab = (subtab, force = false) => {
         if($scope.tabView === subtab && !force) return;
 
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
-
+        visHandlers.removeAll();
         discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
@@ -341,12 +336,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     $scope.goGroups = agent => {
         $rootScope.globalAgent = agent;
         $scope.agentsAutoComplete.reset();
-        if($rootScope.ownHandlers) {
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+        visHandlers.removeAll();
         $rootScope.comeFrom    = 'agents';
         //$location.search('_a',null);
         $location.search('tab', 'groups');
@@ -386,12 +376,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         tabVisualizations.removeAll();
         loadedVisualizations.removeAll();
         $scope.agentsAutoComplete.reset();
-        if($rootScope.ownHandlers) {
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+        visHandlers.removeAll();
     });
 
     //PCI tab

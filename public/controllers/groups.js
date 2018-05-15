@@ -198,12 +198,6 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
         $scope.groups.reset();
         $scope.groupFiles.reset();
         $scope.groupAgents.reset();
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
         reloadWatcher();
     });
 
@@ -220,11 +214,6 @@ app.controller('groupsController', function ($scope,$rootScope) {
     $scope.groupsMenu = 'preview';
     $scope.groupName  = '';
     $scope.$on("$destroy", () => {
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 });
