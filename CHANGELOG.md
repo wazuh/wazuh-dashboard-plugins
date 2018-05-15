@@ -2,10 +2,15 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.2.2 - Kibana v6.2.4 - Revision 391
+## Wazuh v3.2.3 - Kibana v6.2.4 - Revision 391
 
 ### Added
 
+-   Support for Wazuh v3.2.3.
+-   Brand-new extension - _GDPR Alerts_ ([#453](https://github.com/wazuh/wazuh-kibana-app/pull/453)):
+    -   New extension, enabled by default.
+    -   Visualize alerts related to the GDPR compliance on the _Overview_ and _Agents_ tabs.
+    -   The _Ruleset_ tab has been updated to include GDPR filters on the _Rules_ subtab.
 -   Brand-new tab - _Dev tools_ ([#449](https://github.com/wazuh/wazuh-kibana-app/pull/449)):
     -   Find it on the top navbar, next to _Discover_.
     -   Execute Wazuh API requests directly from the app.
@@ -36,6 +41,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+-   Refactoring to Kibana filters management ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452)):
+    -   Added new class to build queries from base query.
+    -   The filter management is being done on controllers instead the `discover` directive.
+    -   Now we are emitting specific events whenever we are fetching data or communicating to the `discover` directive.
+    -   The number of useless requests to fetch data has been reduced.
+    -   The synchronization actions are working as expected regardless the amount of data and/or the amount of machine resources.
 -   Changed OSCAP visualization to avoid clipping issues with large agent names ([#429](https://github.com/wazuh/wazuh-kibana-app/pull/429)).
 -   Now the related Rules or Decoders sections on _Manager/Ruleset_ will remain hidden if there isn't any data to show or while it's loading ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
 -   Added a 200ms delay when fetching iterable data from the Wazuh API ([#445](https://github.com/wazuh/wazuh-kibana-app/pull/445) & [#450](https://github.com/wazuh/wazuh-kibana-app/pull/450)).
@@ -44,7 +55,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 -   Fixed some performance bugs on the `dataHandler` service ([#442](https://github.com/wazuh/wazuh-kibana-app/pull/442)).
--   Fixed bug when loading the _Agents preview_ tab on Safari web browser ([#447](https://github.com/wazuh/wazuh-kibana-app/pull/447)).
+-   Fixed bug when loading the _Agents preview_ tab on Safari web browser ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452)).
+
+### Removed
+
+-   Removed the `rison` dependency from the `package.json` file ([#447](https://github.com/wazuh/wazuh-kibana-app/pull/447)).
 
 ## Wazuh v3.2.1/v3.2.2 - Kibana v6.2.4 - Revision 390
 
