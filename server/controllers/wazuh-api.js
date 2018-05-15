@@ -277,7 +277,7 @@ export default class WazuhApi {
     async getGdprRequirement (req, reply) {
         try {
 
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3006, 401, reply);
+            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3023, 401, reply);
 
             let gdpr_description = '';
 
@@ -289,10 +289,10 @@ export default class WazuhApi {
 
                 if (wapi_config.error_code > 1) {
                     // Can not connect to elasticsearch
-                    return ErrorResponse('Elasticsearch unexpected error or cannot connect', 3007, 400, reply);
+                    return ErrorResponse('Elasticsearch unexpected error or cannot connect', 3024, 400, reply);
                 } else if (wapi_config.error_code > 0) {
                     // Credentials not found
-                    return ErrorResponse('Credentials does not exists', 3008, 400, reply);
+                    return ErrorResponse('Credentials does not exists', 3025, 400, reply);
                 }
 
                 const response = await needle('get', `${wapi_config.url}:${wapi_config.port}/rules/gdpr`, {}, {
@@ -308,7 +308,7 @@ export default class WazuhApi {
                     }
                     return reply(GDPRobject);
                 } else {
-                    return ErrorResponse('An error occurred trying to parse GDPR requirements', 3009, 400, reply);
+                    return ErrorResponse('An error occurred trying to parse GDPR requirements', 3026, 400, reply);
                 }
 
             } else {
@@ -324,7 +324,7 @@ export default class WazuhApi {
                 });
             }
         } catch (error) {
-            return ErrorResponse(error.message || error, 3010, 400, reply);
+            return ErrorResponse(error.message || error, 3027, 400, reply);
         }
 
     }
