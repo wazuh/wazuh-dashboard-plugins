@@ -1416,6 +1416,15 @@ export default [
         "readFromDocValues": true
     },
     {
+        "name": "rule.gpg13",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
         "name": "syscheck.diff",
         "type": "string",
         "count": 0,

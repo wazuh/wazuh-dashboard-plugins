@@ -128,7 +128,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         $scope.extensions.oscap      = $scope.apiEntries[index]._source.extensions.oscap;
         $scope.extensions.audit      = $scope.apiEntries[index]._source.extensions.audit;
         $scope.extensions.pci        = $scope.apiEntries[index]._source.extensions.pci;
-        $scope.extensions.gdpr        = $scope.apiEntries[index]._source.extensions.gdpr;
+        $scope.extensions.gdpr       = $scope.apiEntries[index]._source.extensions.gdpr;
         $scope.extensions.aws        = $scope.apiEntries[index]._source.extensions.aws;
         $scope.extensions.virustotal = $scope.apiEntries[index]._source.extensions.virustotal;
         if(!$scope.$$phase) $scope.$digest();
