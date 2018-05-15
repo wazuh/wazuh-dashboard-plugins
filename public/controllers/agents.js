@@ -168,18 +168,34 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     }
 
     // Switch subtab
-    $scope.switchSubtab = subtab => {
-        if($scope.tabView === subtab) return;
+    $scope.switchSubtab = (subtab, force = false) => {
+        if($scope.tabView === subtab && !force) return;
+
+        if ($rootScope.ownHandlers) {
+            for (let h of $rootScope.ownHandlers) {
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
+
+        $rootScope.rawVisualizations = null;
+
+        $location.search('tabView', subtab);
+        $scope.tabView = subtab;
+        $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+
+        assignFilters($scope.tab, $scope.agent.id);
+
         if(subtab === 'panels' && $scope.tab !== 'configuration'){
+            $rootScope.loadedVisualizations = [];
+
             $rootScope.rawVisualizations = null;
 
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 $rootScope.rawVisualizations = data.data.raw;
-                // Render visualizations
                 $rootScope.$broadcast('updateVis');
-
                 checkMetrics($scope.tab, 'panels');
             })
             .catch(error => errorHandler.handle(error, 'Agents'));
@@ -189,60 +205,19 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     }
 
     // Switch tab
-    $scope.switchTab = tab => {
-        if ($scope.tab === tab) return;
-        assignFilters(tab, $scope.agent.id);
-        if(tab !== 'configuration') {
-            $rootScope.rawVisualizations = null;
-            // Create current tab visualizations
-            genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${appState.getCurrentPattern()}`)
-            .then(data => {
-                $rootScope.rawVisualizations = data.data.raw;
-                // Render visualizations
-                $rootScope.$broadcast('updateVis');
+    $scope.switchTab = (tab, force = false) => {
+        if ($scope.tab === tab && !force) return;
 
-                checkMetrics(tab, 'panels');
-
-            })
-            .catch(error => errorHandler.handle(error, 'Agents'));
-        }
-    };
-
-    // Watchers
-
-    // We watch the resultState provided by the discover
-    $scope.$watch('tabView', () => {
-        $location.search('tabView', $scope.tabView);
-        $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
-
-        $rootScope.loadedVisualizations = [];
-    });
-
-    $scope.$watch('tab', () => {
-
-        $location.search('tab', $scope.tab);
-        $scope.tabView = 'panels';
-
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
-
-        $rootScope.loadedVisualizations = [];
+        $location.search('tab', tab);
+        $scope.tab = tab;
 
         if($scope.tab === 'configuration'){
             firstLoad();
+        } else {
+            $scope.switchSubtab('panels',force);
         }
+    };
 
-    });
 
     // Agent data
     $scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "teal" : "red";
@@ -346,7 +321,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
             validateRootCheck();
 
             $rootScope.completedAgent = true;
-            assignFilters($scope.tab, id);
+
+            $scope.switchTab($scope.tab, true);
 
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -399,6 +375,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
     //Destroy
     $scope.$on("$destroy", () => {
+        $rootScope.discoverPendingUpdates = [];
         $location.search('_a',null)
         $rootScope.rawVisualizations = null;
         $scope.agentsAutoComplete.reset();
@@ -503,6 +480,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
             $rootScope.completedAgent = true;
 
+            $scope.switchTab($scope.tab, true);
+            
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error){
@@ -511,14 +490,4 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         }
     }
     /** End of agent configuration */
-    if($scope.tab !== 'configuration'){
-        $rootScope.rawVisualizations = null;
-        // Create visualizations for controller's first execution
-        genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
-        .then(data => {
-            $rootScope.rawVisualizations = data.data.raw;
-            checkMetrics($scope.tab,'panels');
-        })
-        .catch(error => errorHandler.handle(error, 'Agents'));
-    }
 });

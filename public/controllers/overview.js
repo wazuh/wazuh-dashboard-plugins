@@ -150,8 +150,6 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         }
     }
 
-    assignFilters($location.search().tab || 'general');
-
     const generateMetric = id => {
         let html = $(id).html();
         if (typeof html !== 'undefined' && html.includes('<span')) {
@@ -207,10 +205,27 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     }
 
     // Switch subtab
-    $scope.switchSubtab = subtab => {
-        if ($scope.tabView === subtab) return;
+    $scope.switchSubtab = (subtab,force = false) => {
+        console.log($scope.tabView,subtab)
+        if ($scope.tabView === subtab && !force) return;
+        if ($rootScope.ownHandlers) {
+            for (let h of $rootScope.ownHandlers) {
+                h._scope.$destroy();
+            }
+        }
+        $rootScope.ownHandlers = [];
 
+        $rootScope.rawVisualizations = null;
+
+
+        $location.search('tabView', subtab);
+        $scope.tabView = subtab;
+        $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+
+        assignFilters($scope.tab);
         if(subtab === 'panels'){
+            $rootScope.loadedVisualizations = [];
+
             $rootScope.rawVisualizations = null;
 
             // Create current tab visualizations
@@ -227,54 +242,17 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     }
 
     // Switch tab
-    $scope.switchTab = tab => {
-        if ($scope.tab === tab) return;
-        assignFilters(tab);
-        $rootScope.rawVisualizations = null;
-
-        // Create current tab visualizations
-        genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${appState.getCurrentPattern()}`)
-        .then(data => {
-            $rootScope.rawVisualizations = data.data.raw;
-            // Render visualizations
-            $rootScope.$broadcast('updateVis');
-            checkMetrics(tab, 'panels');
-        })
-        .catch(error => errorHandler.handle(error, 'Overview'));
-    };
-
-    // Watch tabView
-    $scope.$watch('tabView', () => {
-        $location.search('tabView', $scope.tabView);
-        $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
-
-        $rootScope.loadedVisualizations = [];
-    });
-
-    // Watch tab
-    $scope.$watch('tab', () => {
+    $scope.switchTab = (tab,force = false) => {
+        if ($scope.tab === tab && !force) return;
 
         $location.search('tab', $scope.tab);
+        $scope.tab = tab;
 
-        $scope.tabView = 'panels';
-
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
-
-        $rootScope.loadedVisualizations = [];
-    });
+        $scope.switchSubtab('panels',true);
+    };
 
     $scope.$on('$destroy', () => {
+        $rootScope.discoverPendingUpdates = [];
         $rootScope.rawVisualizations = null;
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
@@ -285,15 +263,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         $rootScope.ownHandlers = [];
     });
 
-    // Create visualizations for controller's first execution
-    genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
-    .then(data => {
-        $rootScope.rawVisualizations = data.data.raw;
-        checkMetrics($scope.tab, $scope.tabView);
-    })
-    .catch(error => {
-        errorHandler.handle(error, 'Overview');
-    });
+    $scope.switchTab($scope.tab,true);
 
     //PCI tab
     let tabs = [];
