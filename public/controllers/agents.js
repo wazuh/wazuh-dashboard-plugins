@@ -102,7 +102,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     let filters = []
     const assignFilters = (tab,agent) => {
         try {
-            console.log(agent)
             filters = [];
 
             filters.push(filterHandler.managerQuery(
@@ -178,7 +177,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     // Switch subtab
     $scope.switchSubtab = (subtab, force = false) => {
         if($scope.tabView === subtab && !force) return;
-
         visHandlers.removeAll();
         discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
@@ -193,12 +191,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
                 assignFilters($scope.tab, $scope.agent.id);
-                $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+                $rootScope.$emit('changeTabView',{tabView:subtab})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
             .catch(error => errorHandler.handle(error, 'Agents'));
         } else {
+            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
             checkMetrics($scope.tab, subtab);
         }
     }

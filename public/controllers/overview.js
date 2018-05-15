@@ -225,7 +225,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
                 assignFilters($scope.tab);
-                $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+                $rootScope.$emit('changeTabView',{tabView:subtab})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
@@ -238,7 +238,6 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
 
     // Switch tab
     $scope.switchTab = (tab,force = false) => {
-        console.log('Entering switchTab',$scope.tab,tab)
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
 

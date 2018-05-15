@@ -30,6 +30,9 @@ app.factory('visHandlers', function() {
             if(item && item._scope){
                 item._scope.$destroy();
             }
+            if(item && item._scope && item._scope.savedObj){
+                item._scope.savedObj.destroy();
+            }
         }
         list = [];
     }
