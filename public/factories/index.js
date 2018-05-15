@@ -10,3 +10,4 @@
  * Find more information about this on the LICENSE file.
  */
 import 'plugins/wazuh/factories/data-handler-composer';
+import 'plugins/wazuh/factories/raw-visualizations';

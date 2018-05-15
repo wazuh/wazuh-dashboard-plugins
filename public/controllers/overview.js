@@ -15,10 +15,10 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq,$window) {
+app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations) {
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
 
-    $rootScope.rawVisualizations = null;
+    rawVisualizations.removeAll();
 
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
@@ -215,8 +215,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         }
         $rootScope.ownHandlers = [];
 
-        $rootScope.rawVisualizations = null;
-
+        rawVisualizations.removeAll();
 
         $location.search('tabView', subtab);
         $scope.tabView = subtab;
@@ -226,12 +225,12 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         if(subtab === 'panels'){
             $rootScope.loadedVisualizations = [];
 
-            $rootScope.rawVisualizations = null;
+            rawVisualizations.removeAll();
 
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
-                $rootScope.rawVisualizations = data.data.raw;
+                rawVisualizations.assignItems(data.data.raw);
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
@@ -253,7 +252,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
 
     $scope.$on('$destroy', () => {
         $rootScope.discoverPendingUpdates = [];
-        $rootScope.rawVisualizations = null;
+        rawVisualizations.removeAll()
         if ($rootScope.ownHandlers) {
             for (let h of $rootScope.ownHandlers) {
                 h._scope.$destroy();
