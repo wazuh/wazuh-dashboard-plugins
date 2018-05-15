@@ -183,6 +183,11 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
+
+        if(subtab === 'panels' && $scope.tabView === 'discover'){
+            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+        }
+
         $scope.tabView = subtab;
 
         if(subtab === 'panels' && $scope.tab !== 'configuration'){

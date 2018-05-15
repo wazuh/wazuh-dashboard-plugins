@@ -217,6 +217,11 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
+
+        if(subtab === 'panels' && $scope.tabView === 'discover'){
+            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+        }
+
         $scope.tabView = subtab;
 
         if(subtab === 'panels'){
