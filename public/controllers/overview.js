@@ -290,7 +290,6 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     .then(data => {
         $rootScope.rawVisualizations = data.data.raw;
         checkMetrics($scope.tab, $scope.tabView);
-        if($location.search().tab && $location.search().tabView) $rootScope.$emit('updateVis')
     })
     .catch(error => {
         errorHandler.handle(error, 'Overview');
