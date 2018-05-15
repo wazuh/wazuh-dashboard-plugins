@@ -527,10 +527,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
         .then(data => {
             $rootScope.rawVisualizations = data.data.raw;
-            // Render visualizations
-            //$rootScope.$broadcast('updateVis');
-
             checkMetrics($scope.tab,'panels');
+            if($location.search().tab && $location.search().tabView) $rootScope.$emit('updateVis')
         })
         .catch(error => errorHandler.handle(error, 'Agents'));
     }
