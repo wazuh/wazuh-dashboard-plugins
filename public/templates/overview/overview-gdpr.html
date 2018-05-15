@@ -27,13 +27,6 @@
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-255">
-        <md-card flex="70" class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Requirements</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-GDPR-requirements'"></kbn-vis>
-            </md-card-content>
-        </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Groups</span>
@@ -41,21 +34,28 @@
                 <kbn-vis vis-id="'Wazuh-App-Overview-GDPR-Groups'"></kbn-vis>
             </md-card-content>
         </md-card>
+        <md-card flex="70" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">GDPR Requirements</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Overview-GDPR-requirements'"></kbn-vis>
+            </md-card-content>
+        </md-card>
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-255">
-        <md-card flex="30" class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Agents</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-GDPR-Agents'"></kbn-vis>
-            </md-card-content>
-        </md-card>
         <md-card flex="70" class="wz-md-card">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Requirements by agent</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis vis-id="'Wazuh-App-Overview-GDPR-Requirements-by-agent'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="30" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Agents</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Overview-GDPR-Agents'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
