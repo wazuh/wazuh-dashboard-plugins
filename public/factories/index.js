@@ -11,3 +11,5 @@
  */
 import 'plugins/wazuh/factories/data-handler-composer';
 import 'plugins/wazuh/factories/raw-visualizations';
+import 'plugins/wazuh/factories/loaded-visualizations';
+import 'plugins/wazuh/factories/tab-visualizations';

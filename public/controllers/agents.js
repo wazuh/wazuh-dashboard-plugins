@@ -15,7 +15,7 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations) {
+app.controller('agentsController', function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations) {
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     $rootScope.completedAgent = false;
     $rootScope.page = 'agents';
@@ -68,7 +68,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         virusTotal    : '[vis-id="\'Wazuh-App-Agents-Virustotal-Total\'"]'
     }
 
-    $rootScope.tabVisualizations = {
+    tabVisualizations.assign({
         general      : 7,
         fim          : 8,
         pm           : 4,
@@ -78,7 +78,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         pci          : 3,
         virustotal   : 6,
         configuration: 0
-    };
+    });
 
     // Object for matching nav items and Wazuh groups
     const tabFilters = {
@@ -187,7 +187,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         assignFilters($scope.tab, $scope.agent.id);
 
         if(subtab === 'panels' && $scope.tab !== 'configuration'){
-            $rootScope.loadedVisualizations = [];
+            loadedVisualizations.removeAll();
 
             rawVisualizations.removeAll();
 
@@ -206,6 +206,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
+        tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
 
         $location.search('tab', tab);
@@ -378,6 +379,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         $rootScope.discoverPendingUpdates = [];
         $location.search('_a',null)
         rawVisualizations.removeAll();
+        tabVisualizations.removeAll();
         $scope.agentsAutoComplete.reset();
         if($rootScope.ownHandlers) {
             for(let h of $rootScope.ownHandlers){
