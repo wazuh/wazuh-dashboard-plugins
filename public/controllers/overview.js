@@ -9,13 +9,19 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import $            from 'jquery';
-import * as modules from 'ui/modules'
+import $             from 'jquery';
+import * as modules  from 'ui/modules'
+import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq) {
-    $rootScope.rawVisualizations = null;
+app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
+    $location.search('_a',null)
+    const filterHandler = new FilterHandler(appState.getCurrentPattern());
+    discoverPendingUpdates.removeAll();
+    rawVisualizations.removeAll();
+    tabVisualizations.removeAll();
+    loadedVisualizations.removeAll();
 
     $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
@@ -89,13 +95,10 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     } else { // If tab doesn't exist, default it to 'general'
         $scope.tab = 'general';
         $location.search('tab', 'general');
-
-        // Now we initialize the implicitFilter
-        $rootScope.currentImplicitFilter = "";
     }
 
     // This object represents the number of visualizations per tab; used to show a progress bar
-    $rootScope.tabVisualizations = {
+    tabVisualizations.assign({
         general   : 11,
         fim       : 10,
         pm        : 5,
@@ -106,7 +109,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         gdpr      : 6,
         aws       : 10,
         virustotal: 7
-    };
+    });
 
     // Object for matching nav items and rules groups
     const tabFilters = {
@@ -121,6 +124,36 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         aws       : { group: 'amazon' },
         virustotal: { group: 'virustotal' }
     };
+
+    let filters = []
+
+    const assignFilters = tab => {
+        try{
+
+            filters = [];
+
+            filters.push(filterHandler.managerQuery(
+                appState.getClusterInfo().status == 'enabled' ?
+                appState.getClusterInfo().cluster :
+                appState.getClusterInfo().manager
+            ))
+
+            if(tab !== 'general'){
+                if(tab === 'pci') {
+                    filters.push(filterHandler.pciQuery())
+                } else {
+                    filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
+                }
+            }
+            $rootScope.$emit('wzEventFilters',{filters});
+            if(!$rootScope.$$listenerCount['wzEventFilters']){
+                $timeout(100)
+                .then(() => assignFilters(tab))
+            }
+        } catch(error) {
+            console.log(error.message || error)
+        }
+    }
 
     const generateMetric = id => {
         let html = $(id).html();
@@ -177,105 +210,59 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     }
 
     // Switch subtab
-    $scope.switchSubtab = subtab => {
-        if ($scope.tabView === subtab) return;
+    $scope.switchSubtab = (subtab,force = false) => {
+        if ($scope.tabView === subtab && !force) return;
+
+        visHandlers.removeAll();
+        discoverPendingUpdates.removeAll();
+        rawVisualizations.removeAll();
+        loadedVisualizations.removeAll();
+
+        $location.search('tabView', subtab);
+
+        if(subtab === 'panels' && $scope.tabView === 'discover'){
+            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+        }
+
+        $scope.tabView = subtab;
 
         if(subtab === 'panels'){
-            $rootScope.rawVisualizations = null;
-
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
-                $rootScope.rawVisualizations = data.data.raw;
-                // Render visualizations
+                rawVisualizations.assignItems(data.data.raw);
+                assignFilters($scope.tab);
+                $rootScope.$emit('changeTabView',{tabView:subtab})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
             .catch(error => errorHandler.handle(error, 'Overview'));
         } else {
+            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
             checkMetrics($scope.tab, subtab);
         }
     }
 
     // Switch tab
-    $scope.switchTab = tab => {
-        if ($scope.tab === tab) return;
-        $rootScope.rawVisualizations = null;
-
-        // Create current tab visualizations
-        genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${appState.getCurrentPattern()}`)
-        .then(data => {
-            $rootScope.rawVisualizations = data.data.raw;
-            // Render visualizations
-            $rootScope.$broadcast('updateVis');
-
-            checkMetrics(tab, 'panels');
-
-            // Deleting app state traces in the url
-            $location.search('_a', null);
-
-        })
-        .catch(error => errorHandler.handle(error, 'Overview'));
-    };
-
-    // Watch tabView
-    $scope.$watch('tabView', () => {
-        $location.search('tabView', $scope.tabView);
-
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
-
-        $rootScope.loadedVisualizations = [];
-    });
-
-    // Watch tab
-    $scope.$watch('tab', () => {
+    $scope.switchTab = (tab,force = false) => {
+        tabVisualizations.setTab(tab);
+        if ($scope.tab === tab && !force) return;
 
         $location.search('tab', $scope.tab);
+        $scope.tab = tab;
 
-        $scope.tabView = 'panels';
-
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
-
-        $rootScope.loadedVisualizations = [];
-
-        // Update the implicit filter
-        if (tabFilters[$scope.tab].group === "") $rootScope.currentImplicitFilter = "";
-        else $rootScope.currentImplicitFilter = tabFilters[$scope.tab].group;
-    });
+        $scope.switchSubtab('panels',true);
+    };
 
     $scope.$on('$destroy', () => {
-        $rootScope.rawVisualizations = null;
-        if ($rootScope.ownHandlers) {
-            for (let h of $rootScope.ownHandlers) {
-                h._scope.$destroy();
-            }
-        }
-
-        $rootScope.ownHandlers = [];
+        discoverPendingUpdates.removeAll();
+        rawVisualizations.removeAll();
+        tabVisualizations.removeAll();
+        loadedVisualizations.removeAll();
+        visHandlers.removeAll();
     });
 
-    // Create visualizations for controller's first execution
-    genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
-    .then(data => {
-        $rootScope.rawVisualizations = data.data.raw;
-        // Render visualizations
-        $rootScope.$broadcast('updateVis');
-
-        checkMetrics($scope.tab, $scope.tabView);
-    })
-    .catch(error => {
-        errorHandler.handle(error, 'Overview');
-    });
+    $scope.switchTab($scope.tab,true);
 
     //PCI tab
     let pciTabs = [];

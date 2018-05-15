@@ -91,11 +91,6 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
             clearInterval(intervalId);
         }
         $scope.logs.reset();
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 });
