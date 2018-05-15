@@ -312,7 +312,7 @@ function discoverController(
 
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////            
             discoverPendingUpdates.removeAll()
             discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
             $rootScope.$broadcast('updateVis');
@@ -412,7 +412,7 @@ function discoverController(
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
-              
+
               prev = current;
             };
           }()));
@@ -476,7 +476,8 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    const filters = queryFilter.getFilters();
+    let filters = queryFilter.getFilters();
+    filters = Array.isArray(filters) ? filters.filter(item => item && item.$state && item.$state.store && item.$state.store === 'appState') : [];
     if(!filters || !filters.length) return;
     discoverPendingUpdates.removeAll()
     discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
@@ -627,7 +628,7 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    
+
     $scope.timeRange = {
       from: dateMath.parse(timefilter.time.from),
       to: dateMath.parse(timefilter.time.to, { roundUp: true })
@@ -781,7 +782,7 @@ function discoverController(
     loadFilters(parameters.filters);
   });
 
-  
+
   $scope.tabView = $location.search().tabView || 'panels'
   $rootScope.$on('changeTabView',(evt,parameters) => {
     $scope.tabView = parameters.tabView || 'panels'

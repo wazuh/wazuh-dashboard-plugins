@@ -100,4 +100,16 @@ export default class FilterHandler {
         delete result.query;
         return result;
     }
+
+    gdprQuery(){
+        const result = this.base();
+        result.meta.type = 'exists';
+        result.meta.value = 'exists';
+        result.meta.key = 'rule.gdpr';
+        result.exists = {
+            field: 'rule.gdpr'
+        }
+        delete result.query;
+        return result;
+    }
 }

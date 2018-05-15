@@ -24,6 +24,7 @@ modules.get('app/wazuh', [])
                     extensions : {
                         audit     : true,
                         pci       : true,
+                        gdpr      : true,
                         oscap     : true,
                         aws       : false,
                         virustotal: false

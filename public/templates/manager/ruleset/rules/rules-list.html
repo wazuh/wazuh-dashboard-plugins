@@ -44,7 +44,7 @@
         </md-button>
     </div>
 
-    <md-chips readonly="true" ng-show="rules.hasFilter('level') || rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('path') || rules.hasFilter('group') || rules.hasFilter('pci')">
+    <md-chips readonly="true" ng-show="rules.hasFilter('level') || rules.hasFilter('search') || rules.hasFilter('file') || rules.hasFilter('path') || rules.hasFilter('group') || rules.hasFilter('pci') || rules.hasFilter('gdpr')">
         <md-chip class="wz-chip" ng-if="rules.hasFilter('search') && rules.getFilter('search')">
             <span>Search: {{rules.getFilter('search')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('search', true)"></i>
@@ -75,6 +75,11 @@
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('pci', true)"></i>
             </span>
         </md-chip>
+        <md-chip class="wz-chip" ng-if="rules.hasFilter('gdpr')">
+            <span>GDPR: {{rules.getFilter('gdpr')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="rules.removeFilter('gdpr', true)"></i>
+            </span>
+        </md-chip>
     </md-chips>
 
     <wz-table-header
@@ -83,9 +88,10 @@
         keys="[
             {name:'ID',sortValue:'id',size:5},
             {name:'File',sortValue:'file',size:15},
-            {name:'Description',sortValue:'description',size:35},
+            {name:'Description',sortValue:'description',size:30},
             {name:'Groups',size:25},
-            {name:'Requirement',size:15},
+            {name:'PCI',size:10},
+            {name:'GDPR',size:10},
             {name:'Level',sortValue:'level',size:5}
         ]">
     </wz-table-header>
@@ -98,16 +104,17 @@
         keys="[
             {col:'id',size:5},
             {col:'file',size:15},
-            {col:'description',size:35},
+            {col:'description',size:30},
             {col:'groups',size:25},
-            {col:'pci',size:15},
+            {col:'pci',size:10},
+            {col:'gdpr',size:10},
             {col:'level',size:5}
         ]"
         isruleset="true"
         isdecoders="false"
         class="no-lateral-padding">
     </wz-table>
-    
+
     <div layout="row" class="wz-margin-top-10">
         <span flex></span>
         <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>

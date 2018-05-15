@@ -45,7 +45,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                 return Promise.resolve(true);
             }
             const deferred = $q.defer();
-  
+
             this.busy = true;
             let requestData;
 
@@ -153,8 +153,11 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         removeAllFilters () {
-            this.filters = [];
-            return this.search();
+            for (let filter of this.filters) {
+                this.removeFilter(filter.name, true);
+            }
+            // this.filters = [];
+            // return this.search();
         }
 
         delete (name, index) {

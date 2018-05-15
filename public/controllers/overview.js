@@ -105,7 +105,8 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         vuls      : 8,
         oscap     : 14,
         audit     : 15,
-        pci       : 7,
+        pci       : 6,
+        gdpr      : 6,
         aws       : 10,
         virustotal: 7
     });
@@ -119,26 +120,29 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         oscap     : { group: 'oscap' },
         audit     : { group: 'audit' },
         pci       : { group: 'pci_dss' },
+        gdpr      : { group: 'gdpr' },
         aws       : { group: 'amazon' },
         virustotal: { group: 'virustotal' }
     };
-    
+
     let filters = []
 
     const assignFilters = tab => {
         try{
 
             filters = [];
-    
+
             filters.push(filterHandler.managerQuery(
-                appState.getClusterInfo().status == 'enabled' ? 
-                appState.getClusterInfo().cluster : 
+                appState.getClusterInfo().status == 'enabled' ?
+                appState.getClusterInfo().cluster :
                 appState.getClusterInfo().manager
             ))
-    
+
             if(tab !== 'general'){
                 if(tab === 'pci') {
                     filters.push(filterHandler.pciQuery())
+                } else if(tab === 'gdpr') {
+                    filters.push(filterHandler.gdprQuery())
                 } else {
                     filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
                 }
@@ -263,12 +267,12 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     $scope.switchTab($scope.tab,true);
 
     //PCI tab
-    let tabs = [];
+    let pciTabs = [];
     genericReq
         .request('GET', '/api/wazuh-api/pci/all')
         .then(data => {
             for (let key in data.data) {
-                tabs.push({
+                pciTabs.push({
                     "title": key,
                     "content": data.data[key]
                 });
@@ -279,14 +283,34 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
             if (!$rootScope.$$phase) $rootScope.$digest();
         });
 
-    $scope.tabs = tabs;
-    $scope.selectedIndex = 0;
+    $scope.pciTabs = pciTabs;
+    $scope.selectedPciIndex = 0;
+
+    //GDPR tab
+    let gdprTabs = [];
+    genericReq
+        .request('GET', '/api/wazuh-api/gdpr/all')
+        .then(data => {
+            for (let key in data.data) {
+                gdprTabs.push({
+                    "title": key,
+                    "content": data.data[key]
+                });
+            }
+        })
+        .catch(error => {
+            errorHandler.handle(error, 'Overview');
+            if (!$rootScope.$$phase) $rootScope.$digest();
+        });
+
+    $scope.gdprTabs = gdprTabs;
+    $scope.selectedGdprIndex = 0;
 
     genericReq.request('GET', '/api/wazuh-api/configuration', {})
     .then(configuration => {
         if(configuration && configuration.data && configuration.data.data) {
-            $scope.wzMonitoringEnabled = typeof configuration.data.data['wazuh.monitoring.enabled']  !== 'undefined' ? 
-                                         !!configuration.data.data['wazuh.monitoring.enabled'] : 
+            $scope.wzMonitoringEnabled = typeof configuration.data.data['wazuh.monitoring.enabled']  !== 'undefined' ?
+                                         !!configuration.data.data['wazuh.monitoring.enabled'] :
                                          true;
             if(!$scope.wzMonitoringEnabled){
                 apiReq.request('GET', '/agents/summary', { })
