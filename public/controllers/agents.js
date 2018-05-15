@@ -115,6 +115,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             if(tab !== 'general'){
                 if(tab === 'pci') {
                     filters.push(filterHandler.pciQuery())
+                } else if(tab === 'gdpr') {
+                    filters.push(filterHandler.gdprQuery())
                 } else {
                     filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
                 }

@@ -141,6 +141,8 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
             if(tab !== 'general'){
                 if(tab === 'pci') {
                     filters.push(filterHandler.pciQuery())
+                } else if(tab === 'gdpr') {
+                    filters.push(filterHandler.gdprQuery())
                 } else {
                     filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
                 }
