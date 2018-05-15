@@ -296,10 +296,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         }
     }
 
-    /** Prevents from double agent and come from autocomplete */
-    let lastAgent = null;
-
-
     $scope.getAgent = async (newAgentId,fromAutocomplete) => {
         try {
             $rootScope.completedAgent = false;
@@ -337,7 +333,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
             // Agent
             $scope.agent = data[0].data.data;
-            lastAgent    = data[0].data.data.id;
             if ($scope.agent.os) {
                 $scope.agentOS = $scope.agent.os.name + ' ' + $scope.agent.os.version;
             }

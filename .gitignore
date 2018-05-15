@@ -59,8 +59,3 @@ typings/
 
 # dotenv environment variables file
 .env
-
-
-kibana/
-
-*.zip

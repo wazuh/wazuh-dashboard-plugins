@@ -39,12 +39,11 @@ import 'ui/registry/doc_views.js';
 import 'plugins/kbn_doc_views/kbn_doc_views.js';
 import 'ui/tooltip/tooltip.js';
 import moment from 'moment';
-import rison from 'rison-node';
 import 'ui/pager_control';
 import 'ui/pager';
 import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
 import { documentationLinks } from 'ui/documentation_links/documentation_links';
-import chrome from 'ui/chrome'
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -315,7 +314,7 @@ function discoverController(
             
             $rootScope.discoverPendingUpdates = [];
             $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
-            $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
+            $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
             if($location.search().tab != 'configuration') {
               $rootScope.loadedVisualizations = [];
@@ -473,14 +472,14 @@ function discoverController(
     if ($state.query.language && $state.query.language !== query.language) {
       $state.filters = [];
     }
-    const filters = queryFilter.getFilters();
-    if(!filters || !filters.length) return;
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    const filters = queryFilter.getFilters();
+    if(!filters || !filters.length) return;
     $rootScope.discoverPendingUpdates = [];
     $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
-    $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
+    $rootScope.$broadcast('updateVis');
     $rootScope.$broadcast('fetch');
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////

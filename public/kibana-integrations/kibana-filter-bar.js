@@ -13,10 +13,10 @@ import { FilterBarLibChangeTimeFilterProvider } from 'ui/filter_bar/lib/change_t
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { compareFilters } from 'ui/filter_bar/lib/compare_filters';
 import { uiModules } from 'ui/modules';
-import rison from 'rison'
+
 const module = uiModules.get('kibana');
 
-module.directive('filterBarW', function ($timeout, Private, Promise, getAppState,$location, $rootScope) {
+module.directive('filterBarW', function (Private, Promise, getAppState) {
   const mapAndFlattenFilters = Private(FilterBarLibMapAndFlattenFiltersProvider);
   const mapFlattenAndWrapFilters = Private(FilterBarLibMapFlattenAndWrapFiltersProvider);
   const extractTimeFilter = Private(FilterBarLibExtractTimeFilterProvider);
@@ -164,7 +164,6 @@ module.directive('filterBarW', function ($timeout, Private, Promise, getAppState
           });
           $scope.$emit('filterbar:updated');
         });
-        
       }
 
       updateFilters();
