@@ -17,7 +17,6 @@ const app = modules.get('app/wazuh', []);
 
 app.controller('agentsController', function ($timeout, $scope, $location, $q, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, $window) {
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
-    $rootScope.wzCurrentFilters = [];
     $rootScope.completedAgent = false;
     $rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
@@ -348,7 +347,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
             $rootScope.completedAgent = true;
             assignFilters($scope.tab, id);
-            //assignFilters($location.search().tab,$location.search().agent);
+
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
@@ -358,7 +357,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     };
 
     $scope.goGroups = agent => {
-        $rootScope.wzCurrentFilters = [];
         $rootScope.globalAgent = agent;
         $scope.agentsAutoComplete.reset();
         if($rootScope.ownHandlers) {
@@ -401,7 +399,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
 
     //Destroy
     $scope.$on("$destroy", () => {
-        delete $rootScope.wzWaitForAgent;
         $location.search('_a',null)
         $rootScope.rawVisualizations = null;
         $scope.agentsAutoComplete.reset();
@@ -411,7 +408,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
             }
         }
         $rootScope.ownHandlers = [];
-        $rootScope.wzCurrentFilters = [];
     });
 
     //PCI tab
@@ -450,7 +446,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
     }
 
     $scope.goGroup = () => {
-        delete $rootScope.wzWaitForAgent;
         $rootScope.globalAgent = $scope.agent;
         $rootScope.comeFrom    = 'agents';
         $location.path('/manager/groups');
@@ -523,7 +518,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $q, $r
         .then(data => {
             $rootScope.rawVisualizations = data.data.raw;
             checkMetrics($scope.tab,'panels');
-            if($location.search().tab && $location.search().tabView) $rootScope.$emit('updateVis')
         })
         .catch(error => errorHandler.handle(error, 'Agents'));
     }
