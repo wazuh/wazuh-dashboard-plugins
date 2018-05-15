@@ -38,7 +38,7 @@ const app = modules.get('apps/webinar_app', [])
                         if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
                             renderInProgress = true;
 
-                            const rawVis = raw.filter(item => item.id === $scope.visID);
+                            const rawVis = raw.filter(item => item && item.id === $scope.visID);
                             wzsavedVisualizations.get($scope.visID,rawVis[0]).then(savedObj => {
                                 originalImplicitFilter = savedObj.searchSource.get('query')['query'];
                                 visTitle = savedObj.vis.title;
@@ -116,12 +116,12 @@ const app = modules.get('apps/webinar_app', [])
                 };
 
                 // Listen for changes
-                $rootScope.$on('updateVis', function (event, query, filters) {
+                $rootScope.$on('updateVis', () => {
                     if(!$rootScope.$$phase) $rootScope.$digest();
                     myRender($rootScope.rawVisualizations);
                 });
 
-                var renderComplete = function() {
+                const renderComplete = () => {
                     rendered = true;
                     
                     if(typeof $rootScope.loadedVisualizations === 'undefined') $rootScope.loadedVisualizations = [];
