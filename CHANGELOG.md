@@ -55,11 +55,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 -   Fixed some performance bugs on the `dataHandler` service ([#442](https://github.com/wazuh/wazuh-kibana-app/pull/442)).
--   Fixed bug when loading the _Agents preview_ tab on Safari web browser ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452)).
+-   Fixed bug when loading the _Agents preview_ tab on Safari web browser ([#447](https://github.com/wazuh/wazuh-kibana-app/pull/447)).
 
 ### Removed
 
--   Removed the `rison` dependency from the `package.json` file ([#447](https://github.com/wazuh/wazuh-kibana-app/pull/447)).
+-   Removed the `rison` dependency from the `package.json` file ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452)).
 
 ## Wazuh v3.2.1/v3.2.2 - Kibana v6.2.4 - Revision 390
 
