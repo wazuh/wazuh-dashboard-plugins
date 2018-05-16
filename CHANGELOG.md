@@ -17,7 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   This tab uses your currently selected API from _Settings_.
     -   You can type different API requests on the input window, select one with the cursor, and click on the Play button to execute it.
     -   You can also type comments on the input window.
--   New improvements for the _Manager/Ruleset_ tab ([#446](https://github.com/wazuh/wazuh-kibana-app/pull/446)):
+-   More improvements for the _Manager/Ruleset_ tab ([#446](https://github.com/wazuh/wazuh-kibana-app/pull/446)):
     -   New colour palette for regex, order and rule description arguments.
     -   Added return to List view on Ruleset button while on Detail view.
     -   Fixed line height on all table headers.
@@ -41,12 +41,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
--   Refactoring to Kibana filters management ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452)):
+-   Refactoring to Kibana filters management ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452) & [#459](https://github.com/wazuh/wazuh-kibana-app/pull/459)):
     -   Added new class to build queries from base query.
     -   The filter management is being done on controllers instead the `discover` directive.
     -   Now we are emitting specific events whenever we are fetching data or communicating to the `discover` directive.
     -   The number of useless requests to fetch data has been reduced.
     -   The synchronization actions are working as expected regardless the amount of data and/or the amount of machine resources.
+    -   Fixed several bugs about filter usage and transition to different app tabs.
 -   Changed OSCAP visualization to avoid clipping issues with large agent names ([#429](https://github.com/wazuh/wazuh-kibana-app/pull/429)).
 -   Now the related Rules or Decoders sections on _Manager/Ruleset_ will remain hidden if there isn't any data to show or while it's loading ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
 -   Added a 200ms delay when fetching iterable data from the Wazuh API ([#445](https://github.com/wazuh/wazuh-kibana-app/pull/445) & [#450](https://github.com/wazuh/wazuh-kibana-app/pull/450)).
@@ -55,11 +56,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 -   Fixed some performance bugs on the `dataHandler` service ([#442](https://github.com/wazuh/wazuh-kibana-app/pull/442)).
--   Fixed bug when loading the _Agents preview_ tab on Safari web browser ([#447](https://github.com/wazuh/wazuh-kibana-app/pull/447)).
+-   Fixed a bug when loading the _Agents preview_ tab on Safari web browser ([#447](https://github.com/wazuh/wazuh-kibana-app/pull/447)).
+-   Fixed a bug where a new extension (enabled by default) appears disabled when updating the app ([#456](https://github.com/wazuh/wazuh-kibana-app/pull/456)).
 
 ### Removed
 
 -   Removed the `rison` dependency from the `package.json` file ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452)).
+-   Removed unused Elasticsearch request to avoid problems when there's no API inserted ([#460](https://github.com/wazuh/wazuh-kibana-app/pull/460)).
 
 ## Wazuh v3.2.1/v3.2.2 - Kibana v6.2.4 - Revision 390
 
