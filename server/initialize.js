@@ -17,6 +17,7 @@ import ElasticWrapper     from './lib/elastic-wrapper'
 import packageJSON        from '../package.json'
 import kibana_template    from './integration-files/kibana-template'
 import getConfiguration   from './lib/get-configuration'
+import defaultExt         from './lib/default-ext'
 
 export default (server, options) => {
     const blueWazuh = colors.blue('wazuh');
@@ -218,6 +219,63 @@ export default (server, options) => {
         }
     };
 
+    /**
+     * Checks for new extensions added to the config.yml,
+     * useful whenever a new extension is added and it's enabled by default.
+     * An old app package needs to update its stored API entries, this way we have consistency
+     * with the new extensions.
+     */
+    const checkAPIEntriesExtensions = async () => {
+        try {
+            log('[initialize][checkAPIEntriesExtensions]', `Checking extensions consistency for all API entries`,'info')
+            server.log([blueWazuh, '[initialize][checkAPIEntriesExtensions]', 'info'],  `Checking extensions consistency for all API entries`)
+             
+            const apiEntries = await wzWrapper.getWazuhAPIEntries();
+            const configFile = await getConfiguration();
+
+            if (apiEntries && apiEntries.hits && apiEntries.hits.total > 0) {
+                
+                const currentExtensions = !configFile ? defaultExt : {};
+
+                if(configFile) {
+                    for(const key in defaultExt){
+                        currentExtensions[key]  = typeof configFile['extensions.' + key] !== 'undefined' ?
+                                                  configFile['extensions.' + key] :
+                                                  defaultExt[key];
+                    }
+                }
+
+                for(const item of apiEntries.hits.hits) {
+                    for(const key in currentExtensions){ 
+                        if(item && item._source && item._source.extensions && typeof item._source.extensions[key] !== 'undefined'){
+                            continue;
+                        } else {
+                            if(item._source && item._source.extensions) {
+                                item._source.extensions[key] = currentExtensions[key];
+                            }
+                        }
+                    }
+                    try {
+                        await wzWrapper.updateWazuhIndexDocument(item._id,{ doc: { extensions: item._source.extensions } });
+                        log('[initialize][checkAPIEntriesExtensions]', `Successfully updated API entry extensions with ID: ${item._id}`,'info')
+                        server.log([blueWazuh, '[initialize][checkAPIEntriesExtensions]', 'info'],  `Successfully updated API entry extensions with ID: ${item._id}`)
+                    } catch (error) {
+                        log('[initialize][checkAPIEntriesExtensions]', `Error updating API entry with ID: ${item._id} due to ${error.message || error}`)
+                        server.log([blueWazuh, '[initialize][checkAPIEntriesExtensions]', 'error'], `Error updating API entry extensions with ID: ${item._id} due to ${error.message || error}`);
+                    }
+                    
+                }
+            } else {
+                log('[initialize][checkAPIEntriesExtensions]', 'There is no API entries, skipping extensions check','info')
+                server.log([blueWazuh, '[initialize][checkAPIEntriesExtensions]', 'info'], 'There is no API entries, skipping extensions check')
+            }
+
+            return;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
     const checkWazuhIndex = async () => {
             try{
                 log('[initialize][checkWazuhIndex]', 'Checking .wazuh index.','info')
@@ -253,7 +311,11 @@ export default (server, options) => {
                         throw new Error('Error creating index .wazuh.');
                     }
 
-                } else { // The .wazuh index exists, we now proceed to check whether it's from an older version
+                } else { 
+                    
+                    await checkAPIEntriesExtensions();
+                
+                    // The .wazuh index exists, we now proceed to check whether it's from an older version
                     try{
                         await wzWrapper.getOldWazuhSetup();
 
