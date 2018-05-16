@@ -102,7 +102,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     };
 
     let filters = []
-    const assignFilters = (tab,agent) => {
+    const assignFilters = (tab,agent,localChange) => {
         try {
             filters = [];
 
@@ -123,7 +123,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             }
 
             filters.push(filterHandler.agentQuery(agent));
-            $rootScope.$emit('wzEventFilters',{filters});
+            $rootScope.$emit('wzEventFilters',{filters, localChange});
             if(!$rootScope.$$listenerCount['wzEventFilters']){
                 $timeout(100)
                 .then(() => assignFilters(tab,agent))
@@ -187,7 +187,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
-
+        const localChange = subtab === 'panels' && $scope.tabView === 'discover';
         if(subtab === 'panels' && $scope.tabView === 'discover'){
             $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
         }
@@ -199,7 +199,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
-                assignFilters($scope.tab, $scope.agent.id);
+                assignFilters($scope.tab, $scope.agent.id, localChange);
                 $rootScope.$emit('changeTabView',{tabView:subtab})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
