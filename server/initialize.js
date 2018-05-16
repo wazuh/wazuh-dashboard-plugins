@@ -266,8 +266,8 @@ export default (server, options) => {
                     
                 }
             } else {
-                log('[initialize][checkAPIEntriesExtensions]', 'There is no API entries, skipping extensions check','info')
-                server.log([blueWazuh, '[initialize][checkAPIEntriesExtensions]', 'info'], 'There is no API entries, skipping extensions check')
+                log('[initialize][checkAPIEntriesExtensions]', 'There are no API entries, skipping extensions check','info')
+                server.log([blueWazuh, '[initialize][checkAPIEntriesExtensions]', 'info'], 'There are no API entries, skipping extensions check')
             }
 
             return;
