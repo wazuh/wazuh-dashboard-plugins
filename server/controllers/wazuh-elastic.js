@@ -279,8 +279,6 @@ export default class WazuhElastic {
                 throw new Error('Missing parameters creating visualizations');
             }
 
-            const apiConfig = (req.headers && req.headers.id) ? await this.wzWrapper.getWazuhConfigurationById(req.headers.id) : false;
-            const clusterName = apiConfig && apiConfig.cluster_info ? apiConfig.cluster_info.cluster : false;
             const tabPrefix = req.params.tab.includes('overview') ?
                               'overview' :
                               'agents';
