@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 -   Support for Wazuh v3.2.3.
 -   Brand-new extension - _GDPR Alerts_ ([#453](https://github.com/wazuh/wazuh-kibana-app/pull/453)):
-    -   New extension, enabled by default.
+    -   A new extension, enabled by default.
     -   Visualize alerts related to the GDPR compliance on the _Overview_ and _Agents_ tabs.
     -   The _Ruleset_ tab has been updated to include GDPR filters on the _Rules_ subtab.
 -   Brand-new tab - _Dev tools_ ([#449](https://github.com/wazuh/wazuh-kibana-app/pull/449)):
@@ -18,36 +18,36 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   You can type different API requests on the input window, select one with the cursor, and click on the Play button to execute it.
     -   You can also type comments on the input window.
 -   More improvements for the _Manager/Ruleset_ tab ([#446](https://github.com/wazuh/wazuh-kibana-app/pull/446)):
-    -   New colour palette for regex, order and rule description arguments.
+    -   A new colour palette for regex, order and rule description arguments.
     -   Added return to List view on Ruleset button while on Detail view.
     -   Fixed line height on all table headers.
     -   Removed unused, old code from Ruleset controllers.
 -   Added option on `config.yml` to enable/disable the `wazuh-monitoring` index ([#441](https://github.com/wazuh/wazuh-kibana-app/pull/441)):
-    -   Configure the time frequency to generate new indices.
-    -   The default time frequency has been increased to 1 hour.
+    -   Configure the frequency time to generate new indices.
+    -   The default frequency time has been increased to 1 hour.
     -   When disabled, useful metrics will appear on _Overview/General_ replacing the _Agent status_ visualization.
 -   Added CSV exporting button to the app ([#431](https://github.com/wazuh/wazuh-kibana-app/pull/431)):
     -   Implemented new logic to fetch data from the Wazuh API and download it in CSV format.
     -   Currently available for the _Ruleset_, _Logs_ and _Groups_ sections on the _Manager_ tab.
 -   More refactoring to the app backend ([#439](https://github.com/wazuh/wazuh-kibana-app/pull/439)):
-    -   Standarized error output from the server side.
+    -   Standardized error output from the server side.
     -   Drastically reduced the error management logic on the client side.
     -   Applied the _Facade_ pattern when importing/exporting modules.
     -   Deleted unused/deprecated/useless methods both from server and client side.
     -   Some optimizations to variable type usages.
+-   Refactoring to Kibana filters management ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452) & [#459](https://github.com/wazuh/wazuh-kibana-app/pull/459)):
+    -   Added new class to build queries from the base query.
+    -   The filter management is being done on controllers instead of the `discover` directive.
+    -   Now we are emitting specific events whenever we are fetching data or communicating to the `discover` directive.
+    -   The number of useless requests to fetch data has been reduced.
+    -   The synchronization actions are working as expected regardless the amount of data and/or the number of machine resources.
+    -   Fixed several bugs about filter usage and transition to different app tabs.
 -   Added confirmation message when the user deletes an API entry on _Settings/API_ ([#428](https://github.com/wazuh/wazuh-kibana-app/pull/428)).
 -   Added support for filters on the _Manager/Logs_ tab when realtime is enabled ([#433](https://github.com/wazuh/wazuh-kibana-app/pull/433)).
 -   Added more filter options to the Detail view on _Manager/Ruleset_ ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
 
 ### Changed
 
--   Refactoring to Kibana filters management ([#452](https://github.com/wazuh/wazuh-kibana-app/pull/452) & [#459](https://github.com/wazuh/wazuh-kibana-app/pull/459)):
-    -   Added new class to build queries from base query.
-    -   The filter management is being done on controllers instead the `discover` directive.
-    -   Now we are emitting specific events whenever we are fetching data or communicating to the `discover` directive.
-    -   The number of useless requests to fetch data has been reduced.
-    -   The synchronization actions are working as expected regardless the amount of data and/or the amount of machine resources.
-    -   Fixed several bugs about filter usage and transition to different app tabs.
 -   Changed OSCAP visualization to avoid clipping issues with large agent names ([#429](https://github.com/wazuh/wazuh-kibana-app/pull/429)).
 -   Now the related Rules or Decoders sections on _Manager/Ruleset_ will remain hidden if there isn't any data to show or while it's loading ([#434](https://github.com/wazuh/wazuh-kibana-app/pull/434)).
 -   Added a 200ms delay when fetching iterable data from the Wazuh API ([#445](https://github.com/wazuh/wazuh-kibana-app/pull/445) & [#450](https://github.com/wazuh/wazuh-kibana-app/pull/450)).

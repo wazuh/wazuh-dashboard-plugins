@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-// Imports all modules
+
+// Imports all server modules
 import initialize      from './server/initialize';
 import wazuhElastic    from './server/routes/wazuh-elastic';
 import wazuhApiElastic from './server/routes/wazuh-api-elastic';

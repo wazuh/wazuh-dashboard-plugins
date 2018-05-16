@@ -9,11 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+// Imports the init module
 import init from './init';
 
 export default kibana => new kibana.Plugin({
-    id:      'wazuh',
-    name:    'wazuh',
+    id: 'wazuh',
+    name: 'wazuh',
     require: ['kibana', 'elasticsearch'],
     uiExports: {
         app: {
