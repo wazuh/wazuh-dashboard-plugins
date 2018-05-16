@@ -761,7 +761,7 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const loadFilters = wzCurrentFilters => {
+  const loadFilters = (wzCurrentFilters, localChange) => {
     const appState = getAppState();
     if(!appState || !globalState){
       $timeout(100)
@@ -770,7 +770,7 @@ function discoverController(
         return loadFilters(wzCurrentFilters)
       })
     } else {
-      $state.filters = [];
+      $state.filters = localChange ? $state.filters : [];
 
       queryFilter.addFilters(wzCurrentFilters)
       .then(() => console.log('Filters loaded successfully'))
@@ -779,7 +779,7 @@ function discoverController(
   }
 
   $rootScope.$on('wzEventFilters', (evt,parameters) => {
-    loadFilters(parameters.filters);
+    loadFilters(parameters.filters, parameters.localChange);
   });
 
 
