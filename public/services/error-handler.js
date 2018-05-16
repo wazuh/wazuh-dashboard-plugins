@@ -17,7 +17,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
     const notify = new Notifier();
 
     const extractMessage = error => {
-        if(error && error.status && error.status === -1) return 'Maximum timeout reached fetching data'
+        if(error && error.status && error.status === -1) return 'Could not reach server'
         if(error.data && error.data.errorData && error.data.errorData.message) return error.data.errorData.message;
         if(error.errorData && error.errorData.message) return error.errorData.message;
         if(error.data && typeof error.data === 'string') return error.data;
