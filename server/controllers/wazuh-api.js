@@ -279,6 +279,12 @@ export default class WazuhApi {
 
             if(!protectedRoute(req)) return ErrorResponse('Session expired', 3023, 401, reply);
 
+            // Prevents load GDPR if it's disabled
+            const configFile = getConfiguration();
+            if(configFile && typeof configFile['extensions.gdpr'] !== 'undefined' && !configFile['extensions.gdpr']) {
+                return reply({});
+            }
+
             let gdpr_description = '';
 
             if (req.params.requirement === 'all') {
