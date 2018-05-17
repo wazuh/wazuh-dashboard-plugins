@@ -399,7 +399,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Toggle extension
     $scope.toggleExtension = async (extension, state) => {
         try{
-            if (['oscap','audit','pci','gdpr','aws','virustotal'].includes(extension)) {
+            getCurrentAPIIndex()
+            if ($scope.apiEntries && $scope.apiEntries.length && ['oscap','audit','pci','gdpr','aws','virustotal'].includes(extension)) {
                 await genericReq.request('PUT', `/api/wazuh-api/extension/toggle/${$scope.apiEntries[currentApiEntryIndex]._id}/${extension}/${state}`);
                 $scope.apiEntries[currentApiEntryIndex]._source.extensions[extension] = state;
                 appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
