@@ -319,7 +319,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             if ($scope.agent.os) {
                 $scope.agentOS = $scope.agent.os.name + ' ' + $scope.agent.os.version;
             }
-            else { $scope.agentOS = 'Unkwnown' };
+            else { $scope.agentOS = 'Unknown' };
 
             // Syscheck
             $scope.agent.syscheck = data[1].data.data;
