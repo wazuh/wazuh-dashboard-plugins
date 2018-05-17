@@ -179,7 +179,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, onlyAgent = false) => {
+    $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = false) => {
         if($scope.tabView === subtab && !force) return;
         if(!onlyAgent) visHandlers.removeAll();
         discoverPendingUpdates.removeAll();
@@ -187,8 +187,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
-        const localChange = subtab === 'panels' && $scope.tabView === 'discover';
-        if(subtab === 'panels' && $scope.tabView === 'discover'){
+        const localChange = subtab === 'panels' && $scope.tabView === 'discover' && sameTab;
+        if(subtab === 'panels' && $scope.tabView === 'discover' && sameTab){
             $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
         }
 
@@ -216,13 +216,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const onlyAgent = $scope.tab === tab && force;
+        const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
         $scope.tab = tab;
 
         if($scope.tab === 'configuration'){
             firstLoad();
         } else {
-            $scope.switchSubtab('panels', true, onlyAgent);
+            $scope.switchSubtab('panels', true, onlyAgent, sameTab);
         }
     };
 
