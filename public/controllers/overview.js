@@ -251,7 +251,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const sameTab = $scope.tab === tab;
-        $location.search('tab', $scope.tab);
+        $location.search('tab', tab);
         $scope.tab = tab;
 
         $scope.switchSubtab('panels', true, sameTab);
