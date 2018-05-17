@@ -22,7 +22,9 @@ export default (message = null, code = null, statusCode = null, reply) => {
     if(code) {
         if(typeof message === 'string' && message === 'socket hang up' && code === 3005) {
             filteredMessage = 'Wrong protocol being used to connect to the Wazuh API'
-        } else if(typeof message === 'string' && message.includes('ENOTFOUND') && code === 3005) {
+        } else if(typeof message === 'string' && 
+                 (message.includes('ENOTFOUND') || message.includes('EHOSTUNREACH') || message.includes('EINVAL') || message.includes('EAI_AGAIN')) && 
+                 code === 3005) {
             filteredMessage = 'Wrong URL being used to connect to the Wazuh API'
         } else if(typeof message === 'string' && message.includes('ECONNREFUSED') && code === 3005) {
             filteredMessage = 'Wrong port being used to connect to the Wazuh API'
