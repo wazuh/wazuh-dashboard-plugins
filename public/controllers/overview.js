@@ -212,7 +212,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, sameTab = false) => {
+    $scope.switchSubtab = (subtab, force = false, sameTab = true) => {
         if ($scope.tabView === subtab && !force) return;
         
         visHandlers.removeAll();
@@ -221,7 +221,8 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
-        const localChange = subtab === 'panels' && $scope.tabView === 'discover' && sameTab;
+        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') || 
+                             (subtab === 'discover' && $scope.tabView === 'panels')) && sameTab;
         if(subtab === 'panels' && $scope.tabView === 'discover'  && sameTab){
             $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
         }
