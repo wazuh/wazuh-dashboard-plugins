@@ -6,7 +6,7 @@
     <div layout="row" layout-align="center start">
         <md-nav-bar flex class="padding-right-0 wz-md-navbar" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
             <md-nav-item md-nav-click="submenuNavItem = 'api'" name="api">API</md-nav-item>
-            <md-nav-item md-nav-click="submenuNavItem = 'extensions'" name="extensions">Extensions</md-nav-item>
+            <md-nav-item md-nav-click="submenuNavItem = 'extensions'" ng-if="apiEntries && apiEntries.length" name="extensions">Extensions</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'pattern'" name="pattern">Pattern</md-nav-item>
             <md-nav-item md-nav-click="submenuNavItem = 'about'" name="about">About</md-nav-item>
         </md-nav-bar>
