@@ -62,6 +62,15 @@ const app = modules.get('apps/webinar_app', [])
                                     visualization.searchSource
                                     .query({ language: 'lucene', query: implicitFilter })
                                     .set('filter',  discoverList.length > 1 ? discoverList[1] : {});
+                                } else {
+                                    
+                                    // Get filter for cluster/manager regardless environment
+                                    const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && ['cluster.name','manager.name'].includes(item.meta.key));
+                                    
+                                    // Applying specific filter to Agents status
+                                    if(Array.isArray(monitoringFilter) && monitoringFilter.length) {
+                                        visualization.searchSource.filter(monitoringFilter[0]);
+                                    }
                                 }
 
                                 let params = {};
@@ -110,6 +119,15 @@ const app = modules.get('apps/webinar_app', [])
                                 visualization.searchSource
                                 .query({ language: 'lucene', query: implicitFilter })
                                 .set('filter', discoverList.length > 1 ? discoverList[1] : {});
+                            } else {
+                                    
+                                // Get filter for cluster/manager regardless environment
+                                const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && ['cluster.name','manager.name'].includes(item.meta.key));
+                                
+                                // Applying specific filter to Agents status
+                                if(Array.isArray(monitoringFilter) && monitoringFilter.length) {
+                                    visualization.searchSource.filter(monitoringFilter[0]);
+                                }
                             }
                         }
                     }
