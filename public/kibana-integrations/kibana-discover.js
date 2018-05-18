@@ -312,7 +312,7 @@ function discoverController(
 
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////            
+            ////////////////////////////////////////////////////////////////////////////    
             discoverPendingUpdates.removeAll()
             discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
             $rootScope.$broadcast('updateVis');
@@ -379,7 +379,7 @@ function discoverController(
             function pick(rows, oldRows, fetchStatus) {
               // initial state, pretend we are loading
               if (rows == null && oldRows == null) return status.LOADING;
-
+              
               const rowsEmpty = _.isEmpty(rows);
               // An undefined fetchStatus means the requests are still being
               // prepared to be sent. When all requests are completed,
@@ -404,7 +404,7 @@ function discoverController(
                 current.fetchStatus,
                 prev.fetchStatus
               );
-
+ 
               /////////////////////////////////////////////////////////////////
               // Copying it to the rootScope to access it from the Wazuh App //
               /////////////////////////////////////////////////////////////////
@@ -778,15 +778,20 @@ function discoverController(
     }
   }
 
-  $rootScope.$on('wzEventFilters', (evt,parameters) => {
+  const wzEventFiltersListener = $rootScope.$on('wzEventFilters', (evt,parameters) => {
     loadFilters(parameters.filters, parameters.localChange);
   });
 
 
   $scope.tabView = $location.search().tabView || 'panels'
-  $rootScope.$on('changeTabView',(evt,parameters) => {
+  const changeTabViewListener = $rootScope.$on('changeTabView',(evt,parameters) => {
     $scope.tabView = parameters.tabView || 'panels'
     $scope.updateQueryAndFetch($state.query);
+  })
+
+  $scope.$on('$destroy', () => {
+    wzEventFiltersListener()
+    changeTabViewListener()
   })
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
