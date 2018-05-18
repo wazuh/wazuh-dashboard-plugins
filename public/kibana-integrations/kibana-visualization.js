@@ -79,7 +79,7 @@ const app = modules.get('apps/webinar_app', [])
                                 });
     
                                 visHandler = loader.embedVisualizationWithSavedObject($(`[vis-id="'${$scope.visID}'"]`), visualization, params); 
-                                
+          
                                 visHandlers.addItem(visHandler);
                                 visHandler.addRenderCompleteListener(renderComplete);
                             }).catch(error => {
@@ -137,8 +137,11 @@ const app = modules.get('apps/webinar_app', [])
                     $rootScope.loadingStatus = `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`;
 
                     if (currentCompleted >= 100) {
-
-                        if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
+                        if (!visTitle !== 'Wazuh App Overview General Agents status') { 
+                            const thereIsData   = visHandlers.hasData();
+                            $rootScope.rendered = thereIsData;
+                            if(!thereIsData) $rootScope.resultState = 'none'
+                        }
                         // Forcing a digest cycle
                         if(!$rootScope.$$phase) $rootScope.$digest();
                     }

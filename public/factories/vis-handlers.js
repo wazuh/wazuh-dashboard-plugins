@@ -25,6 +25,18 @@ app.factory('visHandlers', function() {
         return list;
     }
 
+    const hasData = () => {
+        for(const item of list) {
+            if(item && item._scope && item._scope.savedObj && item._scope.savedObj.searchSource && 
+                item._scope.savedObj.searchSource.rawResponse &&
+                item._scope.savedObj.searchSource.rawResponse.hits &&
+                item._scope.savedObj.searchSource.rawResponse.hits.total){
+                    return true;
+                }
+        }
+        return false;
+    }
+
     const removeAll = () => {
         for(const item of list){
             if(item && item._scope){
@@ -40,6 +52,7 @@ app.factory('visHandlers', function() {
     return {
       addItem    : addItem,
       getList    : getList,
-      removeAll  : removeAll
+      removeAll  : removeAll,
+      hasData    : hasData
     };
 });
