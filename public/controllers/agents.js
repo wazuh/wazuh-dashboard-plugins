@@ -131,7 +131,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 .then(() => assignFilters(tab,agent))
             }
         } catch (error){
-            console.log(error.message || error)
+            errorHandler.handle('An error occurred while creating custom filters for visualizations','Agents',true);
         }
     }
 

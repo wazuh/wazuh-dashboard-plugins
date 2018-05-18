@@ -154,7 +154,7 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
                 .then(() => assignFilters(tab))
             }
         } catch(error) {
-            console.log(error.message || error)
+            errorHandler.handle('An error occurred while creating custom filters for visualizations','Overview',true);
         }
     }
 
@@ -336,5 +336,9 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
             $scope.wzMonitoringEnabled = true;
         }
     })
-    .catch(error => {console.log(error.message || error);$scope.wzMonitoringEnabled = true});
+    .catch(error => {
+        $scope.wzMonitoringEnabled = true
+        errorHandler.handle(error, 'Overview');
+        if (!$rootScope.$$phase) $rootScope.$digest();
+    });
 });

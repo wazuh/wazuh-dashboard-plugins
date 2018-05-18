@@ -766,14 +766,13 @@ function discoverController(
     if(!appState || !globalState){
       $timeout(100)
       .then(() => {
-        console.log('Awaiting app state...')
         return loadFilters(wzCurrentFilters)
       })
     } else {
       $state.filters = localChange ? $state.filters : [];
 
       queryFilter.addFilters(wzCurrentFilters)
-      .then(() => console.log('Filters loaded successfully'))
+      .then(() => { })
       .catch(error => console.log(error.message || error));
     }
   }

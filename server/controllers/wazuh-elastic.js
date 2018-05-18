@@ -171,7 +171,6 @@ export default class WazuhElastic {
                 results = await this.wzWrapper.searchWazuhElementsByIndexWithRequest(req, item.title);
             } catch (error){
                 forbidden = true;
-                console.log(`Some user tried to fetch the index pattern ${item.title} without permissions.`)
             }
             if((results && results.hits && results.hits.total >= 1) ||
                (!forbidden && results && results.hits && results.hits.total === 0)
