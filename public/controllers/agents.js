@@ -106,10 +106,12 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         try {
             filters = [];
 
+            const isCluster = appState.getClusterInfo().status == 'enabled';
             filters.push(filterHandler.managerQuery(
-                appState.getClusterInfo().status == 'enabled' ?
+                isCluster ?
                 appState.getClusterInfo().cluster :
-                appState.getClusterInfo().manager
+                appState.getClusterInfo().manager,
+                isCluster
             ))
 
             if(tab !== 'general'){
