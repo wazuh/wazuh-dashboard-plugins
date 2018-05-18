@@ -383,7 +383,13 @@ export default class WazuhApi {
                     return ErrorResponse('Allowed method: [GET]', 3023, 400, reply);
                 }
             }
-            if(req.payload.body.devTools) delete req.payload.body.devTools;
+            if(req.payload.body.devTools) {
+                delete req.payload.body.devTools;
+                const keyRegex = new RegExp(/.*agents\/\d*\/key.*/)
+                if(typeof req.payload.path === 'string' &&  keyRegex.test(req.payload.path)){
+                    return ErrorResponse('Forbidden route /agents/<id>/key', 3028, 400, reply);
+                }
+            }
             return this.makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
         }
     }
