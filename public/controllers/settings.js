@@ -417,6 +417,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     $scope.changeIndexPattern = async newIndexPattern => {
         try {
             appState.setCurrentPattern(newIndexPattern);
+            await genericReq.request('GET',`/refresh-fields/${newIndexPattern}`,{})
             $scope.$emit('updatePattern', {});
             errorHandler.info('Successfully changed the default index-pattern','Settings');
             $scope.selectedIndexPattern = newIndexPattern;
