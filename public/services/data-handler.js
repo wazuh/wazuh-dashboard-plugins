@@ -72,9 +72,9 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             if(this.offset !== 0 && this.offset >= this.totalItems){
                 this.end = true;
                 this.busy = false;
-                deferred.resolve(true);
-                return;
+                return Promise.resolve(true);
             }
+            
             const path = this.onlyParents ? this.path + '/parents' : this.path;
             apiReq.request('GET', path, requestData)
             .then(data => {
@@ -169,7 +169,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         search () {
-            if (this.busy || this.end) {
+            if (this.busy) {
                 return Promise.resolve(true);
             }
             this.busy      = true;
