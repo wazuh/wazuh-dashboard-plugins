@@ -85,7 +85,10 @@
 # ------------------------------ wazuh-monitoring ------------------------------
 #
 # Custom setting to enable/disable wazuh-monitoring indices.
-# Default: enabled
+# Values: true, false, worker
+# If worker is given as value, the app will show the Agents status visualization but won't insert data 
+# on wazuh-monitoring indices
+# Default: true
 #wazuh.monitoring.enabled: true
 #
 # Custom setting to set the frequency for wazuh-monitoring indices cron task.
