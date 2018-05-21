@@ -64,8 +64,8 @@ const app = modules.get('apps/webinar_app', [])
                                     .set('filter',  discoverList.length > 1 ? discoverList[1] : {});
                                 } else {
                                     
-                                    // Get filter for cluster/manager regardless environment
-                                    const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && ['cluster.name','manager.name'].includes(item.meta.key));
+                                    // Checks for cluster.name filter existence 
+                                    const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && item.meta.key.includes('cluster.name'));
                                     
                                     // Applying specific filter to Agents status
                                     if(Array.isArray(monitoringFilter) && monitoringFilter.length) {
@@ -121,8 +121,8 @@ const app = modules.get('apps/webinar_app', [])
                                 .set('filter', discoverList.length > 1 ? discoverList[1] : {});
                             } else {
                                     
-                                // Get filter for cluster/manager regardless environment
-                                const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && ['cluster.name','manager.name'].includes(item.meta.key));
+                                // Checks for cluster.name filter existence 
+                                const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && item.meta.key.includes('cluster.name'));
                                 
                                 // Applying specific filter to Agents status
                                 if(Array.isArray(monitoringFilter) && monitoringFilter.length) {
