@@ -30,7 +30,7 @@ export default (server, options) => {
         const configFile = getConfiguration();
 
         ENABLED   = configFile && typeof configFile['wazuh.monitoring.enabled'] !== 'undefined' ? 
-                    configFile['wazuh.monitoring.enabled'] : 
+                    configFile['wazuh.monitoring.enabled'] && configFile['wazuh.monitoring.enabled'] !== 'worker' : 
                     ENABLED;
         FREQUENCY = configFile && typeof configFile['wazuh.monitoring.frequency'] !== 'undefined' ? 
                     configFile['wazuh.monitoring.frequency'] : 
