@@ -7,6 +7,7 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
     const clusterEnabled = appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled';
     $scope.isClusterEnabled = clusterEnabled;
     $location.search('tabView','cluster-monitoring');
+    $location.search('tab','monitoring')
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     discoverPendingUpdates.removeAll();
@@ -22,7 +23,6 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
     $scope.showConfig = false;
     $scope.showNodes  = false;
     $scope.nodeSearchTerm = '';
-    $location.search('tab','general')
     
     $scope.nodes = ClusterNodes;
 
