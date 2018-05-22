@@ -11,5 +11,6 @@
  */
 import * as AgentsVisualizations   from './agents'
 import * as OverviewVisualizations from './overview'
+import * as ClusterVisualizations  from './cluster'
 
-export { AgentsVisualizations, OverviewVisualizations }
+export { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations }

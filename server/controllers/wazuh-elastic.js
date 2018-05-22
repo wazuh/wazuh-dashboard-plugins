@@ -12,7 +12,7 @@
 import ElasticWrapper from '../lib/elastic-wrapper';
 import ErrorResponse  from './error-response'
 
-import { AgentsVisualizations, OverviewVisualizations }  from '../integration-files/visualizations'
+import { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations }  from '../integration-files/visualizations'
 
 export default class WazuhElastic {
     constructor(server){
@@ -273,13 +273,15 @@ export default class WazuhElastic {
         try {
             if(!req.params.pattern ||
                !req.params.tab ||
-               (req.params.tab && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-'))
+               (req.params.tab && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-') && !req.params.tab.includes('cluster-'))
             ) {
                 throw new Error('Missing parameters creating visualizations');
             }
 
             const tabPrefix = req.params.tab.includes('overview') ?
                               'overview' :
+                              req.params.tab.includes('cluster') ?
+                              'cluster' :
                               'agents';
 
             const tabSplit = req.params.tab.split('-');
@@ -287,6 +289,8 @@ export default class WazuhElastic {
 
             const file = tabPrefix === 'overview' ?
                          OverviewVisualizations[tabSufix] :
+                         tabPrefix === 'cluster' ?
+                         ClusterVisualizations.monitoring :
                          AgentsVisualizations[tabSufix];
            
             const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
