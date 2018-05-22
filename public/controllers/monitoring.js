@@ -122,7 +122,6 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
         }
     }
 
-    console.log('DEBUG 2')
     if(clusterEnabled) load();
 
     $scope.$on('destroy',() => {
