@@ -17,7 +17,8 @@
     <div layout="row" class="md-padding font-size-18 wz-margin-top-10" ng-if="!loading">
         <span flex="20" ng-if="!showConfig && !showNodes"><i class="fa fa-sitemap"></i> {{ currentAPI }}</span>
         <span flex ng-if="showConfig"><i class="fa fa-sitemap"></i> <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span> / overview</span>
-        <span flex ng-if="showNodes"><i class="fa fa-sitemap"></i> <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span> / nodes</span>
+        <span flex ng-if="showNodes && !currentNode"><i class="fa fa-sitemap"></i> <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span> / nodes</span>
+        <span flex ng-if="currentNode"><i class="fa fa-sitemap"></i> <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span> / <span class="wz-text-link cursor-pointer" ng-click="goNodes()">nodes</span> / {{ currentNode.name }}</span>
     </div>
     <div layout="row" ng-if="!showConfig && !showNodes && !loading">
         <md-card flex="50" class="wz-md-card">
@@ -40,8 +41,12 @@
         </md-card>
         <md-card flex="50" class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title wz-text-link cursor-pointer" ng-click="goNodes()">Nodes: {{nodesCount}}</span>
+                <span class="wz-headline-title">Info</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goNodes()">
+                    <span class="wz-text-link" flex="40">Nodes</span>
+                    <span flex class="color-grey">{{nodesCount}}</span>
+                </div>
                 <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goAgents()">
                     <span class="wz-text-link" flex="40">Agents</span>
                     <span flex class="color-grey">{{agentsCount}}</span>
@@ -50,7 +55,7 @@
         </md-card>
     </div>  
 
-    <div layout="row" ng-show="showConfig || showNodes">
+    <div layout="row" ng-show="(showConfig || showNodes) && !currentNode">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
                 <div flex="20">Nodes:
@@ -105,7 +110,7 @@
     </div>
     <div layout="row" ng-show="showNodes">
         <md-card flex class="wz-md-card">
-            <md-card-content>
+            <md-card-content ng-show="!currentNode">
                 <span class="wz-headline-title">Nodes</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <wz-search-bar class="wz-lateral-padding-16" data="nodes" term="nodeSearchTerm" placetext="'Filter nodes...'"></wz-search-bar>
@@ -125,7 +130,7 @@
                     layout="column"
                     flex
                     data="nodes"
-                    nopointer="1"
+                    func="showNode(index)"
                     keys="[
                         {col:'name',size:25},
                         {col:'version',size:25},
@@ -135,6 +140,28 @@
                     class="no-lateral-padding"
                 >
                 </wz-table>
+            </md-card-content>
+            <md-card-content ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.info">
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="15">IP</span>
+                    <span flex class="color-grey">{{currentNode.healthCheck.info.ip}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="15">Version</span>
+                    <span flex class="color-grey">{{currentNode.healthCheck.info.version}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="15">Type</span>
+                    <span flex class="color-grey">{{currentNode.healthCheck.info.type}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="15">Name</span>
+                    <span flex class="color-grey">{{currentNode.healthCheck.info.name}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="15">Active agents</span>
+                    <span flex class="color-grey">{{ currentNode.healthCheck.info.n_active_agents }}</span>
+                </div>
             </md-card-content>
         </md-card>
     </div>

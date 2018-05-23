@@ -30,9 +30,10 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
         monitoring: 2
     });
 
-    $scope.loading    = true;
-    $scope.showConfig = false;
-    $scope.showNodes  = false;
+    $scope.loading     = true;
+    $scope.showConfig  = false;
+    $scope.showNodes   = false;
+    $scope.currentNode = null;
     $scope.nodeSearchTerm = '';
     
     $scope.nodes = ClusterNodes;
@@ -40,6 +41,7 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
     const setBooleans = component => {
         $scope.showConfig = component === 'showConfig';
         $scope.showNodes  = component === 'showNodes';
+        $scope.currentNode = null;
     }
 
     $scope.goAgents = () => {
@@ -58,6 +60,19 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
         setBooleans(null);
     }
 
+    $scope.showNode = async index => {
+        try {
+            $scope.currentNode = $scope.nodes.items[index];
+            const data = await apiReq.request('GET','/cluster/healthcheck',{ node: $scope.currentNode.name });
+            console.log(data)
+            $scope.currentNode.healthCheck = data.data.data.nodes[$scope.currentNode.name];
+            console.log($scope.currentNode.healthCheck)
+            if(!$scope.$$phase) $scope.$digest();
+        } catch(error) {
+            errorHandler.handle(error,'Cluster')
+        }
+
+    }
 
     let filters = [];
     const assignFilters = () => {
@@ -83,18 +98,10 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
     const load = async () => {
         try {
 
-            // Start timelions
             visHandlers.removeAll();
             discoverPendingUpdates.removeAll();
             rawVisualizations.removeAll();
             loadedVisualizations.removeAll();
-
-            const visData = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/cluster-monitoring/${appState.getCurrentPattern()}`)
-    
-            rawVisualizations.assignItems(visData.data.raw);
-            assignFilters();
-            $rootScope.$broadcast('updateVis');
-            // End timelions
 
             await $scope.nodes.nextPage();
 
@@ -124,6 +131,13 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
 
             const health = data[5];
             $scope.healthCheck = health.data.data;
+
+
+            const visData = await genericReq.request('POST',`/api/wazuh-elastic/create-vis/cluster-monitoring/${appState.getCurrentPattern()}`,{ nodes: data[1].data.data })
+    
+            rawVisualizations.assignItems(visData.data.raw);
+            assignFilters();
+            $rootScope.$broadcast('updateVis');
 
             $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
