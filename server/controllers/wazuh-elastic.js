@@ -275,7 +275,7 @@ export default class WazuhElastic {
      * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
      * @param {*} nodes Array of node names. Eg: ['node01', 'node02']
      */
-    buildClusterVisualizationsRaw (app_objects, id, nodes) {
+    buildClusterVisualizationsRaw (app_objects, id, nodes, name) {
         try{
             const visArray = [];
             let aux_source, bulk_content;
@@ -291,18 +291,22 @@ export default class WazuhElastic {
 
                 const visState = JSON.parse(bulk_content.visualization.visState);
                 const title    = visState.title;
-                
-                if(title === 'Wazuh App Cluster Overview'){
-                    let query = '.es('
-                    for(const node of nodes) {
-                        query += `q="cluster.node: ${node.name}",`
+                console.log(visState.params.expression)
+                if(visState.type && visState.type === 'timelion') {
+                    let query = `.es(`
+                    if(title === 'Wazuh App Cluster Overview'){
+                        for(const node of nodes) {
+                            query += `q="cluster.name: ${name} AND cluster.node: ${node.name}",`
+                        }
+                    } else if(title === 'Wazuh App Cluster Overview Manager') {
+                        query += `q="cluster.name: ${name} AND agent.id: 000",`
                     }
                     query = query.substring(0, query.length - 1);
                     query += ')'
                     visState.params.expression = query;
                     bulk_content.visualization.visState = JSON.stringify(visState);
                 }
-
+  
                 visArray.push({
                     attributes: bulk_content.visualization,
                     type      : element._type,
@@ -351,6 +355,7 @@ export default class WazuhElastic {
                !req.payload ||
                !req.payload.nodes ||
                !req.payload.nodes.items ||
+               !req.payload.nodes.name ||
                (req.params.tab && !req.params.tab.includes('cluster-'))
             ) {
                 throw new Error('Missing parameters creating visualizations');
@@ -363,8 +368,9 @@ export default class WazuhElastic {
 
             const file  = ClusterVisualizations['monitoring'];
             const nodes = req.payload.nodes.items;
-            
-            const raw = await this.buildClusterVisualizationsRaw(file, req.params.pattern, nodes);
+            const name  = req.payload.nodes.name;
+
+            const raw = await this.buildClusterVisualizationsRaw(file, req.params.pattern, nodes, name);
 
             return reply({acknowledge: true, raw: raw });
             
