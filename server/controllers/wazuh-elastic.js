@@ -269,19 +269,64 @@ export default class WazuhElastic {
         }
     }
 
+    /**
+     * Replaces visualizations main fields to fit a certain pattern.
+     * @param {*} app_objects Object containing raw visualizations.
+     * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
+     * @param {*} nodes Array of node names. Eg: ['node01', 'node02']
+     */
+    buildClusterVisualizationsRaw (app_objects, id, nodes) {
+        try{
+            const visArray = [];
+            let aux_source, bulk_content;
+            for (const element of app_objects) {
+            	// Stringify and replace index-pattern for visualizations
+                aux_source = JSON.stringify(element._source);
+                aux_source = aux_source.replace("wazuh-alerts", id);
+                aux_source = JSON.parse(aux_source);
+    
+                // Bulk source
+                bulk_content = {};
+                bulk_content[element._type] = aux_source;
+
+                const visState = JSON.parse(bulk_content.visualization.visState);
+                const title    = visState.title;
+                
+                if(title === 'Wazuh App Cluster Overview'){
+                    let query = '.es('
+                    for(const node of nodes) {
+                        query += `q="cluster.node: ${node.name}",`
+                    }
+                    query = query.substring(0, query.length - 1);
+                    query += ')'
+                    visState.params.expression = query;
+                    bulk_content.visualization.visState = JSON.stringify(visState);
+                }
+
+                visArray.push({
+                    attributes: bulk_content.visualization,
+                    type      : element._type,
+                    id        : element._id,
+                    _version  : bulk_content.visualization.version
+                });
+            }
+            return visArray;
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
     async createVis (req, reply) {
         try {
             if(!req.params.pattern ||
                !req.params.tab ||
-               (req.params.tab && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-') && !req.params.tab.includes('cluster-'))
+               (req.params.tab && !req.params.tab.includes('overview-') && !req.params.tab.includes('agents-'))
             ) {
                 throw new Error('Missing parameters creating visualizations');
             }
 
             const tabPrefix = req.params.tab.includes('overview') ?
                               'overview' :
-                              req.params.tab.includes('cluster') ?
-                              'cluster' :
                               'agents';
 
             const tabSplit = req.params.tab.split('-');
@@ -289,8 +334,6 @@ export default class WazuhElastic {
 
             const file = tabPrefix === 'overview' ?
                          OverviewVisualizations[tabSufix] :
-                         tabPrefix === 'cluster' ?
-                         ClusterVisualizations.monitoring :
                          AgentsVisualizations[tabSufix];
            
             const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
@@ -298,6 +341,35 @@ export default class WazuhElastic {
             
         } catch(error){
             return ErrorResponse(error.message || error, 4007, 500, reply);
+        }
+    }
+
+    async createClusterVis (req, reply) {
+        try {
+            if(!req.params.pattern ||
+               !req.params.tab ||
+               !req.payload ||
+               !req.payload.nodes ||
+               !req.payload.nodes.items ||
+               (req.params.tab && !req.params.tab.includes('cluster-'))
+            ) {
+                throw new Error('Missing parameters creating visualizations');
+            }
+
+            const tabPrefix = 'cluster';
+
+            const tabSplit = req.params.tab.split('-');
+            const tabSufix = tabSplit[1];
+
+            const file  = ClusterVisualizations['monitoring'];
+            const nodes = req.payload.nodes.items;
+            
+            const raw = await this.buildClusterVisualizationsRaw(file, req.params.pattern, nodes);
+
+            return reply({acknowledge: true, raw: raw });
+            
+        } catch(error){
+            return ErrorResponse(error.message || error, 4009, 500, reply);
         }
     }
 
