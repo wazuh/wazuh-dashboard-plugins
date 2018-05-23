@@ -58,15 +58,24 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
 
     $scope.goBack = () => {
         setBooleans(null);
+        tabVisualizations.assign({
+            monitoring: 2
+        });
+        assignFilters();
+        $rootScope.$broadcast('updateVis');
     }
 
     $scope.showNode = async index => {
         try {
+            tabVisualizations.assign({
+                monitoring: 1
+            });
             $scope.currentNode = $scope.nodes.items[index];
             const data = await apiReq.request('GET','/cluster/healthcheck',{ node: $scope.currentNode.name });
             console.log(data)
             $scope.currentNode.healthCheck = data.data.data.nodes[$scope.currentNode.name];
-            console.log($scope.currentNode.healthCheck)
+            assignFilters($scope.currentNode.name);
+            $rootScope.$broadcast('updateVis');
             if(!$scope.$$phase) $scope.$digest();
         } catch(error) {
             errorHandler.handle(error,'Cluster')
@@ -75,7 +84,7 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
     }
 
     let filters = [];
-    const assignFilters = () => {
+    const assignFilters = node => {
         try{
 
             filters = [];
@@ -83,6 +92,9 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
                 appState.getClusterInfo().cluster, 
                 true
             ))
+            if(node){
+                filters.push(filterHandler.nodeQuery(node))
+            }
 
             $rootScope.$emit('wzEventFilters',{ filters, localChange: false });
             if(!$rootScope.$$listenerCount['wzEventFilters']){
@@ -132,8 +144,9 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
             const health = data[5];
             $scope.healthCheck = health.data.data;
 
-
-            const visData = await genericReq.request('POST',`/api/wazuh-elastic/create-vis/cluster-monitoring/${appState.getCurrentPattern()}`,{ nodes: data[1].data.data })
+            const nodes = data[1].data.data;
+            nodes.name = $scope.configuration.name;
+            const visData = await genericReq.request('POST',`/api/wazuh-elastic/create-vis/cluster-monitoring/${appState.getCurrentPattern()}`,{ nodes })
     
             rawVisualizations.assignItems(visData.data.raw);
             assignFilters();
