@@ -476,9 +476,12 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    let filters = queryFilter.getFilters();
-    filters = Array.isArray(filters) ? filters.filter(item => item && item.$state && item.$state.store && item.$state.store === 'appState') : [];
-    if(!filters || !filters.length) return;
+    const currentUrlPath = $location.path();
+    if(currentUrlPath && !currentUrlPath.includes('wazuh-discover')){
+      let filters = queryFilter.getFilters();
+      filters = Array.isArray(filters) ? filters.filter(item => item && item.$state && item.$state.store && item.$state.store === 'appState') : [];
+      if(!filters || !filters.length) return;
+    }
     discoverPendingUpdates.removeAll()
     discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
