@@ -53,6 +53,20 @@ export default class FilterHandler {
         return result;
     }
 
+    nodeQuery(node) {
+        const result = this.base();
+        result.meta.key = 'cluster.node';
+        result.meta.value = node;
+        result.meta.params.query = node;
+        result.query.match = {
+            'cluster.node': {
+                query: node,
+                type: 'phrase'
+            }
+        };
+        return result;
+    }
+
     ruleGroupQuery(group) {
         const result = this.base();
         result.meta.key = 'rule.groups';
