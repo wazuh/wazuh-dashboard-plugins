@@ -58,10 +58,20 @@ const app = modules.get('apps/webinar_app', [])
                                     implicitFilter = discoverList ? discoverList[0].query : '';
                                 }
 
-                                if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
+                                if (visTitle !== 'Wazuh App Overview General Agents status' && !visTitle.includes('Cluster')) { // We don't want to filter that visualization as it uses another index-pattern
                                     visualization.searchSource
                                     .query({ language: 'lucene', query: implicitFilter })
                                     .set('filter',  discoverList.length > 1 ? discoverList[1] : {});
+                                } else if(visTitle.includes('Cluster')) {
+                                    // Checks for cluster.name and cluster.node filters existence 
+                                    const clusterFilters = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
+                                    
+                                    // Applying specific filter to cluster visualziations status
+                                    if(Array.isArray(clusterFilters) && clusterFilters.length) {
+                                        for(const clusterFilter of clusterFilters){
+                                            visualization.searchSource.filter(clusterFilter);
+                                        }                                    
+                                    }
                                 } else {
                                     
                                     // Checks for cluster.name filter existence 
@@ -119,6 +129,16 @@ const app = modules.get('apps/webinar_app', [])
                                 visualization.searchSource
                                 .query({ language: 'lucene', query: implicitFilter })
                                 .set('filter', discoverList.length > 1 ? discoverList[1] : {});
+                            } else if(visTitle.includes('Cluster')) {
+                                // Checks for cluster.name and cluster.node filters existence 
+                                const clusterFilters = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
+                                
+                                // Applying specific filter to cluster visualziations status
+                                if(Array.isArray(clusterFilters) && clusterFilters.length) {
+                                    for(const clusterFilter of clusterFilters){
+                                        visualization.searchSource.filter(clusterFilter);
+                                    }                                    
+                                }
                             } else {
                                     
                                 // Checks for cluster.name filter existence 
