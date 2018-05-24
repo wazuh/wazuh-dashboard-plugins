@@ -132,7 +132,6 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
                 .then(() => assignFilters())
             }
         } catch(error) {
-            console.log(error.message || error)
             errorHandler.handle('An error occurred while creating custom filters for visualizations','Cluster',true);
         }
     }
