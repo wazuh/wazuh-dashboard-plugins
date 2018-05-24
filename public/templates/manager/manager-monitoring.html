@@ -54,21 +54,17 @@
         </md-card>
     </div>  
 
-    <div layout="row" ng-show="(showConfig || showNodes) && !currentNode">
-        <md-card flex class="wz-metric-color wz-md-card">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div flex="20">Nodes:
-                    <span class="wz-text-bold">{{nodesCount}}</span>
-                </div>
-                <div flex>Agents:
-                    <span class="wz-text-bold">{{agentsCount}}</span>
-                </div>
+    <kbn-dis ng-if="!showNodes" ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
+
+    <div layout="row" ng-show="showConfig" class="wz-timelions">
+        <md-card flex="30" class="wz-md-card" ng-show="rendered">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Top nodes</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Cluster-Overview-Node-Pie'" id="Wazuh-App-Cluster-Overview-Node-Pie"></kbn-vis>
             </md-card-content>
         </md-card>
-    </div>
-
-    <div layout="row" ng-show="showConfig">
-        <md-card flex="50" class="wz-md-card">
+        <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title">Overview</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -106,8 +102,9 @@
                 </div>
             </md-card-content>
         </md-card>
+
     </div>
-    <kbn-dis ng-if="!showNodes" ng-show="!loading && !showConfig && (!showNodes || currentNode)"></kbn-dis>
+
 
     <div layout="column" flex ng-if="showNodes">
         <md-card flex class="wz-md-card" ng-show="!currentNode">
@@ -150,16 +147,11 @@
             <div class="percentage">{{loadingStatus}}</div>
         </div>
         <div layout="row" class="height-250 wz-timelions" ng-show="currentNode && !loading && !showConfig">
-            <md-card flex class="wz-md-card" ng-show="rendered">
+            <md-card flex class="wz-md-card" >
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">{{ currentNode.name }} alerts summary</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Cluster-Overview-Node'" id="Wazuh-App-Cluster-Overview-Node"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex layout="column" class="wz-md-card" ng-show="!rendered">
-                <md-card-content class="wz-text-center">
-                    No results for selected time interval
+                    <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-Overview-Node'" id="Wazuh-App-Cluster-Overview-Node"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
