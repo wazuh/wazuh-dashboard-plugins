@@ -21,13 +21,6 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
         $scope.submenuNavItem = $routeParams.tab;
     }
 
-    apiReq.request('GET', `/agents/000`, {})
-    .then(data => $rootScope.agent = data.data.data)
-    .catch(error => {
-        errorHandler.handle(error,'Manager');
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    });
-
     $scope.reloadGroups = () => {
         $scope.submenuNavItem = 'groups';
         $rootScope.groupsIsReloaded = true;
