@@ -163,6 +163,12 @@ export default class WazuhElastic {
         }
     }
 
+    /**
+     * Checks one by one if the requesting user has enough privileges to use
+     * an index pattern from the list.
+     * @param {Array<Object>} list List of index patterns 
+     * @param {*} req 
+     */
     async filterAllowedIndexPatternList (list,req) {
         let finalList = [];
         for(let item of list){
@@ -183,6 +189,10 @@ export default class WazuhElastic {
         return finalList;
     }
 
+    /**
+     * Checks for minimum index pattern fields in a list of index patterns.
+     * @param {Array<Object>} indexPatternList List of index patterns
+     */
     validateIndexPattern(indexPatternList){
         const minimum = ["@timestamp", "full_log", "manager.name", "agent.id"];
         let list = [];
@@ -239,8 +249,8 @@ export default class WazuhElastic {
 
     /**
      * Replaces visualizations main fields to fit a certain pattern.
-     * @param {*} app_objects Object containing raw visualizations.
-     * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
+     * @param {Array<Object>} app_objects Object containing raw visualizations.
+     * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
      */
     buildVisualizationsRaw (app_objects, id) {
         try{
@@ -270,15 +280,18 @@ export default class WazuhElastic {
     }
 
     /**
-     * Replaces visualizations main fields to fit a certain pattern.
-     * @param {*} app_objects Object containing raw visualizations.
-     * @param {*} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
-     * @param {*} nodes Array of node names. Eg: ['node01', 'node02']
+     * Replaces cluster visualizations main fields.
+     * @param {Array<Object>} app_objects Object containing raw visualizations.
+     * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
+     * @param {Array<String>} nodes Array of node names. Eg: ['node01', 'node02']
+     * @param {String} name Cluster name. Eg: 'wazuh'
+     * @param {String} master_node Master node name. Eg: 'node01'
      */
-    buildClusterVisualizationsRaw (app_objects, id, nodes, name) {
+    buildClusterVisualizationsRaw (app_objects, id, nodes, name, master_node) {
         try{
             const visArray = [];
             let aux_source, bulk_content;
+
             for (const element of app_objects) {
             	// Stringify and replace index-pattern for visualizations
                 aux_source = JSON.stringify(element._source);
@@ -291,7 +304,7 @@ export default class WazuhElastic {
 
                 const visState = JSON.parse(bulk_content.visualization.visState);
                 const title    = visState.title;
-                console.log(visState.params.expression)
+
                 if(visState.type && visState.type === 'timelion') {
                     let query = `.es(`
                     if(title === 'Wazuh App Cluster Overview'){
@@ -299,7 +312,7 @@ export default class WazuhElastic {
                             query += `q="cluster.name: ${name} AND cluster.node: ${node.name}",`
                         }
                     } else if(title === 'Wazuh App Cluster Overview Manager') {
-                        query += `q="cluster.name: ${name} AND agent.id: 000",`
+                        query += `q="cluster.name: ${name} AND cluster.node: ${master_node} AND agent.id: 000",`
                     }
                     query = query.substring(0, query.length - 1);
                     query += ')'
@@ -314,7 +327,9 @@ export default class WazuhElastic {
                     _version  : bulk_content.visualization.version
                 });
             }
+
             return visArray;
+        
         } catch (error) {
             return Promise.reject(error)
         }
@@ -366,11 +381,12 @@ export default class WazuhElastic {
             const tabSplit = req.params.tab.split('-');
             const tabSufix = tabSplit[1];
 
-            const file  = ClusterVisualizations['monitoring'];
-            const nodes = req.payload.nodes.items;
-            const name  = req.payload.nodes.name;
-
-            const raw = await this.buildClusterVisualizationsRaw(file, req.params.pattern, nodes, name);
+            const file        = ClusterVisualizations['monitoring'];
+            const nodes       = req.payload.nodes.items;
+            const name        = req.payload.nodes.name;
+            const master_node = req.payload.nodes.master_node;
+            
+            const raw = await this.buildClusterVisualizationsRaw(file, req.params.pattern, nodes, name, master_node);
 
             return reply({acknowledge: true, raw: raw });
             
