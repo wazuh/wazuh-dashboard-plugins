@@ -305,13 +305,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 }
             }
 
-
-            if (id === '000' && $scope.tab === 'configuration') {
-                $scope.tab = 'general';
-                discoverPendingUpdates.removeAll();
-                $scope.switchTab('general', true);
-            }
-
             const data = await Promise.all([
                 apiReq.request('GET', `/agents/${id}`, {}),
                 apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
@@ -473,11 +466,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
                 $scope.configurationError = true;
                 $scope.load = false;
-                if($scope.agent.id === '000'){
-                    $scope.configurationError = false;
-                    $scope.tab = 'general';
-                    $scope.switchTab('general', true);
-                }
                 if(!$scope.$$phase) $scope.$digest();
                 return;
             }
