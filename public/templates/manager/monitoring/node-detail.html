@@ -11,6 +11,7 @@
                 <span class="wz-headline-title">{{ currentNode.name }} alerts summary</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-Overview-Node'" id="Wazuh-App-Cluster-Overview-Node"></kbn-vis>
+                <span class="wz-padding-top-10" ng-show="!rendered">No results for selected time interval</span>
             </md-card-content>
         </md-card>
     </div>
