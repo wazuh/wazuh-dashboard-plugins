@@ -145,7 +145,10 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
             $scope.healthCheck = health.data.data;
 
             const nodes = data[1].data.data;
-            nodes.name = $scope.configuration.name;
+
+            nodes.name        = $scope.configuration.name;
+            nodes.master_node = $scope.configuration.node_name;
+
             const visData = await genericReq.request('POST',`/api/wazuh-elastic/create-vis/cluster-monitoring/${appState.getCurrentPattern()}`,{ nodes })
     
             rawVisualizations.assignItems(visData.data.raw);
