@@ -7,7 +7,7 @@
 			<div flex layout-align="center center" class="layout-row" ng-if="agent">
 				<div class="flex">
 					<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
-						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
+						{{agent.id}} - {{agent.name}}</span>
 
 					<span ng-show="agent.status" class="wz-agent-status-indicator" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
 				</div>
@@ -56,7 +56,7 @@
 				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('gdpr');" name="gdpr" ng-show="extensions.gdpr">GDPR</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('virustotal');" name="virustotal" ng-show="extensions.virustotal">VirusTotal</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('configuration');" name="configuration" ng-show="agent.id != '000'">Configuration</md-nav-item>
+                <md-nav-item md-nav-click="switchTab('configuration');" name="configuration">Configuration</md-nav-item>
 			</md-nav-bar>
 		</div>
 
