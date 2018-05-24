@@ -28,7 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   When disabled, useful metrics will appear on _Overview/General_ replacing the _Agent status_ visualization.
 -   Added CSV exporting button to the app ([#431](https://github.com/wazuh/wazuh-kibana-app/pull/431)):
     -   Implemented new logic to fetch data from the Wazuh API and download it in CSV format.
-    -   Currently available for the _Ruleset_, _Logs_ and _Groups_ sections on the _Manager_ tab.
+    -   Currently available for the _Ruleset_, _Logs_ and _Groups_ sections on the _Manager_ tab and also the _Agents_ tab.
 -   More refactoring to the app backend ([#439](https://github.com/wazuh/wazuh-kibana-app/pull/439)):
     -   Standardized error output from the server side.
     -   Drastically reduced the error management logic on the client side.
