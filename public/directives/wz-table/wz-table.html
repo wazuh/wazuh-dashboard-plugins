@@ -21,7 +21,7 @@
     <!-- Agents preview table -->
     <div ng-if="!noscroll && isagents" flex class="wz-table-scroll" when-scrolled="data.nextPage('')">
         <div layout="row" ng-class-odd="'wz-table-odd'" ng-class-even="'wz-table-even'" ng-repeat="item in data.items | filter : searchTerm"
-            class="wz-table-common" ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' ">
+            class="wz-table-common" ng-class="!nopointer ? 'wz-table-cursor-pointer' : '' " ng-show="item && item.id !== '000'">
             <div class="wz-table-agents wz-text-truncatable" ng-repeat="key in keys" flex="{{key.size || ''}}" ng-click="clickAction(full ? item : $index,key)">
                 <span>{{parseItem(item,key) || '---'}}</span>
             </div>
