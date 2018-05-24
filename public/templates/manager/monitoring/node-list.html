@@ -1,0 +1,24 @@
+<div layout="column" flex ng-if="showNodes && !currentNode">
+    <md-card flex class="wz-md-card" ng-show="!currentNode">
+        <md-card-content>
+            <span class="wz-headline-title">Nodes</span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <wz-search-bar class="wz-lateral-padding-16" data="nodes" term="nodeSearchTerm" placetext="'Filter nodes...'"></wz-search-bar>
+
+            <wz-table-header layout="row" data="nodes" keys="[
+                    {name:'Name',size:25},
+                    {name:'Version',size:25},
+                    {name:'IP',size:25},
+                    {name:'Type',size:25}
+                ]">
+            </wz-table-header>
+            <wz-table layout="column" flex data="nodes" func="showNode(index)" keys="[
+                    {col:'name',size:25},
+                    {col:'version',size:25},
+                    {col:'ip',size:25},
+                    {col:'type',size:25}
+                ]" class="no-lateral-padding">
+            </wz-table>
+        </md-card-content>
+    </md-card>
+</div>

@@ -1,0 +1,16 @@
+<div layout="row" layout-align="center stretch" class="height-400 wz-timelions" ng-show="!loading && !showConfig && !showNodes">
+    <md-card flex class="wz-md-card">
+        <md-card-content class="wazuh-column">
+            <span class="wz-headline-title">Master alerts summary</span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Cluster-Overview-Manager'" id="Wazuh-App-Cluster-Overview-Manager"></kbn-vis>
+        </md-card-content>
+    </md-card>
+    <md-card flex class="wz-md-card">
+        <md-card-content class="wazuh-column">
+            <span class="wz-headline-title">Overall alerts summary</span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <kbn-vis specific-time-range="true" vis-id="'Wazuh-App-Cluster-Overview'" id="Wazuh-App-Cluster-Overview"></kbn-vis>
+        </md-card-content>
+    </md-card>
+</div>

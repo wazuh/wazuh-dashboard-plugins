@@ -1,0 +1,14 @@
+<div layout="row" class="md-padding font-size-18 wz-margin-top-10" ng-if="!loading">
+    <span flex="20" ng-if="!showConfig && !showNodes">
+        <i class="fa fa-sitemap"></i> {{ currentAPI }}</span>
+    <span flex ng-if="showConfig">
+        <i class="fa fa-sitemap"></i>
+        <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span> / overview</span>
+    <span flex ng-if="showNodes && !currentNode">
+        <i class="fa fa-sitemap"></i>
+        <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span> / nodes</span>
+    <span flex ng-if="currentNode">
+        <i class="fa fa-sitemap"></i>
+        <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span> /
+        <span class="wz-text-link cursor-pointer" ng-click="goNodes()">nodes</span> / {{ currentNode.name }}</span>
+</div>
