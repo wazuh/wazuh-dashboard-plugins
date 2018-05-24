@@ -14,7 +14,7 @@ import FilterHandler from './filter-handler'
 const app = require('ui/modules').get('app/wazuh', []);
 
 // Logs controller
-app.controller('clusterController', function ($scope, $rootScope, errorHandler, apiReq, ClusterNodes, $window, $location, discoverPendingUpdates, rawVisualizations, loadedVisualizations, visHandlers, tabVisualizations, appState, genericReq) {
+app.controller('clusterController', function ($scope, $rootScope, $timeout, errorHandler, apiReq, ClusterNodes, $window, $location, discoverPendingUpdates, rawVisualizations, loadedVisualizations, visHandlers, tabVisualizations, appState, genericReq) {
     const clusterEnabled = appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled';
     $scope.isClusterEnabled = clusterEnabled;
     $location.search('tabView','cluster-monitoring');
@@ -72,10 +72,40 @@ app.controller('clusterController', function ($scope, $rootScope, errorHandler, 
             });
             $scope.currentNode = $scope.nodes.items[index];
             const data = await apiReq.request('GET','/cluster/healthcheck',{ node: $scope.currentNode.name });
-            console.log(data)
+
             $scope.currentNode.healthCheck = data.data.data.nodes[$scope.currentNode.name];
+
+            if($scope.currentNode.healthCheck && $scope.currentNode.healthCheck.status) {
+
+                $scope.currentNode.healthCheck.status.last_sync_integrity.duration   = 'n/a';
+                $scope.currentNode.healthCheck.status.last_sync_agentinfo.duration   = 'n/a';
+                $scope.currentNode.healthCheck.status.last_sync_agentgroups.duration = 'n/a';
+
+                if($scope.currentNode.healthCheck.status.last_sync_integrity.date_start_master !== 'n/a' && 
+                   $scope.currentNode.healthCheck.status.last_sync_integrity.date_end_master   !== 'n/a') {
+                    const end = new Date($scope.currentNode.healthCheck.status.last_sync_integrity.date_end_master);
+                    const start = new Date($scope.currentNode.healthCheck.status.last_sync_integrity.date_start_master)
+                    $scope.currentNode.healthCheck.status.last_sync_integrity.duration = `${(end - start) / 1000}s`;
+                }
+                
+                if($scope.currentNode.healthCheck.status.last_sync_agentinfo.date_start_master !== 'n/a' && 
+                   $scope.currentNode.healthCheck.status.last_sync_agentinfo.date_end_master   !== 'n/a') {
+                    const end = new Date($scope.currentNode.healthCheck.status.last_sync_agentinfo.date_end_master);
+                    const start = new Date($scope.currentNode.healthCheck.status.last_sync_agentinfo.date_start_master)
+                    $scope.currentNode.healthCheck.status.last_sync_agentinfo.duration = `${(end - start) / 1000}s`;
+                }
+                
+                if($scope.currentNode.healthCheck.status.last_sync_agentgroups.date_start_master !== 'n/a' && 
+                   $scope.currentNode.healthCheck.status.last_sync_agentgroups.date_end_master   !== 'n/a') {
+                    const end = new Date($scope.currentNode.healthCheck.status.last_sync_agentgroups.date_end_master);
+                    const start = new Date($scope.currentNode.healthCheck.status.last_sync_agentgroups.date_start_master)
+                    $scope.currentNode.healthCheck.status.last_sync_agentgroups.duration = `${(end - start) / 1000}s`;
+                }
+            }
+
             assignFilters($scope.currentNode.name);
             $rootScope.$broadcast('updateVis');
+
             if(!$scope.$$phase) $scope.$digest();
         } catch(error) {
             errorHandler.handle(error,'Cluster')
