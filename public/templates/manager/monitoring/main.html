@@ -4,15 +4,15 @@
             <span class="wz-headline-title wz-text-link cursor-pointer" ng-click="goConfiguration()">Overview</span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <div layout="row" class="wz-padding-top-10">
-                <span flex="40">IP</span>
+                <span flex="25">IP</span>
                 <span flex class="color-grey">{{configuration.nodes[0] || 'Unknown'}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-                <span flex="40">Running</span>
+                <span flex="25">Running</span>
                 <span flex class="color-grey">{{ status || 'no' }}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
-                <span flex="40">Version</span>
+                <span flex="25">Version</span>
                 <span flex class="color-grey">{{version}}</span>
             </div>
         </md-card-content>
@@ -22,11 +22,11 @@
             <span class="wz-headline-title">Info</span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goNodes()">
-                <span class="wz-text-link" flex="40">Nodes</span>
+                <span class="wz-text-link" flex="25">Nodes</span>
                 <span flex class="color-grey">{{nodesCount}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goAgents()">
-                <span class="wz-text-link" flex="40">Agents</span>
+                <span class="wz-text-link" flex="25">Agents</span>
                 <span flex class="color-grey">{{agentsCount}}</span>
             </div>
         </md-card-content>
