@@ -306,16 +306,16 @@ export default class WazuhElastic {
                 const title    = visState.title;
 
                 if(visState.type && visState.type === 'timelion') {
-                    let query = `.es(`
+                    let query = '';
                     if(title === 'Wazuh App Cluster Overview'){
                         for(const node of nodes) {
-                            query += `q="cluster.name: ${name} AND cluster.node: ${node.name}",`
+                            query += `.es(q="cluster.name: ${name} AND cluster.node: ${node.name}").label("${node.name}"),`
                         }
+                        query = query.substring(0, query.length - 1);
                     } else if(title === 'Wazuh App Cluster Overview Manager') {
-                        query += `q="cluster.name: ${name} AND cluster.node: ${master_node} AND agent.id: 000",`
-                    }
-                    query = query.substring(0, query.length - 1);
-                    query += ')'
+                        query += `.es(q="cluster.name: ${name}").label("${name} cluster")`
+                    }                   
+  
                     visState.params.expression = query;
                     bulk_content.visualization.visState = JSON.stringify(visState);
                 }
