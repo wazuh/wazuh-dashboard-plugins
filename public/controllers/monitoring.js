@@ -50,10 +50,20 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
 
     $scope.goConfiguration = () => {
         setBooleans('showConfig');
+        tabVisualizations.assign({
+            monitoring: 1
+        });
+        assignFilters();
+        $rootScope.$broadcast('updateVis');
     }
 
     $scope.goNodes = () => {
         setBooleans('showNodes');
+        tabVisualizations.assign({
+            monitoring: 1
+        });
+        assignFilters();
+        $rootScope.$broadcast('updateVis');
     }
 
     $scope.goBack = () => {
