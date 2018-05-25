@@ -11,6 +11,12 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   A new extension, enabled by default.
     -   Visualize alerts related to the GDPR compliance on the _Overview_ and _Agents_ tabs.
     -   The _Ruleset_ tab has been updated to include GDPR filters on the _Rules_ subtab.
+-   Brand-new Management tab - _Monitoring_ ([#490](https://github.com/wazuh/wazuh-kibana-app/pull/490)):
+    -   Visualize your Wazuh cluster, both master and clients.
+        -   Get the current cluster configuration.
+        -   Nodes listing, sorting, searching, etc.
+    -   Get a more in-depth cluster status thanks to the newly added [_Timelion_](https://www.elastic.co/guide/en/kibana/current/timelion.html) visualizations.
+    -   The Detail view gives you a summary of the node's healthcheck.
 -   Brand-new tab - _Dev tools_ ([#449](https://github.com/wazuh/wazuh-kibana-app/pull/449)):
     -   Find it on the top navbar, next to _Discover_.
     -   Execute Wazuh API requests directly from the app.
@@ -55,13 +61,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Added `ENOTFOUND`, `EHOSTUNREACH`, `EINVAL`, `EAI_AGAIN` options for API URL parameter checking ([#463](https://github.com/wazuh/wazuh-kibana-app/pull/463)).
 -   Now the _Settings/Extensions_ subtab won't appear unless there's at least one API inserted ([#465](https://github.com/wazuh/wazuh-kibana-app/pull/465)).
 -   Now the index pattern selector on _Settings/Pattern_ will also refresh the known fields when changing it ([#477](https://github.com/wazuh/wazuh-kibana-app/pull/477)).
+-   Changed the _Manager_ tab into _Management_ ([#490](https://github.com/wazuh/wazuh-kibana-app/pull/490)).
 
 ### Fixed
 
 -   Fixed a bug where toggling extensions after deleting an API entry could lead into an error message ([#465](https://github.com/wazuh/wazuh-kibana-app/pull/465)).
--   Fixed some performance bugs on the `dataHandler` service ([#442](https://github.com/wazuh/wazuh-kibana-app/pull/442)).
+-   Fixed some performance bugs on the `dataHandler` service ([#442](https://github.com/wazuh/wazuh-kibana-app/pull/442) & [#486](https://github.com/wazuh/wazuh-kibana-app/pull/442)).
 -   Fixed a bug when loading the _Agents preview_ tab on Safari web browser ([#447](https://github.com/wazuh/wazuh-kibana-app/pull/447)).
 -   Fixed a bug where a new extension (enabled by default) appears disabled when updating the app ([#456](https://github.com/wazuh/wazuh-kibana-app/pull/456)).
+-   Fixed a bug where pressing the Enter key on the _Discover's_ tab search bar wasn't working properly ([#488](https://github.com/wazuh/wazuh-kibana-app/pull/488)).
 
 ### Removed
 
