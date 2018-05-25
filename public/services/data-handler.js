@@ -88,6 +88,11 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                     this.items.push(items[i]);
                     this.items[i].selected = false;
                 }
+                // Prevents from any manager
+                if (this.path === '/agents') {
+                    const filteredAgents = this.items.filter(item => item && item.id !== '000');
+                    this.items = filteredAgents;
+                }
                 this.offset += items.length;
                 if (this.offset >= this.totalItems) this.end = true;
                 if (data.data.data !== 0){
@@ -212,7 +217,11 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                     const filteredRules = this.items.filter(item => item.id !== this.ruleID);
                     this.items = filteredRules;
                 }
-
+                // Prevents from any manager
+                if (this.path === '/agents') {
+                    const filteredAgents = this.items.filter(item => item && item.id !== '000');
+                    this.items = filteredAgents;
+                }
                 this.offset = items.length;
                 deferred.resolve(true);
                 this.busy = false;
