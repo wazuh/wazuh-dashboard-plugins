@@ -28,7 +28,18 @@ export default class WazuhApiElastic {
         try {
             const data = await this.wzWrapper.getWazuhAPIEntries();
 
-            return reply(data.hits.hits);
+            // Replacing password by ****
+            const result = [];
+            if(data && data.hits && data.hits.hits && Array.isArray(data.hits.hits)){
+                for(const entry of data.hits.hits) {
+                    if(entry && entry._source && entry._source.api_password){
+                        entry._source.api_password = '****'
+                    }
+                    result.push(entry)
+                }
+            } 
+
+            return reply(result);
 
         } catch(error){
             return ErrorResponse(error.message || error, 2001, 500, reply);
