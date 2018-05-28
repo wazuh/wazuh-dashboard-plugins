@@ -11,10 +11,13 @@
  */
 import checkTimestamp from './check-timestamp'
 import healthCheck    from './health-check'
+import totalRAM       from './check-ram'
 
 export default ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler) => {
     try {
         const deferred = $q.defer();
+
+        totalRAM(genericReq,errorHandler);
 
         // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
         if (!$location.path().includes("/health-check")) {
