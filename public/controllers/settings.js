@@ -227,7 +227,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 port        : $scope.formData.port,
                 cluster_info: {},
                 insecure    : 'true',
-                id          : (Array.isArray($scope.apiEntries)) ? $scope.apiEntries.length: 0,
                 extensions  : appState.getExtensions().extensions
             };
 
