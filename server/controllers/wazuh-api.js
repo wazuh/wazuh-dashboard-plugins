@@ -149,14 +149,20 @@ export default class WazuhApi {
             
             const notValid = this.validateCheckApiParams(req.payload);
             if(notValid) return ErrorResponse(notValid, 3003, 500, reply);
-            console.log(req.payload)
+
+            // Check if a Wazuh API id is given (already stored API)
             if(req.payload && req.payload.id) {
+
                 const data = await this.wzWrapper.getWazuhConfigurationById(req.payload.id);
                 if(data) apiAvailable = data;
                 else return ErrorResponse(`The API ${req.payload.id} was not found`, 3029, 500, reply);
+
+            // Check if a password is given and a Wazuh API id is not given (new API)
             } else if(req.payload && !req.payload.id && req.payload.password) {
+
                 apiAvailable = req.payload;
                 apiAvailable.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
+                
             } 
 
             let response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/version`, {}, {
