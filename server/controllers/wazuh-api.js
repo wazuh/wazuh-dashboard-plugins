@@ -123,7 +123,7 @@ export default class WazuhApi {
             return 'Missing param: API USER';
         }
 
-        if (!('password' in payload)) {
+        if (!('password' in payload) && !('id' in payload)) {
             return 'Missing param: API PASSWORD';
         }
 
@@ -144,15 +144,25 @@ export default class WazuhApi {
 
     async checkAPI (req, reply) {
         try {
+            
+            let apiAvailable = null;
+            
             const notValid = this.validateCheckApiParams(req.payload);
             if(notValid) return ErrorResponse(notValid, 3003, 500, reply);
+            console.log(req.payload)
+            if(req.payload && req.payload.id) {
+                const data = await this.wzWrapper.getWazuhConfigurationById(req.payload.id);
+                if(data) apiAvailable = data;
+                else return ErrorResponse(`The API ${req.payload.id} was not found`, 3029, 500, reply);
+            } else if(req.payload && !req.payload.id && req.payload.password) {
+                apiAvailable = req.payload;
+                apiAvailable.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
+            } 
 
-            req.payload.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
-
-            let response = await needle('get', `${req.payload.url}:${req.payload.port}/version`, {}, {
-                username          : req.payload.user,
-                password          : req.payload.password,
-                rejectUnauthorized: !req.payload.insecure
+            let response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/version`, {}, {
+                username          : apiAvailable.user,
+                password          : apiAvailable.password,
+                rejectUnauthorized: !apiAvailable.insecure
             })
 
 
@@ -163,29 +173,29 @@ export default class WazuhApi {
 
             if (parseInt(response.body.error) === 0 && response.body.data) {
 
-                response = await needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
-                    username          : req.payload.user,
-                    password          : req.payload.password,
-                    rejectUnauthorized: !req.payload.insecure
+                response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/agents/000`, {}, {
+                    username          : apiAvailable.user,
+                    password          : apiAvailable.password,
+                    rejectUnauthorized: !apiAvailable.insecure
                 })
 
                 if (!response.body.error) {
                     const managerName = response.body.data.name;
 
-                    response = await needle('get', `${req.payload.url}:${req.payload.port}/cluster/status`, {}, { // Checking the cluster status
-                        username          : req.payload.user,
-                        password          : req.payload.password,
-                        rejectUnauthorized: !req.payload.insecure
+                    response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/cluster/status`, {}, { // Checking the cluster status
+                        username          : apiAvailable.user,
+                        password          : apiAvailable.password,
+                        rejectUnauthorized: !apiAvailable.insecure
                     })
 
                     if (!response.body.error) {
                         if (response.body.data.enabled === 'yes') {
 
                             // If cluster mode is active
-                            response = await needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
-                                username          : req.payload.user,
-                                password          : req.payload.password,
-                                rejectUnauthorized: !req.payload.insecure
+                            response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/cluster/node`, {}, {
+                                username          : apiAvailable.user,
+                                password          : apiAvailable.password,
+                                rejectUnauthorized: !apiAvailable.insecure
                             })
 
                             if (!response.body.error) {
