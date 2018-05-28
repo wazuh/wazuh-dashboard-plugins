@@ -15,7 +15,7 @@ export default async (genericReq, errorHandler) => {
         const totalRAM = data.data.ram
         if(totalRAM < 3072 && totalRAM > 2048) {
             errorHandler.handle(`The machine where Kibana is being executed has ${totalRAM}MB of RAM, please increase it.`, 'RAM', true);
-        } else if(totalRAM < 2048) {
+        } else if(totalRAM <= 2048) {
             errorHandler.handle(`The machine where Kibana is being executed has ${totalRAM}MB of RAM, please increase it.`, 'RAM');
         }
     } catch (error){
