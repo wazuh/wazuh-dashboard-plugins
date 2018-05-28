@@ -14,11 +14,11 @@ export default async (genericReq, errorHandler) => {
         const data = await genericReq.request('GET', '/api/wazuh-api/ram');
         const totalRAM = data.data.ram
         if(totalRAM < 3072 && totalRAM > 2048) {
-            errorHandler.handle(`The machine where Kibana is being executed has ${totalRAM}MB of RAM, please increase it.`, 'RAM', true);
+            errorHandler.handle(`Kibana server has ${totalRAM}MB of RAM, performance will suffer. Please increase it.`, 'RAM', true);
         } else if(totalRAM <= 2048) {
-            errorHandler.handle(`The machine where Kibana is being executed has ${totalRAM}MB of RAM, please increase it.`, 'RAM');
+            errorHandler.handle(`Kibana server has ${totalRAM}MB of RAM, performance will suffer. Please increase it.`, 'RAM');
         }
     } catch (error){
-        errorHandler.handle(`The machine where Kibana is being executed has an unknown amount of RAM, please review it.`, 'RAM', true);
+        errorHandler.handle(`Kibana server has an unknown amount of RAM, please review it.`, 'RAM', true);
     }
 }
