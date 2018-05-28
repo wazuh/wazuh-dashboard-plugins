@@ -41,4 +41,7 @@ export default (server, options) => {
 
     // Returns data from the Wazuh API on CSV readable format
     server.route({ method: 'POST', path: '/api/wazuh-api/csv', handler: (req,res) => ctrl.csv(req,res)})
+
+    // Returns total RAM available from the current machine where Kibana is being executed
+    server.route({ method: 'GET', path: '/api/wazuh-api/ram', handler: (req,res) => ctrl.totalRam(req,res)})
 };

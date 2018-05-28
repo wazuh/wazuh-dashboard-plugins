@@ -23,6 +23,7 @@ import monitoring          from '../monitoring'
 import ErrorResponse       from './error-response'
 import { Parser }          from 'json2csv';
 import getConfiguration    from '../lib/get-configuration'
+import { totalmem }        from 'os'
 
 const blueWazuh = colors.blue('wazuh');
 
@@ -386,7 +387,7 @@ export default class WazuhApi {
             if(req.payload.method !== 'GET' && req.payload.body && req.payload.body.devTools){
                 const configuration = getConfiguration();
                 if(!configuration || (configuration && !configuration['devtools.allowall'])){
-                    return ErrorResponse('Allowed method: [GET]', 3023, 400, reply);
+                    return ErrorResponse('Allowed method: [GET]', 3029, 400, reply);
                 }
             }
             if(req.payload.body.devTools) {
@@ -526,6 +527,16 @@ export default class WazuhApi {
 
         } catch (error) {
             return res({ error: error.message || error }).code(500)
+        }
+    }
+
+    async totalRam(req,reply) {
+        try{
+            // RAM in MB
+            const ram = Math.ceil(totalmem()/1024/1024);
+            return reply({ statusCode: 200, error: 0, ram });
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3030, 500, reply);
         }
     }
 }
