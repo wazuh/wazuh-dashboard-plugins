@@ -1,40 +1,56 @@
-<div flex ng-cloak ng-if="!loading && submenuNavItem == 'logs'" class="mozilla-table-size-85" layout="column" ng-controller="managerLogController">
+<div ng-cloak flex layout="column" layout-padding class="mozilla-table-size-85" ng-controller="managerLogController" ng-if="!loading && submenuNavItem == 'logs'">
 
-    <div layout="row" layout-align="start start" class="wz-padding-right-8 wz-padding-left-16">
-        <div flex="20" layout="column" class="height-40 wz-margin-top-17 wz-margin-right-15 wz-select-input">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="loading">
+        <div></div>
+    </div>
+
+    <!-- Filters and Realtime button section -->
+    <div ng-show="!loading" layout="row" layout-align="start center">
+        <!-- Daemon selector -->
+        <div flex="20" layout="column" class="height-40 wz-margin-right-15 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
             aria-label="Logs category">
-                <option value="all">Choose daemon</option>
+                <option value="all">All daemons</option>
                 <option ng-repeat="(key, value) in summary" value="{{key}}">{{key}}</option>
             </select>
         </div>
+        <!-- End daemon selector -->
 
-        <div flex="20" layout="column" class="height-40 wz-margin-top-17 wz-select-input">
+        <!-- Level selector -->
+        <div flex="20" layout="column" class="height-40 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="type_log == 'all' ? logs.removeFilter('type_log', true) : logs.addFilter('type_log', type_log)"
             aria-label="Logs level">
-                <option value="all">Choose log level</option>
+                <option value="all">All log levels</option>
                 <option value="info">Info</option>
                 <option value="error">Error</option>
                 <option value="warning">Warning</option>
             </select>
         </div>
+        <!-- End Level selector -->
 
+        <!-- White space between filters and Realtime button -->
         <span flex></span>
-        <md-button ng-if="!realtime" class="wazuh-button md-raised md-primary manager-log-buttonplay" ng-click="playRealtime()" aria-label="Play realtime button">
+
+        <md-button ng-if="!realtime" class="wazuh-button md-raised md-primary" ng-click="playRealtime()" aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
             Play realtime
         </md-button>
-        <md-button ng-if="realtime" class="wazuh-button md-raised md-primary manager-log-buttonplay" ng-click="stopRealtime()" aria-label="Stop realtime button">
+        <md-button ng-if="realtime" class="wazuh-button md-raised md-primary" ng-click="stopRealtime()" aria-label="Stop realtime button">
             <i class="fa fa-stop fa-fw" aria-hidden="true"></i>
             Stop realtime
         </md-button>
     </div>
+    <!-- End Filters and Realtime button section -->
 
-    <wz-search-bar isdisabled="realtime" class="wz-lateral-padding-16" data="logs" term="searchTerm" placetext="'Filter logs...'"></wz-search-bar>
+    <!-- Logs table section -->
+    <div ng-show="!loading" flex layout="column">
 
-    <div flex layout="column" class="md-padding no-padding-top">
+        <!-- Searchbar section -->
+        <wz-search-bar isdisabled="realtime" data="logs" term="searchTerm" placetext="'Search logs...'"></wz-search-bar>
+        <!-- End Searchbar section -->
 
-        <!-- Standard -->
+        <!-- Realtime disabled section -->
         <wz-table-header
             layout="row"
             data="logs"
@@ -46,8 +62,19 @@
             ]"
             ng-if="!realtime">
         </wz-table-header>
+        <wz-table
+            layout="column"
+            flex
+            data="logs"
+            keys="[{col:'timestamp',size:15,truncatable:'true'},{col:'tag',size:25,truncatable:'true'},{col:'level',size:10,truncatable:'true'},{col:'description',truncatable:'false'}]"
+            ng-if="!realtime"
+            class="no-lateral-padding"
+            nopointer="true"
+            noheight="true">
+        </wz-table>
+        <!-- End Realtime disabled section -->
 
-        <!-- Realtime -->
+        <!-- Realtime enabled section -->
         <wz-table-header
             layout="row"
             data="realLogs"
@@ -59,20 +86,6 @@
             ]"
             ng-if="realtime">
         </wz-table-header>
-
-        <!-- Standard -->
-        <wz-table
-            layout="column"
-            flex
-            data="logs"
-            keys="[{col:'timestamp',size:15,truncatable:'true'},{col:'tag',size:25,truncatable:'true'},{col:'level',size:10,truncatable:'true'},{col:'description',truncatable:'false'}]"
-            ng-if="!realtime"
-            class="no-lateral-padding"
-            nopointer="true"
-            noheight="true">
-        </wz-table>
-
-        <!-- Realtime -->
         <wz-table
             layout="column"
             flex
@@ -84,9 +97,14 @@
             nopointer="true"
             noheight="true">
         </wz-table>
+        <!-- End Realtime enabled section -->
+
+        <!-- CSV Download button section  -->
         <div layout="row" class="wz-margin-top-10">
             <span flex></span>
-            <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+            <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
         </div>
+        <!-- End CSV Download button section  -->
     </div>
+    <!-- End Logs table section -->
 </div>
