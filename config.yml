@@ -21,60 +21,77 @@
 # ------------------------------- Index patterns -------------------------------
 #
 # Default index pattern to use.
-#pattern:                wazuh-alerts-3.x-*
+#pattern: wazuh-alerts-3.x-*
 #
 # ----------------------------------- Checks -----------------------------------
 #
 # Defines which checks must to be consider by the healthcheck
 # step once the Wazuh app starts. Values must to be true or false.
-#checks.pattern :        true
-#checks.template:        true
-#checks.api     :        true
-#checks.setup   :        true
+#checks.pattern : true
+#checks.template: true
+#checks.api     : true
+#checks.setup   : true
 #
 # --------------------------------- Extensions ---------------------------------
 #
 # Defines which extensions should be activated when you add a new API entry.
 # You can change them after Wazuh app starts.
 # Values must to be true or false.
-#extensions.pci       :  true
-#extensions.audit     :  true
-#extensions.oscap     :  true
-#extensions.aws       :  false
-#extensions.virustotal:  false
+#extensions.pci       : true
+#extensions.gdpr      : true
+#extensions.audit     : true
+#extensions.oscap     : true
+#extensions.aws       : false
+#extensions.virustotal: false
 #
 # ---------------------------- Basic authentication ----------------------------
 #
 # Defines if authentication is enabled or not.
 # Field enabled could be true or false, it means login is enabled/disabled.
 # Field password is the password used to authenticate on the Wazuh app.
-#login.enabled :         false
-#login.password:         changeme
+#login.enabled : false
+#login.password: changeme
 #
 # ---------------------------------- Time out ----------------------------------
 #
 # Defines maximum timeout to be used on the Wazuh app requests.
-# Default value is 8000. It will be ignored if it is bellow 1500.
+# It will be ignored if it is bellow 1500.
 # It means milliseconds before we consider a request as failed.
-#timeout:                8000
+# Default: 8000
+#timeout: 8000
 #
 # ------------------------------ Advanced indices ------------------------------
 #
 # Configure .wazuh and .wazuh-version indices shards and replicas.
-#wazuh.shards              : 1
-#wazuh.replicas            : 1
-#wazuh-version.shards      : 1
-#wazuh-version.replicas    : 1
+#wazuh.shards          : 1
+#wazuh.replicas        : 1
+#wazuh-version.shards  : 1
+#wazuh-version.replicas: 1
 #
 #
 # --------------------------- Index pattern selector ---------------------------
 #
-# Defines if the user is allowed to change the selected index
-# pattern directly from the Wazuh app top menu. Default: yes
-#ip.selector:            true
+# Defines if the user is allowed to change the selected
+# index pattern directly from the Wazuh app top menu.
+# Default: yes
+#ip.selector: true
 #
-#---------------------------- RBAC X-Pack -------------------------------------
+# -------------------------------- X-Pack RBAC ---------------------------------
 #
-# Custom setting to enable/disable RBAC capabilities included on X-Pack (security)
+# Custom setting to enable/disable built-in X-Pack RBAC security capabilities.
 # Default: enabled
-#xpack.rbac.enabled:     true
+#xpack.rbac.enabled: true
+#
+# ------------------------------ wazuh-monitoring ------------------------------
+#
+# Custom setting to enable/disable wazuh-monitoring indices.
+# Values: true, false, worker
+# If worker is given as value, the app will show the Agents status visualization but won't insert data 
+# on wazuh-monitoring indices
+# Default: true
+#wazuh.monitoring.enabled: true
+#
+# Custom setting to set the frequency for wazuh-monitoring indices cron task.
+# Default: 3600 (s)
+#wazuh.monitoring.frequency: 3600
+#

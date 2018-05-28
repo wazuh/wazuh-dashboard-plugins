@@ -1,0 +1,20 @@
+
+<div flex ng-controller="devToolsController" layout="column" class="dev-tools-max-height">
+
+    <wz-menu ng-init="menuNavItem = 'wazuh-dev'"></wz-menu>
+    <md-content flex layout="column" class="md-padding" layout-align="start">
+        <div layout="row" flex>
+            <div flex layout="column">  
+
+                <span class="wz-headline-title wz-dev-title">Console <i ng-click="send()" class="fa fa-play wz-play-dev-color wz-dev-pointer pull-right fa-fw" aria-hidden="true"></i></span>                
+                <textarea flex id="api_input"></textarea>
+
+            </div>
+            <div flex layout="column">
+                <span class="wz-headline-title wz-dev-title"><i ng-click="help()" class="fa fa-question wz-question-dev-color wz-dev-pointer pull-right fa-fw" aria-hidden="true"></i></span>
+                <textarea flex id="api_output"></textarea>
+            </div>
+        </div>
+    </md-content>
+    
+</div>

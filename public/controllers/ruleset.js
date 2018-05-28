@@ -10,24 +10,61 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
+import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState) {
+app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
+    $scope.searchTerm = '';
     $scope.loading = true;
+    $scope.viewingDetail = false;
     $scope.rules   = Rules;
     $scope.rulesRelated = RulesRelated;
     $scope.rulesAutoComplete = RulesAutoComplete;
     $scope.setRulesTab('rules');
-    $rootScope.tabVisualizations = { ruleset: 4 };
     $scope.isArray = angular.isArray;
 
-    $scope.analizeRules = async search => {
+    const colors = [
+        '#004A65', '#00665F', '#BF4B45', '#BF9037', '#1D8C2E', 'BB3ABF',
+        '#00B1F1', '#00F2E2', '#7F322E', '#7F6025', '#104C19', '7C267F',
+        '#0079A5', '#00A69B', '#FF645C', '#FFC04A', '#2ACC43', 'F94DFF',
+        '#0082B2', '#00B3A7', '#401917', '#403012', '#2DD947', '3E1340',
+        '#00668B', '#008C83', '#E55A53', '#E5AD43', '#25B23B', 'E045E5'
+    ];
+
+    $scope.colorRuleArg = ruleArg => {
+        ruleArg = ruleArg.toString();
+        let valuesArray   = ruleArg.match(/\$\(((?!<\/span>).)*?\)(?!<\/span>)/gmi);
+        let coloredString = ruleArg;
+
+        // If valuesArray is empty, means that the description doesn't have any arguments
+        // In this case, then simply return the string
+        // In other case, then colour the string and return
+        if (valuesArray && valuesArray.length) {
+            for (let i = 0, len = valuesArray.length; i < len; i++) {
+                coloredString = coloredString.replace(/\$\(((?!<\/span>).)*?\)(?!<\/span>)/mi, '<span style="color: ' + colors[i] + ' ">' + valuesArray[i] + '</span>');
+            }
+        }
+
+        return $sce.trustAsHtml(coloredString);
+    };
+
+    // Reloading watcher initialization
+    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
+        delete $rootScope.rulesetIsReloaded;
+        $scope.viewingDetail = false;
+        if(!$scope.$$phase) $scope.$digest();
+    });
+
+    $scope.analyzeRules = async search => {
+
         try {
+            if(search && search.length <= 1) return $scope.rulesAutoComplete.items;
+            await $timeout(200);
             $scope.rulesAutoComplete.filters = [];
 
             if(search.startsWith('group:') && search.split('group:')[1].trim()) {
@@ -36,6 +73,8 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
                 await $scope.rulesAutoComplete.addFilter('level',search.split('level:')[1].trim());
             } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
                 await $scope.rulesAutoComplete.addFilter('pci',search.split('pci:')[1].trim());
+            } else if(search.startsWith('gdpr:') && search.split('gdpr:')[1].trim()) {
+                await $scope.rulesAutoComplete.addFilter('gdpr',search.split('gdpr:')[1].trim());
             } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
                 await $scope.rulesAutoComplete.addFilter('file',search.split('file:')[1].trim());
             } else {
@@ -59,36 +98,42 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
             $scope.rules.addFilter('level',search.split('level:')[1].trim());
         } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
             $scope.rules.addFilter('pci',search.split('pci:')[1].trim());
+        } else if(search.startsWith('gdpr:') && search.split('gdpr:')[1].trim()) {
+            $scope.rules.addFilter('gdpr',search.split('gdpr:')[1].trim());
         } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
             $scope.rules.addFilter('file',search.split('file:')[1].trim());
+        } else if(search.startsWith('path:') && search.split('path:')[1].trim()) {
+            $scope.rules.addFilter('path',search.split('path:')[1].trim());
         } else {
             $scope.rules.addFilter('search',search.trim());
         }
     };
 
-    /**
-     * This function takes back to the list but adding a group filter
-     */
-    $scope.addGroupFilter = (name) => {
-        // Clear the autocomplete component
-        $scope.searchTerm = '';
-        angular.element(document.querySelector('#autocomplete')).blur();
-
-        // Add the filter and go back to the list
-        $scope.rules.addFilter('group', name);
-        $scope.closeDetailView();
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/rules', currentApi, $scope.rules ? $scope.rules.filters : null);
+            const csvGenerator = new CsvGenerator(output.csv, 'rules.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
     }
 
     /**
-     * This function takes back to the list but adding a PCI filter
+     * This function takes back to the list but adding a filter from the detail view
      */
-    $scope.addPciFilter = (name) => {
+    $scope.addDetailFilter = (name, value) => {
+        // Remove all previous filters and then add it
+        $scope.rules.removeAllFilters();
+        $scope.rules.addFilter(name, value);
+
         // Clear the autocomplete component
         $scope.searchTerm = '';
         angular.element(document.querySelector('#autocomplete')).blur();
 
-        // Add the filter and go back to the list
-        $scope.rules.addFilter('pci', name);
+        // Go back to the list
         $scope.closeDetailView();
     }
 
@@ -96,12 +141,16 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
      * This function changes to the rule detail view
      */
     $scope.openDetailView = (rule) => {
+        // Clear current rule variable and assign the new one
+        $scope.currentRule = false;
         $scope.currentRule = rule;
 
+        // Create the related rules list, resetting it in first place
         $scope.rulesRelated.reset();
         $scope.rulesRelated.ruleID = $scope.currentRule.id;
         $scope.rulesRelated.addFilter('file', $scope.currentRule.file);
 
+        // Enable the Detail view
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }
@@ -118,13 +167,6 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
 
     const load = async () => {
         try {
-            $rootScope.rawVisualizations = null;
-            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-rules/${appState.getCurrentPattern()}`)
-            $rootScope.rawVisualizations = data.data.raw;
-            // Render visualizations
-            $rootScope.$broadcast('updateVis');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-
             await Promise.all([
                 $scope.rules.nextPage(),
                 $scope.rulesAutoComplete.nextPage()
@@ -141,55 +183,35 @@ app.controller('rulesController', function ($scope, $rootScope, Rules, RulesRela
     //Load
     load();
 
-    let timesOpened = 0;
-    let lastName = false;
-    $scope.closeOther = rule => {
-        const item = rule.id ? rule.id : rule;
-        if(item !== lastName){
-            lastName = item;
-            timesOpened = 0;
-        }
-        timesOpened++;
-        $scope.activeItem = (timesOpened <= 1) ? item : false;
-        if(timesOpened > 1) timesOpened = 0;
-        return true;
-    }
-
     //Destroy
     $scope.$on('$destroy', () => {
         $scope.rules.reset();
+        $scope.rulesRelated.reset();
         $scope.rulesAutoComplete.reset();
-        $rootScope.rawVisualizations = null;
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+        reloadWatcher();
     });
 });
 
-app.controller('decodersController', function ($scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState) {
+app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
     //Initialization
+    $scope.searchTerm = '';
     $scope.loading  = true;
+    $scope.viewingDetail = false;
     $scope.decoders = Decoders;
     $scope.decodersRelated = DecodersRelated;
     $scope.decodersAutoComplete = DecodersAutoComplete;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
-    $rootScope.tabVisualizations = { ruleset: 1 };
     $scope.isArray = angular.isArray;
 
     const colors = [
-        '#3F6833', '#967302', '#2F575E', '#99440A', '#58140C', '#052B51', '#511749', '#3F2B5B', //6
-        '#508642', '#CCA300', '#447EBC', '#C15C17', '#890F02', '#0A437C', '#6D1F62', '#584477', //2
-        '#629E51', '#E5AC0E', '#64B0C8', '#E0752D', '#BF1B00', '#0A50A1', '#962D82', '#614D93', //4
-        '#7EB26D', '#EAB839', '#6ED0E0', '#EF843C', '#E24D42', '#1F78C1', '#BA43A9', '#705DA0', // Normal
-        '#9AC48A', '#F2C96D', '#65C5DB', '#F9934E', '#EA6460', '#5195CE', '#D683CE', '#806EB7', //5
-        '#B7DBAB', '#F4D598', '#70DBED', '#F9BA8F', '#F29191', '#82B5D8', '#E5A8E2', '#AEA2E0', //3
-        '#E0F9D7', '#FCEACA', '#CFFAFF', '#F9E2D2', '#FCE2DE', '#BADFF4', '#F9D9F9', '#DEDAF7' //7
+        '#004A65', '#00665F', '#BF4B45', '#BF9037', '#1D8C2E', 'BB3ABF',
+        '#00B1F1', '#00F2E2', '#7F322E', '#7F6025', '#104C19', '7C267F',
+        '#0079A5', '#00A69B', '#FF645C', '#FFC04A', '#2ACC43', 'F94DFF',
+        '#0082B2', '#00B3A7', '#401917', '#403012', '#2DD947', '3E1340',
+        '#00668B', '#008C83', '#E55A53', '#E5AD43', '#25B23B', 'E045E5'
     ];
 
     $scope.colorRegex = regex => {
@@ -212,18 +234,12 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         return $sce.trustAsHtml(coloredString);
     };
 
-    let timesOpened = 0;
-    let lastName = false;
-    $scope.closeOther = name => {
-        if(name !== lastName){
-            lastName = name;
-            timesOpened = 0;
-        }
-        timesOpened++;
-        $scope.activeItem = (timesOpened <= 1) ? name : false;
-        if(timesOpened > 1) timesOpened = 0;
-        return true;
-    }
+    // Reloading watcher initialization
+    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
+        delete $rootScope.rulesetIsReloaded;
+        $scope.viewingDetail = false;
+        if(!$scope.$$phase) $scope.$digest();
+    });
 
     $scope.checkEnter = search => {
         $scope.searchTerm = '';
@@ -237,8 +253,11 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         }
     };
 
-    $scope.analizeDecoders = async search => {
+    $scope.analyzeDecoders = async search => {
         try {
+            if(search && search.length <= 1) return $scope.decodersAutoComplete.items;
+            await $timeout(200);
+
             $scope.decodersAutoComplete.filters = [];
 
             if(search.startsWith('path:') && search.split('path:')[1].trim()) {
@@ -257,17 +276,49 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         }
     }
 
+    $scope.downloadCsv = async () => {
+        try {
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch('/decoders', currentApi, $scope.decoders ? $scope.decoders.filters : null);
+            const csvGenerator = new CsvGenerator(output.csv, 'decoders.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
+
+    /**
+     * This function takes back to the list but adding a filter from the detail view
+     */
+    $scope.addDetailFilter = (name, value) => {
+        // Remove all previous filters and then add it
+        $scope.decoders.removeAllFilters();
+        $scope.decoders.addFilter(name, value);
+
+        // Clear the autocomplete component
+        $scope.searchTerm = '';
+        angular.element(document.querySelector('#autocomplete')).blur();
+
+        // Go back to the list
+        $scope.closeDetailView();
+    }
+
     /**
      * This function changes to the decoder detail view
      */
     $scope.openDetailView = (decoder) => {
+        // Clear current decoder variable and assign the new one
+        $scope.currentDecoder = false;
         $scope.currentDecoder = decoder;
 
+        // Create the related decoders list, resetting it in first place
         $scope.decodersRelated.reset();
         $scope.decodersRelated.path = `/decoders/${$scope.currentDecoder.name}`;
         $scope.decodersRelated.decoderPosition = $scope.currentDecoder.position;
         $scope.decodersRelated.nextPage('');
 
+        // Enable the Detail view
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
     }
@@ -284,13 +335,6 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
 
     const load = async () => {
         try {
-            $rootScope.rawVisualizations = null;
-            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/manager-ruleset-decoders/${appState.getCurrentPattern()}`)
-            $rootScope.rawVisualizations = data.data.raw;
-            // Render visualizations
-            $rootScope.$broadcast('updateVis');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-
             await Promise.all([
                 $scope.decoders.nextPage(),
                 $scope.decodersAutoComplete.nextPage()
@@ -313,12 +357,6 @@ app.controller('decodersController', function ($scope, $rootScope, $sce, Decoder
         $scope.decoders.reset();
         $scope.decodersRelated.reset();
         $scope.decodersAutoComplete.reset();
-        $rootScope.rawVisualizations = null;
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+        reloadWatcher();
     });
 });

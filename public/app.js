@@ -29,6 +29,18 @@ import 'plugins/wazuh/utils/fontawesome/css/font-awesome.min.css';
 import 'plugins/wazuh/utils/when-scrolled/when-scrolled.js';
 import '../../../ui_framework/dist/ui_framework.css';
 
+// Dev tools
+import 'plugins/wazuh/utils/codemirror/codemirror.css'
+import 'plugins/wazuh/utils/codemirror/foldgutter.css'
+import 'plugins/wazuh/utils/codemirror/ttcn.css'
+import 'plugins/wazuh/utils/codemirror/javascript.js'
+import 'plugins/wazuh/utils/codemirror/brace-fold.js'
+import 'plugins/wazuh/utils/codemirror/foldcode.js'
+import 'plugins/wazuh/utils/codemirror/foldgutter.js'
+import 'plugins/wazuh/utils/codemirror/search-cursor.js'
+import 'plugins/wazuh/utils/codemirror/mark-selection.js'
+
+
 // Material
 import 'plugins/wazuh/../node_modules/angular-material/angular-material.css';
 import 'plugins/wazuh/../node_modules/angular-aria/angular-aria.js';
@@ -38,65 +50,12 @@ import 'plugins/wazuh/../node_modules/angular-material/angular-material.js';
 // Cookies
 import 'plugins/wazuh/../node_modules/angular-cookies/angular-cookies.min.js';
 
-////////////////////////////////////////////////////////////////////
-// Require Kibana integrations
 import 'ui/autoload/all';
 import 'ui/chrome';
-import 'plugins/wazuh/kibana-integrations/kibana-visualization.js';
-import 'plugins/wazuh/kibana-integrations/kibana-filter-bar.js';
-import 'plugins/wazuh/kibana-integrations/kibana-discover.js';
-import 'plugins/wazuh/kibana-integrations/saved-visualizations.js';
 
-// Require services
-import 'plugins/wazuh/services/error-handler.js';
-import 'plugins/wazuh/services/theming.js';
-import 'plugins/wazuh/services/api-request.js';
-import 'plugins/wazuh/services/generic-request.js';
-import 'plugins/wazuh/services/data-handler.js';
-import 'plugins/wazuh/services/app-state.js';
-import 'plugins/wazuh/services/api-tester.js';
-import 'plugins/wazuh/services/pattern-handler.js';
-
-// Set up routes and views
-import 'plugins/wazuh/services/routes.js';
-
-// Require controllers
-
-// Factories
-import 'plugins/wazuh/factories/data-handler-composer.js';
-
-// Wazuh Directives
-import 'plugins/wazuh/directives/wz-dynamic/wz-dynamic.js';
-import 'plugins/wazuh/directives/wz-enter/wz-enter.js';
-import 'plugins/wazuh/directives/wz-menu/wz-menu.js';
-import 'plugins/wazuh/directives/wz-menu/wz-menu.less';
-import 'plugins/wazuh/directives/wz-search-bar/wz-search-bar.js';
-import 'plugins/wazuh/directives/wz-table-header/wz-table-header.js';
-import 'plugins/wazuh/directives/wz-table-header/wz-table-header.less';
-import 'plugins/wazuh/directives/wz-table/wz-table.js';
-import 'plugins/wazuh/directives/wz-table/wz-table.less';
-
-// Blank Screen
-import 'plugins/wazuh/controllers/blank-screen-controller.js';
-
-// Login
-import 'plugins/wazuh/controllers/login.js';
-
-// Overview
-import 'plugins/wazuh/controllers/overview.js';
-
-// Manager
-import 'plugins/wazuh/controllers/manager.js';
-import 'plugins/wazuh/controllers/ruleset.js';
-import 'plugins/wazuh/controllers/osseclog.js';
-import 'plugins/wazuh/controllers/groups.js';
-
-// Agents
-import 'plugins/wazuh/controllers/agents.js';
-import 'plugins/wazuh/controllers/agents-preview.js';
-
-// Settings
-import 'plugins/wazuh/controllers/settings.js';
-
-// Health check
-import 'plugins/wazuh/controllers/health-check.js';
+// Wazuh
+import 'plugins/wazuh/kibana-integrations'
+import 'plugins/wazuh/services'
+import 'plugins/wazuh/controllers'
+import 'plugins/wazuh/factories'
+import 'plugins/wazuh/directives'

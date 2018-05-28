@@ -1,11 +1,12 @@
-<div ng-show="!loading && viewingDetail" flex layout="column">
+<div ng-if="!loading && viewingDetail" flex layout="column">
 
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
         <!-- Back button -->
         <md-button class="md-icon-button" aria-label="Back to rules list" tooltip="Back" tooltip-placement="bottom" ng-click="closeDetailView()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
         <!-- Rule title -->
-        <h1 class="md-headline wz-headline">{{currentRule.description}}</h1>
+        <h1 class="md-headline wz-headline" ng-bind-html="colorRuleArg(currentRule.description)"></h1>
+
     </div>
     <!-- End back button, title and status indicator -->
 
@@ -13,11 +14,11 @@
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div flex ng-if="currentRule.file" class="wz-text-truncatable">File: <span class="wz-text-bold">{{currentRule.file}}</span></div>
-                <div flex ng-if="currentRule.path" class="wz-text-truncatable">Path: <span class="wz-text-bold">{{currentRule.path}}</span></div>
-                <div flex="10" ng-if="currentRule.id" class="wz-text-truncatable">ID: <span class="wz-text-bold">{{currentRule.id}}</span></div>
-                <div flex="10" ng-if="currentRule.level || currentRule.level == 0" class="wz-text-truncatable">Level: <span class="wz-text-bold">{{currentRule.level}}</span></div>
-                <div flex="10" ng-if="currentRule.status" class="wz-text-truncatable">Status: <span class="wz-text-bold">{{currentRule.status}}</span></div>
+                <div flex="15" ng-if="currentRule.id" class="wz-text-truncatable">ID: <span class="wz-text-bold">{{currentRule.id}}</span></div>
+                <div flex="15" ng-if="currentRule.level || currentRule.level == 0" class="wz-text-truncatable">Level: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('level', currentRule.level)" tooltip="Filter by this level" tooltip-placement="bottom">{{currentRule.level}}</span></div>
+                <div flex="35" ng-if="currentRule.file" class="wz-text-truncatable">File: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('file', currentRule.file)" tooltip="Filter by this file" tooltip-placement="bottom">{{currentRule.file}}</span></div>
+                <div flex="35" ng-if="currentRule.path" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('path', currentRule.path)" tooltip="Filter by this path" tooltip-placement="bottom">{{currentRule.path}}</span></div>
+
             </md-card-content>
         </md-card>
     </div>
@@ -32,7 +33,7 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> Groups</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" layout-align="start start">
-                    <md-button class="md-primary wz-text-link" tooltip="Filter by this group" tooltip-placement="bottom" ng-repeat="item in currentRule.groups" ng-click="addGroupFilter(item)">
+                    <md-button class="md-primary wz-text-link" tooltip="Filter by this group" tooltip-placement="bottom" ng-repeat="item in currentRule.groups" ng-click="addDetailFilter('group', item)">
                         {{item}}
                     </md-button>
                 </div>
@@ -46,13 +47,27 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> PCI</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" layout-align="start start">
-                    <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentRule.pci" ng-click="addPciFilter(item)">
+                    <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentRule.pci" ng-click="addDetailFilter('pci', item)">
                         {{item}}
                     </md-button>
                 </div>
             </md-card-content>
         </md-card>
         <!-- End PCI section -->
+
+        <!-- GDPR section -->
+        <md-card ng-if="currentRule.gdpr.length > 0" flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> GDPR</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" layout-align="start start">
+                    <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentRule.gdpr" ng-click="addDetailFilter('gdpr', item)">
+                        {{item}}
+                    </md-button>
+                </div>
+            </md-card-content>
+        </md-card>
+        <!-- End GDPR section -->
 
         <!-- Details section -->
         <md-card flex class="wz-md-card">
@@ -138,7 +153,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentRule.details.regex">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -152,7 +167,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentRule.details.match">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -166,7 +181,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentRule.details.prematch">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -174,39 +189,42 @@
         <!-- End prematch section -->
 
         <!-- Related rules section -->
-        <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
-        <wz-table-header
-            class="wz-side-margin-8"
-            layout="row"
-            data="rulesRelated"
-            keys="[
-                {name:'ID',sortValue:'id',size:5},
-                {name:'File',sortValue:'file',size:15},
-                {name:'Description',sortValue:'description',size:35},
-                {name:'Groups',size:25},
-                {name:'Requirement',size:15},
-                {name:'Level',sortValue:'level',size:5}
-            ]">
-        </wz-table-header>
-        <wz-table
-            layout="column"
-            flex
-            func="openDetailView(ruleRelated)"
-            data="rulesRelated"
-            full="'ruleRelated'"
-            activeitem="activeItem"
-            keys="[
-                {col:'id',size:5},
-                {col:'file',size:15},
-                {col:'description',size:35},
-                {col:'groups',size:25},
-                {col:'pci',size:15},
-                {col:'level',size:5}
-            ]"
-            isruleset="true"
-            isdecoders="false"
-            class="no-lateral-padding wz-side-margin-8">
-        </wz-table>
+        <div ng-show="(rulesRelated.items && rulesRelated.items.length > 0)">
+            <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
+            <wz-table-header
+                class="wz-side-margin-8"
+                layout="row"
+                data="rulesRelated"
+                keys="[
+                    {name:'ID',sortValue:'id',size:5},
+                    {name:'File',sortValue:'file',size:15},
+                    {name:'Description',sortValue:'description',size:30},
+                    {name:'Groups',size:25},
+                    {name:'PCI',size:10},
+                    {name:'GDPR',size:10},
+                    {name:'Level',sortValue:'level',size:5}
+                ]">
+            </wz-table-header>
+            <wz-table
+                layout="column"
+                flex
+                func="openDetailView(ruleRelated)"
+                data="rulesRelated"
+                full="'ruleRelated'"
+                keys="[
+                    {col:'id',size:5},
+                    {col:'file',size:15},
+                    {col:'description',size:30},
+                    {col:'groups',size:25},
+                    {col:'pci',size:10},
+                    {col:'gdpr',size:10},
+                    {col:'level',size:5}
+                ]"
+                isruleset="true"
+                isdecoders="false"
+                class="no-lateral-padding wz-side-margin-8">
+            </wz-table>
+        </div>
         <!-- End related rules section -->
 
     </div>

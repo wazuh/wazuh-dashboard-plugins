@@ -7,7 +7,7 @@
 			<div flex layout-align="center center" class="layout-row" ng-if="agent">
 				<div class="flex">
 					<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
-						{{agent.id}} - {{agent.name}}</span> <span ng-show="agent.id === '000'">(Manager)</span>
+						{{agent.id}} - {{agent.name}}</span>
 
 					<span ng-show="agent.status" class="wz-agent-status-indicator" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
 				</div>
@@ -19,12 +19,12 @@
 					md-selected-item="_swpagent"
 					md-selected-item-change="getAgent(_swpagent.id,true)"
 					md-search-text="searchTerm"
-					md-items="agentAutoComplete in analizeAgents(searchTerm)"
+					md-items="agentAutoComplete in analyzeAgents(searchTerm)"
 					md-item-text="agentAutoComplete.name"
 					md-min-length="0"
 					md-no-asterisk="false"
 					md-menu-class="autocomplete-custom-agents-bar"
-					md-search-text-change="analizeAgents(searchTerm)"
+					md-search-text-change="analyzeAgents(searchTerm)"
 					placeholder="Search by name, ID or IP address"
 					lazy-load-data="agentsAutoComplete.nextPage('')">
 						<md-item-template>
@@ -54,8 +54,9 @@
 				<md-nav-item md-nav-click="switchTab('oscap');" name="oscap"  ng-show="extensions.oscap && agent.os.platform !== 'windows'">SCAP</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit && agent.os.platform !== 'windows'">Audit</md-nav-item>
 				<md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
+                <md-nav-item md-nav-click="switchTab('gdpr');" name="gdpr" ng-show="extensions.gdpr">GDPR</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('virustotal');" name="virustotal" ng-show="extensions.virustotal">VirusTotal</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('configuration');" name="configuration" ng-show="agent.id != '000'">Configuration</md-nav-item>
+                <md-nav-item md-nav-click="switchTab('configuration');" name="configuration">Configuration</md-nav-item>
 			</md-nav-bar>
 		</div>
 

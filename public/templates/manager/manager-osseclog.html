@@ -18,6 +18,7 @@
                 <option value="warning">Warning</option>
             </select>
         </div>
+
         <span flex></span>
         <md-button ng-if="!realtime" class="wazuh-button md-raised md-primary manager-log-buttonplay" ng-click="playRealtime()" aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
@@ -29,7 +30,7 @@
         </md-button>
     </div>
 
-    <wz-search-bar class="wz-lateral-padding-16" data="logs" term="searchTerm" placetext="'Filter logs...'"></wz-search-bar>
+    <wz-search-bar isdisabled="realtime" class="wz-lateral-padding-16" data="logs" term="searchTerm" placetext="'Filter logs...'"></wz-search-bar>
 
     <div flex layout="column" class="md-padding no-padding-top">
 
@@ -83,5 +84,9 @@
             nopointer="true"
             noheight="true">
         </wz-table>
+        <div layout="row" class="wz-margin-top-10">
+            <span flex></span>
+            <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+        </div>
     </div>
 </div>

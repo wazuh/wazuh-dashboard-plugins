@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as AgentsVisualizations   from './agents/index'
-import * as OverviewVisualizations from './overview/index'
-import * as RulesetVisualizations  from './ruleset/index'
+import * as AgentsVisualizations   from './agents'
+import * as OverviewVisualizations from './overview'
+import * as ClusterVisualizations  from './cluster'
 
-export { AgentsVisualizations, OverviewVisualizations, RulesetVisualizations }
+export { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations }

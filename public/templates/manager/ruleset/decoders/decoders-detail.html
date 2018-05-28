@@ -1,4 +1,4 @@
-<div ng-show="!loading && viewingDetail" flex layout="column">
+<div ng-if="!loading && viewingDetail" flex layout="column">
 
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
@@ -13,10 +13,9 @@
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div flex ng-if="currentDecoder.file" class="wz-text-truncatable">File: <span class="wz-text-bold">{{currentDecoder.file}}</span></div>
-                <div flex ng-if="currentDecoder.path" class="wz-text-truncatable">Path: <span class="wz-text-bold">{{currentDecoder.path}}</span></div>
-                <div flex="10" ng-if="currentDecoder.status" class="wz-text-truncatable">Status: <span class="wz-text-bold">{{currentDecoder.status}}</span></div>
-                <div flex="10" ng-if="currentDecoder.position || currentDecoder.position == 0" class="wz-text-truncatable">Position: <span class="wz-text-bold">{{currentDecoder.position}}</span></div>
+                <div flex="20" ng-if="currentDecoder.position || currentDecoder.position == 0" class="wz-text-truncatable">Position: <span class="wz-text-bold">{{currentDecoder.position}}</span></div>
+                <div flex="40" ng-if="currentDecoder.file" class="wz-text-truncatable">File: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('file', currentDecoder.file)" tooltip="Filter by this file" tooltip-placement="bottom">{{currentDecoder.file}}</span></div>
+                <div flex="40" ng-if="currentDecoder.path" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('path', currentDecoder.path)" tooltip="Filter by this path" tooltip-placement="bottom">{{currentDecoder.path}}</span></div>
             </md-card-content>
         </md-card>
     </div>
@@ -117,7 +116,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentDecoder.details.regex">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey" ng-bind-html="colorRegex(item)"></span>
+                        <span ng-bind-html="colorRegex(item)"></span>
                     </div>
                 </div>
             </md-card-content>
@@ -131,7 +130,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentDecoder.details.match">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -145,7 +144,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div ng-repeat="item in currentDecoder.details.prematch">
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-text-right color-grey">{{item}}</span>
+                        <span>{{item}}</span>
                     </div>
                 </div>
             </md-card-content>
@@ -153,35 +152,36 @@
         <!-- End prematch section -->
 
         <!-- Related decoders section -->
-        <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
-        <wz-table-header
-            class="wz-side-margin-8"
-            layout="row"
-            data="decodersRelated"
-            keys="[
-                {name:'Name',sortValue:'name',size:20},
-                {name:'Program name',size:20},
-                {name:'Fields',size:40},
-                {name:'File',sortValue:'file',size:20}
-            ]">
-        </wz-table-header>
-        <wz-table
-            layout="column"
-            flex
-            func="openDetailView(decoderRelated)"
-            data="decodersRelated"
-            full="'decoderRelated'"
-            activeitem="activeItem"
-            keys="[
-                {col:'name',size:20},
-                {col:'details.program_name',size:20},
-                {col:'details.order',size:40},
-                {col:'file',size:20}
-            ]"
-            isruleset="true"
-            isdecoders="true"
-            class="no-lateral-padding wz-side-margin-8">
-        </wz-table>
+        <div ng-show="(decodersRelated.items && decodersRelated.items.length > 0)">
+            <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related decoders</h1>
+            <wz-table-header
+                class="wz-side-margin-8"
+                layout="row"
+                data="decodersRelated"
+                keys="[
+                    {name:'Name',sortValue:'name',size:20},
+                    {name:'Program name',size:20},
+                    {name:'Fields',size:40},
+                    {name:'File',sortValue:'file',size:20}
+                ]">
+            </wz-table-header>
+            <wz-table
+                layout="column"
+                flex
+                func="openDetailView(decoderRelated)"
+                data="decodersRelated"
+                full="'decoderRelated'"
+                keys="[
+                    {col:'name',size:20},
+                    {col:'details.program_name',size:20},
+                    {col:'details.order',size:40},
+                    {col:'file',size:20}
+                ]"
+                isruleset="true"
+                isdecoders="true"
+                class="no-lateral-padding wz-side-margin-8">
+            </wz-table>
+        </div>
         <!-- End related decoders section -->
 
     </div>

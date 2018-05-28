@@ -1,7 +1,7 @@
 {
     "name": "wazuh",
-    "version": "3.2.2",
-    "revision": "0390",
+    "version": "3.2.3",
+    "revision": "0391",
     "kibana": {
         "version": "6.2.4"
     },
@@ -31,10 +31,10 @@
         "ansicolors": "^0.3.2",
         "install": "^0.10.1",
         "js-yaml": "3.10.0",
+        "json2csv": "^4.1.2",
         "lodash": "3.10.1",
         "needle": "^2.0.1",
         "node-cron": "^1.1.2",
-        "rison": "^0.1.1",
         "winston": "3.0.0-rc1"
     }
 }

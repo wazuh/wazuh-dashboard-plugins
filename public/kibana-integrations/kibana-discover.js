@@ -39,7 +39,6 @@ import 'ui/registry/doc_views.js';
 import 'plugins/kbn_doc_views/kbn_doc_views.js';
 import 'ui/tooltip/tooltip.js';
 import moment from 'moment';
-import rison from 'rison-node';
 import 'ui/pager_control';
 import 'ui/pager';
 import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
@@ -115,7 +114,11 @@ function discoverController(
   timefilter,
   appState,
   $rootScope,
-  $location
+  $location,
+  getAppState,
+  globalState,
+  loadedVisualizations,
+  discoverPendingUpdates
 ) {
 
   const Vis = Private(VisProvider);
@@ -309,14 +312,13 @@ function discoverController(
 
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////
-
-            $rootScope.discoverPendingUpdates = [];
-            $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
-            $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
+            ////////////////////////////////////////////////////////////////////////////    
+            discoverPendingUpdates.removeAll()
+            discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
+            $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
             if($location.search().tab != 'configuration') {
-              $rootScope.loadedVisualizations = [];
+              loadedVisualizations.removeAll();
               $rootScope.rendered = false;
               $rootScope.loadingStatus = "Fetching data...";
             }
@@ -377,7 +379,7 @@ function discoverController(
             function pick(rows, oldRows, fetchStatus) {
               // initial state, pretend we are loading
               if (rows == null && oldRows == null) return status.LOADING;
-
+              
               const rowsEmpty = _.isEmpty(rows);
               // An undefined fetchStatus means the requests are still being
               // prepared to be sent. When all requests are completed,
@@ -402,7 +404,7 @@ function discoverController(
                 current.fetchStatus,
                 prev.fetchStatus
               );
-
+ 
               /////////////////////////////////////////////////////////////////
               // Copying it to the rootScope to access it from the Wazuh App //
               /////////////////////////////////////////////////////////////////
@@ -410,7 +412,7 @@ function discoverController(
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
-              
+
               prev = current;
             };
           }()));
@@ -471,13 +473,18 @@ function discoverController(
     if ($state.query.language && $state.query.language !== query.language) {
       $state.filters = [];
     }
-
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    $rootScope.discoverPendingUpdates = [];
-    $rootScope.discoverPendingUpdates.push($state.query, queryFilter.getFilters());
-    $rootScope.$broadcast('updateVis', $state.query, queryFilter.getFilters());
+    const currentUrlPath = $location.path();
+    if(currentUrlPath && !currentUrlPath.includes('wazuh-discover')){
+      let filters = queryFilter.getFilters();
+      filters = Array.isArray(filters) ? filters.filter(item => item && item.$state && item.$state.store && item.$state.store === 'appState') : [];
+      if(!filters || !filters.length) return;
+    }
+    discoverPendingUpdates.removeAll()
+    discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
+    $rootScope.$broadcast('updateVis');
     $rootScope.$broadcast('fetch');
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -617,14 +624,14 @@ function discoverController(
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     if($location.search().tab != 'configuration') {
-      $rootScope.loadedVisualizations = [];
+      loadedVisualizations.removeAll();
       $rootScope.rendered = false;
       $rootScope.loadingStatus = "Fetching data...";
     }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    
+
     $scope.timeRange = {
       from: dateMath.parse(timefilter.time.from),
       to: dateMath.parse(timefilter.time.to, { roundUp: true })
@@ -757,188 +764,37 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  function loadFilters() {
-    if ($scope.tab) {
-      let implicitFilter = [];
+  const loadFilters = (wzCurrentFilters, localChange) => {
+    const appState = getAppState();
+    if(!appState || !globalState){
+      $timeout(100)
+      .then(() => {
+        return loadFilters(wzCurrentFilters)
+      })
+    } else {
+      $state.filters = localChange ? $state.filters : [];
 
-      if (appState.getClusterInfo().status == 'enabled') {
-        // The cluster filter
-        implicitFilter.push(
-          {
-            "meta":{
-              "removable":false,
-              "index":$scope.indexPattern.id,
-              "negate":false,
-              "disabled":false,
-              "alias":null,
-              "type":"phrase",
-              "key":"cluster.name",
-              "value":appState.getClusterInfo().cluster,
-              "params":{
-                "query":appState.getClusterInfo().cluster,
-                "type":"phrase"}
-            },
-            "query":{
-              "match":{
-                "cluster.name":{
-                  "query":appState.getClusterInfo().cluster,
-                  "type":"phrase"}
-                }
-            },
-            "$state":{
-              "store":"appState"
-            }
-          }
-        );
-      } else {
-        // Manager name filter
-        implicitFilter.push(
-          {
-            "meta":{
-              "removable":false,
-              "index":$scope.indexPattern.id,
-              "negate":false,
-              "disabled":false,
-              "alias":null,
-              "type":"phrase",
-              "key":"manager.name",
-              "value":appState.getClusterInfo().manager,
-              "params":{
-                "query":appState.getClusterInfo().manager,
-                "type":"phrase"}
-            },
-            "query":{
-              "match":{
-                "manager.name":{
-                  "query":appState.getClusterInfo().manager,
-                  "type":"phrase"}
-                }
-            },
-            "$state":{
-              "store":"appState"
-            }
-          }
-        );
-      }
-
-      // Check if we are in the agents page and add the proper agent filter
-      if ($rootScope.page === 'agents' && $location.search().agent !== "" && $location.search().agent !== null && angular.isUndefined($location.search().agent) !== true) {
-        implicitFilter.push(
-          {
-            "meta":{
-              "removable":false,
-              "index":$scope.indexPattern.id,
-              "negate":false,
-              "disabled":false,
-              "alias":null,
-              "type":"phrase",
-              "key":"agent.id",
-              "value":$location.search().agent,
-              "params":{
-                "query":$location.search().agent,
-                "type":"phrase"}
-            },
-            "query":{
-              "match":{
-                "agent.id":{
-                  "query":$location.search().agent,
-                  "type":"phrase"}
-                }
-            },
-            "$state":{
-              "store":"appState"
-            }
-          }
-        );
-      }
-
-      // Build the full query using the implicit filter
-      if ($rootScope.currentImplicitFilter !== "" && $rootScope.currentImplicitFilter !== null && angular.isUndefined($rootScope.currentImplicitFilter) !== true) {
-        if ($rootScope.currentImplicitFilter === "pci_dss") {
-          implicitFilter.push(
-            {
-              "meta":{
-                "removable":false,
-                "index":$scope.indexPattern.id,
-                "negate":false,
-                "disabled":false,
-                "alias":null,
-                "type":"exists",
-                "key":"rule.pci_dss",
-                "value":"exists"
-              },
-              "exists":{
-                "field":"rule.pci_dss"
-              },
-              "$state":{
-                "store":"appState"
-              }
-            }
-          );
-        } else {
-          implicitFilter.push(
-            {
-              "meta":{
-                "removable":false,
-                "index":$scope.indexPattern.id,
-                "negate":false,
-                "disabled":false,
-                "alias":null,
-                "type":"phrase",
-                "key":"rule.groups",
-                "value":$rootScope.currentImplicitFilter,
-                "params":{
-                    "query":$rootScope.currentImplicitFilter,
-                    "type":"phrase"
-                }
-              },
-              "query":{
-                "match":{
-                  "rule.groups":{
-                    "query":$rootScope.currentImplicitFilter,
-                    "type":"phrase"
-                  }
-                }
-              },
-              "$state":{
-                "store":"appState"
-              }
-            }
-          );
-        }
-      }
-
-      queryFilter.addFilters(implicitFilter);
+      queryFilter.addFilters(wzCurrentFilters)
+      .then(() => { })
+      .catch(error => console.log(error.message || error));
     }
   }
 
-  // Getting the location from the url
-  $scope.tabView = $location.search().tabView;
-  $scope.tab = $location.search().tab;
-  if ($rootScope.page === 'agents') $scope.agentId = $location.search().agent;
-
-  // Initial loading of filters
- loadFilters(); 
-
-  // Watch for changes in the location
-  $scope.$on('$routeUpdate', () => {
-
-    if ($location.search().tabView !=  $scope.tabView) { // No need to change the filters
-      if ($scope.tabView !== "discover") { // Should do this the first time, to avoid the squeezing of the visualization
-        $scope.updateQueryAndFetch($state.query);
-      }
-      $scope.tabView = $location.search().tabView;
-    }
-    if ($location.search().tab !=  $scope.tab) { // Changing filters
-      $scope.tab = $location.search().tab;
-    }
-    
-    if ($location.search().agent !=  $scope.agentId) { // Changing filters
-      $scope.agentId = $location.search().agent;
-    }
-    if ($location.search().tabView ===  $scope.tabView) loadFilters();
+  const wzEventFiltersListener = $rootScope.$on('wzEventFilters', (evt,parameters) => {
+    loadFilters(parameters.filters, parameters.localChange);
   });
 
+
+  $scope.tabView = $location.search().tabView || 'panels'
+  const changeTabViewListener = $rootScope.$on('changeTabView',(evt,parameters) => {
+    $scope.tabView = parameters.tabView || 'panels'
+    $scope.updateQueryAndFetch($state.query);
+  })
+
+  $scope.$on('$destroy', () => {
+    wzEventFiltersListener()
+    changeTabViewListener()
+  })
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -24,6 +24,7 @@ modules.get('app/wazuh', [])
                     extensions : {
                         audit     : true,
                         pci       : true,
+                        gdpr      : true,
                         oscap     : true,
                         aws       : false,
                         virustotal: false
@@ -106,6 +107,12 @@ modules.get('app/wazuh', [])
         },
         removePatternSelector: () => {
             return $cookies.remove('patternSelector');
+        },
+        setCurrentDevTools: current => {
+            $window.localStorage.setItem('currentDevTools',current);
+        },
+        getCurrentDevTools: () => {
+            return $window.localStorage.getItem('currentDevTools')
         }
     };
 });

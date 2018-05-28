@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module to export ruleset visualizations raw content
+ * Wazuh app - Module to export all the controllers
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import decoders from './ruleset-decoders'
-import rules    from './ruleset-rules'
+import WazuhElastic    from './wazuh-elastic'
+import WazuhApiElastic from './wazuh-api-elastic'
+import WazuhApi        from './wazuh-api'
 
-export { decoders, rules}
+export { WazuhElastic, WazuhApiElastic, WazuhApi }

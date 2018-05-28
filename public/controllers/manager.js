@@ -21,16 +21,14 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
         $scope.submenuNavItem = $routeParams.tab;
     }
 
-    apiReq.request('GET', `/agents/000`, {})
-    .then(data => $rootScope.agent = data.data.data)
-    .catch(error => {
-        errorHandler.handle(error,'Manager');
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    });
-
     $scope.reloadGroups = () => {
         $scope.submenuNavItem = 'groups';
         $rootScope.groupsIsReloaded = true;
+    }
+
+    $scope.reloadRuleset = () => {
+        $scope.submenuNavItem = 'ruleset';
+        $rootScope.rulesetIsReloaded = true;
     }
 
     // Watchers
@@ -48,12 +46,7 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
     $scope.setRulesTab = (tab) => $scope.submenuNavItem2 = tab;
 
     $scope.$on("$destroy", () => {
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 });
 
@@ -97,12 +90,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
     });
 
     $scope.$on("$destroy", () => {
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 
 });
@@ -159,11 +147,6 @@ app.controller('managerConfigurationController', function ($scope, $rootScope, e
 
     load();
     $scope.$on("$destroy", () => {
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 });

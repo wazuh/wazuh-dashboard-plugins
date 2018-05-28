@@ -32,17 +32,20 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         toggleOnlyParents(value){
-            this.onlyParents = !value;
             this.reset();
+            this.onlyParents = !value;
             return this.nextPage();
         }
 
         nextPage () {
-            let deferred = $q.defer();
-            if (this.busy || this.end) {
-                deferred.resolve(true);
-                return;
+            if(this.totalItems && this.items && this.totalItems > this.items.length){
+                this.end = false;
             }
+            if (this.busy || this.end) {
+                return Promise.resolve(true);
+            }
+            const deferred = $q.defer();
+
             this.busy = true;
             let requestData;
 
@@ -69,9 +72,9 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             if(this.offset !== 0 && this.offset >= this.totalItems){
                 this.end = true;
                 this.busy = false;
-                deferred.resolve(true);
-                return;
+                return Promise.resolve(true);
             }
+            
             const path = this.onlyParents ? this.path + '/parents' : this.path;
             apiReq.request('GET', path, requestData)
             .then(data => {
@@ -85,10 +88,14 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                     this.items.push(items[i]);
                     this.items[i].selected = false;
                 }
+                // Prevents from any manager
+                if (this.path === '/agents') {
+                    const filteredAgents = this.items.filter(item => item && item.id !== '000');
+                    this.items = filteredAgents;
+                }
                 this.offset += items.length;
                 if (this.offset >= this.totalItems) this.end = true;
                 if (data.data.data !== 0){
-                    this.busy = false;
                     if(this.path === '/agents/groups'){
                         let filtered = this.items.filter((elem, index, self) => self.findIndex(
                             (t) => {return (t.merged_sum === elem.merged_sum)}) === index);
@@ -103,6 +110,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
 
                     deferred.resolve(true);
                 }
+                this.busy = false;
             })
             .catch(error => {
                 this.busy = false;
@@ -141,6 +149,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         removeFilter (filterName, search) {
+            this.end = false;
             if(search) this.filters = this.filters.filter(filter => filterName !== filter.name && filter.value !== search);
             else       this.filters = this.filters.filter(filter => filterName !== filter.name);
 
@@ -149,9 +158,11 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         removeAllFilters () {
-            for(let filter of this.filters){
+            for (let filter of this.filters) {
                 this.removeFilter(filter.name, true);
             }
+            // this.filters = [];
+            // return this.search();
         }
 
         delete (name, index) {
@@ -163,12 +174,15 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         }
 
         search () {
-            let deferred = $q.defer();
+            if (this.busy) {
+                return Promise.resolve(true);
+            }
+            this.busy      = true;
+            const deferred = $q.defer();
             let requestData;
             this.end       = false;
-            this.busy      = false;
-            //this.sortValue = '';
 
+            //this.sortValue = '';
             requestData = {
                 offset: 0,
                 limit:  this.initialBatch
@@ -203,11 +217,19 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                     const filteredRules = this.items.filter(item => item.id !== this.ruleID);
                     this.items = filteredRules;
                 }
-
+                // Prevents from any manager
+                if (this.path === '/agents') {
+                    const filteredAgents = this.items.filter(item => item && item.id !== '000');
+                    this.items = filteredAgents;
+                }
                 this.offset = items.length;
                 deferred.resolve(true);
+                this.busy = false;
             })
-            .catch(error => errorHandler.handle(error,'Datahandler factory'));
+            .catch(error => {
+                this.busy = false;
+                errorHandler.handle(error,'Datahandler factory');
+            });
 
             return deferred.promise;
         }
@@ -228,6 +250,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             this.busy            = false;
             this.ruleID          = null;
             this.decoderPosition = null;
+            this.onlyParents     = false;
         }
     }
 

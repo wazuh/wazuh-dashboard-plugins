@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import WazuhElastic from '../controllers/wazuh-elastic';
+import { WazuhElastic } from '../controllers';
 
 export default (server, options) => {
     
@@ -23,6 +23,7 @@ export default (server, options) => {
 
     // Create visualizations specified in 'tab' parameter and applying to 'pattern'
     server.route({ method: 'GET', path: '/api/wazuh-elastic/create-vis/{tab}/{pattern}', handler: (req,res) => ctrl.createVis(req,res) });
+    server.route({ method: 'POST', path: '/api/wazuh-elastic/create-vis/{tab}/{pattern}', handler: (req,res) => ctrl.createClusterVis(req,res) });
 
     // Returns whether a correct template is being applied for the index-pattern
     server.route({ method: 'GET', path: '/api/wazuh-elastic/template/{pattern}', handler: (req,res) => ctrl.getTemplate(req,res) });

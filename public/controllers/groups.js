@@ -11,12 +11,13 @@
  */
 import beautifier   from 'plugins/wazuh/utils/json-beautifier';
 import * as modules from 'ui/modules'
+import CsvGenerator from './csv-generator'
 
 const app = modules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',
-function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler) {
+function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler, csvReq, appState) {
     const reloadWatcher = $rootScope.$watch('groupsIsReloaded',() => {
         delete $rootScope.groupsIsReloaded;
         $scope.lookingGroup = false;
@@ -30,6 +31,19 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
     $scope.groups          = Groups;
     $scope.groupAgents     = GroupAgents;
     $scope.groupFiles      = GroupFiles;
+
+    $scope.downloadCsv = async dataProvider => {
+        try {
+            const path         = $scope[dataProvider] ? $scope[dataProvider].path : null;
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch(path, currentApi, $scope[dataProvider] ? $scope[dataProvider].filters : null);
+            const csvGenerator = new CsvGenerator(output.csv, 'groups.csv');
+            csvGenerator.download(true);
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
+            if(!$rootScope.$$phase) $rootScope.$digest();
+        }
+    }
 
     // Store a boolean variable to check if come from agents
     const fromAgents = ('comeFrom' in $rootScope) && ('globalAgent' in $rootScope) && $rootScope.comeFrom === 'agents';
@@ -184,12 +198,6 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
         $scope.groups.reset();
         $scope.groupFiles.reset();
         $scope.groupAgents.reset();
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
         reloadWatcher();
     });
 
@@ -206,11 +214,6 @@ app.controller('groupsController', function ($scope,$rootScope) {
     $scope.groupsMenu = 'preview';
     $scope.groupName  = '';
     $scope.$on("$destroy", () => {
-        if($rootScope.ownHandlers){
-            for(let h of $rootScope.ownHandlers){
-                h._scope.$destroy();
-            }
-        }
-        $rootScope.ownHandlers = [];
+
     });
 });

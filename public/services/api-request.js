@@ -17,7 +17,7 @@ const app = modules.get('app/wazuh', []);
 app.service('apiReq', function ($q, $http, genericReq, appState, $location, $rootScope) {
     return {
         request: (method, path, body) => {
-            let defered = $q.defer();
+            const defered = $q.defer();
 
             if (!method || !path || !body) {
                 defered.reject({
@@ -27,14 +27,16 @@ app.service('apiReq', function ($q, $http, genericReq, appState, $location, $roo
                 return defered.promise;
             }
 
-            if (appState.getCurrentAPI() === undefined || appState.getCurrentAPI() === null)
+            if (!appState.getCurrentAPI()){
                 defered.reject({
                     error:   -3,
                     message: 'No API selected.'
                 });
+                return defered.promise;
+            }
 
-            let id = JSON.parse(appState.getCurrentAPI()).id;
-            let requestData = { method, path, body, id };
+            const id = JSON.parse(appState.getCurrentAPI()).id;
+            const requestData = { method, path, body, id };
 
             genericReq.request('POST', '/api/wazuh-api/request', requestData)
             .then(data => {

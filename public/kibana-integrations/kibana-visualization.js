@@ -21,8 +21,8 @@ const app = modules.get('apps/webinar_app', [])
                 visID: '=visId',
                 specificTimeRange: '=specificTimeRange'
             },
-            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler,Private) {
-                if(!$rootScope.ownHandlers) $rootScope.ownHandlers = [];
+            controller: function VisController($scope, $rootScope, $location, wzsavedVisualizations, genericReq, errorHandler, Private, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
+
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
                 let visTitle               = '';
@@ -33,13 +33,12 @@ const app = modules.get('apps/webinar_app', [])
                 let renderInProgress       = false;
 
                 const myRender = raw => {
-                   
-                    if (raw && (($rootScope.discoverPendingUpdates && $rootScope.discoverPendingUpdates.length != 0) || $scope.visID.includes('Ruleset') ) ) { // There are pending updates from the discover (which is the one who owns the true app state)
-                        
+                    if (raw && discoverPendingUpdates.getList().length) { // There are pending updates from the discover (which is the one who owns the true app state)
+                        const discoverList = discoverPendingUpdates.getList();
                         if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
                             renderInProgress = true;
 
-                            const rawVis = raw.filter(item => item.id === $scope.visID);
+                            const rawVis = raw.filter(item => item && item.id === $scope.visID);
                             wzsavedVisualizations.get($scope.visID,rawVis[0]).then(savedObj => {
                                 originalImplicitFilter = savedObj.searchSource.get('query')['query'];
                                 visTitle = savedObj.vis.title;
@@ -48,21 +47,40 @@ const app = modules.get('apps/webinar_app', [])
                                 // There's an original filter
                                 if (originalImplicitFilter.length > 0 ) {
                                     // And also a pending one -> concatenate them
-                                    if ($rootScope.discoverPendingUpdates && typeof $rootScope.discoverPendingUpdates[0].query === 'string' && $rootScope.discoverPendingUpdates[0].query.length > 0) {
-                                        implicitFilter = originalImplicitFilter + ' AND ' + $rootScope.discoverPendingUpdates[0].query;
+                                    if (typeof discoverList[0].query === 'string' && discoverList[0].query.length > 0) {
+                                        implicitFilter = originalImplicitFilter + ' AND ' + discoverList[0].query;
                                     } else {
                                         // Only the original filter
                                         implicitFilter = originalImplicitFilter;
                                     }
                                 } else {
                                     // Other case, use the pending one, if it is empty, it won't matter
-                                    implicitFilter = $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[0].query : '';
+                                    implicitFilter = discoverList ? discoverList[0].query : '';
                                 }
 
-                                if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
+                                if (visTitle !== 'Wazuh App Overview General Agents status' && !visTitle.includes('Cluster')) { // We don't want to filter that visualization as it uses another index-pattern
                                     visualization.searchSource
                                     .query({ language: 'lucene', query: implicitFilter })
-                                    .set('filter',  $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[1] : {});
+                                    .set('filter',  discoverList.length > 1 ? discoverList[1] : {});
+                                } else if(visTitle.includes('Cluster')) {
+                                    // Checks for cluster.name and cluster.node filters existence 
+                                    const clusterFilters = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
+                                    
+                                    // Applying specific filter to cluster visualziations status
+                                    if(Array.isArray(clusterFilters) && clusterFilters.length) {
+                                        for(const clusterFilter of clusterFilters){
+                                            visualization.searchSource.filter(clusterFilter);
+                                        }                                    
+                                    }
+                                } else {
+                                    
+                                    // Checks for cluster.name filter existence 
+                                    const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && item.meta.key.includes('cluster.name'));
+                                    
+                                    // Applying specific filter to Agents status
+                                    if(Array.isArray(monitoringFilter) && monitoringFilter.length) {
+                                        visualization.searchSource.filter(monitoringFilter[0]);
+                                    }
                                 }
 
                                 let params = {};
@@ -80,8 +98,8 @@ const app = modules.get('apps/webinar_app', [])
                                 });
     
                                 visHandler = loader.embedVisualizationWithSavedObject($(`[vis-id="'${$scope.visID}'"]`), visualization, params); 
-                                
-                                $rootScope.ownHandlers.push(visHandler);
+          
+                                visHandlers.addItem(visHandler);
                                 visHandler.addRenderCompleteListener(renderComplete);
                             }).catch(error => {
                                 if(error && error.message && error.message.includes('not locate that index-pattern-field')){
@@ -96,43 +114,72 @@ const app = modules.get('apps/webinar_app', [])
                             // There's an original filter
                             if (originalImplicitFilter.length > 0 ) {
                                 // And also a pending one -> concatenate them
-                                if ($rootScope.discoverPendingUpdates && typeof $rootScope.discoverPendingUpdates[0].query === 'string' && $rootScope.discoverPendingUpdates[0].query.length > 0) {
-                                    implicitFilter = originalImplicitFilter + ' AND ' + $rootScope.discoverPendingUpdates[0].query;
+                                if (discoverList[0].query === 'string' && discoverList[0].query.length > 0) {
+                                    implicitFilter = originalImplicitFilter + ' AND ' + discoverList[0].query;
                                 } else {
                                     // Only the original filter
                                     implicitFilter = originalImplicitFilter;
                                 }
                             } else {
                                 // Other case, use the pending one, if it is empty, it won't matter
-                                implicitFilter = $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[0].query : '';
+                                implicitFilter = discoverList ? discoverList[0].query : '';
                             }
                             
                             if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
                                 visualization.searchSource
                                 .query({ language: 'lucene', query: implicitFilter })
-                                .set('filter', $rootScope.discoverPendingUpdates ? $rootScope.discoverPendingUpdates[1] : {});
+                                .set('filter', discoverList.length > 1 ? discoverList[1] : {});
+                            } else if(visTitle.includes('Cluster')) {
+                                // Checks for cluster.name and cluster.node filters existence 
+                                const clusterFilters = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
+                                
+                                // Applying specific filter to cluster visualziations status
+                                if(Array.isArray(clusterFilters) && clusterFilters.length) {
+                                    for(const clusterFilter of clusterFilters){
+                                        visualization.searchSource.filter(clusterFilter);
+                                    }                                    
+                                }
+                            } else {
+                                    
+                                // Checks for cluster.name filter existence 
+                                const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && item.meta.key.includes('cluster.name'));
+                                
+                                // Applying specific filter to Agents status
+                                if(Array.isArray(monitoringFilter) && monitoringFilter.length) {
+                                    visualization.searchSource.filter(monitoringFilter[0]);
+                                }
                             }
                         }
                     }
                 };
 
                 // Listen for changes
-                $rootScope.$on('updateVis', function (event, query, filters) {
+                const updateVisWatcher = $rootScope.$on('updateVis', () => {
                     if(!$rootScope.$$phase) $rootScope.$digest();
-                    myRender($rootScope.rawVisualizations);
+                    const rawVis = rawVisualizations.getList();
+                    if(Array.isArray(rawVis) && rawVis.length){
+                        myRender(rawVis);
+                    }
                 });
 
-                var renderComplete = function() {
+                $scope.$on('$destroy',() => {
+                    updateVisWatcher();
+                })
+
+                const renderComplete = () => {
                     rendered = true;
-                    
-                    if(typeof $rootScope.loadedVisualizations === 'undefined') $rootScope.loadedVisualizations = [];
-                    $rootScope.loadedVisualizations.push(true);
-                    let currentCompleted = Math.round(($rootScope.loadedVisualizations.length / $rootScope.tabVisualizations[$location.search().tab]) * 100);
+
+                    loadedVisualizations.addItem(true);
+
+                    let currentCompleted = Math.round((loadedVisualizations.getList().length / tabVisualizations.getItem(tabVisualizations.getTab())) * 100);
                     $rootScope.loadingStatus = `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`;
 
                     if (currentCompleted >= 100) {
-
-                        if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = true;
+                        if (!visTitle !== 'Wazuh App Overview General Agents status') { 
+                            const thereIsData   = visHandlers.hasData();
+                            $rootScope.rendered = thereIsData;
+                            if(!thereIsData) $rootScope.resultState = 'none'
+                        }
                         // Forcing a digest cycle
                         if(!$rootScope.$$phase) $rootScope.$digest();
                     }

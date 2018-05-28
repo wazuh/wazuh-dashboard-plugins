@@ -1,4 +1,4 @@
-<div flex ng-show="!loading" class="md-padding" layout="column" layout-align="start space-around">
+<div flex ng-if="!loading" class="md-padding" layout="column" layout-align="start space-around">
     <div layout="row" layout-align="space-between stretch">
         <md-card flex class="no-margin-left wz-md-card">
             <md-card-content>
@@ -34,11 +34,13 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle">Last registered agent</p>
-                    <p class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right" ng-click="showAgent(lastAgent)">{{lastAgent.name}}</p>
+                    <p ng-if="lastAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right" ng-click="showAgent(lastAgent)">{{lastAgent.name}}</p>
+                    <p ng-if="lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right" >{{lastAgent.name}}</p>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle">Higher activity</p>
-                    <p class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}}</p>
+                    <p ng-if="mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}}</p>
+                    <p ng-if="mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right" >{{mostActiveAgent.name}}</p>
                 </div>
             </md-card-content>
         </md-card>
@@ -109,4 +111,8 @@
             class="no-lateral-padding"
             full="'agent'">
         </wz-table>
+        <div layout="row" class="wz-margin-top-10">
+            <span flex></span>
+            <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+        </div>
     </div>

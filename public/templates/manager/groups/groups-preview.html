@@ -52,9 +52,12 @@
                         {name:'MD5 agent.conf'}
                         ]">
                 </wz-table-header>
-                <wz-table ng-if="!lookingGroup" layout="row" flex func="loadGroup(index)" data="groups" keys="[{col:'name',size:20},{col:'count',size:15},'merged_sum']"
-                    ng-if="!lookingGroup"></wz-table>
-
+                <wz-table ng-if="!lookingGroup" layout="row" flex func="loadGroup(index)" data="groups" keys="[{col:'name',size:20},{col:'count',size:15},'merged_sum']"></wz-table>
+                
+                <div layout="row" class="wz-margin-top-10" ng-if="!lookingGroup">
+                    <span flex></span>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('groups')">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+                </div>
 
                 <wz-table-header layout="row" data="groupAgents" keys="[
                         {name:'ID',sortValue:'id',size:10},
@@ -66,18 +69,27 @@
                         ]" ng-show="lookingGroup && groupsSelectedTab==='agents'">
                 </wz-table-header>
 
+                <wz-table layout="column" flex full="'agent'" func="showAgent(agent)" data="groupAgents" keys="[{col:'id',size:10},'name','ip','os.platform','os.version','version']" ng-if="lookingGroup && groupsSelectedTab==='agents'">
+                </wz-table>
+                
+                <div layout="row" class="wz-margin-top-10" ng-if="lookingGroup && groupsSelectedTab==='agents'">
+                    <span flex></span>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('groupAgents')">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+                </div>
+
                 <wz-table-header layout="row" data="groupFiles" keys="[
                         {name:'File',sortValue:'filename',size:30},
                         {name:'MD5 checksum'}
                         ]" ng-show="lookingGroup && groupsSelectedTab==='files' && !file">
                 </wz-table-header>
 
-                <wz-table layout="column" flex full="'agent'" func="showAgent(agent)" data="groupAgents" keys="[{col:'id',size:10},'name','ip','os.platform','os.version','version']"
-                    ng-if="lookingGroup && groupsSelectedTab==='agents'">
-                </wz-table>
-
                 <wz-table layout="column" flex func="showFile(index)" data="groupFiles" keys="[{col:'filename',size:30},'hash']" ng-if="lookingGroup && groupsSelectedTab==='files' && !file">
                 </wz-table>
+
+                <div layout="row" class="wz-margin-top-10" ng-if="lookingGroup && groupsSelectedTab==='files' && !file">
+                    <span flex></span>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('groupFiles')">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+                </div>
 
                 <div flex layout="column" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
                     <div flex layout="column">

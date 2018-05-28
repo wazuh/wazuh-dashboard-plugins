@@ -80,10 +80,11 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             await genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`);
             $scope.apiEntries.splice(index, 1);
             $rootScope.apiIsDown = null;
+            errorHandler.info('The API was removed successfully','Settings');
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch(error) {
-            errorHandler.handle('Could not remove manager','Settings');
+            errorHandler.handle('Could not remove the API','Settings');
             if(!$rootScope.$$phase) $rootScope.$digest();
         }
     };
@@ -127,6 +128,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         $scope.extensions.oscap      = $scope.apiEntries[index]._source.extensions.oscap;
         $scope.extensions.audit      = $scope.apiEntries[index]._source.extensions.audit;
         $scope.extensions.pci        = $scope.apiEntries[index]._source.extensions.pci;
+        $scope.extensions.gdpr       = $scope.apiEntries[index]._source.extensions.gdpr;
         $scope.extensions.aws        = $scope.apiEntries[index]._source.extensions.aws;
         $scope.extensions.virustotal = $scope.apiEntries[index]._source.extensions.virustotal;
         if(!$scope.$$phase) $scope.$digest();
@@ -160,6 +162,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
             $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
             $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
+            $scope.extensions.gdpr = $scope.apiEntries[currentApiEntryIndex]._source.extensions.gdpr;
             $scope.extensions.aws = $scope.apiEntries[currentApiEntryIndex]._source.extensions.aws;
             $scope.extensions.virustotal = $scope.apiEntries[currentApiEntryIndex]._source.extensions.virustotal;
 
@@ -233,6 +236,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(config.data && config.data.data) {
                 tmpData.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
                 tmpData.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
+                tmpData.extensions.gdpr = typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true;
                 tmpData.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
                 tmpData.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 tmpData.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
@@ -395,7 +399,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Toggle extension
     $scope.toggleExtension = async (extension, state) => {
         try{
-            if (['oscap','audit','pci','aws','virustotal'].includes(extension)) {
+            getCurrentAPIIndex()
+            if ($scope.apiEntries && $scope.apiEntries.length && ['oscap','audit','pci','gdpr','aws','virustotal'].includes(extension)) {
                 await genericReq.request('PUT', `/api/wazuh-api/extension/toggle/${$scope.apiEntries[currentApiEntryIndex]._id}/${extension}/${state}`);
                 $scope.apiEntries[currentApiEntryIndex]._source.extensions[extension] = state;
                 appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
@@ -412,6 +417,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     $scope.changeIndexPattern = async newIndexPattern => {
         try {
             appState.setCurrentPattern(newIndexPattern);
+            await genericReq.request('GET',`/refresh-fields/${newIndexPattern}`,{})
             $scope.$emit('updatePattern', {});
             errorHandler.info('Successfully changed the default index-pattern','Settings');
             $scope.selectedIndexPattern = newIndexPattern;
@@ -449,6 +455,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 $scope.extensions = {};
                 $scope.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
                 $scope.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
+                $scope.extensions.gdpr = typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true;
                 $scope.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
                 $scope.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 $scope.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;

@@ -12,15 +12,17 @@
 
 // Require some libraries
 import needle              from 'needle'
-import fs                  from 'fs'
-import yml                 from 'js-yaml'
 import path                from 'path'
 import colors              from 'ansicolors'
 import pciRequirementsFile from '../integration-files/pci-requirements'
+import gdprRequirementsFile from '../integration-files/gdpr-requirements'
 import ElasticWrapper      from '../lib/elastic-wrapper'
 import getPath             from '../../util/get-path'
 import packageInfo         from '../../package.json'
 import monitoring          from '../monitoring'
+import ErrorResponse       from './error-response'
+import { Parser }          from 'json2csv';
+import getConfiguration    from '../lib/get-configuration'
 
 const blueWazuh = colors.blue('wazuh');
 
@@ -32,17 +34,13 @@ export default class WazuhApi {
 
     async checkStoredAPI (req, reply) {
         try{
-            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
+            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3001, 401, reply);
             // Get config from elasticsearch
             const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
-
             if (wapi_config.error_code > 1) {
-                // Can not connect to elasticsearch
-                return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
-
+                throw new Error(`Could not find Wazuh API entry on Elasticsearch.`)
             } else if (wapi_config.error_code > 0) {
-                // Credentials not found
-                return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
+                throw new Error('Valid credentials not found in Elasticsearch. It seems the credentials were not saved.')
             }
 
             let response = await needle('get', `${wapi_config.url}:${wapi_config.port}/version`, {}, {
@@ -80,11 +78,11 @@ export default class WazuhApi {
                             return reply({ statusCode: 200, data: wapi_config });
 
                         } else if (response.body.error){
-                            return reply({
-                                statusCode: 500,
-                                error     :      7,
-                                message   :    response.body.message
-                            }).code(500);
+                            const tmpMsg = response && response.body && response.body.message ?
+                                           response.body.message :
+                                           'Unexpected error from /cluster/node';
+
+                            throw new Error(tmpMsg)
                         }
 
                     } else { // Cluster mode is not active
@@ -95,73 +93,58 @@ export default class WazuhApi {
                         wapi_config.cluster_info.cluster = 'Disabled';
                         wapi_config.cluster_info.manager = managerName;
                         wapi_config.password = '****'
-                        return reply({ statusCode: 200, data: wapi_config });
 
+                        return reply({ statusCode: 200, data: wapi_config });
                     }
+
                 } else {
-                    return reply({
-                        statusCode: 500,
-                        error     : 5,
-                        message   : 'Error occurred'
-                    }).code(500);
+                    const tmpMsg = response && response.body && response.body.message ?
+                                   response.body.message :
+                                   'Unexpected error from /cluster/status';
+
+                    throw new Error(tmpMsg)
                 }
 
             } else {
-                return reply({
-                    statusCode: 500,
-                    error     : 7,
-                    message   : response.body
-                });
+                throw new Error(`${wapi_config.url}:${wapi_config.port}/version is unreachable`)
             }
         } catch(error){
             if(error.code === 'ECONNREFUSED'){
                 return reply({ statusCode: 200, data: {password: '****', apiIsDown: true } });
             } else {
-                return reply({
-                    statusCode: 500,
-                    error     : 8,
-                    message   : error.message || error
-                });
+                return ErrorResponse(error.message || error, 3002, 500, reply);
             }
         }
     }
 
     validateCheckApiParams (payload)  {
         if (!('user' in payload)) {
-            return this.genericErrorBuilder(400,3,'Missing param: API USER');
+            return 'Missing param: API USER';
         }
 
         if (!('password' in payload)) {
-            return this.genericErrorBuilder(400,4,'Missing param: API PASSWORD');
+            return 'Missing param: API PASSWORD';
         }
 
         if (!('url' in payload)) {
-            return this.genericErrorBuilder(400,5,'Missing param: API URL');
+            return 'Missing param: API URL';
         }
 
         if (!('port' in payload)) {
-            return this.genericErrorBuilder(400,6,'Missing param: API PORT');
+            return 'Missing param: API PORT';
         }
 
         if (!(payload.url.includes('https://')) && !(payload.url.includes('http://'))) {
-            return this.genericErrorBuilder(200,1,'protocol_error');
+            return 'protocol_error';
         }
 
         return false;
     }
 
-    genericErrorBuilder (status,code,message) {
-        return {
-            statusCode: status,
-            error     : code,
-            message   : message || 'Error ocurred'
-        };
-    }
-
     async checkAPI (req, reply) {
         try {
             const notValid = this.validateCheckApiParams(req.payload);
-            if(notValid) return this.genericErrorBuilder(valid);
+            if(notValid) return ErrorResponse(notValid, 3003, 500, reply);
 
             req.payload.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
 
@@ -174,7 +157,7 @@ export default class WazuhApi {
 
             // Check wrong credentials
             if(parseInt(response.statusCode) === 401){
-                return reply(this.genericErrorBuilder(500,10401,'wrong_credentials')).code(500);
+                return ErrorResponse('Wrong credentials', 3004, 500, reply);
             }
 
             if (parseInt(response.body.error) === 0 && response.body.data) {
@@ -225,18 +208,21 @@ export default class WazuhApi {
                     }
                 }
             }
+            const tmpMsg = response.body && response.body.message ?
+                           response.body.message :
+                           'Unexpected error checking the Wazuh API';
 
-            throw new Error(response.body.message)
+            throw new Error(tmpMsg)
 
         } catch(error) {
-            return reply(this.genericErrorBuilder(500,5,error.message || error)).code(500);
+            return ErrorResponse(error.message || error, 3005, 500, reply);
         }
     }
 
     async getPciRequirement (req, reply) {
         try {
 
-            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
+            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3006, 401, reply);
 
             let pci_description = '';
 
@@ -248,10 +234,10 @@ export default class WazuhApi {
 
                 if (wapi_config.error_code > 1) {
                     // Can not connect to elasticsearch
-                    return reply({ statusCode: 200, error: '1', data: 'no_elasticsearch' });
+                    return ErrorResponse('Elasticsearch unexpected error or cannot connect', 3007, 400, reply);
                 } else if (wapi_config.error_code > 0) {
                     // Credentials not found
-                    return reply({ statusCode: 400, error: '2', data: 'no_credentials' });
+                    return ErrorResponse('Credentials does not exists', 3008, 400, reply);
                 }
 
                 const response = await needle('get', `${wapi_config.url}:${wapi_config.port}/rules/pci`, {}, {
@@ -267,7 +253,7 @@ export default class WazuhApi {
                     }
                     return reply(PCIobject);
                 } else {
-                    return reply({ statusCode: 400, error: '9998', data: 'An error occurred trying to parse PCI DSS requirements' });
+                    return ErrorResponse('An error occurred trying to parse PCI DSS requirements', 3009, 400, reply);
                 }
 
             } else {
@@ -283,40 +269,70 @@ export default class WazuhApi {
                 });
             }
         } catch (error) {
-
-            return reply({
-                statusCode: 400,
-                error     : '9999',
-                data      : `An error occurred trying to obtain PCI DSS requirements due to ${error.message || error}`
-            });
+            return ErrorResponse(error.message || error, 3010, 400, reply);
         }
 
     }
 
-    errorControl(error, response) {
-        if (error) {
-            return {
-                isError: true,
-                body: {
-                    statusCode  : 500,
-                    error       : 5,
-                    message     : 'Request error',
-                    errorMessage: error.message || error
+    async getGdprRequirement (req, reply) {
+        try {
+
+            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3023, 401, reply);
+
+            // Prevents load GDPR if it's disabled
+            const configFile = getConfiguration();
+            if(configFile && typeof configFile['extensions.gdpr'] !== 'undefined' && !configFile['extensions.gdpr']) {
+                return reply({});
+            }
+
+            let gdpr_description = '';
+
+            if (req.params.requirement === 'all') {
+                if(!req.headers.id) {
+                    return reply(gdprRequirementsFile);
                 }
-            };
-        } else if (!error && response.body.error) {
-            return {
-                isError: true,
-                body: {
-                    statusCode: 500,
-                    error     : 6,
-                    message   : 'Wazuh api error',
-                    errorData : response.body
+                let wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.headers.id);
+
+                if (wapi_config.error_code > 1) {
+                    // Can not connect to elasticsearch
+                    return ErrorResponse('Elasticsearch unexpected error or cannot connect', 3024, 400, reply);
+                } else if (wapi_config.error_code > 0) {
+                    // Credentials not found
+                    return ErrorResponse('Credentials does not exists', 3025, 400, reply);
                 }
-            };
+
+                const response = await needle('get', `${wapi_config.url}:${wapi_config.port}/rules/gdpr`, {}, {
+                    username          : wapi_config.user,
+                    password          : wapi_config.password,
+                    rejectUnauthorized: !wapi_config.insecure
+                })
+
+                if(response.body.data && response.body.data.items){
+                    let GDPRobject = {};
+                    for(let item of response.body.data.items){
+                        if(typeof gdprRequirementsFile[item] !== 'undefined') GDPRobject[item] = gdprRequirementsFile[item];
+                    }
+                    return reply(GDPRobject);
+                } else {
+                    return ErrorResponse('An error occurred trying to parse GDPR requirements', 3026, 400, reply);
+                }
+
+            } else {
+                if (typeof gdprRequirementsFile[req.params.requirement] !== 'undefined'){
+                    gdpr_description = gdprRequirementsFile[req.params.requirement];
+                }
+
+                return reply({
+                    gdpr: {
+                        requirement: req.params.requirement,
+                        description: gdpr_description
+                    }
+                });
+            }
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3027, 400, reply);
         }
 
-        return ({ isError: false });
     }
 
     async makeRequest (method, path, data, id, reply) {
@@ -325,19 +341,10 @@ export default class WazuhApi {
 
             if (wapi_config.error_code > 1) {
                 //Can not connect to elasticsearch
-                return reply({
-                    statusCode: 404,
-                    error     : 2,
-                    message   : 'Could not connect with elasticsearch'
-                }).code(404);
-
+                return ErrorResponse('Could not connect with elasticsearch', 3011, 404, reply);
             } else if (wapi_config.error_code > 0) {
                 //Credentials not found
-                return reply({
-                    statusCode: 404,
-                    error     : 1,
-                    message   : 'Credentials does not exists'
-                }).code(404);
+                return ErrorResponse('Credentials does not exists', 3012, 404, reply);
             }
 
             if (!data) {
@@ -355,71 +362,48 @@ export default class WazuhApi {
 
             const fullUrl   = getPath(wapi_config) + path;
             const response  = await needle(method, fullUrl, data, options);
-            const errorData = this.errorControl(false, response);
 
-            if (errorData.isError) {
-                return reply(errorData.body).code(500);
+            if(response && response.body && !response.body.error && response.body.data) {
+                return reply(response.body)
             }
 
-            return reply(response.body);
+            throw response && response.body && response.body.error && response.body.message ?
+                  new Error(response.body.message) :
+                  new Error('Unexpected error fetching data from the Wazuh API')
 
         } catch (error) {
-            return reply({
-                statusCode: 500,
-                data      : error.message || error
-            }).code(500);
+            return ErrorResponse(error.message || error, 3013, 500, reply);
         }
     }
 
     requestApi (req, reply) {
-        if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
+        if(!protectedRoute(req)) return ErrorResponse('Session expired', 3014, 401, reply);
         if (!req.payload.method) {
-            return reply({
-                statusCode: 400,
-                error     : 3,
-                message   : 'Missing param: Method'
-            }).code(400);
+            return ErrorResponse('Missing param: method', 3015, 400, reply);
         } else if (!req.payload.path) {
-            return reply({
-                statusCode: 400,
-                error     : 4,
-                message   : 'Missing param: Path'
-            }).code(400);
+            return ErrorResponse('Missing param: path', 3016, 400, reply);
         } else {
+            if(req.payload.method !== 'GET' && req.payload.body && req.payload.body.devTools){
+                const configuration = getConfiguration();
+                if(!configuration || (configuration && !configuration['devtools.allowall'])){
+                    return ErrorResponse('Allowed method: [GET]', 3023, 400, reply);
+                }
+            }
+            if(req.payload.body.devTools) {
+                delete req.payload.body.devTools;
+                const keyRegex = new RegExp(/.*agents\/\d*\/key.*/)
+                if(typeof req.payload.path === 'string' &&  keyRegex.test(req.payload.path)){
+                    return ErrorResponse('Forbidden route /agents/<id>/key', 3028, 400, reply);
+                }
+            }
             return this.makeRequest(req.payload.method, req.payload.path, req.payload.body, req.payload.id, reply);
         }
     }
 
-    async getApiSettings (req, reply) {
-        try{
-            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
-
-            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id);
-
-            if (wapi_config.error_code > 1) {
-                throw new Error('no_elasticsearch');
-            } else if (wapi_config.error_code > 0) {
-                throw new Error('no_credentials');
-            }
-            return reply({
-                statusCode: 200,
-                data      : ''
-            });
-
-        } catch(error){
-            return reply({
-                statusCode: 200,
-                error     : '1',
-                data      : error.message || error
-            });
-        }
-
-    };
-
     // Fetch agent status and insert it directly on demand
     async fetchAgents (req, reply) {
         try{
-            if(!protectedRoute(req)) return reply(this.genericErrorBuilder(401,7,'Session expired.')).code(401);
+            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3017, 401, reply);
             const output = await this.fetchAgentsExternal();
             return reply({
                 'statusCode': 200,
@@ -428,31 +412,13 @@ export default class WazuhApi {
                 output
             });
         } catch(error){
-            return reply({
-                statusCode: 200,
-                error     : '1',
-                data      : error.message || error
-            }); 
-        }
-    }
-
-    postErrorLog (req, reply) {
-
-        if (!req.payload.message) {
-
-            return reply({
-                'statusCode': 500,
-                'message':    'You must provide at least one error message to log'
-            });
-
-        } else {
-            return reply({ statusCode: 200, message: 'Error logged succesfully' });
+            return ErrorResponse(error.message || error, 3018, 500, reply);
         }
     }
 
     getConfigurationFile (req,reply) {
         try{
-            const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
+            const configFile = getConfiguration();
 
             if(configFile && configFile['login.password']){
                 delete configFile['login.password'];
@@ -465,23 +431,23 @@ export default class WazuhApi {
             });
 
         } catch (error) {
-            return reply(this.genericErrorBuilder(500,6,error.message || error)).code(500)
+            return ErrorResponse(error.message || error, 3019, 500, reply);
         }
     }
 
     login(req,reply) {
         try{
 
-            const configFile = yml.load(fs.readFileSync(path.join(__dirname,'../../config.yml'), {encoding: 'utf-8'}));
+            const configFile = getConfiguration();
 
             if(!configFile){
                 throw new Error('Configuration file not found');
             }
 
             if(!req.payload.password) {
-                return reply(this.genericErrorBuilder(401,7,'Please give me a password.')).code(401)
+                return ErrorResponse('Please give me a password.', 3020, 401, reply);
             } else if(req.payload.password !== configFile['login.password']){
-                return reply(this.genericErrorBuilder(401,7,'Wrong password, please try again.')).code(401)
+                return ErrorResponse('Wrong password, please try again.', 3021, 401, reply);
             }
 
             const code = (new Date()-1) + 'wazuhapp';
@@ -494,7 +460,72 @@ export default class WazuhApi {
             return reply({ statusCode: 200, error: 0, code });
 
         } catch (error) {
-            return reply(this.genericErrorBuilder(500,6,error.message || error)).code(500)
+            return ErrorResponse(error.message || error, 3022, 500, reply);
+        }
+    }
+
+    /**
+     * Get full data on CSV format from a list Wazuh API endpoint
+     * @param {*} req
+     * @param {*} res
+     */
+    async csv(req,res) {
+        try{
+
+            if(!req.payload || !req.payload.path) throw new Error('Field path is required')
+            if(!req.payload.id) throw new Error('Field id is required')
+
+            const filters = req.payload && req.payload.filters && Array.isArray(req.payload.filters) ?
+                            req.payload.filters :
+                            [];
+
+            const config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id)
+
+            let path = req.payload.path;
+
+            if(path && typeof path === 'string'){
+                path = path[0] === '/' ? path.substr(1) : path
+            }
+
+            if(!path) throw new Error('An error occurred parsing path field')
+
+            const params = { limit: 99999 };
+
+            if(filters.length) {
+                for(const filter of filters) {
+                    if(!filter.name || !filter.value) continue;
+                    params[filter.name] = filter.value;
+                }
+            }
+
+            const output = await needle('get', `${config.url}:${config.port}/${path}`, params, {
+                username          : config.user,
+                password          : config.password,
+                rejectUnauthorized: !config.insecure
+            })
+
+            if(output && output.body && output.body.data && output.body.data.totalItems) {
+                const fields = Object.keys(output.body.data.items[0]);
+                const data   = output.body.data.items;
+
+                const json2csvParser = new Parser({ fields });
+
+                const csv = json2csvParser.parse(data);
+
+                return res({ csv });
+
+            } else if (output && output.body && output.body.data && !output.body.data.totalItems) {
+
+                throw new Error('No results')
+
+            } else {
+
+                throw new Error('An error occurred fetching data from the Wazuh API')
+
+            }
+
+        } catch (error) {
+            return res({ error: error.message || error }).code(500)
         }
     }
 }

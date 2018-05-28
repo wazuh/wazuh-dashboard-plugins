@@ -11,6 +11,7 @@
  */
 
 import ElasticWrapper from '../lib/elastic-wrapper';
+import ErrorResponse  from './error-response';
 
 const userRegEx  = new RegExp(/^.{3,100}$/);
 const passRegEx  = new RegExp(/^.{3,100}$/);
@@ -27,10 +28,21 @@ export default class WazuhApiElastic {
         try {
             const data = await this.wzWrapper.getWazuhAPIEntries();
 
-            return reply(data.hits.hits);
+            // Replacing password by ****
+            const result = [];
+            if(data && data.hits && data.hits.hits && Array.isArray(data.hits.hits)){
+                for(const entry of data.hits.hits) {
+                    if(entry && entry._source && entry._source.api_password){
+                        entry._source.api_password = '****'
+                    }
+                    result.push(entry)
+                }
+            } 
+
+            return reply(result);
 
         } catch(error){
-            return reply(error);
+            return ErrorResponse(error.message || error, 2001, 500, reply);
         }
     }
 
@@ -41,7 +53,7 @@ export default class WazuhApiElastic {
             return reply(data);
 
         } catch(error){
-            return reply(error);
+            return ErrorResponse(error.message || error, 2002, 500, reply);
         }
     }
 
@@ -57,14 +69,10 @@ export default class WazuhApiElastic {
 
             await this.wzWrapper.updateWazuhIndexDocument(req.params.id, { doc: { active: 'true' } });
 
-            return reply({ statusCode: 200, message:    'ok' });
+            return reply({ statusCode: 200, message: 'ok' });
 
         }catch(error){
-            return reply({
-                statusCode: 500,
-                error     : 8,
-                message   : `Could not save data in elasticsearch due to ${error.message || error}`
-            }).code(500);
+            return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2003, 500, reply);
         }
     }
 
@@ -75,7 +83,7 @@ export default class WazuhApiElastic {
             return reply(data.hits.hits);
 
         } catch(error){
-            return reply(error);
+            return ErrorResponse(error.message || error, 2004, 500, reply);
         }
     }
 
@@ -90,34 +98,30 @@ export default class WazuhApiElastic {
             return reply({ statusCode: 200, message: 'ok' });
 
         } catch (error){
-            return reply({
-                statusCode: 500,
-                error     : 8,
-                message   : `Could not save data in elasticsearch due to ${error.message || error}`
-            }).code(500);
+            return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2005, 500, reply);
         }
     }
 
     validateData (payload) {
         // Validate user
         if(!userRegEx.test(payload.user)){
-            return reply({ statusCode: 400, error: 10001, message: 'Invalid user field' }).code(400);
+            return { code: 2006, message: 'Invalid user field' }
         }
 
         // Validate password
         if(!passRegEx.test(payload.password)){
-            return reply({ statusCode: 400, error: 10002, message: 'Invalid password field' }).code(400);
+            return { code: 2007, message: 'Invalid password field' }
         }
 
         // Validate url
         if(!urlRegEx.test(payload.url) && !urlRegExIP.test(payload.url)){
-            return reply({ statusCode: 400, error: 10003, message: 'Invalid url field' }).code(400);
+            return { code: 2008, message: 'Invalid url field' }
         }
 
         // Validate port
         const validatePort = parseInt(payload.port);
         if(!portRegEx.test(payload.port) || validatePort <= 0 || validatePort >= 99999) {
-            return reply({ statusCode: 400, error: 10004, message: 'Invalid port field' }).code(400);
+            return { code: 2009, message: 'Invalid port field' }
         }
 
         return false;
@@ -140,15 +144,11 @@ export default class WazuhApiElastic {
     async saveAPI (req, reply) {
         try {
             if (!('user' in req.payload) || !('password' in req.payload) || !('url' in req.payload) || !('port' in req.payload)) {
-                return reply({
-                    statusCode: 400,
-                    error     : 7,
-                    message   : 'Missing data'
-                }).code(400);
+                return ErrorResponse('Missing data', 2010, 400, reply);
             }
 
             const valid = this.validateData(req.payload);
-            if(valid) return reply(valid).code(400);
+            if(valid) return ErrorResponse(valid.message, valid.code, 400, reply);
 
             const settings = this.buildSettingsObject(req.payload);
 
@@ -157,11 +157,7 @@ export default class WazuhApiElastic {
             return reply({ statusCode: 200, message: 'ok', response });
 
         } catch (error){
-            return reply({
-                statusCode: 500,
-                error     : 8,
-                message   : `Could not save data in elasticsearch due to ${error.message || error}`
-            }).code(500);
+            return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2011, 500, reply);
         }
     }
 
@@ -173,26 +169,18 @@ export default class WazuhApiElastic {
             return reply({ statusCode: 200, message: 'ok' });
 
         } catch (error) {
-            return reply({
-                statusCode: 500,
-                error     : 8,
-                message   : `Could not save data in elasticsearch due to ${error.message || error}`
-            }).code(500);
+            return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2012, 500, reply);
         }
     }
 
     async updateFullAPI (req, reply) {
         try {
             if (!('user' in req.payload) || !('password' in req.payload) || !('url' in req.payload) || !('port' in req.payload)) {
-                return reply({
-                    statusCode: 400,
-                    error     : 7,
-                    message   : 'Missing data'
-                }).code(400);
+                return ErrorResponse('Missing data', 2013, 400, reply);
             }
 
             const valid = this.validateData(req.payload);
-            if(valid) return reply(valid).code(400);
+            if(valid) return ErrorResponse(valid.message, valid.code, 400, reply);
 
             const settings = this.buildSettingsObject(req.payload);
 
@@ -201,11 +189,7 @@ export default class WazuhApiElastic {
             return reply({ statusCode: 200, message: 'ok' });
 
         } catch (error) {
-            return reply({
-                statusCode: 500,
-                error     : 8,
-                message   : `Could not save data in elasticsearch due to ${error.message || error}`
-            }).code(500);
+            return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2014, 500, reply);
         }
     }
 }

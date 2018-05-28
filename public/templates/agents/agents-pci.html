@@ -1,12 +1,12 @@
-<md-content flex layout="column" ng-if="tab === 'pci' && tabView === 'panels'" ng-show="resultState === 'ready'" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'pci' && tabView === 'panels'" ng-show="resultState === 'ready' && rendered" layout-align="start">
 
     <!-- View: Panels -->
 
 
         <div layout="row" layout-align="center stretch">
             <md-card flex class="wz-md-card">
-                <md-tabs md-selected="selectedIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="pciReq_tab">
-                    <md-tab ng-repeat="tab in tabs" ng-disabled="tab.disabled" label="{{tab.title}}">
+                <md-tabs md-selected="selectedPciIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="pciReq_tab">
+                    <md-tab ng-repeat="tab in pciTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
                         <div class="md-padding">
                             <span class="wz-headline-title">PCI DSS Requirement: {{tab.title}}</span>
                             <md-divider class="wz-margin-top-10"></md-divider>
@@ -22,7 +22,7 @@
         <div layout="row" layout-align="center stretch" class="height-225">
             <md-card flex="70" class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Requirements</span>
+                    <span class="wz-headline-title">PCI Requirements</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis vis-id="'Wazuh-App-Agents-PCI-Requirements'"></kbn-vis>
                 </md-card-content>
@@ -46,6 +46,6 @@
             </md-card>
         </div>
 
-    
+
 
 </md-content>
