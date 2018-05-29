@@ -275,9 +275,10 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                 const tmpHTMLElement = $(`#${item}`);
                 vis2png.assignHTMLItem(item,tmpHTMLElement)
             }            
+            const appliedFilters = visHandlers.getAppliedFilters()
             const array   = await vis2png.checkArray(idArray)
             const name    = `wazuh-overview-${$scope.tab}-${Date.now() / 1000 | 0}.pdf`
-            const request = await genericReq.request('POST','/api/wazuh-api/report',{array,name,title:$scope.tab})
+            const request = await genericReq.request('POST','/api/wazuh-api/report',{array,name,title:'Overview ' + $scope.tab, filters: appliedFilters.filters, time: appliedFilters.time})
             $rootScope.reportStatus = 'Generating report...100%'
             $scope.reportBusy = false;
             $rootScope.reportStatus = false;
