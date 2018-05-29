@@ -541,25 +541,53 @@ export default class WazuhApi {
                 
                 let doc = new PDFDocument();
                 doc.pipe(fs.createWriteStream(path.join(__dirname, '../../../wazuh-reporting/' + req.payload.name)));
+                doc.image(path.join(__dirname, '../../public/img/logo.png'),410,20,{fit:[150,70]})
+                doc.moveDown().fontSize(9).fillColor('blue').text('https://wazuh.com',442,50,{link: 'https://wazuh.com', underline:true, valign:'right', align: 'right'})
+    
                 if(req.payload.title && typeof req.payload.title === 'string') {
-                    doc.text('OVERVIEW ' + req.payload.title.toUpperCase())
+                    doc.fontSize(18).fillColor('black').text(req.payload.title + ' report',45,70)
+                    doc.moveDown()
                 }
+
+                if(req.payload.time){
+                    doc.fontSize(12).text('Time range:')
+                    doc.moveDown()
+                    const str = `${req.payload.time.from} to ${req.payload.time.to}`
+                    doc.fontSize(10).text(str)
+                    doc.moveDown()
+                }
+                 
+                if(req.payload.filters) {
+                    let str = '';
+                    const len = req.payload.filters.length;
+                    for(let i=0; i < len; i++) {
+                        const filter = req.payload.filters[i];
+                        str += i === len - 1 ? 
+                                     filter.meta.key + ': ' + filter.meta.value :
+                                     filter.meta.key + ': ' + filter.meta.value + ' AND '
+                    }
+                    doc.fontSize(12).text('Filters:')
+                    doc.moveDown()
+                    doc.fontSize(10).text(str)
+                    doc.moveDown()
+                }
+
                 let counter = 0;
                 for(const item of req.payload.array){
                     counter++;
                     
-                    doc.image(item.element,{  fit: [460, 300],
+                    doc.image(item.element,{ fit: [460, 270],
                         align: 'center'});
                     doc.moveDown()
                     if(counter >= 3) {
-                        doc.text('Copyright © 2018 Wazuh, Inc.', 20, doc.page.height - 50, {
+                        doc.fontSize(7).text('Copyright © 2018 Wazuh, Inc.', 440, doc.page.height - 30, {
                             lineBreak: false
                         })
                         doc.addPage();
                         counter = 0;
                     }
                 }
-                doc.text('Copyright © 2018 Wazuh, Inc.', 20, doc.page.height - 50, {
+                doc.fontSize(7).text('Copyright © 2018 Wazuh, Inc.', 440, doc.page.height - 30, {
                     lineBreak: false
                 })
                 // PDF Creation logic goes here
