@@ -27,6 +27,8 @@ app.controller('reportingController', function ($scope, errorHandler, genericReq
     }
 
     load();
+    
+    $scope.refresh = () => load();
 
     $scope.deleteReport = async name => {
         try {
