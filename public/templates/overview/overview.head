@@ -3,7 +3,7 @@
     <wz-menu ng-init="menuNavItem = 'overview'"></wz-menu>
 
     <div layout="row" layout-align="space-between start" class="wz-md-navbar-kbn">
-        <div layout="column" layout-align="center start">
+        <div layout="column" flex layout-align="center start">
             <md-nav-bar class="padding-right-0 wz-md-navbar" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
                 <md-nav-item md-nav-click="switchTab('general');" name="general">General</md-nav-item>
                 <md-nav-item md-nav-click="switchTab('fim');" name="fim">File integrity</md-nav-item>
@@ -17,7 +17,9 @@
                 <md-nav-item md-nav-click="switchTab('virustotal');" name="virustotal" ng-show="extensions.virustotal">VirusTotal</md-nav-item>
             </md-nav-bar>
         </div>
-
+        <div layout="column">
+            <md-button class="wz-report-button" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()"><i class="fa fa-fw fa-pencil"></i> Report</md-button>
+        </div>
         <div layout="column" layout-align="end end">
             <md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
                 <md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
@@ -38,6 +40,11 @@
     <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
+    </div>
+
+    <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="reportBusy && reportStatus">
+        <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
+        <div class="percentage">{{reportStatus}}</div>
     </div>
 
     <!-- No results message -->
