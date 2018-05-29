@@ -1,0 +1,44 @@
+<!-- Loading ring -->
+<div class='uil-ring-css' ng-show="loading">
+    <div></div>
+</div>
+<div layout="row" ng-show="!loading && !reports || !reports.length">
+    <md-card class="wz-md-card" flex>
+        <md-card-content class="wz-text-center">
+            <div layout="row" class="wz-padding-top-10">
+                <i class="fa fa-fw fa-frown-o"></i> There are no reports yet.
+            </div>
+        </md-card-content>
+    </md-card>
+</div>
+<div layout="row" ng-show="!loading && reports && reports.length">
+    <md-card flex class="wz-md-card">
+        <md-card-content class="wazuh-column" id="Wazuh-App-Overview-General-Alert-level-evolution">
+            <div layout="row" class="wz-padding-top-10">
+                <table class="table" id="wz_table">
+                    <thead>
+                        <th class="wz-left">File</th>
+                        <th class="wz-left">Size</th>
+                        <th class="wz-left">Created</th>
+                        <th class="wz-left">Options</th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in reports">
+                            <td>{{item.name}}</td>
+                            <td>{{item.size / 1024 | number: 2}}KB</td>
+                            <td>{{item.date.split('T')[0]}} {{item.date.split('T')[1].split('.')[0]}}</td>
+                            <td>
+                                <a ng-href="/api/wazuh-api/report/{{item.name}}" flex class="wz-text-right" target="_blank">
+                                    <i class="fa fa-fw fa-download"></i>
+                                </a>
+                                <a flex class="wz-text-right cursor-pointer" ng-click="deleteReport(item.name)">
+                                    <i class="fa fa-fw fa-remove"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </md-card-content>
+    </md-card>
+</div>
