@@ -12,10 +12,12 @@
 import $             from 'jquery';
 import * as modules  from 'ui/modules'
 import FilterHandler from './filter-handler'
+import PDFDownload   from './pdf-download-generator'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
+app.controller('overviewController', function ($sce, $timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png) {
+
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     discoverPendingUpdates.removeAll();
@@ -257,6 +259,33 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
 
         $scope.switchSubtab('panels', true, sameTab);
     };
+
+    $scope.startVis2Png = async () => {
+        try {
+            if(vis2png.isWorking()){
+                errorHandler.handle('vis2png is busy', 'VIS2PNG',true);
+                return;
+            }
+            $scope.reportBusy = true;
+            $rootScope.reportStatus = 'Generating report...0%'
+            if(!$rootScope.$$phase) $rootScope.$digest();
+            vis2png.clear();
+            const idArray = rawVisualizations.getList().map(item => item.id);
+            for(const item of idArray) {
+                const tmpHTMLElement = $(`#${item}`);
+                vis2png.assignHTMLItem(item,tmpHTMLElement)
+            }            
+            const array   = await vis2png.checkArray(idArray)
+            const name    = `wazuh-overview-${$scope.tab}-${Date.now() / 1000 | 0}.pdf`
+            const request = await genericReq.request('POST','/api/wazuh-api/report',{array,name,title:$scope.tab})
+            $rootScope.reportStatus = 'Generating report...100%'
+            $scope.reportBusy = false;
+            $rootScope.reportStatus = false;
+            errorHandler.info('Report generated successfully, go to Management > Reporting', 'Reporting')
+        } catch (error) {
+            errorHandler.handle(error, 'Reporting')
+        }
+    }
 
     $scope.$on('$destroy', () => {
         discoverPendingUpdates.removeAll();
