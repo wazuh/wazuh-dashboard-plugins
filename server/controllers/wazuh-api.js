@@ -528,4 +528,87 @@ export default class WazuhApi {
             return res({ error: error.message || error }).code(500)
         }
     }
+
+
+    async report(req,reply) {
+        try {
+            const fs = require('fs');
+            if (!fs.existsSync(path.join(__dirname, '../../../wazuh-reporting'))) {
+                fs.mkdirSync(path.join(__dirname, '../../../wazuh-reporting'));
+            }
+            if(req.payload && req.payload.array){
+                const PDFDocument = require('pdfkit');
+                
+                let doc = new PDFDocument();
+                doc.pipe(fs.createWriteStream(path.join(__dirname, '../../../wazuh-reporting/' + req.payload.name)));
+                if(req.payload.title && typeof req.payload.title === 'string') {
+                    doc.text('OVERVIEW ' + req.payload.title.toUpperCase())
+                }
+                let counter = 0;
+                for(const item of req.payload.array){
+                    counter++;
+                    
+                    doc.image(item.element,{  fit: [460, 300],
+                        align: 'center'});
+                    doc.moveDown()
+                    if(counter >= 3) {
+                        doc.text('Copyright © 2018 Wazuh, Inc.', 20, doc.page.height - 50, {
+                            lineBreak: false
+                        })
+                        doc.addPage();
+                        counter = 0;
+                    }
+                }
+                doc.text('Copyright © 2018 Wazuh, Inc.', 20, doc.page.height - 50, {
+                    lineBreak: false
+                })
+                // PDF Creation logic goes here
+                doc.end();
+            }
+            return reply({error: 0, data: null})
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3029, 500, reply);
+        }
+    }
+
+    async getReports(req,reply) {
+        try {
+            const list = [];
+            const reportDir = path.join(__dirname, '../../../wazuh-reporting');
+            const fs = require('fs');
+
+            fs.readdirSync(reportDir).forEach(file => {
+                file = {
+                    name: file,
+                    size: fs.statSync(reportDir + '/' + file).size,
+                    date: fs.statSync(reportDir + '/' + file).birthtime
+                }
+                list.push(file)
+            })
+
+            const result = list.sort((a,b) => a.date > b.date ? 1 : a.date < b.date ? -1 : 0)
+            
+            return reply({list: result});
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3031, 500, reply);
+        }
+    }
+
+    async getReportByName(req,reply) {
+        try {
+            return reply.file(path.join(__dirname, '../../../wazuh-reporting/' + req.params.name));
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3030, 500, reply);
+        }
+    }
+
+    async deleteReportByName(req,reply) {
+        try {
+            const fs = require('fs')
+            fs.unlinkSync(path.join(__dirname, '../../../wazuh-reporting/' + req.params.name))
+            return reply({error:0})
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3032, 500, reply);
+        }
+    }
 }
