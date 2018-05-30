@@ -25,6 +25,9 @@ import { Parser }          from 'json2csv';
 import getConfiguration    from '../lib/get-configuration'
 import PDFDocument         from 'pdfkit'
 import fs                  from 'fs'
+import descriptions        from '../reporting/tab-description'
+
+import { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations } from '../integration-files/visualizations'
 
 const blueWazuh = colors.blue('wazuh');
 
@@ -544,20 +547,24 @@ export default class WazuhApi {
                 doc.image(path.join(__dirname, '../../public/img/logo.png'),410,20,{fit:[150,70]})
                 doc.moveDown().fontSize(9).fillColor('blue').text('https://wazuh.com',442,50,{link: 'https://wazuh.com', underline:true, valign:'right', align: 'right'})
 
-                if(req.payload.title && typeof req.payload.title === 'string') {
-                    doc.fontSize(18).fillColor('black').text(req.payload.title + ' report',45,70)
+                const tab     = req.payload.tab;
+                const section = req.payload.section;
+                
+                if(req.payload.section && typeof req.payload.section === 'string') {
+                    doc.fontSize(18).fillColor('black').text(descriptions[tab].title + ' report',45,70)
                     doc.moveDown()
                 }
 
                 if(req.payload.time){
-                    doc.fontSize(12).text('Time range:')
-                    doc.moveDown()
                     const str = `${req.payload.time.from} to ${req.payload.time.to}`
-                    doc.fontSize(10).text(str)
+                    const currentY = doc.y;
+                    const currentX = doc.x;
+                    doc.fontSize(10).image(path.join(__dirname, '../reporting/clock.png'),currentX,currentY,{width:8, height:8}).text(str,currentX+10,currentY)
                     doc.moveDown()
                 }
                 
                 if(req.payload.filters) {
+                    doc.x -= 10;
                     let str = '';
                     const len = req.payload.filters.length;
                     for(let i=0; i < len; i++) {
@@ -566,24 +573,43 @@ export default class WazuhApi {
                                      filter.meta.key + ': ' + filter.meta.value :
                                      filter.meta.key + ': ' + filter.meta.value + ' AND '
                     }
-                    doc.fontSize(12).text('Filters:')
+                    const currentY = doc.y;
+                    const currentX = doc.x;
+                    doc.fontSize(10).image(path.join(__dirname, '../reporting/filters.png'),currentX,currentY,{width:8, height:8}).text(str,currentX+10,currentY)
                     doc.moveDown()
-                    doc.fontSize(10).text(str)
-                    doc.moveDown()
+                    doc.x -= 10;
                 }
 
+
+                doc.fontSize(12).text(descriptions[tab].description)
+                doc.moveDown()
+                doc.moveDown()
                 let counter = 0;
+                let maxWidth = 0;
                 for(const item of req.payload.array){
+                    if(item.width > maxWidth) maxWidth = item.width;
+                }
+
+                const scaleFactor = 530 / maxWidth;
+
+                let pageNumber = 0;
+                doc.on('pageAdded', () => pageNumber++);
+                const len = req.payload.array.length;
+                for(let i = 0; i < len; i++){
+                    const item = req.payload.array[i]
+                    const title = OverviewVisualizations[tab].filter(v => v._id === item.id);
                     counter++;
-                    const itemWidth = item.width / 2;
-                    doc.image(item.element,{ width: itemWidth < 530 ? itemWidth : 530 });
+                    doc.fontSize(12).text(title[0]._source.title)
+                    doc.moveDown()
+                    doc.image(item.element,((doc.page.width - (item.width*scaleFactor)) / 2),doc.y,{ align: 'center', scale: scaleFactor });
 
                     doc.moveDown()
-                    if(counter >= 3) {
+                    doc.moveDown()
+                    if(counter >= 3 || counter === 2 && pageNumber === 0) {
                         doc.fontSize(7).text('Copyright © 2018 Wazuh, Inc.', 440, doc.page.height - 30, {
                             lineBreak: false
                         })
-                        doc.addPage();
+                        if(i !== (len - 1)) doc.addPage();
                         counter = 0;
                     }
                 }
