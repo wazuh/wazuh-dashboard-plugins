@@ -37,6 +37,7 @@
         "needle": "^2.0.1",
         "node-cron": "^1.1.2",
         "pdfkit": "^0.8.3",
+        "timsort": "^0.3.0",
         "winston": "3.0.0-rc1"
     }
 }
