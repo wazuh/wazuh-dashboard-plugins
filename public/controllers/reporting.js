@@ -24,10 +24,11 @@ app.controller('reportingController', function ($scope, errorHandler, genericReq
         try {
             $scope.loading = true;
             const data = await genericReq.request('GET','/api/wazuh-api/reports',{});
-            items = data.data.list.reverse();
+            items = data.data.list;
             const gap = items.length / 20;
             const gapInteger = parseInt(items.length / 20);
             $scope.gap = gap - parseInt(items.length / 20) > 0 ? gapInteger + 1 : gapInteger;
+            if($scope.gap > 5) $scope.gap = 5;
             $scope.search();
             $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
