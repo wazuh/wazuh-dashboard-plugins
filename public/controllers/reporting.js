@@ -10,15 +10,25 @@
  * Find more information about this on the LICENSE file.
  */
 const app = require('ui/modules').get('app/wazuh', []);
-
+import $ from 'jquery'
 // Logs controller
 app.controller('reportingController', function ($scope, errorHandler, genericReq) {
     $scope.loading = true;
+    $scope.itemsPerPage = 20;
+    $scope.pagedItems = [];
+    $scope.currentPage = 0;
+    let items = [];
+    $scope.gap = 0;
+
     const load = async () => {
         try {
             $scope.loading = true;
             const data = await genericReq.request('GET','/api/wazuh-api/reports',{});
-            $scope.reports = data.data.list.reverse();
+            items = data.data.list.reverse();
+            const gap = items.length / 20;
+            const gapInteger = parseInt(items.length / 20);
+            $scope.gap = gap - parseInt(items.length / 20) > 0 ? gapInteger + 1 : gapInteger;
+            $scope.search();
             $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
         } catch (error) {
@@ -39,5 +49,53 @@ app.controller('reportingController', function ($scope, errorHandler, genericReq
         } catch (error) {
             errorHandler.handle(error,'Reporting');
         }
-    }
+    }	
+
+    // init the filtered items
+    $scope.search = function () {
+        $scope.filteredItems = items;
+        $scope.currentPage = 0;
+        // now group by pages
+        $scope.groupToPages();
+    };
+    // calculate page in place
+    $scope.groupToPages = function () {
+        $scope.pagedItems = [];
+        
+        for (let i = 0; i < $scope.filteredItems.length; i++) {
+            if (i % $scope.itemsPerPage === 0) {
+                $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [ $scope.filteredItems[i] ];
+            } else {
+                $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push($scope.filteredItems[i]);
+            }
+        }
+    };
+    $scope.range = function (size,start, end) {
+        const ret = [];        
+                      
+        if (size < end) {
+            end = size;
+            start = size-$scope.gap;
+        }
+        for (let i = start; i < end; i++) {
+            ret.push(i);
+        }              
+        return ret;
+    };
+
+    $scope.prevPage = function () {
+        if ($scope.currentPage > 0) {
+            $scope.currentPage--;
+        }
+    };
+    
+    $scope.nextPage = function () {
+        if ($scope.currentPage < $scope.pagedItems.length - 1) {
+            $scope.currentPage++;
+        }
+    };
+    
+    $scope.setPage = function () {
+        $scope.currentPage = this.n;
+    };
 });
