@@ -11,9 +11,9 @@
  */
 export default {
     general   : {
-        title: 'general',
-        description: 'Alerts overall summary, including any kind of alert.'
-    } ,
+        title: 'General',
+        description: ''
+    },
     fim       : {
         title: 'File integrity monitoring',
         description: 'Wazuh’s File integrity monitoring (FIM) watches specified files triggering alerts when these files are modified. The component responsible for this task is called syscheck. This component stores the cryptographic checksum and other attributes of a known good file or Windows registry key and regularly compares it to the current file being used by the system, watching for changes.'
