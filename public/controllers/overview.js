@@ -263,26 +263,45 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     $scope.startVis2Png = async () => {
         try {
             if(vis2png.isWorking()){
-                errorHandler.handle('vis2png is busy', 'VIS2PNG',true);
+                errorHandler.handle('Currently there is a job in queue', 'Reporting',true);
                 return;
             }
             $scope.reportBusy = true;
             $rootScope.reportStatus = 'Generating report...0%'
             if(!$rootScope.$$phase) $rootScope.$digest();
+            
             vis2png.clear();
+            
             const idArray = rawVisualizations.getList().map(item => item.id);
+
             for(const item of idArray) {
                 const tmpHTMLElement = $(`#${item}`);
                 vis2png.assignHTMLItem(item,tmpHTMLElement)
             }            
-            const appliedFilters = visHandlers.getAppliedFilters()
-            const array   = await vis2png.checkArray(idArray)
-            const name    = `wazuh-overview-${$scope.tab}-${Date.now() / 1000 | 0}.pdf`
-            const request = await genericReq.request('POST','/api/wazuh-api/report',{array,name,title:'Overview ' + $scope.tab, filters: appliedFilters.filters, time: appliedFilters.time})
-            $rootScope.reportStatus = 'Generating report...100%'
+            
+            const appliedFilters = visHandlers.getAppliedFilters();
+            const tab   = $scope.tab;
+            const array = await vis2png.checkArray(idArray)
+            const name  = `wazuh-overview-${tab}-${Date.now() / 1000 | 0}.pdf`
+            
+            const data    ={
+                array,
+                name,
+                title: `Overview ${tab}`, 
+                filters: appliedFilters.filters, 
+                time: appliedFilters.time,
+                tab,
+                section: 'overview'
+            };
+
+            const request = await genericReq.request('POST','/api/wazuh-api/report',data)
+            
             $scope.reportBusy = false;
             $rootScope.reportStatus = false;
+            
             errorHandler.info('Report generated successfully, go to Management > Reporting', 'Reporting')
+            
+            return;
         } catch (error) {
             errorHandler.handle(error, 'Reporting')
         }
