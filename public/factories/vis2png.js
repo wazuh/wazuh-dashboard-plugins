@@ -30,13 +30,13 @@ app.factory('vis2png', function ($rootScope) {
                 const tmpNode = htmlObject[id]
                 try {
                     const tmpResult = await domtoimage.toPng(tmpNode[0]);
-                    rawArray.push({element:tmpResult,width:tmpNode.width(),height:tmpNode.height()});
+                    rawArray.push({element:tmpResult,width:tmpNode.width(),height:tmpNode.height(), id: id});
                 } catch (error) {}
-                $rootScope.reportStatus = `Generating report...${Math.round((i/len) * 98,2)}%`
+                $rootScope.reportStatus = `Generating report...${Math.round((i/len) * 100)}%`
                 if(!$rootScope.$$phase) $rootScope.$digest()
             }
             working = false;
-            $rootScope.reportStatus = `Generating report...98%`
+            $rootScope.reportStatus = `Generating PDF document...`
             return rawArray;
         } catch (error) {
             working = false;
