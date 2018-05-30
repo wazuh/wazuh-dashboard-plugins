@@ -23,6 +23,8 @@ import monitoring          from '../monitoring'
 import ErrorResponse       from './error-response'
 import { Parser }          from 'json2csv';
 import getConfiguration    from '../lib/get-configuration'
+import PDFDocument         from 'pdfkit'
+import fs                  from 'fs'
 
 const blueWazuh = colors.blue('wazuh');
 
@@ -529,21 +531,19 @@ export default class WazuhApi {
         }
     }
 
-
     async report(req,reply) {
         try {
-            const fs = require('fs');
+
             if (!fs.existsSync(path.join(__dirname, '../../../wazuh-reporting'))) {
                 fs.mkdirSync(path.join(__dirname, '../../../wazuh-reporting'));
             }
+  
             if(req.payload && req.payload.array){
-                const PDFDocument = require('pdfkit');
-                
-                let doc = new PDFDocument();
+                const doc = new PDFDocument();
                 doc.pipe(fs.createWriteStream(path.join(__dirname, '../../../wazuh-reporting/' + req.payload.name)));
                 doc.image(path.join(__dirname, '../../public/img/logo.png'),410,20,{fit:[150,70]})
                 doc.moveDown().fontSize(9).fillColor('blue').text('https://wazuh.com',442,50,{link: 'https://wazuh.com', underline:true, valign:'right', align: 'right'})
-    
+
                 if(req.payload.title && typeof req.payload.title === 'string') {
                     doc.fontSize(18).fillColor('black').text(req.payload.title + ' report',45,70)
                     doc.moveDown()
@@ -556,7 +556,7 @@ export default class WazuhApi {
                     doc.fontSize(10).text(str)
                     doc.moveDown()
                 }
-                 
+                
                 if(req.payload.filters) {
                     let str = '';
                     const len = req.payload.filters.length;
@@ -575,9 +575,9 @@ export default class WazuhApi {
                 let counter = 0;
                 for(const item of req.payload.array){
                     counter++;
-                    
-                    doc.image(item.element,{ fit: [460, 270],
-                        align: 'center'});
+                    const itemWidth = item.width / 2;
+                    doc.image(item.element,{ width: itemWidth < 530 ? itemWidth : 530 });
+
                     doc.moveDown()
                     if(counter >= 3) {
                         doc.fontSize(7).text('Copyright © 2018 Wazuh, Inc.', 440, doc.page.height - 30, {
@@ -587,10 +587,11 @@ export default class WazuhApi {
                         counter = 0;
                     }
                 }
+
                 doc.fontSize(7).text('Copyright © 2018 Wazuh, Inc.', 440, doc.page.height - 30, {
                     lineBreak: false
                 })
-                // PDF Creation logic goes here
+
                 doc.end();
             }
             return reply({error: 0, data: null})
@@ -603,7 +604,6 @@ export default class WazuhApi {
         try {
             const list = [];
             const reportDir = path.join(__dirname, '../../../wazuh-reporting');
-            const fs = require('fs');
 
             fs.readdirSync(reportDir).forEach(file => {
                 file = {
@@ -632,7 +632,6 @@ export default class WazuhApi {
 
     async deleteReportByName(req,reply) {
         try {
-            const fs = require('fs')
             fs.unlinkSync(path.join(__dirname, '../../../wazuh-reporting/' + req.params.name))
             return reply({error:0})
         } catch (error) {
