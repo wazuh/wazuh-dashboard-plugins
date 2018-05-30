@@ -26,6 +26,7 @@ import getConfiguration    from '../lib/get-configuration'
 import PDFDocument         from 'pdfkit'
 import fs                  from 'fs'
 import descriptions        from '../reporting/tab-description'
+import * as TimSort        from 'timsort'
 
 import { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations } from '../integration-files/visualizations'
 
@@ -597,7 +598,9 @@ export default class WazuhApi {
                 const len = req.payload.array.length;
                 for(let i = 0; i < len; i++){
                     const item = req.payload.array[i]
-                    const title = OverviewVisualizations[tab].filter(v => v._id === item.id);
+                    const title = req.payload.isAgents ? 
+                                  AgentsVisualizations[tab].filter(v => v._id === item.id) :
+                                  OverviewVisualizations[tab].filter(v => v._id === item.id);
                     counter++;
                     doc.fontSize(12).text(title[0]._source.title)
                     doc.moveDown()
@@ -630,19 +633,18 @@ export default class WazuhApi {
         try {
             const list = [];
             const reportDir = path.join(__dirname, '../../../wazuh-reporting');
-
+            const sortFunction = (a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
             fs.readdirSync(reportDir).forEach(file => {
+                const stats = fs.statSync(reportDir + '/' + file);
                 file = {
                     name: file,
-                    size: fs.statSync(reportDir + '/' + file).size,
-                    date: fs.statSync(reportDir + '/' + file).birthtime
+                    size: stats.size,
+                    date: stats.birthtime
                 }
                 list.push(file)
             })
-
-            const result = list.sort((a,b) => a.date > b.date ? 1 : a.date < b.date ? -1 : 0)
-            
-            return reply({list: result});
+            TimSort.sort(list,sortFunction)
+            return reply({list: list});
         } catch (error) {
             return ErrorResponse(error.message || error, 3031, 500, reply);
         }
