@@ -2,7 +2,7 @@
 <div class='uil-ring-css' ng-show="loading">
     <div></div>
 </div>
-<div layout="row" ng-show="!loading && !reports || !reports.length">
+<div layout="row" ng-show="!loading && !pagedItems || !pagedItems.length">
     <md-card class="wz-md-card" flex>
         <md-card-content class="wz-text-center">
             <div layout="row" class="wz-padding-top-10">
@@ -11,22 +11,22 @@
         </md-card-content>
     </md-card>
 </div>
-<div layout="row" ng-show="!loading && reports && reports.length">
+<div layout="row" ng-show="!loading && pagedItems && pagedItems.length">
     <md-button class="wz-report-refresh-btn" ng-click="refresh()"><i class="fa fa-fw fa-refresh"></i> Refresh</md-button>
 </div>
-<div layout="row" ng-show="!loading && reports && reports.length">
+<div layout="row" ng-show="!loading && pagedItems && pagedItems.length">
     <md-card flex class="wz-md-card">
         <md-card-content class="wazuh-column" id="Wazuh-App-Overview-General-Alert-level-evolution">
             <div layout="row" class="wz-padding-top-10">
-                <table class="table" id="wz_table">
-                    <thead>
+                <table class="table table-striped table-condensed" id="wz_table">
+                    <thead class="wz-text-bold">
                         <th class="wz-left">File</th>
                         <th class="wz-left">Size</th>
                         <th class="wz-left">Created</th>
                         <th class="wz-left">Options</th>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="item in reports">
+                        <tr ng-repeat="item in pagedItems[currentPage]">
                             <td>{{item.name}}</td>
                             <td>{{item.size / 1024 | number: 2}}KB</td>
                             <td>{{item.date.split('T')[0]}} {{item.date.split('T')[1].split('.')[0]}}</td>
@@ -40,6 +40,27 @@
                             </td>
                         </tr>
                     </tbody>
+                    <tfoot>
+                        <td colspan="6">
+                            <div class="pagination pull-right">
+                                <ul layout="row">
+                                    <li ng-class="{disabled: currentPage == 0}" class="md-padding">
+                                        <a href ng-click="prevPage()">« Prev</a>
+                                    </li>
+                                
+                                    <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) "
+                                        ng-class="{active: n == currentPage}"
+                                    ng-click="setPage()" class="md-padding">
+                                        <a href ng-bind="n + 1">1</a>
+                                    </li>
+                                 
+                                    <li ng-class="{disabled: (currentPage) == pagedItems.length - 1}" class="md-padding">
+                                        <a href ng-click="nextPage()">Next »</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tfoot>
                 </table>
             </div>
         </md-card-content>
