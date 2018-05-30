@@ -19,41 +19,41 @@
 
     <div layout="row" layout-align="start stretch" class="height-230" >
         <md-card flex="40" class="wz-md-card">
-            <md-card-content class="wazuh-column" id="Wazuh-App-Overview-General-Alert-level-evolution">
+            <md-card-content class="wazuh-column" >
                 <span class="wz-headline-title">Alert level evolution</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Alert-level-evolution" vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="60" class="wz-md-card">
-            <md-card-content class="wazuh-column" id="Wazuh-App-Overview-General-Alerts">
+            <md-card-content class="wazuh-column" >
                 <span class="wz-headline-title">Alerts</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Alerts" vis-id="'Wazuh-App-Overview-General-Alerts'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
 
     <div layout="row" layout-align="space-between stretch" class="height-270">
         <md-card flex class="wz-md-card" >
-            <md-card-content class="wazuh-column" id="Wazuh-App-Overview-General-Top-5-agents">
+            <md-card-content class="wazuh-column" >
                 <span class="wz-headline-title">Top 5 agents</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Top-5-agents'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Top-5-agents" vis-id="'Wazuh-App-Overview-General-Top-5-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" >
-            <md-card-content class="wazuh-column" id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents">
+            <md-card-content class="wazuh-column" >
                 <span class="wz-headline-title">Alerts evolution - Top 5 agents</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents" vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="35" class="wz-md-card">
-            <md-card-content class="wazuh-column" ng-show="wzMonitoringEnabled" id="Wazuh-App-Overview-General-Agents-status">
+            <md-card-content class="wazuh-column" ng-show="wzMonitoringEnabled" >
                 <span class="wz-headline-title">Agents status</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Agents-status'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Agents-status" vis-id="'Wazuh-App-Overview-General-Agents-status'"></kbn-vis>
             </md-card-content>
             <md-card-content class="wazuh-column" ng-show="!wzMonitoringEnabled">
                 <span class="wz-headline-title">Agents status</span>

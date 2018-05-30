@@ -18,7 +18,7 @@
             </md-nav-bar>
         </div>
         <div layout="column">
-            <md-button class="wz-report-button" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()"><i class="fa fa-fw fa-pencil"></i> Report</md-button>
+            <md-button ng-class="{'wz-report-button': rendered && !loading && resultState === 'ready'}" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()"><i class="fa fa-fw fa-pencil"></i> Report</md-button>
         </div>
         <div layout="column" layout-align="end end">
             <md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
