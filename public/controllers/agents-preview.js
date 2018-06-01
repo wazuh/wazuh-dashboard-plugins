@@ -110,11 +110,14 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
                     version:  ''
                 });
             }
-            $scope.agentsCountActive         = data[1].data.data.Active;
+            const active = data[1].data.data.Active - 1;
+            const total  = data[1].data.data.Total - 1;
+
+            $scope.agentsCountActive         = active;
             $scope.agentsCountDisconnected   = data[1].data.data.Disconnected;
             $scope.agentsCountNeverConnected = data[1].data.data['Never connected'];
-            $scope.agentsCountTotal          = data[1].data.data.Total;
-            $scope.agentsCoverity            = (data[1].data.data.Active / data[1].data.data.Total) * 100;
+            $scope.agentsCountTotal          = total;
+            $scope.agentsCoverity            = (active / total) * 100;
 
             // tmpUrl y tmpUrl2
             if (data[2].data.data === '') {
