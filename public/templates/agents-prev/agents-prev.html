@@ -22,7 +22,8 @@
                         </div>
                         <div layout="row" class="wz-padding-top-10">
                             <p flex="50">Agents coverage</p>
-                            <p class="wz-text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
+                            <p ng-if="agentsCoverity" class="wz-text-right color-grey">{{(agentsCoverity | number:2)}}%</p>
+                            <p ng-if="!agentsCoverity" class="wz-text-right color-grey">---</p>
                         </div>
                     </div>
                 </div>
@@ -35,12 +36,12 @@
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle">Last registered agent</p>
                     <p ng-if="lastAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right" ng-click="showAgent(lastAgent)">{{lastAgent.name}}</p>
-                    <p ng-if="lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right" >{{lastAgent.name}}</p>
+                    <p ng-if="lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right" >{{lastAgent.name}} (manager)</p>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle">Higher activity</p>
                     <p ng-if="mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right" ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}}</p>
-                    <p ng-if="mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right" >{{mostActiveAgent.name}}</p>
+                    <p ng-if="mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right" >{{mostActiveAgent.name}} (manager)</p>
                 </div>
             </md-card-content>
         </md-card>
