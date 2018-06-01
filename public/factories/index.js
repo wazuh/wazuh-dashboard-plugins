@@ -15,3 +15,4 @@ import 'plugins/wazuh/factories/loaded-visualizations';
 import 'plugins/wazuh/factories/tab-visualizations';
 import 'plugins/wazuh/factories/discover-pending-updates';
 import 'plugins/wazuh/factories/vis-handlers';
+import 'plugins/wazuh/factories/vis2png';

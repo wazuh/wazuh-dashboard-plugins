@@ -1,2 +1,2 @@
-<div flex layout="column" ng-controller="groupsController" class="mozilla-table-size-85" ng-if="submenuNavItem == 'groups'">
+<div ng-cloak flex layout="column" class="mozilla-table-size-85" ng-controller="groupsController" ng-if="submenuNavItem == 'groups'">
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>

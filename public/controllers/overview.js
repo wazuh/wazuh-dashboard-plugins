@@ -15,7 +15,8 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
+app.controller('overviewController', function ($sce, $timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png) {
+
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     discoverPendingUpdates.removeAll();
@@ -257,6 +258,56 @@ app.controller('overviewController', function ($timeout, $scope, $location, $roo
 
         $scope.switchSubtab('panels', true, sameTab);
     };
+
+    $scope.startVis2Png = async () => {
+        try {
+            if(vis2png.isWorking()){
+                errorHandler.handle('Report in progress', 'Reporting',true);
+                return;
+            }
+            $scope.reportBusy = true;
+            $rootScope.reportStatus = 'Generating report...0%'
+            if(!$rootScope.$$phase) $rootScope.$digest();
+            
+            vis2png.clear();
+            
+            const idArray = rawVisualizations.getList().map(item => item.id);
+
+            for(const item of idArray) {
+                const tmpHTMLElement = $(`#${item}`);
+                vis2png.assignHTMLItem(item,tmpHTMLElement)
+            }            
+            
+            const appliedFilters = visHandlers.getAppliedFilters();
+            const tab   = $scope.tab;
+            const array = await vis2png.checkArray(idArray)
+            const name  = `wazuh-overview-${tab}-${Date.now() / 1000 | 0}.pdf`
+            
+            const data    ={
+                array,
+                name,
+                title: `Overview ${tab}`, 
+                filters: appliedFilters.filters, 
+                time: appliedFilters.time,
+                searchBar: appliedFilters.searchBar,
+                tab,
+                section: 'overview'
+            };
+
+            const request = await genericReq.request('POST','/api/wazuh-api/report',data)
+            
+            $scope.reportBusy = false;
+            $rootScope.reportStatus = false;
+            
+            errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
+            
+            return;
+        } catch (error) {
+            $scope.reportBusy = false;
+            $rootScope.reportStatus = false;
+            errorHandler.handle(error, 'Reporting')
+        }
+    }
 
     $scope.$on('$destroy', () => {
         discoverPendingUpdates.removeAll();

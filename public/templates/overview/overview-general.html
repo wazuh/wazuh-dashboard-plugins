@@ -1,5 +1,4 @@
 <md-content flex layout="column" ng-if="tab === 'general' && tabView === 'panels'" ng-show="resultState === 'ready'" layout-align="start">
-
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
@@ -18,43 +17,43 @@
         <kbn-vis vis-id="'Wazuh-App-Overview-General-Authentication-success'"></kbn-vis>
     </div>
 
-    <div layout="row" layout-align="start stretch" class="height-230">
+    <div layout="row" layout-align="start stretch" class="height-230" >
         <md-card flex="40" class="wz-md-card">
-            <md-card-content class="wazuh-column">
+            <md-card-content class="wazuh-column" >
                 <span class="wz-headline-title">Alert level evolution</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Alert-level-evolution" vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="60" class="wz-md-card">
-            <md-card-content class="wazuh-column">
+            <md-card-content class="wazuh-column" >
                 <span class="wz-headline-title">Alerts</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Alerts" vis-id="'Wazuh-App-Overview-General-Alerts'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
 
     <div layout="row" layout-align="space-between stretch" class="height-270">
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
+        <md-card flex class="wz-md-card" >
+            <md-card-content class="wazuh-column" >
                 <span class="wz-headline-title">Top 5 agents</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Top-5-agents'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Top-5-agents" vis-id="'Wazuh-App-Overview-General-Top-5-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
+        <md-card flex class="wz-md-card" >
+            <md-card-content class="wazuh-column" >
                 <span class="wz-headline-title">Alerts evolution - Top 5 agents</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents" vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="35" class="wz-md-card">
-            <md-card-content class="wazuh-column" ng-show="wzMonitoringEnabled">
+            <md-card-content class="wazuh-column" ng-show="wzMonitoringEnabled" >
                 <span class="wz-headline-title">Agents status</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Agents-status'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Agents-status" vis-id="'Wazuh-App-Overview-General-Agents-status'"></kbn-vis>
             </md-card-content>
             <md-card-content class="wazuh-column" ng-show="!wzMonitoringEnabled">
                 <span class="wz-headline-title">Agents status</span>
@@ -94,7 +93,7 @@
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Alerts summary</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts-summary'" id="Wazuh-App-Overview-General-Alerts-summary"></kbn-vis>
+                <kbn-vis vis-id="'Wazuh-App-Overview-General-Alerts-summary'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="40" class="wz-md-card">

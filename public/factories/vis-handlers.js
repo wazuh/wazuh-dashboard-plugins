@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
-
+import dateMath from '@elastic/datemath';
 const app = modules.get('app/wazuh', []);
 
 app.factory('visHandlers', function() {
@@ -23,6 +23,25 @@ app.factory('visHandlers', function() {
 
     const getList = () => {
         return list;
+    }
+
+    const getAppliedFilters = () => {
+        let appliedFilters = {};
+        if(list && list.length) {
+            const filters = list[0]._scope.savedObj.vis.API.queryFilter.getFilters()
+            const { from, to } = list[0]._scope.savedObj.vis.API.timeFilter.time;
+            appliedFilters = {
+                filters,
+                time:{
+                    from: dateMath.parse(from),
+                    to: dateMath.parse(to)
+                },
+                searchBar: list[0] && list[0]._scope && list[0]._scope.appState && list[0]._scope.appState.query && list[0]._scope.appState.query.query ? 
+                           list[0]._scope.appState.query.query :
+                           false
+            }
+        }
+        return appliedFilters;
     }
 
     const hasData = () => {
@@ -50,9 +69,10 @@ app.factory('visHandlers', function() {
     }
   
     return {
-      addItem    : addItem,
-      getList    : getList,
-      removeAll  : removeAll,
-      hasData    : hasData
+      addItem,
+      getList,
+      removeAll,
+      hasData,
+      getAppliedFilters
     };
 });

@@ -20,16 +20,19 @@
 export default (message = null, code = null, statusCode = null, reply) => {
     let filteredMessage = '';
     if(code) {
-        if(typeof message === 'string' && message === 'socket hang up' && code === 3005) {
+        const isString = typeof message === 'string';
+        if(isString && message === 'socket hang up' && code === 3005) {
             filteredMessage = 'Wrong protocol being used to connect to the Wazuh API'
-        } else if(typeof message === 'string' && 
+        } else if(isString && 
                  (message.includes('ENOTFOUND') || message.includes('EHOSTUNREACH') || message.includes('EINVAL') || message.includes('EAI_AGAIN')) && 
                  code === 3005) {
             filteredMessage = 'Wrong URL being used to connect to the Wazuh API'
-        } else if(typeof message === 'string' && message.includes('ECONNREFUSED') && code === 3005) {
+        } else if(isString && message.includes('ECONNREFUSED') && code === 3005) {
             filteredMessage = 'Wrong port being used to connect to the Wazuh API'
-        } else if(typeof message === 'string' && message.toLowerCase().includes('not found') && code === 3002) {
+        } else if(isString && message.toLowerCase().includes('not found') && code === 3002) {
             filteredMessage = 'Wazuh API entry not found'
+        } else if(isString && message.includes('ENOENT') && message.toLowerCase().includes('no such file or directory') && message.toLowerCase().includes('data') && code === 3029 ) {
+            filteredMessage = 'Reporting was aborted'
         }
 
     }

@@ -384,9 +384,57 @@
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item.path}}</span>
                         </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.realtime">
+                            <span flex="25">Realtime</span>
+                            <span class="wz-text-right color-grey">{{item.realtime}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.report_changes">
+                            <span flex="25">Report changes</span>
+                            <span class="wz-text-right color-grey">{{item.report_changes}}</span>
+                        </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="item.check_all">
                             <span flex="25">Check all</span>
                             <span class="wz-text-right color-grey">{{item.check_all}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_sum">
+                            <span flex="25">Check sum</span>
+                            <span class="wz-text-right color-grey">{{item.check_sum}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_sha1sum">
+                            <span flex="25">Check SHA1sum</span>
+                            <span class="wz-text-right color-grey">{{item.check_sha1sum}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_md5sum">
+                            <span flex="25">Check MD5sum</span>
+                            <span class="wz-text-right color-grey">{{item.check_md5sum}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_size">
+                            <span flex="25">Check size</span>
+                            <span class="wz-text-right color-grey">{{item.check_size}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_owner">
+                            <span flex="25">Check owner</span>
+                            <span class="wz-text-right color-grey">{{item.check_owner}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_group">
+                            <span flex="25">Check group</span>
+                            <span class="wz-text-right color-grey">{{item.check_group}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_perm">
+                            <span flex="25">Check permissions</span>
+                            <span class="wz-text-right color-grey">{{item.check_perm}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_mtime">
+                            <span flex="25">Check modification time</span>
+                            <span class="wz-text-right color-grey">{{item.check_mtime}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.check_inode">
+                            <span flex="25">Check inode</span>
+                            <span class="wz-text-right color-grey">{{item.check_inode}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.restrict">
+                            <span flex="25">Restrict</span>
+                            <span class="wz-text-right color-grey">{{item.restrict}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>

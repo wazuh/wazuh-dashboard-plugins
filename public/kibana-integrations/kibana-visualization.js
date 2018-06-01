@@ -25,8 +25,6 @@ const app = modules.get('apps/webinar_app', [])
 
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
-                let visTitle               = '';
-                let fullFilter             = '';
                 let rendered               = false;
                 let visualization          = null;
                 let visHandler             = null;
@@ -41,7 +39,6 @@ const app = modules.get('apps/webinar_app', [])
                             const rawVis = raw.filter(item => item && item.id === $scope.visID);
                             wzsavedVisualizations.get($scope.visID,rawVis[0]).then(savedObj => {
                                 originalImplicitFilter = savedObj.searchSource.get('query')['query'];
-                                visTitle = savedObj.vis.title;
                                 visualization = savedObj;
 
                                 // There's an original filter
@@ -58,11 +55,11 @@ const app = modules.get('apps/webinar_app', [])
                                     implicitFilter = discoverList ? discoverList[0].query : '';
                                 }
 
-                                if (visTitle !== 'Wazuh App Overview General Agents status' && !visTitle.includes('Cluster')) { // We don't want to filter that visualization as it uses another index-pattern
+                                if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status' && !$scope.visID.includes('Cluster')) { // We don't want to filter that visualization as it uses another index-pattern
                                     visualization.searchSource
                                     .query({ language: 'lucene', query: implicitFilter })
                                     .set('filter',  discoverList.length > 1 ? discoverList[1] : {});
-                                } else if(visTitle.includes('Cluster')) {
+                                } else if($scope.visID.includes('Cluster')) {
                                     // Checks for cluster.name and cluster.node filters existence 
                                     const clusterFilters = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
                                     
@@ -125,11 +122,11 @@ const app = modules.get('apps/webinar_app', [])
                                 implicitFilter = discoverList ? discoverList[0].query : '';
                             }
                             
-                            if (visTitle !== 'Wazuh App Overview General Agents status') { // We don't want to filter that visualization as it uses another index-pattern
+                            if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status') { // We don't want to filter that visualization as it uses another index-pattern
                                 visualization.searchSource
                                 .query({ language: 'lucene', query: implicitFilter })
                                 .set('filter', discoverList.length > 1 ? discoverList[1] : {});
-                            } else if(visTitle.includes('Cluster')) {
+                            } else if($scope.visID.includes('Cluster')) {
                                 // Checks for cluster.name and cluster.node filters existence 
                                 const clusterFilters = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
                                 
@@ -175,7 +172,8 @@ const app = modules.get('apps/webinar_app', [])
                     $rootScope.loadingStatus = `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`;
 
                     if (currentCompleted >= 100) {
-                        if (!visTitle !== 'Wazuh App Overview General Agents status') { 
+                        
+                        if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status') { 
                             const thereIsData   = visHandlers.hasData();
                             $rootScope.rendered = thereIsData;
                             if(!thereIsData) $rootScope.resultState = 'none'
@@ -183,7 +181,7 @@ const app = modules.get('apps/webinar_app', [])
                         // Forcing a digest cycle
                         if(!$rootScope.$$phase) $rootScope.$digest();
                     }
-                    else if (!visTitle !== 'Wazuh App Overview General Agents status') $rootScope.rendered = false;
+                    else if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status') $rootScope.rendered = false;
                 };
 
                 // Initializing the visualization

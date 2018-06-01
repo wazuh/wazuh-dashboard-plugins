@@ -15,7 +15,7 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png) {
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     visHandlers.removeAll();
@@ -500,4 +500,55 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         }
     }
     /** End of agent configuration */
+
+    $scope.startVis2Png = async () => {
+        try {
+            if(vis2png.isWorking()){
+                errorHandler.handle('Report in progress', 'Reporting',true);
+                return;
+            }
+            $scope.reportBusy = true;
+            $rootScope.reportStatus = 'Generating report...0%'
+            if(!$rootScope.$$phase) $rootScope.$digest();
+            
+            vis2png.clear();
+            
+            const idArray = rawVisualizations.getList().map(item => item.id);
+
+            for(const item of idArray) {
+                const tmpHTMLElement = $(`#${item}`);
+                vis2png.assignHTMLItem(item,tmpHTMLElement)
+            }            
+            
+            const appliedFilters = visHandlers.getAppliedFilters();
+            const tab   = $scope.tab;
+            const array = await vis2png.checkArray(idArray)
+            const name  = `wazuh-agents-${tab}-${Date.now() / 1000 | 0}.pdf`
+            
+            const data    ={
+                array,
+                name,
+                title: `Agents ${tab}`, 
+                filters: appliedFilters.filters, 
+                time: appliedFilters.time,
+                searchBar: appliedFilters.searchBar,
+                tab,
+                section: 'agents',
+                isAgents: true
+            };
+
+            const request = await genericReq.request('POST','/api/wazuh-api/report',data)
+            
+            $scope.reportBusy = false;
+            $rootScope.reportStatus = false;
+            
+            errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
+            
+            return;
+        } catch (error) {
+            $scope.reportBusy = false;
+            $rootScope.reportStatus = false;
+            errorHandler.handle(error, 'Reporting')
+        }
+    }
 });
