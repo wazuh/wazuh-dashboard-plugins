@@ -35,7 +35,10 @@ app.factory('visHandlers', function() {
                 time:{
                     from: dateMath.parse(from),
                     to: dateMath.parse(to)
-                }
+                },
+                searchBar: list[0] && list[0]._scope && list[0]._scope.appState && list[0]._scope.appState.query && list[0]._scope.appState.query.query ? 
+                           list[0]._scope.appState.query.query :
+                           false
             }
         }
         return appliedFilters;
