@@ -593,6 +593,11 @@ export default class WazuhApi {
                                      filter.meta.key + ': ' + filter.meta.value :
                                      filter.meta.key + ': ' + filter.meta.value + ' AND '
                     }
+                    
+                    if(req.payload.searchBar) {
+                        str += ' AND ' + req.payload.searchBar;
+                    }
+
                     const currentY = doc.y;
                     const currentX = doc.x;
                     doc.fontSize(10).image(path.join(__dirname, '../reporting/filters.png'),currentX,currentY,{width:8, height:8}).text(str,currentX+10,currentY)
