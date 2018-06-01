@@ -2,6 +2,30 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.3/v3.2.4 - Kibana v6.2.4 - Revision 392
+
+### Added
+
+-   Support for Wazuh v3.2.4.
+-   New functionality - _Reporting_ ([#510](https://github.com/wazuh/wazuh-kibana-app/pull/510)):
+    -   Generate PDF logs on the _Overview_ and _Agents_ tabs, with the new button next to _Panels_ and _Discover_.
+    -   The report will contain the current visualizations from the tab where you generated it.
+    -   List all your generated reports, download or deleted them at the new _Management/Reporting_ tab.
+    -   **Warning:** If you leave the tab while generating a report, the process will be aborted.
+-   Added warning/error messages about the total RAM on the server side ([#502](https://github.com/wazuh/wazuh-kibana-app/pull/502)):
+    -   None of this messages will prevent the user from accessing the app, it's just a recommendation.
+    -   If your server has less than 2GB of RAM, you'll get an error message when opening the app.
+    -   If your server has between 2GB and 3GB of RAM, you'll get a warning message.
+    -   If your server has more than 3GB of RAM, you won't get any kind of message.
+-   Refactoring and added loading bar to _Manager Logs_ and _Groups_ tabs ([#505](https://github.com/wazuh/wazuh-kibana-app/pull/505)).
+-   Added more Syscheck options to _Management/Agents_ configuration tabs ([#509](https://github.com/wazuh/wazuh-kibana-app/pull/509)).
+
+### Fixed
+
+-   Added more fields to the `known-fields.js` file to avoid warning messages on _Discover_ when using Filebeat for alerts forwarding ([#497](https://github.com/wazuh/wazuh-kibana-app/pull/497)).
+-   Fixed a bug where clicking on the _Check connection_ button on the _Settings_ tab threw an error message although the API connected successfully ([#504](https://github.com/wazuh/wazuh-kibana-app/pull/504)).
+-   Fixed a bug where the _Agents_ tab was not properly showing the total of agents due to the new Wazuh cluster implementation ([#517](https://github.com/wazuh/wazuh-kibana-app/pull/517)).
+
 ## Wazuh v3.2.3 - Kibana v6.2.4 - Revision 391
 
 ### Added
