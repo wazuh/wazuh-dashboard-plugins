@@ -644,6 +644,12 @@ export default class WazuhApi {
             }
             return reply({error: 0, data: null})
         } catch (error) {
+            // Delete generated file if an error occurred
+            if(req && req.payload && req.payload.name && 
+               fs.existsSync(path.join(__dirname, '../../../wazuh-reporting/' + req.payload.name))
+            ) {
+                fs.unlinkSync(path.join(__dirname, '../../../wazuh-reporting/' + req.payload.name))
+            }
             return ErrorResponse(error.message || error, 3029, 500, reply);
         }
     }
