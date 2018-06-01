@@ -289,6 +289,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                 title: `Overview ${tab}`, 
                 filters: appliedFilters.filters, 
                 time: appliedFilters.time,
+                searchBar: appliedFilters.searchBar,
                 tab,
                 section: 'overview'
             };
