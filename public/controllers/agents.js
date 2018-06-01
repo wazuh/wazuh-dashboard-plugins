@@ -504,7 +504,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     $scope.startVis2Png = async () => {
         try {
             if(vis2png.isWorking()){
-                errorHandler.handle('Currently there is a job in queue', 'Reporting',true);
+                errorHandler.handle('Report in progress', 'Reporting',true);
                 return;
             }
             $scope.reportBusy = true;
@@ -541,7 +541,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             $scope.reportBusy = false;
             $rootScope.reportStatus = false;
             
-            errorHandler.info('Report generated successfully, go to Management > Reporting', 'Reporting')
+            errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
             
             return;
         } catch (error) {
