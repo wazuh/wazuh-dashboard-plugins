@@ -12,7 +12,6 @@
 import $             from 'jquery';
 import * as modules  from 'ui/modules'
 import FilterHandler from './filter-handler'
-import PDFDownload   from './pdf-download-generator'
 
 const app = modules.get('app/wazuh', []);
 
