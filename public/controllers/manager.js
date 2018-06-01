@@ -65,6 +65,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
         apiReq.request('GET', '/decoders', { offset: 0, limit: 1 })
     ])
     .then(data => {
+        // Once Wazuh core fixes agent 000 issues, this should be adjusted
         const active = data[0].data.data.Active - 1;
         const total  = data[0].data.data.Total - 1;
         $scope.agentsCountActive         = active;

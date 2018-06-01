@@ -110,6 +110,8 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
                     version:  ''
                 });
             }
+
+            // Once Wazuh core fixes agent 000 issues, this should be adjusted
             const active = data[1].data.data.Active - 1;
             const total  = data[1].data.data.Total - 1;
 
