@@ -531,6 +531,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 title: `Agents ${tab}`, 
                 filters: appliedFilters.filters, 
                 time: appliedFilters.time,
+                searchBar: appliedFilters.searchBar,
                 tab,
                 section: 'agents',
                 isAgents: true
