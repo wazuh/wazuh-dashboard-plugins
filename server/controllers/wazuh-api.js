@@ -650,6 +650,9 @@ export default class WazuhApi {
 
     async getReports(req,reply) {
         try {
+            if (!fs.existsSync(path.join(__dirname, '../../../wazuh-reporting'))) {
+                fs.mkdirSync(path.join(__dirname, '../../../wazuh-reporting'));
+            }
             const list = [];
             const reportDir = path.join(__dirname, '../../../wazuh-reporting');
             const sortFunction = (a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
