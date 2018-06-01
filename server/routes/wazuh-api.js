@@ -48,9 +48,13 @@ export default (server, options) => {
     // Fetch specific report
     server.route({ method: 'GET', path: '/api/wazuh-api/report/{name}', handler: (req,res) => ctrl.getReportByName(req,res)});
 
-    // Fetch specific report
+    // Delete specific report
     server.route({ method: 'DELETE', path: '/api/wazuh-api/report/{name}', handler: (req,res) => ctrl.deleteReportByName(req,res)});
 
     // Fetch the reports list
     server.route({ method: 'GET', path: '/api/wazuh-api/reports', handler: (req,res) => ctrl.getReports(req,res)});
+
+    // Returns total RAM available from the current machine where Kibana is being executed
+    server.route({ method: 'GET', path: '/api/wazuh-api/ram', handler: (req,res) => ctrl.totalRam(req,res)})
+
 };

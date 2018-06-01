@@ -30,6 +30,9 @@ import * as TimSort        from 'timsort'
 
 import { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations } from '../integration-files/visualizations'
 
+import { totalmem }        from 'os'
+
+
 const blueWazuh = colors.blue('wazuh');
 
 export default class WazuhApi {
@@ -128,7 +131,7 @@ export default class WazuhApi {
             return 'Missing param: API USER';
         }
 
-        if (!('password' in payload)) {
+        if (!('password' in payload) && !('id' in payload)) {
             return 'Missing param: API PASSWORD';
         }
 
@@ -149,15 +152,31 @@ export default class WazuhApi {
 
     async checkAPI (req, reply) {
         try {
+            
+            let apiAvailable = null;
+            
             const notValid = this.validateCheckApiParams(req.payload);
             if(notValid) return ErrorResponse(notValid, 3003, 500, reply);
 
-            req.payload.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
+            // Check if a Wazuh API id is given (already stored API)
+            if(req.payload && req.payload.id) {
 
-            let response = await needle('get', `${req.payload.url}:${req.payload.port}/version`, {}, {
-                username          : req.payload.user,
-                password          : req.payload.password,
-                rejectUnauthorized: !req.payload.insecure
+                const data = await this.wzWrapper.getWazuhConfigurationById(req.payload.id);
+                if(data) apiAvailable = data;
+                else return ErrorResponse(`The API ${req.payload.id} was not found`, 3029, 500, reply);
+
+            // Check if a password is given and a Wazuh API id is not given (new API)
+            } else if(req.payload && !req.payload.id && req.payload.password) {
+
+                apiAvailable = req.payload;
+                apiAvailable.password = Buffer.from(req.payload.password, 'base64').toString('ascii');
+                
+            } 
+
+            let response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/version`, {}, {
+                username          : apiAvailable.user,
+                password          : apiAvailable.password,
+                rejectUnauthorized: !apiAvailable.insecure
             })
 
 
@@ -168,29 +187,29 @@ export default class WazuhApi {
 
             if (parseInt(response.body.error) === 0 && response.body.data) {
 
-                response = await needle('get', `${req.payload.url}:${req.payload.port}/agents/000`, {}, {
-                    username          : req.payload.user,
-                    password          : req.payload.password,
-                    rejectUnauthorized: !req.payload.insecure
+                response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/agents/000`, {}, {
+                    username          : apiAvailable.user,
+                    password          : apiAvailable.password,
+                    rejectUnauthorized: !apiAvailable.insecure
                 })
 
                 if (!response.body.error) {
                     const managerName = response.body.data.name;
 
-                    response = await needle('get', `${req.payload.url}:${req.payload.port}/cluster/status`, {}, { // Checking the cluster status
-                        username          : req.payload.user,
-                        password          : req.payload.password,
-                        rejectUnauthorized: !req.payload.insecure
+                    response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/cluster/status`, {}, { // Checking the cluster status
+                        username          : apiAvailable.user,
+                        password          : apiAvailable.password,
+                        rejectUnauthorized: !apiAvailable.insecure
                     })
 
                     if (!response.body.error) {
                         if (response.body.data.enabled === 'yes') {
 
                             // If cluster mode is active
-                            response = await needle('get', `${req.payload.url}:${req.payload.port}/cluster/node`, {}, {
-                                username          : req.payload.user,
-                                password          : req.payload.password,
-                                rejectUnauthorized: !req.payload.insecure
+                            response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/cluster/node`, {}, {
+                                username          : apiAvailable.user,
+                                password          : apiAvailable.password,
+                                rejectUnauthorized: !apiAvailable.insecure
                             })
 
                             if (!response.body.error) {
@@ -392,7 +411,7 @@ export default class WazuhApi {
             if(req.payload.method !== 'GET' && req.payload.body && req.payload.body.devTools){
                 const configuration = getConfiguration();
                 if(!configuration || (configuration && !configuration['devtools.allowall'])){
-                    return ErrorResponse('Allowed method: [GET]', 3023, 400, reply);
+                    return ErrorResponse('Allowed method: [GET]', 3029, 400, reply);
                 }
             }
             if(req.payload.body.devTools) {
@@ -658,6 +677,17 @@ export default class WazuhApi {
         }
     }
 
+    async totalRam(req,reply) {
+        try{
+            // RAM in MB
+            const ram = Math.ceil(totalmem()/1024/1024);
+            return reply({ statusCode: 200, error: 0, ram });
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3033, 500, reply);
+        }
+    }
+
+
     async deleteReportByName(req,reply) {
         try {
             fs.unlinkSync(path.join(__dirname, '../../../wazuh-reporting/' + req.params.name))
@@ -666,4 +696,5 @@ export default class WazuhApi {
             return ErrorResponse(error.message || error, 3032, 500, reply);
         }
     }
+
 }

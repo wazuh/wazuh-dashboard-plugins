@@ -1666,5 +1666,23 @@ export default [
         "searchable": true,
         "aggregatable": false,
         "readFromDocValues": false
+    },
+    {
+        "name": "source",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false
+    },
+    {
+        "name": "prospector.type",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": false,
+        "aggregatable": false,
+        "readFromDocValues": false
     }
 ];
