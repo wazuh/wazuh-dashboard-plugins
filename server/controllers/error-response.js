@@ -31,7 +31,7 @@ export default (message = null, code = null, statusCode = null, reply) => {
             filteredMessage = 'Wrong port being used to connect to the Wazuh API'
         } else if(isString && message.toLowerCase().includes('not found') && code === 3002) {
             filteredMessage = 'Wazuh API entry not found'
-        } else if(isString && message.toLowerCase().includes('ENOENT: no such file or directory') && message.toLowerCase().includes('data') && code === 3029 ) {
+        } else if(isString && message.includes('ENOENT') && message.toLowerCase().includes('no such file or directory') && message.toLowerCase().includes('data') && code === 3029 ) {
             filteredMessage = 'Reporting was aborted'
         }
 

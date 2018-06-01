@@ -302,6 +302,8 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
             
             return;
         } catch (error) {
+            $scope.reportBusy = false;
+            $rootScope.reportStatus = false;
             errorHandler.handle(error, 'Reporting')
         }
     }
