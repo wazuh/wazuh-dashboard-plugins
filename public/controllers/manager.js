@@ -65,11 +65,13 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
         apiReq.request('GET', '/decoders', { offset: 0, limit: 1 })
     ])
     .then(data => {
-        $scope.agentsCountActive         = data[0].data.data.Active;
+        const active = data[0].data.data.Active - 1;
+        const total  = data[0].data.data.Total - 1;
+        $scope.agentsCountActive         = active;
         $scope.agentsCountDisconnected   = data[0].data.data.Disconnected;
         $scope.agentsCountNeverConnected = data[0].data.data['Never connected'];
-        $scope.agentsCountTotal          = data[0].data.data.Total;
-        $scope.agentsCoverity            = (data[0].data.data.Active / data[0].data.data.Total) * 100;
+        $scope.agentsCountTotal          = total;
+        $scope.agentsCoverity            = (active / total) * 100;
 
         $scope.daemons       = data[1].data.data;
         $scope.managerInfo   = data[2].data.data;
