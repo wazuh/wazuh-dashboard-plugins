@@ -545,6 +545,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             
             return;
         } catch (error) {
+            $scope.reportBusy = false;
+            $rootScope.reportStatus = false;
             errorHandler.handle(error, 'Reporting')
         }
     }
