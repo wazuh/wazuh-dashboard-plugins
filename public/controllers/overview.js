@@ -93,9 +93,9 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     // Check the url hash and retrieve tab information
     if ($location.search().tab) {
         $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'general'
-        $scope.tab = 'general';
-        $location.search('tab', 'general');
+    } else { // If tab doesn't exist, default it to 'welcome'
+        $scope.tab = 'welcome';
+        $location.search('tab', 'welcome');
     }
 
     // This object represents the number of visualizations per tab; used to show a progress bar
@@ -216,14 +216,14 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     // Switch subtab
     $scope.switchSubtab = (subtab, force = false, sameTab = true) => {
         if ($scope.tabView === subtab && !force) return;
-        
+
         visHandlers.removeAll();
         discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
-        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') || 
+        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') ||
                              (subtab === 'discover' && $scope.tabView === 'panels')) && sameTab;
         if(subtab === 'panels' && $scope.tabView === 'discover'  && sameTab){
             $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
@@ -268,26 +268,26 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
             $scope.reportBusy = true;
             $rootScope.reportStatus = 'Generating report...0%'
             if(!$rootScope.$$phase) $rootScope.$digest();
-            
+
             vis2png.clear();
-            
+
             const idArray = rawVisualizations.getList().map(item => item.id);
 
             for(const item of idArray) {
                 const tmpHTMLElement = $(`#${item}`);
                 vis2png.assignHTMLItem(item,tmpHTMLElement)
-            }            
-            
+            }
+
             const appliedFilters = visHandlers.getAppliedFilters();
             const tab   = $scope.tab;
             const array = await vis2png.checkArray(idArray)
             const name  = `wazuh-overview-${tab}-${Date.now() / 1000 | 0}.pdf`
-            
+
             const data    ={
                 array,
                 name,
-                title: `Overview ${tab}`, 
-                filters: appliedFilters.filters, 
+                title: `Overview ${tab}`,
+                filters: appliedFilters.filters,
                 time: appliedFilters.time,
                 searchBar: appliedFilters.searchBar,
                 tab,
@@ -295,12 +295,12 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
             };
 
             const request = await genericReq.request('POST','/api/wazuh-api/report',data)
-            
+
             $scope.reportBusy = false;
             $rootScope.reportStatus = false;
-            
+
             errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-            
+
             return;
         } catch (error) {
             $scope.reportBusy = false;
