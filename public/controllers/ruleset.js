@@ -53,9 +53,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         return $sce.trustAsHtml(coloredString);
     };
 
-    // Reloading watcher initialization
-    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
-        delete $rootScope.rulesetIsReloaded;
+    // Reloading event listener
+    $scope.$on('rulesetIsReloaded',() => {
         $scope.viewingDetail = false;
         if(!$scope.$$phase) $scope.$digest();
     });
@@ -188,7 +187,6 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         $scope.rules.reset();
         $scope.rulesRelated.reset();
         $scope.rulesAutoComplete.reset();
-        reloadWatcher();
     });
 });
 
@@ -234,9 +232,8 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         return $sce.trustAsHtml(coloredString);
     };
 
-    // Reloading watcher initialization
-    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
-        delete $rootScope.rulesetIsReloaded;
+    // Reloading event listener
+    $scope.$on('rulesetIsReloaded',() => {
         $scope.viewingDetail = false;
         if(!$scope.$$phase) $scope.$digest();
     });
@@ -357,6 +354,5 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         $scope.decoders.reset();
         $scope.decodersRelated.reset();
         $scope.decodersAutoComplete.reset();
-        reloadWatcher();
     });
 });

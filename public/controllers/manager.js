@@ -23,12 +23,12 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
 
     $scope.reloadGroups = () => {
         $scope.submenuNavItem = 'groups';
-        $rootScope.groupsIsReloaded = true;
+        $scope.$broadcast('groupsIsReloaded')
     }
 
     $scope.reloadRuleset = () => {
         $scope.submenuNavItem = 'ruleset';
-        $rootScope.rulesetIsReloaded = true;
+        $scope.$broadcast('rulesetIsReloaded')
     }
 
     // Watchers
