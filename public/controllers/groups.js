@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier   from 'plugins/wazuh/utils/json-beautifier';
-import * as modules from 'ui/modules'
-import CsvGenerator from './csv-generator'
+import beautifier     from 'plugins/wazuh/utils/json-beautifier';
+import * as modules   from 'ui/modules'
+import * as FileSaver from '../services/file-saver'
 
 const app = modules.get('app/wazuh', []);
 
@@ -34,11 +34,16 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
 
     $scope.downloadCsv = async dataProvider => {
         try {
+            errorHandler.info('Your download should begin automatically...', 'CSV')
             const path         = $scope[dataProvider] ? $scope[dataProvider].path : null;
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch(path, currentApi, $scope[dataProvider] ? $scope[dataProvider].filters : null);
-            const csvGenerator = new CsvGenerator(output.csv, 'groups.csv');
-            csvGenerator.download(true);
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'groups.csv');
+            
+            return;
+
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
             if(!$rootScope.$$phase) $rootScope.$digest();
