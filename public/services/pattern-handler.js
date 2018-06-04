@@ -33,8 +33,8 @@ modules.get('app/wazuh', [])
                 return patternList.data.data;
             } catch (error) {
                 errorHandler.handle(error,'Pattern Handler (getPatternList)');
-                if(!$rootScope.$$phase) $rootScope.$digest();
             }
+            return;
         },
         changePattern: async selectedPattern => {
             try {
@@ -43,9 +43,8 @@ modules.get('app/wazuh', [])
                 return appState.getCurrentPattern();
             } catch (error) {
                 errorHandler.handle(error,'Pattern Handler (changePattern)');
-                if(!$rootScope.$$phase) $rootScope.$digest();
             }
-
+            return;
         }
     };
 });

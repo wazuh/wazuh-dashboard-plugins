@@ -84,8 +84,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
             return $scope.rulesAutoComplete.items;
         } catch (error){
             errorHandler.handle(error,'Ruleset');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     $scope.checkEnter = search => {
@@ -121,8 +121,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     /**
@@ -180,8 +180,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
             return;
         } catch (error) {
             errorHandler.handle('Unexpected exception loading controller','Ruleset');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     //Load
@@ -274,8 +274,8 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
             return $scope.decodersAutoComplete.items;
         } catch (error){
             errorHandler.handle(error,'Ruleset');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     $scope.downloadCsv = async () => {
@@ -290,8 +290,8 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
 
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     /**
@@ -351,8 +351,8 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
             return;
         } catch (error) {
             errorHandler.handle(error,'Ruleset');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     //Load

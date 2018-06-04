@@ -33,8 +33,8 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
             return;
         } catch (error) {
             errorHandler.handle(error,'Logs');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     $scope.playRealtime = async () => {
@@ -69,8 +69,8 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
 
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     const initialize = async () => {
@@ -83,8 +83,8 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
             return;
         } catch (error) {
             errorHandler.handle(error,'Logs');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     initialize();

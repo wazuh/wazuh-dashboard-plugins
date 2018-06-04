@@ -45,8 +45,8 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
 
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     // Store a boolean variable to check if come from agents
@@ -93,11 +93,10 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
             $scope.load = false;
 
             if(!$scope.$$phase) $scope.$digest();
-            return;
         } catch (error) {
             errorHandler.handle(error,'Groups');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     load();
@@ -182,11 +181,10 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
             $scope.filename = filename;
 
             if(!$scope.$$phase) $scope.$digest();
-            return;
         } catch (error) {
             errorHandler.handle(error,'Groups');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     // Changing the view to overview a specific group

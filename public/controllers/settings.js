@@ -74,7 +74,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
                 if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
                     errorHandler.handle("Can't delete the currently selected API. Please, select another API as default before deleting this one.",'Settings',true);
-                    if(!$rootScope.$$phase) $rootScope.$digest();
                     return;
                 }
             }
@@ -87,8 +86,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;
         } catch(error) {
             errorHandler.handle('Could not remove the API','Settings');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     // Get current API index
@@ -174,8 +173,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;
         } catch (error) {
             errorHandler.handle('Error getting API entries','Settings');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     const validator = formName => {
@@ -218,7 +217,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(invalid) {
                 $scope.messageError = invalid;
                 errorHandler.handle(invalid,'Settings');
-                if(!$rootScope.$$phase) $rootScope.$digest();
                 return;
             }
 
@@ -316,7 +314,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if(invalid) {
                 $scope.messageErrorUpdate = invalid;
                 errorHandler.handle(invalid,'Settings');
-                if(!$rootScope.$$phase) $rootScope.$digest();
                 return;
             }
 
@@ -412,8 +409,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         } catch (error){
             const msg = appState.getCurrentAPI() ? 'Invalid request when toggling extensions.' : 'Can not save extension state: no Wazuh API detected';
             errorHandler.handle(msg,'Settings');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     $scope.changeIndexPattern = async newIndexPattern => {
@@ -427,8 +424,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;
         } catch (error) {
             errorHandler.handle('Error while changing the default index-pattern','Settings');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     const printError = (error,updating) => {
@@ -469,8 +466,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             return;
         } catch (error) {
             errorHandler.handle('Error when loading Wazuh setup info','Settings');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     // Loading data

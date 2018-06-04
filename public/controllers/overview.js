@@ -329,10 +329,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error, 'Overview');
-            if (!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error, 'Overview'));
 
     $scope.pciTabs = pciTabs;
     $scope.selectedPciIndex = 0;
@@ -349,10 +346,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error, 'Overview');
-            if (!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error, 'Overview'));
 
     $scope.gdprTabs = gdprTabs;
     $scope.selectedGdprIndex = 0;
@@ -376,10 +370,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                         throw new Error('Error fetching /agents/summary from Wazuh API')
                     }
                 })
-                .catch(error => {
-                    errorHandler.handle(error, 'Overview - Monitoring');
-                    if (!$rootScope.$$phase) $rootScope.$digest();
-                })
+                .catch(error => errorHandler.handle(error, 'Overview - Monitoring'))
             }
         } else {
             $scope.wzMonitoringEnabled = true;
@@ -388,6 +379,5 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     .catch(error => {
         $scope.wzMonitoringEnabled = true
         errorHandler.handle(error, 'Overview');
-        if (!$rootScope.$$phase) $rootScope.$digest();
     });
 });
