@@ -14,16 +14,17 @@ import * as modules from 'ui/modules'
 const app = modules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('blankScreenController', function($scope, $rootScope, $location, errorHandler) {
-    if ($rootScope.blankScreenError) {
+app.controller('blankScreenController', function($scope, $location, errorHandler, wzMisc) {
+    const bse_error = wzMisc.getValue('blankScreenError')
+    if (bse_error) {
         let parsed = null;
         try {
-            parsed = errorHandler.handle($rootScope.blankScreenError,'',false,true);
+            parsed = errorHandler.handle(bse_error,'',false,true);
         } catch (error) {
             // Do nothing (intended)
         }
-        $scope.errorToShow = parsed ? parsed : $rootScope.blankScreenError;
-        delete $rootScope.blankScreenError;
+        $scope.errorToShow = parsed ? parsed : bse_error;
+        wzMisc.setBlankScr(false)
         if (!$scope.$$phase) $scope.$digest();
     }
     $scope.goOverview = () => {

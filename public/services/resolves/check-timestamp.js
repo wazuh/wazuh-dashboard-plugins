@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default async (appState,genericReq,errorHandler,$rootScope,$location) => {
+export default async (appState,genericReq,errorHandler,$rootScope,$location, wzMisc) => {
     try {
         const data = await genericReq.request('GET', '/api/wazuh-elastic/timestamp');
         const current = appState.getCreatedAt();
@@ -18,13 +18,13 @@ export default async (appState,genericReq,errorHandler,$rootScope,$location) => 
             $rootScope.lastRestart = data.data.lastRestart;
             if(!$rootScope.$$phase) $rootScope.$digest();
         } else {
-            $rootScope.blankScreenError = 'Your .wazuh-version index is empty or corrupt.'
+            wzMisc.setBlankScr('Your .wazuh-version index is empty or corrupt.')
             $location.search('tab',null);
             $location.path('/blank-screen');
         }
         return;
     } catch (error){
-        $rootScope.blankScreenError = error.message || error;
+        wzMisc.setBlankScr(error.message || error)
         $location.search('tab',null);
         $location.path('/blank-screen');
     }

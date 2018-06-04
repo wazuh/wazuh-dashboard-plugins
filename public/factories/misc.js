@@ -17,18 +17,21 @@ const app = modules.get('app/wazuh', []);
 app.factory('wzMisc', function() {
     const state = {
         apiIsDown: false,
-        comeFromWizard: false
+        comeFromWizard: false,
+        blankScreenError: false
     }
 
     const setApiIsDown = value => state.apiIsDown = value;
     const setWizard    = value => state.comeFromWizard = value;
     const setGeneric   = (key,value) => state[key] = value;
+    const setBlankScr  = value => state.blankScreenError = value;
     const getValue     = key   => state[key];
   
     return {
        setGeneric,
        setApiIsDown,
        setWizard,
+       setBlankScr,
        getValue
     };
 });

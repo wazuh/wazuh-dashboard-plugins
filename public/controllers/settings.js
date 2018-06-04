@@ -144,7 +144,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.indexPatterns = patternList.data.data;
 
             if(!patternList.data.data.length){
-                $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                wzMisc.setBlankScr('Sorry but no valid index patterns were found')
                 $location.search('tab',null);
                 $location.path('/blank-screen');
                 return;
