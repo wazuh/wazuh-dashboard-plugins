@@ -11,9 +11,7 @@
             <span flex ng-if="tab !== 'welcome'">
                 <i class="fa fa-fw fa-bar-chart"></i>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span> /
-                <span class="wz-text-uppercase">{{ tab }}</span>
-                <span ng-if="tabView === 'panels'">(Panels)</span>
-                <span ng-if="tabView === 'discover'">(Discover)</span>
+                <span class="wz-text-capitalize">{{ tab }}</span>
             </span>
             <span flex ng-if="tab === 'welcome'">
                 <i class="fa fa-fw fa-bar-chart"></i>
@@ -21,6 +19,10 @@
             </span>
         </div>
         <!-- End breadcrumbs -->
+
+        <!-- Separator -->
+        <span flex></span>
+        <!-- End separator -->
 
         <!-- Discover/Panels/Report buttons section -->
         <div ng-show="tab !== 'welcome'">
@@ -34,10 +36,6 @@
                 <i class="fa fa-compass fa-fw"></i> View Discover
             </md-button>
         </div>
-
-        <!-- Separator -->
-        <span flex></span>
-        <!-- End separator -->
 
         <div ng-show="tab !== 'welcome'">
             <!-- Report button -->

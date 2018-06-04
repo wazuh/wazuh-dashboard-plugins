@@ -2,242 +2,178 @@
 
     <div layout="row" class="md-padding font-size-18">
         <span flex>
-            <i class="fa fa-fw fa-home"></i> Main sections
+            <i class="fa fa-fw fa-server"></i> Host monitoring
         </span>
     </div>
 
     <div layout="row" layout-align="start start" layout-wrap>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('general')" class="wz-headline-title wz-text-link cursor-pointer">General</span>
+                <i class="fa fa-fw fa-home"></i> <span ng-click="switchTab('general')" class="wz-headline-title wz-text-link cursor-pointer">General</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Brief overview of your latest Wazuh alerts</p>
                 </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('fim')" class="wz-headline-title wz-text-link cursor-pointer">File Integrity</span>
+                <i class="fa fa-fw fa-file"></i> <span ng-click="switchTab('fim')" class="wz-headline-title wz-text-link cursor-pointer">File Integrity</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Alerts from monitored files and directories</p>
                 </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex="30" class="wz-md-card" ng-show="extensions.aws">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('pm')" class="wz-headline-title wz-text-link cursor-pointer">Policy Monitoring</span>
+                <i class="fa fa-fw fa-amazon"></i> <span ng-click="switchTab('aws')" class="wz-headline-title wz-text-link cursor-pointer">AWS</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>AWS CloudTrail logs from AWS S3 buckets</p>
                 </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/amazon/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('vuls')" class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
-                </div>
-            </md-card-content>
-        </md-card>
-
     </div>
 
     <div layout="row" class="md-padding font-size-18">
         <span flex>
-            <i class="fa fa-fw fa-puzzle-piece"></i> Extensions
+            <i class="fa fa-fw fa-flag"></i> System audit
         </span>
     </div>
 
     <div layout="row" layout-align="start start" layout-wrap>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('scap')" class="wz-headline-title wz-text-link cursor-pointer">Open SCAP</span>
+                <i class="fa fa-fw fa-desktop"></i> <span ng-click="switchTab('pm')" class="wz-headline-title wz-text-link cursor-pointer">Policy Monitoring</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Anomaly detection of patterns that do not match expected behavior</p>
                 </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/rootcheck/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex="30" class="wz-md-card" ng-show="extensions.audit">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('audit')" class="wz-headline-title wz-text-link cursor-pointer">Audit</span>
+                <i class="fa fa-fw fa-balance-scale"></i> <span ng-click="switchTab('audit')" class="wz-headline-title wz-text-link cursor-pointer">Audit</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Linux Audit system alerts</p>
                 </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/system-calls-monitoring/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex="30" class="wz-md-card" ng-show="extensions.oscap">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('pci')" class="wz-headline-title wz-text-link cursor-pointer">PCI DSS</span>
+                <i class="fa fa-fw fa-search"></i> <span ng-click="switchTab('oscap')" class="wz-headline-title wz-text-link cursor-pointer">Open SCAP</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Alerts about OpenSCAP policies for security policies/benchmarks</p>
                 </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/openscap/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('gdpr')" class="wz-headline-title wz-text-link cursor-pointer">GDPR</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
-                </div>
-            </md-card-content>
-        </md-card>
-        <md-card flex="30" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('aws')" class="wz-headline-title wz-text-link cursor-pointer">AWS</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
-                </div>
-            </md-card-content>
-        </md-card>
-        <md-card flex="30" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('virustotal')" class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row">
-                    <div flex layout="column">
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Level 12 alerts</p>
-                            <p class="wz-text-right color-grey">666</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication failure</p>
-                            <p class="wz-text-right color-grey">1.000.000</p>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="50">Authentication success</p>
-                            <p class="wz-text-right color-grey">0</p>
-                        </div>
-                    </div>
-                </div>
-            </md-card-content>
-        </md-card>
+    </div>
 
+    <div layout="row" class="md-padding font-size-18">
+        <span flex>
+            <i class="fa fa-fw fa-shield"></i> Security
+        </span>
+    </div>
+
+    <div layout="row" layout-align="start start" layout-wrap>
+        <md-card flex="30" class="wz-md-card">
+            <md-card-content>
+                <i class="fa fa-fw fa-bug"></i> <span ng-click="switchTab('vuls')" class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Alerts about known vulnerabilities on your applications</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/vulnerability-detection.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+        <md-card flex="30" class="wz-md-card" ng-show="extensions.virustotal">
+            <md-card-content>
+                <i class="fa fa-fw fa-file-o"></i> <span ng-click="switchTab('virustotal')" class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Alerts from VirusTotal malicious content scans</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+    </div>
+
+    <div layout="row" class="md-padding font-size-18" ng-show="extensions.pci || extensions.gdpr">
+        <span flex>
+            <i class="fa fa-fw fa-check"></i> Compliance
+        </span>
+    </div>
+
+    <div layout="row" layout-align="start start" layout-wrap ng-show="extensions.pci || extensions.gdpr">
+        <md-card flex="30" class="wz-md-card" ng-show="extensions.pci">
+            <md-card-content>
+                <i class="fa fa-fw fa-credit-card"></i> <span ng-click="switchTab('pci')" class="wz-headline-title wz-text-link cursor-pointer">PCI DSS</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>PCI DSS compliance alerts</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/pci-dss/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+        <md-card flex="30" class="wz-md-card" ng-show="extensions.gdpr">
+            <md-card-content>
+                <i class="fa fa-fw fa-list-ol"></i> <span ng-click="switchTab('gdpr')" class="wz-headline-title wz-text-link cursor-pointer">GDPR</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>GDPR compliance alerts</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/gdpr/index.html" class="wz-button-flat small">
+                    <i class="fa fa-fw fa-info"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
     </div>
 
 </md-content>
