@@ -16,3 +16,4 @@ import 'plugins/wazuh/factories/tab-visualizations';
 import 'plugins/wazuh/factories/discover-pending-updates';
 import 'plugins/wazuh/factories/vis-handlers';
 import 'plugins/wazuh/factories/vis2png';
+import 'plugins/wazuh/factories/share-agent';
