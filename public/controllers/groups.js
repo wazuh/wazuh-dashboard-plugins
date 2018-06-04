@@ -119,8 +119,7 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
     };
 
     $scope.showAgent = agent => {
-        $rootScope.globalAgent = agent.id;
-        $rootScope.comeFrom    = 'groups';
+        shareAgent.setAgent(agent)
         $location.search('tab', null);
         $location.path('/agents');
     };
