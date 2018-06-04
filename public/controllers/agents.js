@@ -174,8 +174,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                     break;
             }
         }
-
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     // Switch subtab

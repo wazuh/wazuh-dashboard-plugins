@@ -432,7 +432,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         const text = errorHandler.handle(error,'Settings');
         if(!updating) $scope.messageError       = text;
         else          $scope.messageErrorUpdate = text;
-        if(!$rootScope.$$phase) $rootScope.$digest();
     };
 
     const getAppInfo = async () => {
