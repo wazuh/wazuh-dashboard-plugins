@@ -18,8 +18,7 @@ const app = modules.get('app/wazuh', []);
 // Groups preview controller
 app.controller('groupsPreviewController',
 function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler, csvReq, appState) {
-    const reloadWatcher = $rootScope.$watch('groupsIsReloaded',() => {
-        delete $rootScope.groupsIsReloaded;
+    $scope.$on('groupsIsReloaded',() => {        
         $scope.lookingGroup = false;
         if(!$scope.$$phase) $scope.$digest();
     });
@@ -203,7 +202,6 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
         $scope.groups.reset();
         $scope.groupFiles.reset();
         $scope.groupAgents.reset();
-        reloadWatcher();
     });
 
 
