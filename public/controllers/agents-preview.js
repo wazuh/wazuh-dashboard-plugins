@@ -150,16 +150,13 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
     };
 
     $scope.goGroup = agent => {
-        $rootScope.globalAgent = agent;
-        $rootScope.comeFrom    = 'agents';
         shareAgent.setAgent(agent);
         $location.search('tab', 'groups');
         $location.path('/manager');
     };
 
     $scope.showAgent = agent => {
-        $rootScope.globalAgent = agent.id;
-        $rootScope.comeFrom    = 'agentsPreview';
+        shareAgent.setAgent(agent);
         $location.path('/agents');
     };
 
