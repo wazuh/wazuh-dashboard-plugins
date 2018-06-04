@@ -9,11 +9,11 @@
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <span flex ng-if="tab !== 'welcome'">
-                <i class="fa fa-fw fa-chart"></i>
+                <i class="fa fa-fw fa-bar-chart"></i>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span> / General / Panels
             </span>
             <span flex ng-if="tab === 'welcome'">
-                <i class="fa fa-fw fa-chart"></i>
+                <i class="fa fa-fw fa-bar-chart"></i>
                 <span>Overview</span> / Welcome
             </span>
         </div>
