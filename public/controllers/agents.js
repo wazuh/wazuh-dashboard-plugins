@@ -330,8 +330,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             return;
         } catch (error) {
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     $scope.goGroups = agent => {
@@ -353,9 +353,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             return $scope.agentsAutoComplete.items;
         } catch (error) {
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
-
+        return;
     }
 
     //Load
@@ -366,7 +365,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $scope.agentsAutoComplete.nextPage('');
     } catch (e) {
         errorHandler.handle('Unexpected exception loading controller','Agents');
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     //Destroy
@@ -390,10 +388,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error,'Agents'));
 
     $scope.pciTabs       = pciTabs;
     $scope.selectedPciIndex = 0;
@@ -409,10 +404,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error,'Agents'));
 
     $scope.gdprTabs       = gdprTabs;
     $scope.selectedGdprIndex = 0;
@@ -489,8 +481,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             return;
         } catch (error){
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
     /** End of agent configuration */
 

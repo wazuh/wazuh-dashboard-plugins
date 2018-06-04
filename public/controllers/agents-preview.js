@@ -89,8 +89,8 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
             csvGenerator.download(true);
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     const load = async () => {
@@ -145,8 +145,8 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
             return;
         } catch (error) {
             errorHandler.handle(error,'Agents Preview');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     $scope.goGroup = agent => {

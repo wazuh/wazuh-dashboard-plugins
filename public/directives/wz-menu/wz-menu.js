@@ -90,7 +90,6 @@ app.directive('wzMenu',function(){
                 } catch (error) {
                     errorHandler.handle(error,'Directives - Menu');
                     $scope.theresPattern = false;
-                    if(!$rootScope.$$phase) $rootScope.$digest();
                 }
             }
 
@@ -106,7 +105,6 @@ app.directive('wzMenu',function(){
                     return;
                 }catch(error){
                     errorHandler.handle(error,'Directives - Menu');
-                    if(!$rootScope.$$phase) $rootScope.$digest();
                 }
             }
 
@@ -130,7 +128,6 @@ app.directive('wzMenu',function(){
                 })
                 .catch(error => {
                     errorHandler.handle(error,'Directives - Menu');
-                    if(!$rootScope.$$phase) $rootScope.$digest();
                     $scope.theresPattern = false;
                 });
             });
