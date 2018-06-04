@@ -271,12 +271,11 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
             
             vis2png.clear();
             
-            const idArray = rawVisualizations.getList().map(item => item.id);
-
-            for(const item of idArray) {
-                const tmpHTMLElement = $(`#${item}`);
-                vis2png.assignHTMLItem(item,tmpHTMLElement)
-            }            
+            const idArray = rawVisualizations.getList().map(item => {
+                const tmpHTMLElement = $(`#${item.id}`);
+                vis2png.assignHTMLItem(item.id,tmpHTMLElement)
+                return item.id;
+            });
             
             const appliedFilters = visHandlers.getAppliedFilters();
             const tab   = $scope.tab;
