@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
-import CsvGenerator from './csv-generator'
+import * as modules   from 'ui/modules'
+import * as FileSaver from '../services/file-saver'
 
 const app = modules.get('app/wazuh', []);
 
@@ -111,10 +111,15 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 
     $scope.downloadCsv = async () => {
         try {
+            errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/rules', currentApi, $scope.rules ? $scope.rules.filters : null);
-            const csvGenerator = new CsvGenerator(output.csv, 'rules.csv');
-            csvGenerator.download(true);
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'rules.csv');
+            
+            return;
+
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
             if(!$rootScope.$$phase) $rootScope.$digest();
@@ -280,8 +285,12 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         try {
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/decoders', currentApi, $scope.decoders ? $scope.decoders.filters : null);
-            const csvGenerator = new CsvGenerator(output.csv, 'decoders.csv');
-            csvGenerator.download(true);
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'decoders.csv');
+            
+            return;
+
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
             if(!$rootScope.$$phase) $rootScope.$digest();

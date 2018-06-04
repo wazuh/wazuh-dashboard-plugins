@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
-import CsvGenerator from './csv-generator'
+import * as modules   from 'ui/modules'
+import * as FileSaver from '../services/file-saver'
 
 const app = modules.get('app/wazuh', []);
 
@@ -83,10 +83,15 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
 
     $scope.downloadCsv = async () => {
         try {
+            errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/agents', currentApi, $scope.agents ? $scope.agents.filters : null);
-            const csvGenerator = new CsvGenerator(output.csv, 'agents.csv');
-            csvGenerator.download(true);
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'agents.csv');
+            
+            return;
+
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
             if(!$rootScope.$$phase) $rootScope.$digest();
