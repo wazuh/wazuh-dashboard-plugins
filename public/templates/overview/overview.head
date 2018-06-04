@@ -10,37 +10,42 @@
         <div layout="row" layout-padding>
             <span flex ng-if="tab !== 'welcome'">
                 <i class="fa fa-fw fa-bar-chart"></i>
-                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span> / General / Panels
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span> /
+                <span class="wz-text-uppercase">{{ tab }}</span>
+                <span ng-if="tabView === 'panels'">(Panels)</span>
+                <span ng-if="tabView === 'discover'">(Discover)</span>
             </span>
             <span flex ng-if="tab === 'welcome'">
                 <i class="fa fa-fw fa-bar-chart"></i>
-                <span>Overview</span> / Welcome
+                <span>Overview / Welcome</span>
             </span>
         </div>
         <!-- End breadcrumbs -->
+
+        <!-- Discover/Panels/Report buttons section -->
+        <div ng-show="tab !== 'welcome'">
+            <!-- Panels button -->
+            <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')">
+                <i class="fa fa-th fa-fw"></i> View Panels
+            </md-button>
+
+            <!-- Discover button -->
+            <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')">
+                <i class="fa fa-compass fa-fw"></i> View Discover
+            </md-button>
+        </div>
 
         <!-- Separator -->
         <span flex></span>
         <!-- End separator -->
 
-        <!-- Discover/Panels buttons section -->
         <div ng-show="tab !== 'welcome'">
-            <md-button ng-if="tabView === 'panels'" class="wazuh-button md-raised md-primary" ng-click="switchSubtab('discover')">
-                <i class="fa fa-compass fa-fw"></i> View Discover
-            </md-button>
-            <md-button ng-if="tabView === 'discover'" class="wazuh-button md-raised md-primary" ng-click="switchSubtab('panels')">
-                <i class="fa fa-th fa-fw"></i> View Panels
-            </md-button>
-        </div>
-        <!-- End Discover/Panels buttons section -->
-
-        <!-- Reporting button section -->
-        <div ng-show="tab !== 'welcome'">
-            <md-button ng-class="{'wz-report-button': rendered && !loading && resultState === 'ready'}" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()">
+            <!-- Report button -->
+            <md-button class="wz-button-flat small" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()">
                 <i class="fa fa-fw fa-pencil"></i> Report
             </md-button>
         </div>
-        <!-- End reporting button section -->
+        <!-- End Discover/Panels/Reporting buttons section -->
     </div>
     <!-- End navigation section -->
 
@@ -76,57 +81,3 @@
         <!-- No results section -->
     </div>
     <!-- End Overview-related section -->
-
-    <!-- <div layout="row" layout-align="space-between start" class="wz-md-navbar-kbn">
-        <div layout="column" flex layout-align="center start">
-            <md-nav-bar class="padding-right-0 wz-md-navbar" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
-                <md-nav-item md-nav-click="switchTab('general');" name="general">General</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('fim');" name="fim">File integrity</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy monitoring</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('vuls');" name="vuls">Vulnerabilities</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('oscap');" name="oscap" ng-show="extensions.oscap">SCAP</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('gdpr');" name="gdpr" ng-show="extensions.gdpr">GDPR</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('aws');" name="aws" ng-show="extensions.aws">AWS</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('virustotal');" name="virustotal" ng-show="extensions.virustotal">VirusTotal</md-nav-item>
-            </md-nav-bar>
-        </div>
-        <div layout="column">
-            <md-button ng-class="{'wz-report-button': rendered && !loading && resultState === 'ready'}" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()"><i class="fa fa-fw fa-pencil"></i> Report</md-button>
-        </div>
-        <div layout="column" layout-align="end end">
-            <md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
-                <md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-                    <i class="fa fa-th fa-fw"></i> Panels
-                </md-nav-item>
-                <md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-                    <i class="fa fa-compass fa-fw"></i> Discover
-                </md-nav-item>
-            </md-nav-bar>
-        </div>
-    </div> -->
-
-    <!-- <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear> -->
-
-    <!-- View: Discover -->
-    <!-- <kbn-dis></kbn-dis> -->
-
-    <!-- <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
-        <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
-        <div class="percentage">{{loadingStatus}}</div>
-    </div>
-
-    <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="reportBusy && reportStatus">
-        <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
-        <div class="percentage">{{reportStatus}}</div>
-    </div> -->
-
-    <!-- No results message -->
-    <!-- <md-content flex layout="row" layout-align="start start" ng-show="resultState !== 'ready' && tabView === 'panels'">
-        <md-card flex layout="column" class="wz-md-card">
-            <md-card-content class="wz-text-center">
-                No results for selected time interval
-            </md-card-content>
-        </md-card>
-    </md-content> -->
