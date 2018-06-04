@@ -24,7 +24,6 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     tabVisualizations.removeAll();
     loadedVisualizations.removeAll();
 
-    $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
     $scope.wzMonitoringEnabled = false;

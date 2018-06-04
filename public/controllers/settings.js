@@ -16,8 +16,6 @@ import * as modules from 'ui/modules'
 const app = modules.get('app/wazuh', []);
 
 app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler) {
-    $rootScope.page = "settings";
-
     if ($rootScope.comeFromWizard) {
         sessionStorage.removeItem('healthCheck');
         $rootScope.comeFromWizard = false;

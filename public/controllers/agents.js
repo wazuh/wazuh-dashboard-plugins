@@ -24,7 +24,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     tabVisualizations.removeAll();
     loadedVisualizations.removeAll();
 
-    $rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
     $scope.agentsAutoComplete = AgentsAutoComplete;
 
