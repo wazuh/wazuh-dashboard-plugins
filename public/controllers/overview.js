@@ -208,8 +208,6 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                     break;
             }
         }
-
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     // Switch subtab
