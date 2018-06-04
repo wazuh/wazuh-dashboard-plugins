@@ -17,7 +17,7 @@ const app = modules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',
-function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler, csvReq, appState) {
+function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler, csvReq, appState, shareAgent) {
     $scope.$on('groupsIsReloaded',() => {        
         $scope.lookingGroup = false;
         if(!$scope.$$phase) $scope.$digest();
@@ -50,18 +50,18 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
     }
 
     // Store a boolean variable to check if come from agents
-    const fromAgents = ('comeFrom' in $rootScope) && ('globalAgent' in $rootScope) && $rootScope.comeFrom === 'agents';
+    const globalAgent = shareAgent.getAgent();
 
     const load = async () => {
         try {
             // If come from agents
-            if(fromAgents) {
+            if(globalAgent) {
                 let len = 0;
                 // Get ALL groups
                 const data = await apiReq.request('GET','/agents/groups/',{limit:99999})
 
                 // Obtain an array with 0 or 1 element, in that case is our group
-                let filtered = data.data.data.items.filter(group => group.name === $rootScope.globalAgent.group);
+                const filtered = data.data.data.items.filter(group => group.name === globalAgent.group);
                 // Store the array length, should be 0 or 1
                 len = filtered.length;
                 // If len is 1
@@ -73,8 +73,7 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
                     $scope.lookingGroup=true
                 }
                 // Clean $rootScope
-                delete $rootScope.globalAgent;
-                delete $rootScope.comeFrom;
+                shareAgent.deleteAgent();
                 // Get more groups to fill the md-content with more items
                 await $scope.groups.nextPage();
 

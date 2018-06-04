@@ -14,7 +14,7 @@ import * as FileSaver from '../services/file-saver'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsPreviewController', function ($scope, $rootScope, $routeParams, genericReq, apiReq, appState, Agents, $location, errorHandler, csvReq) {
+app.controller('agentsPreviewController', function ($scope, $rootScope, $routeParams, genericReq, apiReq, appState, Agents, $location, errorHandler, csvReq, shareAgent) {
     $scope.loading     = true;
     $scope.agents      = Agents;
     $scope.status      = 'all';
@@ -157,6 +157,7 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
     $scope.goGroup = agent => {
         $rootScope.globalAgent = agent;
         $rootScope.comeFrom    = 'agents';
+        shareAgent.setAgent(agent);
         $location.search('tab', 'groups');
         $location.path('/manager');
     };
