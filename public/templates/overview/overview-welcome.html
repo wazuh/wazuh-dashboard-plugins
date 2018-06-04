@@ -1,12 +1,5 @@
 <md-content flex layout="column" ng-if="tab === 'welcome'" layout-align="start">
 
-    <div layout="row" class="md-padding">
-        <span flex>
-            <i class="fa fa-fw fa-bar-chart"></i>
-            <span class="wz-text-link cursor-pointer">Overview</span> / Welcome
-        </span>
-    </div>
-
     <div layout="row" class="md-padding font-size-18">
         <span flex>
             <i class="fa fa-fw fa-home"></i> Main sections
@@ -16,7 +9,7 @@
     <div layout="row" layout-align="start start" layout-wrap>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">General</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('general')" class="wz-headline-title wz-text-link cursor-pointer">General</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -38,7 +31,7 @@
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">File Integrity</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('fim')" class="wz-headline-title wz-text-link cursor-pointer">File Integrity</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -60,7 +53,7 @@
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">Policy Monitoring</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('pm')" class="wz-headline-title wz-text-link cursor-pointer">Policy Monitoring</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -82,7 +75,7 @@
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('vuls')" class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -114,7 +107,7 @@
     <div layout="row" layout-align="start start" layout-wrap>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">Open SCAP</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('scap')" class="wz-headline-title wz-text-link cursor-pointer">Open SCAP</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -136,7 +129,7 @@
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">Audit</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('audit')" class="wz-headline-title wz-text-link cursor-pointer">Audit</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -158,7 +151,7 @@
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">PCI DSS</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('pci')" class="wz-headline-title wz-text-link cursor-pointer">PCI DSS</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -180,7 +173,7 @@
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">GDPR</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('gdpr')" class="wz-headline-title wz-text-link cursor-pointer">GDPR</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -202,7 +195,7 @@
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">AWS</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('aws')" class="wz-headline-title wz-text-link cursor-pointer">AWS</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">
@@ -224,7 +217,7 @@
         </md-card>
         <md-card flex="30" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bar-chart"></i> <span class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span>
+                <i class="fa fa-fw fa-bar-chart"></i> <span ng-click="switchTab('virustotal')" class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row">
                     <div flex layout="column">

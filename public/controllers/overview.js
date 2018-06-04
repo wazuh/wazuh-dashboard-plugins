@@ -232,7 +232,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
         $scope.tabView = subtab;
 
-        if(subtab === 'panels'){
+        if(subtab === 'panels' && $scope.tab !== 'welcome'){
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
