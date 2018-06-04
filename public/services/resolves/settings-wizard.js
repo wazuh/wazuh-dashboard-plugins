@@ -39,8 +39,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
             }
 
             if(!fromElastic){
-                $rootScope.comeFromWizard = true;
-                if(!$rootScope.$$phase) $rootScope.$digest();
+                wzMisc.setWizard(true);
                 if(!$location.path().includes("/settings")) {
                     $location.search('_a', null);
                     $location.search('tab', 'api');
@@ -119,7 +118,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         callCheckStored();
                     } else {
                         errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
-                        $rootScope.comeFromWizard = true;
+                        wzMisc.setWizard(true);
                         if(!$location.path().includes("/settings")) {
                             $location.search('_a', null);
                             $location.search('tab', 'api');
@@ -130,7 +129,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 })
                 .catch(error => {
                     errorHandler.handle(error,'Routes');
-                    $rootScope.comeFromWizard = true;
+                    wzMisc.setWizard(true);
                     if(!$location.path().includes("/settings")) {
                         $location.search('_a', null);
                         $location.search('tab', 'api');
