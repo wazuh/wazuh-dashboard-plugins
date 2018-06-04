@@ -100,6 +100,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
     // This object represents the number of visualizations per tab; used to show a progress bar
     tabVisualizations.assign({
+        welcome   : 0,
         general   : 11,
         fim       : 10,
         pm        : 5,
