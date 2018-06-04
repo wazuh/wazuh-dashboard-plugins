@@ -7,7 +7,7 @@
     </div>
 
     <div layout="row" layout-align="start start" layout-wrap>
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex="33" class="wz-md-card">
             <md-card-content>
                 <i class="fa fa-fw fa-home"></i> <span ng-click="switchTab('general')" class="wz-headline-title wz-text-link cursor-pointer">General</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -21,7 +21,7 @@
                 </md-button>
             </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex="33" class="wz-md-card">
             <md-card-content>
                 <i class="fa fa-fw fa-file"></i> <span ng-click="switchTab('fim')" class="wz-headline-title wz-text-link cursor-pointer">File Integrity</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -35,7 +35,7 @@
                 </md-button>
             </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card" ng-show="extensions.aws">
+        <md-card flex="33" class="wz-md-card" ng-show="extensions.aws">
             <md-card-content>
                 <i class="fa fa-fw fa-amazon"></i> <span ng-click="switchTab('aws')" class="wz-headline-title wz-text-link cursor-pointer">AWS</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -58,12 +58,12 @@
     </div>
 
     <div layout="row" layout-align="start start" layout-wrap>
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex="33" class="wz-md-card">
             <md-card-content>
                 <i class="fa fa-fw fa-desktop"></i> <span ng-click="switchTab('pm')" class="wz-headline-title wz-text-link cursor-pointer">Policy Monitoring</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
-                    <p>Anomaly detection of patterns that do not match expected behavior</p>
+                    <p>Anomaly detection of unexpected behavior</p>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center">
@@ -72,7 +72,7 @@
                 </md-button>
             </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card" ng-show="extensions.audit">
+        <md-card flex="33" class="wz-md-card" ng-show="extensions.audit">
             <md-card-content>
                 <i class="fa fa-fw fa-balance-scale"></i> <span ng-click="switchTab('audit')" class="wz-headline-title wz-text-link cursor-pointer">Audit</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -86,12 +86,12 @@
                 </md-button>
             </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card" ng-show="extensions.oscap">
+        <md-card flex="33" class="wz-md-card" ng-show="extensions.oscap">
             <md-card-content>
                 <i class="fa fa-fw fa-search"></i> <span ng-click="switchTab('oscap')" class="wz-headline-title wz-text-link cursor-pointer">Open SCAP</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
-                    <p>Alerts about OpenSCAP policies for security policies/benchmarks</p>
+                    <p>Alerts about OpenSCAP security policies</p>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center">
@@ -109,7 +109,7 @@
     </div>
 
     <div layout="row" layout-align="start start" layout-wrap>
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex="50" class="wz-md-card">
             <md-card-content>
                 <i class="fa fa-fw fa-bug"></i> <span ng-click="switchTab('vuls')" class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -123,7 +123,7 @@
                 </md-button>
             </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card" ng-show="extensions.virustotal">
+        <md-card flex="50" class="wz-md-card" ng-show="extensions.virustotal">
             <md-card-content>
                 <i class="fa fa-fw fa-file-o"></i> <span ng-click="switchTab('virustotal')" class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -146,7 +146,7 @@
     </div>
 
     <div layout="row" layout-align="start start" layout-wrap ng-show="extensions.pci || extensions.gdpr">
-        <md-card flex="30" class="wz-md-card" ng-show="extensions.pci">
+        <md-card flex="50" class="wz-md-card" ng-show="extensions.pci">
             <md-card-content>
                 <i class="fa fa-fw fa-credit-card"></i> <span ng-click="switchTab('pci')" class="wz-headline-title wz-text-link cursor-pointer">PCI DSS</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -160,7 +160,7 @@
                 </md-button>
             </md-card-actions>
         </md-card>
-        <md-card flex="30" class="wz-md-card" ng-show="extensions.gdpr">
+        <md-card flex="50" class="wz-md-card" ng-show="extensions.gdpr">
             <md-card-content>
                 <i class="fa fa-fw fa-list-ol"></i> <span ng-click="switchTab('gdpr')" class="wz-headline-title wz-text-link cursor-pointer">GDPR</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
