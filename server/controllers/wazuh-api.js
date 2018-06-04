@@ -554,14 +554,6 @@ export default class WazuhApi {
         }
     }
 
-    async getCSVByName(req,reply) {
-        try {
-            return reply.file(path.join(__dirname, '../../../wazuh-tmp/pepe.csv'));
-        } catch (error) {
-            return ErrorResponse(error.message || error, 3030, 500, reply);
-        }
-    }
-
     async report(req,reply) {
         try {
 
