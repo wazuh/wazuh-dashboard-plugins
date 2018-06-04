@@ -34,7 +34,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 errorHandler.handle('Wazuh RESTful API seems to be down.','Routes');
             } else {
                 fromElastic = true;
-                $rootScope.blankScreenError = errorHandler.handle(data,'Routes');
+                wzMisc.setBlankScr(errorHandler.handle(data,'Routes'));
                 appState.removeCurrentAPI();
             }
 
