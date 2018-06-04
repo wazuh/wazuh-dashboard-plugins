@@ -15,11 +15,14 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler) {
+app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc) {
     if ($rootScope.comeFromWizard) {
         sessionStorage.removeItem('healthCheck');
         $rootScope.comeFromWizard = false;
     }
+
+
+    $scope.apiIsDown = wzMisc.getValue('apiIsDown');
 
     // Initialize
 
@@ -77,7 +80,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             }
             await genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`);
             $scope.apiEntries.splice(index, 1);
-            $rootScope.apiIsDown = null;
+            wzMisc.setApiIsDown(false)
+            $scope.apiIsDown = false;
             errorHandler.info('The API was removed successfully','Settings');
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -334,7 +338,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             await genericReq.request('PUT', '/api/wazuh-api/update-settings' , tmpData);
             $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
 
-            $rootScope.apiIsDown  = null;
+            wzMisc.setApiIsDown(false)
+            $scope.apiIsDown = false;
 
             $scope.apiEntries[index]._source.cluster_info.cluster = tmpData.cluster_info.cluster;
             $scope.apiEntries[index]._source.cluster_info.manager = tmpData.cluster_info.manager;
@@ -376,8 +381,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             await genericReq.request('PUT', tmpUrl , { cluster_info: tmpData.cluster_info });
 
             $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
-            $rootScope.apiIsDown = null;
-
+            wzMisc.setApiIsDown(false)
+            $scope.apiIsDown = false;
             errorHandler.info('Connection success','Settings');
 
             if(!$scope.$$phase) $scope.$digest();
