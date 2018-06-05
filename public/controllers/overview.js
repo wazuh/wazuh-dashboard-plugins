@@ -29,6 +29,21 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
     $scope.wzMonitoringEnabled = false;
 
+    // Tab names
+    $scope.tabNames = {
+        welcome   : 'Welcome',
+        general   : 'General',
+        fim       : 'File integrity',
+        pm        : 'Policy monitoring',
+        vuls      : 'Vulnerabilities',
+        oscap     : 'Open SCAP',
+        audit     : 'Audit',
+        pci       : 'PCI DSS',
+        gdpr      : 'GDPR',
+        aws       : 'AWS',
+        virustotal: 'VirusTotal'
+    }
+
     // Metrics General
     const metricsGeneral = {
         totalAlerts: '[vis-id="\'Wazuh-App-Overview-General-Metric-alerts\'"]',
