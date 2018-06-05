@@ -5,15 +5,17 @@
     <!-- End top navbar section -->
 
     <!-- Navigation section (Breadcrumbs, Discover, etc) -->
-    <div layout="row" layout-align="start start">
+    <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
-            <span flex ng-if="tab !== 'welcome'">
+            <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
+            <span ng-if="tab !== 'welcome'">
                 <i class="fa fa-fw fa-bar-chart"></i>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span> /
                 <span>{{ tabNames[tab] }}</span>
             </span>
-            <span flex ng-if="tab === 'welcome'">
+            <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
+            <span ng-if="tab === 'welcome'">
                 <i class="fa fa-fw fa-bar-chart"></i>
                 <span>Overview / Welcome</span>
             </span>
@@ -21,7 +23,7 @@
         <!-- End breadcrumbs -->
 
         <!-- Reporting button section -->
-        <div layout="row" ng-show="tab !== 'welcome'">
+        <div ng-show="tab !== 'welcome'">
             <!-- Report button -->
             <md-button class="wz-button-flat small" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()">
                 <i class="fa fa-fw fa-file-text"></i> Generate report
@@ -34,7 +36,7 @@
         <!-- End separator -->
 
         <!-- Discover/Panels buttons section -->
-        <div layout="row" ng-show="tab !== 'welcome'">
+        <div ng-show="tab !== 'welcome'">
             <!-- Panels button -->
             <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')">
                 <i class="fa fa-th fa-fw"></i> View panels
@@ -44,10 +46,6 @@
             <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')">
                 <i class="fa fa-compass fa-fw"></i> View Discover
             </md-button>
-
-            <!-- <md-switch flex aria-label="View Discover switch">
-                View Discover <i class="fa fa-compass fa-fw"></i>
-            </md-switch> -->
         </div>
         <!-- End Discover/Panels buttons section -->
     </div>

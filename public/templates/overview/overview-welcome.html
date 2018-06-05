@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="tab === 'welcome'" layout-align="start">
+<div flex layout="column" layout-align="start stretch" ng-if="tab === 'welcome'">
 
     <div layout="row" class="md-padding font-size-18">
         <span flex>
@@ -111,7 +111,7 @@
     <div layout="row" layout-align="start start" layout-wrap>
         <md-card flex="25" class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-bug"></i> <span ng-click="switchTab('vuls')" class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span>
+                <i class="fa fa-fw fa-file-text"></i> <span ng-click="switchTab('vuls')" class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Alerts about known vulnerabilities on your applications</p>
@@ -125,7 +125,7 @@
         </md-card>
         <md-card flex="25" class="wz-md-card" ng-show="extensions.virustotal">
             <md-card-content>
-                <i class="fa fa-fw fa-file-o"></i> <span ng-click="switchTab('virustotal')" class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span>
+                <i class="fa fa-fw fa-bug"></i> <span ng-click="switchTab('virustotal')" class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Alerts from VirusTotal malicious content scans</p>
@@ -176,4 +176,4 @@
         </md-card>
     </div>
 
-</md-content>
+</div>
