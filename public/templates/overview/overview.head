@@ -5,7 +5,7 @@
     <!-- End top navbar section -->
 
     <!-- Navigation section (Breadcrumbs, Discover, etc) -->
-    <div layout="row" layout-align="start center">
+    <div layout="row" layout-align="start start">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <span flex ng-if="tab !== 'welcome'">
@@ -53,35 +53,30 @@
     </div>
     <!-- End navigation section -->
 
-    <!-- Overview-related section -->
-    <!-- These elements are not shown if you're on the initial tab -->
-    <div ng-if="tab !== 'welcome'">
-        <!-- Discover search bar section -->
-        <kbn-dis></kbn-dis>
-        <!-- End Discover search bar section -->
+    <!-- Discover search bar section -->
+    <kbn-dis ng-show="tab !== 'welcome'"></kbn-dis>
+    <!-- End Discover search bar section -->
 
-        <!-- Loading status section -->
-        <div layout="column" layout-align="center center" class="wazuh-loading" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
-            <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-            <div class="percentage">{{loadingStatus}}</div>
-        </div>
-        <!-- End loading status section -->
-
-        <!-- Report status section -->
-        <div layout="column" layout-align="center center" class="wazuh-loading" ng-show="reportBusy && reportStatus">
-            <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-            <div class="percentage">{{reportStatus}}</div>
-        </div>
-        <!-- End report status section -->
-
-        <!-- No results section -->
-        <div layout="row" ng-show="resultState !== 'ready' && tabView === 'panels'">
-            <md-card flex layout="column" class="wz-md-card">
-                <md-card-content class="wz-text-center">
-                    <span>There are no results for selected time range. Try another one.</span>
-                </md-card-content>
-            </md-card>
-        </div>
-        <!-- No results section -->
+    <!-- Loading status section -->
+    <div ng-if="tab !== 'welcome'" layout="column" layout-align="center center" class="wazuh-loading" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+        <div class="percentage">{{loadingStatus}}</div>
     </div>
-    <!-- End Overview-related section -->
+    <!-- End loading status section -->
+
+    <!-- Report status section -->
+    <div ng-if="tab !== 'welcome'" layout="column" layout-align="center center" class="wazuh-loading" ng-show="reportBusy && reportStatus">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+        <div class="percentage">{{reportStatus}}</div>
+    </div>
+    <!-- End report status section -->
+
+    <!-- No results section -->
+    <div ng-if="tab !== 'welcome'" layout="row" ng-show="resultState !== 'ready' && tabView === 'panels'">
+        <md-card flex layout="column" class="wz-md-card">
+            <md-card-content class="wz-text-center">
+                <span>There are no results for selected time range. Try another one.</span>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- No results section -->

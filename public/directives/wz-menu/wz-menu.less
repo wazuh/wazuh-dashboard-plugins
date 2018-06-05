@@ -29,10 +29,19 @@
 }
 
 /* Style to override the font on the toolbar */
-.wz-menu-content,
-.wz-menu-button {
+.wz-menu-content {
     font-size: 14px;
+}
+
+.wz-menu-button {
+    font-size: 14px !important;
     transition: none !important;
+    min-height: 30px !important;
+    line-height: 30px !important;
+}
+
+.wz-menu-button.md-icon-button {
+    line-height: 24px !important;
 }
 
 /* Style to mark active or when-hover buttons on the toolbar */
