@@ -1,11 +1,11 @@
-<div layout="column" ng-controller="overviewController">
+<div ng-cloak layout="column" ng-controller="overviewController">
 
     <!-- Top navbar section -->
     <wz-menu ng-init="menuNavItem = 'overview'"></wz-menu>
     <!-- End top navbar section -->
 
     <!-- Navigation section (Breadcrumbs, Discover, etc) -->
-    <div layout="row" layout-align="start start">
+    <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <span flex ng-if="tab !== 'welcome'">
@@ -21,7 +21,7 @@
         <!-- End breadcrumbs -->
 
         <!-- Reporting button section -->
-        <div ng-show="tab !== 'welcome'">
+        <div layout="row" ng-show="tab !== 'welcome'">
             <!-- Report button -->
             <md-button class="wz-button-flat small" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()">
                 <i class="fa fa-fw fa-file-text"></i> Generate report
@@ -34,7 +34,7 @@
         <!-- End separator -->
 
         <!-- Discover/Panels buttons section -->
-        <div ng-show="tab !== 'welcome'">
+        <div layout="row" ng-show="tab !== 'welcome'">
             <!-- Panels button -->
             <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')">
                 <i class="fa fa-th fa-fw"></i> View panels
@@ -44,6 +44,10 @@
             <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')">
                 <i class="fa fa-compass fa-fw"></i> View Discover
             </md-button>
+
+            <!-- <md-switch flex aria-label="View Discover switch">
+                View Discover <i class="fa fa-compass fa-fw"></i>
+            </md-switch> -->
         </div>
         <!-- End Discover/Panels buttons section -->
     </div>
