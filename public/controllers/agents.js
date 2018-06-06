@@ -177,10 +177,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = true) => {
+    $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = true, preserveDiscover = false) => {
         if($scope.tabView === subtab && !force) return;
         if(!onlyAgent) visHandlers.removeAll();
-        discoverPendingUpdates.removeAll();
+        if(!preserveDiscover) discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
 
@@ -217,12 +217,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
+        const preserveDiscover = $scope.tab === 'configuration'
         $scope.tab = tab;
 
         if($scope.tab === 'configuration'){
             firstLoad();
         } else {
-            $scope.switchSubtab('panels', true, onlyAgent, sameTab);
+            $scope.switchSubtab('panels', true, onlyAgent, sameTab, preserveDiscover);
         }
     };
 
