@@ -199,16 +199,10 @@ div.uil-ring-css {
 
 /* Custom buttons styles */
 
-.wazuh-button {
-    background-color: rgb(0, 85, 113) !important;
+.wz-button {
     color: white !important;
     transition: none !important;
-}
-
-.wazuh-button.active,
-.wazuh-button:not([disabled]):hover {
-    background-color: rgb(0, 121, 165) !important;
-    color: white !important;
+    background-color: rgb(0, 85, 113) !important;
 }
 
 .wz-button-flat {
@@ -217,6 +211,8 @@ div.uil-ring-css {
     line-height: 30px !important;
 }
 
+.wz-button.active,
+.wz-button:not([disabled]):hover,
 .wz-button-flat:not([disabled]):hover {
     background-color: rgb(0, 121, 165) !important;
     color: white !important;
@@ -281,7 +277,7 @@ div.uil-ring-css {
     box-shadow: none;
 }
 
-:focus:not(.wazuh-button):not(.input-filter-box):not(.kuiLocalSearchInput) {
+:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput) {
     box-shadow: none !important;
 }
 

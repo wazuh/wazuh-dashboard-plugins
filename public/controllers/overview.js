@@ -230,11 +230,11 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, sameTab = true) => {
+    $scope.switchSubtab = (subtab, force = false, sameTab = true, preserveDiscover = false) => {
         if ($scope.tabView === subtab && !force) return;
 
         visHandlers.removeAll();
-        discoverPendingUpdates.removeAll();
+        if(!preserveDiscover) discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
 
@@ -270,9 +270,10 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
         if ($scope.tab === tab && !force) return;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
+        const preserveDiscover = $scope.tab === 'welcome';
         $scope.tab = tab;
 
-        $scope.switchSubtab('panels', true, sameTab);
+        $scope.switchSubtab('panels', true, sameTab, preserveDiscover);
     };
 
     $scope.startVis2Png = async () => {
