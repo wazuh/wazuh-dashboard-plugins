@@ -287,7 +287,7 @@ export default class WazuhElastic {
      * @param {String} name Cluster name. Eg: 'wazuh'
      * @param {String} master_node Master node name. Eg: 'node01'
      */
-    buildClusterVisualizationsRaw (app_objects, id, nodes, name, master_node) {
+    buildClusterVisualizationsRaw (app_objects, id, nodes = [], name, master_node, pattern_name = '*') {
         try{
             const visArray = [];
             let aux_source, bulk_content;
@@ -309,11 +309,11 @@ export default class WazuhElastic {
                     let query = '';
                     if(title === 'Wazuh App Cluster Overview'){
                         for(const node of nodes) {
-                            query += `.es(q="cluster.name: ${name} AND cluster.node: ${node.name}").label("${node.name}"),`
+                            query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${node.name}").label("${node.name}"),`
                         }
                         query = query.substring(0, query.length - 1);
                     } else if(title === 'Wazuh App Cluster Overview Manager') {
-                        query += `.es(q="cluster.name: ${name}").label("${name} cluster")`
+                        query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`
                     }                   
   
                     visState.params.expression = query;
@@ -386,7 +386,10 @@ export default class WazuhElastic {
             const name        = req.payload.nodes.name;
             const master_node = req.payload.nodes.master_node;
             
-            const raw = await this.buildClusterVisualizationsRaw(file, req.params.pattern, nodes, name, master_node);
+            const pattern_doc  = await this.wzWrapper.getIndexPatternUsingGet(req.params.pattern);
+            const pattern_name = pattern_doc._source['index-pattern'].title;
+
+            const raw = await this.buildClusterVisualizationsRaw(file, req.params.pattern, nodes, name, master_node, pattern_name);
 
             return reply({acknowledge: true, raw: raw });
             
