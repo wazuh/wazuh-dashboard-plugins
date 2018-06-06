@@ -1,67 +1,65 @@
-<div layout="column" layout-fill>
-    <md-toolbar class="wz-menu">
+<md-toolbar class="wz-menu">
 
-        <!-- Main toolbar content -->
-        <div class="md-toolbar-tools wz-menu-content">
+    <!-- Main toolbar content -->
+    <div class="md-toolbar-tools wz-menu-content">
 
-            <!-- Wazuh app logo -->
-            <a class="cursor-pointer wz-logo-container wz-margin-right-15" href="#/"><img class="wz-responsive-img" aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png"></img></a>
+        <!-- Wazuh app logo -->
+        <a class="cursor-pointer wz-logo-container wz-margin-right-15" href="#/"><img class="wz-responsive-img" aria-hidden="true" kbn-src="/plugins/wazuh/img/new_logo_white.png"></img></a>
 
-            <!-- Main Wazuh app navigation buttons -->
-            <md-button class="wz-menu-button" ng-href="#/overview" ng-class="{'wz-menu-active': menuNavItem == 'overview' }" aria-label="Overview tab">
-                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i> Overview
-            </md-button>
+        <!-- Main Wazuh app navigation buttons -->
+        <md-button class="wz-menu-button" ng-href="#/overview" ng-class="{'wz-menu-active': menuNavItem === 'overview' }" aria-label="Overview tab">
+            <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i> Overview
+        </md-button>
 
-            <md-button class="wz-menu-button" ng-href="#/manager" ng-class="{'wz-menu-active': menuNavItem == 'manager' }" aria-label="Cluster tab">
-                <i class="fa fa-fw fa-server" aria-hidden="true"></i> Management
-            </md-button>
+        <md-button class="wz-menu-button" ng-href="#/manager" ng-class="{'wz-menu-active': menuNavItem === 'manager' }" aria-label="Cluster tab">
+            <i class="fa fa-fw fa-server" aria-hidden="true"></i> Management
+        </md-button>
 
-            <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-class="{'wz-menu-active': menuNavItem == 'agents' }" aria-label="Agents tab">
-                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
-            </md-button>
+        <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-class="{'wz-menu-active': menuNavItem === 'agents' }" aria-label="Agents tab">
+            <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
+        </md-button>
 
-            <md-button class="wz-menu-button" ng-href="#/wazuh-discover" ng-class="{'wz-menu-active': menuNavItem == 'discover' }" aria-label="Discover tab">
-                <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
-            </md-button>
+        <md-button class="wz-menu-button" ng-href="#/wazuh-discover" ng-class="{'wz-menu-active': menuNavItem === 'discover' }" aria-label="Discover tab">
+            <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
+        </md-button>
 
-            <md-button class="wz-menu-button" ng-href="#/wazuh-dev" ng-class="{'wz-menu-active': menuNavItem == 'wazuh-dev' }" aria-label="Dev Tools tab">
-                <i class="fa fa-fw fa-hashtag" aria-hidden="true"></i> Dev tools
-            </md-button>
+        <md-button class="wz-menu-button" ng-href="#/wazuh-dev" ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab">
+            <i class="fa fa-fw fa-hashtag" aria-hidden="true"></i> Dev tools
+        </md-button>
 
-            <!-- Fill up the space between left and right area -->
-            <span flex></span>
+        <!-- Fill up the space between left and right area -->
+        <span flex></span>
 
-            <!-- API/Index pattern section -->
-            <!-- Case 1a - There's API -->
-            <span ng-show="theresAPI" class="small" tooltip="Selected API" tooltip-placement="bottom">
-                <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
-            </span>
+        <!-- API/Index pattern section -->
+        <!-- Case 1a - There's API -->
+        <span ng-show="theresAPI" class="small" tooltip="Selected API" tooltip-placement="bottom">
+            <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
+        </span>
 
-            <!-- Case 1b - There's no API -->
-            <span ng-show="!theresAPI" class="small" tooltip="No API credentials inserted" tooltip-placement="bottom">
-                No API<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
-            </span>
+        <!-- Case 1b - There's no API -->
+        <span ng-show="!theresAPI" class="small" tooltip="No API credentials inserted" tooltip-placement="bottom">
+            No API<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
+        </span>
 
-            <!-- Case 2a - There's pattern and there's more than one -->
-            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" class="small" tooltip="Selected index pattern" tooltip-placement="bottom">
-                <select class="wz-menu-select" ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" aria-label="Index pattern selector" placeholder="Index pattern">
-                    <option class="wz-menu-select-option" ng-repeat="pattern in patternList" value="{{pattern.id}}">
-                        {{pattern.title}}
-                    </option>
-                </select>
-            </span>
+        <!-- Case 2a - There's pattern and there's more than one -->
+        <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" class="small" tooltip="Selected index pattern" tooltip-placement="bottom">
+            <select class="wz-menu-select" ng-model="currentSelectedPattern" ng-change="changePattern(currentSelectedPattern)" aria-label="Index pattern selector" placeholder="Index pattern">
+                <option class="wz-menu-select-option" ng-repeat="pattern in patternList" value="{{pattern.id}}">
+                    {{pattern.title}}
+                </option>
+            </select>
+        </span>
 
-            <!-- Case 2b - There's pattern and there's only one-->
-            <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" class="small" tooltip="Selected index pattern" tooltip-placement="bottom">
-                {{patternList[0].title}}
-            </span>
+        <!-- Case 2b - There's pattern and there's only one-->
+        <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" class="small" tooltip="Selected index pattern" tooltip-placement="bottom">
+            {{patternList[0].title}}
+        </span>
 
-            <!-- Settings tab button -->
-            <md-button class="wz-menu-button md-icon-button" ng-href="#/settings" ng-class="{'wz-menu-active': menuNavItem == 'settings' }" aria-label="Settings tab">
-                <i class="fa fa-cog" aria-hidden="true"></i>
-            </md-button>
+        <!-- Settings tab button -->
+        <md-button class="wz-menu-button md-icon-button" ng-href="#/settings" ng-class="{'wz-menu-active': menuNavItem === 'settings' }" aria-label="Settings tab">
+            <i class="fa fa-cog" aria-hidden="true"></i>
+        </md-button>
 
-        </div>
+    </div>
 
-    </md-toolbar>
-</div>
+</md-toolbar>
