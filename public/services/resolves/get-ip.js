@@ -14,12 +14,12 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import healthCheck from './health-check'
 
-export default (Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler) => {
+export default (Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc) => {
     const deferred = $q.defer();
 
     const catchFunction = error => {
         deferred.reject(error);
-        $rootScope.blankScreenError = errorHandler.handle(error,'Elasticsearch',false,true);
+        wzMisc.setBlankScr(errorHandler.handle(error,'Elasticsearch',false,true));
         $location.path('/blank-screen');
     }
 
@@ -42,7 +42,7 @@ export default (Promise, courier, config, $q, $rootScope, $window, $location, Pr
                     currentPattern = appState.getCurrentPattern();
                 } else {
                     if(!data.data.data.length){
-                        $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                        wzMisc.setBlankScr('Sorry but no valid index patterns were found')
                         $location.search('tab',null);
                         $location.path('/blank-screen');
                         return;

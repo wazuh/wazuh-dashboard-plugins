@@ -9,17 +9,16 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier   from 'plugins/wazuh/utils/json-beautifier';
-import * as modules from 'ui/modules'
-import CsvGenerator from './csv-generator'
+import beautifier     from 'plugins/wazuh/utils/json-beautifier';
+import * as modules   from 'ui/modules'
+import * as FileSaver from '../services/file-saver'
 
 const app = modules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',
-function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler, csvReq, appState) {
-    const reloadWatcher = $rootScope.$watch('groupsIsReloaded',() => {
-        delete $rootScope.groupsIsReloaded;
+function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler, csvReq, appState, shareAgent) {
+    $scope.$on('groupsIsReloaded',() => {        
         $scope.lookingGroup = false;
         if(!$scope.$$phase) $scope.$digest();
     });
@@ -34,30 +33,35 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
 
     $scope.downloadCsv = async dataProvider => {
         try {
+            errorHandler.info('Your download should begin automatically...', 'CSV')
             const path         = $scope[dataProvider] ? $scope[dataProvider].path : null;
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch(path, currentApi, $scope[dataProvider] ? $scope[dataProvider].filters : null);
-            const csvGenerator = new CsvGenerator(output.csv, 'groups.csv');
-            csvGenerator.download(true);
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'groups.csv');
+            
+            return;
+
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     // Store a boolean variable to check if come from agents
-    const fromAgents = ('comeFrom' in $rootScope) && ('globalAgent' in $rootScope) && $rootScope.comeFrom === 'agents';
+    const globalAgent = shareAgent.getAgent();
 
     const load = async () => {
         try {
             // If come from agents
-            if(fromAgents) {
+            if(globalAgent) {
                 let len = 0;
                 // Get ALL groups
                 const data = await apiReq.request('GET','/agents/groups/',{limit:99999})
 
                 // Obtain an array with 0 or 1 element, in that case is our group
-                let filtered = data.data.data.items.filter(group => group.name === $rootScope.globalAgent.group);
+                const filtered = data.data.data.items.filter(group => group.name === globalAgent.group);
                 // Store the array length, should be 0 or 1
                 len = filtered.length;
                 // If len is 1
@@ -69,8 +73,7 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
                     $scope.lookingGroup=true
                 }
                 // Clean $rootScope
-                delete $rootScope.globalAgent;
-                delete $rootScope.comeFrom;
+                shareAgent.deleteAgent();
                 // Get more groups to fill the md-content with more items
                 await $scope.groups.nextPage();
 
@@ -90,11 +93,10 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
             $scope.load = false;
 
             if(!$scope.$$phase) $scope.$digest();
-            return;
         } catch (error) {
             errorHandler.handle(error,'Groups');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     load();
@@ -116,8 +118,7 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
     };
 
     $scope.showAgent = agent => {
-        $rootScope.globalAgent = agent.id;
-        $rootScope.comeFrom    = 'groups';
+        shareAgent.setAgent(agent)
         $location.search('tab', null);
         $location.path('/agents');
     };
@@ -180,11 +181,10 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
             $scope.filename = filename;
 
             if(!$scope.$$phase) $scope.$digest();
-            return;
         } catch (error) {
             errorHandler.handle(error,'Groups');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     // Changing the view to overview a specific group
@@ -198,7 +198,6 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
         $scope.groups.reset();
         $scope.groupFiles.reset();
         $scope.groupAgents.reset();
-        reloadWatcher();
     });
 
 

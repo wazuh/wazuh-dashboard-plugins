@@ -494,7 +494,7 @@ export default class WazuhApi {
      * @param {*} req
      * @param {*} res
      */
-    async csv(req,res) {
+    async csv(req,reply) {
         try{
 
             if(!req.payload || !req.payload.path) throw new Error('Field path is required')
@@ -506,15 +506,16 @@ export default class WazuhApi {
 
             const config = await this.wzWrapper.getWazuhConfigurationById(req.payload.id)
 
-            let path = req.payload.path;
+            let path_tmp = req.payload.path;
 
-            if(path && typeof path === 'string'){
-                path = path[0] === '/' ? path.substr(1) : path
+            if(path_tmp && typeof path_tmp === 'string'){
+                path_tmp = path_tmp[0] === '/' ? path_tmp.substr(1) : path_tmp
             }
 
-            if(!path) throw new Error('An error occurred parsing path field')
+            if(!path_tmp) throw new Error('An error occurred parsing path field')
 
-            const params = { limit: 99999 };
+            // Real limit, regardless the user query
+            const params = { limit: 45000 };
 
             if(filters.length) {
                 for(const filter of filters) {
@@ -523,7 +524,7 @@ export default class WazuhApi {
                 }
             }
 
-            const output = await needle('get', `${config.url}:${config.port}/${path}`, params, {
+            const output = await needle('get', `${config.url}:${config.port}/${path_tmp}`, params, {
                 username          : config.user,
                 password          : config.password,
                 rejectUnauthorized: !config.insecure
@@ -534,10 +535,9 @@ export default class WazuhApi {
                 const data   = output.body.data.items;
 
                 const json2csvParser = new Parser({ fields });
+                const csv            = json2csvParser.parse(data);
 
-                const csv = json2csvParser.parse(data);
-
-                return res({ csv });
+                return reply(csv).type('text/csv')
 
             } else if (output && output.body && output.body.data && !output.body.data.totalItems) {
 
@@ -550,7 +550,7 @@ export default class WazuhApi {
             }
 
         } catch (error) {
-            return res({ error: error.message || error }).code(500)
+            return ErrorResponse(error.message || error, 3034, 500, reply);
         }
     }
 

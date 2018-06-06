@@ -24,7 +24,6 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     tabVisualizations.removeAll();
     loadedVisualizations.removeAll();
 
-    $rootScope.page = 'overview';
     $scope.extensions = appState.getExtensions().extensions;
 
     $scope.wzMonitoringEnabled = false;
@@ -225,8 +224,6 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                     break;
             }
         }
-
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     // Switch subtab
@@ -288,12 +285,11 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
             vis2png.clear();
 
-            const idArray = rawVisualizations.getList().map(item => item.id);
-
-            for(const item of idArray) {
-                const tmpHTMLElement = $(`#${item}`);
-                vis2png.assignHTMLItem(item,tmpHTMLElement)
-            }
+            const idArray = rawVisualizations.getList().map(item => {
+                const tmpHTMLElement = $(`#${item.id}`);
+                vis2png.assignHTMLItem(item.id,tmpHTMLElement)
+                return item.id;
+            });
 
             const appliedFilters = visHandlers.getAppliedFilters();
             const tab   = $scope.tab;
@@ -348,10 +344,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error, 'Overview');
-            if (!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error, 'Overview'));
 
     $scope.pciTabs = pciTabs;
     $scope.selectedPciIndex = 0;
@@ -368,10 +361,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error, 'Overview');
-            if (!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error, 'Overview'));
 
     $scope.gdprTabs = gdprTabs;
     $scope.selectedGdprIndex = 0;
@@ -395,10 +385,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                         throw new Error('Error fetching /agents/summary from Wazuh API')
                     }
                 })
-                .catch(error => {
-                    errorHandler.handle(error, 'Overview - Monitoring');
-                    if (!$rootScope.$$phase) $rootScope.$digest();
-                })
+                .catch(error => errorHandler.handle(error, 'Overview - Monitoring'))
             }
         } else {
             $scope.wzMonitoringEnabled = true;
@@ -407,6 +394,5 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     .catch(error => {
         $scope.wzMonitoringEnabled = true
         errorHandler.handle(error, 'Overview');
-        if (!$rootScope.$$phase) $rootScope.$digest();
     });
 });

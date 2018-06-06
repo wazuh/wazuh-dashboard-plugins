@@ -14,7 +14,7 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.service('testAPI', function ($http, $location, $rootScope, appState, genericReq) {
+app.service('testAPI', function ($http, $location, $rootScope, appState, genericReq, wzMisc) {
     return {
         check_stored: async data => {
             try {
@@ -55,7 +55,7 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, generic
                 }
             } catch (error) {
                 if(error.status && error.status === -1){
-                    $rootScope.apiIsDown = true;
+                    wzMisc.setApiIsDown(true)
                 } 
                 return Promise.reject(error);
                 

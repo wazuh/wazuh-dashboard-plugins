@@ -15,7 +15,7 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, shareAgent) {
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     visHandlers.removeAll();
@@ -24,8 +24,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     tabVisualizations.removeAll();
     loadedVisualizations.removeAll();
 
-    $rootScope.completedAgent = false;
-    $rootScope.page = 'agents';
     $scope.extensions = appState.getExtensions().extensions;
     $scope.agentsAutoComplete = AgentsAutoComplete;
 
@@ -176,20 +174,18 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                     break;
             }
         }
-
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = true) => {
+    $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = true, preserveDiscover = false) => {
         if($scope.tabView === subtab && !force) return;
         if(!onlyAgent) visHandlers.removeAll();
-        discoverPendingUpdates.removeAll();
+        if(!preserveDiscover) discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
-        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') || 
+        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') ||
                              (subtab === 'discover' && $scope.tabView === 'panels')) && sameTab;
         if(subtab === 'panels' && $scope.tabView === 'discover' && sameTab){
             $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
@@ -203,7 +199,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
                 assignFilters($scope.tab, $scope.agent.id, localChange);
-                $rootScope.$emit('changeTabView',{tabView:subtab})
+                $rootScope.$emit('changeTabView',{tabView:subtab});
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
@@ -221,12 +217,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
+        const preserveDiscover = $scope.tab === 'configuration';
         $scope.tab = tab;
 
         if($scope.tab === 'configuration'){
             firstLoad();
         } else {
-            $scope.switchSubtab('panels', true, onlyAgent, sameTab);
+            $scope.switchSubtab('panels', true, onlyAgent, sameTab, preserveDiscover);
         }
     };
 
@@ -284,7 +281,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     $scope.getAgent = async (newAgentId,fromAutocomplete) => {
         try {
-            $rootScope.completedAgent = false;
+            const globalAgent = shareAgent.getAgent()
             if($scope.tab === 'configuration'){
                 return $scope.getAgentConfig(newAgentId);
             }
@@ -296,12 +293,12 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 id = newAgentId;
                 $location.search('agent', id);
             } else {
-                if ($location.search().agent && !$rootScope.globalAgent) { // There's one in the url
+                if ($location.search().agent && !globalAgent) { // There's one in the url
                     id = $location.search().agent;
-                } else { // We pick the one in the rootScope
-                    id = $rootScope.globalAgent;
+                } else {
+                    id = globalAgent.id;
+                    shareAgent.deleteAgent();
                     $location.search('agent', id);
-                    delete $rootScope.globalAgent;
                 }
             }
 
@@ -326,24 +323,21 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             $scope.agent.rootcheck = data[2].data.data;
             validateRootCheck();
 
-            $rootScope.completedAgent = true;
-
             $scope.switchTab($scope.tab, true);
 
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     $scope.goGroups = agent => {
-        $rootScope.globalAgent = agent;
         $scope.agentsAutoComplete.reset();
         visHandlers.removeAll();
-        $rootScope.comeFrom    = 'agents';
         //$location.search('_a',null);
+        shareAgent.setAgent(agent)
         $location.search('tab', 'groups');
         $location.path('/manager');
     };
@@ -358,9 +352,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             return $scope.agentsAutoComplete.items;
         } catch (error) {
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
-
+        return;
     }
 
     //Load
@@ -371,7 +364,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $scope.agentsAutoComplete.nextPage('');
     } catch (e) {
         errorHandler.handle('Unexpected exception loading controller','Agents');
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     //Destroy
@@ -395,10 +387,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error,'Agents'));
 
     $scope.pciTabs       = pciTabs;
     $scope.selectedPciIndex = 0;
@@ -414,10 +403,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error,'Agents'));
 
     $scope.gdprTabs       = gdprTabs;
     $scope.selectedGdprIndex = 0;
@@ -439,23 +425,22 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     $scope.goGroup = () => {
-        $rootScope.globalAgent = $scope.agent;
-        $rootScope.comeFrom    = 'agents';
+        shareAgent.setAgent($scope.agent)
         $location.path('/manager/groups');
     };
 
     const firstLoad = async () => {
         try{
-            $rootScope.completedAgent = false;
+            const globalAgent = shareAgent.getAgent();
             $scope.configurationError = false;
             $scope.load = true;
             let id;
-            if ($location.search().agent && !$rootScope.globalAgent) { // There's one in the url
+            if ($location.search().agent && !globalAgent) { // There's one in the url
                 id = $location.search().agent;
-            } else { // We pick the one in the rootScope
-                id = $rootScope.globalAgent;
+            } else {
+                id = globalAgent.id;
+                shareAgent.deleteAgent();
                 $location.search('agent', id);
-                delete $rootScope.globalAgent;
             }
 
             let data         = await apiReq.request('GET', `/agents/${id}`, {});
@@ -489,15 +474,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
             $scope.load = false;
 
-            $rootScope.completedAgent = true;
             if($scope.tab !== 'configuration') $scope.switchTab($scope.tab, true);
 
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error){
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
     /** End of agent configuration */
 
@@ -510,26 +494,26 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             $scope.reportBusy = true;
             $rootScope.reportStatus = 'Generating report...0%'
             if(!$rootScope.$$phase) $rootScope.$digest();
-            
+
             vis2png.clear();
-            
+
             const idArray = rawVisualizations.getList().map(item => item.id);
 
             for(const item of idArray) {
                 const tmpHTMLElement = $(`#${item}`);
                 vis2png.assignHTMLItem(item,tmpHTMLElement)
-            }            
-            
+            }
+
             const appliedFilters = visHandlers.getAppliedFilters();
             const tab   = $scope.tab;
             const array = await vis2png.checkArray(idArray)
             const name  = `wazuh-agents-${tab}-${Date.now() / 1000 | 0}.pdf`
-            
+
             const data    ={
                 array,
                 name,
-                title: `Agents ${tab}`, 
-                filters: appliedFilters.filters, 
+                title: `Agents ${tab}`,
+                filters: appliedFilters.filters,
                 time: appliedFilters.time,
                 searchBar: appliedFilters.searchBar,
                 tab,
@@ -538,12 +522,12 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             };
 
             const request = await genericReq.request('POST','/api/wazuh-api/report',data)
-            
+
             $scope.reportBusy = false;
             $rootScope.reportStatus = false;
-            
+
             errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-            
+
             return;
         } catch (error) {
             $scope.reportBusy = false;

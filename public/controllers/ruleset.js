@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
-import CsvGenerator from './csv-generator'
+import * as modules   from 'ui/modules'
+import * as FileSaver from '../services/file-saver'
 
 const app = modules.get('app/wazuh', []);
 
@@ -53,9 +53,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         return $sce.trustAsHtml(coloredString);
     };
 
-    // Reloading watcher initialization
-    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
-        delete $rootScope.rulesetIsReloaded;
+    // Reloading event listener
+    $scope.$on('rulesetIsReloaded',() => {
         $scope.viewingDetail = false;
         if(!$scope.$$phase) $scope.$digest();
     });
@@ -85,8 +84,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
             return $scope.rulesAutoComplete.items;
         } catch (error){
             errorHandler.handle(error,'Ruleset');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     $scope.checkEnter = search => {
@@ -111,14 +110,19 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 
     $scope.downloadCsv = async () => {
         try {
+            errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/rules', currentApi, $scope.rules ? $scope.rules.filters : null);
-            const csvGenerator = new CsvGenerator(output.csv, 'rules.csv');
-            csvGenerator.download(true);
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'rules.csv');
+            
+            return;
+
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     /**
@@ -176,8 +180,8 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
             return;
         } catch (error) {
             errorHandler.handle('Unexpected exception loading controller','Ruleset');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     //Load
@@ -188,7 +192,6 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         $scope.rules.reset();
         $scope.rulesRelated.reset();
         $scope.rulesAutoComplete.reset();
-        reloadWatcher();
     });
 });
 
@@ -234,9 +237,8 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         return $sce.trustAsHtml(coloredString);
     };
 
-    // Reloading watcher initialization
-    const reloadWatcher = $rootScope.$watch('rulesetIsReloaded',() => {
-        delete $rootScope.rulesetIsReloaded;
+    // Reloading event listener
+    $scope.$on('rulesetIsReloaded',() => {
         $scope.viewingDetail = false;
         if(!$scope.$$phase) $scope.$digest();
     });
@@ -272,20 +274,24 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
             return $scope.decodersAutoComplete.items;
         } catch (error){
             errorHandler.handle(error,'Ruleset');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     $scope.downloadCsv = async () => {
         try {
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/decoders', currentApi, $scope.decoders ? $scope.decoders.filters : null);
-            const csvGenerator = new CsvGenerator(output.csv, 'decoders.csv');
-            csvGenerator.download(true);
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'decoders.csv');
+            
+            return;
+
         } catch (error) {
             errorHandler.handle(error,'Download CSV');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     /**
@@ -345,8 +351,8 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
             return;
         } catch (error) {
             errorHandler.handle(error,'Ruleset');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
 
     //Load
@@ -357,6 +363,5 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         $scope.decoders.reset();
         $scope.decodersRelated.reset();
         $scope.decodersAutoComplete.reset();
-        reloadWatcher();
     });
 });

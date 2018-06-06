@@ -2,6 +2,17 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.4 - Kibana v6.2.4 - Revision 393
+
+### Changed
+
+-   Now the report generation process will run on parallel mode in foreground ([#523](https://github.com/wazuh/wazuh-kibana-app/pull/523)).
+-   Replaced the usage of `$rootScope` with two new factories, along with more controller improvements ([#525](https://github.com/wazuh/wazuh-kibana-app/pull/525)).
+
+### Fixed
+
+-   Fixed a bug where the app crashes when attempting to download huge amounts of data as CSV format ([#521](https://github.com/wazuh/wazuh-kibana-app/pull/521)).
+
 ## Wazuh v3.2.3/v3.2.4 - Kibana v6.2.4 - Revision 392
 
 ### Added
