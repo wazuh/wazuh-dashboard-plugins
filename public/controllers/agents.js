@@ -34,6 +34,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $scope.tabView = "panels";
         $location.search("tabView", "panels");
     }
+    let tabHistory = [];
 
     // Check the url hash and retrivew the tab information
     if ($location.search().tab){
@@ -42,6 +43,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $scope.tab = "general";
         $location.search("tab", "general");
     }
+    tabHistory.push($scope.tab)
 
     // Metrics Audit
     const metricsAudit = {
@@ -180,7 +182,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = true, preserveDiscover = false) => {
         if($scope.tabView === subtab && !force) return;
         if(!onlyAgent) visHandlers.removeAll();
-        if(!preserveDiscover) discoverPendingUpdates.removeAll();
+        discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
 
@@ -198,7 +200,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
-                assignFilters($scope.tab, $scope.agent.id, localChange);
+                assignFilters($scope.tab, $scope.agent.id, localChange || preserveDiscover);
                 $rootScope.$emit('changeTabView',{tabView:subtab})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
@@ -212,12 +214,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
+        tabHistory.push(tab)
+        if (tabHistory.length > 3) tabHistory = tabHistory.slice(-3);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
-        const preserveDiscover = $scope.tab === 'configuration'
+        const preserveDiscover = tabHistory.length === 3 && tabHistory[0] === tabHistory[2] && tabHistory[1] === 'configuration';
         $scope.tab = tab;
 
         if($scope.tab === 'configuration'){
