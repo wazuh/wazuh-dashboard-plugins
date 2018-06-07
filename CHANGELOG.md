@@ -12,6 +12,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 -   Fixed a bug where the app crashes when attempting to download huge amounts of data as CSV format ([#521](https://github.com/wazuh/wazuh-kibana-app/pull/521)).
+-   Fixed a bug on the Timelion visualizations from _Management/Monitoring_ which were not properly filtering and showing the cluster nodes information ([#530](https://github.com/wazuh/wazuh-kibana-app/pull/530)).
+-   Fixed a bug on the loading process when switching between tabs with or without visualizations in the _Agents_ tab ([#531](https://github.com/wazuh/wazuh-kibana-app/pull/531)).
 
 ## Wazuh v3.2.3/v3.2.4 - Kibana v6.2.4 - Revision 392
 
