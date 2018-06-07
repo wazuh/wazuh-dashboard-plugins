@@ -15,6 +15,7 @@ import * as FileSaver from '../services/file-saver'
 const app = modules.get('app/wazuh', []);
 
 app.controller('agentsPreviewController', function ($scope, $rootScope, $routeParams, genericReq, apiReq, appState, Agents, $location, errorHandler, csvReq, shareAgent) {
+    $scope.isClusterEnabled = appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled'
     $scope.loading     = true;
     $scope.agents      = Agents;
     $scope.status      = 'all';
@@ -23,6 +24,8 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
     $scope.osPlatforms = [];
     $scope.versions    = [];
     $scope.groups      = [];
+    $scope.nodes       = [];
+    $scope.node_name   = 'all';
     $scope.mostActiveAgent = {
         name: '',
         id  : ''
@@ -55,6 +58,9 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
         /** Pending API implementation */
         //} else if(filter.includes('group-')){
         //    $scope.agents.addFilter('group',filter.split('group-')[1]);
+
+        } else if(filter.includes('node-')){
+            $scope.agents.addFilter('node',filter.split('node-')[1]);
         } else if(filter.includes('version-')) {
             $scope.agents.addFilter('version',filter.split('version-')[1]);
         } else {
@@ -70,11 +76,12 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
     // Retrieve os list
     const retrieveList = agents => {
         for(const agent of agents){
-            if(agent.id && agent.id==='000') continue;
+            if(agent.id === '000') continue;
             if(agent.group && !$scope.groups.includes(agent.group)) $scope.groups.push(agent.group);
+            if(agent.node_name && !$scope.nodes.includes(agent.node_name)) $scope.nodes.push(agent.node_name);
             if(agent.version && !$scope.versions.includes(agent.version)) $scope.versions.push(agent.version);
             if(agent.os && agent.os.name){
-                const exists = $scope.osPlatforms.filter(e => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
+                const exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
                 if(!exists.length){
                     $scope.osPlatforms.push({
                         name:     agent.os.name,
