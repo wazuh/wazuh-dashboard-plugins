@@ -40,7 +40,7 @@ const app = modules.get('apps/webinar_app', [])
                             wzsavedVisualizations.get($scope.visID,rawVis[0]).then(savedObj => {
                                 originalImplicitFilter = savedObj.searchSource.get('query')['query'];
                                 visualization = savedObj;
-
+                                
                                 // There's an original filter
                                 if (originalImplicitFilter.length > 0 ) {
                                     // And also a pending one -> concatenate them
@@ -59,16 +59,6 @@ const app = modules.get('apps/webinar_app', [])
                                     visualization.searchSource
                                     .query({ language: 'lucene', query: implicitFilter })
                                     .set('filter',  discoverList.length > 1 ? discoverList[1] : {});
-                                } else if($scope.visID.includes('Cluster')) {
-                                    // Checks for cluster.name and cluster.node filters existence 
-                                    const clusterFilters = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
-                                    
-                                    // Applying specific filter to cluster visualziations status
-                                    if(Array.isArray(clusterFilters) && clusterFilters.length) {
-                                        for(const clusterFilter of clusterFilters){
-                                            visualization.searchSource.filter(clusterFilter);
-                                        }                                    
-                                    }
                                 } else {
                                     
                                     // Checks for cluster.name filter existence 
@@ -126,16 +116,6 @@ const app = modules.get('apps/webinar_app', [])
                                 visualization.searchSource
                                 .query({ language: 'lucene', query: implicitFilter })
                                 .set('filter', discoverList.length > 1 ? discoverList[1] : {});
-                            } else if($scope.visID.includes('Cluster')) {
-                                // Checks for cluster.name and cluster.node filters existence 
-                                const clusterFilters = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
-                                
-                                // Applying specific filter to cluster visualziations status
-                                if(Array.isArray(clusterFilters) && clusterFilters.length) {
-                                    for(const clusterFilter of clusterFilters){
-                                        visualization.searchSource.filter(clusterFilter);
-                                    }                                    
-                                }
                             } else {
                                     
                                 // Checks for cluster.name filter existence 
