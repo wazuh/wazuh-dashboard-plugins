@@ -83,7 +83,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
             .then(() => testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id))
             .then(data => {
                 if(data && data === 'cookies_outdated'){
-                    $location.search('tab','general');
+                    $location.search('tab','welcome');
                     $location.path('/overview')
                 } else {
                     if (data.data.error || data.data.data.apiIsDown) {

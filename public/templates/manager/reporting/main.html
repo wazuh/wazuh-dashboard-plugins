@@ -20,10 +20,10 @@
             <div layout="row" class="wz-padding-top-10">
                 <table class="table table-striped table-condensed" id="wz_table">
                     <thead class="wz-text-bold">
-                        <th class="wz-left">File</th>
-                        <th class="wz-left">Size</th>
-                        <th class="wz-left">Created</th>
-                        <th class="wz-left">Options</th>
+                        <th class="wz-text-left">File</th>
+                        <th class="wz-text-left">Size</th>
+                        <th class="wz-text-left">Created</th>
+                        <th class="wz-text-left">Options</th>
                     </thead>
                     <tbody>
                         <tr ng-repeat="item in pagedItems[currentPage]">
@@ -47,13 +47,13 @@
                                     <li ng-class="{disabled: currentPage == 0}" class="md-padding">
                                         <a href ng-click="prevPage()">« Prev</a>
                                     </li>
-                                
+
                                     <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) "
                                         ng-class="{active: n == currentPage}"
                                     ng-click="setPage()" class="md-padding">
                                         <a href ng-bind="n + 1">1</a>
                                     </li>
-                                 
+
                                     <li ng-class="{disabled: (currentPage) == pagedItems.length - 1}" class="md-padding">
                                         <a href ng-click="nextPage()">Next »</a>
                                     </li>

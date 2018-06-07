@@ -34,16 +34,33 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $scope.tabView = "panels";
         $location.search("tabView", "panels");
     }
+
     let tabHistory = [];
 
     // Check the url hash and retrivew the tab information
     if ($location.search().tab){
         $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'general'
-        $scope.tab = "general";
-        $location.search("tab", "general");
+    } else { // If tab doesn't exist, default it to 'welcome'
+        $scope.tab = "welcome";
+        $location.search("tab", "welcome");
     }
-    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome') tabHistory.push($scope.tab)
+
+    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome') tabHistory.push($scope.tab);
+
+    // Tab names
+    $scope.tabNames = {
+        welcome      : 'Welcome',
+        general      : 'General',
+        fim          : 'File integrity',
+        pm           : 'Policy monitoring',
+        vuls         : 'Vulnerabilities',
+        oscap        : 'Open SCAP',
+        audit        : 'Audit',
+        pci          : 'PCI DSS',
+        gdpr         : 'GDPR',
+        virustotal   : 'VirusTotal',
+        configuration: 'Configuration'
+    }
 
     // Metrics Audit
     const metricsAudit = {
@@ -76,6 +93,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     tabVisualizations.assign({
+        welcome      : 0,
         general      : 7,
         fim          : 8,
         pm           : 4,
@@ -97,8 +115,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         oscap     : { group: 'oscap' },
         audit     : { group: 'audit' },
         pci       : { group: 'pci_dss' },
-        virustotal: { group: 'virustotal' },
-        gdpr      : { group: 'gdpr' }
+        gdpr      : { group: 'gdpr' },
+        virustotal: { group: 'virustotal' }
     };
 
     let filters = []
@@ -187,7 +205,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
-        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') || 
+        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') ||
                              (subtab === 'discover' && $scope.tabView === 'panels')) && sameTab;
         if(subtab === 'panels' && $scope.tabView === 'discover' && sameTab){
             $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
@@ -195,13 +213,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
         $scope.tabView = subtab;
 
-        if(subtab === 'panels' && $scope.tab !== 'configuration'){
+        if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome'){
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
                 assignFilters($scope.tab, $scope.agent.id, localChange || preserveDiscover);
-                $rootScope.$emit('changeTabView',{tabView:subtab})
+                $rootScope.$emit('changeTabView',{tabView:subtab});
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
@@ -214,7 +232,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
-        if(tab !== 'configuration' && tab !== 'welcome') tabHistory.push(tab)
+        if(tab !== 'configuration' && tab !== 'welcome') tabHistory.push(tab);
         if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
@@ -299,7 +317,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             } else {
                 if ($location.search().agent && !globalAgent) { // There's one in the url
                     id = $location.search().agent;
-                } else { 
+                } else {
                     id = globalAgent.id;
                     shareAgent.deleteAgent();
                     $location.search('agent', id);
@@ -432,7 +450,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             let id;
             if ($location.search().agent && !globalAgent) { // There's one in the url
                 id = $location.search().agent;
-            } else { 
+            } else {
                 id = globalAgent.id;
                 shareAgent.deleteAgent();
                 $location.search('agent', id);
@@ -489,26 +507,26 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             $scope.reportBusy = true;
             $rootScope.reportStatus = 'Generating report...0%'
             if(!$rootScope.$$phase) $rootScope.$digest();
-            
+
             vis2png.clear();
-            
+
             const idArray = rawVisualizations.getList().map(item => item.id);
 
             for(const item of idArray) {
                 const tmpHTMLElement = $(`#${item}`);
                 vis2png.assignHTMLItem(item,tmpHTMLElement)
-            }            
-            
+            }
+
             const appliedFilters = visHandlers.getAppliedFilters();
             const tab   = $scope.tab;
             const array = await vis2png.checkArray(idArray)
             const name  = `wazuh-agents-${tab}-${Date.now() / 1000 | 0}.pdf`
-            
+
             const data    ={
                 array,
                 name,
-                title: `Agents ${tab}`, 
-                filters: appliedFilters.filters, 
+                title: `Agents ${tab}`,
+                filters: appliedFilters.filters,
                 time: appliedFilters.time,
                 searchBar: appliedFilters.searchBar,
                 tab,
@@ -517,12 +535,12 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             };
 
             const request = await genericReq.request('POST','/api/wazuh-api/report',data)
-            
+
             $scope.reportBusy = false;
             $rootScope.reportStatus = false;
-            
+
             errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-            
+
             return;
         } catch (error) {
             $scope.reportBusy = false;
@@ -532,11 +550,11 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     //Load
-    try {    
+    try {
         $scope.getAgent();
         $scope.agentsAutoComplete.nextPage('');
     } catch (e) {
         errorHandler.handle('Unexpected exception loading controller','Agents');
     }
-    
+
 });

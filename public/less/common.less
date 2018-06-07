@@ -199,14 +199,36 @@ div.uil-ring-css {
 
 /* Custom buttons styles */
 
-.wazuh-button {
+.wz-button {
+    color: white !important;
+    transition: none !important;
     background-color: rgb(0, 85, 113) !important;
+}
+
+.wz-button-flat {
+    transition: none !important;
+    min-height: 30px !important;
+    line-height: 30px !important;
+}
+
+.wz-button.active,
+.wz-button:not([disabled]):hover,
+.wz-button-flat:not([disabled]):hover {
+    background-color: rgb(0, 121, 165) !important;
     color: white !important;
 }
 
-.wazuh-button.active,
-.wazuh-button:not([disabled]):hover {
-    background-color: rgb(0, 121, 165) !important;
+/* Custom reporting button styles */
+
+.wz-report-button:hover {
+    background-color: #0079a5 !important;
+    color: #F5F5F5;
+    border-radius: 0;
+}
+
+.wz-report-refresh-btn {
+    position: absolute !important;
+    right: 0px;
 }
 
 /* Custom input filter box styles */
@@ -255,7 +277,7 @@ div.uil-ring-css {
     box-shadow: none;
 }
 
-:focus:not(.wazuh-button):not(.input-filter-box):not(.kuiLocalSearchInput) {
+:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput) {
     box-shadow: none !important;
 }
 
@@ -320,10 +342,6 @@ div.uil-ring-css {
     border-bottom: none !important;
 }
 
-.wz-md-navbar-kbn {
-    margin-bottom: 15px !important;
-}
-
 kbn-vis,
 visualize,
 visualization {
@@ -369,6 +387,12 @@ kbn-vis .vis-container {
     overflow: hidden;
 }
 
+.wz-card-actions {
+    margin: 0 !important;
+    border-top: 1px solid #D9D9D9 !important;
+    background-color: rgb(228, 242, 245);
+}
+
 .wz-select-input {
     border-radius: 0;
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
@@ -394,11 +418,9 @@ kbn-vis .vis-container {
 }
 
 .wz-agent-status-indicator {
-    width: 100%;
-    padding: 4px;
     color: white;
-    font-weight: normal;
-    font-size: 12px;
+    padding: 0 6px;
+    border-radius: 2px;
     text-transform: uppercase;
 }
 
@@ -422,19 +444,3 @@ kbn-vis .vis-container {
 #monitoring_dis .kuiLocalDropdown {
     z-index: 10;
 }
-
-.wz-left {
-    text-align: left
-}
-
-.wz-report-button:hover {
-    background-color: #0079a5 !important;
-    color: #F5F5F5;
-    border-radius: 0;
-}
-
-.wz-report-refresh-btn {
-    position: absolute !important;
-    right: 0px;
-}
-

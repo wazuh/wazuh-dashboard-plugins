@@ -28,6 +28,21 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
     $scope.wzMonitoringEnabled = false;
 
+    // Tab names
+    $scope.tabNames = {
+        welcome   : 'Welcome',
+        general   : 'General',
+        fim       : 'File integrity',
+        pm        : 'Policy monitoring',
+        vuls      : 'Vulnerabilities',
+        oscap     : 'Open SCAP',
+        audit     : 'Audit',
+        pci       : 'PCI DSS',
+        gdpr      : 'GDPR',
+        aws       : 'AWS',
+        virustotal: 'VirusTotal'
+    }
+
     // Metrics General
     const metricsGeneral = {
         totalAlerts: '[vis-id="\'Wazuh-App-Overview-General-Metric-alerts\'"]',
@@ -81,6 +96,8 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
         awsRevoked       :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
     }
 
+    let tabHistory = [];
+
     // Check the url hash and retrieve tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
@@ -89,16 +106,19 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
         $location.search('tabView', 'panels');
     }
 
+    if($scope.tab !== 'welcome') tabHistory.push($scope.tab);
+
     // Check the url hash and retrieve tab information
     if ($location.search().tab) {
         $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'general'
-        $scope.tab = 'general';
-        $location.search('tab', 'general');
+    } else { // If tab doesn't exist, default it to 'welcome'
+        $scope.tab = 'welcome';
+        $location.search('tab', 'welcome');
     }
 
     // This object represents the number of visualizations per tab; used to show a progress bar
     tabVisualizations.assign({
+        welcome   : 0,
         general   : 11,
         fim       : 10,
         pm        : 5,
@@ -211,16 +231,16 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, sameTab = true) => {
+    $scope.switchSubtab = (subtab, force = false, sameTab = true, preserveDiscover = false) => {
         if ($scope.tabView === subtab && !force) return;
-        
+
         visHandlers.removeAll();
         discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
-        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') || 
+        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') ||
                              (subtab === 'discover' && $scope.tabView === 'panels')) && sameTab;
         if(subtab === 'panels' && $scope.tabView === 'discover'  && sameTab){
             $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
@@ -228,12 +248,12 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
         $scope.tabView = subtab;
 
-        if(subtab === 'panels'){
+        if(subtab === 'panels' && $scope.tab !== 'welcome'){
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
-                assignFilters($scope.tab, localChange);
+                assignFilters($scope.tab, localChange || preserveDiscover);
                 $rootScope.$emit('changeTabView',{tabView:subtab})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
@@ -247,13 +267,16 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
     // Switch tab
     $scope.switchTab = (tab,force = false) => {
+        if(tab !== 'welcome') tabHistory.push(tab);
+        if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
+        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
         $scope.tab = tab;
 
-        $scope.switchSubtab('panels', true, sameTab);
+        $scope.switchSubtab('panels', true, sameTab, preserveDiscover);
     };
 
     $scope.startVis2Png = async () => {
@@ -265,25 +288,25 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
             $scope.reportBusy = true;
             $rootScope.reportStatus = 'Generating report...0%'
             if(!$rootScope.$$phase) $rootScope.$digest();
-            
+
             vis2png.clear();
-            
+
             const idArray = rawVisualizations.getList().map(item => {
                 const tmpHTMLElement = $(`#${item.id}`);
                 vis2png.assignHTMLItem(item.id,tmpHTMLElement)
                 return item.id;
             });
-            
+
             const appliedFilters = visHandlers.getAppliedFilters();
             const tab   = $scope.tab;
             const array = await vis2png.checkArray(idArray)
             const name  = `wazuh-overview-${tab}-${Date.now() / 1000 | 0}.pdf`
-            
+
             const data    ={
                 array,
                 name,
-                title: `Overview ${tab}`, 
-                filters: appliedFilters.filters, 
+                title: `Overview ${tab}`,
+                filters: appliedFilters.filters,
                 time: appliedFilters.time,
                 searchBar: appliedFilters.searchBar,
                 tab,
@@ -291,12 +314,12 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
             };
 
             const request = await genericReq.request('POST','/api/wazuh-api/report',data)
-            
+
             $scope.reportBusy = false;
             $rootScope.reportStatus = false;
-            
+
             errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-            
+
             return;
         } catch (error) {
             $scope.reportBusy = false;
