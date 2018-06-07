@@ -43,7 +43,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $scope.tab = "general";
         $location.search("tab", "general");
     }
-    tabHistory.push($scope.tab)
+    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome') tabHistory.push($scope.tab)
 
     // Metrics Audit
     const metricsAudit = {
@@ -214,14 +214,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
-        tabHistory.push(tab)
-        if (tabHistory.length > 3) tabHistory = tabHistory.slice(-3);
+        if(tab !== 'configuration' && tab !== 'welcome') tabHistory.push(tab)
+        if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
-        const preserveDiscover = tabHistory.length === 3 && tabHistory[0] === tabHistory[2] && tabHistory[1] === 'configuration';
+        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
         $scope.tab = tab;
 
         if($scope.tab === 'configuration'){
@@ -360,15 +360,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         return;
     }
 
-    //Load
-    try {
-        if($scope.tab !== 'configuration'){
-            $scope.getAgent();
-        }
-        $scope.agentsAutoComplete.nextPage('');
-    } catch (e) {
-        errorHandler.handle('Unexpected exception loading controller','Agents');
-    }
 
     //Destroy
     $scope.$on("$destroy", () => {
@@ -539,4 +530,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             errorHandler.handle(error, 'Reporting')
         }
     }
+
+    //Load
+    try {    
+        $scope.getAgent();
+        $scope.agentsAutoComplete.nextPage('');
+    } catch (e) {
+        errorHandler.handle('Unexpected exception loading controller','Agents');
+    }
+    
 });

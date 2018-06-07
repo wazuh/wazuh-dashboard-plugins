@@ -68,11 +68,19 @@
                 </select>
             </div>
 
-            <div flex="20" layout="column" class="height-40 wz-margin-top-17 wz-select-input">
+            <div flex="20" layout="column" class="height-40 wz-margin-top-17 wz-select-input wz-margin-right-15">
                 <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="osPlatform" ng-change="applyFilters(osPlatform)" aria-label="Filter by operative system">
                     <option value="all">All OS platforms</option>
                     <option ng-repeat='platform in osPlatforms' value="{{platform.platform}} - {{platform.version}}">
                         {{platform.name}} {{platform.version}}
+                    </option>
+                </select>
+            </div>
+            <div flex="20" layout="column" class="height-40 wz-margin-top-17 wz-select-input">
+                <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox" ng-model="version" ng-change="applyFilters('version-' + version)" aria-label="Filter by Wazuh version">
+                    <option value="all">All versions</option>
+                    <option ng-repeat='version in versions' value="{{version}}">
+                        {{version}}
                     </option>
                 </select>
             </div>
