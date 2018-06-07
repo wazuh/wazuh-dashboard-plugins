@@ -19,7 +19,9 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
     $scope.agents      = Agents;
     $scope.status      = 'all';
     $scope.osPlatform  = 'all';
+    $scope.version     = 'all'
     $scope.osPlatforms = [];
+    $scope.versions    = [];
     $scope.groups      = [];
     $scope.mostActiveAgent = {
         name: '',
@@ -53,7 +55,8 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
         /** Pending API implementation */
         //} else if(filter.includes('group-')){
         //    $scope.agents.addFilter('group',filter.split('group-')[1]);
-
+        } else if(filter.includes('version-')) {
+            $scope.agents.addFilter('version',filter.split('version-')[1]);
         } else {
             const platform = filter.split(' - ')[0];
             const version  = filter.split(' - ')[1];
@@ -66,10 +69,12 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
 
     // Retrieve os list
     const retrieveList = agents => {
-        for(let agent of agents){
+        for(const agent of agents){
+            if(agent.id && agent.id==='000') continue;
             if(agent.group && !$scope.groups.includes(agent.group)) $scope.groups.push(agent.group);
-            if('os' in agent && 'name' in agent.os){
-                let exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
+            if(agent.version && !$scope.versions.includes(agent.version)) $scope.versions.push(agent.version);
+            if(agent.os && agent.os.name){
+                const exists = $scope.osPlatforms.filter(e => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
                 if(!exists.length){
                     $scope.osPlatforms.push({
                         name:     agent.os.name,
