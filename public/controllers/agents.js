@@ -360,15 +360,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         return;
     }
 
-    //Load
-    try {
-        if($scope.tab !== 'configuration'){
-            $scope.getAgent();
-        }
-        $scope.agentsAutoComplete.nextPage('');
-    } catch (e) {
-        errorHandler.handle('Unexpected exception loading controller','Agents');
-    }
 
     //Destroy
     $scope.$on("$destroy", () => {
@@ -539,4 +530,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             errorHandler.handle(error, 'Reporting')
         }
     }
+
+    //Load
+    try {    
+        $scope.getAgent();
+        $scope.agentsAutoComplete.nextPage('');
+    } catch (e) {
+        errorHandler.handle('Unexpected exception loading controller','Agents');
+    }
+    
 });
