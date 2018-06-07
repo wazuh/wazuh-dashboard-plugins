@@ -1,4 +1,4 @@
-<div ng-cloak ng-controller="agentsController">
+<div flex layout="column" ng-cloak ng-controller="agentsController">
 
     <!-- Top navbar section -->
     <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
