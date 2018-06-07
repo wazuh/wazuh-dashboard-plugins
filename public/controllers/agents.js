@@ -221,7 +221,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
-        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
+        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1] && !force;
         $scope.tab = tab;
 
         if($scope.tab === 'configuration'){
