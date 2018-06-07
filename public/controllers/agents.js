@@ -34,6 +34,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $scope.tabView = "panels";
         $location.search("tabView", "panels");
     }
+
     let tabHistory = [];
 
     // Check the url hash and retrivew the tab information
@@ -43,7 +44,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $scope.tab = "welcome";
         $location.search("tab", "welcome");
     }
-    if($scope.tab !== 'welcome' && $scope.tab !== 'configuration') tabHistory.push($scope.tab);
+
+    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome') tabHistory.push($scope.tab);
 
     // Tab names
     $scope.tabNames = {
@@ -230,14 +232,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
-        if(tab !== 'welcome' && tab !== 'configuration') tabHistory.push(tab);
+        if(tab !== 'configuration' && tab !== 'welcome') tabHistory.push(tab);
         if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
-        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
+        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1] && !force;
         $scope.tab = tab;
 
         if($scope.tab === 'configuration'){
@@ -376,15 +378,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         return;
     }
 
-    //Load
-    try {
-        if($scope.tab !== 'configuration'){
-            $scope.getAgent();
-        }
-        $scope.agentsAutoComplete.nextPage('');
-    } catch (e) {
-        errorHandler.handle('Unexpected exception loading controller','Agents');
-    }
 
     //Destroy
     $scope.$on("$destroy", () => {
@@ -555,4 +548,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             errorHandler.handle(error, 'Reporting')
         }
     }
+
+    //Load
+    try {
+        $scope.getAgent();
+        $scope.agentsAutoComplete.nextPage('');
+    } catch (e) {
+        errorHandler.handle('Unexpected exception loading controller','Agents');
+    }
+
 });
