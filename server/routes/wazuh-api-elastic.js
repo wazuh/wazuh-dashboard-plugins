@@ -29,9 +29,6 @@ export default (server, options) => {
     // Set Wazuh-API as default (multimanager) on elasticsearch index
     server.route({ method: 'PUT', path: '/api/wazuh-api/apiEntries/{id}', handler: (req,reply) => ctrl.setAPIEntryDefault(req,reply) });
 
-    // Toggle extension state: Enable / Disable
-    server.route({ method: 'PUT', path: '/api/wazuh-api/extension/toggle/{id}/{extensionName}/{extensionValue}', handler: (req,reply) => ctrl.toggleExtension(req,reply) });
-
     // Return extension state list
     server.route({ method: 'GET', path: '/api/wazuh-api/extension', handler: (req,reply) => ctrl.getExtensions(req,reply) });
 

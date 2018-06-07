@@ -87,21 +87,6 @@ export default class WazuhApiElastic {
         }
     }
 
-    async toggleExtension (req, reply) {
-        try {
-            // Toggle extenion state
-            let extension = {};
-            extension[req.params.extensionName] = (req.params.extensionValue === 'true');
-
-            await this.wzWrapper.updateWazuhIndexDocument(req.params.id, { doc: { extensions: extension }});
-
-            return reply({ statusCode: 200, message: 'ok' });
-
-        } catch (error){
-            return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2005, 500, reply);
-        }
-    }
-
     validateData (payload) {
         // Validate user
         if(!userRegEx.test(payload.user)){
