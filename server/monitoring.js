@@ -97,6 +97,7 @@ export default (server, options) => {
             return;
 
         } catch (error) {
+            agentsArray.length = 0;
             log('[monitoring][checkStatus]', error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
         }
@@ -169,7 +170,7 @@ export default (server, options) => {
                 await checkAndSaveStatus(apiEntry);
 
             }
-            
+
             return { result: 'ok' }
         } catch(error){
             log('[monitoring][loadCredentials]',error.message || error);
