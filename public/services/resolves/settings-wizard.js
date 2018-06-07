@@ -74,7 +74,6 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
             }
 
             appState.setClusterInfo(data.data.data.cluster_info);
-            appState.setExtensions(data.data.data.extensions);
             deferred.resolve();
         }
 

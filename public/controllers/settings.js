@@ -397,20 +397,13 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     // Toggle extension
     $scope.toggleExtension = async (extension, state) => {
-        try{
-            getCurrentAPIIndex()
-            if ($scope.apiEntries && $scope.apiEntries.length && ['oscap','audit','pci','gdpr','aws','virustotal'].includes(extension)) {
-                await genericReq.request('PUT', `/api/wazuh-api/extension/toggle/${$scope.apiEntries[currentApiEntryIndex]._id}/${extension}/${state}`);
-                $scope.apiEntries[currentApiEntryIndex]._source.extensions[extension] = state;
-                appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
-                if(!$scope.$$phase) $scope.$digest();
-            }
-            return;
-        } catch (error){
-            const msg = appState.getCurrentAPI() ? 'Invalid request when toggling extensions.' : 'Can not save extension state: no Wazuh API detected';
-            errorHandler.handle(msg,'Settings');
+        getCurrentAPIIndex()
+        if ($scope.apiEntries && $scope.apiEntries.length && ['oscap','audit','pci','gdpr','aws','virustotal'].includes(extension)) {
+            $scope.apiEntries[currentApiEntryIndex]._source.extensions[extension] = state;
+            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._source.extensions);
+
+            if(!$scope.$$phase) $scope.$digest();
         }
-        return;
     };
 
     $scope.changeIndexPattern = async newIndexPattern => {
