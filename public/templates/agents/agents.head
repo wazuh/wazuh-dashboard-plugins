@@ -6,7 +6,7 @@
 
     <!-- NOT FINISHED -->
     <!-- Agent name and autocomplete section -->
-    <div layout="row">
+    <!-- <div layout="row">
 		<div class="md-toolbar-tools" layout="row">
 			<div flex layout-align="center center" class="layout-row" ng-if="agent">
 				<div class="flex">
@@ -29,7 +29,7 @@
 					md-no-asterisk="false"
 					md-menu-class="autocomplete-custom-agents-bar"
 					md-search-text-change="analyzeAgents(searchTerm)"
-					placeholder="Search by name, ID or IP address"
+					placeholder="Search agents by name, ID or IP address..."
 					lazy-load-data="agentsAutoComplete.nextPage('')">
 						<md-item-template>
 							<span class="item-title">
@@ -46,29 +46,36 @@
 				</span>
 			</div>
 		</div>
-	</div>
+	</div> -->
     <!-- End agent name and autocomplete section -->
 
     <!-- Navigation section (Breadcrumbs, Discover, etc) -->
     <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
-        <div layout="row" layout-padding>
+        <div layout="row" layout-padding ng-if="agent">
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
             <div ng-if="tab !== 'welcome'">
-                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i>
-                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span>
+                <i class="fa fa-fw fa-tv" aria-hidden="true"></i>
+                <span class="wz-text-link wz-text-bold cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
                 <span> / {{ tabNames[tab] }}</span>
             </div>
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
             <div ng-if="tab === 'welcome'">
-                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i>
-                <span>Overview / Welcome</span>
+                <i class="fa fa-fw fa-tv" aria-hidden="true"></i>
+                <span class="wz-text-bold">{{agent.name}} ({{agent.id}})</span>
+                <span> / Welcome</span>
             </div>
         </div>
         <!-- End breadcrumbs -->
 
+        <!-- Agent status section -->
+        <div ng-if="agent.status">
+            <span class="wz-agent-status-indicator" ng-class="getAgentStatusClass(agent.status)" aria-label="Agent status indicator">{{formatAgentStatus(agent.status)}}</span>
+        </div>
+        <!-- End agent status section -->
+
         <!-- Reporting button section -->
-        <div ng-show="tab !== 'welcome'">
+        <div ng-show="tab !== 'welcome' && tab !== 'configuration'">
             <!-- Report button -->
             <md-button class="wz-button-flat small" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()" aria-label="Generate report button">
                 <i class="fa fa-fw fa-file-text" aria-hidden="true"></i> Generate report
@@ -81,7 +88,7 @@
         <!-- End separator -->
 
         <!-- Discover/Panels buttons section -->
-        <div ng-show="tab !== 'welcome'">
+        <div ng-show="tab !== 'welcome' && tab !== 'configuration'">
             <!-- Panels button -->
             <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')" aria-label="View panels button">
                 <i class="fa fa-fw fa-th" aria-hidden="true"></i> View panels
@@ -93,6 +100,37 @@
             </md-button>
         </div>
         <!-- End Discover/Panels buttons section -->
+
+        <!-- Agent autocomplete selector section -->
+        <div flex="30" class="wz-margin-8-no-left">
+            <md-autocomplete id="agentsAutocomplete" flex class="wz-autocomplete wz-select-input"
+            md-no-cache="true"
+            md-select-on-match="false"
+            md-selected-item="_swpagent"
+            md-selected-item-change="getAgent(_swpagent.id,true)"
+            md-search-text="searchTerm"
+            md-items="agentAutoComplete in analyzeAgents(searchTerm)"
+            md-item-text="agentAutoComplete.name"
+            md-min-length="0"
+            md-no-asterisk="false"
+            md-menu-class="autocomplete-custom-agents-bar"
+            md-search-text-change="analyzeAgents(searchTerm)"
+            placeholder="Search by name, ID or IP address"
+            lazy-load-data="agentsAutoComplete.nextPage('')">
+                <md-item-template>
+                    <span class="item-title">
+                        <span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>
+                    </span>
+                    <span class="item-metadata">
+                        <span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
+                    </span>
+                </md-item-template>
+                <md-not-found>
+                    No agents matching "{{searchTerm}}" were found.
+                </md-not-found>
+            </md-autocomplete>
+        </div>
+        <!-- End agent autocomplete selector section -->
     </div>
     <!-- End navigation section -->
 
@@ -108,7 +146,7 @@
     <!-- End loading status section -->
 
     <!-- Report status section -->
-    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if=ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
+    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{reportStatus}}</div>
     </div>
