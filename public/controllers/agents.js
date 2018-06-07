@@ -39,11 +39,26 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     // Check the url hash and retrivew the tab information
     if ($location.search().tab){
         $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'general'
-        $scope.tab = "general";
-        $location.search("tab", "general");
+    } else { // If tab doesn't exist, default it to 'welcome'
+        $scope.tab = "welcome";
+        $location.search("tab", "welcome");
     }
-    tabHistory.push($scope.tab)
+    if($scope.tab !== 'welcome' && $scope.tab !== 'configuration') tabHistory.push($scope.tab);
+
+    // Tab names
+    $scope.tabNames = {
+        welcome      : 'Welcome',
+        general      : 'General',
+        fim          : 'File integrity',
+        pm           : 'Policy monitoring',
+        vuls         : 'Vulnerabilities',
+        oscap        : 'Open SCAP',
+        audit        : 'Audit',
+        pci          : 'PCI DSS',
+        gdpr         : 'GDPR',
+        virustotal   : 'VirusTotal',
+        configuration: 'Configuration'
+    }
 
     // Metrics Audit
     const metricsAudit = {
@@ -76,6 +91,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     tabVisualizations.assign({
+        welcome      : 0,
         general      : 7,
         fim          : 8,
         pm           : 4,
@@ -97,8 +113,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         oscap     : { group: 'oscap' },
         audit     : { group: 'audit' },
         pci       : { group: 'pci_dss' },
-        virustotal: { group: 'virustotal' },
-        gdpr      : { group: 'gdpr' }
+        gdpr      : { group: 'gdpr' },
+        virustotal: { group: 'virustotal' }
     };
 
     let filters = []
@@ -195,7 +211,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
         $scope.tabView = subtab;
 
-        if(subtab === 'panels' && $scope.tab !== 'configuration'){
+        if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome'){
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
@@ -214,14 +230,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
-        tabHistory.push(tab)
-        if (tabHistory.length > 3) tabHistory = tabHistory.slice(-3);
+        if(tab !== 'welcome' && tab !== 'configuration') tabHistory.push(tab);
+        if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
-        const preserveDiscover = tabHistory.length === 3 && tabHistory[0] === tabHistory[2] && tabHistory[1] === 'configuration';
+        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
         $scope.tab = tab;
 
         if($scope.tab === 'configuration'){

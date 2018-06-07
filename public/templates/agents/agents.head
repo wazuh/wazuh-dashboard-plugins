@@ -1,8 +1,164 @@
-<div flex ng-controller="agentsController" layout="column">
+<div ng-cloak ng-controller="agentsController">
 
+    <!-- Top navbar section -->
     <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
+    <!-- End top navbar section -->
 
-	<div layout="row">
+    <!-- NOT FINISHED -->
+    <!-- Agent name and autocomplete section -->
+    <div layout="row">
+		<div class="md-toolbar-tools" layout="row">
+			<div flex layout-align="center center" class="layout-row" ng-if="agent">
+				<div class="flex">
+					<span> <i class="fa fa-desktop wz-margin-right-5" aria-hidden="true"></i>
+						{{agent.id}} - {{agent.name}}</span>
+
+					<span ng-show="agent.status" class="wz-agent-status-indicator" ng-class="getAgentStatusClass(agent.status)" aria-hidden="false">{{formatAgentStatus(agent.status)}}</span>
+				</div>
+
+				<span layout="row" class="padding-left-0" layout-align="space-between start" flex="40">
+					<md-autocomplete id="agentsAutocomplete" flex class="wz-autocomplete wz-select-input"
+					md-no-cache="true"
+					md-select-on-match="false"
+					md-selected-item="_swpagent"
+					md-selected-item-change="getAgent(_swpagent.id,true)"
+					md-search-text="searchTerm"
+					md-items="agentAutoComplete in analyzeAgents(searchTerm)"
+					md-item-text="agentAutoComplete.name"
+					md-min-length="0"
+					md-no-asterisk="false"
+					md-menu-class="autocomplete-custom-agents-bar"
+					md-search-text-change="analyzeAgents(searchTerm)"
+					placeholder="Search by name, ID or IP address"
+					lazy-load-data="agentsAutoComplete.nextPage('')">
+						<md-item-template>
+							<span class="item-title">
+								<span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>
+							</span>
+							<span class="item-metadata">
+								<span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
+							</span>
+						</md-item-template>
+						<md-not-found>
+							No agents matching "{{searchTerm}}" were found.
+						</md-not-found>
+					</md-autocomplete>
+				</span>
+			</div>
+		</div>
+	</div>
+    <!-- End agent name and autocomplete section -->
+
+    <!-- Navigation section (Breadcrumbs, Discover, etc) -->
+    <div layout="row" layout-align="start center">
+        <!-- Breadcrumbs -->
+        <div layout="row" layout-padding>
+            <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
+            <div ng-if="tab !== 'welcome'">
+                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span>
+                <span> / {{ tabNames[tab] }}</span>
+            </div>
+            <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
+            <div ng-if="tab === 'welcome'">
+                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i>
+                <span>Overview / Welcome</span>
+            </div>
+        </div>
+        <!-- End breadcrumbs -->
+
+        <!-- Reporting button section -->
+        <div ng-show="tab !== 'welcome'">
+            <!-- Report button -->
+            <md-button class="wz-button-flat small" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()" aria-label="Generate report button">
+                <i class="fa fa-fw fa-file-text" aria-hidden="true"></i> Generate report
+            </md-button>
+        </div>
+        <!-- End Reporting buttons section -->
+
+        <!-- Separator -->
+        <span flex></span>
+        <!-- End separator -->
+
+        <!-- Discover/Panels buttons section -->
+        <div ng-show="tab !== 'welcome'">
+            <!-- Panels button -->
+            <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')" aria-label="View panels button">
+                <i class="fa fa-fw fa-th" aria-hidden="true"></i> View panels
+            </md-button>
+
+            <!-- Discover button -->
+            <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')" aria-label="View Discover button">
+                <i class="fa fa-fw fa-compass" aria-hidden="true"></i> View Discover
+            </md-button>
+        </div>
+        <!-- End Discover/Panels buttons section -->
+    </div>
+    <!-- End navigation section -->
+
+    <!-- Discover search bar section -->
+    <kbn-dis ng-show="(tab !== 'welcome') && (tab !== 'configuration')"></kbn-dis>
+    <!-- End Discover search bar section -->
+
+    <!-- Loading status section -->
+    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+        <div class="percentage">{{loadingStatus}}</div>
+    </div>
+    <!-- End loading status section -->
+
+    <!-- Report status section -->
+    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if=ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+        <div class="percentage">{{reportStatus}}</div>
+    </div>
+    <!-- End report status section -->
+
+    <!-- No results section -->
+    <div layout="row" ng-if=ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="resultState !== 'ready' && tabView === 'panels'">
+        <md-card flex layout="column" class="wz-md-card">
+            <md-card-content class="wz-text-center">
+                <span>There are no results for selected time range. Try another one.</span>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- No results section -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-- <div layout="row">
 		<div class="md-toolbar-tools" layout="row">
 			<div flex layout-align="center center" class="layout-row" ng-if="agent">
 				<div class="flex">
@@ -72,28 +228,28 @@
 				</md-nav-item>
 			</md-nav-bar>
 		</div>
-	</div>
+	</div> -->
 
     <!-- <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear> -->
 
 	<!-- View: Discover -->
-    <kbn-dis ng-show="tab != 'configuration'"></kbn-dis>
+    <!-- <kbn-dis ng-show="tab != 'configuration'"></kbn-dis>
 
     <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && tabView === 'panels' && tab !== 'configuration' && !rendered">
         <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
 	</div>
-	
+
 	<div class="wazuh-loading" layout="column" layout-align="center center" ng-show="reportBusy && reportStatus">
         <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
         <div class="percentage">{{reportStatus}}</div>
-    </div>
+    </div> -->
 
 	<!-- No results message -->
-    <md-content flex layout="row" layout-align="start start" ng-show="tab != 'configuration' && resultState !== 'ready' && tabView === 'panels'">
+    <!-- <md-content flex layout="row" layout-align="start start" ng-show="tab != 'configuration' && resultState !== 'ready' && tabView === 'panels'">
         <md-card flex layout="column" class="wz-md-card">
             <md-card-content class="wz-text-center">
                 No results for selected time interval
             </md-card-content>
         </md-card>
-    </md-content>
+    </md-content> -->

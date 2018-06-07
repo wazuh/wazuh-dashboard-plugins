@@ -96,6 +96,8 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
         awsRevoked       :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
     }
 
+    let tabHistory = [];
+
     // Check the url hash and retrieve tabView information
     if ($location.search().tabView) {
         $scope.tabView = $location.search().tabView;
@@ -103,6 +105,8 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
         $scope.tabView = 'panels';
         $location.search('tabView', 'panels');
     }
+
+    if($scope.tab !== 'welcome') tabHistory.push($scope.tab);
 
     // Check the url hash and retrieve tab information
     if ($location.search().tab) {
@@ -231,7 +235,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
         if ($scope.tabView === subtab && !force) return;
 
         visHandlers.removeAll();
-        if(!preserveDiscover) discoverPendingUpdates.removeAll();
+        discoverPendingUpdates.removeAll();
         rawVisualizations.removeAll();
         loadedVisualizations.removeAll();
 
@@ -249,7 +253,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
-                assignFilters($scope.tab, localChange);
+                assignFilters($scope.tab, localChange || preserveDiscover);
                 $rootScope.$emit('changeTabView',{tabView:subtab})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
@@ -263,11 +267,13 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
     // Switch tab
     $scope.switchTab = (tab,force = false) => {
+        if(tab !== 'welcome') tabHistory.push(tab);
+        if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
-        const preserveDiscover = $scope.tab === 'welcome';
+        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
         $scope.tab = tab;
 
         $scope.switchSubtab('panels', true, sameTab, preserveDiscover);
