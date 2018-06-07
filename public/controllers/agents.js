@@ -24,7 +24,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     tabVisualizations.removeAll();
     loadedVisualizations.removeAll();
 
-    $scope.extensions = appState.getExtensions().extensions;
+    const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
+    const extensions  = appState.getExtensions(currentApi);
+    $scope.extensions = extensions;
+    
     $scope.agentsAutoComplete = AgentsAutoComplete;
 
     // Check the url hash and retrieve the tabView information

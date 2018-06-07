@@ -76,17 +76,6 @@ export default class WazuhApiElastic {
         }
     }
 
-    async getExtensions (req, reply) {
-        try{
-            const data = await this.wzWrapper.getWazuhAPIEntries();
-
-            return reply(data.hits.hits);
-
-        } catch(error){
-            return ErrorResponse(error.message || error, 2004, 500, reply);
-        }
-    }
-
     validateData (payload) {
         // Validate user
         if(!userRegEx.test(payload.user)){
