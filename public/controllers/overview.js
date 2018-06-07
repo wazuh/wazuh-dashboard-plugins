@@ -24,7 +24,10 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     tabVisualizations.removeAll();
     loadedVisualizations.removeAll();
 
-    $scope.extensions = appState.getExtensions().extensions;
+   
+    const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
+    const extensions  = appState.getExtensions(currentApi);
+    $scope.extensions = extensions;
 
     $scope.wzMonitoringEnabled = false;
 

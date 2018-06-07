@@ -78,7 +78,22 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
         }
 
         const callCheckStored = () => {
-            checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location)
+            genericReq.request('GET', '/api/wazuh-api/configuration', {})
+            .then(config => {
+                const currentApi = appState.getCurrentAPI();
+                if(currentApi && !appState.getExtensions(JSON.parse(currentApi).id)){
+                    const extensions = {
+                        audit: typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true,
+                        pci:   typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true,
+                        gdpr:  typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true,
+                        oscap: typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true,
+                        aws:   typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false,
+                        virustotal: typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false
+                    }
+                    appState.setExtensions(JSON.parse(currentApi).id,extensions)
+                }
+                return checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location);
+            })
             .then(() => testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id))
             .then(data => {
                 if(data && data === 'cookies_outdated'){
@@ -91,7 +106,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         wzMisc.setApiIsDown(false)
                         changeCurrentApi(data);
                     }
-                }
+                }                
             })
             .catch(error => {
                 appState.removeCurrentAPI();

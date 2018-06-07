@@ -14,30 +14,17 @@ import * as modules from 'ui/modules'
 modules.get('app/wazuh', [])
 .service('appState', function ($cookies, $window) {
     return {
-        getExtensions: () => {
-            const data = {
-                extensions: $cookies.getObject('extensions')
-            };
-
-            if(typeof data.extensions === 'undefined'){
-                return {
-                    extensions : {
-                        audit     : true,
-                        pci       : true,
-                        gdpr      : true,
-                        oscap     : true,
-                        aws       : false,
-                        virustotal: false
-                    }
-                }
-            }
-            return data;
+        getExtensions: id => {
+            const current = $cookies.getObject('extensions');
+            return current ? current[id] : false;
         },
-        setExtensions: extensions => {
+        setExtensions: (id,extensions) => {
+            const current = $cookies.getObject('extensions') || {};
+            current[id] = extensions;
             const exp = new Date();
             exp.setDate(exp.getDate() + 365);
             if (extensions) {
-                $cookies.putObject('extensions', extensions, { 'expires': exp });
+                $cookies.putObject('extensions', current, { 'expires': exp });
             }
         },
         getClusterInfo: () => {
