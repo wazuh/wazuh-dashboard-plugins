@@ -107,7 +107,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     // Set default API
     $scope.setDefault = (item) => {
-        let index = $scope.apiEntries.indexOf(item);
+        const index = $scope.apiEntries.indexOf(item);
 
         appState.setClusterInfo($scope.apiEntries[index]._source.cluster_info);
 
@@ -119,21 +119,21 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
         $scope.$emit('updateAPI', {});
 
-        $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
-        $scope.extensions     = $scope.apiEntries[index]._source.extensions;
-
+        const currentApi = appState.getCurrentAPI();
+        $scope.currentDefault = JSON.parse(currentApi).id;
+       
         errorHandler.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`,'Settings');
 
         getCurrentAPIIndex();
-        $scope.extensions = {};
-        $scope.extensions.oscap      = $scope.apiEntries[index]._source.extensions.oscap;
-        $scope.extensions.audit      = $scope.apiEntries[index]._source.extensions.audit;
-        $scope.extensions.pci        = $scope.apiEntries[index]._source.extensions.pci;
-        $scope.extensions.gdpr       = $scope.apiEntries[index]._source.extensions.gdpr;
-        $scope.extensions.aws        = $scope.apiEntries[index]._source.extensions.aws;
-        $scope.extensions.virustotal = $scope.apiEntries[index]._source.extensions.virustotal;
+
+        if(currentApi && !appState.getExtensions(JSON.parse(currentApi).id)){
+            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._id,$scope.apiEntries[currentApiEntryIndex]._source.extensions);
+        }
+
+        $scope.extensions = appState.getExtensions(JSON.parse(currentApi).id);
+
         if(!$scope.$$phase) $scope.$digest();
-        appState.setExtensions($scope.apiEntries[index]._id,$scope.apiEntries[index]._source.extensions);
+        return;
     };
 
     // Get settings function
