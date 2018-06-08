@@ -153,20 +153,23 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             $scope.apiEntries = data.data.length > 0 ? data.data : [];
             $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
-            if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null)
-                $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
+
+            const currentApi = appState.getCurrentAPI();
+
+            if (currentApi){
+                $scope.currentDefault = JSON.parse(currentApi).id;
+            }
+                
             if(!$scope.$$phase) $scope.$digest();
             getCurrentAPIIndex();
             if(!currentApiEntryIndex) return;
-            $scope.extensions = {};
-            $scope.extensions.oscap = $scope.apiEntries[currentApiEntryIndex]._source.extensions.oscap;
-            $scope.extensions.audit = $scope.apiEntries[currentApiEntryIndex]._source.extensions.audit;
-            $scope.extensions.pci = $scope.apiEntries[currentApiEntryIndex]._source.extensions.pci;
-            $scope.extensions.gdpr = $scope.apiEntries[currentApiEntryIndex]._source.extensions.gdpr;
-            $scope.extensions.aws = $scope.apiEntries[currentApiEntryIndex]._source.extensions.aws;
-            $scope.extensions.virustotal = $scope.apiEntries[currentApiEntryIndex]._source.extensions.virustotal;
 
-            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._id,$scope.apiEntries[currentApiEntryIndex]._source.extensions);
+            if(currentApi && !appState.getExtensions(JSON.parse(currentApi).id)){
+                appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._id,$scope.apiEntries[currentApiEntryIndex]._source.extensions);
+            }
+
+            $scope.extensions = appState.getExtensions(JSON.parse(currentApi).id);
+
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
