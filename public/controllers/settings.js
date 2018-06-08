@@ -449,7 +449,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 $scope.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 $scope.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
             } else {
-                $scope.extensions = appState.getExtensions(appState.getCurrentAPI().id);
+                $scope.extensions = appState.getExtensions(JSON.parse(appState.getCurrentAPI()).id);
             }
             if(!$scope.$$phase) $scope.$digest();
             return;
