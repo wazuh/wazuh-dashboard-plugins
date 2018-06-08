@@ -221,7 +221,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
-                assignFilters($scope.tab, $scope.agent.id, localChange || preserveDiscover);
+                assignFilters($scope.tab, $scope.agent.id, !changeAgent && localChange || !changeAgent && preserveDiscover);
+                changeAgent = false;
                 $rootScope.$emit('changeTabView',{tabView:subtab});
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
@@ -232,7 +233,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             checkMetrics($scope.tab, subtab);
         }
     }
-
+    let changeAgent = false;
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
         if(tab !== 'configuration' && tab !== 'welcome') tabHistory.push(tab);
@@ -244,7 +245,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $location.search('tab', tab);
         const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1] && !force;
         $scope.tab = tab;
-
+        
         if($scope.tab === 'configuration'){
             firstLoad();
         } else {
@@ -306,6 +307,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     $scope.getAgent = async (newAgentId,fromAutocomplete) => {
         try {
+            changeAgent = true;
             const globalAgent = shareAgent.getAgent()
             if($scope.tab === 'configuration'){
                 return $scope.getAgentConfig(newAgentId);
@@ -347,7 +349,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             // Rootcheck
             $scope.agent.rootcheck = data[2].data.data;
             validateRootCheck();
-
+            
             $scope.switchTab($scope.tab, true);
 
             if(!$scope.$$phase) $scope.$digest();
