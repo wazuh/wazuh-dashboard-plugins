@@ -51,7 +51,6 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
     }
 
     $scope.applyFilters = filter => {
-        $scope.agents.filters = [];
         if(filter.includes('Unknown')){
             $scope.agents.addFilter('status','Never connected');
 
