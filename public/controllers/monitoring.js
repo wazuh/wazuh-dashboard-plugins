@@ -178,7 +178,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             $scope.version = version.data.data;
 
             const agents = data[4]
-            $scope.agentsCount = agents.data.data.totalItems;
+            $scope.agentsCount = agents.data.data.totalItems - 1;
 
             const health = data[5];
             $scope.healthCheck = health.data.data;
