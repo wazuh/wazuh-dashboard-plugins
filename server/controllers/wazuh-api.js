@@ -304,11 +304,7 @@ export default class WazuhApi {
 
             if(!protectedRoute(req)) return ErrorResponse('Session expired', 3023, 401, reply);
 
-            // Prevents load GDPR if it's disabled
-            const configFile = getConfiguration();
-            if(configFile && typeof configFile['extensions.gdpr'] !== 'undefined' && !configFile['extensions.gdpr']) {
-                return reply({});
-            }
+
 
             let gdpr_description = '';
 
@@ -316,7 +312,24 @@ export default class WazuhApi {
                 if(!req.headers.id) {
                     return reply(gdprRequirementsFile);
                 }
-                let wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.headers.id);
+                const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.headers.id);
+                
+                // Checking for GDPR 
+                const version = await needle('get', `${wapi_config.url}:${wapi_config.port}/version`, {}, {
+                    username          : wapi_config.user,
+                    password          : wapi_config.password,
+                    rejectUnauthorized: !wapi_config.insecure
+                });
+                
+                const number = version.body.data;
+
+                const major = number.split('v')[1].split('.')[0]
+                const minor = number.split('v')[1].split('.')[1].split('.')[0]
+                const patch = number.split('v')[1].split('.')[1].split('.')[1]
+
+                if((major >= 3 && minor < 2) || (major >= 3 && minor >= 2 && patch < 3)){
+                    return reply({});
+                }
 
                 if (wapi_config.error_code > 1) {
                     // Can not connect to elasticsearch

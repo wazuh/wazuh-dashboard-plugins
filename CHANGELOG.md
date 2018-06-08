@@ -22,6 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Replaced the usage of `$rootScope` with two new factories, along with more controller improvements ([#525](https://github.com/wazuh/wazuh-kibana-app/pull/525)).
 -   Now the _Extensions_ tab on _Settings_ won't edit the `.wazuh` index to modify the extensions configuration for all users ([#545](https://github.com/wazuh/wazuh-kibana-app/pull/545)).
     -   This allows each new user to always start with the base extensions configuration, and modify it to its needs storing the settings on a browser cookie.
+-   Now the GDPR requirements description on its tab won't be loaded if the Wazuh API version is not v3.2.3 or higher ([#546](https://github.com/wazuh/wazuh-kibana-app/pull/546)).
 
 ### Fixed
 
