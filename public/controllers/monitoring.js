@@ -124,7 +124,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
     }
 
     let filters = [];
-    const assignFilters = node => {
+    const assignFilters = (node = false) => {
         try{
 
             filters = [];
@@ -139,7 +139,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             $rootScope.$emit('wzEventFilters',{ filters, localChange: false });
             if(!$rootScope.$$listenerCount['wzEventFilters']){
                 $timeout(100)
-                .then(() => assignFilters())
+                .then(() => assignFilters(node))
             }
         } catch(error) {
             errorHandler.handle('An error occurred while creating custom filters for visualizations','Cluster',true);
