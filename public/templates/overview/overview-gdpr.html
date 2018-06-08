@@ -1,6 +1,6 @@
 <md-content flex layout="column" ng-if="tab === 'gdpr' && tabView === 'panels'" ng-show="resultState === 'ready'" layout-align="start">
 
-    <div layout="row" layout-align="center stretch">
+    <div layout="row" layout-align="center stretch" ng-show="gdprTabs.length">
         <md-card flex class="wz-md-card">
             <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="gdprReq_tab">
                 <md-tab ng-repeat="tab in gdprTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
