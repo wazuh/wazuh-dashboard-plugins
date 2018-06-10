@@ -100,7 +100,7 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'agents.csv');
-            
+
             return;
 
         } catch (error) {
@@ -115,7 +115,7 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
                 $scope.agents.nextPage(),
                 apiReq.request('GET', '/agents/summary', { }),
                 genericReq.request('GET', tmpUrl),
-                apiReq.request('GET', '/agents', { sort:'-date_add', limit:9999999 })
+                apiReq.request('GET', '/agents', { sort:'-dateAdd', limit:9999999 })
             ]);
 
             // Agents summary
