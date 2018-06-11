@@ -521,6 +521,9 @@ export default (server, options) => {
     const getNodeInformation = async config => {
         try {
             const response = await needle('get', `${config.url}:${config.api_port}/cluster/node`, {}, {
+                headers: {
+                    'wazuh-app-version': packageJSON.version
+                },
                 username: config.api_user,
                 password:  Buffer.from(config.api_password, 'base64').toString("ascii"),
                 rejectUnauthorized: !config.insecure
@@ -547,6 +550,9 @@ export default (server, options) => {
     const getClusterStatus = async config => {
         try {
             const response = await needle('get', `${config.url}:${config.api_port}/cluster/status`, {}, { // Checking the cluster status
+                headers: {
+                    'wazuh-app-version': packageJSON.version
+                },
                 username: config.api_user,
                 password: Buffer.from(config.api_password, 'base64').toString("ascii"),
                 rejectUnauthorized: !config.insecure
@@ -579,6 +585,9 @@ export default (server, options) => {
     const checkVersion = async config => {
         try {
             const response = await needle('get', `${config.url}:${config.api_port}/version`, {}, {
+                headers: {
+                    'wazuh-app-version': packageJSON.version
+                },
                 username: config.api_user,
                 password: Buffer.from(config.api_password, 'base64').toString("ascii"),
                 rejectUnauthorized: !config.insecure
