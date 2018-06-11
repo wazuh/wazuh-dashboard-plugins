@@ -132,7 +132,7 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
 
         addFilter (filterName, value) {
             this.removeFilter(filterName, false);
-
+            
             this.filters.push({
                 name:  filterName,
                 value: value
@@ -144,7 +144,8 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
         // Only used by agents preview, don't use for any thing more //
         ///////////////////////////////////////////////////////////////
         addMultipleFilters (arrayOfFilters) {
-            this.filters = [...arrayOfFilters];
+            for(const filter of arrayOfFilters) this.removeFilter(filter.name,false)
+            this.filters.push(...arrayOfFilters);
             return this.search();
         }
 

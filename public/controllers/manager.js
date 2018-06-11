@@ -23,12 +23,12 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
 
     $scope.reloadGroups = () => {
         $scope.submenuNavItem = 'groups';
-        $rootScope.groupsIsReloaded = true;
+        $scope.$broadcast('groupsIsReloaded')
     }
 
     $scope.reloadRuleset = () => {
         $scope.submenuNavItem = 'ruleset';
-        $rootScope.rulesetIsReloaded = true;
+        $scope.$broadcast('rulesetIsReloaded')
     }
 
     // Watchers
@@ -87,10 +87,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
         $scope.load = false;
         if(!$scope.$$phase) $scope.$digest();
     })
-    .catch(error => {
-        errorHandler.handle(error,'Manager');
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    });
+    .catch(error => errorHandler.handle(error,'Manager'));
 
     $scope.$on("$destroy", () => {
 
@@ -144,8 +141,8 @@ app.controller('managerConfigurationController', function ($scope, $rootScope, e
             return;
         } catch (error) {
             errorHandler.handle(error,'Manager');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     load();

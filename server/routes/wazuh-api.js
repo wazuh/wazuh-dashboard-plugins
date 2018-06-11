@@ -42,7 +42,7 @@ export default (server, options) => {
     // Returns data from the Wazuh API on CSV readable format
     server.route({ method: 'POST', path: '/api/wazuh-api/csv', handler: (req,res) => ctrl.csv(req,res)})
 
-    // Builds a PDF repor from multiple PNG images
+    // Builds a PDF report from multiple PNG images
     server.route({ method: 'POST', path: '/api/wazuh-api/report', handler: (req,res) => ctrl.report(req,res)});
 
     // Fetch specific report

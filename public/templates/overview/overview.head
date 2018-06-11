@@ -1,57 +1,80 @@
-<div flex ng-controller="overviewController" layout="column">
+<div flex layout="column" ng-cloak ng-controller="overviewController">
 
+    <!-- Top navbar section -->
     <wz-menu ng-init="menuNavItem = 'overview'"></wz-menu>
+    <!-- End top navbar section -->
 
-    <div layout="row" layout-align="space-between start" class="wz-md-navbar-kbn">
-        <div layout="column" flex layout-align="center start">
-            <md-nav-bar class="padding-right-0 wz-md-navbar" md-selected-nav-item="tab" nav-bar-aria-label="navigation submenu">
-                <md-nav-item md-nav-click="switchTab('general');" name="general">General</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('fim');" name="fim">File integrity</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('pm');" name="pm">Policy monitoring</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('vuls');" name="vuls">Vulnerabilities</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('oscap');" name="oscap" ng-show="extensions.oscap">SCAP</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('audit');" name="audit" ng-show="extensions.audit">Audit</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('pci');" name="pci" ng-show="extensions.pci">PCI DSS</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('gdpr');" name="gdpr" ng-show="extensions.gdpr">GDPR</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('aws');" name="aws" ng-show="extensions.aws">AWS</md-nav-item>
-                <md-nav-item md-nav-click="switchTab('virustotal');" name="virustotal" ng-show="extensions.virustotal">VirusTotal</md-nav-item>
-            </md-nav-bar>
+    <!-- Navigation section (Breadcrumbs, Discover, etc) -->
+    <div layout="row" layout-align="start center">
+        <!-- Breadcrumbs -->
+        <div layout="row" layout-padding>
+            <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
+            <div ng-if="tab !== 'welcome'">
+                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span>
+                <span> / {{ tabNames[tab] }}</span>
+            </div>
+            <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
+            <div ng-if="tab === 'welcome'">
+                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i>
+                <span>Overview / Welcome</span>
+            </div>
         </div>
-        <div layout="column">
-            <md-button ng-class="{'wz-report-button': rendered && !loading && resultState === 'ready'}" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()"><i class="fa fa-fw fa-pencil"></i> Report</md-button>
+        <!-- End breadcrumbs -->
+
+        <!-- Reporting button section -->
+        <div ng-show="tab !== 'welcome'">
+            <!-- Report button -->
+            <md-button class="wz-button-flat small" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()" aria-label="Generate report button">
+                <i class="fa fa-fw fa-file-text" aria-hidden="true"></i> Generate report
+            </md-button>
         </div>
-        <div layout="column" layout-align="end end">
-            <md-nav-bar layout-align="end end" class="padding-right-0 wz-md-navbar" md-selected-nav-item="tabView" nav-bar-aria-label="navigation submenu">
-                <md-nav-item md-nav-click="switchSubtab('panels')" name="panels">
-                    <i class="fa fa-th fa-fw"></i> Panels
-                </md-nav-item>
-                <md-nav-item md-nav-click="switchSubtab('discover')" name="discover">
-                    <i class="fa fa-compass fa-fw"></i> Discover
-                </md-nav-item>
-            </md-nav-bar>
+        <!-- End Reporting buttons section -->
+
+        <!-- Separator -->
+        <span flex></span>
+        <!-- End separator -->
+
+        <!-- Discover/Panels buttons section -->
+        <div ng-show="tab !== 'welcome'">
+            <!-- Panels button -->
+            <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')" aria-label="View panels button">
+                <i class="fa fa-fw fa-th" aria-hidden="true"></i> View panels
+            </md-button>
+
+            <!-- Discover button -->
+            <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')" aria-label="View Discover button">
+                <i class="fa fa-fw fa-compass" aria-hidden="true"></i> View Discover
+            </md-button>
         </div>
+        <!-- End Discover/Panels buttons section -->
     </div>
+    <!-- End navigation section -->
 
-    <!-- <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear> -->
+    <!-- Discover search bar section -->
+    <kbn-dis ng-show="tab !== 'welcome'"></kbn-dis>
+    <!-- End Discover search bar section -->
 
-    <!-- View: Discover -->
-    <kbn-dis></kbn-dis>
-
-    <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
-        <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
+    <!-- Loading status section -->
+    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="tab !== 'welcome'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
+    <!-- End loading status section -->
 
-    <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="reportBusy && reportStatus">
-        <div class="percentage"><i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i></div>
+    <!-- Report status section -->
+    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="tab !== 'welcome'" ng-show="reportBusy && reportStatus">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{reportStatus}}</div>
     </div>
+    <!-- End report status section -->
 
-    <!-- No results message -->
-    <md-content flex layout="row" layout-align="start start" ng-show="resultState !== 'ready' && tabView === 'panels'">
+    <!-- No results section -->
+    <div layout="row" ng-if="tab !== 'welcome'" ng-show="resultState !== 'ready' && tabView === 'panels'">
         <md-card flex layout="column" class="wz-md-card">
             <md-card-content class="wz-text-center">
-                No results for selected time interval
+                <span>There are no results for selected time range. Try another one.</span>
             </md-card-content>
         </md-card>
-    </md-content>
+    </div>
+    <!-- No results section -->

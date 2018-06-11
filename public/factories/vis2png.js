@@ -23,18 +23,19 @@ app.factory('vis2png', function ($rootScope) {
     const checkArray = async visArray => {
         try {
             working = true;
-            const promises = [];
             const len = visArray.length;
-            for(let i=0; i < len; i++){
-                const id = visArray[i]
-                const tmpNode = htmlObject[id]
+            let currentCompleted = 0;
+            await Promise.all(visArray.map(async (currentValue, index, array) => {
+                const tmpNode = htmlObject[currentValue]
                 try {
                     const tmpResult = await domtoimage.toPng(tmpNode[0]);
-                    rawArray.push({element:tmpResult,width:tmpNode.width(),height:tmpNode.height(), id: id});
+                    rawArray.push({element:tmpResult,width:tmpNode.width(),height:tmpNode.height(), id: currentValue});
                 } catch (error) {}
-                $rootScope.reportStatus = `Generating report...${Math.round((i/len) * 100)}%`
+                currentCompleted++;
+                $rootScope.reportStatus = `Generating report...${Math.round((currentCompleted/len) * 100)}%`
                 if(!$rootScope.$$phase) $rootScope.$digest()
-            }
+            }))
+
             working = false;
             $rootScope.reportStatus = `Generating PDF document...`
             return rawArray;

@@ -16,8 +16,8 @@
 
 /* Style to the base toolbar */
 .wz-menu {
-    height: 58px;
-    min-height: 58px;
+    height: 50px;
+    min-height: 50px;
     border-bottom: 1px solid #D9D9D9 !important;
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
 }
@@ -29,9 +29,19 @@
 }
 
 /* Style to override the font on the toolbar */
-.wz-menu-content,
+.wz-menu-content {
+    font-size: 14px;
+}
+
 .wz-menu-button {
-    font-size: 16px;
+    font-size: 14px !important;
+    transition: none !important;
+    min-height: 30px !important;
+    line-height: 30px !important;
+}
+
+.wz-menu-button.md-icon-button {
+    line-height: 24px !important;
 }
 
 /* Style to mark active or when-hover buttons on the toolbar */
@@ -52,9 +62,4 @@
 .wz-menu-select-option {
     color: rgba(0, 0, 0, 0.87);
     background-color: white;
-}
-
-/* Style for the IP selector */
-.wz-ip-selector {
-    font-size: 13px;
 }

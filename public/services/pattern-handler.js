@@ -12,14 +12,14 @@
 import * as modules from 'ui/modules'
 
 modules.get('app/wazuh', [])
-.service('patternHandler', function ($rootScope, $location, genericReq, appState, errorHandler) {
+.service('patternHandler', function ($location, genericReq, appState, errorHandler, wzMisc) {
     return {
         getPatternList: async () => {
             try {
                 const patternList = await genericReq.request('GET','/get-list',{});
 
                 if(!patternList.data.data.length){
-                    $rootScope.blankScreenError = 'Sorry but no valid index patterns were found'
+                    wzMisc.setBlankScr('Sorry but no valid index patterns were found')
                     $location.search('tab',null);
                     $location.path('/blank-screen');
                     return;
@@ -33,8 +33,8 @@ modules.get('app/wazuh', [])
                 return patternList.data.data;
             } catch (error) {
                 errorHandler.handle(error,'Pattern Handler (getPatternList)');
-                if(!$rootScope.$$phase) $rootScope.$digest();
             }
+            return;
         },
         changePattern: async selectedPattern => {
             try {
@@ -43,9 +43,8 @@ modules.get('app/wazuh', [])
                 return appState.getCurrentPattern();
             } catch (error) {
                 errorHandler.handle(error,'Pattern Handler (changePattern)');
-                if(!$rootScope.$$phase) $rootScope.$digest();
             }
-
+            return;
         }
     };
 });

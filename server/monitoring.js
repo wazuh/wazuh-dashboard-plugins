@@ -62,15 +62,15 @@ export default (server, options) => {
     let todayIndex    = index_prefix + fDate;
 
     // Check status and get agent status array
-    const checkStatus = async (apiEntry, maxSize, offset) => {
+    const checkStatus = async (apiEntry, maxSize) => {
         try {
             if (!maxSize) {
                 throw new Error('You must provide a max size')
             }
 
             const payload = {
-                offset: offset ? offset: 0,
-                limit : (250 < maxSize) ? 250 : maxSize
+                offset: 0,
+                limit : 1000
             };
 
             const options = {
@@ -82,22 +82,22 @@ export default (server, options) => {
                 rejectUnauthorized: !apiEntry.insecure
             };
 
-            const response = await needle('get', `${getPath(apiEntry)}/agents`, payload, options);
-
-            if (!response.error && response.body.data.items) {
-                agentsArray = agentsArray.concat(response.body.data.items);
-                if ((payload.limit + payload.offset) < maxSize) {
-                    return checkStatus(apiEntry, response.body.data.totalItems, payload.limit + payload.offset);
+            while(agentsArray.length < maxSize){
+                const response = await needle('get', `${getPath(apiEntry)}/agents`, payload, options);
+                if (!response.error && response.body.data.items) {
+                    agentsArray = agentsArray.concat(response.body.data.items);
+                    payload.offset += payload.limit;
                 } else {
-                    await saveStatus(apiEntry.clusterName);
+                    throw new Error('Can not access Wazuh API')
                 }
-            } else {
-                throw new Error('Can not access Wazuh API')
             }
-
+ 
+            await saveStatus(apiEntry.clusterName);
+ 
             return;
 
         } catch (error) {
+            agentsArray.length = 0;
             log('[monitoring][checkStatus]', error.message || error);
             server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
         }
@@ -107,8 +107,8 @@ export default (server, options) => {
     const checkAndSaveStatus = async apiEntry => {
         try{
             const payload = {
-                'offset': 0,
-                'limit':  1
+                offset: 0,
+                limit:  1
             };
 
             const options = {
@@ -132,7 +132,7 @@ export default (server, options) => {
                                    false;
 
             if (!response.error && response.body.data && response.body.data.totalItems) {
-                checkStatus(apiEntry, response.body.data.totalItems);
+                await checkStatus(apiEntry, response.body.data.totalItems);
             } else {
                 log('[monitoring][checkAndSaveStatus]', 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
                 server.log([blueWazuh, 'monitoring', 'error'], 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.');
@@ -158,21 +158,19 @@ export default (server, options) => {
                 ))
             );
 
-            for(let element of filteredApis) {
-                let apiEntry = {
-                    'user':     element._source.api_user,
-                    'password': Buffer.from(element._source.api_password, 'base64').toString("ascii"),
-                    'url':      element._source.url,
-                    'port':     element._source.api_port,
-                    'insecure': element._source.insecure
+            for(const element of filteredApis) {
+                const apiEntry = {
+                    user:     element._source.api_user,
+                    password: Buffer.from(element._source.api_password, 'base64').toString("ascii"),
+                    url:      element._source.url,
+                    port:     element._source.api_port,
+                    insecure: element._source.insecure
                 };
-                if (apiEntry.error) {
-                    log('[monitoring][loadCredentials]', apiEntry.error || apiEntry);
-                    server.log([blueWazuh, 'monitoring', 'error'], `Error getting wazuh-api data: ${apiEntry.error}`);
-                    break;
-                }
+
                 await checkAndSaveStatus(apiEntry);
+
             }
+
             return { result: 'ok' }
         } catch(error){
             log('[monitoring][loadCredentials]',error.message || error);

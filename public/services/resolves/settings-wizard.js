@@ -13,7 +13,7 @@ import checkTimestamp from './check-timestamp'
 import healthCheck    from './health-check'
 import totalRAM       from './check-ram'
 
-export default ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler) => {
+export default ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc) => {
     try {
         const deferred = $q.defer();
 
@@ -30,17 +30,16 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
             } else if((data.data && (data.data.apiIsDown || data.data.message === 'socket hang up')) ||
                     (data.data.data && (data.data.data.apiIsDown || data.data.data.message === 'socket hang up'))){
-                $rootScope.apiIsDown = "down";
+                wzMisc.setApiIsDown(true)
                 errorHandler.handle('Wazuh RESTful API seems to be down.','Routes');
             } else {
                 fromElastic = true;
-                $rootScope.blankScreenError = errorHandler.handle(data,'Routes');
+                wzMisc.setBlankScr(errorHandler.handle(data,'Routes'));
                 appState.removeCurrentAPI();
             }
 
             if(!fromElastic){
-                $rootScope.comeFromWizard = true;
-                if(!$rootScope.$$phase) $rootScope.$digest();
+                wzMisc.setWizard(true);
                 if(!$location.path().includes("/settings")) {
                     $location.search('_a', null);
                     $location.search('tab', 'api');
@@ -75,25 +74,39 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
             }
 
             appState.setClusterInfo(data.data.data.cluster_info);
-            appState.setExtensions(data.data.data.extensions);
             deferred.resolve();
         }
 
         const callCheckStored = () => {
-            checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location)
+            genericReq.request('GET', '/api/wazuh-api/configuration', {})
+            .then(config => {
+                const currentApi = appState.getCurrentAPI();
+                if(currentApi && !appState.getExtensions(JSON.parse(currentApi).id)){
+                    const extensions = {
+                        audit: typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true,
+                        pci:   typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true,
+                        gdpr:  typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true,
+                        oscap: typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true,
+                        aws:   typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false,
+                        virustotal: typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false
+                    }
+                    appState.setExtensions(JSON.parse(currentApi).id,extensions)
+                }
+                return checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location);
+            })
             .then(() => testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id))
             .then(data => {
                 if(data && data === 'cookies_outdated'){
-                    $location.search('tab','general');
+                    $location.search('tab','welcome');
                     $location.path('/overview')
                 } else {
                     if (data.data.error || data.data.data.apiIsDown) {
                         checkResponse(data);
                     } else {
-                        $rootScope.apiIsDown = null;
+                        wzMisc.setApiIsDown(false)
                         changeCurrentApi(data);
                     }
-                }
+                }                
             })
             .catch(error => {
                 appState.removeCurrentAPI();
@@ -119,7 +132,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         callCheckStored();
                     } else {
                         errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
-                        $rootScope.comeFromWizard = true;
+                        wzMisc.setWizard(true);
                         if(!$location.path().includes("/settings")) {
                             $location.search('_a', null);
                             $location.search('tab', 'api');
@@ -130,7 +143,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 })
                 .catch(error => {
                     errorHandler.handle(error,'Routes');
-                    $rootScope.comeFromWizard = true;
+                    wzMisc.setWizard(true);
                     if(!$location.path().includes("/settings")) {
                         $location.search('_a', null);
                         $location.search('tab', 'api');

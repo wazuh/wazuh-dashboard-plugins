@@ -15,7 +15,7 @@ import FilterHandler from './filter-handler'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, shareAgent) {
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     visHandlers.removeAll();
@@ -24,9 +24,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     tabVisualizations.removeAll();
     loadedVisualizations.removeAll();
 
-    $rootScope.completedAgent = false;
-    $rootScope.page = 'agents';
-    $scope.extensions = appState.getExtensions().extensions;
+    const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
+    const extensions  = appState.getExtensions(currentApi);
+    $scope.extensions = extensions;
+    
     $scope.agentsAutoComplete = AgentsAutoComplete;
 
     // Check the url hash and retrieve the tabView information
@@ -37,12 +38,31 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $location.search("tabView", "panels");
     }
 
+    let tabHistory = [];
+
     // Check the url hash and retrivew the tab information
     if ($location.search().tab){
         $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'general'
-        $scope.tab = "general";
-        $location.search("tab", "general");
+    } else { // If tab doesn't exist, default it to 'welcome'
+        $scope.tab = "welcome";
+        $location.search("tab", "welcome");
+    }
+
+    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome') tabHistory.push($scope.tab);
+
+    // Tab names
+    $scope.tabNames = {
+        welcome      : 'Welcome',
+        general      : 'General',
+        fim          : 'File integrity',
+        pm           : 'Policy monitoring',
+        vuls         : 'Vulnerabilities',
+        oscap        : 'Open SCAP',
+        audit        : 'Audit',
+        pci          : 'PCI DSS',
+        gdpr         : 'GDPR',
+        virustotal   : 'VirusTotal',
+        configuration: 'Configuration'
     }
 
     // Metrics Audit
@@ -76,6 +96,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     tabVisualizations.assign({
+        welcome      : 0,
         general      : 7,
         fim          : 8,
         pm           : 4,
@@ -97,8 +118,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         oscap     : { group: 'oscap' },
         audit     : { group: 'audit' },
         pci       : { group: 'pci_dss' },
-        virustotal: { group: 'virustotal' },
-        gdpr      : { group: 'gdpr' }
+        gdpr      : { group: 'gdpr' },
+        virustotal: { group: 'virustotal' }
     };
 
     let filters = []
@@ -176,12 +197,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                     break;
             }
         }
-
-        if(!$rootScope.$$phase) $rootScope.$digest();
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = true) => {
+    $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = true, preserveDiscover = false) => {
         if($scope.tabView === subtab && !force) return;
         if(!onlyAgent) visHandlers.removeAll();
         discoverPendingUpdates.removeAll();
@@ -189,7 +208,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         loadedVisualizations.removeAll();
 
         $location.search('tabView', subtab);
-        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') || 
+        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') ||
                              (subtab === 'discover' && $scope.tabView === 'panels')) && sameTab;
         if(subtab === 'panels' && $scope.tabView === 'discover' && sameTab){
             $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
@@ -197,13 +216,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
         $scope.tabView = subtab;
 
-        if(subtab === 'panels' && $scope.tab !== 'configuration'){
+        if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome'){
             // Create current tab visualizations
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
-                assignFilters($scope.tab, $scope.agent.id, localChange);
-                $rootScope.$emit('changeTabView',{tabView:subtab})
+                assignFilters($scope.tab, $scope.agent.id, !changeAgent && localChange || !changeAgent && preserveDiscover);
+                changeAgent = false;
+                $rootScope.$emit('changeTabView',{tabView:subtab});
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
             })
@@ -213,20 +233,23 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             checkMetrics($scope.tab, subtab);
         }
     }
-
+    let changeAgent = false;
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
+        if(tab !== 'configuration' && tab !== 'welcome') tabHistory.push(tab);
+        if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
+        const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1] && !force;
         $scope.tab = tab;
-
+        
         if($scope.tab === 'configuration'){
             firstLoad();
         } else {
-            $scope.switchSubtab('panels', true, onlyAgent, sameTab);
+            $scope.switchSubtab('panels', true, onlyAgent, sameTab, preserveDiscover);
         }
     };
 
@@ -284,7 +307,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     $scope.getAgent = async (newAgentId,fromAutocomplete) => {
         try {
-            $rootScope.completedAgent = false;
+            changeAgent = true;
+            const globalAgent = shareAgent.getAgent()
             if($scope.tab === 'configuration'){
                 return $scope.getAgentConfig(newAgentId);
             }
@@ -296,12 +320,12 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 id = newAgentId;
                 $location.search('agent', id);
             } else {
-                if ($location.search().agent && !$rootScope.globalAgent) { // There's one in the url
+                if ($location.search().agent && !globalAgent) { // There's one in the url
                     id = $location.search().agent;
-                } else { // We pick the one in the rootScope
-                    id = $rootScope.globalAgent;
+                } else {
+                    id = globalAgent.id;
+                    shareAgent.deleteAgent();
                     $location.search('agent', id);
-                    delete $rootScope.globalAgent;
                 }
             }
 
@@ -325,25 +349,22 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             // Rootcheck
             $scope.agent.rootcheck = data[2].data.data;
             validateRootCheck();
-
-            $rootScope.completedAgent = true;
-
+            
             $scope.switchTab($scope.tab, true);
 
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     };
 
     $scope.goGroups = agent => {
-        $rootScope.globalAgent = agent;
         $scope.agentsAutoComplete.reset();
         visHandlers.removeAll();
-        $rootScope.comeFrom    = 'agents';
         //$location.search('_a',null);
+        shareAgent.setAgent(agent)
         $location.search('tab', 'groups');
         $location.path('/manager');
     };
@@ -358,21 +379,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             return $scope.agentsAutoComplete.items;
         } catch (error) {
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
-
+        return;
     }
 
-    //Load
-    try {
-        if($scope.tab !== 'configuration'){
-            $scope.getAgent();
-        }
-        $scope.agentsAutoComplete.nextPage('');
-    } catch (e) {
-        errorHandler.handle('Unexpected exception loading controller','Agents');
-        if(!$rootScope.$$phase) $rootScope.$digest();
-    }
 
     //Destroy
     $scope.$on("$destroy", () => {
@@ -395,10 +405,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error,'Agents'));
 
     $scope.pciTabs       = pciTabs;
     $scope.selectedPciIndex = 0;
@@ -414,10 +421,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 });
             }
         })
-        .catch(error => {
-            errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
-        });
+        .catch(error => errorHandler.handle(error,'Agents'));
 
     $scope.gdprTabs       = gdprTabs;
     $scope.selectedGdprIndex = 0;
@@ -439,23 +443,22 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     $scope.goGroup = () => {
-        $rootScope.globalAgent = $scope.agent;
-        $rootScope.comeFrom    = 'agents';
+        shareAgent.setAgent($scope.agent)
         $location.path('/manager/groups');
     };
 
     const firstLoad = async () => {
         try{
-            $rootScope.completedAgent = false;
+            const globalAgent = shareAgent.getAgent();
             $scope.configurationError = false;
             $scope.load = true;
             let id;
-            if ($location.search().agent && !$rootScope.globalAgent) { // There's one in the url
+            if ($location.search().agent && !globalAgent) { // There's one in the url
                 id = $location.search().agent;
-            } else { // We pick the one in the rootScope
-                id = $rootScope.globalAgent;
+            } else {
+                id = globalAgent.id;
+                shareAgent.deleteAgent();
                 $location.search('agent', id);
-                delete $rootScope.globalAgent;
             }
 
             let data         = await apiReq.request('GET', `/agents/${id}`, {});
@@ -489,15 +492,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
             $scope.load = false;
 
-            $rootScope.completedAgent = true;
             if($scope.tab !== 'configuration') $scope.switchTab($scope.tab, true);
 
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error){
             errorHandler.handle(error,'Agents');
-            if(!$rootScope.$$phase) $rootScope.$digest();
         }
+        return;
     }
     /** End of agent configuration */
 
@@ -510,26 +512,26 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             $scope.reportBusy = true;
             $rootScope.reportStatus = 'Generating report...0%'
             if(!$rootScope.$$phase) $rootScope.$digest();
-            
+
             vis2png.clear();
-            
+
             const idArray = rawVisualizations.getList().map(item => item.id);
 
             for(const item of idArray) {
                 const tmpHTMLElement = $(`#${item}`);
                 vis2png.assignHTMLItem(item,tmpHTMLElement)
-            }            
-            
+            }
+
             const appliedFilters = visHandlers.getAppliedFilters();
             const tab   = $scope.tab;
             const array = await vis2png.checkArray(idArray)
             const name  = `wazuh-agents-${tab}-${Date.now() / 1000 | 0}.pdf`
-            
+
             const data    ={
                 array,
                 name,
-                title: `Agents ${tab}`, 
-                filters: appliedFilters.filters, 
+                title: `Agents ${tab}`,
+                filters: appliedFilters.filters,
                 time: appliedFilters.time,
                 searchBar: appliedFilters.searchBar,
                 tab,
@@ -538,12 +540,12 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             };
 
             const request = await genericReq.request('POST','/api/wazuh-api/report',data)
-            
+
             $scope.reportBusy = false;
             $rootScope.reportStatus = false;
-            
+
             errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-            
+
             return;
         } catch (error) {
             $scope.reportBusy = false;
@@ -551,4 +553,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             errorHandler.handle(error, 'Reporting')
         }
     }
+
+    //Load
+    try {
+        $scope.getAgent();
+        $scope.agentsAutoComplete.nextPage('');
+    } catch (e) {
+        errorHandler.handle('Unexpected exception loading controller','Agents');
+    }
+
 });

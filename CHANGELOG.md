@@ -2,6 +2,37 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.2.4 - Kibana v6.2.4 - Revision 393
+
+### Added
+
+-   Brand-new Wazuh app redesign for _Overview_ and _Agents_ tabs ([#543](https://github.com/wazuh/wazuh-kibana-app/pull/543)):
+    -   Updated UI for these tabs using breadcrumbs.
+    -   New _Welcome_ screen, presenting all the tabs to the user, with useful links to our documentation.
+    -   Overall design improved, adjusted font sizes and reduced HTML code.
+    -   This base will allow the app to increase its functionality in the future.
+    -   Removed the `md-nav-bar` component for a better user experience on small screens.
+    -   Improved app performance removing some CSS effects from some components, such as buttons.
+-   New filter for agent version on the _Agents Preview_ tab ([#537](https://github.com/wazuh/wazuh-kibana-app/pull/537)).
+-   New filter for cluster node on the _Agents Preview_ tab ([#538](https://github.com/wazuh/wazuh-kibana-app/pull/538)).
+
+### Changed
+
+-   Now the report generation process will run in a parallel mode in the foreground ([#523](https://github.com/wazuh/wazuh-kibana-app/pull/523)).
+-   Replaced the usage of `$rootScope` with two new factories, along with more controller improvements ([#525](https://github.com/wazuh/wazuh-kibana-app/pull/525)).
+-   Now the _Extensions_ tab on _Settings_ won't edit the `.wazuh` index to modify the extensions configuration for all users ([#545](https://github.com/wazuh/wazuh-kibana-app/pull/545)).
+    -   This allows each new user to always start with the base extensions configuration, and modify it to its needs storing the settings on a browser cookie.
+-   Now the GDPR requirements description on its tab won't be loaded if the Wazuh API version is not v3.2.3 or higher ([#546](https://github.com/wazuh/wazuh-kibana-app/pull/546)).
+
+### Fixed
+
+-   Fixed a bug where the app crashes when attempting to download huge amounts of data as CSV format ([#521](https://github.com/wazuh/wazuh-kibana-app/pull/521)).
+-   Fixed a bug on the Timelion visualizations from _Management/Monitoring_ which were not properly filtering and showing the cluster nodes information ([#530](https://github.com/wazuh/wazuh-kibana-app/pull/530)).
+-   Fixed several bugs on the loading process when switching between tabs with or without visualizations in the _Overview_ and _Agents_ tab ([#531](https://github.com/wazuh/wazuh-kibana-app/pull/531) & [#533](https://github.com/wazuh/wazuh-kibana-app/pull/533)).
+-   Fixed a bug on the `wazuh-monitoring` index feature when using multiple inserted APIs, along with several performance improvements ([#539](https://github.com/wazuh/wazuh-kibana-app/pull/539)).
+-   Fixed a bug where the OS filter on the _Agents Preview_ tab would exclude the rest of filters instead of combining them ([#552](https://github.com/wazuh/wazuh-kibana-app/pull/552)).
+-   Fixed a bug where the Extensions settings were restored every time the user opened the _Settings_ tab or pressed the _Set default manager_ button ([#555](https://github.com/wazuh/wazuh-kibana-app/pull/555) & [#556](https://github.com/wazuh/wazuh-kibana-app/pull/556)).
+
 ## Wazuh v3.2.3/v3.2.4 - Kibana v6.2.4 - Revision 392
 
 ### Added
