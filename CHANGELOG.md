@@ -30,6 +30,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Fixed a bug on the Timelion visualizations from _Management/Monitoring_ which were not properly filtering and showing the cluster nodes information ([#530](https://github.com/wazuh/wazuh-kibana-app/pull/530)).
 -   Fixed several bugs on the loading process when switching between tabs with or without visualizations in the _Overview_ and _Agents_ tab ([#531](https://github.com/wazuh/wazuh-kibana-app/pull/531) & [#533](https://github.com/wazuh/wazuh-kibana-app/pull/533)).
 -   Fixed a bug on the `wazuh-monitoring` index feature when using multiple inserted APIs, along with several performance improvements ([#539](https://github.com/wazuh/wazuh-kibana-app/pull/539)).
+-   Fixed a bug where the OS filter on the _Agents Preview_ tab would exclude the rest of filters instead of combining them ([#552](https://github.com/wazuh/wazuh-kibana-app/pull/552)).
+-   Fixed a bug where the Extensions settings were restored every time the user opened the _Settings_ tab or pressed the _Set default manager_ button ([#555](https://github.com/wazuh/wazuh-kibana-app/pull/555) & [#556](https://github.com/wazuh/wazuh-kibana-app/pull/556)).
 
 ## Wazuh v3.2.3/v3.2.4 - Kibana v6.2.4 - Revision 392
 
