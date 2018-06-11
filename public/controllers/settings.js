@@ -61,9 +61,11 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 }
             }
             await genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`);
+            $scope.showEditForm[$scope.apiEntries[index]._id] = false;
             $scope.apiEntries.splice(index, 1);
             wzMisc.setApiIsDown(false)
             $scope.apiIsDown = false;
+            $scope.isEditing = false;
             errorHandler.info('The API was removed successfully','Settings');
             if(!$scope.$$phase) $scope.$digest();
             return;
