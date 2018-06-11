@@ -2,6 +2,13 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.3.0 - Kibana v6.2.4 - Revision 394
+
+### Added
+
+-   Support for Wazuh v3.3.0.
+-   Updated some backend API calls to include the app version in the request header ([#560](https://github.com/wazuh/wazuh-kibana-app/pull/560)).
+
 ## Wazuh v3.2.4 - Kibana v6.2.4 - Revision 393
 
 ### Added

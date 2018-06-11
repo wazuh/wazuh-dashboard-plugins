@@ -53,6 +53,9 @@ export default class WazuhApi {
             }
 
             let response = await needle('get', `${wapi_config.url}:${wapi_config.port}/version`, {}, {
+                headers: {
+                    'wazuh-app-version': packageInfo.version
+                },
                 username          : wapi_config.user,
                 password          : wapi_config.password,
                 rejectUnauthorized: !wapi_config.insecure
@@ -61,6 +64,9 @@ export default class WazuhApi {
             if (parseInt(response.body.error) === 0 && response.body.data) {
                 // Checking the cluster status
                 response = await needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/status`, {}, {
+                    headers: {
+                        'wazuh-app-version': packageInfo.version
+                    },
                     username          : wapi_config.user,
                     password          : wapi_config.password,
                     rejectUnauthorized: !wapi_config.insecure
@@ -70,6 +76,9 @@ export default class WazuhApi {
                     // If cluster mode is active
                     if (response.body.data.enabled === 'yes') {
                         response = await needle('get', `${wapi_config.url}:${wapi_config.port}/cluster/node`, {}, {
+                            headers: {
+                                'wazuh-app-version': packageInfo.version
+                            },
                             username          : wapi_config.user,
                             password          : wapi_config.password,
                             rejectUnauthorized: !wapi_config.insecure
@@ -174,6 +183,9 @@ export default class WazuhApi {
             } 
 
             let response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/version`, {}, {
+                headers: {
+                    'wazuh-app-version': packageInfo.version
+                },
                 username          : apiAvailable.user,
                 password          : apiAvailable.password,
                 rejectUnauthorized: !apiAvailable.insecure
@@ -188,6 +200,9 @@ export default class WazuhApi {
             if (parseInt(response.body.error) === 0 && response.body.data) {
 
                 response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/agents/000`, {}, {
+                    headers: {
+                        'wazuh-app-version': packageInfo.version
+                    },
                     username          : apiAvailable.user,
                     password          : apiAvailable.password,
                     rejectUnauthorized: !apiAvailable.insecure
@@ -197,6 +212,9 @@ export default class WazuhApi {
                     const managerName = response.body.data.name;
 
                     response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/cluster/status`, {}, { // Checking the cluster status
+                        headers: {
+                            'wazuh-app-version': packageInfo.version
+                        },
                         username          : apiAvailable.user,
                         password          : apiAvailable.password,
                         rejectUnauthorized: !apiAvailable.insecure
@@ -207,6 +225,9 @@ export default class WazuhApi {
 
                             // If cluster mode is active
                             response = await needle('get', `${apiAvailable.url}:${apiAvailable.port}/cluster/node`, {}, {
+                                headers: {
+                                    'wazuh-app-version': packageInfo.version
+                                },
                                 username          : apiAvailable.user,
                                 password          : apiAvailable.password,
                                 rejectUnauthorized: !apiAvailable.insecure
@@ -266,6 +287,9 @@ export default class WazuhApi {
                 }
 
                 const response = await needle('get', `${wapi_config.url}:${wapi_config.port}/rules/pci`, {}, {
+                    headers: {
+                        'wazuh-app-version': packageInfo.version
+                    },
                     username          : wapi_config.user,
                     password          : wapi_config.password,
                     rejectUnauthorized: !wapi_config.insecure
@@ -316,6 +340,9 @@ export default class WazuhApi {
                 
                 // Checking for GDPR 
                 const version = await needle('get', `${wapi_config.url}:${wapi_config.port}/version`, {}, {
+                    headers: {
+                        'wazuh-app-version': packageInfo.version
+                    },
                     username          : wapi_config.user,
                     password          : wapi_config.password,
                     rejectUnauthorized: !wapi_config.insecure
@@ -340,6 +367,9 @@ export default class WazuhApi {
                 }
 
                 const response = await needle('get', `${wapi_config.url}:${wapi_config.port}/rules/gdpr`, {}, {
+                    headers: {
+                        'wazuh-app-version': packageInfo.version
+                    },
                     username          : wapi_config.user,
                     password          : wapi_config.password,
                     rejectUnauthorized: !wapi_config.insecure
@@ -538,6 +568,9 @@ export default class WazuhApi {
             }
 
             const output = await needle('get', `${config.url}:${config.port}/${path_tmp}`, params, {
+                headers: {
+                    'wazuh-app-version': packageInfo.version
+                },
                 username          : config.user,
                 password          : config.password,
                 rejectUnauthorized: !config.insecure
