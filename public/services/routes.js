@@ -23,7 +23,7 @@ import agentsPrevTemplate  from 'plugins/wazuh/templates/agents-prev/agents-prev
 import managerTemplate     from 'plugins/wazuh/templates/manager/manager.jade'
 import overviewTemplate    from 'plugins/wazuh/templates/overview/overview.jade'
 import discoverTemplate    from 'plugins/wazuh/templates/discover/discover.jade'
-import settingsTemplate    from 'plugins/wazuh/templates/settings/settings.html'
+import settingsTemplate    from 'plugins/wazuh/templates/settings/settings.jade'
 import loginTemplate       from 'plugins/wazuh/templates/auth/login.html'
 import blankScreenTemplate from 'plugins/wazuh/templates/error-handler/blank-screen.html'
 import devToolsTemplate    from 'plugins/wazuh/templates/dev-tools/dev-tools.html'
