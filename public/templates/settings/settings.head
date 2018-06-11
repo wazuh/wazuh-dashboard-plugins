@@ -1,0 +1,21 @@
+<div flex ng-controller="settingsController" layout="column">
+
+    <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
+
+    <!-- Settings navbar -->
+    <div layout="row" layout-align="center start" ng-if="!load">
+        <md-nav-bar flex class="padding-right-0 wz-md-navbar" md-selected-nav-item="submenuNavItem" nav-bar-aria-label="navigation submenu">
+            <md-nav-item md-nav-click="switchTab('api')" name="api">API</md-nav-item>
+            <md-nav-item md-nav-click="switchTab('extensions')" ng-if="apiEntries && apiEntries.length" name="extensions">Extensions</md-nav-item>
+            <md-nav-item md-nav-click="switchTab('pattern')" name="pattern">Pattern</md-nav-item>
+            <md-nav-item md-nav-click="switchTab('about')" name="about">About</md-nav-item>
+        </md-nav-bar>
+    </div>
+
+    <div layout="column" layout-align="start stretch" ng-if="!load">
+    

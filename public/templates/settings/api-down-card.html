@@ -1,0 +1,28 @@
+<md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="apiIsDown">
+    <md-card-content>
+        <span class="wz-headline-title">Wazuh API seems to be down</span>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <div layout="row" class="wz-padding-top-10 wz-line-height">
+            Please, check if Wazuh RESTful API is running with one of the commands below:
+        </div>
+
+        <div layout="row" class="wz-padding-top-10 wz-line-height">
+            <ul>
+                <li>For Systemd:</li>
+                <li>
+                    <pre class="json-beautifier"><code># systemctl status wazuh-api</code></pre>
+                </li>
+                <li>For SysV Init:</li>
+                <li>
+                    <pre class="json-beautifier"><code># service wazuh-api status</code></pre>
+                </li>
+            </ul>
+        </div>
+
+        <div layout="row" class="wz-padding-top-10 wz-line-height">
+            If the API is&nbsp;
+            <code>active (running)</code> please check its configuration below.
+        </div>
+    </md-card-content>
+</md-card>
