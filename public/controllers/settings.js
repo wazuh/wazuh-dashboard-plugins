@@ -26,10 +26,9 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Initialize
     let currentApiEntryIndex;
     $scope.formData            = {};
-    $scope.menuNavItem         = 'settings';
+    $scope.tab                 = 'welcome';
     $scope.load                = true;
     $scope.addManagerContainer = false;
-    $scope.submenuNavItem      = "api";
     $scope.showEditForm        = {};
     $scope.formUpdate          = {};
 
@@ -39,15 +38,24 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
+    // Tab names
+    $scope.tabNames = {
+        welcome   : 'Welcome',
+        api       : 'API configuration',
+        extensions: 'Extensions',
+        pattern   : 'Index pattern'
+    }
+
     $scope.indexPatterns = [];
     $scope.apiEntries    = [];
+
     if ($routeParams.tab){
-        $scope.submenuNavItem = $routeParams.tab;
+        $scope.tab = $routeParams.tab;
     }
 
     $scope.switchTab = tab => {
-        $scope.submenuNavItem = tab;
-        $location.search('tab', $scope.submenuNavItem);
+        $scope.tab = tab;
+        $location.search('tab', $scope.tab);
     }
 
     // Remove API entry
@@ -104,7 +112,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
         const currentApi = appState.getCurrentAPI();
         $scope.currentDefault = JSON.parse(currentApi).id;
-       
+
         errorHandler.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`,'Settings');
 
         getCurrentAPIIndex();
@@ -142,7 +150,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if (currentApi){
                 $scope.currentDefault = JSON.parse(currentApi).id;
             }
-                
+
             if(!$scope.$$phase) $scope.$digest();
             getCurrentAPIIndex();
             if(!currentApiEntryIndex) return;
