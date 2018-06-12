@@ -15,6 +15,34 @@ import * as modules from 'ui/modules'
 const app = modules.get('app/wazuh', []);
 
 app.factory('tabVisualizations', function() {
+    const agents = {
+        welcome      : 0,
+        general      : 7,
+        fim          : 8,
+        pm           : 4,
+        vuls         : 7,
+        oscap        : 13,
+        audit        : 15,
+        gdpr         : 3,
+        pci          : 3,
+        virustotal   : 6,
+        configuration: 0
+    }
+
+    const overview = {
+        welcome   : 0,
+        general   : 11,
+        fim       : 10,
+        pm        : 5,
+        vuls      : 8,
+        oscap     : 14,
+        audit     : 15,
+        pci       : 6,
+        gdpr      : 6,
+        aws       : 10,
+        virustotal: 7
+    }
+
     let tabVisualizations = {}
     let currentTab = '';
 
@@ -29,7 +57,13 @@ app.factory('tabVisualizations', function() {
     }
 
     const assign = tabs => {
-        tabVisualizations = tabs;
+        if(typeof tabs === 'object') {
+            tabVisualizations = tabs;
+        } else if(typeof tabs === 'string') {
+            tabVisualizations = tabs === 'overview' ?
+                                overview :
+                                agents;
+        } 
     }
 
     const removeAll = () => {
@@ -37,10 +71,10 @@ app.factory('tabVisualizations', function() {
     }
   
     return {
-      getItem  : getItem,
-      removeAll: removeAll,
-      assign   : assign,
-      setTab   : setTab,
-      getTab   : getTab
+      getItem,
+      removeAll,
+      assign,
+      setTab,
+      getTab   
     };
 });
