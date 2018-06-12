@@ -114,8 +114,7 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
             const data = await Promise.all([
                 $scope.agents.nextPage(),
                 apiReq.request('GET', '/agents/summary', { }),
-                genericReq.request('GET', tmpUrl),
-                apiReq.request('GET', '/agents', { sort:'-dateAdd', limit:9999999 })
+                genericReq.request('GET', tmpUrl)
             ]);
 
             // Agents summary
@@ -151,10 +150,22 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
                 }
             }
 
-            // Last agent
-            $scope.lastAgent = data[3].data.data.items[0];
+            // Fetch agents sorting by -dateAdd and using pagination
+            const agents = [];
+            const total_items = data[1].data.data.Total;
+            let offset = 0;
+            const limit = 1000;
+            while(agents.length < total_items){
+                const page = await apiReq.request('GET', '/agents', { sort:'-dateAdd', limit, offset });
+                agents.push(...page.data.data.items)
+                offset += limit;
+            }
 
-            retrieveList(data[3].data.data.items);
+
+            // Last agent
+            $scope.lastAgent = agents[0];
+
+            retrieveList(agents);
 
             $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
