@@ -18,7 +18,7 @@ import { metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal } fr
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, tabVisualizations, vis2png, shareAgent, commonData, reportingService, visFactoryService) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, apiReq, AgentsAutoComplete, errorHandler, tabVisualizations, vis2png, shareAgent, commonData, reportingService, visFactoryService) {
 
     $rootScope.reportStatus = false;
 
@@ -32,24 +32,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     
     $scope.agentsAutoComplete = AgentsAutoComplete;
 
-    // Check the url hash and retrieve the tabView information
-    if ($location.search().tabView){
-        $scope.tabView = $location.search().tabView;
-    } else { // If tabView doesn't exist, default it to 'panels'
-        $scope.tabView = "panels";
-        $location.search("tabView", "panels");
-    }
+    $scope.tabView = commonData.checkTabViewLocation();
+    $scope.tab     = commonData.checkTabLocation();
 
     let tabHistory = [];
-
-    // Check the url hash and retrivew the tab information
-    if ($location.search().tab){
-        $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'welcome'
-        $scope.tab = "welcome";
-        $location.search("tab", "welcome");
-    }
-
     if($scope.tab !== 'configuration' && $scope.tab !== 'welcome') tabHistory.push($scope.tab);
 
     // Tab names
@@ -152,26 +138,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     $scope.getAgent = async (newAgentId,fromAutocomplete) => {
         try {
             changeAgent = true;
+            
             const globalAgent = shareAgent.getAgent()
+            
             if($scope.tab === 'configuration'){
                 return $scope.getAgentConfig(newAgentId);
             }
 
-            let id = null;
-
-            // They passed an id
-            if (newAgentId) {
-                id = newAgentId;
-                $location.search('agent', id);
-            } else {
-                if ($location.search().agent && !globalAgent) { // There's one in the url
-                    id = $location.search().agent;
-                } else {
-                    id = globalAgent.id;
-                    shareAgent.deleteAgent();
-                    $location.search('agent', id);
-                }
-            }
+            const id = commonData.checkLocationAgentId(newAgentId, globalAgent)
 
             const data = await Promise.all([
                 apiReq.request('GET', `/agents/${id}`, {}),
@@ -207,7 +181,6 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     $scope.goGroups = agent => {
         $scope.agentsAutoComplete.reset();
         visFactoryService.clearAll()
-        //$location.search('_a',null);
         shareAgent.setAgent(agent)
         $location.search('tab', 'groups');
         $location.path('/manager');
@@ -246,17 +219,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     $scope.isArray = angular.isArray;
 
-    const getAgent = newAgentId => {
-
-        // They passed an id
+    $scope.getAgentConfig = newAgentId => {
         if (newAgentId) {
             $location.search('agent', newAgentId);
         }
-
-    };
-
-    $scope.getAgentConfig = newAgentId => {
-        getAgent(newAgentId);
         firstLoad();
     }
 
@@ -270,16 +236,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             const globalAgent = shareAgent.getAgent();
             $scope.configurationError = false;
             $scope.load = true;
-            let id;
-            if ($location.search().agent && !globalAgent) { // There's one in the url
-                id = $location.search().agent;
-            } else {
-                id = globalAgent.id;
-                shareAgent.deleteAgent();
-                $location.search('agent', id);
-            }
 
-            let data         = await apiReq.request('GET', `/agents/${id}`, {});
+            const id = commonData.checkLocationAgentId(false, globalAgent)
+
+            const data       = await apiReq.request('GET', `/agents/${id}`, {});
             $scope.agent     = data.data.data;
             $scope.groupName = $scope.agent.group;
 
@@ -291,21 +251,22 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 return;
             }
 
-            data                      = await apiReq.request('GET', `/agents/groups/${$scope.groupName}/configuration`, {});
-            $scope.groupConfiguration = data.data.data.items[0];
-            $scope.rawJSON            = beautifier.prettyPrint(data.data.data.items);
+            const configurationData   = await apiReq.request('GET', `/agents/groups/${$scope.groupName}/configuration`, {});
+            $scope.groupConfiguration = configurationData.data.data.items[0];
+            $scope.rawJSON            = beautifier.prettyPrint(configurationData.data.data.items);
 
-            data = await Promise.all([
+            const agentGroups = await Promise.all([
                 apiReq.request('GET', `/agents/groups?search=${$scope.groupName}`, {}),
                 apiReq.request('GET', `/agents/groups/${$scope.groupName}`, {})
             ]);
 
 
-            let filtered          = data[0].data.data.items.filter(item => item.name === $scope.groupName);
-            $scope.groupMergedSum = (filtered.length) ? filtered[0].merged_sum : 'Unknown';
+            const groupMergedSum  = agentGroups[0].data.data.items.filter(item => item.name === $scope.groupName);
+            $scope.groupMergedSum = (groupMergedSum.length) ? groupMergedSum[0].merged_sum : 'Unknown';
 
-            filtered              = data[1].data.data.items.filter(item => item.id === $scope.agent.id);
-            $scope.agentMergedSum = (filtered.length) ? filtered[0].merged_sum : 'Unknown';
+            const agentMergedSum  = agentGroups[1].data.data.items.filter(item => item.id === $scope.agent.id);
+            $scope.agentMergedSum = (agentMergedSum.length) ? agentMergedSum[0].merged_sum : 'Unknown';
+
             $scope.isSynchronized = (($scope.agentMergedSum === $scope.groupMergedSum) && !([$scope.agentMergedSum,$scope.groupMergedSum].includes('Unknown')) ) ? true : false;
 
             $scope.load = false;

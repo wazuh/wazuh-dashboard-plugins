@@ -35,25 +35,11 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // Tab names
     $scope.tabNames = TabNames;
 
+    $scope.tabView = commonData.checkTabViewLocation();
+    $scope.tab     = commonData.checkTabLocation();
+
     let tabHistory = [];
-
-    // Check the url hash and retrieve tabView information
-    if ($location.search().tabView) {
-        $scope.tabView = $location.search().tabView;
-    } else { // If tabView doesn't exist, default it to 'panels'
-        $scope.tabView = 'panels';
-        $location.search('tabView', 'panels');
-    }
-
     if($scope.tab !== 'welcome') tabHistory.push($scope.tab);
-
-    // Check the url hash and retrieve tab information
-    if ($location.search().tab) {
-        $scope.tab = $location.search().tab;
-    } else { // If tab doesn't exist, default it to 'welcome'
-        $scope.tab = 'welcome';
-        $location.search('tab', 'welcome');
-    }
 
     // This object represents the number of visualizations per tab; used to show a progress bar
     tabVisualizations.assign('overview');
