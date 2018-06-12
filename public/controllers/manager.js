@@ -13,7 +13,7 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('managerController', function ($scope, $rootScope, $routeParams, $location, apiReq, errorHandler) {
+app.controller('managerController', function ($scope, $rootScope, $routeParams, $location) {
     $scope.submenuNavItem  = 'status';
     $scope.submenuNavItem2 = 'rules';
 
@@ -50,7 +50,7 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
     });
 });
 
-app.controller('managerStatusController', function ($scope,$rootScope, errorHandler, apiReq) {
+app.controller('managerStatusController', function ($scope, errorHandler, apiReq) {
     //Initialization
     $scope.load  = true;
 
@@ -97,7 +97,7 @@ app.controller('managerStatusController', function ($scope,$rootScope, errorHand
 
 import beautifier from 'plugins/wazuh/utils/json-beautifier';
 
-app.controller('managerConfigurationController', function ($scope, $rootScope, errorHandler, apiReq) {
+app.controller('managerConfigurationController', function ($scope, errorHandler, apiReq) {
     //Initialization
     $scope.load    = true;
     $scope.isArray = angular.isArray;
@@ -115,28 +115,29 @@ app.controller('managerConfigurationController', function ($scope, $rootScope, e
             $scope.managerConfiguration = data.data.data;
 
             if($scope.managerConfiguration && $scope.managerConfiguration['active-response']){
-                for(let i=0,len = $scope.managerConfiguration['active-response'].length; i<len; i++){
-                    let rule = '';
-                    const rulesArray = $scope.managerConfiguration['active-response'][i].rules_id ?
-                                       $scope.managerConfiguration['active-response'][i].rules_id.split(',') :
+
+                for(const ar of $scope.managerConfiguration['active-response']) {
+                    const rulesArray = ar.rules_id ?
+                    ar.rules_id.split(',') :
                                        [];
-                    if($scope.managerConfiguration['active-response'][i].rules_id && rulesArray.length > 1){
-                        let tmp = [];
-                        for(let id of rulesArray){
-                            rule = await apiReq.request('GET',`/rules/${id}`,{});
+                    if(ar.rules_id && rulesArray.length > 1){
+                        const tmp = [];
+                        
+                        for(const id of rulesArray){
+                            const rule = await apiReq.request('GET',`/rules/${id}`,{});
                             tmp.push(rule.data.data.items[0]);
                         }
 
-                        $scope.managerConfiguration['active-response'][i].rules = tmp;
-                    } else if($scope.managerConfiguration['active-response'][i].rules_id){
-                        rule = await apiReq.request('GET',`/rules/${$scope.managerConfiguration['active-response'][i].rules_id}`,{});
-                        $scope.managerConfiguration['active-response'][i].rule = rule.data.data.items[0];
+                        ar.rules = tmp;
+                    } else if(ar.rules_id){
+                        const rule = await apiReq.request('GET',`/rules/${ar.rules_id}`,{});
+                        ar.rule = rule.data.data.items[0];
                     }
                 }
             }
 
-            $scope.raw = beautifier.prettyPrint(data.data.data);
-            $scope.load                 = false;
+            $scope.raw  = beautifier.prettyPrint(data.data.data);
+            $scope.load = false;
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
