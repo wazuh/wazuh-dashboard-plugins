@@ -18,17 +18,13 @@ import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metrics
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($sce, $timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, commonData, reportingService) {
+app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, tabVisualizations, commonData, reportingService, visFactoryService) {
     
     $rootScope.reportStatus = false;
 
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
-    discoverPendingUpdates.removeAll();
-    rawVisualizations.removeAll();
-    tabVisualizations.removeAll();
-    loadedVisualizations.removeAll();
-
+    visFactoryService.clearAll()
    
     const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
     const extensions  = appState.getExtensions(currentApi);
@@ -97,37 +93,29 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, sameTab = true, preserveDiscover = false) => {
-        if ($scope.tabView === subtab && !force) return;
+    $scope.switchSubtab = async (subtab, force = false, sameTab = true, preserveDiscover = false) => {
+        try {
 
-        visHandlers.removeAll();
-        discoverPendingUpdates.removeAll();
-        rawVisualizations.removeAll();
-        loadedVisualizations.removeAll();
+            if ($scope.tabView === subtab && !force) return;
 
-        $location.search('tabView', subtab);
-        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') ||
-                             (subtab === 'discover' && $scope.tabView === 'panels')) && sameTab;
-        if(subtab === 'panels' && $scope.tabView === 'discover'  && sameTab){
-            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
-        }
+            visFactoryService.clear()
+            $location.search('tabView', subtab);
+            const localChange = (subtab === 'panels' && $scope.tabView === 'discover') && sameTab;
+            $scope.tabView = subtab;
+    
+            if(subtab === 'panels' && $scope.tab !== 'welcome'){
+                await visFactoryService.buildOverviewVisualizations(filterHandler, $scope.tab, subtab, localChange || preserveDiscover)
+            } else {
+                $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+            }
 
-        $scope.tabView = subtab;
+            checkMetrics($scope.tab, subtab)
 
-        if(subtab === 'panels' && $scope.tab !== 'welcome'){
-            // Create current tab visualizations
-            genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
-            .then(data => {
-                rawVisualizations.assignItems(data.data.raw);
-                commonData.assignFilters(filterHandler, $scope.tab, localChange || preserveDiscover);
-                $rootScope.$emit('changeTabView',{tabView:subtab})
-                $rootScope.$broadcast('updateVis');
-                checkMetrics($scope.tab, 'panels');
-            })
-            .catch(error => errorHandler.handle(error, 'Overview'));
-        } else {
-            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
-            checkMetrics($scope.tab, subtab);
+            return;
+
+        } catch (error) {
+            errorHandler.handle(error, 'Overview')
+            return;
         }
     }
 
@@ -147,35 +135,36 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
     $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab);
 
-    $scope.$on('$destroy', () => {
-        discoverPendingUpdates.removeAll();
-        rawVisualizations.removeAll();
-        tabVisualizations.removeAll();
-        loadedVisualizations.removeAll();
-        visHandlers.removeAll();
-    });
-
-    $scope.switchTab($scope.tab,true);
 
     // PCI and GDPR requirements
-    Promise.all([commonData.getPCI(),commonData.getGDPR()])
-    .then(data => {
-        $scope.pciTabs           = data[0];
-        $scope.selectedPciIndex  = 0;
-        $scope.gdprTabs          = data[1];
-        $scope.selectedGdprIndex = 0;
-    })
-    .catch(error => errorHandler.handle(error,'Overview'));
+    const loadPciAndGDPR = async () => {
+        try {
 
-    genericReq.request('GET', '/api/wazuh-api/configuration', {})
-    .then(configuration => {
-        if(configuration && configuration.data && configuration.data.data) {
-            $scope.wzMonitoringEnabled = typeof configuration.data.data['wazuh.monitoring.enabled']  !== 'undefined' ?
-                                         !!configuration.data.data['wazuh.monitoring.enabled'] :
-                                         true;
-            if(!$scope.wzMonitoringEnabled){
-                apiReq.request('GET', '/agents/summary', { })
-                .then(data => {
+            const data = await Promise.all([commonData.getPCI(),commonData.getGDPR()])
+
+            $scope.pciTabs           = data[0];
+            $scope.selectedPciIndex  = 0;
+            $scope.gdprTabs          = data[1];
+            $scope.selectedGdprIndex = 0;
+
+            return;
+
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    }
+
+    const loadConfiguration = async () => {
+        try {
+            const configuration = await genericReq.request('GET', '/api/wazuh-api/configuration', {})
+
+            if(configuration && configuration.data && configuration.data.data) {
+                $scope.wzMonitoringEnabled = typeof configuration.data.data['wazuh.monitoring.enabled']  !== 'undefined' ?
+                                                !!configuration.data.data['wazuh.monitoring.enabled'] :
+                                                true;
+                if(!$scope.wzMonitoringEnabled){
+                    const data = await apiReq.request('GET', '/agents/summary', { })
+      
                     if(data && data.data && data.data.data){
                         $scope.agentsCountActive         = data.data.data.Active;
                         $scope.agentsCountDisconnected   = data.data.data.Disconnected;
@@ -185,15 +174,39 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
                     } else {
                         throw new Error('Error fetching /agents/summary from Wazuh API')
                     }
-                })
-                .catch(error => errorHandler.handle(error, 'Overview - Monitoring'))
+                }
+            } else {
+                $scope.wzMonitoringEnabled = true;
             }
-        } else {
-            $scope.wzMonitoringEnabled = true;
+
+            return;
+
+        } catch (error) {
+            $scope.wzMonitoringEnabled = true
+            return Promise.reject(error)
         }
-    })
-    .catch(error => {
-        $scope.wzMonitoringEnabled = true
-        errorHandler.handle(error, 'Overview');
+    }
+
+    const init = async () => {
+        try {
+            await Promise.all([
+                loadPciAndGDPR(),
+                loadConfiguration()
+            ])
+
+            $scope.switchTab($scope.tab,true);
+
+            return;
+
+        } catch (error) {
+            errorHandler.handle(error, 'Overview (init)')
+            return;
+        }
+    }
+
+    init();
+
+    $scope.$on('$destroy', () => {
+        visFactoryService.clearAll()
     });
 });

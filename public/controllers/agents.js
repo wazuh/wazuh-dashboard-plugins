@@ -18,17 +18,13 @@ import { metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal } fr
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, shareAgent, commonData, reportingService) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, tabVisualizations, vis2png, shareAgent, commonData, reportingService, visFactoryService) {
 
     $rootScope.reportStatus = false;
 
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
-    visHandlers.removeAll();
-    discoverPendingUpdates.removeAll();
-    rawVisualizations.removeAll();
-    tabVisualizations.removeAll();
-    loadedVisualizations.removeAll();
+    visFactoryService.clearAll()
 
     const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
     const extensions  = appState.getExtensions(currentApi);
@@ -87,39 +83,33 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
 
     // Switch subtab
-    $scope.switchSubtab = (subtab, force = false, onlyAgent = false, sameTab = true, preserveDiscover = false) => {
-        if($scope.tabView === subtab && !force) return;
-        if(!onlyAgent) visHandlers.removeAll();
-        discoverPendingUpdates.removeAll();
-        rawVisualizations.removeAll();
-        loadedVisualizations.removeAll();
+    $scope.switchSubtab = async (subtab, force = false, onlyAgent = false, sameTab = true, preserveDiscover = false) => {
+        try {
+            if($scope.tabView === subtab && !force) return;
 
-        $location.search('tabView', subtab);
-        const localChange = ((subtab === 'panels' && $scope.tabView === 'discover') ||
-                             (subtab === 'discover' && $scope.tabView === 'panels')) && sameTab;
-        if(subtab === 'panels' && $scope.tabView === 'discover' && sameTab){
-            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
-        }
-
-        $scope.tabView = subtab;
-
-        if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome'){
-            // Create current tab visualizations
-            genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${$scope.tab}/${appState.getCurrentPattern()}`)
-            .then(data => {
-                rawVisualizations.assignItems(data.data.raw);
-                commonData.assignFilters(filterHandler, $scope.tab, !changeAgent && localChange || !changeAgent && preserveDiscover, $scope.agent.id)
+            visFactoryService.clear(onlyAgent)
+            $location.search('tabView', subtab);
+            const localChange = (subtab === 'panels' && $scope.tabView === 'discover') && sameTab;
+            $scope.tabView = subtab;
+    
+            if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome'){
+                const condition = !changeAgent && localChange || !changeAgent && preserveDiscover;
+                await visFactoryService.buildAgentsVisualizations(filterHandler, $scope.tab, subtab, condition, $scope.agent.id)
                 changeAgent = false;
-                $rootScope.$emit('changeTabView',{tabView:subtab});
-                $rootScope.$broadcast('updateVis');
-                checkMetrics($scope.tab, 'panels');
-            })
-            .catch(error => errorHandler.handle(error, 'Agents'));
-        } else {
-            $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+            } else {
+                $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+            }
+
             checkMetrics($scope.tab, subtab);
+
+            return;
+
+        } catch (error) {
+            errorHandler.handle(error,'Agents');
+            return;
         }
     }
+
     
     let changeAgent = false;
 
@@ -216,7 +206,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     $scope.goGroups = agent => {
         $scope.agentsAutoComplete.reset();
-        visHandlers.removeAll();
+        visFactoryService.clearAll()
         //$location.search('_a',null);
         shareAgent.setAgent(agent)
         $location.search('tab', 'groups');
@@ -240,12 +230,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     //Destroy
     $scope.$on("$destroy", () => {
-        discoverPendingUpdates.removeAll();
-        rawVisualizations.removeAll();
-        tabVisualizations.removeAll();
-        loadedVisualizations.removeAll();
+        visFactoryService.clearAll()
         $scope.agentsAutoComplete.reset();
-        visHandlers.removeAll();
     });
 
     // PCI and GDPR requirements
