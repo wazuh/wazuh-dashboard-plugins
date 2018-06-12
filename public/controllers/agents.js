@@ -152,47 +152,20 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     };
 
     // Agent data
-    $scope.getAgentStatusClass = (agentStatus) => agentStatus === "Active" ? "teal" : "red";
+    $scope.getAgentStatusClass = agentStatus => agentStatus === "Active" ? "teal" : "red";
 
-    $scope.formatAgentStatus = (agentStatus) => {
+    $scope.formatAgentStatus = agentStatus => {
         return ['Active','Disconnected'].includes(agentStatus) ? agentStatus : 'Never connected';
     };
 
     const validateRootCheck = () => {
-        $scope.agent.rootcheck.duration = 'Unknown';
-        if ($scope.agent.rootcheck.end && $scope.agent.rootcheck.start) {
-            $scope.agent.rootcheck.duration = ((new Date($scope.agent.rootcheck.end) - new Date($scope.agent.rootcheck.start))/1000)/60;
-            $scope.agent.rootcheck.duration = Math.round($scope.agent.rootcheck.duration * 100) / 100;
-
-            if($scope.agent.rootcheck.duration <= 0){
-                $scope.agent.rootcheck.inProgress = true;
-            }
-        } else {
-            if (!$scope.agent.rootcheck.end) {
-                $scope.agent.rootcheck.end = 'Unknown';
-            }
-            if (!$scope.agent.rootcheck.start){
-                $scope.agent.rootcheck.start = 'Unknown';
-            }
-        }
+        const result = commonData.validateRange($scope.agent.rootcheck)
+        $scope.agent.rootcheck = result;
     }
 
     const validateSysCheck = () => {
-        $scope.agent.syscheck.duration = 'Unknown';
-        if ($scope.agent.syscheck.end && $scope.agent.syscheck.start) {
-            $scope.agent.syscheck.duration = ((new Date($scope.agent.syscheck.end) - new Date($scope.agent.syscheck.start))/1000)/60;
-            $scope.agent.syscheck.duration = Math.round($scope.agent.syscheck.duration * 100) / 100;
-            if($scope.agent.syscheck.duration <= 0){
-                $scope.agent.syscheck.inProgress = true;
-            }
-        } else {
-            if (!$scope.agent.syscheck.end) {
-                $scope.agent.syscheck.end = 'Unknown';
-            }
-            if (!$scope.agent.syscheck.start){
-                $scope.agent.syscheck.start = 'Unknown';
-            }
-        }
+        const result = commonData.validateRange($scope.agent.syscheck)
+        $scope.agent.syscheck = result;
     }
 
     $scope.getAgent = async (newAgentId,fromAutocomplete) => {
