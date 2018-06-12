@@ -9,13 +9,16 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import $             from 'jquery';
-import * as modules  from 'ui/modules'
-import FilterHandler from './filter-handler'
+import $              from 'jquery';
+import * as modules   from 'ui/modules'
+import FilterHandler  from './filter-handler'
+import generateMetric from '../utils/generate-metric'
+import TabNames       from '../utils/tab-names'
+import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($sce, $timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png) {
+app.controller('overviewController', function ($sce, $timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, commonData) {
 
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
@@ -32,72 +35,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     $scope.wzMonitoringEnabled = false;
 
     // Tab names
-    $scope.tabNames = {
-        welcome   : 'Welcome',
-        general   : 'General',
-        fim       : 'File integrity',
-        pm        : 'Policy monitoring',
-        vuls      : 'Vulnerabilities',
-        oscap     : 'Open SCAP',
-        audit     : 'Audit',
-        pci       : 'PCI DSS',
-        gdpr      : 'GDPR',
-        aws       : 'AWS',
-        virustotal: 'VirusTotal'
-    }
-
-    // Metrics General
-    const metricsGeneral = {
-        totalAlerts: '[vis-id="\'Wazuh-App-Overview-General-Metric-alerts\'"]',
-        level12    : '[vis-id="\'Wazuh-App-Overview-General-Level-12-alerts\'"]',
-        authFailure: '[vis-id="\'Wazuh-App-Overview-General-Authentication-failure\'"]',
-        authSuccess: '[vis-id="\'Wazuh-App-Overview-General-Authentication-success\'"]'
-    }
-
-    // Metrics FIM
-    const metricsFim = {
-        fimAdded   : '[vis-id="\'Wazuh-App-Overview-FIM-Added\'"]',
-        fimModified: '[vis-id="\'Wazuh-App-Overview-FIM-Modified\'"]',
-        fimDeleted : '[vis-id="\'Wazuh-App-Overview-FIM-Deleted\'"]'
-    }
-
-    // Metrics Audit
-    const metricsAudit = {
-        auditNewFiles     : '[vis-id="\'Wazuh-App-Overview-Audit-New-files\'"]',
-        auditReadFiles    : '[vis-id="\'Wazuh-App-Overview-Audit-Read-files\'"]',
-        auditModifiedFiles: '[vis-id="\'Wazuh-App-Overview-Audit-Modified-files\'"]',
-        auditRemovedFiles : '[vis-id="\'Wazuh-App-Overview-Audit-Removed-files\'"]'
-    }
-
-    // Metrics Vulnerability Detector
-    const metricsVulnerability = {
-        vulnCritical: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]',
-        vulnHigh    : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"]',
-        vulnMedium  : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"]',
-        vulnLow     : '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
-    }
-
-    // Metrics Scap
-    const metricsScap = {
-        scapLastScore   : '[vis-id="\'Wazuh-App-Overview-OSCAP-Last-score\'"]',
-        scapHighestScore: '[vis-id="\'Wazuh-App-Overview-OSCAP-Highest-score\'"]',
-        scapLowestScore : '[vis-id="\'Wazuh-App-Overview-OSCAP-Lowest-score\'"]'
-    }
-
-    // Metrics Virustotal
-    const metricsVirustotal = {
-        virusMalicious: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Malicious\'"]',
-        virusPositives: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Positives\'"]',
-        virusTotal    : '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
-    }
-
-    // Metrics AWS
-    const metricsAws = {
-        awsLogins        :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Successful-logins\'"]',
-        awsMostActiveUser:'[vis-id="\'Wazuh-App-Overview-AWS-Most-active-user\'"]',
-        awsAuthorized    :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Authorize-security\'"]',
-        awsRevoked       :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
-    }
+    $scope.tabNames = TabNames;
 
     let tabHistory = [];
 
@@ -133,71 +71,6 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
         aws       : 10,
         virustotal: 7
     });
-
-    // Object for matching nav items and rules groups
-    const tabFilters = {
-        general   : { group: '' },
-        fim       : { group: 'syscheck' },
-        pm        : { group: 'rootcheck' },
-        vuls      : { group: 'vulnerability-detector' },
-        oscap     : { group: 'oscap' },
-        audit     : { group: 'audit' },
-        pci       : { group: 'pci_dss' },
-        gdpr      : { group: 'gdpr' },
-        aws       : { group: 'amazon' },
-        virustotal: { group: 'virustotal' }
-    };
-
-    let filters = []
-
-    const assignFilters = (tab, localChange) => {
-        try{
-
-            filters = [];
-            const isCluster = appState.getClusterInfo().status == 'enabled';
-            filters.push(filterHandler.managerQuery(
-                isCluster ?
-                appState.getClusterInfo().cluster :
-                appState.getClusterInfo().manager,
-                isCluster
-            ))
-
-            if(tab !== 'general'){
-                if(tab === 'pci') {
-                    filters.push(filterHandler.pciQuery())
-                } else if(tab === 'gdpr') {
-                    filters.push(filterHandler.gdprQuery())
-                } else {
-                    filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
-                }
-            }
-            $rootScope.$emit('wzEventFilters',{filters, localChange});
-            if(!$rootScope.$$listenerCount['wzEventFilters']){
-                $timeout(100)
-                .then(() => assignFilters(tab))
-            }
-        } catch(error) {
-            errorHandler.handle('An error occurred while creating custom filters for visualizations','Overview',true);
-        }
-    }
-
-    const generateMetric = id => {
-        let html = $(id).html();
-        if (typeof html !== 'undefined' && html.includes('<span')) {
-            if(typeof html.split('<span>')[1] !== 'undefined'){
-                return html.split('<span>')[1].split('</span')[0];
-            } else if(html.includes('table') && html.includes('cell-hover')){
-                let nonB = html.split('ng-non-bindable')[1];
-                if(nonB &&
-                    nonB.split('>')[1] &&
-                    nonB.split('>')[1].split('</')[0]
-                ) {
-                    return nonB.split('>')[1].split('</')[0];
-                }
-            }
-        }
-        return '';
-    }
 
     const createMetrics = metricsObject => {
         for(let key in metricsObject) {
@@ -256,7 +129,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
             genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${$scope.tab}/${appState.getCurrentPattern()}`)
             .then(data => {
                 rawVisualizations.assignItems(data.data.raw);
-                assignFilters($scope.tab, localChange || preserveDiscover);
+                commonData.assignFilters(filterHandler, $scope.tab, localChange || preserveDiscover);
                 $rootScope.$emit('changeTabView',{tabView:subtab})
                 $rootScope.$broadcast('updateVis');
                 checkMetrics($scope.tab, 'panels');
@@ -341,39 +214,15 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
 
     $scope.switchTab($scope.tab,true);
 
-    //PCI tab
-    let pciTabs = [];
-    genericReq
-        .request('GET', '/api/wazuh-api/pci/all')
-        .then(data => {
-            for (let key in data.data) {
-                pciTabs.push({
-                    "title": key,
-                    "content": data.data[key]
-                });
-            }
-        })
-        .catch(error => errorHandler.handle(error, 'Overview'));
-
-    $scope.pciTabs = pciTabs;
-    $scope.selectedPciIndex = 0;
-
-    //GDPR tab
-    let gdprTabs = [];
-    genericReq
-        .request('GET', '/api/wazuh-api/gdpr/all')
-        .then(data => {
-            for (let key in data.data) {
-                gdprTabs.push({
-                    "title": key,
-                    "content": data.data[key]
-                });
-            }
-        })
-        .catch(error => errorHandler.handle(error, 'Overview'));
-
-    $scope.gdprTabs = gdprTabs;
-    $scope.selectedGdprIndex = 0;
+    // PCI and GDPR requirements
+    Promise.all([commonData.getPCI(),commonData.getGDPR()])
+    .then(data => {
+        $scope.pciTabs           = data[0];
+        $scope.selectedPciIndex  = 0;
+        $scope.gdprTabs          = data[1];
+        $scope.selectedGdprIndex = 0;
+    })
+    .catch(error => errorHandler.handle(error,'Overview'));
 
     genericReq.request('GET', '/api/wazuh-api/configuration', {})
     .then(configuration => {
