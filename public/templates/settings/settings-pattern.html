@@ -1,4 +1,4 @@
-<md-card class="wz-md-card" flex layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'pattern'">
+<md-card class="wz-md-card" flex layout-padding layout-align="start stretch" ng-if="tab == 'pattern'">
     <md-card-content>
         <span class="wz-headline-title">Wazuh App: Index pattern selection</span>
         <md-divider class="wz-margin-top-10"></md-divider>
@@ -6,8 +6,7 @@
         <div layout="row" class="wz-padding-top-10">Select the index pattern to run search and analytics against.</div>
 
         <div layout="row" class="wz-padding-top-10">
-            <strong>Beware:</strong>&nbsp;the new index-pattern structure must be compatible with Wazuh alerts, otherwise the visualizations
-            will load erroneous data, or no data at all.
+            <strong>Beware:</strong>&nbsp;the new index-pattern structure must be compatible with Wazuh alerts, otherwise the visualizations will load erroneous data, or no data at all.
         </div>
 
         <div flex="20" layout="column" class="height-40 md-block wz-margin-top-17 wz-margin-right-15 wz-select-input">

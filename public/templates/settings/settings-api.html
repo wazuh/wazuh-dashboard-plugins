@@ -1,4 +1,4 @@
-<md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="submenuNavItem == 'api'">
+<md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="tab == 'api'">
     <md-card-content>
         <span class="wz-headline-title">Wazuh App: API configuration</span>
         <md-divider class="wz-margin-top-10"></md-divider>
@@ -76,7 +76,7 @@
 
         <div layout="row" ng-show="!currentAPI || (addManagerContainer && !isEditing)">
             <!-- Add API form -->
-            <form flex ng-submit="saveSettings()" layout="column" layout-align="start stretch" 
+            <form flex ng-submit="saveSettings()" layout="column" layout-align="start stretch"
                 class="margin-top-30">
                 <!-- Input section -->
                 <md-input-container class="wz-input-container">
