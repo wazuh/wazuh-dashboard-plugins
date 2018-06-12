@@ -83,6 +83,24 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
             } catch(error) {
                 errorHandler.handle('An error occurred while creating custom filters for visualizations',agent ? 'Agents' : 'Overview',true);
             }
+        },
+        validateRange: data => {
+            const result = {
+                duration  : 'Unknown',
+                inProgress: false,
+                end       : data.end || 'Unknown',
+                start     : data.start || 'Unknown'
+            }
+
+            if(data.end && data.start) {
+                result.duration = ((new Date(data.end) - new Date(data.start))/1000)/60;
+                result.duration = Math.round(result.duration * 100) / 100;
+                if(result.duration <= 0){
+                    result.inProgress = true;
+                }
+            } 
+
+            return result;
         }
     }
 });
