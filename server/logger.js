@@ -16,7 +16,7 @@ import path    from 'path';
 let allowed = false;
 
 /** 
- * Checks if ../../wazuh-logs exists. If it doesn't exist, it will be created.
+ * Checks if wazuh-logs exists. If it doesn't exist, it will be created.
  */
 const initDirectory = () => {
     try{
@@ -27,8 +27,8 @@ const initDirectory = () => {
             throw new Error('Kibana is out of /usr/share/kibana path and the Wazuh App is inside plugins directory')
 
         }
-        if (!fs.existsSync(path.join(__dirname, '../../wazuh-logs'))) {
-            fs.mkdirSync(path.join(__dirname, '../../wazuh-logs'));
+        if (!fs.existsSync(path.join(__dirname, '../../../optimize/wazuh-logs'))) {
+            fs.mkdirSync(path.join(__dirname, '../../../optimize/wazuh-logs'));
         }
         allowed = true;
         return;
@@ -46,7 +46,7 @@ const wazuhlogger = winston.createLogger({
     format    : winston.format.json(),
     transports: [
         new winston.transports.File({
-            filename: path.join(__dirname, '../../wazuh-logs/wazuhapp.log')
+            filename: path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log')
         })
     ]
 });
@@ -77,10 +77,10 @@ const getFilesizeInMegaBytes = filename => {
  */
 const checkFiles = () => {
     if(allowed){
-        if (getFilesizeInMegaBytes(path.join(__dirname, '../../wazuh-logs/wazuhapp.log')) >= 100) {
+        if (getFilesizeInMegaBytes(path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log')) >= 100) {
             fs.renameSync(
-                path.join(__dirname, '../../wazuh-logs/wazuhapp.log'),
-                path.join(__dirname, `../../wazuh-logs/wazuhapp.${new Date().getTime()}.log`)
+                path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log'),
+                path.join(__dirname, `../../../optimize/wazuh-logs/wazuhapp.${new Date().getTime()}.log`)
             )
         }
     }
