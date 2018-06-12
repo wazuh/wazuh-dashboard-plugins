@@ -11,14 +11,16 @@
  */
 import $              from 'jquery';
 import * as modules   from 'ui/modules'
-import FilterHandler  from './filter-handler'
+import FilterHandler  from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
 import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($sce, $timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, commonData) {
+app.controller('overviewController', function ($sce, $timeout, $scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, commonData, reportingService) {
+    
+    $rootScope.reportStatus = false;
 
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
@@ -58,19 +60,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
     }
 
     // This object represents the number of visualizations per tab; used to show a progress bar
-    tabVisualizations.assign({
-        welcome   : 0,
-        general   : 11,
-        fim       : 10,
-        pm        : 5,
-        vuls      : 8,
-        oscap     : 14,
-        audit     : 15,
-        pci       : 6,
-        gdpr      : 6,
-        aws       : 10,
-        virustotal: 7
-    });
+    tabVisualizations.assign('overview');
 
     const createMetrics = metricsObject => {
         for(let key in metricsObject) {
@@ -155,54 +145,7 @@ app.controller('overviewController', function ($sce, $timeout, $scope, $location
         $scope.switchSubtab('panels', true, sameTab, preserveDiscover);
     };
 
-    $scope.startVis2Png = async () => {
-        try {
-            if(vis2png.isWorking()){
-                errorHandler.handle('Report in progress', 'Reporting',true);
-                return;
-            }
-            $scope.reportBusy = true;
-            $rootScope.reportStatus = 'Generating report...0%'
-            if(!$rootScope.$$phase) $rootScope.$digest();
-
-            vis2png.clear();
-
-            const idArray = rawVisualizations.getList().map(item => {
-                const tmpHTMLElement = $(`#${item.id}`);
-                vis2png.assignHTMLItem(item.id,tmpHTMLElement)
-                return item.id;
-            });
-
-            const appliedFilters = visHandlers.getAppliedFilters();
-            const tab   = $scope.tab;
-            const array = await vis2png.checkArray(idArray)
-            const name  = `wazuh-overview-${tab}-${Date.now() / 1000 | 0}.pdf`
-
-            const data    ={
-                array,
-                name,
-                title: `Overview ${tab}`,
-                filters: appliedFilters.filters,
-                time: appliedFilters.time,
-                searchBar: appliedFilters.searchBar,
-                tab,
-                section: 'overview'
-            };
-
-            const request = await genericReq.request('POST','/api/wazuh-api/report',data)
-
-            $scope.reportBusy = false;
-            $rootScope.reportStatus = false;
-
-            errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-
-            return;
-        } catch (error) {
-            $scope.reportBusy = false;
-            $rootScope.reportStatus = false;
-            errorHandler.handle(error, 'Reporting')
-        }
-    }
+    $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab);
 
     $scope.$on('$destroy', () => {
         discoverPendingUpdates.removeAll();
