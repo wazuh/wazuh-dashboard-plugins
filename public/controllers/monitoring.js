@@ -9,9 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import FilterHandler from './filter-handler'
+import FilterHandler from '../utils/filter-handler'
+import * as modules  from 'ui/modules'
 
-const app = require('ui/modules').get('app/wazuh', []);
+const app = modules.get('app/wazuh', []);
 
 // Logs controller
 app.controller('clusterController', function ($scope, $rootScope, $timeout, errorHandler, apiReq, ClusterNodes, $window, $location, discoverPendingUpdates, rawVisualizations, loadedVisualizations, visHandlers, tabVisualizations, appState, genericReq) {

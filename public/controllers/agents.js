@@ -11,14 +11,17 @@
  */
 import beautifier    from 'plugins/wazuh/utils/json-beautifier';
 import * as modules  from 'ui/modules'
-import FilterHandler from './filter-handler'
+import FilterHandler from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
 import { metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal } from '../utils/agents-metrics'
 
 const app = modules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, shareAgent, commonData) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, genericReq, apiReq, AgentsAutoComplete, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers, vis2png, shareAgent, commonData, reportingService) {
+
+    $rootScope.reportStatus = false;
+
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     visHandlers.removeAll();
@@ -56,19 +59,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     // Tab names
     $scope.tabNames = TabNames;
 
-    tabVisualizations.assign({
-        welcome      : 0,
-        general      : 7,
-        fim          : 8,
-        pm           : 4,
-        vuls         : 7,
-        oscap        : 13,
-        audit        : 15,
-        gdpr         : 3,
-        pci          : 3,
-        virustotal   : 6,
-        configuration: 0
-    });
+    tabVisualizations.assign('agents');
 
     const createMetrics = metricsObject => {
         for(let key in metricsObject) {
@@ -344,56 +335,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     }
     /** End of agent configuration */
 
-    $scope.startVis2Png = async () => {
-        try {
-            if(vis2png.isWorking()){
-                errorHandler.handle('Report in progress', 'Reporting',true);
-                return;
-            }
-            $scope.reportBusy = true;
-            $rootScope.reportStatus = 'Generating report...0%'
-            if(!$rootScope.$$phase) $rootScope.$digest();
-
-            vis2png.clear();
-
-            const idArray = rawVisualizations.getList().map(item => item.id);
-
-            for(const item of idArray) {
-                const tmpHTMLElement = $(`#${item}`);
-                vis2png.assignHTMLItem(item,tmpHTMLElement)
-            }
-
-            const appliedFilters = visHandlers.getAppliedFilters();
-            const tab   = $scope.tab;
-            const array = await vis2png.checkArray(idArray)
-            const name  = `wazuh-agents-${tab}-${Date.now() / 1000 | 0}.pdf`
-
-            const data    ={
-                array,
-                name,
-                title: `Agents ${tab}`,
-                filters: appliedFilters.filters,
-                time: appliedFilters.time,
-                searchBar: appliedFilters.searchBar,
-                tab,
-                section: 'agents',
-                isAgents: true
-            };
-
-            const request = await genericReq.request('POST','/api/wazuh-api/report',data)
-
-            $scope.reportBusy = false;
-            $rootScope.reportStatus = false;
-
-            errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-
-            return;
-        } catch (error) {
-            $scope.reportBusy = false;
-            $rootScope.reportStatus = false;
-            errorHandler.handle(error, 'Reporting')
-        }
-    }
+    $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab, true);
 
     //Load
     try {
