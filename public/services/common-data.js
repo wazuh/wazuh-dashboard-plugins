@@ -13,7 +13,7 @@ import * as modules from 'ui/modules'
 
 const app = modules.get('app/wazuh', []);
 
-app.service('commonData', function ($rootScope, $timeout, genericReq, appState, errorHandler) {
+app.service('commonData', function ($rootScope, $timeout, genericReq, appState, errorHandler, $location, shareAgent) {
     return {
         getGDPR: async () => {
             try {
@@ -101,6 +101,37 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
             } 
 
             return result;
+        },
+        checkTabLocation: () => {
+            if ($location.search().tab){
+                return $location.search().tab;
+            } else {
+                $location.search('tab', 'welcome');
+                return 'welcome';
+            }
+        },
+        checkTabViewLocation: () => {
+            if ($location.search().tabView){
+                return $location.search().tabView;
+            } else {
+                $location.search('tabView', 'panels');
+                return 'panels'
+            }
+
+        },
+        checkLocationAgentId: (newAgentId, globalAgent) => {
+            if (newAgentId) {
+                $location.search('agent', newAgentId);
+                return newAgentId;
+            } else {
+                if ($location.search().agent && !globalAgent) { // There's one in the url
+                    return $location.search().agent;
+                } else {
+                    shareAgent.deleteAgent();
+                    $location.search('agent', globalAgent.id);
+                    return globalAgent.id;
+                }
+            }
         }
     }
 });
