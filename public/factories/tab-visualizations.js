@@ -52,9 +52,7 @@ app.factory('tabVisualizations', function() {
         return currentTab;
     }
 
-    const getItem = item => {
-        return tabVisualizations[item]
-    }
+    const getItem = item => tabVisualizations[item]
 
     const assign = tabs => {
         if(typeof tabs === 'object') {
@@ -66,10 +64,8 @@ app.factory('tabVisualizations', function() {
         } 
     }
 
-    const removeAll = () => {
-        tabVisualizations = {};
-    }
-  
+    const removeAll = () => tabVisualizations = {};
+      
     return {
       getItem,
       removeAll,

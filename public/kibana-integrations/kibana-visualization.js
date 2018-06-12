@@ -148,7 +148,7 @@ const app = modules.get('apps/webinar_app', [])
 
                     loadedVisualizations.addItem(true);
 
-                    let currentCompleted = Math.round((loadedVisualizations.getList().length / tabVisualizations.getItem(tabVisualizations.getTab())) * 100);
+                    const currentCompleted = Math.round((loadedVisualizations.getList().length / tabVisualizations.getItem(tabVisualizations.getTab())) * 100);
                     $rootScope.loadingStatus = `Rendering visualizations... ${currentCompleted > 100 ? 100 : currentCompleted} %`;
 
                     if (currentCompleted >= 100) {
