@@ -10,15 +10,20 @@
  * Find more information about this on the LICENSE file.
  */
 export default {
-    welcome   : 'Welcome',
-    general   : 'General',
-    fim       : 'File integrity',
-    pm        : 'Policy monitoring',
-    vuls      : 'Vulnerabilities',
-    oscap     : 'Open SCAP',
-    audit     : 'Audit',
-    pci       : 'PCI DSS',
-    gdpr      : 'GDPR',
-    aws       : 'AWS',
-    virustotal: 'VirusTotal'
+    welcome      : 'Welcome',
+    general      : 'General',
+    fim          : 'File integrity',
+    pm           : 'Policy monitoring',
+    vuls         : 'Vulnerabilities',
+    oscap        : 'Open SCAP',
+    audit        : 'Audit',
+    pci          : 'PCI DSS',
+    gdpr         : 'GDPR',
+    aws          : 'AWS',
+    virustotal   : 'VirusTotal',
+    configuration: 'Configuration',
+    api          : 'API configuration',
+    extensions   : 'Extensions',
+    pattern      : 'Index pattern',
+    about        : 'About'
 }
