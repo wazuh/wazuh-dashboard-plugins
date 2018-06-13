@@ -43,7 +43,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         welcome   : 'Welcome',
         api       : 'API configuration',
         extensions: 'Extensions',
-        pattern   : 'Index pattern'
+        pattern   : 'Index pattern',
+        about     : 'About'
     }
 
     $scope.indexPatterns = [];
