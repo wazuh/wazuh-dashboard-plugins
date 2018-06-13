@@ -12,6 +12,7 @@
 import base64       from 'plugins/wazuh/utils/base64.js';
 import chrome       from 'ui/chrome';
 import * as modules from 'ui/modules'
+import TabNames     from '../utils/tab-names'
 
 const app = modules.get('app/wazuh', []);
 
@@ -39,13 +40,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
     // Tab names
-    $scope.tabNames = {
-        welcome   : 'Welcome',
-        api       : 'API configuration',
-        extensions: 'Extensions',
-        pattern   : 'Index pattern',
-        about     : 'About'
-    }
+    $scope.tabNames = TabNames;
 
     $scope.indexPatterns = [];
     $scope.apiEntries    = [];
