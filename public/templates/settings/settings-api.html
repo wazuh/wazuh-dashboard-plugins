@@ -1,110 +1,124 @@
-<md-card class="wz-md-card" layout-padding layout-align="start stretch" ng-if="tab == 'api'">
-    <md-card-content>
-        <span class="wz-headline-title">Wazuh App: API configuration</span>
-        <md-divider class="wz-margin-top-10"></md-divider>
+<div flex layout="column" layout-align="start stretch" ng-if="tab === 'api' && !load">
 
-        <!-- API list headings row -->
-        <div layout="row" layout-align="start start" class="wz-padding-top-10 wz-padding-bottom-14">
-            <p flex="15" class="wz-text-bold">Cluster</p>
-            <p flex="20" class="wz-text-bold">Manager</p>
-            <p flex="15" class="wz-text-bold">API URL</p>
-            <p flex="15" class="wz-text-bold">API Port</p>
-            <p flex="15" class="wz-text-bold">User</p>
-            <p flex="20" class="wz-text-bold">Actions</p>
-        </div>
-
-        <div ng-repeat="entry in apiEntries">
-            <!-- API entry -->
-            <div layout="row" layout-align="space-between center" class="wz-padding-top-10 wz-padding-bottom-14">
-                <p flex="15">
-                    <i ng-show="(entry._id === currentDefault)" tooltip="This is the default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
-                <p flex="20">{{entry._source.cluster_info.manager}}</p>
-                <p flex="15">{{entry._source.url}}</p>
-                <p flex="15">{{entry._source.api_port}}</p>
-                <p flex="15">{{entry._source.api_user}}</p>
-                <p flex="20">
-                    <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
-                    <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                    <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                    <i ng-click="toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                </p>
-            </div>
-
-            <!-- Edit API form -->
-            <div layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id] && isEditing">
-                <form flex ng-submit="updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
-                    <!-- Input section -->
-                    <md-input-container class="wz-input-container">
-                        <label>Username</label>
-                        <input ng-model="formUpdate.user" ng-init="formUpdate.user=entry._source.api_user" type="text" placeholder="" aria-label="username"
-                            required/>
-                    </md-input-container>
-                    <md-input-container class="wz-input-container">
-                        <label>Password</label>
-                        <input ng-model="formUpdate.password" type="password" placeholder="" aria-label="password" required/>
-                    </md-input-container>
-                    <md-input-container class="wz-input-container">
-                        <label>URL</label>
-                        <input ng-model="formUpdate.url" ng-init="formUpdate.url=entry._source.url" type="url" placeholder="http(s)://" aria-label="full url"
-                            required/>
-                    </md-input-container>
-                    <md-input-container class="wz-input-container">
-                        <label>Port</label>
-                        <input ng-model="formUpdate.port" ng-init="formUpdate.port=entry._source.api_port" type="text" placeholder="" aria-label="port"
-                            required/>
-                    </md-input-container>
-                    <!-- Button and errors section -->
-                    <div layout="row" layout-align="center center" ng-if="messageError">
-                        <p class="color-f9">{{messageErrorUpdate}}</p>
-                    </div>
-                    <div layout="row" layout-align="center center">
-                        <md-button type="submit" class="wz-button md-raised md-primary" aria-label="Update API button">
-                            <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Update API
-                        </md-button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Add API button container -->
-        <div ng-show="!isUpdating()" layout="row" layout-align="center center" class="wz-padding-top-10">
-            <md-button ng-click="switch()" class="wz-button md-raised md-primary"
-                aria-label="Add new API button">
-                <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new API
-            </md-button>
-        </div>
-
-        <div layout="row" ng-show="!currentAPI || (addManagerContainer && !isEditing)">
-            <!-- Add API form -->
-            <form flex ng-submit="saveSettings()" layout="column" layout-align="start stretch"
-                class="margin-top-30">
-                <!-- Input section -->
-                <md-input-container class="wz-input-container">
-                    <label>Username</label>
-                    <input ng-model="formData.user" type="text" placeholder="" aria-label="username" required/>
-                </md-input-container>
-                <md-input-container class="wz-input-container">
-                    <label>Password</label>
-                    <input ng-model="formData.password" type="password" placeholder="" aria-label="password" required/>
-                </md-input-container>
-                <md-input-container class="wz-input-container">
-                    <label>URL</label>
-                    <input ng-model="formData.url" type="url" placeholder="http(s)://" aria-label="full url" required/>
-                </md-input-container>
-                <md-input-container class="wz-input-container">
-                    <label>Port</label>
-                    <input ng-model="formData.port" type="text" placeholder="" aria-label="port" required/>
-                </md-input-container>
-                <!-- Button and errors section -->
-                <div layout="row" layout-align="center center">
-                    <p class="color-f9">{{messageError}}</p>
+    <!-- API configuration card section -->
+    <div layout="row" layout-align="start start">
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <i class="fa fa-fw fa-tasks" aria-hidden="true"></i> <span class="wz-headline-title">API configuration</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <!-- API entries headings section -->
+                <div layout="row" class="wz-padding-top-10 wz-padding-bottom-14">
+                    <p flex="15" class="wz-text-bold">Cluster</p>
+                    <p flex="20" class="wz-text-bold">Manager</p>
+                    <p flex="15" class="wz-text-bold">API URL</p>
+                    <p flex="15" class="wz-text-bold">API Port</p>
+                    <p flex="15" class="wz-text-bold">User</p>
+                    <p flex="20" class="wz-text-bold">Actions</p>
                 </div>
-                <div layout="row" layout-align="center center">
-                    <md-button type="submit" class="wz-button md-raised md-primary" aria-label="Save API button">
-                        <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save API
+                <!-- End API entries headings section -->
+
+                <!-- API entries list section -->
+                <div ng-repeat="entry in apiEntries">
+                    <!-- API entry -->
+                    <div layout="row" layout-align="space-between center" class="wz-padding-top-10 wz-padding-bottom-14">
+                        <p flex="15">
+                            <i ng-show="(entry._id === currentDefault)" tooltip="This is the default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
+                        <p flex="20">{{entry._source.cluster_info.manager}}</p>
+                        <p flex="15">{{entry._source.url}}</p>
+                        <p flex="15">{{entry._source.api_port}}</p>
+                        <p flex="15">{{entry._source.api_user}}</p>
+                        <p flex="20">
+                            <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                        </p>
+                    </div>
+                    <!-- End API entry -->
+                    <!-- Edit API form -->
+                    <div layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id] && isEditing">
+                        <form flex ng-submit="updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
+                            <!-- Input section -->
+                            <md-input-container class="wz-input-container">
+                                <label>Username</label>
+                                <input ng-model="formUpdate.user" ng-init="formUpdate.user=entry._source.api_user" type="text" placeholder="" aria-label="username"
+                                    required/>
+                            </md-input-container>
+                            <md-input-container class="wz-input-container">
+                                <label>Password</label>
+                                <input ng-model="formUpdate.password" type="password" placeholder="" aria-label="password" required/>
+                            </md-input-container>
+                            <md-input-container class="wz-input-container">
+                                <label>URL</label>
+                                <input ng-model="formUpdate.url" ng-init="formUpdate.url=entry._source.url" type="url" placeholder="http(s)://" aria-label="full url"
+                                    required/>
+                            </md-input-container>
+                            <md-input-container class="wz-input-container">
+                                <label>Port</label>
+                                <input ng-model="formUpdate.port" ng-init="formUpdate.port=entry._source.api_port" type="text" placeholder="" aria-label="port"
+                                    required/>
+                            </md-input-container>
+                            <!-- Button and errors section -->
+                            <div layout="row" layout-align="center center" ng-if="messageError">
+                                <p class="color-f9">{{messageErrorUpdate}}</p>
+                            </div>
+                            <div layout="row" layout-align="center center">
+                                <md-button type="submit" class="wz-button md-raised md-primary" aria-label="Update API button">
+                                    <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Update API
+                                </md-button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- End edit API form -->
+                </div>
+                <!-- End API entries list section -->
+
+                <!-- Add API button section -->
+                <div ng-show="!isUpdating()" layout="row" layout-align="center center" class="wz-padding-top-10">
+                    <md-button ng-click="switch()" class="wz-button md-raised md-primary"
+                        aria-label="Add new API button">
+                        <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new API
                     </md-button>
                 </div>
-            </form>
-        </div>
-    </md-card-content>
-</md-card>
+                <!-- End add API button section -->
+
+                <!-- Add API section-->
+                <div layout="row" ng-show="!currentAPI || (addManagerContainer && !isEditing)">
+                    <!-- Add API form -->
+                    <form flex ng-submit="saveSettings()" layout="column" layout-align="start stretch"
+                        class="margin-top-30">
+                        <!-- Input section -->
+                        <md-input-container class="wz-input-container">
+                            <label>Username</label>
+                            <input ng-model="formData.user" type="text" placeholder="" aria-label="username" required/>
+                        </md-input-container>
+                        <md-input-container class="wz-input-container">
+                            <label>Password</label>
+                            <input ng-model="formData.password" type="password" placeholder="" aria-label="password" required/>
+                        </md-input-container>
+                        <md-input-container class="wz-input-container">
+                            <label>URL</label>
+                            <input ng-model="formData.url" type="url" placeholder="http(s)://" aria-label="full url" required/>
+                        </md-input-container>
+                        <md-input-container class="wz-input-container">
+                            <label>Port</label>
+                            <input ng-model="formData.port" type="text" placeholder="" aria-label="port" required/>
+                        </md-input-container>
+                        <!-- Button and errors section -->
+                        <div layout="row" layout-align="center center">
+                            <p class="color-f9">{{messageError}}</p>
+                        </div>
+                        <div layout="row" layout-align="center center">
+                            <md-button type="submit" class="wz-button md-raised md-primary" aria-label="Save API button">
+                                <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save API
+                            </md-button>
+                        </div>
+                    </form>
+                    <!-- End add API form -->
+                </div>
+                <!-- End add API section-->
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- End API configuration card section -->
+</div>
