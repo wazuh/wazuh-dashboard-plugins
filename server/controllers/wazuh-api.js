@@ -603,13 +603,13 @@ export default class WazuhApi {
     async report(req,reply) {
         try {
 
-            if (!fs.existsSync(path.join(__dirname, '../../../wazuh-reporting'))) {
-                fs.mkdirSync(path.join(__dirname, '../../../wazuh-reporting'));
+            if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'))) {
+                fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
             }
   
             if(req.payload && req.payload.array){
                 const doc = new PDFDocument();
-                doc.pipe(fs.createWriteStream(path.join(__dirname, '../../../wazuh-reporting/' + req.payload.name)));
+                doc.pipe(fs.createWriteStream(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name)));
                 doc.image(path.join(__dirname, '../../public/img/logo.png'),410,20,{fit:[150,70]})
                 doc.moveDown().fontSize(9).fillColor('blue').text('https://wazuh.com',442,50,{link: 'https://wazuh.com', underline:true, valign:'right', align: 'right'})
 
@@ -697,9 +697,9 @@ export default class WazuhApi {
         } catch (error) {
             // Delete generated file if an error occurred
             if(req && req.payload && req.payload.name && 
-               fs.existsSync(path.join(__dirname, '../../../wazuh-reporting/' + req.payload.name))
+               fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name))
             ) {
-                fs.unlinkSync(path.join(__dirname, '../../../wazuh-reporting/' + req.payload.name))
+                fs.unlinkSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name))
             }
             return ErrorResponse(error.message || error, 3029, 500, reply);
         }
@@ -707,11 +707,11 @@ export default class WazuhApi {
 
     async getReports(req,reply) {
         try {
-            if (!fs.existsSync(path.join(__dirname, '../../../wazuh-reporting'))) {
-                fs.mkdirSync(path.join(__dirname, '../../../wazuh-reporting'));
+            if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'))) {
+                fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
             }
             const list = [];
-            const reportDir = path.join(__dirname, '../../../wazuh-reporting');
+            const reportDir = path.join(__dirname, '../../../../optimize/wazuh-reporting');
             const sortFunction = (a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
             fs.readdirSync(reportDir).forEach(file => {
                 const stats = fs.statSync(reportDir + '/' + file);
@@ -731,7 +731,7 @@ export default class WazuhApi {
 
     async getReportByName(req,reply) {
         try {
-            return reply.file(path.join(__dirname, '../../../wazuh-reporting/' + req.params.name));
+            return reply.file(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.params.name));
         } catch (error) {
             return ErrorResponse(error.message || error, 3030, 500, reply);
         }
@@ -750,7 +750,7 @@ export default class WazuhApi {
 
     async deleteReportByName(req,reply) {
         try {
-            fs.unlinkSync(path.join(__dirname, '../../../wazuh-reporting/' + req.params.name))
+            fs.unlinkSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.params.name))
             return reply({error:0})
         } catch (error) {
             return ErrorResponse(error.message || error, 3032, 500, reply);

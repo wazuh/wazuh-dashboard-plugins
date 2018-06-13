@@ -4,6 +4,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v3.3.0 - Kibana v6.2.4 - Revision 395
 
+## Added
+
+-   Refactoring for _Overview_ and _Agents_ controllers ([#564](https://github.com/wazuh/wazuh-kibana-app/pull/564)):
+    -   Reduced duplicated code by splitting it into separate files.
+    -   Added new services to provide similar functionality between different app tabs.
+    -   Code optimization for a better performance and maintainability.
+
+## Changed
+
+-   The `wazuh-logs` and `wazuh-monitoring` folders have been moved to the Kibana's `optimize` directory in order to avoid some error messages when using the `kibana-plugin list` command ([#563](https://github.com/wazuh/wazuh-kibana-app/pull/563)).
+
 ## Fixed
 
 -   Fixed a bug on the _Settings_ tab where updating an API entry with wrong credentials would corrupt the existing one ([#558](https://github.com/wazuh/wazuh-kibana-app/pull/558)).
