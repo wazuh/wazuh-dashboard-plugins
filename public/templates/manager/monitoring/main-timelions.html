@@ -4,7 +4,7 @@
     </div>
     <div class="percentage">{{loadingStatus}}</div>
 </div>
-<div layout="row" ng-show="resultState !== 'ready' && !rendered && !showConfig && !showNodes ">
+<div layout="row" ng-show="resultState !== 'ready' && !rendered && !showConfig && !showNodes && !loading">
     <md-card flex layout="column" class="wz-md-card">
         <md-card-content class="wz-text-center">
             No results for selected time interval

@@ -1,1 +1,45 @@
-<md-content flex layout="column" ng-if="tab == 'monitoring'" ng-show="isClusterEnabled" ng-controller="clusterController">
+<div flex layout="column" ng-if="tab == 'monitoring'" ng-show="isClusterEnabled" ng-controller="clusterController">
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="loading">
+        <div></div>
+    </div>
+
+    <!-- Navigation section (Breadcrumbs, etc) -->
+    <div layout="row" layout-align="start center" ng-if="!loading">
+        <!-- Breadcrumbs -->
+        <div layout="row" layout-padding>
+            <div ng-if="!showConfig && !showNodes">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / {{ tabNames[tab] }}</span>
+                <span> ({{ currentAPI }})</span>
+            </div>
+            <div ng-if="showConfig">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / {{ tabNames[tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()"> ({{ currentAPI }})</span>
+                <span> / Overview</span>
+            </div>
+            <div ng-if="showNodes && !currentNode">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / {{ tabNames[tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()"> ({{ currentAPI }})</span>
+                <span> / Nodes</span>
+            </div>
+            <div ng-if="currentNode">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / {{ tabNames[tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()"> ({{ currentAPI }})</span>
+                <span class="wz-text-link cursor-pointer" ng-click="goNodes()"> / Nodes</span>
+                <span> / {{ currentNode.name }}</span>
+            </div>
+        </div>
+        <!-- End breadcrumbs -->
+    </div>
+    <!-- End navigation section -->
+
+    <kbn-dis ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>

@@ -5,7 +5,7 @@
     <!-- End top navbar section -->
 
     <!-- Navigation section (Breadcrumbs, etc) -->
-    <div layout="row" layout-align="start center">
+    <div layout="row" layout-align="start center" ng-if="tab !== 'monitoring'">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
