@@ -125,10 +125,14 @@ const VisualizeLoaderProvider = ($compile, $rootScope, savedVisualizations) => {
  * @return {Promise} A promise, that resolves to the visualize loader.
  */
 function getVisualizeLoader() {
-  return chrome.dangerouslyGetActiveInjector().then($injector => {
-    const Private = $injector.get('Private');
-    return Private(VisualizeLoaderProvider);
-  });
+  const $injector = angular.element(document.body).injector();
+  if (!$injector) {
+    return Promise.reject('document.body had no angular context after bootstrapping');
+  }
+  const Private = $injector.get('Private');
+  const result = Private(VisualizeLoaderProvider);
+  return result;
+
 
 }
 

@@ -157,6 +157,7 @@ const app = modules.get('apps/webinar_app', [])
                             const thereIsData   = visHandlers.hasData();
                             $rootScope.rendered = thereIsData;
                             if(!thereIsData) $rootScope.resultState = 'none'
+                            else $rootScope.resultState = 'ready'
                         }
                         // Forcing a digest cycle
                         if(!$rootScope.$$phase) $rootScope.$digest();
