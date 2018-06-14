@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-controller="managerConfigurationController" ng-if="!load && tab == 'configuration'">
+<div flex layout="column" layout-align="start stretch" ng-controller="managerConfigurationController" ng-if="tab === 'configuration'">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="load">
@@ -6,13 +6,13 @@
     </div>
 
     <!-- The section container -->
-    <div flex layout="row" layout-align="start stretch" class="md-padding" ng-show="!load"  ng-init="selectedItem='global'">
+    <div flex layout="row" layout-align="start stretch" ng-show="!load"  ng-init="selectedItem='global'">
 
         <!-- Left column - Configuration summary and section links -->
         <div flex="25">
 
             <!-- GLOBAL -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.global">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.global">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('global')" tooltip="Click to see more details" tooltip-placement="right">Global</span>
@@ -31,7 +31,7 @@
             <!-- END GLOBAL -->
 
             <!-- CLUSTER -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.cluster">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.cluster">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('cluster')" tooltip="Click to see more details" tooltip-placement="right">Cluster</span>
@@ -50,7 +50,7 @@
             <!-- END CLUSTER -->
 
             <!-- SYSCHECK -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.syscheck">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.syscheck">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('syscheck')" tooltip="Click to see more details" tooltip-placement="right">Syscheck</span>
@@ -69,7 +69,7 @@
             <!-- END SYSCHECK -->
 
             <!-- ROOTCHECK -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.rootcheck">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.rootcheck">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('rootcheck')" tooltip="Click to see more details" tooltip-placement="right">Rootcheck</span>
@@ -88,7 +88,7 @@
             <!-- END ROOTCHECK -->
 
             <!-- SYSCOLLECTOR -->
-            <md-card flex class="no-margin-left wz-md-card" ng-show="managerConfiguration.syscollector">
+            <md-card flex class="wz-md-card" ng-show="managerConfiguration.syscollector">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('syscollector')" tooltip="Click to see more details" tooltip-placement="right">Syscollector</span>
@@ -106,7 +106,7 @@
             <!-- END SYSCOLLECTOR -->
 
             <!-- LOGCOLLECTOR -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.logcollector">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.logcollector">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('logcollector')" tooltip="Click to see more details" tooltip-placement="right">Logcollector</span>
@@ -119,7 +119,7 @@
             <!-- END LOGCOLLECTOR -->
 
             <!-- E-MAIL ALERTS -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.email_alerts">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.email_alerts">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('email_alerts')" tooltip="Click to see more details" tooltip-placement="right">E-mail alerts</span>
@@ -138,7 +138,7 @@
             <!-- END E-MAIL ALERTS -->
 
             <!-- AUTH -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.auth">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.auth">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('auth')" tooltip="Click to see more details" tooltip-placement="right">Auth</span>
@@ -157,7 +157,7 @@
             <!-- END AUTH -->
 
             <!-- RULESET -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.ruleset">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.ruleset">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('ruleset')" tooltip="Click to see more details" tooltip-placement="right">Ruleset</span>
@@ -170,7 +170,7 @@
             <!-- END RULESET -->
 
             <!-- COMMAND -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.command">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.command">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('command')" tooltip="Click to see more details" tooltip-placement="right">Command</span>
@@ -183,7 +183,7 @@
             <!-- END COMMAND -->
 
             <!-- ACTIVE RESPONSE -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration['active-response'].length > 0">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration['active-response'].length > 0">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('active-response')" tooltip="Click to see more details" tooltip-placement="right">Active response</span>
@@ -196,7 +196,7 @@
             <!-- END ACTIVE RESPONSE -->
 
             <!-- REMOTE -->
-            <md-card flex class="no-margin-left wz-md-card" ng-if="managerConfiguration.remote">
+            <md-card flex class="wz-md-card" ng-if="managerConfiguration.remote">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title wz-text-link" ng-click="switchItem('remote')" tooltip="Click to see more details" tooltip-placement="right">Remote</span>
@@ -215,7 +215,7 @@
         <div flex="75" layout="row" layout-align="start stretch">
 
             <!-- GLOBAL -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'global'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'global'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-dashboard"></i> Global</span>
@@ -283,7 +283,7 @@
             <!-- END GLOBAL -->
 
             <!-- CLUSTER -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'cluster'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'cluster'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-server"></i> Cluster</span>
@@ -330,7 +330,7 @@
             <!-- END CLUSTER -->
 
             <!-- SYSCHECK -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'syscheck'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'syscheck'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> Syscheck</span>
@@ -443,7 +443,7 @@
             <!-- END SYSCHECK -->
 
             <!-- ROOTCHECK -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'rootcheck'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'rootcheck'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-check"></i> Rootcheck</span>
@@ -496,7 +496,7 @@
             <!-- END ROOTCHECK -->
 
             <!-- RULESET -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'ruleset'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'ruleset'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-dot-circle-o"></i> Ruleset</span>
@@ -597,7 +597,7 @@
             <!-- END RULESET -->
 
             <!-- SYSCOLLECTOR -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'syscollector'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'syscollector'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-laptop"></i> Syscollector</span>
@@ -632,7 +632,7 @@
             <!-- END SYSCOLLECTOR -->
 
             <!-- LOGCOLLECTOR -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'logcollector'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'logcollector'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-reorder"></i> Logcollector</span>
@@ -670,7 +670,7 @@
             <!-- END LOGCOLLECTOR -->
 
             <!-- EMAIL ALERTS -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'email_alerts'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'email_alerts'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-envelope-o"></i> E-mail alerts</span>
@@ -713,7 +713,7 @@
             <!-- END EMAIL ALERTS -->
 
             <!-- AUTH -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'auth'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'auth'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-server"></i> Auth</span>
@@ -776,7 +776,7 @@
             <!-- END AUTH -->
 
             <!-- COMMAND -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'command'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'command'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-terminal"></i> Command</span>
@@ -806,7 +806,7 @@
             <!-- END COMMAND -->
 
             <!-- ACTIVE RESPONSE -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'active-response'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'active-response'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-random"></i> Active response</span>
@@ -871,7 +871,7 @@
             <!-- END ACTIVE RESPONSE -->
 
             <!-- REMOTE -->
-            <md-card flex class="no-margin-right wz-md-card" ng-show="selectedItem === 'remote'">
+            <md-card flex class="wz-md-card" ng-show="selectedItem === 'remote'">
                 <md-card-content>
                     <!-- Section title -->
                     <span class="wz-headline-title"><i class="fa fa-fw fa-feed"></i> Remote</span>
@@ -901,4 +901,4 @@
 
     </div>
 
-</md-content>
+</div>
