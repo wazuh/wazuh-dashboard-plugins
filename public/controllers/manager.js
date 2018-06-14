@@ -15,43 +15,43 @@ import TabNames     from '../utils/tab-names'
 const app = modules.get('app/wazuh', []);
 
 app.controller('managerController', function ($scope, $rootScope, $routeParams, $location) {
-    $scope.submenuNavItem  = 'welcome';
-    $scope.submenuNavItem2 = 'rules';
+    $scope.tab  = 'welcome';
+    $scope.rulesetTab = 'rules';
 
     // Tab names
     $scope.tabNames = TabNames;
 
     if ($routeParams.tab){
-        $scope.submenuNavItem = $routeParams.tab;
+        $scope.tab = $routeParams.tab;
     }
 
     $scope.reloadGroups = () => {
-        $scope.submenuNavItem = 'groups';
+        $scope.tab = 'groups';
         $scope.$broadcast('groupsIsReloaded')
     }
 
     $scope.reloadRuleset = () => {
-        $scope.submenuNavItem = 'ruleset';
+        $scope.tab = 'ruleset';
         $scope.$broadcast('rulesetIsReloaded')
     }
 
     // Watchers
-    $scope.$watch('submenuNavItem', () => {
-        if($scope.submenuNavItem === 'ruleset') {
+    $scope.$watch('tab', () => {
+        if($scope.tab === 'ruleset') {
             $rootScope.globalRuleSet = 'ruleset';
-            $rootScope.globalsubmenuNavItem2 = $scope.submenuNavItem2;
+            $rootScope.globalRulesetTab = $scope.rulesetTab;
         } else {
             delete $rootScope.globalRuleSet;
-            delete $rootScope.globalsubmenuNavItem2;
+            delete $rootScope.globalRulesetTab;
         }
-        $location.search('tab', $scope.submenuNavItem);
+        $location.search('tab', $scope.tab);
     });
 
     $scope.switchTab = tab => {
-        $scope.submenuNavItem = tab;
+        $scope.tab = tab;
     }
 
-    $scope.setRulesTab = (tab) => $scope.submenuNavItem2 = tab;
+    $scope.setRulesTab = (tab) => $scope.rulesetTab = tab;
 
     $scope.$on("$destroy", () => {
 

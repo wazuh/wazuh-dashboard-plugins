@@ -9,13 +9,13 @@
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-            <div ng-if="submenuNavItem !== 'welcome'">
+            <div ng-if="tab !== 'welcome'">
                 <i class="fa fa-fw fa-server" aria-hidden="true"></i>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
-                <span> / {{ tabNames[submenuNavItem] }}</span>
+                <span> / {{ tabNames[tab] }}</span>
             </div>
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
-            <div ng-if="submenuNavItem === 'welcome'">
+            <div ng-if="tab === 'welcome'">
                 <i class="fa fa-fw fa-server" aria-hidden="true"></i>
                 <span>Management / Welcome</span>
             </div>

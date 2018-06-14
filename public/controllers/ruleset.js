@@ -16,7 +16,7 @@ const app = modules.get('app/wazuh', []);
 
 app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
 
-    $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
+    $scope.setRulesTab = tab => $rootScope.globalRulesetTab = tab;
 
     //Initialization
     $scope.searchTerm = '';
@@ -196,7 +196,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 });
 
 app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
-    $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
+    $scope.setRulesTab = tab => $rootScope.globalRulesetTab = tab;
 
     //Initialization
     $scope.searchTerm = '';

@@ -1,1 +1,1 @@
-<md-content flex layout="column" ng-if="submenuNavItem == 'reporting'" ng-controller="reportingController">
+<md-content flex layout="column" ng-if="tab == 'reporting'" ng-controller="reportingController">

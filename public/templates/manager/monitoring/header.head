@@ -1,1 +1,1 @@
-<md-content flex layout="column" ng-if="submenuNavItem == 'monitoring'" ng-show="isClusterEnabled" ng-controller="clusterController">
+<md-content flex layout="column" ng-if="tab == 'monitoring'" ng-show="isClusterEnabled" ng-controller="clusterController">
