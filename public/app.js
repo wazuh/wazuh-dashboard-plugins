@@ -27,7 +27,7 @@ app.config(['$httpProvider', function($httpProvider) {
 // Font Awesome, Kibana UI framework and others
 import 'plugins/wazuh/utils/fontawesome/css/font-awesome.min.css';
 import 'plugins/wazuh/utils/when-scrolled/when-scrolled.js';
-import '../../../ui_framework/dist/ui_framework.css';
+import './less/ui_framework.css';
 
 // Dev tools
 import 'plugins/wazuh/utils/codemirror/codemirror.css'

@@ -33,7 +33,7 @@ export default kibana => new kibana.Plugin({
                 'spyModes',
                 'fieldFormats',
             ],
-            injectVars: server => {
+            injectUiAppVars: server => {
                 return server.plugins.kibana.injectVars(server);
             }
         }
