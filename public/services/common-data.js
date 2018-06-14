@@ -14,6 +14,50 @@ import * as modules from 'ui/modules'
 const app = modules.get('app/wazuh', []);
 
 app.service('commonData', function ($rootScope, $timeout, genericReq, appState, errorHandler, $location, shareAgent) {
+
+    const af = (filterHandler, tab, localChange, agent = false) => {
+        try{
+            const tabFilters = {
+                general   : { group: '' },
+                fim       : { group: 'syscheck' },
+                pm        : { group: 'rootcheck' },
+                vuls      : { group: 'vulnerability-detector' },
+                oscap     : { group: 'oscap' },
+                audit     : { group: 'audit' },
+                pci       : { group: 'pci_dss' },
+                gdpr      : { group: 'gdpr' },
+                aws       : { group: 'amazon' },
+                virustotal: { group: 'virustotal' }
+            };
+
+            const filters = [];
+            const isCluster = appState.getClusterInfo().status == 'enabled';
+            filters.push(filterHandler.managerQuery(
+                isCluster ?
+                appState.getClusterInfo().cluster :
+                appState.getClusterInfo().manager,
+                isCluster
+            ))
+
+            if(tab !== 'general'){
+                if(tab === 'pci') {
+                    filters.push(filterHandler.pciQuery())
+                } else if(tab === 'gdpr') {
+                    filters.push(filterHandler.gdprQuery())
+                } else {
+                    filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
+                }
+            }
+            if(agent) filters.push(filterHandler.agentQuery(agent));
+            $rootScope.$emit('wzEventFilters',{filters, localChange});
+            if(!$rootScope.$$listenerCount['wzEventFilters']){
+                $timeout(100)
+                .then(() => af(filterHandler, tab, localChange, agent = false))
+            }
+        } catch(error) {
+            errorHandler.handle('An error occurred while creating custom filters for visualizations',agent ? 'Agents' : 'Overview',true);
+        }
+    };
     return {
         getGDPR: async () => {
             try {
@@ -41,49 +85,7 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
                 return Promise.reject(error);
             }
         },
-        assignFilters: (filterHandler, tab, localChange, agent = false) => {
-            try{
-                const tabFilters = {
-                    general   : { group: '' },
-                    fim       : { group: 'syscheck' },
-                    pm        : { group: 'rootcheck' },
-                    vuls      : { group: 'vulnerability-detector' },
-                    oscap     : { group: 'oscap' },
-                    audit     : { group: 'audit' },
-                    pci       : { group: 'pci_dss' },
-                    gdpr      : { group: 'gdpr' },
-                    aws       : { group: 'amazon' },
-                    virustotal: { group: 'virustotal' }
-                };
-
-                const filters = [];
-                const isCluster = appState.getClusterInfo().status == 'enabled';
-                filters.push(filterHandler.managerQuery(
-                    isCluster ?
-                    appState.getClusterInfo().cluster :
-                    appState.getClusterInfo().manager,
-                    isCluster
-                ))
-    
-                if(tab !== 'general'){
-                    if(tab === 'pci') {
-                        filters.push(filterHandler.pciQuery())
-                    } else if(tab === 'gdpr') {
-                        filters.push(filterHandler.gdprQuery())
-                    } else {
-                        filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
-                    }
-                }
-                if(agent) filters.push(filterHandler.agentQuery(agent));
-                $rootScope.$emit('wzEventFilters',{filters, localChange});
-                if(!$rootScope.$$listenerCount['wzEventFilters']){
-                    $timeout(100)
-                    .then(() => assignFilters(tab))
-                }
-            } catch(error) {
-                errorHandler.handle('An error occurred while creating custom filters for visualizations',agent ? 'Agents' : 'Overview',true);
-            }
-        },
+        assignFilters: (filterHandler, tab, localChange, agent = false) => af(filterHandler, tab, localChange, agent = false),
         validateRange: data => {
             const result = {
                 duration  : 'Unknown',
