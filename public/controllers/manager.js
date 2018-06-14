@@ -10,12 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 import * as modules from 'ui/modules'
+import TabNames     from '../utils/tab-names'
 
 const app = modules.get('app/wazuh', []);
 
 app.controller('managerController', function ($scope, $rootScope, $routeParams, $location) {
-    $scope.submenuNavItem  = 'status';
+    $scope.submenuNavItem  = 'welcome';
     $scope.submenuNavItem2 = 'rules';
+
+    // Tab names
+    $scope.tabNames = TabNames;
 
     if ($routeParams.tab){
         $scope.submenuNavItem = $routeParams.tab;
@@ -42,6 +46,10 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
         }
         $location.search('tab', $scope.submenuNavItem);
     });
+
+    $scope.switchTab = tab => {
+        $scope.submenuNavItem = tab;
+    }
 
     $scope.setRulesTab = (tab) => $scope.submenuNavItem2 = tab;
 
@@ -122,7 +130,7 @@ app.controller('managerConfigurationController', function ($scope, errorHandler,
                                        [];
                     if(ar.rules_id && rulesArray.length > 1){
                         const tmp = [];
-                        
+
                         for(const id of rulesArray){
                             const rule = await apiReq.request('GET',`/rules/${id}`,{});
                             tmp.push(rule.data.data.items[0]);
