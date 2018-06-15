@@ -129,6 +129,32 @@ function discoverController(
     location: 'Discover'
   });
 
+  //////////////////////////////////////////////////////////
+  //////////////////// WAZUH ///////////////////////////////
+  //////////////////////////////////////////////////////////
+  const calcWzInterval = () => {
+    let wzInterval = false;
+    try {
+      const from = dateMath.parse($scope.timefilter.time.from);
+      const to   = dateMath.parse($scope.timefilter.time.to);
+      
+      const totalSeconds = (to - from) / 1000
+      if(totalSeconds < 3600 )                                     wzInterval = 'm'
+      else if(totalSeconds >= 3600 && totalSeconds < 216000)       wzInterval = 'h'
+      else if(totalSeconds >= 216000 && totalSeconds < 5184000)    wzInterval = 'd'
+      else if(totalSeconds >= 5184000 && totalSeconds < 155520000) wzInterval = 'w'
+      else                                                         wzInterval = 'M'
+
+
+    } catch (error) {}
+
+    return wzInterval
+  }
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+
+
   ///////////////////////////////////////////////////////////////////////////////
   //////////// WAZUH ////////////////////////////////////////////////////////////
   // Old code:                                                                 //
@@ -287,32 +313,19 @@ function discoverController(
 
     //////////////////////////////////////////////////////////
     //////////////////// WAZUH ///////////////////////////////
+    /////////////////////////////////////////////////////////
+    let wzInterval = calcWzInterval();
     //////////////////////////////////////////////////////////
-    let wzInterval = false;
-    try {
-      const from = dateMath.parse($scope.timefilter.time.from);
-      const to   = dateMath.parse($scope.timefilter.time.to);
-      
-      const totalSeconds = (from - to) / 1000
+    //////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
 
-      if(totalSeconds < 3600 )                                     wzInterval = 'm'
-      else if(totalSeconds >= 3600 && totalSeconds < 216000)       wzInterval = 'h'
-      else if(totalSeconds >= 216000 && totalSeconds < 5184000)    wzInterval = 'd'
-      else if(totalSeconds >= 5184000 && totalSeconds < 155520000) wzInterval = 'w'
-      else                                                         wzInterval = 'M'
-
-
-    } catch (error) {}
-    //////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////
 
     return {
       query: $scope.searchSource.get('query') || { query: '', language: config.get('search:queryLanguage') },
       sort: getSort.array(savedSearch.sort, $scope.indexPattern, config.get('discover:sort:defaultOrder')),
       columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
       index: $scope.indexPattern.id,
-      interval: wzInterval || 'h', 
+      interval: wzInterval || 'h',  //// WAZUH /////
       filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
     };
   }
@@ -352,6 +365,14 @@ function discoverController(
     $scope.updateDataSource()
       .then(function () {
         $scope.$listen(timefilter, 'fetch', function () {
+          ////////////////////////////////////////////////
+          //               WAZUH                        //
+          ////////////////////////////////////////////////
+          $state.interval = calcWzInterval() || 'd'
+          ////////////////////////////////////////////////
+          ////////////////////////////////////////////////
+          ////////////////////////////////////////////////
+
           $scope.fetch();
         });
 
@@ -528,14 +549,15 @@ function discoverController(
   };
 
   $scope.updateQueryAndFetch = function (query) {
-    console.log(query)
-    // reset state if language changes
-    /*if ($state.query.language && $state.query.language !== query.language) {
-      $state.filters = [];
-    }*/
+
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    // We don't need this cause the auto-complete feature breaks using this   //
+    /*if ($state.query.language && $state.query.language !== query.language) {
+      $state.filters = [];
+    }*/
+
     const currentUrlPath = $location.path();
     if(currentUrlPath && !currentUrlPath.includes('wazuh-discover')){
       let filters = queryFilter.getFilters();
