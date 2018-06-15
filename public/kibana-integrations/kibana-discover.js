@@ -75,7 +75,6 @@ import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { AggTypesBucketsIntervalOptionsProvider } from 'ui/agg_types/buckets/_interval_options';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
 import uiRoutes from 'ui/routes';
-import indexTemplate from 'plugins/kibana/discover/index.html';
 import { StateProvider } from 'ui/state_management/state';
 import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
 import { FilterManagerProvider } from 'ui/filter_manager';
@@ -130,7 +129,45 @@ function discoverController(
     location: 'Discover'
   });
 
-  $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
+  ///////////////////////////////////////////////////////////////////////////////
+  //////////// WAZUH ////////////////////////////////////////////////////////////
+  // Old code:                                                                 //
+  // $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider); //
+  ///////////////////////////////////////////////////////////////////////////////
+  $scope.intervalOptions = [
+    {
+      display: 'Minute',
+      val: 'm'
+    },
+    {
+      display: 'Hourly',
+      val: 'h'
+    },
+    {
+      display: 'Daily',
+      val: 'd'
+    },
+    {
+      display: 'Weekly',
+      val: 'w'
+    },
+    {
+      display: 'Monthly',
+      val: 'M'
+    },
+    {
+      display: 'Yearly',
+      val: 'y'
+    },
+    {
+      display: 'Custom',
+      val: 'custom'
+    }
+  ]
+  //////////////////////////////////////
+  //////////////////////////////////////
+  //////////////////////////////////////
+
   $scope.showInterval = false;
   $scope.minimumVisibleRows = 50;
 
@@ -247,12 +284,35 @@ function discoverController(
   $scope.uiState = $state.makeStateful('uiState');
 
   function getStateDefaults() {
+
+    //////////////////////////////////////////////////////////
+    //////////////////// WAZUH ///////////////////////////////
+    //////////////////////////////////////////////////////////
+    let wzInterval = false;
+    try {
+      const from = dateMath.parse($scope.timefilter.time.from);
+      const to   = dateMath.parse($scope.timefilter.time.to);
+      
+      const totalSeconds = (from - to) / 1000
+
+      if(totalSeconds < 3600 )                                     wzInterval = 'm'
+      else if(totalSeconds >= 3600 && totalSeconds < 216000)       wzInterval = 'h'
+      else if(totalSeconds >= 216000 && totalSeconds < 5184000)    wzInterval = 'd'
+      else if(totalSeconds >= 5184000 && totalSeconds < 155520000) wzInterval = 'w'
+      else                                                         wzInterval = 'M'
+
+
+    } catch (error) {}
+    //////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
+
     return {
       query: $scope.searchSource.get('query') || { query: '', language: config.get('search:queryLanguage') },
       sort: getSort.array(savedSearch.sort, $scope.indexPattern, config.get('discover:sort:defaultOrder')),
       columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
       index: $scope.indexPattern.id,
-      interval: 'auto',
+      interval: wzInterval || 'h', 
       filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
     };
   }
