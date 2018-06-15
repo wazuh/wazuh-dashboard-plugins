@@ -31,7 +31,13 @@ export default kibana => new kibana.Plugin({
                 'visEditorTypes',
                 'savedObjectTypes',   
                 'spyModes',
-                'fieldFormats'
+                'fieldFormats',
+                'fieldFormatEditors',
+                'navbarExtensions',
+                'managementSections',
+                'devTools',
+                'docViews',
+                'embeddableFactories'
             ]
         }
     },

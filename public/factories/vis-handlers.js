@@ -10,9 +10,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 import dateMath from '@kbn/datemath';
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.factory('visHandlers', function() {
     let list = [];

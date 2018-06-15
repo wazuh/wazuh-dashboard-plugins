@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import 'plugins/wazuh/kibana-integrations/kibana-visualization.js';
-import 'plugins/wazuh/kibana-integrations/kibana-filter-bar.js';
-import 'plugins/wazuh/kibana-integrations/kibana-discover.js';
-import 'plugins/wazuh/kibana-integrations/saved-visualizations.js';
+import './kibana-visualization.js';
+import './kibana-filter-bar.js';
+import './kibana-discover.js';
+import './saved-visualizations.js';

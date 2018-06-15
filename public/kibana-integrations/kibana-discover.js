@@ -1,10 +1,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////       WAZUH             //////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html'
 
-modules.get('app/wazuh', []).directive('kbnDis', [function() {
+uiModules.get('app/wazuh', []).directive('kbnDis', [function() {
     return {
         restrict: 'E',
         scope: {},
@@ -75,7 +75,6 @@ import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { AggTypesBucketsIntervalOptionsProvider } from 'ui/agg_types/buckets/_interval_options';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
 import uiRoutes from 'ui/routes';
-import { uiModules } from 'ui/modules';
 import indexTemplate from 'plugins/kibana/discover/index.html';
 import { StateProvider } from 'ui/state_management/state';
 import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
@@ -469,10 +468,11 @@ function discoverController(
   };
 
   $scope.updateQueryAndFetch = function (query) {
+    console.log(query)
     // reset state if language changes
-    if ($state.query.language && $state.query.language !== query.language) {
+    /*if ($state.query.language && $state.query.language !== query.language) {
       $state.filters = [];
-    }
+    }*/
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////

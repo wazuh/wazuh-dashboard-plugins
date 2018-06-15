@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier     from 'plugins/wazuh/utils/json-beautifier';
-import * as modules   from 'ui/modules'
+import beautifier     from '../utils/json-beautifier';
+import { uiModules }  from 'ui/modules'
 import * as FileSaver from '../services/file-saver'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',

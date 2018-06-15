@@ -11,9 +11,9 @@
  */
 
 import searchBarTemplate from './wz-search-bar.html'
-import * as modules      from 'ui/modules'
+import { uiModules }      from 'ui/modules'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzSearchBar', function() {
     return {

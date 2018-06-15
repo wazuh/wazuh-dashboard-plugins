@@ -9,10 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 import $            from 'jquery'
 
-modules.get('app/wazuh', [])
+uiModules.get('app/wazuh', [])
 .service('visFactoryService', function ($rootScope, appState, genericReq, discoverPendingUpdates, rawVisualizations, tabVisualizations, loadedVisualizations, commonData, visHandlers) {
     
     const clear = (onlyAgent = false) => {

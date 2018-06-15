@@ -11,10 +11,10 @@
  */
 
 // Require CSS
-import 'plugins/wazuh/less/loader';
-import * as modules from 'ui/modules'
+import './less/loader';
+import { uiModules } from 'ui/modules'
 // Set up Wazuh app
-const app = modules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
+const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
 app.config(['$compileProvider', function($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|data|blob):/);
@@ -25,37 +25,37 @@ app.config(['$httpProvider', function($httpProvider) {
 }]);
 
 // Font Awesome, Kibana UI framework and others
-import 'plugins/wazuh/utils/fontawesome/css/font-awesome.min.css';
-import 'plugins/wazuh/utils/when-scrolled/when-scrolled.js';
+import './utils/fontawesome/css/font-awesome.min.css';
+import './utils/when-scrolled/when-scrolled.js';
 import './less/ui_framework.css';
 
 // Dev tools
-import 'plugins/wazuh/utils/codemirror/codemirror.css'
-import 'plugins/wazuh/utils/codemirror/foldgutter.css'
-import 'plugins/wazuh/utils/codemirror/ttcn.css'
-import 'plugins/wazuh/utils/codemirror/javascript.js'
-import 'plugins/wazuh/utils/codemirror/brace-fold.js'
-import 'plugins/wazuh/utils/codemirror/foldcode.js'
-import 'plugins/wazuh/utils/codemirror/foldgutter.js'
-import 'plugins/wazuh/utils/codemirror/search-cursor.js'
-import 'plugins/wazuh/utils/codemirror/mark-selection.js'
+import './utils/codemirror/codemirror.css'
+import './utils/codemirror/foldgutter.css'
+import './utils/codemirror/ttcn.css'
+import './utils/codemirror/javascript.js'
+import './utils/codemirror/brace-fold.js'
+import './utils/codemirror/foldcode.js'
+import './utils/codemirror/foldgutter.js'
+import './utils/codemirror/search-cursor.js'
+import './utils/codemirror/mark-selection.js'
 
 
 // Material
-import 'plugins/wazuh/../node_modules/angular-material/angular-material.css';
-import 'plugins/wazuh/../node_modules/angular-aria/angular-aria.js';
-import 'plugins/wazuh/../node_modules/angular-animate/angular-animate.js';
-import 'plugins/wazuh/../node_modules/angular-material/angular-material.js';
+import './../node_modules/angular-material/angular-material.css';
+import './../node_modules/angular-aria/angular-aria.js';
+import './../node_modules/angular-animate/angular-animate.js';
+import './../node_modules/angular-material/angular-material.js';
 
 // Cookies
-import 'plugins/wazuh/../node_modules/angular-cookies/angular-cookies.min.js';
+import './../node_modules/angular-cookies/angular-cookies.min.js';
 
 import 'ui/autoload/all';
 import 'ui/chrome';
 
 // Wazuh
-import 'plugins/wazuh/kibana-integrations'
-import 'plugins/wazuh/services'
-import 'plugins/wazuh/controllers'
-import 'plugins/wazuh/factories'
-import 'plugins/wazuh/directives'
+import './kibana-integrations'
+import './services'
+import './controllers'
+import './factories'
+import './directives'

@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import 'plugins/wazuh/factories/data-handler-composer';
-import 'plugins/wazuh/factories/raw-visualizations';
-import 'plugins/wazuh/factories/loaded-visualizations';
-import 'plugins/wazuh/factories/tab-visualizations';
-import 'plugins/wazuh/factories/discover-pending-updates';
-import 'plugins/wazuh/factories/vis-handlers';
-import 'plugins/wazuh/factories/vis2png';
-import 'plugins/wazuh/factories/share-agent';
-import 'plugins/wazuh/factories/misc';
+import './data-handler-composer';
+import './raw-visualizations';
+import './loaded-visualizations';
+import './tab-visualizations';
+import './discover-pending-updates';
+import './vis-handlers';
+import './vis2png';
+import './share-agent';
+import './misc';

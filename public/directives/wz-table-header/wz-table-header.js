@@ -11,9 +11,9 @@
  */
 
 import tableHeaderTemplate from './wz-table-header.html'
-import * as modules        from 'ui/modules'
+import { uiModules }        from 'ui/modules'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzTableHeader', function() {
     return {
