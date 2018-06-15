@@ -28,6 +28,7 @@
           query="state.query"
           app-name="'discover'"
           on-submit="updateQueryAndFetch($query)"
+          index-patterns="[indexPattern]"
         >
         </query-bar>
       </div>
@@ -38,8 +39,7 @@
     <div class="row">
       <filter-bar-w
         state="state"
-        index-patterns="[indexPattern]"
-        ng-if="['lucene', 'kql'].includes(state.query.language)"       
+        index-patterns="[indexPattern]" 
       ></filter-bar-w>
     </div>
     <div class="row" ng-show="tabView === 'discover'">
@@ -102,28 +102,27 @@
                       >
                     </select>
                     <span ng-show="bucketInterval.scaled">
-                      <kbn-info
-                        placement="right"
-                        class="kuiIcon--info"
-                        info="This interval creates {{ bucketInterval.scale > 1 ? 'buckets that are too large' : 'too many buckets' }} to show in the selected time range, so it has been scaled to {{ bucketInterval.description }}">
-                      </kbn-info>
-                      Scaled to {{ bucketInterval.description }}
+                      <icon-tip
+                      content="getBucketIntervalToolTipText()"
+                      position="'top'"
+                    ></icon-tip>
+                    Scaled to {{ bucketInterval.description }}
                     </span>
                   </span>
                 </center>
 
               </header>
 
-              <visualization
-                 ng-if="vis && rows.length != 0"
-                 vis="vis"
-                 ui-state="uiState"
-                 vis-data="visData"
-                 show-spy-panel="true"
-                 search-source="searchSource"
-                 style="height: 200px"
-                >
-              </visualization>
+              <!--<visualization
+              ng-if="vis && rows.length != 0"
+              vis="vis"
+              ui-state="uiState"
+              vis-data="visData"
+              show-spy-panel="true"
+              search-source="searchSource"
+              style="height: 200px"
+             >
+           </visualization>-->
             </section>
 
             <section class="discover-table" fixed-scroll aria-label="Documents">
