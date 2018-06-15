@@ -728,13 +728,25 @@ function discoverController(
         },
         aggs: visStateAggs
       });
+      
 
       $scope.searchSource.onRequestStart((searchSource, searchRequest) => {
         return $scope.vis.onSearchRequestStart(searchSource, searchRequest);
       });
 
       $scope.searchSource.aggs(function () {
-        return $scope.vis.getAggConfig().toDsl();
+        //////////////////// WAZUH ////////////////////////////////
+        // Old code:                                             //
+        // return $scope.vis.getAggConfig().toDsl();             //
+        ///////////////////////////////////////////////////////////
+        const result = $scope.vis.getAggConfig().toDsl();
+        if(result[2] && result[2].date_histogram && result[2].date_histogram.interval === '0ms') {
+          result[2].date_histogram.interval = '1d'
+        }
+        return result;
+        ///////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////
       });
     }
   }

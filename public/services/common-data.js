@@ -15,7 +15,7 @@ const app = modules.get('app/wazuh', []);
 
 app.service('commonData', function ($rootScope, $timeout, genericReq, appState, errorHandler, $location, shareAgent) {
 
-    const af = (filterHandler, tab, localChange, agent = false) => {
+    const af = (filterHandler, tab, localChange, agent) => {
         try{
             const tabFilters = {
                 general   : { group: '' },
@@ -85,7 +85,7 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
                 return Promise.reject(error);
             }
         },
-        assignFilters: (filterHandler, tab, localChange, agent = false) => af(filterHandler, tab, localChange, agent = false),
+        assignFilters: (filterHandler, tab, localChange, agent) => af(filterHandler, tab, localChange, agent),
         validateRange: data => {
             const result = {
                 duration  : 'Unknown',
