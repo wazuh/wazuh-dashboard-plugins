@@ -139,11 +139,11 @@ function discoverController(
       const to   = dateMath.parse($scope.timefilter.time.to);
       
       const totalSeconds = (to - from) / 1000
-      if(totalSeconds < 3600 )                                     wzInterval = 'm'
-      else if(totalSeconds >= 3600 && totalSeconds < 216000)       wzInterval = 'h'
-      else if(totalSeconds >= 216000 && totalSeconds < 5184000)    wzInterval = 'd'
-      else if(totalSeconds >= 5184000 && totalSeconds < 155520000) wzInterval = 'w'
-      else                                                         wzInterval = 'M'
+      if(totalSeconds <= 3600 )                                 wzInterval = 'm'
+      else if(totalSeconds > 3600 && totalSeconds <= 86400)     wzInterval = 'h'
+      else if(totalSeconds > 86400 && totalSeconds <= 604800)   wzInterval = 'd'
+      else if(totalSeconds > 604800 && totalSeconds <= 2419200) wzInterval = 'w'
+      else                                                      wzInterval = 'M'
 
 
     } catch (error) {}
