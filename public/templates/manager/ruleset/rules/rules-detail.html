@@ -27,169 +27,181 @@
     <!-- Rest of rule information -->
     <div layout="column" layout-align="start">
 
-        <!-- Groups section -->
-        <md-card ng-if="currentRule.groups.length > 0" flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> Groups</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" layout-align="start start">
-                    <md-button class="md-primary wz-text-link" tooltip="Filter by this group" tooltip-placement="bottom" ng-repeat="item in currentRule.groups" ng-click="addDetailFilter('group', item)">
-                        {{item}}
-                    </md-button>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End groups section -->
+        <div layout="row" layout-align="start stretch">
 
-        <!-- PCI section -->
-        <md-card ng-if="currentRule.pci.length > 0" flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> PCI</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" layout-align="start start">
-                    <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentRule.pci" ng-click="addDetailFilter('pci', item)">
-                        {{item}}
-                    </md-button>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End PCI section -->
-
-        <!-- GDPR section -->
-        <md-card ng-if="currentRule.gdpr.length > 0" flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> GDPR</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" layout-align="start start">
-                    <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentRule.gdpr" ng-click="addDetailFilter('gdpr', item)">
-                        {{item}}
-                    </md-button>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End GDPR section -->
-
-        <!-- Details section -->
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div ng-if="currentRule.details.status" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Status</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.status}}</span>
-                </div>
-                <div ng-if="currentRule.details.category" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Category</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.category}}</span>
-                </div>
-                <div ng-if="currentRule.details.noalert" layout="row" class="wz-padding-top-10">
-                    <span flex="20">No alert</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.noalert}}</span>
-                </div>
-                <div ng-if="currentRule.details.regex && !isArray(currentRule.details.regex)" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Regex</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.regex}}</span>
-                </div>
-                <div ng-if="currentRule.details.parent" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Parent</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.parent}}</span>
-                </div>
-                <div ng-if="currentRule.details.frequency" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Frequency</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.frequency}}</span>
-                </div>
-                <div ng-if="currentRule.details.ignore" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Ignore</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.ignore}}</span>
-                </div>
-                <div ng-if="currentRule.details.info" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Info</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.info}}</span>
-                </div>
-                <div ng-if="currentRule.details.timeframe" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Timeframe</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.timeframe}}</span>
-                </div>
-                <div ng-if="currentRule.details.options" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Options</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.options}}</span>
-                </div>
-                <div ng-if="currentRule.details.type" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Type</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.type}}</span>
-                </div>
-                <div ng-if="currentRule.details.if_sid" layout="row" class="wz-padding-top-10">
-                    <span flex="20">If SID</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.if_sid}}</span>
-                </div>
-                <div ng-if="currentRule.details.if_matched_sid" layout="row" class="wz-padding-top-10">
-                    <span flex="20">If matched SID</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.if_matched_sid}}</span>
-                </div>
-                <div ng-if="currentRule.details.id" layout="row" class="wz-padding-top-10">
-                    <span flex="20">ID</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.id}}</span>
-                </div>
-                <div ng-if="currentRule.details.match && !isArray(currentRule.details.match)" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Match</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.match}}</span>
-                </div>
-                <div ng-if="currentRule.details.prematch && !isArray(currentRule.details.prematch)" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Prematch</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.prematch}}</span>
-                </div>
-                <div ng-if="currentRule.details.decoded_as" layout="row" class="wz-padding-top-10">
-                    <span flex="20">Decoded as</span>
-                    <span class="wz-text-right color-grey">{{currentRule.details.decoded_as}}</span>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End details section -->
-
-        <!-- Regex section -->
-        <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.regex)">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-asterisk" aria-hidden="true"></i> Regex</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div ng-repeat="item in currentRule.details.regex">
-                    <div layout="row" class="wz-padding-top-10">
-                        <span>{{item}}</span>
+            <!-- Groups section -->
+            <md-card ng-if="currentRule.groups.length > 0" flex class="wz-md-card">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> Groups</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" layout-align="start start" layout-wrap>
+                        <md-button class="md-primary wz-text-link" tooltip="Filter by this group" tooltip-placement="bottom" ng-repeat="item in currentRule.groups" ng-click="addDetailFilter('group', item)">
+                            {{item}}
+                        </md-button>
                     </div>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End regex section -->
+                </md-card-content>
+            </md-card>
+            <!-- End groups section -->
 
-        <!-- Match section -->
-        <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.match)">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Match</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div ng-repeat="item in currentRule.details.match">
-                    <div layout="row" class="wz-padding-top-10">
-                        <span>{{item}}</span>
+            <!-- Details section -->
+            <md-card flex class="wz-md-card">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div ng-if="currentRule.details.status" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Status</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.status}}</span>
                     </div>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End match section -->
+                    <div ng-if="currentRule.details.category" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Category</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.category}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.noalert" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">No alert</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.noalert}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.regex && !isArray(currentRule.details.regex)" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Regex</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.regex}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.parent" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Parent</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.parent}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.frequency" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Frequency</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.frequency}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.ignore" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Ignore</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.ignore}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.info" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Info</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.info}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.timeframe" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Timeframe</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.timeframe}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.options" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Options</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.options}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.type" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Type</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.type}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.if_sid" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">If SID</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.if_sid}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.if_matched_sid" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">If matched SID</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.if_matched_sid}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.id" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">ID</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.id}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.match && !isArray(currentRule.details.match)" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Match</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.match}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.prematch && !isArray(currentRule.details.prematch)" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Prematch</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.prematch}}</span>
+                    </div>
+                    <div ng-if="currentRule.details.decoded_as" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Decoded as</span>
+                        <span class="wz-text-right color-grey">{{currentRule.details.decoded_as}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End details section -->
 
-        <!-- Prematch section -->
-        <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.prematch)">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Prematch</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div ng-repeat="item in currentRule.details.prematch">
-                    <div layout="row" class="wz-padding-top-10">
-                        <span>{{item}}</span>
+        </div>
+
+        <div layout="row" layout-align="start stretch" ng-if="currentRule.pci.length > 0 || currentRule.gdpr.length > 0">
+
+            <!-- PCI section -->
+            <md-card ng-if="currentRule.pci.length > 0" flex class="wz-md-card">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> PCI</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" layout-align="start start" layout-wrap>
+                        <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentRule.pci" ng-click="addDetailFilter('pci', item)">
+                            {{item}}
+                        </md-button>
                     </div>
-                </div>
-            </md-card-content>
-        </md-card>
-        <!-- End prematch section -->
+                </md-card-content>
+            </md-card>
+            <!-- End PCI section -->
+
+            <!-- GDPR section -->
+            <md-card ng-if="currentRule.gdpr.length > 0" flex class="wz-md-card">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> GDPR</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row" layout-align="start start" layout-wrap>
+                        <md-button class="md-primary wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom" ng-repeat="item in currentRule.gdpr" ng-click="addDetailFilter('gdpr', item)">
+                            {{item}}
+                        </md-button>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End GDPR section -->
+
+        </div>
+
+        <div layout="row" layout-align="start stretch" ng-if="isArray(currentRule.details.regex) || isArray(currentRule.details.match) || isArray(currentRule.details.prematch)">
+
+            <!-- Regex section -->
+            <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.regex)">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-asterisk" aria-hidden="true"></i> Regex</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div ng-repeat="item in currentRule.details.regex">
+                        <div layout="row" class="wz-padding-top-10" layout-wrap>
+                            <span>{{item}}</span>
+                        </div>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End regex section -->
+
+            <!-- Match section -->
+            <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.match)">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Match</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div ng-repeat="item in currentRule.details.match">
+                        <div layout="row" class="wz-padding-top-10" layout-wrap>
+                            <span>{{item}}</span>
+                        </div>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End match section -->
+
+            <!-- Prematch section -->
+            <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.prematch)">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Prematch</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div ng-repeat="item in currentRule.details.prematch">
+                        <div layout="row" class="wz-padding-top-10" layout-wrap>
+                            <span>{{item}}</span>
+                        </div>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End prematch section -->
+
+        </div>
 
         <!-- Related rules section -->
-        <div ng-show="(rulesRelated.items && rulesRelated.items.length > 0)">
+        <div ng-show="(rulesRelated.items && rulesRelated.items.length > 0)" layout-padding>
             <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
             <wz-table-header
                 class="wz-side-margin-8"
