@@ -1,4 +1,4 @@
-<div flex layout="column" ng-if="tab == 'monitoring'" ng-show="isClusterEnabled" ng-controller="clusterController">
+<div flex layout="column" ng-if="tab == 'monitoring' && isClusterEnabled" ng-controller="clusterController">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="loading">
@@ -53,4 +53,6 @@
     </div>
     <!-- End navigation section -->
 
+    <!-- Discover search bar section -->
     <kbn-dis ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
+    <!-- End Discover search bar section -->

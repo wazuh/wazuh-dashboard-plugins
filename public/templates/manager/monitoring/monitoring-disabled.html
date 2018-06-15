@@ -1,0 +1,29 @@
+<div flex layout="column" ng-if="tab == 'monitoring' && !isClusterEnabled" ng-controller="clusterController">
+
+    <!-- Cluster disabled breadcrumbs -->
+    <div layout="row" layout-align="start center">
+        <div layout="row" layout-padding>
+            <div>
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / {{ tabNames[tab] }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- End cluster disabled breadcrumbs -->
+
+    <!-- Cluster disabled section -->
+    <div flex layout="row" layout-align="start start">
+        <md-card flex class="wz-md-card" flex>
+            <md-card-content class="wz-text-center">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Cluster disabled</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column" class="wz-padding-top-10">
+                    <p>The cluster is disabled. Visit the documentation on <a target="_blank" href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html">this link</a> to learn about how to enable it.
+                    </p>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- End cluster disabled section -->
+</div>
