@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 
-modules.get('app/wazuh', [])
+uiModules.get('app/wazuh', [])
 .service('appState', function ($cookies, $window) {
     return {
         getExtensions: id => {

@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 import $              from 'jquery';
-import * as modules   from 'ui/modules'
+import { uiModules } from 'ui/modules'
 import FilterHandler  from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
 import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, tabVisualizations, commonData, reportingService, visFactoryService) {
     

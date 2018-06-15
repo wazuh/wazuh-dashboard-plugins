@@ -9,14 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier    from 'plugins/wazuh/utils/json-beautifier';
-import * as modules  from 'ui/modules'
+import beautifier    from '../utils/json-beautifier';
+import { uiModules } from 'ui/modules'
 import FilterHandler from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
 import { metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal } from '../utils/agents-metrics'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, apiReq, AgentsAutoComplete, errorHandler, tabVisualizations, vis2png, shareAgent, commonData, reportingService, visFactoryService) {
 

@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules  from 'ui/modules'
+import { uiModules }  from 'ui/modules'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzEnter', function () {
     return function (scope, element, attrs) {

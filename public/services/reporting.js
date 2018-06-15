@@ -9,10 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 import $            from 'jquery'
 
-modules.get('app/wazuh', [])
+uiModules.get('app/wazuh', [])
 .service('reportingService', function ($rootScope, vis2png, rawVisualizations, visHandlers, genericReq, errorHandler) {
     return {
         startVis2Png: async (tab,isAgents = false) => {
