@@ -42,6 +42,8 @@ app.directive('wazuhTable', function() {
                     $scope.$emit('wazuhShowRule',{rule:item})
                 } else if(instance.path === '/decoders') {
                     $scope.$emit('wazuhShowDecoder',{decoder:item})
+                } else if(instance.path === '/cluster/nodes') {
+                    $scope.$emit('wazuhShowClusterNode',{node:item})
                 }
             }
 

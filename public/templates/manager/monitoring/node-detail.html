@@ -1,17 +1,23 @@
 <div layout="column" flex ng-show="currentNode">
-    <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && !rendered && currentNode && !loading && !showConfig">
+    <div class="wazuh-loading wz-monitoring-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && !rendered && currentNode && !loading && !showConfig">
         <div class="percentage">
             <i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
         </div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
     <div layout="row" class="height-250 wz-timelions" ng-show="currentNode && !loading && !showConfig">
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-show="rendered">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">{{ currentNode.name }} alerts summary</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-Overview-Node'" id="Wazuh-App-Cluster-Overview-Node"></kbn-vis>
-                <span class="wz-padding-top-10" ng-show="!rendered">No results for selected time interval</span>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card" ng-if="!rendered">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">{{ currentNode.name }} alerts summary</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <span class="wz-padding-top-10" >No results for selected time interval</span>
             </md-card-content>
         </md-card>
     </div>
