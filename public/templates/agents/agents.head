@@ -30,7 +30,7 @@
         <!-- End agent status section -->
 
         <!-- Reporting button section -->
-        <div ng-show="tab !== 'welcome' && tab !== 'configuration'">
+        <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'">
             <!-- Report button -->
             <md-button class="wz-button-flat small" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()" aria-label="Generate report button">
                 <i class="fa fa-fw fa-file-text" aria-hidden="true"></i> Generate report
@@ -43,7 +43,7 @@
         <!-- End separator -->
 
         <!-- Discover/Panels buttons section -->
-        <div ng-show="tab !== 'welcome' && tab !== 'configuration'">
+        <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'">
             <!-- Panels button -->
             <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')" aria-label="View panels button">
                 <i class="fa fa-fw fa-th" aria-hidden="true"></i> View panels
@@ -90,25 +90,25 @@
     <!-- End navigation section -->
 
     <!-- Discover search bar section -->
-    <kbn-dis ng-show="(tab !== 'welcome') && (tab !== 'configuration')"></kbn-dis>
+    <kbn-dis ng-show="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'"></kbn-dis>
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
     <!-- End loading status section -->
 
     <!-- Report status section -->
-    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
+    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'" ng-show="reportBusy && reportStatus">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{reportStatus}}</div>
     </div>
     <!-- End report status section -->
 
     <!-- No results section -->
-    <div layout="row" ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="resultState !== 'ready' && tabView === 'panels'">
+    <div layout="row" ng-if="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'" ng-show="resultState !== 'ready' && tabView === 'panels'">
         <md-card flex layout="column" class="wz-md-card">
             <md-card-content class="wz-text-center">
                 <span>There are no results for selected time range. Try another one.</span>

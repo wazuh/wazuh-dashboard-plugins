@@ -13,9 +13,4 @@ import './wz-dynamic/wz-dynamic';
 import './wz-enter/wz-enter';
 import './wz-menu/wz-menu';
 import './wz-menu/wz-menu.less';
-import './wz-search-bar/wz-search-bar';
-import './wz-table-header/wz-table-header';
-import './wz-table-header/wz-table-header.less';
-import './wz-table/wz-table';
-import './wz-table/wz-table.less';
 import './wazuh-table/controller'

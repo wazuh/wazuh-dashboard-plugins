@@ -22,5 +22,6 @@ export default {
     name: 'Name',
     count: 'Count',
     'details.program_name': 'Program name',
-    'details.order': 'Order'
+    'details.order': 'Order',
+    vendor: 'Vendor'
 }

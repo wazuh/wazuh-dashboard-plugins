@@ -25,5 +25,6 @@ export default {
     api          : 'API configuration',
     extensions   : 'Extensions',
     pattern      : 'Index pattern',
-    about        : 'About'
+    about        : 'About',
+    syscollector : 'Syscollector'
 }

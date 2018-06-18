@@ -36,7 +36,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     $scope.tab     = commonData.checkTabLocation();
 
     let tabHistory = [];
-    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome') tabHistory.push($scope.tab);
+    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome' && $scope.tab !== 'syscollector') tabHistory.push($scope.tab);
 
     // Tab names
     $scope.tabNames = TabNames;
@@ -78,7 +78,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             const localChange = (subtab === 'panels' && $scope.tabView === 'discover') && sameTab;
             $scope.tabView = subtab;
     
-            if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome'){
+            if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome' && $scope.tab !== 'syscollector'){
                 const condition = !changeAgent && localChange || !changeAgent && preserveDiscover;
                 await visFactoryService.buildAgentsVisualizations(filterHandler, $scope.tab, subtab, condition, $scope.agent.id)
                 changeAgent = false;
@@ -101,7 +101,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
-        if(tab !== 'configuration' && tab !== 'welcome') tabHistory.push(tab);
+        if(tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector') tabHistory.push(tab);
         if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
@@ -137,6 +137,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     $scope.getAgent = async (newAgentId,fromAutocomplete) => {
         try {
+            $scope.load = true;
             changeAgent = true;
             
             const globalAgent = shareAgent.getAgent()
@@ -150,7 +151,9 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             const data = await Promise.all([
                 apiReq.request('GET', `/agents/${id}`, {}),
                 apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-                apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
+                apiReq.request('GET', `/rootcheck/${id}/last_scan`, {}),
+                apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
+                apiReq.request('GET', `/syscollector/${id}/os`, {})
             ]);
 
             // Agent
@@ -169,7 +172,13 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             validateRootCheck();
             
             $scope.switchTab($scope.tab, true);
+            
+            $scope.syscollector = {
+                hardware: data[3].data.data,
+                os: data[4].data.data
+            }
 
+            $scope.load = false;
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
@@ -281,6 +290,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         return;
     }
     /** End of agent configuration */
+
+    $scope.search = term => {
+        $scope.$broadcast('wazuhSearch',{term})
+    }
 
     $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab, true);
 

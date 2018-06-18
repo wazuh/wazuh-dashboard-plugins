@@ -1,4 +1,7 @@
-<div flex layout="column" layout-align="start stretch" ng-if="tab === 'welcome'">
+<div class='uil-ring-css' ng-show="load">
+    <div></div>
+</div>
+<div flex layout="column" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load">
 
     <!-- Host monitoring section -->
     <!-- Headline -->
@@ -53,6 +56,21 @@
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html" class="wz-text-link cursor-pointer small" aria-label="Open Centralized configuration documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <md-card flex="25" class="wz-md-card" ng-if="syscollector && syscollector.os && syscollector.os.sysname">
+            <md-card-content>
+                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> <span ng-click="switchTab('syscollector')" class="wz-headline-title wz-text-link cursor-pointer">Syscollector</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Check the agent hardware and its installed software</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html" class="wz-text-link cursor-pointer small" aria-label="Syscollector">
                     <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
                 </md-button>
             </md-card-actions>
