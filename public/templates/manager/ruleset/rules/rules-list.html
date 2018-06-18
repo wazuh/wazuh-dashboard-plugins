@@ -17,33 +17,33 @@
         </md-button>
     </div>
 
-    <md-chips readonly="true" ng-show="appliedFilters.length">
-        <md-chip class="wz-chip" ng-if="includesFilter('file')">
+    <md-chips readonly="true" ng-show="appliedFilters.length || implicitFilterFromDetail">
+        <md-chip class="wz-chip" ng-show="includesFilter('file')">
             <span>File: {{getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-if="includesFilter('path')">
+        <md-chip class="wz-chip" ng-show="includesFilter('path')">
             <span>File: {{getFilter('path')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('path')"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-if="includesFilter('level')">
+        <md-chip class="wz-chip" ng-show="includesFilter('level')">
             <span>Level: {{getFilter('level')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('level')"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-if="includesFilter('group')">
+        <md-chip class="wz-chip" ng-show="includesFilter('group')">
             <span>Group: {{getFilter('group')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('group')"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-if="includesFilter('pci')">
+        <md-chip class="wz-chip" ng-show="includesFilter('pci')">
             <span>PCI control: {{getFilter('pci')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('pci')"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-if="includesFilter('gdpr')">
+        <md-chip class="wz-chip" ng-show="includesFilter('gdpr')">
             <span>GDPR: {{getFilter('gdpr')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('gdpr')"></i>
             </span>
@@ -51,7 +51,13 @@
     </md-chips>
 
     <div layout="row">
-        <wazuh-table 
+        <wazuh-table ng-if="implicitFilterFromDetail"
+            implicit-filter="implicitFilterFromDetail"
+            flex 
+            path="'/rules'" 
+            keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" allow-click="true">
+        </wazuh-table>
+        <wazuh-table ng-if="!implicitFilterFromDetail"
                 flex 
                 path="'/rules'" 
                 keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" allow-click="true">

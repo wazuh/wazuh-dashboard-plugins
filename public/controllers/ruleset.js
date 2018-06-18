@@ -14,7 +14,8 @@ import * as FileSaver from '../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
+app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq) {
+    $scope.implicitFilterFromDetail = false;
     $scope.appliedFilters = [];
     $scope.search = term => {
         if(term.startsWith('group:') && term.split('group:')[1].trim()) {
@@ -47,9 +48,16 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         }
     }
 
-    $scope.includesFilter = filterName => $scope.appliedFilters.filter(item => item.name === filterName).length;
-    $scope.getFilter      = filterName => $scope.appliedFilters.filter(item => item.name === filterName)[0].value;
+    $scope.includesFilter = filterName => {
+        return $scope.appliedFilters.filter(item => item.name === filterName).length ||
+               $scope.implicitFilterFromDetail && $scope.implicitFilterFromDetail.name === filterName;
+    }
+    $scope.getFilter      = filterName => {
+        const filtered = $scope.appliedFilters.filter(item => item.name === filterName);
+        return filtered.length ? filtered[0].value :  $scope.implicitFilterFromDetail.value;
+    }
     $scope.removeFilter   = filterName => {
+        $scope.implicitFilterFromDetail = false;
         $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== filterName);
         return $scope.$broadcast('wazuhRemoveFilter',{filterName});
     }
@@ -58,11 +66,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 
     //Initialization
     $scope.searchTerm = '';
-    $scope.loading = true;
     $scope.viewingDetail = false;
-    $scope.rules   = Rules;
-    $scope.rulesRelated = RulesRelated;
-    $scope.rulesAutoComplete = RulesAutoComplete;
     $scope.setRulesTab('rules');
     $scope.isArray = angular.isArray;
 
@@ -118,14 +122,9 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
      * This function takes back to the list but adding a filter from the detail view
      */
     $scope.addDetailFilter = (name, value) => {
-        // Remove all previous filters and then add it
-        $scope.rules.removeAllFilters();
-        $scope.rules.addFilter(name, value);
-
+        $scope.implicitFilterFromDetail = {name,value}
         // Clear the autocomplete component
         $scope.searchTerm = '';
-        angular.element(document.querySelector('#autocomplete')).blur();
-
         // Go back to the list
         $scope.closeDetailView();
     }
@@ -139,37 +138,13 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
     /**
      * This function changes to the rules list view
      */
-    $scope.closeDetailView = () => {
+    $scope.closeDetailView = clear => {
+        if(clear) $scope.implicitFilterFromDetail = false;
         $scope.viewingDetail = false;
         $scope.currentRule = false;
-        $scope.rulesRelated.reset();
         if(!$scope.$$phase) $scope.$digest();
     }
 
-    const load = async () => {
-        try {
-            await Promise.all([
-                $scope.rules.nextPage(),
-                $scope.rulesAutoComplete.nextPage()
-            ]);
-            $scope.loading = false;
-            if(!$scope.$$phase) $scope.$digest();
-            return;
-        } catch (error) {
-            errorHandler.handle('Unexpected exception loading controller','Ruleset');
-        }
-        return;
-    }
-
-    //Load
-    load();
-
-    //Destroy
-    $scope.$on('$destroy', () => {
-        $scope.rules.reset();
-        $scope.rulesRelated.reset();
-        $scope.rulesAutoComplete.reset();
-    });
 });
 
 app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, Decoders, DecodersRelated, DecodersAutoComplete, errorHandler, genericReq, appState, csvReq) {
