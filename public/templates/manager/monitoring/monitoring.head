@@ -46,7 +46,7 @@
                 <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="goNodes()">Nodes</span>
-                <span> / {{ currentNode.name }}</span>
+                <span> / <span class="wz-text-bold">{{ currentNode.name }}</span></span>
             </div>
         </div>
         <!-- End breadcrumbs -->

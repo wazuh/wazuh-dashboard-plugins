@@ -1,114 +1,132 @@
-<div layout="column" flex ng-show="currentNode">
-    <div class="wazuh-loading" layout="column" layout-align="center center" ng-show="resultState === 'ready' && !rendered && currentNode && !loading && !showConfig">
-        <div class="percentage">
-            <i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
-        </div>
+<div flex layout="column" layout-align="start stretch" ng-show="currentNode">
+
+    <!-- Loading status section -->
+    <div layout="column" layout-align="center center" class="wazuh-loading wz-margin-bottom-40" ng-show="resultState === 'ready' && !rendered && currentNode && !loading && !showConfig">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
-    <div layout="row" class="height-250 wz-timelions" ng-show="currentNode && !loading && !showConfig">
+    <!-- End loading status section -->
+
+    <!-- Node alerts summary card -->
+    <div layout="row" layout-align="start stretch" class="height-250 wz-timelions" ng-show="!loading && currentNode && !showConfig">
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">{{ currentNode.name }} alerts summary</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-Overview-Node'" id="Wazuh-App-Cluster-Overview-Node"></kbn-vis>
-                <span class="wz-padding-top-10" ng-show="!rendered">No results for selected time interval</span>
+                <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered">There are no results for selected time range. Try another one.</span>
             </md-card-content>
         </md-card>
     </div>
-    <div layout="row" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck">
-        <md-card flex layout="column" class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.info">
+    <!-- End node alerts summary card -->
+
+    <!-- Node info and files cards section -->
+    <div layout="row" layout-align="start stretch" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck">
+
+        <!-- Node information card -->
+        <md-card flex class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.info">
             <md-card-content>
-                <span class="wz-headline-title">Info</span>
+                <i class="fa fa-fw fa-info" aria-hidden="true"></i> <span class="wz-headline-title">Node information</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="20">IP</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.info.ip}}</span>
+                    <span flex="30">IP</span>
+                    <span class="color-grey">{{currentNode.healthCheck.info.ip}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="20">Version</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.info.version}}</span>
+                    <span flex="30">Version</span>
+                    <span class="color-grey">{{currentNode.healthCheck.info.version}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="20">Type</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.info.type}}</span>
+                    <span flex="30">Type</span>
+                    <span class="color-grey">{{currentNode.healthCheck.info.type}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="20">Name</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.info.name}}</span>
+                    <span flex="30">Name</span>
+                    <span class="color-grey">{{currentNode.healthCheck.info.name}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
-                    <span flex="20">Active agents</span>
-                    <span flex class="color-grey">{{ currentNode.healthCheck.info.n_active_agents }}</span>
+                    <span flex="30">Active agents</span>
+                    <span class="color-grey">{{ currentNode.healthCheck.info.n_active_agents }}</span>
                 </div>
             </md-card-content>
         </md-card>
-        <md-card layout="column" flex class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
+
+        <!-- Last files sync card -->
+        <md-card flex class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
             <md-card-content>
-                <span class="wz-headline-title">Last files integrity synchronization</span>
+                <i class="fa fa-fw fa-file" aria-hidden="true"></i> <span class="wz-headline-title">Last files integrity synchronization</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Last sync</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.date_end_master}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.date_end_master}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Duration</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.duration}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.duration}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Total shared files</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.shared}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.shared}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Total missing files</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.missing}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.missing}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Total extra but valid files</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra_valid}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra_valid}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Total extra files</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_integrity.total_files.extra}}</span>
                 </div>
             </md-card-content>
         </md-card>
     </div>
-    <div layout="row" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
-        <md-card layout="column" flex class="wz-md-card">
+    <!-- End node info and files cards section -->
+
+    <!-- Node agents cards section -->
+    <div layout="row" layout-align="start stretch" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
+
+        <!-- Agents sync card -->
+        <md-card flex class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title">Last agents information synchronization</span>
+                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> <span class="wz-headline-title">Last agents information synchronization</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Last sync</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.date_end_master}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.date_end_master}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Duration</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.duration}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.duration}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Total agent info</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.total_agentinfo}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentinfo.total_agentinfo}}</span>
                 </div>
             </md-card-content>
         </md-card>
-        <md-card flex layout="column" class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.status">
+
+        <!-- Groups sync card -->
+        <md-card flex class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title">Last agents groups synchronization</span>
+                <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> <span class="wz-headline-title">Last agents groups synchronization</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Last sync</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.date_end_master}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.date_end_master}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Duration</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.duration}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.duration}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="30">Total agent info</span>
-                    <span flex class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.total_agentgroups}}</span>
+                    <span class="color-grey">{{currentNode.healthCheck.status.last_sync_agentgroups.total_agentgroups}}</span>
                 </div>
             </md-card-content>
         </md-card>
     </div>
+    <!-- End ode agents cards section -->
 </div>
