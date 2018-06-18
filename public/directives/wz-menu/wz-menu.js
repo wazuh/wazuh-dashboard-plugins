@@ -11,13 +11,13 @@
  */
 
 import menuTemplate from './wz-menu.html'
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 
-const app = modules.get('app/wazuh', []);;
+const app = uiModules.get('app/wazuh', []);;
 
 app.directive('wzMenu',function(){
     return {
-        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler,genericReq,$location) {
+        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler, genericReq, $location, wzMisc) {
 
             $rootScope.showSelector = appState.getPatternSelector();
 

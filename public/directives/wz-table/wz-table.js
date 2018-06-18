@@ -11,9 +11,9 @@
  */
 
 import tableTemplate from './wz-table.html'
-import * as modules  from 'ui/modules'
+import { uiModules }  from 'ui/modules'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzTable',function(){
     return {

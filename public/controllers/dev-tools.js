@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
-import beautifier   from 'plugins/wazuh/utils/json-beautifier'
-import CodeMirror   from 'plugins/wazuh/utils/codemirror/lib/codemirror'
-import jsonLint     from 'plugins/wazuh/utils/codemirror/json-lint.js'
+import { uiModules } from 'ui/modules'
+import beautifier    from '../utils/json-beautifier'
+import CodeMirror    from '../utils/codemirror/lib/codemirror'
+import jsonLint      from '../utils/codemirror/json-lint'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 // Logs controller
 app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState) {

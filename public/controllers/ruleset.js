@@ -9,10 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules   from 'ui/modules'
+import { uiModules }   from 'ui/modules'
 import * as FileSaver from '../services/file-saver'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
 

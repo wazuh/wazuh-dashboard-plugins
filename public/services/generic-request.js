@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import chrome       from 'ui/chrome';
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 
-modules.get('app/wazuh', [])
+uiModules.get('app/wazuh', [])
 .service('genericReq', function ($q, $http, $location, $rootScope, appState,errorHandler) {
 
     const _request = (method, url, payload = null) => {

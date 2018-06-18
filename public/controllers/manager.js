@@ -9,10 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
+import beautifier    from '../utils/json-beautifier'
 import TabNames     from '../utils/tab-names'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.controller('managerController', function ($scope, $rootScope, $routeParams, $location) {
     $scope.tab  = 'welcome';
@@ -102,8 +103,6 @@ app.controller('managerStatusController', function ($scope, errorHandler, apiReq
     });
 
 });
-
-import beautifier from 'plugins/wazuh/utils/json-beautifier';
 
 app.controller('managerConfigurationController', function ($scope, errorHandler, apiReq) {
     //Initialization

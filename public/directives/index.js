@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import 'plugins/wazuh/directives/wz-dynamic/wz-dynamic';
-import 'plugins/wazuh/directives/wz-enter/wz-enter';
-import 'plugins/wazuh/directives/wz-menu/wz-menu';
-import 'plugins/wazuh/directives/wz-menu/wz-menu.less';
-import 'plugins/wazuh/directives/wz-search-bar/wz-search-bar';
-import 'plugins/wazuh/directives/wz-table-header/wz-table-header';
-import 'plugins/wazuh/directives/wz-table-header/wz-table-header.less';
-import 'plugins/wazuh/directives/wz-table/wz-table';
-import 'plugins/wazuh/directives/wz-table/wz-table.less';
+import './wz-dynamic/wz-dynamic';
+import './wz-enter/wz-enter';
+import './wz-menu/wz-menu';
+import './wz-menu/wz-menu.less';
+import './wz-search-bar/wz-search-bar';
+import './wz-table-header/wz-table-header';
+import './wz-table-header/wz-table-header.less';
+import './wz-table/wz-table';
+import './wz-table/wz-table.less';
