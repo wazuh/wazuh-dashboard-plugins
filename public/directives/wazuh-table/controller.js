@@ -105,7 +105,7 @@ app.directive('wazuhTable', function() {
 
             $scope.sort = async field => {
                 $scope.wazuh_table_loading = true;
-                instance.addSorting(field);
+                instance.addSorting(field.value || field);
                 $scope.sortValue = instance.sortValue;
                 $scope.sortDir   = instance.sortDir;
                 items = await instance.fetch();
@@ -116,8 +116,9 @@ app.directive('wazuhTable', function() {
                 if(!$scope.$$phase) $scope.$digest()
             }
 
-            const search = async term => {
+            const search = async (term, removeFilters) => {
                 $scope.wazuh_table_loading = true;
+                if(removeFilters) instance.removeFilters();
                 instance.addFilter('search',term);
                 items = await instance.fetch();
                 $scope.items = items;
@@ -151,7 +152,12 @@ app.directive('wazuhTable', function() {
             })
 
             $scope.$on('wazuhSearch',(event,parameters) => {
-                return search(parameters.term)
+                return search(parameters.term,parameters.removeFilters)
+            })
+
+            $scope.$on('wazuhRemoveFilter',(event,parameters) => {
+                instance.filters = instance.filters.filter(item => item.name !== parameters.filterName);
+                return init();
             })
 
             const realTimeFunction = async () => {

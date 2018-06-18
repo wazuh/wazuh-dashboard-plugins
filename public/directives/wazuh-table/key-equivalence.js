@@ -15,6 +15,10 @@ export default {
     merged_sum: 'MD5 agent.conf',
     hash: 'MD5 agent.conf',
     filename: 'File',
+    file:'File',
+    gdpr: 'GDPR',
+    pci: 'PCI',
+    groups: 'Groups',
     name: 'Name',
     count: 'Count'
 }

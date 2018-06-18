@@ -15,6 +15,44 @@ import * as FileSaver from '../services/file-saver'
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, Rules, RulesRelated, RulesAutoComplete, errorHandler, genericReq, appState, csvReq) {
+    $scope.appliedFilters = [];
+    $scope.search = term => {
+        if(term.startsWith('group:') && term.split('group:')[1].trim()) {
+            $scope.custom_search = ''
+            const filter = {name:'group',value:term.split('group:')[1].trim()};
+            $scope.appliedFilters.push(filter)
+            $scope.$broadcast('wazuhFilter',{filter})
+        } else if(term.startsWith('level:') && term.split('level:')[1].trim()) {
+            $scope.custom_search = ''
+            const filter = {name:'level',value:term.split('level:')[1].trim()};
+            $scope.appliedFilters.push(filter)
+            $scope.$broadcast('wazuhFilter',{filter})
+        } else if(term.startsWith('pci:') && term.split('pci:')[1].trim()) {
+            $scope.custom_search = ''
+            const filter = {name:'pci',value:term.split('pci:')[1].trim()};
+            $scope.appliedFilters.push(filter)
+            $scope.$broadcast('wazuhFilter',{filter})
+        } else if(term.startsWith('gdpr:') && term.split('gdpr:')[1].trim()) {
+            $scope.custom_search = ''
+            const filter = {name:'gdpr',value:term.split('gdpr:')[1].trim()};
+            $scope.appliedFilters.push(filter)
+            $scope.$broadcast('wazuhFilter',{filter})
+        } else if(term.startsWith('file:') && term.split('file:')[1].trim()) {
+            $scope.custom_search = ''
+            const filter = {name:'file',value:term.split('file:')[1].trim()};
+            $scope.appliedFilters.push(filter)
+            $scope.$broadcast('wazuhFilter',{filter})
+        } else {
+            $scope.$broadcast('wazuhSearch',{term,removeFilters: true})
+        }
+    }
+
+    $scope.includesFilter = filterName => $scope.appliedFilters.filter(item => item.name === filterName).length;
+    $scope.getFilter      = filterName => $scope.appliedFilters.filter(item => item.name === filterName)[0].value;
+    $scope.removeFilter   = filterName => {
+        $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== filterName);
+        return $scope.$broadcast('wazuhRemoveFilter',{filterName});
+    }
 
     $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
 
@@ -59,35 +97,6 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         if(!$scope.$$phase) $scope.$digest();
     });
 
-    $scope.analyzeRules = async search => {
-
-        try {
-            if(search && search.length <= 1) return $scope.rulesAutoComplete.items;
-            await $timeout(200);
-            $scope.rulesAutoComplete.filters = [];
-
-            if(search.startsWith('group:') && search.split('group:')[1].trim()) {
-                await $scope.rulesAutoComplete.addFilter('group',search.split('group:')[1].trim());
-            } else if(search.startsWith('level:') && search.split('level:')[1].trim()) {
-                await $scope.rulesAutoComplete.addFilter('level',search.split('level:')[1].trim());
-            } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
-                await $scope.rulesAutoComplete.addFilter('pci',search.split('pci:')[1].trim());
-            } else if(search.startsWith('gdpr:') && search.split('gdpr:')[1].trim()) {
-                await $scope.rulesAutoComplete.addFilter('gdpr',search.split('gdpr:')[1].trim());
-            } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
-                await $scope.rulesAutoComplete.addFilter('file',search.split('file:')[1].trim());
-            } else {
-                await $scope.rulesAutoComplete.addFilter('search',search);
-            }
-
-            if(!$scope.$$phase) $scope.$digest();
-            return $scope.rulesAutoComplete.items;
-        } catch (error){
-            errorHandler.handle(error,'Ruleset');
-        }
-        return;
-    }
-
     $scope.checkEnter = search => {
         $scope.searchTerm = '';
         angular.element(document.querySelector('#autocomplete')).blur();
@@ -112,7 +121,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/rules', currentApi, $scope.rules ? $scope.rules.filters : null);
+            const output       = await csvReq.fetch('/rules', currentApi, null);
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'rules.csv');
