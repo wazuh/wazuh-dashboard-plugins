@@ -20,5 +20,7 @@ export default {
     pci: 'PCI',
     groups: 'Groups',
     name: 'Name',
-    count: 'Count'
+    count: 'Count',
+    'details.program_name': 'Program name',
+    'details.order': 'Order'
 }

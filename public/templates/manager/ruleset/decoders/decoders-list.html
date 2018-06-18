@@ -1,87 +1,60 @@
 <div ng-show="!loading && !viewingDetail" flex layout="column">
     <div id="content" layout="row" layout-align="start start">
-        <span flex layout="row" layout-align="space-between center">
-            <md-autocomplete flex id="Auto" class="wz-autocomplete wz-select-input wz-margin-right-16" md-input-id="autocomplete" md-select-on-match="true" md-no-cache="noCache" md-selected-item="filter"
-                md-selected-item-change="decoders.addFilter('search', filter.name)" md-search-text="searchTerm" md-items="decoder in analyzeDecoders(searchTerm)"
-                md-item-text="decoder.name +' '+ decoder.file" md-min-length="0" md-no-asterisk="false" md-menu-class="autocomplete-custom-agents-bar"
-                md-search-text-change="analyzeDecoders(searchTerm)" placeholder="Search decoders..." lazy-load-data="decodersAutoComplete.nextPage()"
-                md-autofocus="" wz-enter="checkEnter(searchTerm)">
-                <md-item-template>
-                    <span>
-                        <span>
-                            <strong md-highlight-text="search" md-highlight-flags="i"> {{decoder.file}} - {{decoder.name}} </strong>
-                        </span>
-                    </span>
-                    <span>
-                        <span> {{decoder.type}} </span>
-                    </span>
-                </md-item-template>
-                <md-not-found> No results matching "{{searchTerm}}" were found. </md-not-found>
-            </md-autocomplete>
-        </span>
+        
+        <input flex="60" placeholder="Filter decoders..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-top-4 height-36"
+            aria-invalid="false" wz-enter="search(custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-36 wz-margin-top-4 wz-margin-right-16" ng-click="search(custom_search)">
+            <span class="fa fa-search" aria-hidden="true"></span>
+        </button>  
 
         <div flex="15" layout="column" class="height-40 wz-select-input wz-margin-right-8">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="decoders.toggleOnlyParents(typeFilter == 'all')" aria-label="Filter by type" ng-init="'All decoders'">
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="onlyParents(typeFilter)" aria-label="Filter by type" ng-init="'All decoders'">
                 <option value="all">All decoders</option>
                 <option value="parents">Parent decoders</option>
             </select>
         </div>
-
-        <md-button ng-class="(globalsubmenuNavItem2 == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
-            class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
-            <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
-        </md-button>
-        <md-button ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
+        <div flex layout="column">
+            <md-button flex ng-class="(globalsubmenuNavItem2 == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
+                class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
+                <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
+            </md-button>
+        </div>
+        <div flex layout="column">
+        <md-button flex ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
             class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
             <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
         </md-button>
-
+        </div>
     </div>
 
-    <md-chips readonly="true" ng-show="decoders.hasFilter('search') || decoders.hasFilter('file') || decoders.hasFilter('path')">
-        <md-chip class="wz-chip" ng-if="decoders.hasFilter('search') && decoders.getFilter('search')">
-            <span>Search: {{decoders.getFilter('search')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="decoders.removeFilter('search', true)"></i>
+    <md-chips readonly="true" ng-show="appliedFilters.length || implicitFilterFromDetail">
+        <md-chip class="wz-chip" ng-if="includesFilter('file');">
+            <span>File: {{getFilter('file')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-if="decoders.hasFilter('file');">
-            <span>File: {{decoders.getFilter('file')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="decoders.removeFilter('file', true)"></i>
-            </span>
-        </md-chip>
-        <md-chip class="wz-chip" ng-if="decoders.hasFilter('path');">
-            <span>Path: {{decoders.getFilter('path')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="decoders.removeFilter('path', true)"></i>
+        <md-chip class="wz-chip" ng-if="includesFilter('path');">
+            <span>Path: {{getFilter('path')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('path')"></i>
             </span>
         </md-chip>
     </md-chips>
 
-    <wz-table-header
-        layout="row"
-        data="decoders"
-        keys="[
-            {name:'Name',sortValue:'name',size:20},
-            {name:'Program name',size:20},
-            {name:'Fields',size:40},
-            {name:'File',sortValue:'file',size:20}
-        ]">
-    </wz-table-header>
-    <wz-table
-        layout="column"
-        flex
-        func="openDetailView(decoder)"
-        data="decoders"
-        full="'decoder'"
-        keys="[
-            {col:'name',size:20},
-            {col:'details.program_name',size:20},
-            {col:'details.order',size:40},
-            {col:'file',size:20}
-        ]"
-        isruleset="true"
-        isdecoders="true"
-        class="no-lateral-padding">
-    </wz-table>
+    <div layout="row">
+        <wazuh-table ng-if="implicitFilterFromDetail"
+            implicit-filter="implicitFilterFromDetail"
+            flex 
+            path="'/decoders'" 
+            keys="['name',{value:'details.program_name',size:2},{value:'details.order',size:2},'file']" 
+            allow-click="true">
+        </wazuh-table> 
+        <wazuh-table ng-if="!implicitFilterFromDetail"
+                flex 
+                path="'/decoders'" 
+                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']" 
+                allow-click="true">
+        </wazuh-table>
+    </div>
 
     <div layout="row" class="wz-margin-top-10">
         <span flex></span>

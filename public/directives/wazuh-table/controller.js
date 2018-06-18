@@ -26,7 +26,7 @@ app.directive('wazuhTable', function() {
             allowClick: '=allowClick',
             implicitFilter: '=implicitFilter'
         },
-        controller: function($scope, apiReq, $timeout, shareAgent, $location) {
+        controller: function($scope, apiReq, $timeout, shareAgent, $location) {            
             $scope.keyEquivalence = KeyEquivalenece;
 
             $scope.clickAction = item => {
@@ -40,6 +40,8 @@ app.directive('wazuhTable', function() {
                     $scope.$emit('wazuhShowGroupFile',{groupName:instance.path.split('groups/')[1].split('/files')[0],fileName:item.filename})
                 } else if(instance.path === '/rules') {
                     $scope.$emit('wazuhShowRule',{rule:item})
+                } else if(instance.path === '/decoders') {
+                    $scope.$emit('wazuhShowDecoder',{decoder:item})
                 }
             }
 
@@ -149,6 +151,11 @@ app.directive('wazuhTable', function() {
                 $scope.wazuh_table_loading = false;
                 if(!$scope.$$phase) $scope.$digest()
             }
+
+            $scope.$on('wazuhUpdateInstancePath',(event,parameters) => {
+                instance.path = parameters.path;
+                return init();
+            })
 
             $scope.$on('wazuhFilter',(event,parameters) => {
                 return filter(parameters.filter)

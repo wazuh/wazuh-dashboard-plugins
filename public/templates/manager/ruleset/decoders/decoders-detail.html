@@ -152,35 +152,17 @@
         <!-- End prematch section -->
 
         <!-- Related decoders section -->
-        <div ng-show="(decodersRelated.items && decodersRelated.items.length > 0)">
+        <div layout="row">
             <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related decoders</h1>
-            <wz-table-header
-                class="wz-side-margin-8"
-                layout="row"
-                data="decodersRelated"
-                keys="[
-                    {name:'Name',sortValue:'name',size:20},
-                    {name:'Program name',size:20},
-                    {name:'Fields',size:40},
-                    {name:'File',sortValue:'file',size:20}
-                ]">
-            </wz-table-header>
-            <wz-table
-                layout="column"
-                flex
-                func="openDetailView(decoderRelated)"
-                data="decodersRelated"
-                full="'decoderRelated'"
-                keys="[
-                    {col:'name',size:20},
-                    {col:'details.program_name',size:20},
-                    {col:'details.order',size:40},
-                    {col:'file',size:20}
-                ]"
-                isruleset="true"
-                isdecoders="true"
-                class="no-lateral-padding wz-side-margin-8">
-            </wz-table>
+        </div>
+        <div layout="row" ng-if="currentDecoder" class="md-padding">
+            <wazuh-table
+                flex 
+                path="'/decoders'" 
+                implicit-filter="{ name:'file',value: currentDecoder.file}"
+                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']" 
+                allow-click="true">
+            </wazuh-table>
         </div>
         <!-- End related decoders section -->
 

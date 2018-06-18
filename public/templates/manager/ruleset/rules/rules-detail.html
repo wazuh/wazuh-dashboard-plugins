@@ -192,12 +192,13 @@
         <div layout="row">
             <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
         </div>
-        <div layout="row" ng-if="currentRule">
+        <div layout="row" ng-if="currentRule" class="md-padding">
             <wazuh-table 
                     flex 
                     path="'/rules'" 
                     implicit-filter="{ name:'file',value: currentRule.file}"
-                    keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" allow-click="true">
+                    keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" 
+                    allow-click="true">
             </wazuh-table>
         </div>
         <!-- End related rules section -->

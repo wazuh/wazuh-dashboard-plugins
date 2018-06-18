@@ -13,7 +13,17 @@
         </thead>
         <tbody>
             <tr ng-class="allowClick ? 'wz-table-cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage]" ng-click="clickAction(item)">
-                <td ng-repeat="key in keys">{{ key === 'os.name' ? item.os.name : key === 'os.version' ? item.os.version : item[key.value || key] || '---' }}</td>
+                <td ng-repeat="key in keys" ng-if="path !== '/decoders'">{{ key === 'os.name' ? item.os.name || '---' : key === 'os.version' ? item.os.version || '---' : item[key.value || key] || '---' }}</td>
+                <td ng-repeat="key in keys" ng-if="path === '/decoders'">
+                    {{ 
+                        key === 'details.program_name' || key.value === 'details.program_name' ? 
+                                                       item.details.program_name || '---' : 
+                        key === 'details.order' || key.value === 'details.order' ? 
+                                                              item.details.order || '---' : 
+                                                    item[key.value || key] || '---' 
+                    }}
+                </td>
+                
             </tr>
         </tbody>
         <tfoot ng-show="items.length >= itemsPerPage">
