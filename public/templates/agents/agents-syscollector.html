@@ -1,9 +1,13 @@
-<md-content flex layout="column" ng-if="tab === 'syscollector'">
+<md-content flex layout="column" ng-if="tab === 'syscollector'" ng-show="!load">
     <div layout="row" class="layout-padding">
         <md-card flex>
             <md-card-content>
                 <span class="wz-headline-title">OS information</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Scan date</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.os.scan.time }}</span>
+                </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span>Sysname</span>
                     <span flex class="wz-text-right color-grey">{{ syscollector.os.sysname }}</span>
@@ -31,6 +35,10 @@
             <md-card-content>
                 <span class="wz-headline-title">Hardware information</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Scan date</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.hardware.scan.time }}</span>
+                </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span>Board</span>
                     <span flex class="wz-text-right color-grey">{{ syscollector.hardware.board_serial }}</span>
