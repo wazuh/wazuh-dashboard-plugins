@@ -17,26 +17,20 @@ const app = uiModules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',
-function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents, errorHandler, csvReq, appState, shareAgent) {
-    $scope.$on('groupsIsReloaded',() => {        
+function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState, shareAgent) {
+    $scope.$on('groupsIsReloaded',() => {    
+        $scope.currentGroup = false;    
         $scope.lookingGroup = false;
         if(!$scope.$$phase) $scope.$digest();
     });
 
-    $scope.searchTerm      = '';
-    $scope.searchTermAgent = '';
-    $scope.searchTermFile  = '';
-    $scope.load            = true;
-    $scope.groups          = Groups;
-    $scope.groupAgents     = GroupAgents;
-    $scope.groupFiles      = GroupFiles;
+    $scope.load = true;
 
-    $scope.downloadCsv = async dataProvider => {
+    $scope.downloadCsv = async data_path => {
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
-            const path         = $scope[dataProvider] ? $scope[dataProvider].path : null;
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch(path, currentApi, $scope[dataProvider] ? $scope[dataProvider].filters : null);
+            const output       = await csvReq.fetch(data_path, currentApi, null);
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'groups.csv');
@@ -47,6 +41,10 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
             errorHandler.handle(error,'Download CSV');
         }
         return;
+    }
+
+    $scope.search = term => {
+        $scope.$broadcast('wazuhSearch',{term})
     }
 
     // Store a boolean variable to check if come from agents
@@ -60,34 +58,17 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
                 // Get ALL groups
                 const data = await apiReq.request('GET','/agents/groups/',{limit:99999})
 
-                // Obtain an array with 0 or 1 element, in that case is our group
                 const filtered = data.data.data.items.filter(group => group.name === globalAgent.group);
-                // Store the array length, should be 0 or 1
-                len = filtered.length;
-                // If len is 1
-                if(len){
-                    // First element is now our group $scope.groups.item is an array with only our group
-                    $scope.groups.items = filtered;
+
+                if(Array.isArray(filtered) && filtered.length){
                     // Load that our group
-                    $scope.loadGroup(0,true);
+                    $scope.loadGroup(filtered[0],true);
                     $scope.lookingGroup=true
+                } else {
+                    throw Error(`Group ${globalAgent.group} not found`);
                 }
-                // Clean $rootScope
+
                 shareAgent.deleteAgent();
-                // Get more groups to fill the md-content with more items
-                await $scope.groups.nextPage();
-
-                // If our group was not found  we need to call loadGroup after load some groups
-                if(!len) {
-                    $scope.loadGroup(0,true);
-                    $scope.lookingGroup=true
-                }
-
-            // If not come from agents make as normal
-            } else {
-                // Actual execution in the controller's initialization
-                await $scope.groups.nextPage();
-                $scope.loadGroup(0,true);
             }
 
             $scope.load = false;
@@ -103,46 +84,34 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
 
     $scope.toggle = () => $scope.lookingGroup=true;
 
-    $scope.showFiles = index => {
-        $scope.fileViewer = false;
-        $scope.groupFiles.reset();
-        $scope.groupFiles.path = `/agents/groups/${$scope.groups.items[index].name}/files`;
-        $scope.groupFiles.nextPage('');
-    };
-
-    $scope.showAgents = index => {
-        $scope.fileViewer = false;
-        $scope.groupAgents.reset();
-        $scope.groupAgents.path = `/agents/groups/${$scope.groups.items[index].name}`;
-        $scope.groupAgents.nextPage('');
-    };
-
     $scope.showAgent = agent => {
         shareAgent.setAgent(agent)
         $location.search('tab', null);
         $location.path('/agents');
     };
 
-    $scope.loadGroup = (index,firstTime) => {
-        if(!firstTime) $scope.lookingGroup=true;
-        $scope.fileViewer = false;
-        $scope.groupAgents.reset();
-        $scope.groupFiles.reset();
-        $scope.selectedGroup = index;
-        $scope.showFiles(index);
-        $scope.showAgents(index);
-    };
-
-    // Select specific group
-    $scope.checkSelected = index => {
-        for(let group of $scope.groups.items){
-            if (group.selected) {
-                group = false;
-            }
+    $scope.loadGroup = async (group,firstTime) => {
+        try {
+            if(!firstTime) $scope.lookingGroup=true;
+            const count = await apiReq.request('GET',`/agents/groups/${group.name}/files`,{limit:1})
+            $scope.totalFiles = count.data.data.totalItems;
+            $scope.fileViewer = false;
+            $scope.currentGroup = group;
+            $scope.fileViewer = false;
+            if(!$scope.$$phase) $scope.$digest();
+        } catch (error) {
+            errorHandler.handle(error,'Groups')
         }
-        $scope.groups.items[index] = true;
+        return;
     };
 
+    $scope.$on('wazuhShowGroup',(event,parameters) => {
+        return $scope.loadGroup(parameters.group)
+    })
+
+    $scope.$on('wazuhShowGroupFile',(event,parameters) => {
+        return $scope.showFile(parameters.groupName, parameters.fileName)
+    })
 
     $scope.goBackToAgents = () => {
         $scope.groupsSelectedTab = 'agents';
@@ -155,30 +124,25 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
         $scope.groupsSelectedTab = 'files';
         $scope.file     = false;
         $scope.filename = false;
+        $scope.fileViewer = false;
         if(!$scope.$$phase) $scope.$digest();
     }
 
     $scope.goBackGroups = () => {
+        $scope.currentGroup = false;
         $scope.lookingGroup = false;
         if(!$scope.$$phase) $scope.$digest();
     }
 
-    $scope.showFile = async index => {
+    $scope.showFile = async (groupName, fileName) => {
         try {
             if($scope.filename) $scope.filename = '';
-            let filename = $scope.groupFiles.items[index].filename;
-            if(filename === '../ar.conf') filename = 'ar.conf';
-
+            if(fileName === '../ar.conf') fileName = 'ar.conf';
             $scope.fileViewer = true;
-
-            const tmpName = `/agents/groups/${$scope.groups.items[$scope.selectedGroup].name}`+
-                          `/files/${filename}`;
-
-
+            const tmpName = `/agents/groups/${groupName}/files/${fileName}`;
             const data = await apiReq.request('GET', tmpName, {})
-
             $scope.file = beautifier.prettyPrint(data.data.data);
-            $scope.filename = filename;
+            $scope.filename = fileName;
 
             if(!$scope.$$phase) $scope.$digest();
         } catch (error) {
@@ -187,17 +151,9 @@ function ($scope, $rootScope, $location, apiReq, Groups, GroupFiles, GroupAgents
         return;
     };
 
-    // Changing the view to overview a specific group
-    $scope.groupOverview = group => {
-        $scope.$parent.$parent.groupName  = group;
-        $scope.$parent.$parent.groupsMenu = 'overview';
-    };
-
     // Resetting the factory configuration
     $scope.$on("$destroy", () => {
-        $scope.groups.reset();
-        $scope.groupFiles.reset();
-        $scope.groupAgents.reset();
+
     });
 
 
