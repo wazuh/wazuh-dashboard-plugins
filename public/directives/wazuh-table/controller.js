@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import template from './template.html'
-import { uiModules }        from 'ui/modules'
-import DataFactory from '../../services/data-factory'
+import template        from './template.html'
+import { uiModules }   from 'ui/modules'
+import DataFactory     from '../../services/data-factory'
 import KeyEquivalenece from './key-equivalence'
 
 const app = uiModules.get('app/wazuh', []);
@@ -26,7 +26,7 @@ app.directive('wazuhTable', function() {
             allowClick: '=allowClick',
             implicitFilter: '=implicitFilter'
         },
-        controller: function($scope, apiReq, $timeout, shareAgent, $location) {            
+        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler) {            
             $scope.keyEquivalence = KeyEquivalenece;
 
             $scope.clickAction = item => {
@@ -111,47 +111,62 @@ app.directive('wazuhTable', function() {
             $scope.items = []
 
             $scope.sort = async field => {
-                $scope.wazuh_table_loading = true;
-                instance.addSorting(field.value || field);
-                $scope.sortValue = instance.sortValue;
-                $scope.sortDir   = instance.sortDir;
-                items = await instance.fetch();
-                $scope.items = items;
-                checkGap();
-                $scope.searchTable();
-                $scope.wazuh_table_loading = false;
-                if(!$scope.$$phase) $scope.$digest()
+                try {
+                    $scope.wazuh_table_loading = true;
+                    instance.addSorting(field.value || field);
+                    $scope.sortValue = instance.sortValue;
+                    $scope.sortDir   = instance.sortDir;
+                    items = await instance.fetch();
+                    $scope.items = items;
+                    checkGap();
+                    $scope.searchTable();
+                    $scope.wazuh_table_loading = false;
+                    if(!$scope.$$phase) $scope.$digest()
+                } catch (error) {
+                    errorHandler.handle(error,'Data factory')
+                }
+                return;
             }
 
             const search = async (term, removeFilters) => {
-                $scope.wazuh_table_loading = true;
-                if(removeFilters) instance.removeFilters();
-                instance.addFilter('search',term);
-                items = await instance.fetch();
-                $scope.items = items;
-                checkGap();
-                $scope.searchTable();
-                $scope.wazuh_table_loading = false;
-                if(!$scope.$$phase) $scope.$digest()
+                try {
+                    $scope.wazuh_table_loading = true;
+                    if(removeFilters) instance.removeFilters();
+                    instance.addFilter('search',term);
+                    items = await instance.fetch();
+                    $scope.items = items;
+                    checkGap();
+                    $scope.searchTable();
+                    $scope.wazuh_table_loading = false;
+                    if(!$scope.$$phase) $scope.$digest()
+                } catch(error) {
+                    errorHandler.handle(error,'Data factory')
+                }
+                return;
             }
 
             const filter = async filter => {
-                $scope.wazuh_table_loading = true;
-                if(filter.name === 'platform' && instance.path === '/agents'){
-                    const platform = filter.value.split(' - ')[0];
-                    const version  = filter.value.split(' - ')[1];
-                    instance.addFilter('os.platform',platform);
-                    instance.addFilter('os.version',version);
-                } else {
-                    instance.addFilter(filter.name,filter.value);
+                try {
+                    $scope.wazuh_table_loading = true;
+                    if(filter.name === 'platform' && instance.path === '/agents'){
+                        const platform = filter.value.split(' - ')[0];
+                        const version  = filter.value.split(' - ')[1];
+                        instance.addFilter('os.platform',platform);
+                        instance.addFilter('os.version',version);
+                    } else {
+                        instance.addFilter(filter.name,filter.value);
+                    }
+                    
+                    items = await instance.fetch();
+                    $scope.items = items;
+                    checkGap();
+                    $scope.searchTable();
+                    $scope.wazuh_table_loading = false;
+                    if(!$scope.$$phase) $scope.$digest()
+                } catch(error) {
+                    errorHandler.handle(error,'Data factory')                    
                 }
-                
-                items = await instance.fetch();
-                $scope.items = items;
-                checkGap();
-                $scope.searchTable();
-                $scope.wazuh_table_loading = false;
-                if(!$scope.$$phase) $scope.$digest()
+                return;
             }
 
             $scope.$on('wazuhUpdateInstancePath',(event,parameters) => {
@@ -173,14 +188,20 @@ app.directive('wazuhTable', function() {
             })
 
             const realTimeFunction = async () => {
-                while(realTime) {
-                    items = await instance.fetch({limit:10});
-                    await $timeout(1000);
-                    $scope.items = items;
-                    checkGap();
-                    $scope.searchTable();
-                    if(!$scope.$$phase) $scope.$digest()
+                try {
+                    while(realTime) {
+                        items = await instance.fetch({limit:10});
+                        await $timeout(1000);
+                        $scope.items = items;
+                        checkGap();
+                        $scope.searchTable();
+                        if(!$scope.$$phase) $scope.$digest()
+                    }    
+                } catch(error) {
+                    realTime = false;
+                    errorHandler.handle(error,'Data factory')                    
                 }
+                return;
             }
 
             $scope.$on('wazuhPlayRealTime',() => {
@@ -201,13 +222,18 @@ app.directive('wazuhTable', function() {
             }
 
             const init = async () => {
-                $scope.wazuh_table_loading = true;
-                items = await instance.fetch();
-                $scope.items = items;
-                checkGap();
-                $scope.searchTable();
-                $scope.wazuh_table_loading = false;
-                if(!$scope.$$phase) $scope.$digest()
+                try {
+                    $scope.wazuh_table_loading = true;
+                    items = await instance.fetch();
+                    $scope.items = items;
+                    checkGap();
+                    $scope.searchTable();
+                    $scope.wazuh_table_loading = false;
+                    if(!$scope.$$phase) $scope.$digest()
+                } catch (error) {
+                    errorHandler.handle(error,'Data factory')                    
+                }
+                return;
             }
 
             init()
