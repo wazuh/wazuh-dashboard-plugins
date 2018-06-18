@@ -97,26 +97,6 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         if(!$scope.$$phase) $scope.$digest();
     });
 
-    $scope.checkEnter = search => {
-        $scope.searchTerm = '';
-        angular.element(document.querySelector('#autocomplete')).blur();
-        if(search.startsWith('group:') && search.split('group:')[1].trim()) {
-            $scope.rules.addFilter('group',search.split('group:')[1].trim());
-        } else if(search.startsWith('level:') && search.split('level:')[1].trim()) {
-            $scope.rules.addFilter('level',search.split('level:')[1].trim());
-        } else if(search.startsWith('pci:') && search.split('pci:')[1].trim()) {
-            $scope.rules.addFilter('pci',search.split('pci:')[1].trim());
-        } else if(search.startsWith('gdpr:') && search.split('gdpr:')[1].trim()) {
-            $scope.rules.addFilter('gdpr',search.split('gdpr:')[1].trim());
-        } else if(search.startsWith('file:') && search.split('file:')[1].trim()) {
-            $scope.rules.addFilter('file',search.split('file:')[1].trim());
-        } else if(search.startsWith('path:') && search.split('path:')[1].trim()) {
-            $scope.rules.addFilter('path',search.split('path:')[1].trim());
-        } else {
-            $scope.rules.addFilter('search',search.trim());
-        }
-    };
-
     $scope.downloadCsv = async () => {
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
@@ -150,23 +130,11 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         $scope.closeDetailView();
     }
 
-    /**
-     * This function changes to the rule detail view
-     */
-    $scope.openDetailView = (rule) => {
-        // Clear current rule variable and assign the new one
-        $scope.currentRule = false;
-        $scope.currentRule = rule;
-
-        // Create the related rules list, resetting it in first place
-        $scope.rulesRelated.reset();
-        $scope.rulesRelated.ruleID = $scope.currentRule.id;
-        $scope.rulesRelated.addFilter('file', $scope.currentRule.file);
-
-        // Enable the Detail view
+    $scope.$on('wazuhShowRule',(event,parameters) => {
+        $scope.currentRule = parameters.rule;
         $scope.viewingDetail = true;
         if(!$scope.$$phase) $scope.$digest();
-    }
+    })
 
     /**
      * This function changes to the rules list view

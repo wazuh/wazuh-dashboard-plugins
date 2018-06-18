@@ -23,7 +23,8 @@ app.directive('wazuhTable', function() {
         scope: {
             path: '=path',
             keys: '=keys',
-            allowClick: '=allowClick'
+            allowClick: '=allowClick',
+            implicitFilter: '=implicitFilter'
         },
         controller: function($scope, apiReq, $timeout, shareAgent, $location) {
             $scope.keyEquivalence = KeyEquivalenece;
@@ -37,6 +38,8 @@ app.directive('wazuhTable', function() {
                     $scope.$emit('wazuhShowGroup',{group:item})
                 } else if(new RegExp(/^\/agents\/groups\/[a-zA-Z0-9]*\/files$/).test(instance.path)){
                     $scope.$emit('wazuhShowGroupFile',{groupName:instance.path.split('groups/')[1].split('/files')[0],fileName:item.filename})
+                } else if(instance.path === '/rules') {
+                    $scope.$emit('wazuhShowRule',{rule:item})
                 }
             }
 
@@ -100,7 +103,7 @@ app.directive('wazuhTable', function() {
             };
             ////////////////////////////////////
 
-            const instance = new DataFactory(apiReq,$scope.path)
+            const instance = new DataFactory(apiReq,$scope.path,$scope.implicitFilter)
             $scope.items = []
 
             $scope.sort = async field => {

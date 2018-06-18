@@ -189,41 +189,16 @@
         <!-- End prematch section -->
 
         <!-- Related rules section -->
-        <div ng-show="(rulesRelated.items && rulesRelated.items.length > 0)">
+        <div layout="row">
             <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
-            <wz-table-header
-                class="wz-side-margin-8"
-                layout="row"
-                data="rulesRelated"
-                keys="[
-                    {name:'ID',sortValue:'id',size:5},
-                    {name:'File',sortValue:'file',size:15},
-                    {name:'Description',sortValue:'description',size:30},
-                    {name:'Groups',size:25},
-                    {name:'PCI',size:10},
-                    {name:'GDPR',size:10},
-                    {name:'Level',sortValue:'level',size:5}
-                ]">
-            </wz-table-header>
-            <wz-table
-                layout="column"
-                flex
-                func="openDetailView(ruleRelated)"
-                data="rulesRelated"
-                full="'ruleRelated'"
-                keys="[
-                    {col:'id',size:5},
-                    {col:'file',size:15},
-                    {col:'description',size:30},
-                    {col:'groups',size:25},
-                    {col:'pci',size:10},
-                    {col:'gdpr',size:10},
-                    {col:'level',size:5}
-                ]"
-                isruleset="true"
-                isdecoders="false"
-                class="no-lateral-padding wz-side-margin-8">
-            </wz-table>
+        </div>
+        <div layout="row" ng-if="currentRule">
+            <wazuh-table 
+                    flex 
+                    path="'/rules'" 
+                    implicit-filter="{ name:'file',value: currentRule.file}"
+                    keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" allow-click="true">
+            </wazuh-table>
         </div>
         <!-- End related rules section -->
 
