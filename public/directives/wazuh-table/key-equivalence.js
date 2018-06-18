@@ -1,0 +1,20 @@
+export default {
+    id: 'ID',
+    timestamp: 'Timestamp',
+    url: 'URL',
+    version: 'Version',
+    'os.name': 'OS name',
+    'os.version': 'OS version',
+    version: 'Version',
+    status: 'Status',
+    group: 'Group',
+    ip: 'IP',
+    description: 'Description',
+    tag: 'Tag',
+    level: 'Level',
+    merged_sum: 'MD5 agent.conf',
+    hash: 'MD5 agent.conf',
+    filename: 'File',
+    name: 'Name',
+    count: 'Count'
+}

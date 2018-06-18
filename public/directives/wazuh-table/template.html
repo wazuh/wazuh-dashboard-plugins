@@ -1,0 +1,43 @@
+
+<div layout="row" class="md-padding" ng-show="wazuh_table_loading" >
+    <md-progress-linear class="md-accent" md-mode="indeterminate"></md-progress-linear>
+</div>
+<div layout="row" ng-show="!wazuh_table_loading && items.length" class="md-padding">
+    <table class="table table-striped table-condensed" style="table-layout: fixed !important" id="wz_table">
+        <thead class="wz-text-bold">
+            <th ng-repeat="key in keys" class="wz-text-left" ng-class="key.size ? 'col-lg-' + key.size : 'col-lg-1'" ng-click="!key.nosortable && sort(key)">
+                {{ keyEquivalence[key.value || key] || key.value || key }}
+                <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === key ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                    aria-hidden="true"></i>
+            </th>
+        </thead>
+        <tbody>
+            <tr ng-class="allowClick ? 'wz-table-cursor-pointer' : ''" ng-repeat="item in pagedItems[currentPage]" ng-click="clickAction(item)">
+                <td ng-repeat="key in keys">{{ key === 'os.name' ? item.os.name : key === 'os.version' ? item.os.version : item[key.value || key] }}</td>
+            </tr>
+        </tbody>
+        <tfoot ng-show="items.length >= itemsPerPage">
+            <td colspan="{{keys.length}}">
+                <div class="pagination pull-right" style="margin:0 !important">
+                    <ul layout="row">
+                        <li ng-class="{disabled: currentPage == 0}" class="md-padding">
+                            <a href ng-click="prevPage()">« Prev</a>
+                        </li>
+
+                        <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{active: n == currentPage}" ng-click="setPage()"
+                            class="md-padding">
+                            <a href ng-bind="n + 1">1</a>
+                        </li>
+
+                        <li ng-class="{disabled: (currentPage) == pagedItems.length - 1}" class="md-padding">
+                            <a href ng-click="nextPage()">Next »</a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tfoot>
+    </table>
+</div>
+<div layout="row" ng-show="!wazuh_table_loading" class="md-padding">
+    Result: {{ items.length }} items. 
+</div>

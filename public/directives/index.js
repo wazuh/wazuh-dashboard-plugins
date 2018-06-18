@@ -18,3 +18,4 @@ import './wz-table-header/wz-table-header';
 import './wz-table-header/wz-table-header.less';
 import './wz-table/wz-table';
 import './wz-table/wz-table.less';
+import './wazuh-table/controller'
