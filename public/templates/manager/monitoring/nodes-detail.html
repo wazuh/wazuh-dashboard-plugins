@@ -1,12 +1,5 @@
 <div flex layout="column" layout-align="start stretch" ng-show="currentNode">
 
-    <!-- Loading status section -->
-    <div layout="column" layout-align="center center" class="wazuh-loading wz-margin-bottom-40" ng-show="resultState === 'ready' && !rendered && currentNode && !loading && !showConfig">
-        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-        <div class="percentage">{{loadingStatus}}</div>
-    </div>
-    <!-- End loading status section -->
-
     <!-- Node alerts summary card -->
     <div layout="row" layout-align="start stretch" class="height-250 wz-timelions" ng-show="!loading && currentNode && !showConfig">
         <md-card flex class="wz-md-card">

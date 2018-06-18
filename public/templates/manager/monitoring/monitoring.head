@@ -56,3 +56,10 @@
     <!-- Discover search bar section -->
     <kbn-dis ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
     <!-- End Discover search bar section -->
+
+    <!-- Loading status section -->
+    <div layout="column" layout-align="center center" class="wazuh-loading wz-margin-bottom-40" ng-show="!loading && !rendered && resultState === 'ready'">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+        <div class="percentage">{{loadingStatus}}</div>
+    </div>
+    <!-- End loading status section -->
