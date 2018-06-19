@@ -28,6 +28,7 @@ app.directive('wazuhTable', function() {
         },
         controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler) {            
             $scope.keyEquivalence = KeyEquivalenece;
+            $scope.totalItems = 0;
 
             $scope.clickAction = item => {
                 if(instance.path === '/agents' || new RegExp(/^\/agents\/groups\/[a-zA-Z0-9]*$/).test(instance.path)){
@@ -117,6 +118,7 @@ app.directive('wazuhTable', function() {
                     $scope.sortValue = instance.sortValue;
                     $scope.sortDir   = instance.sortDir;
                     items = await instance.fetch();
+                    $scope.totalItems = items.length;
                     $scope.items = items;
                     checkGap();
                     $scope.searchTable();
@@ -134,6 +136,7 @@ app.directive('wazuhTable', function() {
                     if(removeFilters) instance.removeFilters();
                     instance.addFilter('search',term);
                     items = await instance.fetch();
+                    $scope.totalItems = items.length;
                     $scope.items = items;
                     checkGap();
                     $scope.searchTable();
@@ -158,6 +161,7 @@ app.directive('wazuhTable', function() {
                     }
                     
                     items = await instance.fetch();
+                    $scope.totalItems = items.length;
                     $scope.items = items;
                     checkGap();
                     $scope.searchTable();
@@ -192,6 +196,7 @@ app.directive('wazuhTable', function() {
                     while(realTime) {
                         items = await instance.fetch({limit:10});
                         await $timeout(1000);
+                        $scope.totalItems = items.length;
                         $scope.items = items;
                         checkGap();
                         $scope.searchTable();
@@ -225,6 +230,7 @@ app.directive('wazuhTable', function() {
                 try {
                     $scope.wazuh_table_loading = true;
                     items = await instance.fetch();
+                    $scope.totalItems = items.length;
                     $scope.items = items;
                     checkGap();
                     $scope.searchTable();
