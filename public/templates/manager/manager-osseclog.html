@@ -48,7 +48,12 @@
 
     <!-- Logs table section -->
     <div layout="row">
-        <wazuh-table flex path="'/manager/logs'" keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"></wazuh-table>
+        <wazuh-table 
+            flex 
+            path="'/manager/logs'" 
+            keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
+            rows-per-page="19">
+        </wazuh-table>
     </div>
     <!-- End Logs table section -->
 

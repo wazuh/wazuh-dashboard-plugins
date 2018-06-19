@@ -47,13 +47,15 @@
             flex 
             path="'/decoders'" 
             keys="['name',{value:'details.program_name',size:2},{value:'details.order',size:2},'file']" 
-            allow-click="true">
+            allow-click="true"
+            rows-per-page="18">
         </wazuh-table> 
         <wazuh-table ng-if="!implicitFilterFromDetail"
                 flex 
                 path="'/decoders'" 
                 keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']" 
-                allow-click="true">
+                allow-click="true"
+                rows-per-page="18">
         </wazuh-table>
     </div>
 
