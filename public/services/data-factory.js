@@ -82,8 +82,9 @@ export default class DataFactory {
             const ops = []
             for(let i=0; i<ops_number; i++){
                 parameters.offset += limit;
-
-                ops.push(this.httpClient.request('GET', this.path, parameters))
+                const tmp_copy = {}
+                Object.assign(tmp_copy,parameters)
+                ops.push(this.httpClient.request('GET', this.path, tmp_copy))
             }
             const remainingItems = await Promise.all(ops);
             remainingItems.map(page => this.items.push(...page.data.data.items))
