@@ -34,5 +34,7 @@ export default {
     count: 'Count',
     'details.program_name': 'Program name',
     'details.order': 'Order',
-    vendor: 'Vendor'
+    vendor: 'Vendor',
+    type: 'Type',
+    architecture: 'Architecture'
 }
