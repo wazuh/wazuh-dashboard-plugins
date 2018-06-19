@@ -41,6 +41,7 @@
 #extensions.gdpr      : true
 #extensions.audit     : true
 #extensions.oscap     : true
+#extensions.ciscat    : false
 #extensions.aws       : false
 #extensions.virustotal: false
 #
@@ -68,12 +69,11 @@
 #wazuh-version.shards  : 1
 #wazuh-version.replicas: 1
 #
-#
 # --------------------------- Index pattern selector ---------------------------
 #
 # Defines if the user is allowed to change the selected
 # index pattern directly from the Wazuh app top menu.
-# Default: yes
+# Default: true
 #ip.selector: true
 #
 # -------------------------------- X-Pack RBAC ---------------------------------
@@ -86,8 +86,8 @@
 #
 # Custom setting to enable/disable wazuh-monitoring indices.
 # Values: true, false, worker
-# If worker is given as value, the app will show the Agents status visualization but won't insert data 
-# on wazuh-monitoring indices
+# If worker is given as value, the app will show the Agents status
+# visualization but won't insert data on wazuh-monitoring indices.
 # Default: true
 #wazuh.monitoring.enabled: true
 #
