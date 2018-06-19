@@ -1,34 +1,44 @@
-<div layout="row" ng-if="!showConfig && !showNodes && !loading" class="wz-timelions">
-    <md-card flex="50" class="wz-md-card">
+<!-- Cards for main monitoring section -->
+<div layout="row" layout-align="start stretch" class="wz-timelions" ng-if="!loading && !showConfig && !showNodes">
+
+    <!-- Overview card -->
+    <md-card flex class="wz-md-card">
         <md-card-content>
-            <span class="wz-headline-title wz-text-link cursor-pointer" ng-click="goConfiguration()">Overview</span>
+            <i class="fa fa-fw fa-pie-chart" aria-hidden="true"></i> <span ng-click="goConfiguration()" class="wz-headline-title wz-text-link cursor-pointer">Overview</span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <div layout="row" class="wz-padding-top-10">
                 <span flex="25">IP</span>
-                <span flex class="color-grey">{{configuration.nodes[0] || 'Unknown'}}</span>
+                <span class="color-grey">{{configuration.nodes[0] || 'Unknown'}}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
                 <span flex="25">Running</span>
-                <span flex class="color-grey">{{ status || 'no' }}</span>
+                <span class="color-grey">{{ status || 'no' }}</span>
             </div>
             <div layout="row" class="wz-padding-top-10">
                 <span flex="25">Version</span>
-                <span flex class="color-grey">{{version}}</span>
+                <span class="color-grey">{{version}}</span>
             </div>
         </md-card-content>
     </md-card>
-    <md-card flex="50" class="wz-md-card">
+    <!-- End overview card -->
+
+    <!-- Info card -->
+    <md-card flex class="wz-md-card">
         <md-card-content>
-            <span class="wz-headline-title">Info</span>
+            <i class="fa fa-fw fa-info" aria-hidden="true"></i> <span class="wz-headline-title">Information</span>
             <md-divider class="wz-margin-top-10"></md-divider>
+            <!-- Nodes -->
             <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goNodes()">
-                <span class="wz-text-link" flex="25">Nodes</span>
-                <span flex class="color-grey">{{nodesCount}}</span>
+                <span flex="25" class="wz-text-link" tooltip="Click to open the list of nodes" tooltip-placement="left">Nodes</span>
+                <span class="wz-text-link" tooltip="Click to open the list of nodes" tooltip-placement="right">{{nodesCount}}</span>
             </div>
+            <!-- Agents -->
             <div layout="row" class="wz-padding-top-10 cursor-pointer" ng-click="goAgents()">
-                <span class="wz-text-link" flex="25">Agents</span>
-                <span flex class="color-grey">{{agentsCount}}</span>
+                <span flex="25" class="wz-text-link" tooltip="Click to open the list of agents" tooltip-placement="left">Agents</span>
+                <span class="wz-text-link" tooltip="Click to open the list of agents" tooltip-placement="right">{{agentsCount}}</span>
             </div>
         </md-card-content>
     </md-card>
+    <!-- End info card -->
 </div>
+<!-- End cards for main monitoring section -->

@@ -1,0 +1,65 @@
+<div flex layout="column" ng-controller="clusterController" ng-if="tab === 'monitoring'" ng-show="isClusterEnabled">
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="loading">
+        <div></div>
+    </div>
+
+    <!-- Navigation section (Breadcrumbs, etc) -->
+    <div layout="row" layout-align="start center" ng-if="!loading">
+        <!-- Breadcrumbs -->
+        <div layout="row" layout-padding>
+            <!-- Main monitoring section -->
+            <div ng-if="!showConfig && !showNodes">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / {{ tabNames[tab] }}</span>
+                <span> / {{ currentAPI }}</span>
+            </div>
+            <!-- Overview section -->
+            <div ng-if="showConfig">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
+                <span> / Overview</span>
+            </div>
+            <!-- The nodes list -->
+            <div ng-if="showNodes && !currentNode">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
+                <span> / Nodes</span>
+            </div>
+            <!-- Single node section -->
+            <div ng-if="currentNode">
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="goNodes()">Nodes</span>
+                <span> / <span class="wz-text-bold">{{ currentNode.name }}</span></span>
+            </div>
+        </div>
+        <!-- End breadcrumbs -->
+    </div>
+    <!-- End navigation section -->
+
+    <!-- Discover search bar section -->
+    <kbn-dis ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
+    <!-- End Discover search bar section -->
+
+    <!-- Loading status section -->
+    <div layout="column" layout-align="center center" class="wazuh-loading wz-margin-bottom-40" ng-show="!loading && !rendered && resultState === 'ready'">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+        <div class="percentage">{{loadingStatus}}</div>
+    </div>
+    <!-- End loading status section -->

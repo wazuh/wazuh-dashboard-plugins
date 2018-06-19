@@ -1,4 +1,4 @@
-<div ng-show="!loading && !viewingDetail" flex layout="column">
+<div ng-show="!loading && !viewingDetail" flex layout="column" class="md-padding">
     <div id="content" layout="row" layout-align="start start">
         <span flex layout="row" layout-align="space-between center">
             <md-autocomplete flex id="Auto" class="wz-autocomplete wz-select-input wz-margin-right-16" md-input-id="autocomplete" md-select-on-match="true" md-no-cache="noCache" md-selected-item="filter"
@@ -27,11 +27,11 @@
             </select>
         </div>
 
-        <md-button ng-class="(globalsubmenuNavItem2 == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
+        <md-button ng-class="(globalRulesetTab == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
             class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
             <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
         </md-button>
-        <md-button ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
+        <md-button ng-class="(globalRulesetTab == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
             class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
             <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
         </md-button>

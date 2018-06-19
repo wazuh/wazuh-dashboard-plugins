@@ -1,4 +1,4 @@
-<div ng-cloak flex layout="column" layout-padding class="mozilla-table-size-85" ng-controller="managerLogController" ng-if="!loading && submenuNavItem == 'logs'">
+<div flex layout="column" layout-padding layout-align="start stretch" class="mozilla-table-size-85" ng-controller="managerLogController" ng-if="tab === 'logs'">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="loading">
@@ -6,7 +6,7 @@
     </div>
 
     <!-- Filters and Realtime button section -->
-    <div ng-show="!loading" layout="row" layout-align="start center">
+    <div ng-if="!loading" layout="row" layout-align="start center">
         <!-- Daemon selector -->
         <div flex="20" layout="column" class="height-40 wz-margin-right-15 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
@@ -44,7 +44,7 @@
     <!-- End Filters and Realtime button section -->
 
     <!-- Logs table section -->
-    <div ng-show="!loading" flex layout="column">
+    <div ng-if="!loading" flex layout="column">
 
         <!-- Searchbar section -->
         <wz-search-bar isdisabled="realtime" data="logs" term="searchTerm" placetext="'Search logs...'"></wz-search-bar>

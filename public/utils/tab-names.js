@@ -25,5 +25,13 @@ export default {
     api          : 'API configuration',
     extensions   : 'Extensions',
     pattern      : 'Index pattern',
-    about        : 'About'
+    about        : 'About',
+    status       : 'Status',
+    ruleset      : 'Ruleset',
+    rules        : 'Rules',
+    decoders     : 'Decoders',
+    logs         : 'Logs',
+    groups       : 'Groups',
+    monitoring   : 'Monitoring',
+    reporting    : 'Reporting'
 }
