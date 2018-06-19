@@ -57,4 +57,6 @@ export default (server, options) => {
     // Returns total RAM available from the current machine where Kibana is being executed
     server.route({ method: 'GET', path: '/api/wazuh-api/ram', handler: (req,res) => ctrl.totalRam(req,res)})
 
+    // Returns unique fields from the agents such OS, agent version ...
+    server.route({ method: 'GET', path: '/api/wazuh-api/agents-unique/{api}', handler: (req,res) => ctrl.getAgentsFieldsUniqueCount(req,res)});
 };
