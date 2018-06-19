@@ -63,7 +63,12 @@
 
         <!-- Groups table -->
         <div layout="row" ng-if="!lookingGroup" class="md-padding">
-            <wazuh-table flex path="'/agents/groups'" keys="['name','count','merged_sum']" allow-click="true">
+            <wazuh-table 
+                flex 
+                path="'/agents/groups'" 
+                keys="['name','count','merged_sum']" 
+                allow-click="true"
+                rows-per-page="19">
             </wazuh-table>
         </div>
         <!-- End groups table -->
@@ -79,8 +84,12 @@
 
         <!-- Group agents table -->
         <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup" class="md-padding">
-            <wazuh-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
-                allow-click="true">
+            <wazuh-table 
+                flex 
+                path="'/agents/groups/' + currentGroup.name" 
+                keys="['id','name','ip','status','os.name','os.version','version']"
+                allow-click="true"
+                rows-per-page="14">
             </wazuh-table>
         </div>
         <!-- End Group agents table -->
@@ -96,8 +105,12 @@
 
         <!-- Group files table -->
         <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup" class="md-padding">
-            <wazuh-table flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
-                allow-click="true">
+            <wazuh-table 
+                flex 
+                path="'/agents/groups/' + currentGroup.name + '/files'" 
+                keys="[{value:'filename',size:2},{value:'hash',size:6}]"
+                allow-click="true"
+                rows-per-page="14">
             </wazuh-table>
         </div>
         <!-- End Group files table -->

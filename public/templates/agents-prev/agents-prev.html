@@ -101,7 +101,12 @@
     </div>
 
     <div layout="row" class="margin-top-30">
-        <wazuh-table flex path="'/agents'" keys="['id','name','ip','status','group','os.name','os.version','version']" allow-click="true">
+        <wazuh-table 
+            flex 
+            path="'/agents'" 
+            keys="['id',{value:'name',size:2},'ip','status','group','os.name','os.version','version']" 
+            allow-click="true"
+            rows-per-page="17">
         </wazuh-table>
     </div>
 
