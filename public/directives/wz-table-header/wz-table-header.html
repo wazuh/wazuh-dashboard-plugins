@@ -1,9 +1,0 @@
-<md-toolbar layout="row" class="md-toolbar-tools wz-theader-toolbar" ng-show="(!noscroll && data.items && data.items.length > 0) || (noscroll && data)">
-    <div class="wz-text-truncatable" ng-repeat="key in keys" flex="{{key.size || ''}}">
-        <span ng-if="key.sortValue" class="wz-theader-color" ng-click="data.sort(key.sortValue)">{{key.name}}
-            <i class="fa wz-theader-sort-icon" ng-class="data.sortValue === key.sortValue ? (data.sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                aria-hidden="true"></i>
-        </span>
-        <span ng-if="!key.sortValue" class="wz-theader-color">{{key.name}}</span>
-    </div>
-</md-toolbar>

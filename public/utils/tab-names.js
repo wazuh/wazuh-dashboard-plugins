@@ -26,6 +26,7 @@ export default {
     extensions   : 'Extensions',
     pattern      : 'Index pattern',
     about        : 'About',
+    syscollector : 'Inventory',
     status       : 'Status',
     ruleset      : 'Ruleset',
     rules        : 'Rules',

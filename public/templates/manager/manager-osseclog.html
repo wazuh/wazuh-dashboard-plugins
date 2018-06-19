@@ -1,15 +1,18 @@
-<div flex layout="column" layout-padding layout-align="start stretch" class="mozilla-table-size-85" ng-controller="managerLogController" ng-if="tab === 'logs'">
-
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="loading">
-        <div></div>
-    </div>
-
+<div ng-cloak flex layout="column" layout-padding class="mozilla-table-size-85" ng-controller="managerLogController" ng-if="!loading && submenuNavItem == 'logs'">
     <!-- Filters and Realtime button section -->
-    <div ng-if="!loading" layout="row" layout-align="start center">
+    <div ng-show="!loading" layout="row" layout-align="start center">
+        <div layout="column" flex="40" class="height-40 wz-margin-right-15">
+            <div layout="row">
+                <input placeholder="Filter logs..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                    aria-invalid="false" wz-enter="search(custom_search)">
+                <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+                    <span class="fa fa-search" aria-hidden="true"></span>
+                </button>  
+            </div>      
+        </div>
         <!-- Daemon selector -->
         <div flex="20" layout="column" class="height-40 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="category == 'all' ? logs.removeFilter('category', true) : logs.addFilter('category', category)"
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="filter({name:'category',value:category})"
             aria-label="Logs category">
                 <option value="all">All daemons</option>
                 <option ng-repeat="(key, value) in summary" value="{{key}}">{{key}}</option>
@@ -19,7 +22,7 @@
 
         <!-- Level selector -->
         <div flex="20" layout="column" class="height-40 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="type_log == 'all' ? logs.removeFilter('type_log', true) : logs.addFilter('type_log', type_log)"
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="filter({name:'type_log',value:type_log})"
             aria-label="Logs level">
                 <option value="all">All log levels</option>
                 <option value="info">Info</option>
@@ -44,6 +47,10 @@
     <!-- End Filters and Realtime button section -->
 
     <!-- Logs table section -->
+<<<<<<< HEAD
+    <div layout="row">
+        <wazuh-table flex path="'/manager/logs'" keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"></wazuh-table>
+=======
     <div ng-if="!loading" flex layout="column">
 
         <!-- Searchbar section -->
@@ -105,6 +112,12 @@
             <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
         </div>
         <!-- End CSV Download button section -->
+>>>>>>> 3.3
     </div>
     <!-- End Logs table section -->
+
+    <div layout="row" class="md-padding">
+        <span flex></span>
+        <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+    </div>
 </div>

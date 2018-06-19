@@ -1,0 +1,70 @@
+<md-content flex layout="column" ng-if="tab === 'syscollector'" ng-show="!load">
+    <div layout="row" class="layout-padding">
+        <md-card flex>
+            <md-card-content>
+                <span class="wz-headline-title">OS information</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Scan date</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.os.scan.time }}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Sysname</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.os.sysname }}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Version</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.os.version }}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Architecture</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.os.architecture }}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Release</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.os.release }}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Distribution</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.os.os.name }} {{ syscollector.os.os.version }}</span>
+                </div>
+
+            </md-card-content>
+        </md-card>
+        <md-card flex>
+            <md-card-content>
+                <span class="wz-headline-title">Hardware information</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Scan date</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.hardware.scan.time }}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>Board</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.hardware.board_serial }}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>RAM</span>
+                    <span flex class="wz-text-right color-grey">{{ (syscollector.hardware.ram.total / 1024) | number: 2 }} MB</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span>CPU</span>
+                    <span flex class="wz-text-right color-grey">{{ syscollector.hardware.cpu.name }} ({{ syscollector.hardware.cpu.cores }} cores)</span>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="md-padding">
+        <input placeholder="Filter packages..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+            aria-invalid="false" wz-enter="search(custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+            <span class="fa fa-search" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <div layout="row" ng-if="agent" class="md-padding">
+        <wazuh-table flex path="'/syscollector/' + agent.id + '/packages'" keys="['name','architecture','version',{value:'vendor',size:2},{value:'description',size:2}]">
+        </wazuh-table>
+    </div>
+</md-content>
