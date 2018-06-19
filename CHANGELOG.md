@@ -8,13 +8,25 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 -   Support for Wazuh v3.3.1.
 -   Support for Elastic Stack v6.3.0 ([#579](https://github.com/wazuh/wazuh-kibana-app/pull/579)).
--   Brand-new Wazuh app redesign for the _Settings_ tab ([#570](https://github.com/wazuh/wazuh-kibana-app/pull/570)):
-    -   Refactored and optimized UI for this tab, using a breadcrumbs-based navigability.
+-   Brand-new Wazuh app redesign for the _Monitoring_ and _Settings_ tab ([#581](https://github.com/wazuh/wazuh-kibana-app/pull/581) & [#570](https://github.com/wazuh/wazuh-kibana-app/pull/570)):
+    -   Refactored and optimized UI for these tabs, using a breadcrumbs-based navigability.
     -   Used the same guidelines from the previous redesign for _Overview_ and _Agents_ tabs.
 -   Refactoring for _Overview_ and _Agents_ controllers ([#564](https://github.com/wazuh/wazuh-kibana-app/pull/564)):
     -   Reduced duplicated code by splitting it into separate files.
     -   Code optimization for a better performance and maintainability.
     -   Added new services to provide similar functionality between different app tabs.
+-   New tab for _Agents_ - _Inventory_ ([#582](https://github.com/wazuh/wazuh-kibana-app/pull/582)):
+    -   Get information about the agent host, such as installed packages, motherboard, operating system, etc.
+    -   This tab will appear if the agent has the [`syscollector`](https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html) wodle enabled.
+-   Refactoring for all app tables ([#582](https://github.com/wazuh/wazuh-kibana-app/pull/582)):
+    -   Replaced the old `wz-table` directive with a new one, along with a new data factory.
+    -   Now the tables are built with a pagination system.
+    -   Much easier method for building tables for the app.
+    -   Performance and stability improvements when fetching API data.
+-   Added inline queries for the _Dev tools_ tab ([#583](https://github.com/wazuh/wazuh-kibana-app/pull/583)):
+    -   Now you can insert queries using inline parameters, just like in a browser.
+    -   You can combine inline parameters with JSON-like parameters.
+    -   If you use the same parameter on both methods with different values, the inline paramenter has precedence over the other one.
 -   Added `data.vulnerability.package.condition` to the list of known fields ([#566](https://github.com/wazuh/wazuh-kibana-app/pull/566)).
 
 ## Changed
