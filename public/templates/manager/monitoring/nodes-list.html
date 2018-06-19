@@ -1,23 +1,14 @@
-<div layout="column" layout-align="start stretch" class="md-padding" ng-if="showNodes && !currentNode">
+<div layout="column" flex ng-if="showNodes && !currentNode">
+    <div layout="row" class="md-padding">
+        <input placeholder="Filter nodes..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+            aria-invalid="false" wz-enter="search(custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+            <span class="fa fa-search" aria-hidden="true"></span>
+        </button>
+    </div>
+    <div layout="row" class="md-padding">
+        <wazuh-table flex path="'/cluster/nodes'" keys="['name','version','ip','type']" allow-click="true">
+        </wazuh-table>
+    </div>
 
-    <!-- Monitoring nodes searchbar -->
-    <wz-search-bar data="nodes" term="nodeSearchTerm" placetext="'Search nodes...'"></wz-search-bar>
-    <!-- End monitoring nodes searchbar -->
-
-    <!-- Monitoring nodes table -->
-    <wz-table-header layout="row" data="nodes" keys="[
-            {name:'Name',size:25},
-            {name:'Version',size:25},
-            {name:'IP',size:25},
-            {name:'Type',size:25}
-        ]">
-    </wz-table-header>
-    <wz-table layout="column" flex data="nodes" func="showNode(index)" keys="[
-            {col:'name',size:25},
-            {col:'version',size:25},
-            {col:'ip',size:25},
-            {col:'type',size:25}
-        ]" class="no-lateral-padding">
-    </wz-table>
-    <!-- End monitoring nodes table -->
 </div>
