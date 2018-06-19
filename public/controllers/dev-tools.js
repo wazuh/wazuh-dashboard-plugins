@@ -13,6 +13,7 @@ import { uiModules } from 'ui/modules'
 import beautifier    from '../utils/json-beautifier'
 import CodeMirror    from '../utils/codemirror/lib/codemirror'
 import jsonLint      from '../utils/codemirror/json-lint'
+import queryString   from 'query-string'
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -224,23 +225,33 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                                 desiredGroup.requestText.split(method)[1].trim() :
                                 desiredGroup.requestText;
 
+            // Checks for inline parameters
+            const inlineSplit = requestCopy.split('?');
+
+            const extra = inlineSplit && inlineSplit[1] ? 
+                          queryString.parse(inlineSplit[1]) :
+                          {};
+ 
             const req = requestCopy ?
                         requestCopy.startsWith('/') ? 
                         requestCopy :  
                         `/${requestCopy}` :
                         '/';
 
-            let validJSON = true, JSONraw = {};
+            let JSONraw = {};
             try {
                 JSONraw = JSON.parse(desiredGroup.requestTextJson);
             } catch(error) {
-                validJSON = false;
+                JSONraw = {}
             }
 
+            // Assign inline parameters
+            for(const key in extra) JSONraw[key] = extra[key];
+
             const path   = req.includes('?') ? req.split('?')[0] : req;
-            const params = { devTools: true }
+
             if(typeof JSONraw === 'object') JSONraw.devTools = true;
-            const output = await apiReq.request(method, path, validJSON && !req.includes('?') ? JSONraw : params)
+            const output = await apiReq.request(method, path, JSONraw)
 
             apiOutputBox.setValue(
                 JSON.stringify(output.data.data,null,2)
