@@ -5,7 +5,9 @@
 <div layout="row" ng-show="!wazuh_table_loading && items.length">
     <table class="table table-striped table-condensed" style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="wz-text-left" ng-class="!key.nosortable ? 'cursor-pointer' : ''" ng-class="key.size ? 'col-lg-' + key.size : 'col-lg-1'" ng-click="!key.nosortable && sort(key)">
+            <th ng-repeat="key in keys" class="wz-text-left" 
+                ng-class="{ 'cursor-pointer' : !key.nosortable, 'col-lg-1' : !key.size, 'col-lg-{{key.size}}' : key.size }"
+                ng-click="!key.nosortable && sort(key)">
                 {{ keyEquivalence[key.value || key] || key.value || key }}
                 <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                     aria-hidden="true"></i>
