@@ -70,7 +70,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         return $scope.$broadcast('wazuhRemoveFilter',{filterName});
     }
 
-    $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
+    $scope.setRulesTab = tab => $rootScope.globalRulesetTab = tab;
 
     //Initialization
     $scope.searchTerm = '';
@@ -148,7 +148,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 });
 
 app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq) {
-    $scope.setRulesTab = tab => $rootScope.globalsubmenuNavItem2 = tab;
+    $scope.setRulesTab = tab => $rootScope.globalRulesetTab = tab;
 
     $scope.implicitFilterFromDetail = false;
     $scope.appliedFilters = [];

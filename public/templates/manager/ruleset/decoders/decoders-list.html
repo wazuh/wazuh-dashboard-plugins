@@ -1,4 +1,4 @@
-<div ng-show="!loading && !viewingDetail" flex layout="column">
+<div ng-show="!loading && !viewingDetail" flex layout="column" class="md-padding">
     <div id="content" layout="row" layout-align="start start">
         
         <input flex="60" placeholder="Filter decoders..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-top-4 height-36"
@@ -13,17 +13,18 @@
                 <option value="parents">Parent decoders</option>
             </select>
         </div>
+
         <div flex layout="column">
-            <md-button flex ng-class="(globalsubmenuNavItem2 == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
+            <md-button flex ng-class="(globalRulesetTab == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
                 class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
                 <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
             </md-button>
         </div>
         <div flex layout="column">
-        <md-button flex ng-class="(globalsubmenuNavItem2 == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
-            class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
-            <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
-        </md-button>
+            <md-button flex ng-class="(globalRulesetTab == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
+                class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
+                <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
+            </md-button>
         </div>
     </div>
 

@@ -47,8 +47,72 @@
     <!-- End Filters and Realtime button section -->
 
     <!-- Logs table section -->
+<<<<<<< HEAD
     <div layout="row">
         <wazuh-table flex path="'/manager/logs'" keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"></wazuh-table>
+=======
+    <div ng-if="!loading" flex layout="column">
+
+        <!-- Searchbar section -->
+        <wz-search-bar isdisabled="realtime" data="logs" term="searchTerm" placetext="'Search logs...'"></wz-search-bar>
+        <!-- End Searchbar section -->
+
+        <!-- Realtime disabled section -->
+        <wz-table-header
+            layout="row"
+            data="logs"
+            keys="[
+            {name:'Timestamp',sortValue:'timestamp',size:15},
+            {name:'Tag',sortValue:'tag',size:25},
+            {name:'Level',sortValue:'level',size:10},
+            {name:'Description'}
+            ]"
+            ng-if="!realtime">
+        </wz-table-header>
+        <wz-table
+            layout="column"
+            flex
+            data="logs"
+            keys="[{col:'timestamp',size:15,truncatable:'true'},{col:'tag',size:25,truncatable:'true'},{col:'level',size:10,truncatable:'true'},{col:'description',truncatable:'false'}]"
+            ng-if="!realtime"
+            class="no-lateral-padding"
+            nopointer="true"
+            noheight="true">
+        </wz-table>
+        <!-- End Realtime disabled section -->
+
+        <!-- Realtime enabled section -->
+        <wz-table-header
+            layout="row"
+            data="realLogs"
+            keys="[
+            {name:'Timestamp',size:15},
+            {name:'Tag',size:25},
+            {name:'Level',size:10},
+            {name:'Description'}
+            ]"
+            ng-if="realtime">
+        </wz-table-header>
+        <wz-table
+            layout="column"
+            flex
+            data="realLogs"
+            keys="[{col:'timestamp',size:15,truncatable:'true'},{col:'tag',size:25,truncatable:'true'},{col:'level',size:10,truncatable:'true'},{col:'description',truncatable:'false'}]"
+            ng-if="realtime"
+            class="no-lateral-padding",
+            noscroll="true"
+            nopointer="true"
+            noheight="true">
+        </wz-table>
+        <!-- End Realtime enabled section -->
+
+        <!-- CSV Download button section -->
+        <div layout="row" class="wz-margin-top-10">
+            <span flex></span>
+            <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+        </div>
+        <!-- End CSV Download button section -->
+>>>>>>> 3.3
     </div>
     <!-- End Logs table section -->
 

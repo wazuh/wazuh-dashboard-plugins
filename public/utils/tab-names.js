@@ -26,5 +26,13 @@ export default {
     extensions   : 'Extensions',
     pattern      : 'Index pattern',
     about        : 'About',
-    syscollector : 'Inventory'
+    syscollector : 'Inventory',
+    status       : 'Status',
+    ruleset      : 'Ruleset',
+    rules        : 'Rules',
+    decoders     : 'Decoders',
+    logs         : 'Logs',
+    groups       : 'Groups',
+    monitoring   : 'Monitoring',
+    reporting    : 'Reporting'
 }

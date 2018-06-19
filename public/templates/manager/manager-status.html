@@ -1,125 +1,128 @@
-<md-content flex layout="column" ng-if="!load && submenuNavItem == 'status'" ng-controller="managerStatusController">
+<div flex layout="column" layout-align="start stretch" ng-controller="managerStatusController" ng-if="tab === 'status'">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="load">
         <div></div>
     </div>
 
-    <div flex layout="column" ng-show="!load" layout-align="start stretch">
-
-        <div class="joinCardsRow" layout="row" layout-align="start stretch">
-            <md-card flex ng-repeat="(k,v) in daemons" class="wz-md-card">
-                <md-card-content class="wz-text-center">
-                    <center>
-                        <p ng-class="getDaemonStatusClass(v)" class="round"></p>
-                        <p class="wz-padding-top-10">{{k}}</p>
-                    </center>
-                </md-card-content>
-            </md-card>
-        </div>
-
-        <div layout="row">
-            <md-card flex class="wz-metric-color wz-md-card">
-                <md-card-content layout="row" class="wz-padding-metric">
-                    <div flex>Total agents:
-                        <span class="wz-text-bold">{{agentsCountTotal}}</span>
-                    </div>
-                    <div flex>Active:
-                        <span class="wz-text-bold">{{agentsCountActive}}</span>
-                    </div>
-                    <div flex>Disconnected:
-                        <span class="wz-text-bold">{{agentsCountDisconnected}}</span>
-                    </div>
-                    <div flex>Never connected:
-                        <span class="wz-text-bold">{{agentsCountNeverConnected}}</span>
-                    </div>
-                    <div flex>Agents coverage:
-                        <span ng-if="agentsCoverity" class="wz-text-bold">{{(agentsCoverity | number:2)}}%</span>
-                        <span ng-if="!agentsCoverity" class="wz-text-bold">---</span>
-                    </div>
-                </md-card-content>
-            </md-card>
-        </div>
-
-        <div layout="row" layout-align="start stretch">
-            <md-card flex="50" class="wz-md-card">
-                <md-card-content>
-                    <span class="wz-headline-title">Manager information</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Version</span>
-                        <span class="wz-text-right color-grey">{{managerInfo.version ? managerInfo.version : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Compilation date</span>
-                        <span class="wz-text-right color-grey">{{managerInfo.compilation_date ? managerInfo.compilation_date : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Installation path</span>
-                        <span class="wz-text-right color-grey">{{managerInfo.path ? managerInfo.path : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Installation type</span>
-                        <span class="wz-text-right color-grey">{{managerInfo.type ? managerInfo.type : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Agents limit</span>
-                        <span class="wz-text-right color-grey">{{managerInfo.max_agents ? managerInfo.max_agents : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">OpenSSL Support</span>
-                        <span class="wz-text-right color-grey">{{managerInfo.openssl_support ? managerInfo.openssl_support : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Total rules</span>
-                        <span class="wz-text-right color-grey">{{totalRules ? totalRules : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Total decoders</span>
-                        <span class="wz-text-right color-grey">{{totalDecoders ? totalDecoders : '-'}}</span>
-                    </div>
-                </md-card-content>
-            </md-card>
-
-            <md-card flex="50" class="wz-md-card" ng-show="agentInfo && agentInfo.id !== '000'">
-                <md-card-content>
-                    <span class="wz-headline-title">Last registered agent</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Name</span>
-                        <span class="wz-text-right color-grey">{{agentInfo.name ? agentInfo.name : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">ID</span>
-                        <span class="wz-text-right color-grey">{{agentInfo.id ? agentInfo.id : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Status</span>
-                        <span class="wz-text-right color-grey">{{agentInfo.status ? agentInfo.status : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">IP Address</span>
-                        <span class="wz-text-right color-grey">{{agentInfo.ip ? agentInfo.ip : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Date add</span>
-                        <span class="wz-text-right color-grey">{{agentInfo.dateAdd ? agentInfo.dateAdd : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Version</span>
-                        <span class="wz-text-right color-grey">{{agentInfo.version ? agentInfo.version : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="agentInfo.id !== '000'">
-                        <span flex="25">Last keep alive</span>
-                        <span class="wz-text-right color-grey">{{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</span>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <span flex="25">Operating system</span>
-                        <span class="wz-text-right color-grey">{{agentInfo.os.name ? agentInfo.os.name + agentInfo.os.version : agentInfo.os.uname ? agentInfo.os.uname
-                            : '-'}}</span>
-                    </div>
-                </md-card-content>
-            </md-card>
-        </div>
+    <!-- Daemons status section -->
+    <div layout="row" layout-align="start stretch" ng-if="!load">
+        <md-card flex class="wz-md-card" ng-repeat="(k,v) in daemons">
+            <md-card-content>
+                <center>
+                    <p ng-class="getDaemonStatusClass(v)" class="round"></p>
+                    <p class="wz-padding-top-10">{{k}}</p>
+                </center>
+            </md-card-content>
+        </md-card>
     </div>
-</md-content>
+    <!-- End daemons status section -->
+
+    <!-- Agents status section -->
+    <div layout="row" layout-align="start center" ng-if="!load">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div flex class="wz-text-truncatable">Total agents:
+                    <span class="wz-text-bold">{{agentsCountTotal}}</span>
+                </div>
+                <div flex class="wz-text-truncatable">Active:
+                    <span class="wz-text-bold">{{agentsCountActive}}</span>
+                </div>
+                <div flex class="wz-text-truncatable">Disconnected:
+                    <span class="wz-text-bold">{{agentsCountDisconnected}}</span>
+                </div>
+                <div flex class="wz-text-truncatable">Never connected: <span class="wz-text-bold">{{agentsCountNeverConnected}}</span>
+                </div>
+                <div flex class="wz-text-truncatable">Agents coverage:
+                    <span ng-if="agentsCoverity" class="wz-text-bold">{{(agentsCoverity | number:2)}}%</span>
+                    <span ng-if="!agentsCoverity" class="wz-text-bold">---</span>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- End agents status section -->
+
+    <div layout="row" layout-align="start stretch" layout-wrap ng-if="!load">
+        <!-- Manager information section -->
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i> <span class="wz-headline-title">Manager information</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Version</span>
+                    <span class="wz-text-right color-grey">{{managerInfo.version ? managerInfo.version : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Compilation date</span>
+                    <span class="wz-text-right color-grey">{{managerInfo.compilation_date ? managerInfo.compilation_date : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Installation path</span>
+                    <span class="wz-text-right color-grey">{{managerInfo.path ? managerInfo.path : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Installation type</span>
+                    <span class="wz-text-right color-grey">{{managerInfo.type ? managerInfo.type : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Agents limit</span>
+                    <span class="wz-text-right color-grey">{{managerInfo.max_agents ? managerInfo.max_agents : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">OpenSSL Support</span>
+                    <span class="wz-text-right color-grey">{{managerInfo.openssl_support ? managerInfo.openssl_support : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Total rules</span>
+                    <span class="wz-text-right color-grey">{{totalRules ? totalRules : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Total decoders</span>
+                    <span class="wz-text-right color-grey">{{totalDecoders ? totalDecoders : '-'}}</span>
+                </div>
+            </md-card-content>
+        </md-card>
+        <!-- End manager information section -->
+
+        <!-- Last registered agent section -->
+        <md-card flex class="wz-md-card" ng-show="agentInfo && agentInfo.id !== '000'">
+            <md-card-content>
+                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> <span class="wz-headline-title">Last registered agent</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Name</span>
+                    <span class="wz-text-right color-grey">{{agentInfo.name ? agentInfo.name : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">ID</span>
+                    <span class="wz-text-right color-grey">{{agentInfo.id ? agentInfo.id : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Status</span>
+                    <span class="wz-text-right color-grey">{{agentInfo.status ? agentInfo.status : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">IP Address</span>
+                    <span class="wz-text-right color-grey">{{agentInfo.ip ? agentInfo.ip : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Date add</span>
+                    <span class="wz-text-right color-grey">{{agentInfo.dateAdd ? agentInfo.dateAdd : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Version</span>
+                    <span class="wz-text-right color-grey">{{agentInfo.version ? agentInfo.version : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10" ng-if="agentInfo.id !== '000'">
+                    <span flex="25">Last keep alive</span>
+                    <span class="wz-text-right color-grey">{{agentInfo.lastKeepAlive ? agentInfo.lastKeepAlive : '-'}}</span>
+                </div>
+                <div layout="row" class="wz-padding-top-10">
+                    <span flex="25">Operating system</span>
+                    <span class="wz-text-right color-grey">{{agentInfo.os.name ? agentInfo.os.name + agentInfo.os.version : agentInfo.os.uname ? agentInfo.os.uname : '-'}}</span>
+                </div>
+            </md-card-content>
+        </md-card>
+        <!-- End last registered agent section -->
+    </div>
+</div>
