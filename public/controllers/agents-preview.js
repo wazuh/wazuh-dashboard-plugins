@@ -14,7 +14,7 @@ import * as FileSaver from '../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsPreviewController', function ($scope, $routeParams, genericReq, apiReq, appState, $location, errorHandler, csvReq, shareAgent) {
+app.controller('agentsPreviewController', function ($scope, $routeParams, genericReq, appState, $location, errorHandler, csvReq, shareAgent) {
     
     $scope.search = term => {
         $scope.$broadcast('wazuhSearch',{term})
