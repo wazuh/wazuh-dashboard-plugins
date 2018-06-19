@@ -56,6 +56,7 @@ export default class DataFactory {
     
     async fetch(options = {}) {
         try {     
+            const start = new Date();
             this.items       = [];       
             let offset       = 0;
             const limit      = options.limit || 2000;
@@ -69,7 +70,9 @@ export default class DataFactory {
             this.items.push(...firstPage.data.data.items)
             if(options.limit) {
                 if(this.path === '/agents') this.items = this.items.filter(item => item.id !== '000')
-                return this.items;   
+                const end = new Date();
+                const elapsed = (end - start) / 1000
+                return {items:this.items, time:elapsed};   
             }
 
             const totalItems = firstPage.data.data.totalItems;
@@ -89,7 +92,11 @@ export default class DataFactory {
             const remainingItems = await Promise.all(ops);
             remainingItems.map(page => this.items.push(...page.data.data.items))
             if(this.path === '/agents') this.items = this.items.filter(item => item.id !== '000')
-            return this.items;
+
+            const end = new Date();
+            const elapsed = (end - start) / 1000;
+
+            return {items:this.items, time:elapsed};
         
         } catch (error) {
             return Promise.reject(error);
