@@ -64,7 +64,7 @@
     </div>
 
     <div layout="row" ng-if="agent" class="md-padding">
-        <wazuh-table flex path="'/syscollector/' + agent.id + '/packages'" keys="['name','version',{value:'vendor',size:2},{value:'description',size:2}]">
+        <wazuh-table flex path="'/syscollector/' + agent.id + '/packages'" keys="['name','architecture','version',{value:'vendor',size:2},{value:'description',size:2}]">
         </wazuh-table>
     </div>
 </md-content>
