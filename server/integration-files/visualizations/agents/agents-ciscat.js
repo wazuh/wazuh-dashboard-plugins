@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Default extensions
+ * Wazuh app - Module for Agents/CIS-CAT visualizations
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,12 +9,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default {
-    audit     : true,
-    pci       : true,
-    oscap     : true,
-    aws       : false,
-    ciscat    : false,
-    virustotal: false,
-    gdpr      : true
-}
+export default []

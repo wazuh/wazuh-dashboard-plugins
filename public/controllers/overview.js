@@ -14,18 +14,18 @@ import { uiModules } from 'ui/modules'
 import FilterHandler  from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
-import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
+import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
 
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, tabVisualizations, commonData, reportingService, visFactoryService) {
-    
+
     $rootScope.reportStatus = false;
 
     $location.search('_a',null)
     const filterHandler = new FilterHandler(appState.getCurrentPattern());
     visFactoryService.clearAll()
-   
+
     const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
     const extensions  = appState.getExtensions(currentApi);
     $scope.extensions = extensions;
@@ -68,6 +68,9 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                 case 'oscap':
                     createMetrics(metricsScap);
                     break;
+                case 'ciscat':
+                    createMetrics(metricsCiscat);
+                    break;
                 case 'virustotal':
                     createMetrics(metricsVirustotal);
                     break;
@@ -88,7 +91,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
             $location.search('tabView', subtab);
             const localChange = (subtab === 'panels' && $scope.tabView === 'discover') && sameTab;
             $scope.tabView = subtab;
-    
+
             if(subtab === 'panels' && $scope.tab !== 'welcome'){
                 await visFactoryService.buildOverviewVisualizations(filterHandler, $scope.tab, subtab, localChange || preserveDiscover)
             } else {
@@ -150,7 +153,7 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
                                                 true;
                 if(!$scope.wzMonitoringEnabled){
                     const data = await apiReq.request('GET', '/agents/summary', { })
-      
+
                     if(data && data.data && data.data.data){
                         $scope.agentsCountActive         = data.data.data.Active;
                         $scope.agentsCountDisconnected   = data.data.data.Disconnected;

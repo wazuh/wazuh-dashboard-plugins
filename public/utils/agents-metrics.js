@@ -32,6 +32,9 @@ const metricsScap = {
     scapLowestScore : '[vis-id="\'Wazuh-App-Agents-OSCAP-Lower-score-metric\'"]'
 }
 
+// Metrics CIS-CAT
+const metricsCiscat = {}
+
 // Metrics Virustotal
 const metricsVirustotal = {
     virusMalicious: '[vis-id="\'Wazuh-App-Agents-Virustotal-Total-Malicious\'"]',
@@ -39,4 +42,4 @@ const metricsVirustotal = {
     virusTotal    : '[vis-id="\'Wazuh-App-Agents-Virustotal-Total\'"]'
 }
 
-export default { metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal }
+export default { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal }

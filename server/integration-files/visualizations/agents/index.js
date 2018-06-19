@@ -13,10 +13,11 @@ import audit      from './agents-audit'
 import fim        from './agents-fim'
 import general    from './agents-general'
 import oscap      from './agents-oscap'
+import ciscat     from './agents-ciscat'
 import pci        from './agents-pci'
 import gdpr       from './agents-gdpr'
 import pm         from './agents-pm'
 import virustotal from './agents-virustotal'
 import vuls       from './agents-vuls'
 
-export { audit, fim, general, oscap, pci, gdpr, pm, virustotal, vuls }
+export { audit, fim, general, oscap, ciscat, pci, gdpr, pm, virustotal, vuls }

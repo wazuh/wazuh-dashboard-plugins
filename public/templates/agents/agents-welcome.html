@@ -61,6 +61,7 @@
             </md-card-actions>
         </md-card>
 
+        <!-- Inventory -->
         <md-card flex="25" class="wz-md-card" ng-if="syscollector && syscollector.os && syscollector.os.sysname">
             <md-card-content>
                 <i class="fa fa-fw fa-cog" aria-hidden="true"></i> <span ng-click="switchTab('syscollector')" class="wz-headline-title wz-text-link cursor-pointer">Inventory</span>
@@ -70,7 +71,7 @@
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
-                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html" class="wz-text-link cursor-pointer small" aria-label="Syscollector">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html" class="wz-text-link cursor-pointer small" aria-label="Open Syscollector documentation">
                     <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
                 </md-button>
             </md-card-actions>
@@ -132,6 +133,22 @@
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/openscap/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Open SCAP documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- CIS-CAT -->
+        <md-card flex="25" class="wz-md-card" ng-show="extensions.ciscat">
+            <md-card-content>
+                <i class="fa fa-fw fa-rocket" aria-hidden="true"></i> <span ng-click="switchTab('ciscat')" class="wz-headline-title wz-text-link cursor-pointer">CIS-CAT</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Alerts from CIS benchmark assessments</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html" class="wz-text-link cursor-pointer small" aria-label="Open CIS-CAT integration documentation">
                     <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
                 </md-button>
             </md-card-actions>

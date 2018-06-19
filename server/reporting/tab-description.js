@@ -40,7 +40,11 @@ export default {
     },
     gdpr      : {
         title: 'GDPR',
-        description: 'The General Data Protection Regulation took effect on 25th May 2018. Wazuh helps with most technical requirements, taking advantage of features such as File Integrity or Policy monitoring. In addition, the entire Ruleset has been mapped following the GDPR regulation, enriching all the alerts related to this purpose.'   
+        description: 'The General Data Protection Regulation took effect on 25th May 2018. Wazuh helps with most technical requirements, taking advantage of features such as File Integrity or Policy monitoring. In addition, the entire Ruleset has been mapped following the GDPR regulation, enriching all the alerts related to this purpose.'
+    },
+    ciscat    : {
+        title: 'CIS-CAT',
+        description: 'CIS (Center for Internet Security) is an entity dedicated to safeguard private and public organizations against cyber threats. This entity provides CIS benchmarks guidelines, which are a recognized global standard and best practices for securing IT systems and data against cyberattacks.'
     },
     aws       : {
         title: 'Amazon web services',

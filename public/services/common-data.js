@@ -23,6 +23,7 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
                 pm        : { group: 'rootcheck' },
                 vuls      : { group: 'vulnerability-detector' },
                 oscap     : { group: 'oscap' },
+                ciscat    : { group: 'ciscat' },
                 audit     : { group: 'audit' },
                 pci       : { group: 'pci_dss' },
                 gdpr      : { group: 'gdpr' },
@@ -66,7 +67,7 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
                 if(!data.data) return [];
                 for(const key in data.data){
                     gdprTabs.push({ title: key, content: data.data[key] });
-                } 
+                }
                 return gdprTabs;
             } catch(error) {
                 return Promise.reject(error);
@@ -100,7 +101,7 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
                 if(result.duration <= 0){
                     result.inProgress = true;
                 }
-            } 
+            }
 
             return result;
         },
