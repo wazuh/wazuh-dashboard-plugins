@@ -55,7 +55,9 @@ const metricsCiscat = {
     ciscatScanPass      : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-pass\'"]',
     ciscatScanFail      : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-fail\'"]',
     ciscatScanTimestamp : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-timestamp\'"]',
-    ciscatScanError     : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-error\'"]'
+    ciscatScanError     : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-error\'"]',
+    ciscatScanBenchmark : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-benchmark\'"]',
+    ciscatScanUnknown   : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-unknown\'"]'
 }
 
 // Metrics Virustotal
