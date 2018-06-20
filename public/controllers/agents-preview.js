@@ -14,7 +14,7 @@ import * as FileSaver from '../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsPreviewController', function ($scope, $routeParams, genericReq, appState, $location, errorHandler, csvReq, shareAgent) {
+app.controller('agentsPreviewController', function ($scope, $routeParams, genericReq, appState, $location, errorHandler, csvReq, shareAgent, wzTableFilter) {
     
     $scope.search = term => {
         $scope.$broadcast('wazuhSearch',{term})
@@ -54,7 +54,7 @@ app.controller('agentsPreviewController', function ($scope, $routeParams, generi
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/agents', currentApi, null);
+            const output       = await csvReq.fetch('/agents', currentApi, wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'agents.csv');

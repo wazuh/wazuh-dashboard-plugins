@@ -22,7 +22,7 @@ const colors = [
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq) {
+app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq, wzTableFilter) {
     $scope.implicitFilterFromDetail = false;
     $scope.appliedFilters = [];
     $scope.search = term => {
@@ -105,7 +105,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/rules', currentApi, null);
+            const output       = await csvReq.fetch('/rules', currentApi, wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'rules.csv');
@@ -147,7 +147,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 
 });
 
-app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq) {
+app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq, wzTableFilter) {
     $scope.setRulesTab = tab => $rootScope.globalRulesetTab = tab;
 
     $scope.implicitFilterFromDetail = false;
@@ -224,7 +224,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
     $scope.downloadCsv = async () => {
         try {
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/decoders', currentApi, null);
+            const output       = await csvReq.fetch('/decoders', currentApi, wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'decoders.csv');

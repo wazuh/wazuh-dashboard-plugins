@@ -19,7 +19,15 @@ import * as FileSaver from '../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, apiReq, AgentsAutoComplete, errorHandler, tabVisualizations, vis2png, shareAgent, commonData, reportingService, visFactoryService, csvReq) {
+app.controller('agentsController', 
+
+function (
+    $timeout, $scope, $location, $rootScope, 
+    appState, apiReq, AgentsAutoComplete, errorHandler, 
+    tabVisualizations, vis2png, shareAgent, commonData, 
+    reportingService, visFactoryService, csvReq, 
+    wzTableFilter
+) {
 
     $rootScope.reportStatus = false;
 
@@ -214,7 +222,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch(data_path, currentApi, null);
+            const output       = await csvReq.fetch(data_path, currentApi, wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'packages.csv');
