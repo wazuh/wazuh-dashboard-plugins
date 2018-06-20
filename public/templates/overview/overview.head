@@ -56,14 +56,14 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="tab !== 'welcome'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center" ng-if="tab !== 'welcome'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
     <!-- End loading status section -->
 
     <!-- Report status section -->
-    <div layout="column" layout-align="center center" class="wazuh-loading" ng-if="tab !== 'welcome'" ng-show="reportBusy && reportStatus">
+    <div layout="column" layout-align="center center" ng-if="tab !== 'welcome'" ng-show="reportBusy && reportStatus">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{reportStatus}}</div>
     </div>
