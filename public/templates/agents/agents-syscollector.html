@@ -70,4 +70,10 @@
             keys="['name','architecture','version',{value:'vendor',size:3},{value:'description',size:3}]">
         </wazuh-table>
     </div>
+    <div layout="row" class="md-padding" ng-if="agent">
+        <span flex></span>
+        <a class="small" id="btnDownload" ng-click="downloadCsv('/syscollector/' + agent.id + '/packages')">Formatted
+            <i aria-hidden="true" class="fa fa-fw fa-download"></i>
+        </a>
+    </div>
 </md-content>

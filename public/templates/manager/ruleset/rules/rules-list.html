@@ -55,12 +55,16 @@
             implicit-filter="implicitFilterFromDetail"
             flex 
             path="'/rules'" 
-            keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" allow-click="true">
+            keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" 
+            allow-click="true"
+            rows-per-page="18">
         </wazuh-table>
         <wazuh-table ng-if="!implicitFilterFromDetail"
                 flex 
                 path="'/rules'" 
-                keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" allow-click="true">
+                keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" 
+                allow-click="true"
+                rows-per-page="18">
         </wazuh-table>
     </div>
 

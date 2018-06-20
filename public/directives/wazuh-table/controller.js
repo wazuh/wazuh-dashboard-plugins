@@ -24,7 +24,8 @@ app.directive('wazuhTable', function() {
             path: '=path',
             keys: '=keys',
             allowClick: '=allowClick',
-            implicitFilter: '=implicitFilter'
+            implicitFilter: '=implicitFilter',
+            rowsPerPage: '=rowsPerPage'
         },
         controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler) {            
             $scope.keyEquivalence = KeyEquivalenece;
@@ -52,7 +53,7 @@ app.directive('wazuhTable', function() {
 
             $scope.wazuh_table_loading = true;
             //// PAGINATION ////////////////////
-            $scope.itemsPerPage = 10;
+            $scope.itemsPerPage = $scope.rowsPerPage || 10;
             $scope.pagedItems = [];
             $scope.currentPage = 0;
             let items = [];
@@ -117,7 +118,9 @@ app.directive('wazuhTable', function() {
                     instance.addSorting(field.value || field);
                     $scope.sortValue = instance.sortValue;
                     $scope.sortDir   = instance.sortDir;
-                    items = await instance.fetch();
+                    const result = await instance.fetch();
+                    items = result.items;
+                    $scope.time = result.time;
                     $scope.totalItems = items.length;
                     $scope.items = items;
                     checkGap();
@@ -135,7 +138,9 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = true;
                     if(removeFilters) instance.removeFilters();
                     instance.addFilter('search',term);
-                    items = await instance.fetch();
+                    const result = await instance.fetch();
+                    items = result.items;
+                    $scope.time = result.time;
                     $scope.totalItems = items.length;
                     $scope.items = items;
                     checkGap();
@@ -160,7 +165,9 @@ app.directive('wazuhTable', function() {
                         instance.addFilter(filter.name,filter.value);
                     }
                     
-                    items = await instance.fetch();
+                    const result = await instance.fetch();
+                    items = result.items;
+                    $scope.time = result.time;
                     $scope.totalItems = items.length;
                     $scope.items = items;
                     checkGap();
@@ -194,13 +201,17 @@ app.directive('wazuhTable', function() {
             const realTimeFunction = async () => {
                 try {
                     while(realTime) {
-                        items = await instance.fetch({limit:10});
-                        await $timeout(1000);
+                        const result = await instance.fetch({limit:10});
+                        items = result.items;
+                        $scope.time = result.time;
+                        $scope.totalItems = items.length;
+                        $scope.items = items;
                         $scope.totalItems = items.length;
                         $scope.items = items;
                         checkGap();
                         $scope.searchTable();
                         if(!$scope.$$phase) $scope.$digest()
+                        await $timeout(1000);
                     }    
                 } catch(error) {
                     realTime = false;
@@ -229,7 +240,9 @@ app.directive('wazuhTable', function() {
             const init = async () => {
                 try {
                     $scope.wazuh_table_loading = true;
-                    items = await instance.fetch();
+                    const result = await instance.fetch();
+                    items = result.items;
+                    $scope.time = result.time;
                     $scope.totalItems = items.length;
                     $scope.items = items;
                     checkGap();
@@ -243,6 +256,23 @@ app.directive('wazuhTable', function() {
             }
 
             init()
+
+            const splitArray = array => {
+                if(Array.isArray(array)){
+                    if(!array.length) return false;
+                    let str = '';
+                    for(const item of array) str += `${item}, `;
+                    str = str.substring(0, str.length - 2);
+                    return str;
+                }
+                return array;
+            }
+
+            $scope.checkIfArray = item => {
+                return typeof item === 'object' ? 
+                       splitArray(item) :
+                       item == 0 ? '0' : item;
+            }
 
             $scope.$on('$destroy',() => {
                 realTime = null;

@@ -6,6 +6,7 @@
   height: 300px;
   color: black;
   direction: ltr;
+  border-top: 1px solid #ddd
 }
 
 /* PADDING */
@@ -281,6 +282,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
 
 .CodeMirror-code {
   outline: none;
+  line-height: 18px;
 }
 
 /* Force content-box sizing for the elements where we expect it */

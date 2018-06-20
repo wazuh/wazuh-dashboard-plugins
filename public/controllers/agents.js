@@ -15,10 +15,11 @@ import FilterHandler from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
 import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal } from '../utils/agents-metrics'
+import * as FileSaver from '../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, apiReq, AgentsAutoComplete, errorHandler, tabVisualizations, vis2png, shareAgent, commonData, reportingService, visFactoryService) {
+app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, apiReq, AgentsAutoComplete, errorHandler, tabVisualizations, vis2png, shareAgent, commonData, reportingService, visFactoryService, csvReq) {
 
     $rootScope.reportStatus = false;
 
@@ -208,6 +209,23 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             return $scope.agentsAutoComplete.items;
         } catch (error) {
             errorHandler.handle(error,'Agents');
+        }
+        return;
+    }
+
+    $scope.downloadCsv = async data_path => {
+        try {
+            errorHandler.info('Your download should begin automatically...', 'CSV')
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch(data_path, currentApi, null);
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'packages.csv');
+            
+            return;
+
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
         }
         return;
     }

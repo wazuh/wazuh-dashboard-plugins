@@ -757,4 +757,93 @@ export default class WazuhApi {
         }
     }
 
+    async getAgentsFieldsUniqueCount(req, reply) {
+        try {
+
+            if(!req.params || !req.params.api) throw new Error('Field api is required')
+
+            const config  = await this.wzWrapper.getWazuhConfigurationById(req.params.api);
+            
+            const headers = {
+                headers: {
+                    'wazuh-app-version': packageInfo.version
+                },
+                username          : config.user,
+                password          : config.password,
+                rejectUnauthorized: !config.insecure
+            };
+            
+            const url = `${config.url}:${config.port}/agents`;
+
+            const params = {
+                limit : 2000,
+                offset: 0,
+                sort  :'-dateAdd'
+            }
+            
+            const items = [];
+
+            const output = await needle('get', url, params, headers)
+
+            items.push(...output.body.data.items)
+
+            const totalItems = output.body.data.totalItems;
+
+            while(items.length < totalItems){
+                params.offset += params.limit;
+                const tmp = await needle('get', url, params, headers)
+                items.push(...tmp.body.data.items)
+            }
+
+            const result = {
+                groups     : [],
+                nodes      : [],
+                versions   : [],
+                osPlatforms: [],
+                lastAgent  : items[0],
+                summary: {
+                    agentsCountActive        :0,
+                    agentsCountDisconnected  :0,
+                    agentsCountNeverConnected:0,
+                    agentsCountTotal         :0,
+                    agentsCoverity           :0
+                }
+            }
+
+            for(const agent of items){
+                if(agent.id === '000') continue;
+                if(agent.group && !result.groups.includes(agent.group)) result.groups.push(agent.group);
+                if(agent.node_name && !result.nodes.includes(agent.node_name)) result.nodes.push(agent.node_name);
+                if(agent.version && !result.versions.includes(agent.version)) result.versions.push(agent.version);
+                if(agent.os && agent.os.name){
+                    const exists = result.osPlatforms.filter((e) => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
+                    if(!exists.length){
+                        result.osPlatforms.push({
+                            name:     agent.os.name,
+                            platform: agent.os.platform,
+                            version:  agent.os.version
+                        });
+                    }
+                }
+            }
+
+            const summary = await needle('get', url + '/summary', {}, headers)
+
+            // Once Wazuh core fixes agent 000 issues, this should be adjusted
+            const active = summary.body.data.Active - 1;
+            const total  = summary.body.data.Total - 1;
+
+            result.summary.agentsCountActive         = active;
+            result.summary.agentsCountDisconnected   = summary.body.data.Disconnected;
+            result.summary.agentsCountNeverConnected = summary.body.data['Never connected'];
+            result.summary.agentsCountTotal          = total;
+            result.summary.agentsCoverity            = (active / total) * 100;
+            
+            return reply({error:0, result})
+
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3035, 500, reply)
+        }
+    }
+
 }
