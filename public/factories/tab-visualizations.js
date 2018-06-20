@@ -37,7 +37,7 @@ app.factory('tabVisualizations', function() {
         pm        : 5,
         vuls      : 8,
         oscap     : 14,
-        ciscat    : 12,
+        ciscat    : 11,
         audit     : 15,
         pci       : 6,
         gdpr      : 6,

@@ -33,7 +33,16 @@ const metricsScap = {
 }
 
 // Metrics CIS-CAT
-const metricsCiscat = {}
+const metricsCiscat = {
+    ciscatScanNotChecked: '[vis-id="\'Wazuh-app-Agents-CISCAT-last-scan-not-checked\'"]',
+    ciscatScanScore     : '[vis-id="\'Wazuh-app-Agents-CISCAT-last-scan-score\'"]',
+    ciscatScanPass      : '[vis-id="\'Wazuh-app-Agents-CISCAT-last-scan-pass\'"]',
+    ciscatScanFail      : '[vis-id="\'Wazuh-app-Agents-CISCAT-last-scan-fail\'"]',
+    ciscatScanTimestamp : '[vis-id="\'Wazuh-app-Agents-CISCAT-last-scan-timestamp\'"]',
+    ciscatScanError     : '[vis-id="\'Wazuh-app-Agents-CISCAT-last-scan-error\'"]',
+    ciscatScanBenchmark : '[vis-id="\'Wazuh-app-Agents-CISCAT-last-scan-benchmark\'"]',
+    ciscatScanUnknown   : '[vis-id="\'Wazuh-app-Agents-CISCAT-last-scan-unknown\'"]'
+}
 
 // Metrics Virustotal
 const metricsVirustotal = {
