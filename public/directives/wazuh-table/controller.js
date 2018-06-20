@@ -201,13 +201,17 @@ app.directive('wazuhTable', function() {
             const realTimeFunction = async () => {
                 try {
                     while(realTime) {
-                        items = await instance.fetch({limit:10});
-                        await $timeout(1000);
+                        const result = await instance.fetch({limit:10});
+                        items = result.items;
+                        $scope.time = result.time;
+                        $scope.totalItems = items.length;
+                        $scope.items = items;
                         $scope.totalItems = items.length;
                         $scope.items = items;
                         checkGap();
                         $scope.searchTable();
                         if(!$scope.$$phase) $scope.$digest()
+                        await $timeout(1000);
                     }    
                 } catch(error) {
                     realTime = false;
