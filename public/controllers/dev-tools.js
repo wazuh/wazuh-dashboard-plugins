@@ -178,7 +178,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         }
         groups = analyzeGroups();
         const currentGroup = calculateWhichGroup();
-        highlightGroup(currentGroup);  
+        highlightGroup(currentGroup); 
     }
 
     const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{
@@ -194,18 +194,36 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     });
 
     const calculateWhichGroup = () => {
-        const selection    = apiInputBox.getCursor()
-        const desiredGroup = groups.filter(item => item.end >= selection.line && item.start <= selection.line);
-        return desiredGroup ? desiredGroup[0] : null;
+        try {
+            const selection    = apiInputBox.getCursor()
+            const desiredGroup = groups.filter(item => item.end >= selection.line && item.start <= selection.line);
+
+            // Place play button at first line from the selected group
+            const cords = apiInputBox.cursorCoords({line:desiredGroup[0].start,ch:0});
+            if(!$('#play_button').is(":visible")) $('#play_button').show()
+            const currentPlayButton = $('#play_button').offset();
+            $('#play_button').offset({top:cords.top,left:currentPlayButton.left})
+            
+            return desiredGroup[0];
+        } catch(error) {
+            $('#play_button').hide()
+            return null;
+        }
+
     }
 
-    $scope.send = async (firstTime) => {
+    $scope.send = async firstTime => {
         try {
             groups = analyzeGroups();
             
             const desiredGroup   = calculateWhichGroup();
             if(!desiredGroup) throw Error('not desired');
-     
+            if(firstTime){
+                const cords = apiInputBox.cursorCoords({line:desiredGroup.start,ch:0});
+                const currentPlayButton = $('#play_button').offset();
+                $('#play_button').offset({top:cords.top+10,left:currentPlayButton.left})
+            }
+
             const affectedGroups         = checkJsonParseError();
             const filteredAffectedGroups = affectedGroups.filter(item => item === desiredGroup.requestText);
             if(filteredAffectedGroups.length) {apiOutputBox.setValue('Error parsing JSON query'); return;}
