@@ -17,7 +17,7 @@ const app = uiModules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',
-function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState, shareAgent) {
+function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState, shareAgent, wzTableFilter) {
     $scope.$on('groupsIsReloaded',() => {    
         $scope.currentGroup = false;    
         $scope.lookingGroup = false;
@@ -30,7 +30,7 @@ function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState,
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch(data_path, currentApi, null);
+            const output       = await csvReq.fetch(data_path, currentApi, wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'groups.csv');

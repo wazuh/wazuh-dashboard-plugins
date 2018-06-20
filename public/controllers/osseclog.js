@@ -15,7 +15,7 @@ import * as FileSaver from '../services/file-saver'
 const app = uiModules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('managerLogController', function ($scope, apiReq, errorHandler, csvReq, appState) {
+app.controller('managerLogController', function ($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
     $scope.type_log    = 'all';
     $scope.category    = 'all';
     
@@ -41,7 +41,7 @@ app.controller('managerLogController', function ($scope, apiReq, errorHandler, c
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/manager/logs', currentApi, null);
+            const output       = await csvReq.fetch('/manager/logs', currentApi, wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'logs.csv');
