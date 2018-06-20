@@ -1,5 +1,4 @@
 <div flex layout="column">
 
     <wz-menu ng-init="menuNavItem = 'discover'"></wz-menu>
-
-    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="load"></md-progress-linear>
+    
