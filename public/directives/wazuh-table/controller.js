@@ -27,7 +27,7 @@ app.directive('wazuhTable', function() {
             implicitFilter: '=implicitFilter',
             rowsPerPage: '=rowsPerPage'
         },
-        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler) {            
+        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter) {            
             $scope.keyEquivalence = KeyEquivalenece;
             $scope.totalItems = 0;
 
@@ -138,6 +138,7 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = true;
                     if(removeFilters) instance.removeFilters();
                     instance.addFilter('search',term);
+                    wzTableFilter.set(instance.filters)
                     const result = await instance.fetch();
                     items = result.items;
                     $scope.time = result.time;
@@ -164,7 +165,7 @@ app.directive('wazuhTable', function() {
                     } else {
                         instance.addFilter(filter.name,filter.value);
                     }
-                    
+                    wzTableFilter.set(instance.filters)
                     const result = await instance.fetch();
                     items = result.items;
                     $scope.time = result.time;
@@ -195,6 +196,7 @@ app.directive('wazuhTable', function() {
 
             $scope.$on('wazuhRemoveFilter',(event,parameters) => {
                 instance.filters = instance.filters.filter(item => item.name !== parameters.filterName);
+                wzTableFilter.set(instance.filters)
                 return init();
             })
 
@@ -204,8 +206,6 @@ app.directive('wazuhTable', function() {
                         const result = await instance.fetch({limit:10});
                         items = result.items;
                         $scope.time = result.time;
-                        $scope.totalItems = items.length;
-                        $scope.items = items;
                         $scope.totalItems = items.length;
                         $scope.items = items;
                         checkGap();
@@ -241,6 +241,7 @@ app.directive('wazuhTable', function() {
                 try {
                     $scope.wazuh_table_loading = true;
                     const result = await instance.fetch();
+                    wzTableFilter.set(instance.filters)
                     items = result.items;
                     $scope.time = result.time;
                     $scope.totalItems = items.length;
@@ -276,9 +277,17 @@ app.directive('wazuhTable', function() {
 
             $scope.$on('$destroy',() => {
                 realTime = null;
+                wzTableFilter.set([])
             })
 
         },
         template: template
     }
-});
+})
+.service('wzTableFilter',() => {
+    const filters = [];
+    return {
+        set: array => { if(Array.isArray(array)) { filters.length = 0; filters.push(...array) } },
+        get: () => filters
+    }
+})
