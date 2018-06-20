@@ -17,6 +17,7 @@ export default {
     vuls         : 'Vulnerabilities',
     oscap        : 'Open SCAP',
     audit        : 'Audit',
+    ciscat       : 'CIS-CAT',
     pci          : 'PCI DSS',
     gdpr         : 'GDPR',
     aws          : 'AWS',

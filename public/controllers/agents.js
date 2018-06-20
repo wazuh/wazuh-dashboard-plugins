@@ -14,7 +14,7 @@ import { uiModules } from 'ui/modules'
 import FilterHandler from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
-import { metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal } from '../utils/agents-metrics'
+import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal } from '../utils/agents-metrics'
 import * as FileSaver from '../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
@@ -30,7 +30,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
     const extensions  = appState.getExtensions(currentApi);
     $scope.extensions = extensions;
-    
+
     $scope.agentsAutoComplete = AgentsAutoComplete;
 
     $scope.tabView = commonData.checkTabViewLocation();
@@ -62,6 +62,9 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 case 'oscap':
                     createMetrics(metricsScap);
                     break;
+                case 'ciscat':
+                    createMetrics(metricsCiscat);
+                    break;
                 case 'virustotal':
                     createMetrics(metricsVirustotal);
                     break;
@@ -78,7 +81,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             $location.search('tabView', subtab);
             const localChange = (subtab === 'panels' && $scope.tabView === 'discover') && sameTab;
             $scope.tabView = subtab;
-    
+
             if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome' && $scope.tab !== 'syscollector'){
                 const condition = !changeAgent && localChange || !changeAgent && preserveDiscover;
                 await visFactoryService.buildAgentsVisualizations(filterHandler, $scope.tab, subtab, condition, $scope.agent.id)
@@ -97,7 +100,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         }
     }
 
-    
+
     let changeAgent = false;
 
     // Switch tab
@@ -111,7 +114,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $location.search('tab', tab);
         const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1] && !force;
         $scope.tab = tab;
-        
+
         if($scope.tab === 'configuration'){
             firstLoad();
         } else {
@@ -140,9 +143,9 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         try {
             $scope.load = true;
             changeAgent = true;
-            
+
             const globalAgent = shareAgent.getAgent()
-            
+
             if($scope.tab === 'configuration'){
                 return $scope.getAgentConfig(newAgentId);
             }
@@ -171,9 +174,9 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             // Rootcheck
             $scope.agent.rootcheck = data[2].data.data;
             validateRootCheck();
-            
+
             $scope.switchTab($scope.tab, true);
-            
+
             $scope.syscollector = {
                 hardware: data[3].data.data,
                 os: data[4].data.data

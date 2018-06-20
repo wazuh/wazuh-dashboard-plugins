@@ -227,6 +227,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 tmpData.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
                 tmpData.extensions.gdpr = typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true;
                 tmpData.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
+                tmpData.extensions.ciscat = typeof config.data.data['extensions.ciscat'] !== 'undefined' ? config.data.data['extensions.ciscat'] : false;
                 tmpData.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 tmpData.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
             }
@@ -437,6 +438,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 $scope.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
                 $scope.extensions.gdpr = typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true;
                 $scope.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
+                $scope.extensions.ciscat = typeof config.data.data['extensions.ciscat'] !== 'undefined' ? config.data.data['extensions.ciscat'] : false;
                 $scope.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 $scope.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
             } else {

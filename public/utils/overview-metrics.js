@@ -48,6 +48,18 @@ const metricsScap = {
     scapLowestScore : '[vis-id="\'Wazuh-App-Overview-OSCAP-Lowest-score\'"]'
 }
 
+// Metrics CIS-CAT
+const metricsCiscat = {
+    ciscatScanNotChecked: '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-not-checked\'"]',
+    ciscatScanScore     : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-score\'"]',
+    ciscatScanPass      : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-pass\'"]',
+    ciscatScanFail      : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-fail\'"]',
+    ciscatScanTimestamp : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-timestamp\'"]',
+    ciscatScanError     : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-error\'"]',
+    ciscatScanBenchmark : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-benchmark\'"]',
+    ciscatScanUnknown   : '[vis-id="\'Wazuh-app-Overview-CISCAT-last-scan-unknown\'"]'
+}
+
 // Metrics Virustotal
 const metricsVirustotal = {
     virusMalicious: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total-Malicious\'"]',
@@ -63,4 +75,4 @@ const metricsAws = {
     awsRevoked       :'[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
 }
 
-export default { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal, metricsAws }
+export default { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal, metricsAws }

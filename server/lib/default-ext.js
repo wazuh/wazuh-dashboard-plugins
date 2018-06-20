@@ -14,6 +14,7 @@ export default {
     pci       : true,
     oscap     : true,
     aws       : false,
+    ciscat    : false,
     virustotal: false,
     gdpr      : true
 }
