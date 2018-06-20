@@ -380,13 +380,17 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     };
 
     // Toggle extension
-    $scope.toggleExtension = async (extension, state) => {
-        getCurrentAPIIndex()
-        if ($scope.apiEntries && $scope.apiEntries.length && ['oscap','audit','pci','gdpr','aws','virustotal'].includes(extension)) {
-            $scope.apiEntries[currentApiEntryIndex]._source.extensions[extension] = state;
-            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._id,$scope.apiEntries[currentApiEntryIndex]._source.extensions);
-
+    $scope.toggleExtension = (extension, state) => {
+        try{
+            const api = JSON.parse(appState.getCurrentAPI()).id
+            const currentExtensions = appState.getExtensions(api);
+            currentExtensions[extension] = state;
+            appState.setExtensions(api,currentExtensions)
+            getCurrentAPIIndex()
+            $scope.apiEntries[currentApiEntryIndex]._source.extensions = currentExtensions;
             if(!$scope.$$phase) $scope.$digest();
+        } catch (error) {
+            errorHandler.handle(error, 'Settings')
         }
     };
 
