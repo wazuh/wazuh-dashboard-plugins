@@ -11,27 +11,37 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Brand-new Wazuh app redesign for the _Monitoring_ and _Settings_ tab ([#581](https://github.com/wazuh/wazuh-kibana-app/pull/581) & [#570](https://github.com/wazuh/wazuh-kibana-app/pull/570)):
     -   Refactored and optimized UI for these tabs, using a breadcrumbs-based navigability.
     -   Used the same guidelines from the previous redesign for _Overview_ and _Agents_ tabs.
+-   New tab for _Agents_ - _Inventory_ ([#582](https://github.com/wazuh/wazuh-kibana-app/pull/582)):
+    -   Get information about the agent host, such as installed packages, motherboard, operating system, etc.
+    -   This tab will appear if the agent has the [`syscollector`](https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html) wodle enabled.
+-   Brand-new extension - _CIS-CAT Alerts_ ([#601](https://github.com/wazuh/wazuh-kibana-app/pull/601)):
+    -   A new extension, disabled by default.
+    -   Visualize alerts related to the CIS-CAT benchmarks on the _Overview_ and _Agents_ tabs.
+    -   Get information about the last performed scan and its score.
+-   Several improvements for the  _Dev tools_ tab ([#583](https://github.com/wazuh/wazuh-kibana-app/pull/583) & [#597](https://github.com/wazuh/wazuh-kibana-app/pull/597)):
+    -   Now you can insert queries using inline parameters, just like in a web browser.
+    -   You can combine inline parameters with JSON-like parameters.
+    -   If you use the same parameter on both methods with different values, the inline parameter has precedence over the other one.
+    -   The tab icon has been changed for a more appropriate one.
+    -   The `Execute query` button is now always placed on the first line of the query block.
 -   Refactoring for _Overview_ and _Agents_ controllers ([#564](https://github.com/wazuh/wazuh-kibana-app/pull/564)):
     -   Reduced duplicated code by splitting it into separate files.
     -   Code optimization for a better performance and maintainability.
     -   Added new services to provide similar functionality between different app tabs.
--   New tab for _Agents_ - _Inventory_ ([#582](https://github.com/wazuh/wazuh-kibana-app/pull/582)):
-    -   Get information about the agent host, such as installed packages, motherboard, operating system, etc.
-    -   This tab will appear if the agent has the [`syscollector`](https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html) wodle enabled.
 -   Refactoring for all app tables ([#582](https://github.com/wazuh/wazuh-kibana-app/pull/582)):
     -   Replaced the old `wz-table` directive with a new one, along with a new data factory.
     -   Now the tables are built with a pagination system.
     -   Much easier method for building tables for the app.
     -   Performance and stability improvements when fetching API data.
--   Added inline queries for the _Dev tools_ tab ([#583](https://github.com/wazuh/wazuh-kibana-app/pull/583)):
-    -   Now you can insert queries using inline parameters, just like in a browser.
-    -   You can combine inline parameters with JSON-like parameters.
-    -   If you use the same parameter on both methods with different values, the inline paramenter has precedence over the other one.
+    -   Now you can see the total amount of items and the elapsed time.
 -   Added `data.vulnerability.package.condition` to the list of known fields ([#566](https://github.com/wazuh/wazuh-kibana-app/pull/566)).
 
 ## Changed
 
 -   The `wazuh-logs` and `wazuh-monitoring` folders have been moved to the Kibana's `optimize` directory in order to avoid some error messages when using the `kibana-plugin list` command ([#563](https://github.com/wazuh/wazuh-kibana-app/pull/563)).
+-   Moved some logic from the _Agents preview_ tab to the server, to avoid excessive client-side workload ([#586](https://github.com/wazuh/wazuh-kibana-app/pull/586)).
+-   Changed the UI to use the same loading ring across all the app tabs ([#593](https://github.com/wazuh/wazuh-kibana-app/pull/593) & [#599](https://github.com/wazuh/wazuh-kibana-app/pull/599)).
+-   Changed the _No results_ message across all the tabs with visualizations ([#599](https://github.com/wazuh/wazuh-kibana-app/pull/599)).
 
 ## Fixed
 
@@ -39,6 +49,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Fixed a bug on the _Settings_ tab where removing an API entry while its edit form is opened would hide the `Add API` button unless the user reloads the tab ([#558](https://github.com/wazuh/wazuh-kibana-app/pull/558)).
 -   Fixed some Audit visualizations on the _Overview_ and _Agents_ tabs that weren't using the same search query to show the results ([#572](https://github.com/wazuh/wazuh-kibana-app/pull/572)).
 -   Fixed undefined variable error on the `wz-menu` directive ([#575](https://github.com/wazuh/wazuh-kibana-app/pull/575)).
+-   Fixed a bug on the _Settings/Extensions_ tab where enabling/disabling some extensions could make other ones to be disabled ([#591](https://github.com/wazuh/wazuh-kibana-app/pull/591)).
 
 ## Wazuh v3.3.0 - Kibana v6.2.4 - Revision 395
 
