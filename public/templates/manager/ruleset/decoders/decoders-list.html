@@ -1,31 +1,27 @@
 <div ng-show="!loading && !viewingDetail" flex layout="column" class="md-padding">
     <div id="content" layout="row" layout-align="start start">
-        
-        <input flex="60" placeholder="Filter decoders..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-top-4 height-36"
+
+        <input flex placeholder="Filter decoders..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-top-4 height-36"
             aria-invalid="false" wz-enter="search(custom_search)">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-36 wz-margin-top-4 wz-margin-right-16" ng-click="search(custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
-        </button>  
+        </button>
 
-        <div flex="15" layout="column" class="height-40 wz-select-input wz-margin-right-8">
+        <div layout="column" class="height-40 wz-select-input wz-margin-right-8">
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="onlyParents(typeFilter)" aria-label="Filter by type" ng-init="'All decoders'">
                 <option value="all">All decoders</option>
                 <option value="parents">Parent decoders</option>
             </select>
         </div>
 
-        <div flex layout="column">
-            <md-button flex ng-class="(globalRulesetTab == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
-                class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
-                <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
-            </md-button>
-        </div>
-        <div flex layout="column">
-            <md-button flex ng-class="(globalRulesetTab == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
-                class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
-                <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
-            </md-button>
-        </div>
+        <md-button ng-class="(globalRulesetTab == 'rules') ? 'active' : ''" ng-click="setRulesTab('rules')"
+            class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
+            <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
+        </md-button>
+        <md-button ng-class="(globalRulesetTab == 'decoders') ? 'active' : ''" ng-click="setRulesTab('decoders')"
+            class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
+            <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
+        </md-button>
     </div>
 
     <md-chips readonly="true" ng-show="appliedFilters.length || implicitFilterFromDetail">
@@ -44,16 +40,16 @@
     <div layout="row">
         <wazuh-table ng-if="implicitFilterFromDetail"
             implicit-filter="implicitFilterFromDetail"
-            flex 
-            path="'/decoders'" 
-            keys="['name',{value:'details.program_name',size:2},{value:'details.order',size:2},'file']" 
+            flex
+            path="'/decoders'"
+            keys="['name',{value:'details.program_name',size:2},{value:'details.order',size:2},'file']"
             allow-click="true"
             rows-per-page="18">
-        </wazuh-table> 
+        </wazuh-table>
         <wazuh-table ng-if="!implicitFilterFromDetail"
-                flex 
-                path="'/decoders'" 
-                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']" 
+                flex
+                path="'/decoders'"
+                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
                 allow-click="true"
                 rows-per-page="18">
         </wazuh-table>
