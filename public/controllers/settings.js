@@ -12,6 +12,7 @@
 import base64       from 'plugins/wazuh/utils/base64.js';
 import chrome       from 'ui/chrome';
 import * as modules from 'ui/modules'
+import TabNames     from '../utils/tab-names'
 
 const app = modules.get('app/wazuh', []);
 
@@ -21,30 +22,16 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         wzMisc.setWizard(false)
     }
 
-
     $scope.apiIsDown = wzMisc.getValue('apiIsDown');
 
     // Initialize
-
     let currentApiEntryIndex;
-    $scope.formData = {
-        user    : '',
-        password: '',
-        url     : ''
-    };
-    $scope.accept_ssl          = true;
-    $scope.editConfiguration   = true;
-    $scope.menuNavItem         = 'settings';
+    $scope.formData            = {};
+    $scope.tab                 = 'welcome';
     $scope.load                = true;
     $scope.addManagerContainer = false;
-    $scope.submenuNavItem      = "api";
     $scope.showEditForm        = {};
-    $scope.formUpdate = {
-        user    : null,
-        password: null,
-        url     : null,
-        port    : null
-    };
+    $scope.formUpdate          = {};
 
     const userRegEx  = new RegExp(/^.{3,100}$/);
     const passRegEx  = new RegExp(/^.{3,100}$/);
@@ -52,20 +39,20 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
     const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
+    // Tab names
+    $scope.tabNames = TabNames;
+
     $scope.indexPatterns = [];
     $scope.apiEntries    = [];
+
     if ($routeParams.tab){
-        $scope.submenuNavItem = $routeParams.tab;
+        $scope.tab = $routeParams.tab;
     }
 
-    // Watch tab change
-    $scope.$watch('submenuNavItem', () => {
-        $location.search('tab', $scope.submenuNavItem);
-    });
-
-    $scope.$watch('apiEntries',() => {
-        if(!$scope.$$phase) $scope.$digest();
-    })
+    $scope.switchTab = tab => {
+        $scope.tab = tab;
+        $location.search('tab', $scope.tab);
+    }
 
     // Remove API entry
     $scope.removeManager = async item => {
@@ -78,9 +65,11 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 }
             }
             await genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`);
+            $scope.showEditForm[$scope.apiEntries[index]._id] = false;
             $scope.apiEntries.splice(index, 1);
             wzMisc.setApiIsDown(false)
             $scope.apiIsDown = false;
+            $scope.isEditing = false;
             errorHandler.info('The API was removed successfully','Settings');
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -92,11 +81,9 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     // Get current API index
     const getCurrentAPIIndex = () => {
-        for(let i = 0, len = $scope.apiEntries.length; i < len; i += 1) {
-            if($scope.apiEntries[i]._id === $scope.currentDefault) {
-                currentApiEntryIndex = i;
-            }
-        }
+        $scope.apiEntries.map((entry,index,array) => {
+            if(entry._id === $scope.currentDefault) currentApiEntryIndex = index;
+        })
     }
 
     const sortByTimestamp = (a,b) => {
@@ -121,7 +108,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
         const currentApi = appState.getCurrentAPI();
         $scope.currentDefault = JSON.parse(currentApi).id;
-       
+
         errorHandler.info(`API ${$scope.apiEntries[index]._source.cluster_info.manager} set as default`,'Settings');
 
         getCurrentAPIIndex();
@@ -159,7 +146,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             if (currentApi){
                 $scope.currentDefault = JSON.parse(currentApi).id;
             }
-                
+
             if(!$scope.$$phase) $scope.$digest();
             getCurrentAPIIndex();
             if(!currentApiEntryIndex) return;
@@ -211,8 +198,10 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     }
 
     // Save settings function
-    const saveSettings = async () => {
+    $scope.saveSettings = async () => {
         try {
+            $scope.messageError = "";
+            $scope.isEditing = false;
             const invalid = validator('formData');
 
             if(invalid) {
@@ -266,10 +255,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             errorHandler.info('Wazuh API successfully added','Settings');
             $scope.addManagerContainer = false;
-            $scope.formData.user       = "";
-            $scope.formData.password   = "";
-            $scope.formData.url        = "";
-            $scope.formData.port       = "";
+
+            $scope.formData = {}
 
             // Setting current API as default if no one is in the cookies
             if (!appState.getCurrentAPI()) { // No cookie
@@ -286,6 +273,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 genericReq.request('GET', '/api/wazuh-api/fetchAgents'),
                 getSettings()
             ]);
+
 
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -356,6 +344,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         }
     };
 
+    $scope.switch = () => $scope.addManagerContainer = !$scope.addManagerContainer;
+
     // Check manager connectivity
     $scope.checkManager = async item => {
         try {
@@ -363,7 +353,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             const tmpData = {
                 user        : $scope.apiEntries[index]._source.api_user,
-                password    : $scope.apiEntries[index]._source.api_password,
+                //password    : $scope.apiEntries[index]._source.api_password,
                 url         : $scope.apiEntries[index]._source.url,
                 port        : $scope.apiEntries[index]._source.api_port,
                 cluster_info: {},
@@ -387,12 +377,6 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
         } catch(error) {
             printError(error);
         }
-    };
-
-    // Process form
-    $scope.processForm = () => {
-        $scope.messageError = "";
-        saveSettings();
     };
 
     // Toggle extension

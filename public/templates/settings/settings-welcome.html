@@ -1,0 +1,84 @@
+<div flex layout="column" layout-align="start stretch" ng-if="tab === 'welcome' && !load">
+
+    <!-- Configure app section -->
+    <!-- Headline -->
+    <div layout="row" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-sliders" aria-hidden="true"></i> Configure the Wazuh app</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Section cards -->
+    <div layout="row" layout-align="start start" layout-wrap>
+
+        <!-- API -->
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <i class="fa fa-fw fa-tasks" aria-hidden="true"></i> <span ng-click="switchTab('api')" class="wz-headline-title wz-text-link cursor-pointer">API configuration</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Administer your Wazuh API credentials</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/installation-guide/installing-elastic-stack/connect_wazuh_app.html" class="wz-text-link cursor-pointer small" aria-label="Open connect app to API documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- Extensions -->
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <i class="fa fa-fw fa-check-square-o" aria-hidden="true"></i> <span ng-click="switchTab('extensions')" class="wz-headline-title wz-text-link cursor-pointer">Extensions</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Enable or disable extensions on the app</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh capabilities documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+    </div>
+    <!-- End section cards -->
+
+    <!-- Section cards -->
+    <div layout="row" layout-align="start start" layout-wrap>
+
+        <!-- Pattern -->
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <i class="fa fa-fw fa-filter" aria-hidden="true"></i> <span ng-click="switchTab('pattern')" class="wz-headline-title wz-text-link cursor-pointer">Index pattern</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Select a pattern for exploring alerts</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://www.elastic.co/guide/en/kibana/current/tutorial-define-index.html" class="wz-text-link cursor-pointer small" aria-label="Open Kibana index patterns documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- About -->
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span ng-click="switchTab('about')" class="wz-headline-title wz-text-link cursor-pointer">About</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <p>Learn more about this app</p>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://github.com/wazuh/wazuh-kibana-app/blob/master/CHANGELOG.md" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh Kibana app changelog file">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+    </div>
+    <!-- End section cards -->
+    <!-- End configure app section -->
+</div>

@@ -1074,6 +1074,15 @@ export default [
         "readFromDocValues": true
     },
     {
+        "name": "data.vulnerability.package.condition",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
         "name": "data.vulnerability.published",
         "type": "date",
         "count": 0,

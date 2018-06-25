@@ -1,0 +1,42 @@
+<div flex layout="column" ng-cloak ng-controller="settingsController">
+
+    <!-- Top navbar section -->
+    <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
+    <!-- End top navbar section -->
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
+
+    <!-- Navigation section (Breadcrumbs, etc) -->
+    <div layout="row" layout-align="start center" ng-if="!load">
+        <!-- Breadcrumbs -->
+        <div layout="row" layout-padding>
+            <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
+            <div ng-if="tab !== 'welcome'">
+                <i class="fa fa-fw fa-cog" aria-hidden="true"></i>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Settings</span>
+                <span> / {{ tabNames[tab] }}</span>
+            </div>
+            <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
+            <div ng-if="tab === 'welcome'">
+                <i class="fa fa-fw fa-cog" aria-hidden="true"></i>
+                <span>Settings / Welcome</span>
+            </div>
+        </div>
+        <!-- End breadcrumbs -->
+    </div>
+    <!-- End navigation section -->
+
+    <!-- App information section -->
+    <div layout="row" layout-align="start center" ng-if="!load">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div class="wz-text-truncatable" flex>App version: <span class="wz-text-bold">{{appInfo["app-version"]}}</span></div>
+                <div class="wz-text-truncatable" flex>App revision: <span class="wz-text-bold">{{appInfo["revision"]}}</span></div>
+                <div class="wz-text-truncatable" flex>Install date: <span class="wz-text-bold">{{appInfo["installationDate"] | date : "medium"}}</span></div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- End app information section -->
