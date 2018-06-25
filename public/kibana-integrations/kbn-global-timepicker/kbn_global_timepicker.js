@@ -23,6 +23,7 @@ import { once, clone } from 'lodash';
 import toggleHtml from './kbn_global_timepicker.html';
 import { timeNavigation } from './time_navigation';
 
+// WAZUH. Renamed from kbnGlobalTimepicker to wzKbnGlobalTimepicker
 uiModules
   .get('kibana')
   .directive('wzKbnGlobalTimepicker', (timefilter, globalState, $rootScope) => {

@@ -46,6 +46,7 @@ import './bread_crumbs/bread_crumbs';
 
 const module = uiModules.get('kibana');
 
+// WAZUH. Renamed from kbnTopNav to wzKbnTopNav
 module.directive('wzKbnTopNav', function (Private) {
   const KbnTopNavController = Private(KbnTopNavControllerProvider);
   const navbarExtensions = Private(NavBarExtensionsRegistryProvider);
