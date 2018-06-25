@@ -2,12 +2,13 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.3.0 - Kibana v6.2.4 - Revision 396
+## Wazuh v3.3.0/v3.3.1 - Kibana v6.2.4 - Revision 396
 
 ## Added
 
+-   Support for Wazuh v3.3.1.
 -   Brand-new Wazuh app redesign for the _Settings_ tab ([#570](https://github.com/wazuh/wazuh-kibana-app/pull/570)):
-    -   Refactored and optimized UI for this tab, using a breadcrumbs-based navigability.
+    -   Refactored and optimized UI for these tabs, using a breadcrumbs-based navigability.
     -   Used the same guidelines from the previous redesign for _Overview_ and _Agents_ tabs.
 -   Refactoring for _Overview_ and _Agents_ controllers ([#564](https://github.com/wazuh/wazuh-kibana-app/pull/564)):
     -   Reduced duplicated code by splitting it into separate files.
@@ -24,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Fixed a bug on the _Settings_ tab where updating an API entry with wrong credentials would corrupt the existing one ([#558](https://github.com/wazuh/wazuh-kibana-app/pull/558)).
 -   Fixed a bug on the _Settings_ tab where removing an API entry while its edit form is opened would hide the `Add API` button unless the user reloads the tab ([#558](https://github.com/wazuh/wazuh-kibana-app/pull/558)).
 -   Fixed some Audit visualizations on the _Overview_ and _Agents_ tabs that weren't using the same search query to show the results ([#572](https://github.com/wazuh/wazuh-kibana-app/pull/572)).
+-   Fixed undefined variable error on the `wz-menu` directive ([#575](https://github.com/wazuh/wazuh-kibana-app/pull/575)).
 
 ## Wazuh v3.3.0 - Kibana v6.2.4 - Revision 395
 
