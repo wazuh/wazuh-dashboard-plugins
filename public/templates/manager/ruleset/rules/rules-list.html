@@ -1,17 +1,17 @@
 <div ng-if="!loading && !viewingDetail" flex layout="column" class="md-padding">
     <div id="content" layout="row">
-        <input flex="80" placeholder="Filter rules..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-top-4 height-36"
+
+        <input flex placeholder="Filter rules..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-top-4 height-36"
             aria-invalid="false" wz-enter="search(custom_search)">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-36 wz-margin-top-4" ng-click="search(custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
-        </button>  
+        </button>
 
-
-        <md-button flex ng-class="(globalRulesetTab == 'rules') ? 'active' : ''"
+        <md-button ng-class="(globalRulesetTab == 'rules') ? 'active' : ''"
             ng-click="setRulesTab('rules')" class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
             <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
         </md-button>
-        <md-button flex ng-class="(globalRulesetTab == 'decoders') ? 'active' : ''"
+        <md-button ng-class="(globalRulesetTab == 'decoders') ? 'active' : ''"
             ng-click="setRulesTab('decoders')" class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
             <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
         </md-button>
@@ -53,16 +53,16 @@
     <div layout="row">
         <wazuh-table ng-if="implicitFilterFromDetail"
             implicit-filter="implicitFilterFromDetail"
-            flex 
-            path="'/rules'" 
-            keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" 
+            flex
+            path="'/rules'"
+            keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
             allow-click="true"
             rows-per-page="18">
         </wazuh-table>
         <wazuh-table ng-if="!implicitFilterFromDetail"
-                flex 
-                path="'/rules'" 
-                keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" 
+                flex
+                path="'/rules'"
+                keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
                 allow-click="true"
                 rows-per-page="18">
         </wazuh-table>
