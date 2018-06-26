@@ -109,7 +109,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'rules.csv');
-            
+
             return;
 
         } catch (error) {
@@ -200,7 +200,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         if(!$scope.$$phase) $scope.$digest();
     });
 
-    $scope.search = term => {        
+    $scope.search = term => {
         if(term && term.startsWith('path:') && term.split('path:')[1].trim()) {
             $scope.custom_search = ''
             const filter = {name:'path',value:term.split('path:')[1].trim()};
@@ -228,7 +228,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'decoders.csv');
-            
+
             return;
 
         } catch (error) {
@@ -261,7 +261,6 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         if(clear) $scope.implicitFilterFromDetail = false;
         $scope.viewingDetail = false;
         $scope.currentDecoder = false;
-        $scope.decodersRelated.reset();
         if(!$scope.$$phase) $scope.$digest();
     }
 });
