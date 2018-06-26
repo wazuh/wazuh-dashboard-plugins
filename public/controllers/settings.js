@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import base64       from 'plugins/wazuh/utils/base64.js';
-import chrome       from 'ui/chrome';
-import * as modules from 'ui/modules'
-import TabNames     from '../utils/tab-names'
+import base64        from '../utils/base64.js'
+import chrome        from 'ui/chrome'
+import { uiModules } from 'ui/modules'
+import TabNames      from '../utils/tab-names'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc) {
     if (wzMisc.getValue('comeFromWizard')) {
@@ -227,6 +227,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 tmpData.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
                 tmpData.extensions.gdpr = typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true;
                 tmpData.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
+                tmpData.extensions.ciscat = typeof config.data.data['extensions.ciscat'] !== 'undefined' ? config.data.data['extensions.ciscat'] : false;
                 tmpData.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 tmpData.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
             }
@@ -380,13 +381,17 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     };
 
     // Toggle extension
-    $scope.toggleExtension = async (extension, state) => {
-        getCurrentAPIIndex()
-        if ($scope.apiEntries && $scope.apiEntries.length && ['oscap','audit','pci','gdpr','aws','virustotal'].includes(extension)) {
-            $scope.apiEntries[currentApiEntryIndex]._source.extensions[extension] = state;
-            appState.setExtensions($scope.apiEntries[currentApiEntryIndex]._id,$scope.apiEntries[currentApiEntryIndex]._source.extensions);
-
+    $scope.toggleExtension = (extension, state) => {
+        try{
+            const api = JSON.parse(appState.getCurrentAPI()).id
+            const currentExtensions = appState.getExtensions(api);
+            currentExtensions[extension] = state;
+            appState.setExtensions(api,currentExtensions)
+            getCurrentAPIIndex()
+            $scope.apiEntries[currentApiEntryIndex]._source.extensions = currentExtensions;
             if(!$scope.$$phase) $scope.$digest();
+        } catch (error) {
+            errorHandler.handle(error, 'Settings')
         }
     };
 
@@ -433,6 +438,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 $scope.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
                 $scope.extensions.gdpr = typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true;
                 $scope.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
+                $scope.extensions.ciscat = typeof config.data.data['extensions.ciscat'] !== 'undefined' ? config.data.data['extensions.ciscat'] : false;
                 $scope.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
                 $scope.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
             } else {

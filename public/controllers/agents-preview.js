@@ -9,15 +9,24 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules   from 'ui/modules'
+import { uiModules }  from 'ui/modules'
 import * as FileSaver from '../services/file-saver'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsPreviewController', function ($scope, $rootScope, $routeParams, genericReq, apiReq, appState, Agents, $location, errorHandler, csvReq, shareAgent) {
+app.controller('agentsPreviewController', function ($scope, $routeParams, genericReq, appState, $location, errorHandler, csvReq, shareAgent, wzTableFilter) {
+    
+    $scope.search = term => {
+        $scope.$broadcast('wazuhSearch',{term})
+    }
+   
+    $scope.filter = filter => {
+        $scope.$broadcast('wazuhFilter',{filter})
+    }
+
     $scope.isClusterEnabled = appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled'
     $scope.loading     = true;
-    $scope.agents      = Agents;
+
     $scope.status      = 'all';
     $scope.osPlatform  = 'all';
     $scope.version     = 'all'
@@ -41,62 +50,11 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
         $location.search('tab', $scope.submenuNavItem);
     });
 
-    let tmpUrl, tmpUrl2;
-    if (appState.getClusterInfo().status === 'enabled') {
-        tmpUrl  = `/api/wazuh-elastic/top/cluster/${appState.getClusterInfo().cluster}/agent.name`;
-        tmpUrl2 = `/api/wazuh-elastic/top/cluster/${appState.getClusterInfo().cluster}/agent.id`;
-    } else {
-        tmpUrl  = `/api/wazuh-elastic/top/manager/${appState.getClusterInfo().manager}/agent.name`;
-        tmpUrl2 = `/api/wazuh-elastic/top/manager/${appState.getClusterInfo().manager}/agent.id`;
-    }
-
-    $scope.applyFilters = filter => {
-        if(filter.includes('Unknown')){
-            $scope.agents.addFilter('status','Never connected');
-
-        /** Pending API implementation */
-        //} else if(filter.includes('group-')){
-        //    $scope.agents.addFilter('group',filter.split('group-')[1]);
-
-        } else if(filter.includes('node-')){
-            $scope.agents.addFilter('node',filter.split('node-')[1]);
-        } else if(filter.includes('version-')) {
-            $scope.agents.addFilter('version',filter.split('version-')[1]);
-        } else {
-            const platform = filter.split(' - ')[0];
-            const version  = filter.split(' - ')[1];
-            $scope.agents.addMultipleFilters([
-                { name:  'os.platform', value: platform },
-                { name:  'os.version', value: version }
-            ]);
-        }
-    }
-
-    // Retrieve os list
-    const retrieveList = agents => {
-        for(const agent of agents){
-            if(agent.id === '000') continue;
-            if(agent.group && !$scope.groups.includes(agent.group)) $scope.groups.push(agent.group);
-            if(agent.node_name && !$scope.nodes.includes(agent.node_name)) $scope.nodes.push(agent.node_name);
-            if(agent.version && !$scope.versions.includes(agent.version)) $scope.versions.push(agent.version);
-            if(agent.os && agent.os.name){
-                const exists = $scope.osPlatforms.filter((e) => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
-                if(!exists.length){
-                    $scope.osPlatforms.push({
-                        name:     agent.os.name,
-                        platform: agent.os.platform,
-                        version:  agent.os.version
-                    });
-                }
-            }
-        }
-    }
-
     $scope.downloadCsv = async () => {
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/agents', currentApi, $scope.agents ? $scope.agents.filters : null);
+            const output       = await csvReq.fetch('/agents', currentApi, wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'agents.csv');
@@ -111,61 +69,41 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
 
     const load = async () => {
         try{
+            const api = JSON.parse(appState.getCurrentAPI()).id
+            const clusterInfo    = appState.getClusterInfo();
+            const firstUrlParam  = clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+            const secondUrlParam = clusterInfo[firstUrlParam];
+
             const data = await Promise.all([
-                $scope.agents.nextPage(),
-                apiReq.request('GET', '/agents/summary', { }),
-                genericReq.request('GET', tmpUrl)
+                genericReq.request('GET', '/api/wazuh-api/agents-unique/' + api, {}),
+                genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name`)                
             ]);
+            
+            const unique = data[0].data.result;
 
-            // Agents summary
-            if(parseInt(data[1].data.data['Never connected']) > 0){
-                $scope.osPlatforms.push({
-                    name:     'Unknown',
-                    platform: 'Unknown',
-                    version:  ''
-                });
-            }
+            $scope.groups                    = unique.groups;
+            $scope.nodes                     = unique.nodes;
+            $scope.versions                  = unique.versions;
+            $scope.osPlatforms               = unique.osPlatforms;
+            $scope.lastAgent                 = unique.lastAgent;
+            $scope.agentsCountActive         = unique.summary.agentsCountActive;
+            $scope.agentsCountDisconnected   = unique.summary.agentsCountDisconnected;
+            $scope.agentsCountNeverConnected = unique.summary.agentsCountNeverConnected;
+            $scope.agentsCountTotal          = unique.summary.agentsCountTotal;
+            $scope.agentsCoverity            = unique.summary.agentsCoverity;
 
-            // Once Wazuh core fixes agent 000 issues, this should be adjusted
-            const active = data[1].data.data.Active - 1;
-            const total  = data[1].data.data.Total - 1;
-
-            $scope.agentsCountActive         = active;
-            $scope.agentsCountDisconnected   = data[1].data.data.Disconnected;
-            $scope.agentsCountNeverConnected = data[1].data.data['Never connected'];
-            $scope.agentsCountTotal          = total;
-            $scope.agentsCoverity            = (active / total) * 100;
-
-            // tmpUrl y tmpUrl2
-            if (data[2].data.data === '') {
+            if (data[1].data.data === '') {
                 $scope.mostActiveAgent.name = appState.getClusterInfo().manager;
                 $scope.mostActiveAgent.id   = '000';
             } else {
-                $scope.mostActiveAgent.name = data[2].data.data;
-                const info = await genericReq.request('GET', tmpUrl2);
+                $scope.mostActiveAgent.name = data[1].data.data;
+                const info = await genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id`);
                 if (info.data.data === '' && $scope.mostActiveAgent.name !== '') {
                     $scope.mostActiveAgent.id = '000';
                 } else {
                     $scope.mostActiveAgent.id = info.data.data;
                 }
             }
-
-            // Fetch agents sorting by -dateAdd and using pagination
-            const agents = [];
-            const total_items = data[1].data.data.Total;
-            let offset = 0;
-            const limit = 1000;
-            while(agents.length < total_items){
-                const page = await apiReq.request('GET', '/agents', { sort:'-dateAdd', limit, offset });
-                agents.push(...page.data.data.items)
-                offset += limit;
-            }
-
-
-            // Last agent
-            $scope.lastAgent = agents[0];
-
-            retrieveList(agents);
 
             $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
@@ -176,20 +114,12 @@ app.controller('agentsPreviewController', function ($scope, $rootScope, $routePa
         return;
     };
 
-    $scope.goGroup = agent => {
-        shareAgent.setAgent(agent);
-        $location.search('tab', 'groups');
-        $location.path('/manager');
-    };
-
     $scope.showAgent = agent => {
         shareAgent.setAgent(agent);
         $location.path('/agents');
-    };
+    }
 
     //Load
     load();
 
-    //Destroy
-    $scope.$on("$destroy", () => $scope.agents.reset());
 });

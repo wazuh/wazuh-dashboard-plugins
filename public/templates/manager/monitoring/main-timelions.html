@@ -1,17 +1,15 @@
-<div class="wazuh-loading" layout="column" layout-align="center center" ng-show="!loading && !rendered && resultState === 'ready' && !showConfig && !showNodes ">
-    <div class="percentage">
-        <i class="fa fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
-    </div>
-    <div class="percentage">{{loadingStatus}}</div>
-</div>
-<div layout="row" ng-show="resultState !== 'ready' && !rendered && !showConfig && !showNodes ">
+<!-- No results section -->
+<div layout="row" ng-show="resultState !== 'ready' && !loading && !showConfig && !showNodes">
     <md-card flex layout="column" class="wz-md-card">
         <md-card-content class="wz-text-center">
-            No results for selected time interval
+            <span>There are no results for selected time range. Try another one.</span>
         </md-card-content>
     </md-card>
 </div>
-<div layout="row" layout-align="center stretch" class="height-400" ng-show="!loading && !showConfig && !showNodes && rendered">
+<!-- End no results section -->
+
+<!-- Monitoring Timelion visualizations section -->
+<div layout="row" layout-align="start stretch" class="height-400" ng-show="!loading && !showConfig && !showNodes && rendered">
     <md-card flex class="wz-md-card">
         <md-card-content class="wazuh-column">
             <span class="wz-headline-title">Cluster alerts summary</span>
@@ -27,3 +25,4 @@
         </md-card-content>
     </md-card>
 </div>
+<!-- End monitoring Timelion visualizations section -->

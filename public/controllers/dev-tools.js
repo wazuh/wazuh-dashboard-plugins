@@ -9,12 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
-import beautifier   from 'plugins/wazuh/utils/json-beautifier'
-import CodeMirror   from 'plugins/wazuh/utils/codemirror/lib/codemirror'
-import jsonLint     from 'plugins/wazuh/utils/codemirror/json-lint.js'
+import { uiModules } from 'ui/modules'
+import beautifier    from '../utils/json-beautifier'
+import CodeMirror    from '../utils/codemirror/lib/codemirror'
+import jsonLint      from '../utils/codemirror/json-lint'
+import queryString   from 'query-string'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 // Logs controller
 app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState) {
@@ -177,7 +178,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         }
         groups = analyzeGroups();
         const currentGroup = calculateWhichGroup();
-        highlightGroup(currentGroup);  
+        highlightGroup(currentGroup); 
     }
 
     const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{
@@ -193,18 +194,36 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
     });
 
     const calculateWhichGroup = () => {
-        const selection    = apiInputBox.getCursor()
-        const desiredGroup = groups.filter(item => item.end >= selection.line && item.start <= selection.line);
-        return desiredGroup ? desiredGroup[0] : null;
+        try {
+            const selection    = apiInputBox.getCursor()
+            const desiredGroup = groups.filter(item => item.end >= selection.line && item.start <= selection.line);
+
+            // Place play button at first line from the selected group
+            const cords = apiInputBox.cursorCoords({line:desiredGroup[0].start,ch:0});
+            if(!$('#play_button').is(":visible")) $('#play_button').show()
+            const currentPlayButton = $('#play_button').offset();
+            $('#play_button').offset({top:cords.top,left:currentPlayButton.left})
+            
+            return desiredGroup[0];
+        } catch(error) {
+            $('#play_button').hide()
+            return null;
+        }
+
     }
 
-    $scope.send = async (firstTime) => {
+    $scope.send = async firstTime => {
         try {
             groups = analyzeGroups();
             
             const desiredGroup   = calculateWhichGroup();
             if(!desiredGroup) throw Error('not desired');
-     
+            if(firstTime){
+                const cords = apiInputBox.cursorCoords({line:desiredGroup.start,ch:0});
+                const currentPlayButton = $('#play_button').offset();
+                $('#play_button').offset({top:cords.top+10,left:currentPlayButton.left})
+            }
+
             const affectedGroups         = checkJsonParseError();
             const filteredAffectedGroups = affectedGroups.filter(item => item === desiredGroup.requestText);
             if(filteredAffectedGroups.length) {apiOutputBox.setValue('Error parsing JSON query'); return;}
@@ -224,23 +243,33 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                                 desiredGroup.requestText.split(method)[1].trim() :
                                 desiredGroup.requestText;
 
+            // Checks for inline parameters
+            const inlineSplit = requestCopy.split('?');
+
+            const extra = inlineSplit && inlineSplit[1] ? 
+                          queryString.parse(inlineSplit[1]) :
+                          {};
+ 
             const req = requestCopy ?
                         requestCopy.startsWith('/') ? 
                         requestCopy :  
                         `/${requestCopy}` :
                         '/';
 
-            let validJSON = true, JSONraw = {};
+            let JSONraw = {};
             try {
                 JSONraw = JSON.parse(desiredGroup.requestTextJson);
             } catch(error) {
-                validJSON = false;
+                JSONraw = {}
             }
 
+            // Assign inline parameters
+            for(const key in extra) JSONraw[key] = extra[key];
+
             const path   = req.includes('?') ? req.split('?')[0] : req;
-            const params = { devTools: true }
+
             if(typeof JSONraw === 'object') JSONraw.devTools = true;
-            const output = await apiReq.request(method, path, validJSON && !req.includes('?') ? JSONraw : params)
+            const output = await apiReq.request(method, path, JSONraw)
 
             apiOutputBox.setValue(
                 JSON.stringify(output.data.data,null,2)

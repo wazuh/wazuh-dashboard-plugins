@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 /**
  * Main function to build a data handler factory.
@@ -24,28 +24,12 @@ const compose = (DataHandler, path) => {
     return dataHandler;
 };
 
-const groups   = DataHandler => compose(DataHandler, '/agents/groups');
+
 const agents   = DataHandler => compose(DataHandler, '/agents');
-const logs     = DataHandler => compose(DataHandler, '/manager/logs');
-const rules    = DataHandler => compose(DataHandler, '/rules');
-const decoders = DataHandler => compose(DataHandler, '/decoders');
-const nodes    = DataHandler => compose(DataHandler, '/cluster/nodes');
 const simple   = DataHandler => new DataHandler();
 
 app
-    .factory('Groups', groups)
-    .factory('GroupAgents', simple)
-    .factory('GroupFiles', simple)
     .factory('AgentsAutoComplete', agents)
-    .factory('Agents', agents)
-    .factory('Logs', logs)
-    .factory('Rules', rules)
-    .factory('RulesRelated', rules)
-    .factory('RulesAutoComplete', rules)
-    .factory('Decoders', decoders)
-    .factory('DecodersRelated', simple)
-    .factory('DecodersAutoComplete', decoders)
-    .factory('ClusterNodes', nodes)
     .directive('lazyLoadData', function($compile) {
         return {
             link: (scope, el, attrs) => {

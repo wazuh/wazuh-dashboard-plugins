@@ -1693,5 +1693,176 @@ export default [
         "searchable": false,
         "aggregatable": false,
         "readFromDocValues": false
+    },
+    {
+        "name": "data.cis.benchmark",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.description",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.error",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.fail",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.group",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.hostname",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.notchecked",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.pass",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.rationale",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.remediation",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.result",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.rule_id",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.rule_title",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.score",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.timestamp",
+        "type": "date",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.cis.unknown",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.scan_id",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "data.type",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "input.type",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
     }
 ];

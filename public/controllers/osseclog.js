@@ -9,58 +9,39 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules   from 'ui/modules'
+import { uiModules }  from 'ui/modules'
 import * as FileSaver from '../services/file-saver'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('managerLogController', function ($scope, $rootScope, Logs, apiReq, errorHandler, csvReq, appState) {
-    $scope.searchTerm  = '';
-    $scope.loading     = true;
-    $scope.logs        = Logs;
-    $scope.realtime    = false;
-    $scope.realLogs    = [];
+app.controller('managerLogController', function ($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
     $scope.type_log    = 'all';
     $scope.category    = 'all';
-    let intervalId     = null;
+    
+    $scope.search = term => {
+        $scope.$broadcast('wazuhSearch',{term})
+    }
+   
+    $scope.filter = async filter => {
+        $scope.$broadcast('wazuhFilter',{filter})
+    }
 
-    const getRealLogs = async params => {
-        try{
-            const data = await apiReq.request('GET', '/manager/logs', params);
-            $scope.realLogs = data.data.data.items;
-            if(!$scope.$$phase) $scope.$digest();
-            return;
-        } catch (error) {
-            errorHandler.handle(error,'Logs');
-        }
-        return;
-    };
-
-    $scope.playRealtime = async () => {
-        const params = { limit: 20 };
-        if($scope.logs && $scope.logs.filters && Array.isArray($scope.logs.filters)){
-            for(const filter of $scope.logs.filters){
-                if(!filter.name || !filter.value) continue;
-                params[filter.name] = filter.value;
-            }
-        }
-        $scope.realtime = true;
-        await getRealLogs(params);
-        intervalId = setInterval(() => getRealLogs(params), 2500);
+    $scope.playRealtime = () => {
+        $scope.realtime   = true;
+        $scope.$broadcast('wazuhPlayRealTime')
     };
 
     $scope.stopRealtime = () => {
         $scope.realtime   = false;
-        clearInterval(intervalId);
-        if(!$scope.$$phase) $scope.$digest();
+        $scope.$broadcast('wazuhStopRealTime')
     }
 
     $scope.downloadCsv = async () => {
         try {
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/manager/logs', currentApi, $scope.logs ? $scope.logs.filters : null);
+            const output       = await csvReq.fetch('/manager/logs', currentApi, wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'logs.csv');
@@ -74,11 +55,9 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
     }
 
     const initialize = async () => {
-        try{            
-            await $scope.logs.nextPage();
+        try{   
             const data = await apiReq.request('GET', '/manager/logs/summary', {});
             $scope.summary = data.data.data;
-            $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
@@ -88,14 +67,4 @@ app.controller('managerLogController', function ($scope, $rootScope, Logs, apiRe
     }
 
     initialize();
-
-    // Resetting the factory configuration
-    $scope.$on("$destroy", () => {
-        if($scope.realtime) {
-            $scope.realtime = false;
-            clearInterval(intervalId);
-        }
-        $scope.logs.reset();
-
-    });
 });

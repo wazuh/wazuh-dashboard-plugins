@@ -1,15 +1,15 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////       WAZUH             //////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-import * as modules from 'ui/modules'
-import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html'
+import { uiModules } from 'ui/modules';
+import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html';
 
-modules.get('app/wazuh', []).directive('kbnDis', [function() {
+uiModules.get('app/wazuh', []).directive('kbnDis', [function() {
     return {
         restrict: 'E',
         scope: {},
         template: discoverTemplate
-    }
+    };
 }]);
 
 // Added dependencies (from Kibana module)
@@ -29,20 +29,17 @@ import 'plugins/kibana/discover/styles/main.less';
 import 'ui/doc_table/components/table_row';
 
 // Research added (further checks needed)
-import 'ui/doc_table/doc_table.js';
+import 'ui/doc_table/doc_table';
 import 'ui/styles/sidebar.less';
 import 'ui/styles/table.less';
-import 'ui/doc_viewer/doc_viewer.js';
-import 'ui/doc_title/doc_title.js';
-import 'ui/style_compile/style_compile.js';
-import 'ui/registry/doc_views.js';
-import 'plugins/kbn_doc_views/kbn_doc_views.js';
-import 'ui/tooltip/tooltip.js';
-import moment from 'moment';
+import 'ui/doc_viewer/doc_viewer';
+import 'ui/doc_title/doc_title';
+import 'ui/style_compile/style_compile';
+import 'ui/registry/doc_views';
+import 'plugins/kbn_doc_views/kbn_doc_views';
+import 'ui/tooltip/tooltip';
 import 'ui/pager_control';
 import 'ui/pager';
-import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
-import { documentationLinks } from 'ui/documentation_links/documentation_links';
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +51,7 @@ import angular from 'angular';
 import { getSort } from 'ui/doc_table/lib/get_sort';
 import * as columnActions from 'ui/doc_table/actions/columns';
 import * as filterActions from 'ui/doc_table/actions/filter';
-import dateMath from '@elastic/datemath';
+import dateMath from '@kbn/datemath';
 import 'ui/doc_table';
 import 'ui/visualize';
 import 'ui/notify';
@@ -72,21 +69,15 @@ import { BasicResponseHandlerProvider } from 'ui/vis/response_handlers/basic';
 import { DocTitleProvider } from 'ui/doc_title';
 import PluginsKibanaDiscoverHitSortFnProvider from 'plugins/kibana/discover/_hit_sort_fn';
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
-import { AggTypesBucketsIntervalOptionsProvider } from 'ui/agg_types/buckets/_interval_options';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
-import uiRoutes from 'ui/routes';
-import { uiModules } from 'ui/modules';
-import indexTemplate from 'plugins/kibana/discover/index.html';
-import { StateProvider } from 'ui/state_management/state';
 import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
 import { FilterManagerProvider } from 'ui/filter_manager';
-import { SavedObjectsClientProvider } from 'ui/saved_objects';
+import { toastNotifications } from 'ui/notify';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
   'kibana/index_patterns',
-  'kibana',
   'app/wazuh'
 ]);
 
@@ -131,7 +122,71 @@ function discoverController(
     location: 'Discover'
   });
 
-  $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider);
+  //////////////////////////////////////////////////////////
+  //////////////////// WAZUH ///////////////////////////////
+  //////////////////////////////////////////////////////////
+  const calcWzInterval = () => {
+    let wzInterval = false;
+    try {
+      const from = dateMath.parse($scope.timefilter.time.from);
+      const to   = dateMath.parse($scope.timefilter.time.to);
+      
+      const totalSeconds = (to - from) / 1000;
+      if(totalSeconds <= 3600 )                                 wzInterval = 'm';
+      else if(totalSeconds > 3600 && totalSeconds <= 86400)     wzInterval = 'h';
+      else if(totalSeconds > 86400 && totalSeconds <= 604800)   wzInterval = 'd';
+      else if(totalSeconds > 604800 && totalSeconds <= 2419200) wzInterval = 'w';
+      else                                                      wzInterval = 'M';
+
+
+    } catch (error) {}
+
+    return wzInterval;
+  };
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+
+
+  ///////////////////////////////////////////////////////////////////////////////
+  //////////// WAZUH ////////////////////////////////////////////////////////////
+  // Old code:                                                                 //
+  // $scope.intervalOptions = Private(AggTypesBucketsIntervalOptionsProvider); //
+  ///////////////////////////////////////////////////////////////////////////////
+  $scope.intervalOptions = [
+    {
+      display: 'Minute',
+      val: 'm'
+    },
+    {
+      display: 'Hourly',
+      val: 'h'
+    },
+    {
+      display: 'Daily',
+      val: 'd'
+    },
+    {
+      display: 'Weekly',
+      val: 'w'
+    },
+    {
+      display: 'Monthly',
+      val: 'M'
+    },
+    {
+      display: 'Yearly',
+      val: 'y'
+    },
+    {
+      display: 'Custom',
+      val: 'custom'
+    }
+  ];
+  //////////////////////////////////////
+  //////////////////////////////////////
+  //////////////////////////////////////
+
   $scope.showInterval = false;
   $scope.minimumVisibleRows = 50;
 
@@ -248,12 +303,22 @@ function discoverController(
   $scope.uiState = $state.makeStateful('uiState');
 
   function getStateDefaults() {
+
+    //////////////////////////////////////////////////////////
+    //////////////////// WAZUH ///////////////////////////////
+    /////////////////////////////////////////////////////////
+    let wzInterval = calcWzInterval();
+    //////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
+
+
     return {
       query: $scope.searchSource.get('query') || { query: '', language: config.get('search:queryLanguage') },
       sort: getSort.array(savedSearch.sort, $scope.indexPattern, config.get('discover:sort:defaultOrder')),
       columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
       index: $scope.indexPattern.id,
-      interval: 'auto',
+      interval: wzInterval || 'h',  //// WAZUH /////
       filters: _.cloneDeep($scope.searchSource.getOwn('filter'))
     };
   }
@@ -293,6 +358,14 @@ function discoverController(
     $scope.updateDataSource()
       .then(function () {
         $scope.$listen(timefilter, 'fetch', function () {
+          ////////////////////////////////////////////////
+          //               WAZUH                        //
+          ////////////////////////////////////////////////
+          $state.interval = calcWzInterval() || 'd';
+          ////////////////////////////////////////////////
+          ////////////////////////////////////////////////
+          ////////////////////////////////////////////////
+
           $scope.fetch();
         });
 
@@ -313,7 +386,7 @@ function discoverController(
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////    
-            discoverPendingUpdates.removeAll()
+            discoverPendingUpdates.removeAll();
             discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
             $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
@@ -436,10 +509,15 @@ function discoverController(
         return savedSearch.save()
           .then(function (id) {
             stateMonitor.setInitialState($state.toJSON());
-            $scope.kbnTopNav.close('save');
+            $scope.wzKbnTopNav.close('save'); // WAZUH replaced kbnTopNav
 
             if (id) {
-              notify.info('Saved Data Source "' + savedSearch.title + '"');
+              // Using toaster service due to notify.info is now deprecated
+              toastNotifications.addSuccess({
+                title: `Search '${savedSearch.title}' was saved`,
+                'data-test-subj': 'saveSearchSuccess',
+              });
+
               if (savedSearch.id !== $route.current.params.id) {
                 kbnUrl.change('/discover/{{id}}', { id: savedSearch.id });
               } else {
@@ -469,20 +547,22 @@ function discoverController(
   };
 
   $scope.updateQueryAndFetch = function (query) {
-    // reset state if language changes
-    if ($state.query.language && $state.query.language !== query.language) {
-      $state.filters = [];
-    }
+
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    // We don't need this cause the auto-complete feature breaks using this   //
+    /*if ($state.query.language && $state.query.language !== query.language) {
+      $state.filters = [];
+    }*/
+
     const currentUrlPath = $location.path();
     if(currentUrlPath && !currentUrlPath.includes('wazuh-discover')){
       let filters = queryFilter.getFilters();
       filters = Array.isArray(filters) ? filters.filter(item => item && item.$state && item.$state.store && item.$state.store === 'appState') : [];
       if(!filters || !filters.length) return;
     }
-    discoverPendingUpdates.removeAll()
+    discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
     $rootScope.$broadcast('fetch');
@@ -728,13 +808,25 @@ function discoverController(
         },
         aggs: visStateAggs
       });
+      
 
       $scope.searchSource.onRequestStart((searchSource, searchRequest) => {
         return $scope.vis.onSearchRequestStart(searchSource, searchRequest);
       });
 
       $scope.searchSource.aggs(function () {
-        return $scope.vis.getAggConfig().toDsl();
+        //////////////////// WAZUH ////////////////////////////////
+        // Old code:                                             //
+        // return $scope.vis.getAggConfig().toDsl();             //
+        ///////////////////////////////////////////////////////////
+        const result = $scope.vis.getAggConfig().toDsl();
+        if(result[2] && result[2].date_histogram && result[2].date_histogram.interval === '0ms') {
+          result[2].date_histogram.interval = '1d';
+        }
+        return result;
+        ///////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////
       });
     }
   }
@@ -769,8 +861,8 @@ function discoverController(
     if(!appState || !globalState){
       $timeout(100)
       .then(() => {
-        return loadFilters(wzCurrentFilters)
-      })
+        return loadFilters(wzCurrentFilters);
+      });
     } else {
       $state.filters = localChange ? $state.filters : [];
 
@@ -778,23 +870,23 @@ function discoverController(
       .then(() => { })
       .catch(error => console.log(error.message || error));
     }
-  }
+  };
 
   const wzEventFiltersListener = $rootScope.$on('wzEventFilters', (evt,parameters) => {
     loadFilters(parameters.filters, parameters.localChange);
   });
 
 
-  $scope.tabView = $location.search().tabView || 'panels'
+  $scope.tabView = $location.search().tabView || 'panels';
   const changeTabViewListener = $rootScope.$on('changeTabView',(evt,parameters) => {
-    $scope.tabView = parameters.tabView || 'panels'
+    $scope.tabView = parameters.tabView || 'panels';
     $scope.updateQueryAndFetch($state.query);
-  })
+  });
 
   $scope.$on('$destroy', () => {
-    wzEventFiltersListener()
-    changeTabViewListener()
-  })
+    wzEventFiltersListener();
+    changeTabViewListener();
+  });
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,74 @@
+
+<div layout="row" class="md-padding" ng-show="wazuh_table_loading" >
+    <div class='uil-ring-css'><div></div></div>
+</div>
+<div layout="row" ng-show="!wazuh_table_loading && items.length">
+    <table class="table table-striped table-condensed" style="table-layout: fixed !important" id="wz_table">
+        <thead class="wz-text-bold">
+            <th ng-repeat="key in keys" class="wz-text-left" 
+                ng-class="{ 'cursor-pointer' : !key.nosortable, 'col-lg-1' : !key.size, 'col-lg-{{key.size}}' : key.size }"
+                ng-click="!key.nosortable && sort(key)">
+                {{ keyEquivalence[key.value || key] || key.value || key }}
+                <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                    aria-hidden="true"></i>
+            </th>
+        </thead>
+        <tbody>
+            <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage]" ng-click="clickAction(item)">
+                <td ng-repeat="key in keys" ng-if="path !== '/decoders'">
+                    {{ 
+                        key === 'os.name' ? 
+                        item.os.name || '---' : 
+                        key === 'os.version' ? 
+                        item.os.version || '---' : 
+                        checkIfArray(item[key.value || key]) || '---' 
+                    }}
+                </td>
+                <td ng-repeat="key in keys" ng-if="path === '/decoders'">
+                    {{ 
+                        key === 'details.program_name' || key.value === 'details.program_name' ? 
+                        item.details.program_name || '---' : 
+                        key === 'details.order' || key.value === 'details.order' ? 
+                        item.details.order || '---' : 
+                        checkIfArray(item[key.value || key]) || '---' 
+                    }}
+                </td>
+                
+            </tr>
+        </tbody>
+        <tfoot >
+            <td colspan="{{keys.length}}">
+                <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}} seconds)</span>
+                <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
+                    <ul layout="row">
+                        <li ng-class="{disabled: currentPage == 0}" class="md-padding">
+                            <a href ng-click="prevPage()">« Prev</a>
+                        </li>
+
+                        <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{active: n == currentPage}" ng-click="setPage()"
+                            class="md-padding">
+                            <a href ng-bind="n + 1">1</a>
+                        </li>
+
+                        <li ng-class="{disabled: (currentPage) == pagedItems.length - 1}" class="md-padding">
+                            <a href ng-click="nextPage()">Next »</a>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tfoot>
+    </table>
+</div>
+
+<div layout="row" ng-if="!wazuh_table_loading && !totalItems">
+    <div flex class="euiCallOut euiCallOut--warning" data-test-subj="discoverNoResults">
+        <div class="euiCallOutHeader">
+            <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use></svg>
+            <span class="euiCallOutHeader__title">No results match your search criteria</span>
+        </div>
+    </div>
+</div>
+
+<div layout="row" ng-if="!wazuh_table_loading && !totalItems" class="wz-margin-top-10">
+    <span class="color-grey">0 items ({{time | number: 2}} seconds)</span>
+</div>

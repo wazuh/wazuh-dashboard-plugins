@@ -1,0 +1,14 @@
+<div layout="column" flex ng-if="showNodes && !currentNode">
+    <div layout="row" class="md-padding">
+        <input placeholder="Filter nodes..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+            aria-invalid="false" wz-enter="search(custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+            <span class="fa fa-search" aria-hidden="true"></span>
+        </button>
+    </div>
+    <div layout="row" class="md-padding">
+        <wazuh-table flex path="'/cluster/nodes'" keys="['name','version','ip','type']" allow-click="true">
+        </wazuh-table>
+    </div>
+
+</div>

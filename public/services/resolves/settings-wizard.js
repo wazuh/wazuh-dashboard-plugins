@@ -87,6 +87,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         pci:   typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true,
                         gdpr:  typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true,
                         oscap: typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true,
+                        ciscat: typeof config.data.data['extensions.ciscat'] !== 'undefined' ? config.data.data['extensions.ciscat'] : false,
                         aws:   typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false,
                         virustotal: typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false
                     }
@@ -106,7 +107,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         wzMisc.setApiIsDown(false)
                         changeCurrentApi(data);
                     }
-                }                
+                }
             })
             .catch(error => {
                 appState.removeCurrentAPI();

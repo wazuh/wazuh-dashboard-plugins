@@ -12,7 +12,7 @@
     <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- PCI DSS -->
-        <md-card flex class="wz-md-card">
+        <md-card flex="45" class="wz-md-card">
             <md-card-content flex layout="column">
                 <div layout="row">
                     <span class="wz-headline-title"><i class="fa fa-fw fa-credit-card" aria-hidden="true"></i> PCI DSS</span>
@@ -35,7 +35,7 @@
         </md-card>
 
         <!-- GDPR -->
-        <md-card flex class="wz-md-card">
+        <md-card flex="45" class="wz-md-card">
             <md-card-content flex layout="column">
                 <div layout="row">
                     <span class="wz-headline-title"><i class="fa fa-fw fa-list-ol" aria-hidden="true"></i> GDPR</span>
@@ -56,14 +56,9 @@
                 </md-button>
             </md-card-actions>
         </md-card>
-    </div>
-    <!-- End section cards -->
-
-    <!-- Section cards -->
-    <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- Audit -->
-        <md-card flex class="wz-md-card">
+        <md-card flex="45" class="wz-md-card">
             <md-card-content flex layout="column">
                 <div layout="row">
                     <span class="wz-headline-title"><i class="fa fa-fw fa-balance-scale" aria-hidden="true"></i> Audit</span>
@@ -86,7 +81,7 @@
         </md-card>
 
         <!-- Open SCAP -->
-        <md-card flex class="wz-md-card">
+        <md-card flex="45" class="wz-md-card">
             <md-card-content flex layout="column">
                 <div layout="row">
                     <span class="wz-headline-title"><i class="fa fa-fw fa-search" aria-hidden="true"></i> Open SCAP</span>
@@ -107,14 +102,31 @@
                 </md-button>
             </md-card-actions>
         </md-card>
-    </div>
-    <!-- End section cards -->
 
-    <!-- Section cards -->
-    <div layout="row" layout-align="start stretch" layout-wrap>
+        <!-- CIS-CAT -->
+        <md-card flex="45" class="wz-md-card">
+            <md-card-content flex layout="column">
+                <div layout="row">
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> CIS-CAT</span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">CIS (Center for Internet Security) is an entity dedicated to safeguard private and public organizations against cyber threats. This entity provides CIS benchmarks guidelines, which are a recognized global standard and best practices for securing IT systems and data against cyberattacks.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="CIS-CAT extension switch" ng-model="extensions.ciscat" ng-change="toggleExtension('ciscat',extensions.ciscat)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html" class="wz-text-link cursor-pointer small" aria-label="Open CIS-CAT integration documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
 
         <!-- Amazon -->
-        <md-card flex class="wz-md-card">
+        <md-card flex="45" class="wz-md-card">
             <md-card-content flex layout="column">
                 <div layout="row">
                     <span class="wz-headline-title"><i class="fa fa-fw fa-amazon" aria-hidden="true"></i> Amazon Web Services (AWS)</span>
@@ -137,7 +149,7 @@
         </md-card>
 
         <!-- VirusTotal -->
-        <md-card flex class="wz-md-card">
+        <md-card flex="45" class="wz-md-card">
             <md-card-content flex layout="column">
                 <div layout="row">
                     <span class="wz-headline-title"><i class="fa fa-fw fa-bug" aria-hidden="true"></i> VirusTotal</span>
@@ -148,7 +160,7 @@
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="Open SCAP extension switch" ng-model="extensions.virustotal" ng-change="toggleExtension('virustotal',extensions.virustotal)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="VirusTotal extension switch" ng-model="extensions.virustotal" ng-change="toggleExtension('virustotal',extensions.virustotal)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">

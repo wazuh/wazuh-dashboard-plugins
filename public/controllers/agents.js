@@ -9,16 +9,25 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier    from 'plugins/wazuh/utils/json-beautifier';
-import * as modules  from 'ui/modules'
+import beautifier    from '../utils/json-beautifier';
+import { uiModules } from 'ui/modules'
 import FilterHandler from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
-import { metricsAudit, metricsVulnerability, metricsScap, metricsVirustotal } from '../utils/agents-metrics'
+import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal } from '../utils/agents-metrics'
+import * as FileSaver from '../services/file-saver'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsController', function ($timeout, $scope, $location, $rootScope, appState, apiReq, AgentsAutoComplete, errorHandler, tabVisualizations, vis2png, shareAgent, commonData, reportingService, visFactoryService) {
+app.controller('agentsController', 
+
+function (
+    $timeout, $scope, $location, $rootScope, 
+    appState, apiReq, AgentsAutoComplete, errorHandler, 
+    tabVisualizations, vis2png, shareAgent, commonData, 
+    reportingService, visFactoryService, csvReq, 
+    wzTableFilter
+) {
 
     $rootScope.reportStatus = false;
 
@@ -29,14 +38,14 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
     const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
     const extensions  = appState.getExtensions(currentApi);
     $scope.extensions = extensions;
-    
+
     $scope.agentsAutoComplete = AgentsAutoComplete;
 
     $scope.tabView = commonData.checkTabViewLocation();
     $scope.tab     = commonData.checkTabLocation();
 
     let tabHistory = [];
-    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome') tabHistory.push($scope.tab);
+    if($scope.tab !== 'configuration' && $scope.tab !== 'welcome' && $scope.tab !== 'syscollector') tabHistory.push($scope.tab);
 
     // Tab names
     $scope.tabNames = TabNames;
@@ -61,6 +70,9 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
                 case 'oscap':
                     createMetrics(metricsScap);
                     break;
+                case 'ciscat':
+                    createMetrics(metricsCiscat);
+                    break;
                 case 'virustotal':
                     createMetrics(metricsVirustotal);
                     break;
@@ -77,8 +89,8 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             $location.search('tabView', subtab);
             const localChange = (subtab === 'panels' && $scope.tabView === 'discover') && sameTab;
             $scope.tabView = subtab;
-    
-            if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome'){
+
+            if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome' && $scope.tab !== 'syscollector'){
                 const condition = !changeAgent && localChange || !changeAgent && preserveDiscover;
                 await visFactoryService.buildAgentsVisualizations(filterHandler, $scope.tab, subtab, condition, $scope.agent.id)
                 changeAgent = false;
@@ -96,12 +108,12 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         }
     }
 
-    
+
     let changeAgent = false;
 
     // Switch tab
     $scope.switchTab = (tab, force = false) => {
-        if(tab !== 'configuration' && tab !== 'welcome') tabHistory.push(tab);
+        if(tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector') tabHistory.push(tab);
         if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
@@ -110,7 +122,7 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         $location.search('tab', tab);
         const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1] && !force;
         $scope.tab = tab;
-        
+
         if($scope.tab === 'configuration'){
             firstLoad();
         } else {
@@ -137,10 +149,11 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
 
     $scope.getAgent = async (newAgentId,fromAutocomplete) => {
         try {
+            $scope.load = true;
             changeAgent = true;
-            
+
             const globalAgent = shareAgent.getAgent()
-            
+
             if($scope.tab === 'configuration'){
                 return $scope.getAgentConfig(newAgentId);
             }
@@ -150,7 +163,9 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             const data = await Promise.all([
                 apiReq.request('GET', `/agents/${id}`, {}),
                 apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-                apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
+                apiReq.request('GET', `/rootcheck/${id}/last_scan`, {}),
+                apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
+                apiReq.request('GET', `/syscollector/${id}/os`, {})
             ]);
 
             // Agent
@@ -167,9 +182,15 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             // Rootcheck
             $scope.agent.rootcheck = data[2].data.data;
             validateRootCheck();
-            
+
             $scope.switchTab($scope.tab, true);
 
+            $scope.syscollector = {
+                hardware: data[3].data.data,
+                os: data[4].data.data
+            }
+
+            $scope.load = false;
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
@@ -196,6 +217,23 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
             return $scope.agentsAutoComplete.items;
         } catch (error) {
             errorHandler.handle(error,'Agents');
+        }
+        return;
+    }
+
+    $scope.downloadCsv = async data_path => {
+        try {
+            errorHandler.info('Your download should begin automatically...', 'CSV')
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const output       = await csvReq.fetch(data_path, currentApi, wzTableFilter.get());
+            const blob         = new Blob([output], {type: 'text/csv'});
+
+            FileSaver.saveAs(blob, 'packages.csv');
+            
+            return;
+
+        } catch (error) {
+            errorHandler.handle(error,'Download CSV');
         }
         return;
     }
@@ -281,6 +319,10 @@ app.controller('agentsController', function ($timeout, $scope, $location, $rootS
         return;
     }
     /** End of agent configuration */
+
+    $scope.search = term => {
+        $scope.$broadcast('wazuhSearch',{term})
+    }
 
     $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab, true);
 

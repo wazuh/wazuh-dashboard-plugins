@@ -67,6 +67,9 @@
 }
 
 /* Custom JSON viewer settings */
+.wz-word-wrap {
+    word-wrap: break-word;
+}
 
 .wz-pre {
     white-space: pre-wrap;
@@ -93,23 +96,6 @@
 .kuiLocalSearchInput:focus {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid #D9D9D9 !important;
-}
-
-/* Custom progress linear styles */
-
-.wazuh-loading md-progress-linear {
-    height: 20px !important;
-}
-
-.wazuh-loading md-progress-linear .md-container {
-    height: 20px !important;
-}
-
-.wazuh-loading md-progress-linear .md-container .md-bar {
-    height: 20px !important;
-}
-.wazuh-loading md-progress-linear .md-container .md-dashed:before {
-    height: 20px !important;
 }
 
 /* Custom loading ring styles */
@@ -160,10 +146,6 @@ div.uil-ring-css {
     width: 15px;
 }
 
-.joinCardsRow {
-    margin-top: 5px;
-}
-
 /* Custom Manager/Ruleset styles */
 
 .manager-ruleset-decoders-top-24 {
@@ -178,6 +160,10 @@ div.uil-ring-css {
 
 .manager-ruleset-btn {
     top: -3px;
+}
+
+.wz-margin-top-4 {
+    margin-top: 4px;
 }
 
 /* Custom md-switch styles */
@@ -325,15 +311,13 @@ div.uil-ring-css {
 
 .wz-border-none,
 .wz-border-none md-select-value {
-    border: none;
+    border: none !important;
 }
 
-.wz-border-0,
-.wz-md-navbar .md-nav-bar {
+.wz-border-0 {
     border: 0px;
 }
 
-.wz-md-navbar ._md-nav-button-text,
 .wz-md-tab .md-tab,
 .wz-md-tab .md-active {
     color: black !important;
@@ -430,15 +414,8 @@ kbn-vis .vis-container {
     text-transform: uppercase;
 }
 
-.wz-search-bar-size {
-    padding: 5px;
-    height: 35px;
-    margin-top: 0px !important;
-    margin-right: 0px !important;
-}
-
 .wz-timelions {
-    margin-top: -30px;
+    margin-top: -40px;
     z-index: 2;
 }
 
@@ -449,4 +426,13 @@ kbn-vis .vis-container {
 
 #monitoring_dis .kuiLocalDropdown {
     z-index: 10;
+}
+
+.wz-monitoring-loading {
+    z-index: 50;
+    margin-bottom: 30px;
+}
+
+.wz-always-top {
+    z-index: 9999 !important;
 }

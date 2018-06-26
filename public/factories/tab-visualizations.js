@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Factory to store visualization tabs
- * 
+ *
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,9 +10,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import * as modules from 'ui/modules'
+import { uiModules } from 'ui/modules'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 app.factory('tabVisualizations', function() {
     const agents = {
@@ -22,6 +22,7 @@ app.factory('tabVisualizations', function() {
         pm           : 4,
         vuls         : 7,
         oscap        : 13,
+        ciscat       : 11,
         audit        : 15,
         gdpr         : 3,
         pci          : 3,
@@ -36,6 +37,7 @@ app.factory('tabVisualizations', function() {
         pm        : 5,
         vuls      : 8,
         oscap     : 14,
+        ciscat    : 11,
         audit     : 15,
         pci       : 6,
         gdpr      : 6,
@@ -46,8 +48,8 @@ app.factory('tabVisualizations', function() {
     let tabVisualizations = {}
     let currentTab = '';
 
-    const setTab = tab => currentTab = tab; 
-    
+    const setTab = tab => currentTab = tab;
+
     const getTab = () => {
         return currentTab;
     }
@@ -61,16 +63,16 @@ app.factory('tabVisualizations', function() {
             tabVisualizations = tabs === 'overview' ?
                                 overview :
                                 agents;
-        } 
+        }
     }
 
     const removeAll = () => tabVisualizations = {};
-      
+
     return {
       getItem,
       removeAll,
       assign,
       setTab,
-      getTab   
+      getTab
     };
 });

@@ -17,6 +17,7 @@ export default {
     vuls         : 'Vulnerabilities',
     oscap        : 'Open SCAP',
     audit        : 'Audit',
+    ciscat       : 'CIS-CAT',
     pci          : 'PCI DSS',
     gdpr         : 'GDPR',
     aws          : 'AWS',
@@ -25,5 +26,14 @@ export default {
     api          : 'API configuration',
     extensions   : 'Extensions',
     pattern      : 'Index pattern',
-    about        : 'About'
+    about        : 'About',
+    syscollector : 'Inventory',
+    status       : 'Status',
+    ruleset      : 'Ruleset',
+    rules        : 'Rules',
+    decoders     : 'Decoders',
+    logs         : 'Logs',
+    groups       : 'Groups',
+    monitoring   : 'Monitoring',
+    reporting    : 'Reporting'
 }

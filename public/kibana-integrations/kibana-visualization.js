@@ -10,10 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import $              from 'jquery';
-import * as modules   from 'ui/modules'
+import { uiModules }   from 'ui/modules'
 import * as ownLoader from './loader/loader-import'
 
-const app = modules.get('apps/webinar_app', [])
+const app = uiModules.get('apps/webinar_app', [])
     .directive('kbnVis', [function () {
         return {
             restrict: 'E',
@@ -157,6 +157,7 @@ const app = modules.get('apps/webinar_app', [])
                             const thereIsData   = visHandlers.hasData();
                             $rootScope.rendered = thereIsData;
                             if(!thereIsData) $rootScope.resultState = 'none'
+                            else $rootScope.resultState = 'ready'
                         }
                         // Forcing a digest cycle
                         if(!$rootScope.$$phase) $rootScope.$digest();

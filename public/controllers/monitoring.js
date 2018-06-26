@@ -10,12 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 import FilterHandler from '../utils/filter-handler'
-import * as modules  from 'ui/modules'
+import { uiModules } from 'ui/modules'
 
-const app = modules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('clusterController', function ($scope, $rootScope, $timeout, errorHandler, apiReq, ClusterNodes, $window, $location, discoverPendingUpdates, rawVisualizations, loadedVisualizations, visHandlers, tabVisualizations, appState, genericReq) {
+app.controller('clusterController', function ($scope, $rootScope, $timeout, errorHandler, apiReq, $window, $location, discoverPendingUpdates, rawVisualizations, loadedVisualizations, visHandlers, tabVisualizations, appState, genericReq) {
+    $scope.search = term => {
+        $scope.$broadcast('wazuhSearch',{term})
+    }
     const clusterEnabled = appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled';
     $scope.isClusterEnabled = clusterEnabled;
     $location.search('tabView','cluster-monitoring');
@@ -37,8 +40,6 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
     $scope.currentNode = null;
     $scope.nodeSearchTerm = '';
     
-    $scope.nodes = ClusterNodes;
-
     const setBooleans = component => {
         $scope.showConfig = component === 'showConfig';
         $scope.showNodes  = component === 'showNodes';
@@ -76,12 +77,12 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
         $rootScope.$broadcast('updateVis');
     }
 
-    $scope.showNode = async index => {
+    $scope.$on('wazuhShowClusterNode',async (event,parameters) => {
         try {
             tabVisualizations.assign({
                 monitoring: 1
             });
-            $scope.currentNode = $scope.nodes.items[index];
+            $scope.currentNode = parameters.node;
             const data = await apiReq.request('GET','/cluster/healthcheck',{ node: $scope.currentNode.name });
 
             $scope.currentNode.healthCheck = data.data.data.nodes[$scope.currentNode.name];
@@ -122,7 +123,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             errorHandler.handle(error,'Cluster')
         }
 
-    }
+    })
 
     let filters = [];
     const assignFilters = (node = false) => {
@@ -154,8 +155,6 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             discoverPendingUpdates.removeAll();
             rawVisualizations.removeAll();
             loadedVisualizations.removeAll();
-
-            await $scope.nodes.nextPage();
 
             const data = await Promise.all([
                 apiReq.request('GET','/cluster/status',{}),

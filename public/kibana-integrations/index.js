@@ -9,7 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import 'plugins/wazuh/kibana-integrations/kibana-visualization.js';
-import 'plugins/wazuh/kibana-integrations/kibana-filter-bar.js';
-import 'plugins/wazuh/kibana-integrations/kibana-discover.js';
-import 'plugins/wazuh/kibana-integrations/saved-visualizations.js';
+import './kibana-visualization';
+import './kibana-filter-bar';
+import './kibana-discover';
+import './saved-visualizations';
+import './kbn_top_nav/index';
+import './kbn-global-timepicker/kbn_global_timepicker';
