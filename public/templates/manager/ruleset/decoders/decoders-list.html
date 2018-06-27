@@ -24,7 +24,7 @@
         </md-button>
     </div>
 
-    <md-chips readonly="true" ng-show="appliedFilters.length || implicitFilterFromDetail">
+    <md-chips class="wz-chips" readonly="true" ng-show="appliedFilters.length || implicitFilterFromDetail">
         <md-chip class="wz-chip" ng-if="includesFilter('file');">
             <span>File: {{getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
