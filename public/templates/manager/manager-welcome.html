@@ -8,16 +8,17 @@
     <!-- End headline -->
 
     <!-- Section cards -->
-    <div layout="row" layout-align="start start" layout-wrap>
+    <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- Ruleset -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> <span ng-click="reloadRuleset()" class="wz-headline-title wz-text-link cursor-pointer">Ruleset</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> <span ng-click="reloadRuleset()" class="wz-headline-title wz-text-link cursor-pointer">Ruleset</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Review all your current rules and decoders</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/ruleset/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh ruleset documentation">
@@ -28,12 +29,13 @@
 
         <!-- Groups -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> <span ng-click="reloadGroups()" class="wz-headline-title wz-text-link cursor-pointer">Groups</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-object-group" aria-hidden="true"></i> <span ng-click="reloadGroups()" class="wz-headline-title wz-text-link cursor-pointer">Groups</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>List and check your groups, its agents and files</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh groups documentation">
@@ -44,12 +46,13 @@
 
         <!-- Configuration -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> <span ng-click="switchTab('configuration')" class="wz-headline-title wz-text-link cursor-pointer">Configuration</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-cog" aria-hidden="true"></i> <span ng-click="switchTab('configuration')" class="wz-headline-title wz-text-link cursor-pointer">Configuration</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>List the current Wazuh manager configuration</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh local configuration documentation">
@@ -69,16 +72,17 @@
     <!-- End headline -->
 
     <!-- Section cards -->
-    <div layout="row" layout-align="start start" layout-wrap>
+    <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- Status -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-heartbeat" aria-hidden="true"></i> <span ng-click="switchTab('status')" class="wz-headline-title wz-text-link cursor-pointer">Status</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-heartbeat" aria-hidden="true"></i> <span ng-click="switchTab('status')" class="wz-headline-title wz-text-link cursor-pointer">Status</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Check the status of all Wazuh manager daemons</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/daemons/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh daemons documentation">
@@ -89,12 +93,13 @@
 
         <!-- Logs -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-pencil-square-o" aria-hidden="true"></i> <span ng-click="switchTab('logs')" class="wz-headline-title wz-text-link cursor-pointer">Logs</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-pencil-square-o" aria-hidden="true"></i> <span ng-click="switchTab('logs')" class="wz-headline-title wz-text-link cursor-pointer">Logs</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Review the logs of all Wazuh manager daemons</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh local configuration documentation">
@@ -105,12 +110,13 @@
 
         <!-- Monitoring -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-search" aria-hidden="true"></i> <span ng-click="switchTab('monitoring')" class="wz-headline-title wz-text-link cursor-pointer">Monitoring</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-search" aria-hidden="true"></i> <span ng-click="switchTab('monitoring')" class="wz-headline-title wz-text-link cursor-pointer">Monitoring</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Visualize your Wazuh cluster nodes and its agents</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh cluster documentation">
@@ -122,16 +128,17 @@
     <!-- End section cards -->
 
     <!-- Section cards -->
-    <div layout="row" layout-align="start start" layout-wrap>
+    <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- Reporting -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-file-text" aria-hidden="true"></i> <span ng-click="switchTab('reporting')" class="wz-headline-title wz-text-link cursor-pointer">Reporting</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-file-text" aria-hidden="true"></i> <span ng-click="switchTab('reporting')" class="wz-headline-title wz-text-link cursor-pointer">Reporting</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>List and download all the Wazuh app reports</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh local configuration documentation">
