@@ -1,12 +1,7 @@
-<md-content flex layout="column" ng-if="tab === 'configuration' && configurationError">
-
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
-    </div>
+<md-content flex layout="column" ng-if="tab === 'configuration' && configurationError" ng-show="!load">
 
     <!-- This container appears when there's some error getting the configuration -->
-    <div layout="column" layout-align="start stretch" ng-show="!load">
+    <div layout="column" layout-align="start stretch" >
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-warning"></i> Warning</span>
@@ -33,15 +28,10 @@
 
 </md-content>
 
-<md-content flex layout="column" layout-align="start" ng-if="tab === 'configuration' && !configurationError">
-
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
-    </div>
+<md-content flex layout="column" layout-align="start" ng-if="tab === 'configuration' && !configurationError" ng-show="!load">
 
     <!-- The section container -->
-    <div flex layout="column" layout-align="start stretch" ng-show="!load" ng-init="toggleRAW=false;selectedConfigTab='fim';">
+    <div flex layout="column" layout-align="start stretch" ng-init="toggleRAW=false;selectedConfigTab='fim';">
 
         <!-- First row - Configuration status and other details -->
         <div layout="row">

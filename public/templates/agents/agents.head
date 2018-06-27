@@ -116,3 +116,8 @@
         </md-card>
     </div>
     <!-- No results section -->
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
