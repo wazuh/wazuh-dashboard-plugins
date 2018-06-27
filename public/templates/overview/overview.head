@@ -25,8 +25,8 @@
         <!-- Reporting button section -->
         <div ng-show="tab !== 'welcome'">
             <!-- Report button -->
-            <md-button class="wz-button-flat small" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()" aria-label="Generate report button">
-                <i class="fa fa-fw fa-file-text" aria-hidden="true"></i> Generate report
+            <md-button md-no-ink class="md-icon-button small wz-no-margin-padding" tooltip="Generate report" tooltip-placement="bottom" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="startVis2Png()" aria-label="Generate report button">
+                <i class="fa fa-fw fa-print" aria-hidden="true"></i>
             </md-button>
         </div>
         <!-- End Reporting buttons section -->
