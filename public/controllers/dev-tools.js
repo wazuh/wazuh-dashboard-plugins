@@ -249,7 +249,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             const extra = inlineSplit && inlineSplit[1] ? 
                           queryString.parse(inlineSplit[1]) :
                           {};
- 
+           
             const req = requestCopy ?
                         requestCopy.startsWith('/') ? 
                         requestCopy :  
@@ -262,6 +262,9 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             } catch(error) {
                 JSONraw = {}
             }
+
+            if(typeof extra.pretty !== 'undefined')   delete extra.pretty;
+            if(typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
 
             // Assign inline parameters
             for(const key in extra) JSONraw[key] = extra[key];
