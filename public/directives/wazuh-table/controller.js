@@ -47,7 +47,7 @@ app.directive('wazuhTable', function() {
                 } else if(instance.path === '/cluster/nodes') {
                     $scope.$emit('wazuhShowClusterNode',{node:item})
                 }
-            }
+            };
 
             let realTime = false;
 
@@ -79,6 +79,7 @@ app.directive('wazuhTable', function() {
                     }
                 }
             };
+
             $scope.range = function (size,start, end) {
                 const ret = [];        
                             
@@ -109,8 +110,8 @@ app.directive('wazuhTable', function() {
             };
             ////////////////////////////////////
 
-            const instance = new DataFactory(apiReq,$scope.path,$scope.implicitFilter)
-            $scope.items = []
+            const instance = new DataFactory(apiReq,$scope.path,$scope.implicitFilter);
+            $scope.items = [];
 
             $scope.sort = async field => {
                 try {
@@ -131,7 +132,7 @@ app.directive('wazuhTable', function() {
                     errorHandler.handle(error,'Data factory')
                 }
                 return;
-            }
+            };
 
             const search = async (term, removeFilters) => {
                 try {
@@ -152,7 +153,7 @@ app.directive('wazuhTable', function() {
                     errorHandler.handle(error,'Data factory')
                 }
                 return;
-            }
+            };
 
             const filter = async filter => {
                 try {
@@ -179,26 +180,26 @@ app.directive('wazuhTable', function() {
                     errorHandler.handle(error,'Data factory')                    
                 }
                 return;
-            }
+            };
 
             $scope.$on('wazuhUpdateInstancePath',(event,parameters) => {
                 instance.path = parameters.path;
                 return init();
-            })
+            });
 
             $scope.$on('wazuhFilter',(event,parameters) => {
                 return filter(parameters.filter)
-            })
+            });
 
             $scope.$on('wazuhSearch',(event,parameters) => {
                 return search(parameters.term,parameters.removeFilters)
-            })
+            });
 
             $scope.$on('wazuhRemoveFilter',(event,parameters) => {
                 instance.filters = instance.filters.filter(item => item.name !== parameters.filterName);
                 wzTableFilter.set(instance.filters)
                 return init();
-            })
+            });
 
             const realTimeFunction = async () => {
                 try {
@@ -218,24 +219,24 @@ app.directive('wazuhTable', function() {
                     errorHandler.handle(error,'Data factory')                    
                 }
                 return;
-            }
+            };
 
             $scope.$on('wazuhPlayRealTime',() => {
                 realTime = true;
                 return realTimeFunction();
-            })
+            });
 
             $scope.$on('wazuhStopRealTime',() => {
                 realTime = false;
                 return init();
-            })
+            });
 
             const checkGap = () => {
-                const gap = items.length / 20;
-                const gapInteger = parseInt(items.length / 20);
-                $scope.gap = gap - parseInt(items.length / 20) > 0 ? gapInteger + 1 : gapInteger;
+                const gap = items.length / $scope.itemsPerPage;
+                const gapInteger = parseInt(gap);
+                $scope.gap = gap - gapInteger > 0 ? gapInteger + 1 : gapInteger;
                 if($scope.gap > 5) $scope.gap = 5;
-            }
+            };
 
             const init = async () => {
                 try {
@@ -254,9 +255,9 @@ app.directive('wazuhTable', function() {
                     errorHandler.handle(error,'Data factory')                    
                 }
                 return;
-            }
+            };
 
-            init()
+            init();
 
             const splitArray = array => {
                 if(Array.isArray(array)){
@@ -267,18 +268,18 @@ app.directive('wazuhTable', function() {
                     return str;
                 }
                 return array;
-            }
+            };
 
             $scope.checkIfArray = item => {
                 return typeof item === 'object' ? 
                        splitArray(item) :
                        item == 0 ? '0' : item;
-            }
+            };
 
             $scope.$on('$destroy',() => {
                 realTime = null;
-                wzTableFilter.set([])
-            })
+                wzTableFilter.set([]);
+            });
 
         },
         template: template
@@ -287,7 +288,7 @@ app.directive('wazuhTable', function() {
 .service('wzTableFilter',() => {
     const filters = [];
     return {
-        set: array => { if(Array.isArray(array)) { filters.length = 0; filters.push(...array) } },
+        set: array => { if(Array.isArray(array)) { filters.length = 0; filters.push(...array); } },
         get: () => filters
-    }
-})
+    };
+});
