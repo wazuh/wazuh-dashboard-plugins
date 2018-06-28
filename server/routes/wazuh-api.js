@@ -42,18 +42,6 @@ export default (server, options) => {
     // Returns data from the Wazuh API on CSV readable format
     server.route({ method: 'POST', path: '/api/wazuh-api/csv', handler: (req,res) => ctrl.csv(req,res)})
 
-    // Builds a PDF report from multiple PNG images
-    server.route({ method: 'POST', path: '/api/wazuh-api/report', handler: (req,res) => ctrl.report(req,res)});
-
-    // Fetch specific report
-    server.route({ method: 'GET', path: '/api/wazuh-api/report/{name}', handler: (req,res) => ctrl.getReportByName(req,res)});
-
-    // Delete specific report
-    server.route({ method: 'DELETE', path: '/api/wazuh-api/report/{name}', handler: (req,res) => ctrl.deleteReportByName(req,res)});
-
-    // Fetch the reports list
-    server.route({ method: 'GET', path: '/api/wazuh-api/reports', handler: (req,res) => ctrl.getReports(req,res)});
-
     // Returns total RAM available from the current machine where Kibana is being executed
     server.route({ method: 'GET', path: '/api/wazuh-api/ram', handler: (req,res) => ctrl.totalRam(req,res)})
 

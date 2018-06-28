@@ -25,7 +25,7 @@ app.controller('reportingController', function ($scope, errorHandler, genericReq
     const load = async () => {
         try {
             $scope.loading = true;
-            const data = await genericReq.request('GET','/api/wazuh-api/reports',{});
+            const data = await genericReq.request('GET','/api/wazuh-reporting/reports',{});
             items = data.data.list;
             const gap = items.length / 20;
             const gapInteger = parseInt(items.length / 20);
@@ -46,7 +46,7 @@ app.controller('reportingController', function ($scope, errorHandler, genericReq
     $scope.deleteReport = async name => {
         try {
             $scope.loading = true;
-            await genericReq.request('DELETE','/api/wazuh-api/report/' + name,{})
+            await genericReq.request('DELETE','/api/wazuh-reporting/report/' + name,{})
             await load();
             errorHandler.info('Success','Reporting');
         } catch (error) {

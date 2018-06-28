@@ -52,7 +52,7 @@ uiModules.get('app/wazuh', [])
                     isAgents
                 };
 
-                await genericReq.request('POST','/api/wazuh-api/report',data);
+                await genericReq.request('POST','/api/wazuh-reporting/report',data);
 
                 $rootScope.reportBusy = false;
                 $rootScope.reportStatus = false;
