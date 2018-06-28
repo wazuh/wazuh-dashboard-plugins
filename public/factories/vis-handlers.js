@@ -19,17 +19,36 @@ app.factory('visHandlers', function() {
 
     const addItem = item => {
         list.push(item);
-    }
+    };
 
     const getList = () => {
         return list;
-    }
+    };
 
     const getAppliedFilters = () => {
         let appliedFilters = {};
+
+        // Check raw response from all rendered tables
+        const tables = list.filter(item => item._scope &&
+                                           item._scope.savedObj &&
+                                           item._scope.savedObj.vis &&
+                                           item._scope.savedObj.vis.type &&
+                                           item._scope.savedObj.vis.type.type === 'table')
+                            .map(item => (item._scope &&
+                                          item._scope.savedObj &&
+                                          item._scope.savedObj.vis &&
+                                          item._scope.savedObj.vis.searchSource &&
+                                          item._scope.savedObj.vis.searchSource.rawResponse) ? 
+                                          item._scope.savedObj.vis.searchSource.rawResponse : 
+                                          false);
+        
         if(list && list.length) {
-            const filters = list[0]._scope.savedObj.vis.API.queryFilter.getFilters()
+            // Parse applied filters for the first visualization
+            const filters = list[0]._scope.savedObj.vis.API.queryFilter.getFilters();
+
+            // Parse current time range
             const { from, to } = list[0]._scope.savedObj.vis.API.timeFilter.time;
+
             appliedFilters = {
                 filters,
                 time:{
@@ -38,11 +57,12 @@ app.factory('visHandlers', function() {
                 },
                 searchBar: list[0] && list[0]._scope && list[0]._scope.appState && list[0]._scope.appState.query && list[0]._scope.appState.query.query ? 
                            list[0]._scope.appState.query.query :
-                           false
-            }
+                           false,
+                tables
+            };
         }
         return appliedFilters;
-    }
+    };
 
     const hasData = () => {
         for(const item of list) {
@@ -54,7 +74,7 @@ app.factory('visHandlers', function() {
                 }
         }
         return false;
-    }
+    };
 
     const removeAll = () => {
         for(const item of list){
@@ -66,7 +86,7 @@ app.factory('visHandlers', function() {
             }
         }
         list = [];
-    }
+    };
   
     return {
       addItem,
