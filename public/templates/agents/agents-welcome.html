@@ -1,7 +1,58 @@
-<div class='uil-ring-css' ng-show="load">
-    <div></div>
-</div>
 <div flex layout="column" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load">
+
+    <!-- Agent information section -->
+    <div layout="row" layout-align="start center">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div class="wz-text-truncatable" flex>
+                    Name: <span class="wz-text-bold">{{ agent.name }}</span>
+                    <md-tooltip ng-if="agent.name.length > 25" md-direction="bottom" class="wz-tooltip">
+                        Full name: {{ agent.name }}
+                    </md-tooltip>
+                </div>
+                <div class="wz-text-truncatable" flex>
+                    IP: <span class="wz-text-bold">{{ agent.ip }}</span>
+                </div>
+                <div class="wz-text-truncatable" flex ng-if="agent.group">
+                    Group: <span class="wz-text-bold wz-text-link" ng-click="goGroups(agent)">{{ agent.group }}</span>
+                </div>
+                <div class="wz-text-truncatable" flex ng-if="agent.version">
+                    Version: <span class="wz-text-bold">{{ agent.version }}</span>
+                </div>
+                <div class="wz-text-truncatable" flex>
+                    OS: <span class="wz-text-bold">{{ agentOS }}</span>
+                    <md-tooltip ng-if="agentOS.length > 25" md-direction="bottom" class="wz-tooltip">
+                        Full OS name: {{ agentOS }}
+                    </md-tooltip>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <div layout="row" layout-align="start center">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div class="wz-text-truncatable" flex>Last keep alive:<span class="wz-text-bold"> {{agent.lastKeepAlive || 'Unknown' }}</span></div>
+                <div class="wz-text-truncatable" flex>Registration date:<span class="wz-text-bold"> {{agent.dateAdd}}</span></div>
+                <div class="wz-text-truncatable" flex ng-if="agent.syscheck.inProgress">Last syscheck scan:<span class="wz-text-bold"> Scan in progress</span></div>
+                <div class="wz-text-truncatable" flex ng-if="!agent.syscheck.inProgress">Last syscheck scan:<span class="wz-text-bold"> {{agent.syscheck.end || 'Unknown'}}</span>
+                    <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom" class="wz-tooltip">
+                        Start time: {{ agent.syscheck.start || 'Unknown'}} <br>
+                        End time: {{ agent.syscheck.end || 'Unknown'}} <br>
+                        Duration time: {{ agent.syscheck.duration +' minutes' || 'Unknown'}}
+                    </md-tooltip>
+                </div>
+                <div class="wz-text-truncatable" flex ng-if="agent.rootcheck.inProgress">Last rootcheck scan:<span class="wz-text-bold"> Scan in progress</span></div>
+                <div class="wz-text-truncatable" flex ng-if="!agent.rootcheck.inProgress">Last rootcheck scan:<span class="wz-text-bold"> {{agent.rootcheck.end || 'Unknown'}}</span>
+                    <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom" class="wz-tooltip">
+                        Start time: {{ agent.rootcheck.start || 'Unknown'}} <br>
+                        End time: {{ agent.rootcheck.end || 'Unknown'}} <br>
+                        Duration time: {{ agent.rootcheck.duration +' minutes' || 'Unknown'}}
+                    </md-tooltip>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- End agent information section -->
 
     <!-- Host monitoring section -->
     <!-- Headline -->
@@ -11,16 +62,17 @@
     <!-- End headline -->
 
     <!-- Section cards -->
-    <div layout="row" layout-align="start start" layout-wrap>
+    <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- General -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-home" aria-hidden="true"></i> <span ng-click="switchTab('general')" class="wz-headline-title wz-text-link cursor-pointer">General</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-home" aria-hidden="true"></i> <span ng-click="switchTab('general')" class="wz-headline-title wz-text-link cursor-pointer">General</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Brief overview of your latest Wazuh alerts</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh capabilities documentation">
@@ -31,12 +83,13 @@
 
         <!-- File integrity monitoring -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-file" aria-hidden="true"></i> <span ng-click="switchTab('fim')" class="wz-headline-title wz-text-link cursor-pointer">File integrity</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-file" aria-hidden="true"></i> <span ng-click="switchTab('fim')" class="wz-headline-title wz-text-link cursor-pointer">File integrity</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Alerts from monitored files and directories</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html" class="wz-text-link cursor-pointer small" aria-label="Open File integrity documentation">
@@ -47,12 +100,13 @@
 
         <!-- Configuration -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> <span ng-click="switchTab('configuration')" class="wz-headline-title wz-text-link cursor-pointer">Configuration</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-cog" aria-hidden="true"></i> <span ng-click="switchTab('configuration')" class="wz-headline-title wz-text-link cursor-pointer">Configuration</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Check the group configuration for this agent</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html" class="wz-text-link cursor-pointer small" aria-label="Open Centralized configuration documentation">
@@ -63,12 +117,13 @@
 
         <!-- Inventory -->
         <md-card flex="25" class="wz-md-card" ng-if="syscollector && syscollector.os && syscollector.os.sysname">
-            <md-card-content>
-                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> <span ng-click="switchTab('syscollector')" class="wz-headline-title wz-text-link cursor-pointer">Inventory</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-cog" aria-hidden="true"></i> <span ng-click="switchTab('syscollector')" class="wz-headline-title wz-text-link cursor-pointer">Inventory</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Check the agent hardware and its installed software</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html" class="wz-text-link cursor-pointer small" aria-label="Open Syscollector documentation">
@@ -88,16 +143,17 @@
     <!-- End headline -->
 
     <!-- Section cards -->
-    <div layout="row" layout-align="start start" layout-wrap>
+    <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- Policy monitoring -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-desktop" aria-hidden="true"></i> <span ng-click="switchTab('pm')" class="wz-headline-title wz-text-link cursor-pointer">Policy Monitoring</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-desktop" aria-hidden="true"></i> <span ng-click="switchTab('pm')" class="wz-headline-title wz-text-link cursor-pointer">Policy Monitoring</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Anomalous behaviour detection</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/rootcheck/index.html" class="wz-text-link cursor-pointer small" aria-label="Open AWS documentation">
@@ -108,12 +164,13 @@
 
         <!-- Audit -->
         <md-card flex="25" class="wz-md-card" ng-show="extensions.audit">
-            <md-card-content>
-                <i class="fa fa-fw fa-balance-scale" aria-hidden="true"></i> <span ng-click="switchTab('audit')" class="wz-headline-title wz-text-link cursor-pointer">Audit</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-balance-scale" aria-hidden="true"></i> <span ng-click="switchTab('audit')" class="wz-headline-title wz-text-link cursor-pointer">Audit</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Linux Audit system alerts</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/system-calls-monitoring/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Audit documentation">
@@ -124,12 +181,13 @@
 
         <!-- Open SCAP -->
         <md-card flex="25" class="wz-md-card" ng-show="extensions.oscap">
-            <md-card-content>
-                <i class="fa fa-fw fa-search" aria-hidden="true"></i> <span ng-click="switchTab('oscap')" class="wz-headline-title wz-text-link cursor-pointer">Open SCAP</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-search" aria-hidden="true"></i> <span ng-click="switchTab('oscap')" class="wz-headline-title wz-text-link cursor-pointer">Open SCAP</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Alerts about OpenSCAP security policies</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/openscap/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Open SCAP documentation">
@@ -140,12 +198,13 @@
 
         <!-- CIS-CAT -->
         <md-card flex="25" class="wz-md-card" ng-show="extensions.ciscat">
-            <md-card-content>
-                <i class="fa fa-fw fa-rocket" aria-hidden="true"></i> <span ng-click="switchTab('ciscat')" class="wz-headline-title wz-text-link cursor-pointer">CIS-CAT</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> <span ng-click="switchTab('ciscat')" class="wz-headline-title wz-text-link cursor-pointer">CIS-CAT</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Alerts from CIS benchmark assessments</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html" class="wz-text-link cursor-pointer small" aria-label="Open CIS-CAT integration documentation">
@@ -165,16 +224,17 @@
     <!-- End headline -->
 
     <!-- Section cards -->
-    <div layout="row" layout-align="start start" layout-wrap>
+    <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- Vulnerability detection -->
         <md-card flex="25" class="wz-md-card">
-            <md-card-content>
-                <i class="fa fa-fw fa-file-text" aria-hidden="true"></i> <span ng-click="switchTab('vuls')" class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-file-text" aria-hidden="true"></i> <span ng-click="switchTab('vuls')" class="wz-headline-title wz-text-link cursor-pointer">Vulnerabilities</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Alerts about known vulnerabilities on your applications</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/vulnerability-detection.html" class="wz-text-link cursor-pointer small" aria-label="Open Vulnerabilities documentation">
@@ -185,12 +245,13 @@
 
         <!-- VirusTotal -->
         <md-card flex="25" class="wz-md-card" ng-show="extensions.virustotal">
-            <md-card-content>
-                <i class="fa fa-fw fa-bug" aria-hidden="true"></i> <span ng-click="switchTab('virustotal')" class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-bug" aria-hidden="true"></i> <span ng-click="switchTab('virustotal')" class="wz-headline-title wz-text-link cursor-pointer">VirusTotal</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>Alerts from VirusTotal malicious content scans</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html" class="wz-text-link cursor-pointer small" aria-label="Open VirusTotal integration documentation">
@@ -210,16 +271,17 @@
     <!-- End headline -->
 
     <!-- Section cards -->
-    <div layout="row" layout-align="start start" layout-wrap ng-show="extensions.pci || extensions.gdpr">
+    <div layout="row" layout-align="start stretch" layout-wrap ng-show="extensions.pci || extensions.gdpr">
 
         <!-- PCI DSS -->
         <md-card flex="25" class="wz-md-card" ng-show="extensions.pci">
-            <md-card-content>
-                <i class="fa fa-fw fa-credit-card" aria-hidden="true"></i> <span ng-click="switchTab('pci')" class="wz-headline-title wz-text-link cursor-pointer">PCI DSS</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-credit-card" aria-hidden="true"></i> <span ng-click="switchTab('pci')" class="wz-headline-title wz-text-link cursor-pointer">PCI DSS</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>PCI DSS compliance alerts</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/pci-dss/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh PCI DSS documentation">
@@ -230,12 +292,13 @@
 
         <!-- GDPR -->
         <md-card flex="25" class="wz-md-card" ng-show="extensions.gdpr">
-            <md-card-content>
-                <i class="fa fa-fw fa-list-ol" aria-hidden="true"></i> <span ng-click="switchTab('gdpr')" class="wz-headline-title wz-text-link cursor-pointer">GDPR</span>
+            <md-card-content flex layout="column">
+                <span><i class="fa fa-fw fa-list-ol" aria-hidden="true"></i> <span ng-click="switchTab('gdpr')" class="wz-headline-title wz-text-link cursor-pointer">GDPR</span></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p>GDPR compliance alerts</p>
                 </div>
+                <span flex></span>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
                 <md-button target="_blank" href="https://documentation.wazuh.com/current/gdpr/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh GDPR documentation">
