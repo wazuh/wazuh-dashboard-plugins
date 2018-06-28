@@ -12,7 +12,6 @@
 import needle             from 'needle'
 import colors             from 'ansicolors'
 import log                from './logger'
-import knownFields        from './integration-files/known-fields'
 import ElasticWrapper     from './lib/elastic-wrapper'
 import packageJSON        from '../package.json'
 import kibana_template    from './integration-files/kibana-template'
@@ -29,37 +28,18 @@ export default (server, options) => {
 
     log('[initialize]', `App revision: ${packageJSON.revision || 'missing revision'}`, 'info');
 
-    let objects = {};
-    let app_objects = {};
     let configurationFile = {};
     let pattern = null;
     // Read config from package.json and config.yml
     try {
         configurationFile = getConfiguration();
 
-        global.loginEnabled = (configurationFile && typeof configurationFile['login.enabled'] !== 'undefined') ? configurationFile['login.enabled'] : false;
         pattern = (configurationFile && typeof configurationFile.pattern !== 'undefined') ? configurationFile.pattern : 'wazuh-alerts-3.x-*';
         global.XPACK_RBAC_ENABLED = (configurationFile && typeof configurationFile['xpack.rbac.enabled'] !== 'undefined') ? configurationFile['xpack.rbac.enabled'] : true;
 
     } catch (e) {
         log('[initialize]', e.message || e);
         server.log([blueWazuh, 'initialize', 'error'], 'Something went wrong while reading the configuration.' + e.message);
-    }
-
-    if (typeof global.sessions === 'undefined') {
-        global.sessions = {};
-    }
-
-    global.protectedRoute = req => {
-        if (!loginEnabled) return true;
-        const session = (req.headers && req.headers.code) ? sessions[req.headers.code] : null;
-        if (!session) return false;
-        const timeElapsed = (new Date() - session.created) / 1000;
-        if (timeElapsed >= session.exp) {
-            delete sessions[req.payload.code];
-            return false;
-        }
-        return true;
     }
 
     const defaultIndexPattern = pattern || "wazuh-alerts-3.x-*";
