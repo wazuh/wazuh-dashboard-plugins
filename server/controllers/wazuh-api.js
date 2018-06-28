@@ -11,22 +11,23 @@
  */
 
 // Require some libraries
-import needle              from 'needle'
-import path                from 'path'
-import colors              from 'ansicolors'
-import pciRequirementsFile from '../integration-files/pci-requirements'
-import gdprRequirementsFile from '../integration-files/gdpr-requirements'
-import ElasticWrapper      from '../lib/elastic-wrapper'
-import getPath             from '../../util/get-path'
-import packageInfo         from '../../package.json'
-import monitoring          from '../monitoring'
-import ErrorResponse       from './error-response'
+import needle              from 'needle';
+import path                from 'path';
+import colors              from 'ansicolors';
+import pciRequirementsFile from '../integration-files/pci-requirements';
+import gdprRequirementsFile from '../integration-files/gdpr-requirements';
+import ElasticWrapper      from '../lib/elastic-wrapper';
+import getPath             from '../../util/get-path';
+import packageInfo         from '../../package.json';
+import monitoring          from '../monitoring';
+import ErrorResponse       from './error-response';
 import { Parser }          from 'json2csv';
-import getConfiguration    from '../lib/get-configuration'
-import PDFDocument         from 'pdfkit'
-import fs                  from 'fs'
-import descriptions        from '../reporting/tab-description'
-import * as TimSort        from 'timsort'
+import getConfiguration    from '../lib/get-configuration';
+import PDFDocument         from 'pdfkit';
+import fs                  from 'fs';
+import descriptions        from '../reporting/tab-description';
+import * as TimSort        from 'timsort';
+import rawParser           from '../reporting/raw-parser';
 
 import { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations } from '../integration-files/visualizations'
 
@@ -651,6 +652,15 @@ export default class WazuhApi {
                     doc.x -= 10;
                 }
 
+                // Rendering tables
+                if(req.payload.tables) {
+                    for(const table of req.payload.tables) {
+                        const rows = rawParser(table);                            
+                        if(Array.isArray(rows) && rows.length){
+                            // Build table
+                        }
+                    }
+                }
 
                 doc.fontSize(12).text(descriptions[tab].description)
                 doc.moveDown()
