@@ -34,13 +34,32 @@ app.factory('visHandlers', function() {
                                            item._scope.savedObj.vis &&
                                            item._scope.savedObj.vis.type &&
                                            item._scope.savedObj.vis.type.type === 'table')
-                            .map(item => (item._scope &&
-                                          item._scope.savedObj &&
-                                          item._scope.savedObj.vis &&
-                                          item._scope.savedObj.vis.searchSource &&
-                                          item._scope.savedObj.vis.searchSource.rawResponse) ? 
-                                          item._scope.savedObj.vis.searchSource.rawResponse : 
-                                          false);
+                            .map(item => {
+                                const columns = []; 
+                                for(const agg of item._scope.savedObj._source.visState.aggs){
+                                    if(agg.type === 'count') continue;
+                                    if(agg.params && agg.params.customLabel){
+                                        columns.push(agg.params.customLabel);
+                                    } else {
+                                        columns.push('Column');
+                                    }
+                                }
+                                columns.push('Count');
+                                
+                                return (item._scope &&
+                                        item._scope.savedObj &&
+                                        item._scope.savedObj.vis &&
+                                        item._scope.savedObj.vis.searchSource &&
+                                        item._scope.savedObj.vis.searchSource.rawResponse) ? 
+                                        {
+                                            rawResponse: item._scope.savedObj.vis.searchSource.rawResponse,
+                                            title: (item._scope && item._scope.savedObj && item._scope.savedObj.title) ?
+                                                    item._scope.savedObj.title :
+                                                    'Table',
+                                            columns
+                                        } : 
+                                        false;
+                            });
         
         if(list && list.length) {
             // Parse applied filters for the first visualization
