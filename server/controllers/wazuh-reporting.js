@@ -84,8 +84,9 @@ export default class WazuhReportingCtrl {
 
     renderTables(tables) {
         for (const table of tables) {
-            const rows = rawParser(table.rawResponse);
-            if (Array.isArray(rows) && rows.length) {
+            const rowsparsed = rawParser(table.rawResponse);
+            if (Array.isArray(rowsparsed) && rowsparsed.length) {
+                const rows = rowsparsed.length > 100 ? rowsparsed.slice(0,99) : rowsparsed;
                 this.dd.content.push({ text: table.title, style: 'subtitlenobold', pageBreak: 'before' });
                 this.dd.content.push('\n');
                 const full_body = [];
