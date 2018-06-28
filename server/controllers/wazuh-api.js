@@ -13,7 +13,6 @@
 // Require some libraries
 import needle              from 'needle'
 import path                from 'path'
-import colors              from 'ansicolors'
 import pciRequirementsFile from '../integration-files/pci-requirements'
 import gdprRequirementsFile from '../integration-files/gdpr-requirements'
 import ElasticWrapper      from '../lib/elastic-wrapper'
@@ -28,12 +27,9 @@ import fs                  from 'fs'
 import descriptions        from '../reporting/tab-description'
 import * as TimSort        from 'timsort'
 
-import { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations } from '../integration-files/visualizations'
+import { AgentsVisualizations, OverviewVisualizations } from '../integration-files/visualizations'
 
 import { totalmem }        from 'os'
-
-
-const blueWazuh = colors.blue('wazuh');
 
 export default class WazuhApi {
     constructor(server){
@@ -43,7 +39,7 @@ export default class WazuhApi {
 
     async checkStoredAPI (req, reply) {
         try{
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3001, 401, reply);
+
             // Get config from elasticsearch
             const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
             if (wapi_config.error_code > 1) {
@@ -268,8 +264,6 @@ export default class WazuhApi {
     async getPciRequirement (req, reply) {
         try {
 
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3006, 401, reply);
-
             let pci_description = '';
 
             if (req.params.requirement === 'all') {
@@ -325,11 +319,6 @@ export default class WazuhApi {
 
     async getGdprRequirement (req, reply) {
         try {
-
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3023, 401, reply);
-
-
-
             let gdpr_description = '';
 
             if (req.params.requirement === 'all') {
@@ -445,7 +434,6 @@ export default class WazuhApi {
     }
 
     requestApi (req, reply) {
-        if(!protectedRoute(req)) return ErrorResponse('Session expired', 3014, 401, reply);
         if (!req.payload.method) {
             return ErrorResponse('Missing param: method', 3015, 400, reply);
         } else if (!req.payload.path) {
@@ -471,7 +459,6 @@ export default class WazuhApi {
     // Fetch agent status and insert it directly on demand
     async fetchAgents (req, reply) {
         try{
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3017, 401, reply);
             const output = await this.fetchAgentsExternal();
             return reply({
                 'statusCode': 200,
@@ -488,10 +475,6 @@ export default class WazuhApi {
         try{
             const configFile = getConfiguration();
 
-            if(configFile && configFile['login.password']){
-                delete configFile['login.password'];
-            }
-
             return reply({
                 statusCode: 200,
                 error     : 0,
@@ -500,35 +483,6 @@ export default class WazuhApi {
 
         } catch (error) {
             return ErrorResponse(error.message || error, 3019, 500, reply);
-        }
-    }
-
-    login(req,reply) {
-        try{
-
-            const configFile = getConfiguration();
-
-            if(!configFile){
-                throw new Error('Configuration file not found');
-            }
-
-            if(!req.payload.password) {
-                return ErrorResponse('Please give me a password.', 3020, 401, reply);
-            } else if(req.payload.password !== configFile['login.password']){
-                return ErrorResponse('Wrong password, please try again.', 3021, 401, reply);
-            }
-
-            const code = (new Date()-1) + 'wazuhapp';
-
-            sessions[code] = {
-                created: new Date(),
-                exp    : 86400
-            }
-
-            return reply({ statusCode: 200, error: 0, code });
-
-        } catch (error) {
-            return ErrorResponse(error.message || error, 3022, 500, reply);
         }
     }
 
