@@ -11,14 +11,20 @@
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
             <div ng-if="tab !== 'welcome'">
                 <i class="fa fa-fw fa-tv" aria-hidden="true"></i>
-                <span class="wz-text-link wz-text-bold cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
-                <span> / {{ tabNames[tab] }}</span>
+                <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
+                <span> / </span>
+                <span>{{ tabNames[tab] }}</span>
             </div>
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
             <div ng-if="tab === 'welcome'">
                 <i class="fa fa-fw fa-tv" aria-hidden="true"></i>
-                <span class="wz-text-bold">{{agent.name}} ({{agent.id}})</span>
-                <span> / Welcome</span>
+                <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
+                <span> / </span>
+                <span>{{agent.name}} ({{agent.id}})</span>
+                <span> / </span>
+                <span>Welcome</span>
             </div>
         </div>
         <!-- End breadcrumbs -->
