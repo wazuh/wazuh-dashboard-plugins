@@ -228,7 +228,9 @@ export default class WazuhReportingCtrl {
     
     async report(req, reply) {
         try {
-
+            // Init
+            this.printer    = new PdfPrinter(this.fonts);
+            this.dd.content = [];
             if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'))) {
                 fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
             }
