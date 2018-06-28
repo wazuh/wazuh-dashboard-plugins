@@ -16,6 +16,7 @@ import wazuhElastic    from './server/routes/wazuh-elastic';
 import wazuhApiElastic from './server/routes/wazuh-api-elastic';
 import monitoring      from './server/monitoring';
 import wazuhApi        from './server/routes/wazuh-api';
+import wazuhReporting  from './server/routes/wazuh-reporting';
 
 export default (server, options) => {
     initialize(server, options);
@@ -23,4 +24,5 @@ export default (server, options) => {
     wazuhApiElastic(server, options);
     monitoring(server, false);
     wazuhApi(server, options);
+    wazuhReporting(server, options);
 };

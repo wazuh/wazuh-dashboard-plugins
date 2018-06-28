@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
-import $            from 'jquery'
+import { uiModules } from 'ui/modules';
+import $             from 'jquery';
 
 uiModules.get('app/wazuh', [])
 .service('reportingService', function ($rootScope, vis2png, rawVisualizations, visHandlers, genericReq, errorHandler) {
@@ -22,7 +22,7 @@ uiModules.get('app/wazuh', [])
                     return;
                 }
                 $rootScope.reportBusy = true;
-                $rootScope.reportStatus = 'Generating report...0%'
+                $rootScope.reportStatus = 'Generating report...0%';
                 if(!$rootScope.$$phase) $rootScope.$digest();
 
                 vis2png.clear();
@@ -31,12 +31,12 @@ uiModules.get('app/wazuh', [])
 
                 for(const item of idArray) {
                     const tmpHTMLElement = $(`#${item}`);
-                    vis2png.assignHTMLItem(item,tmpHTMLElement)
+                    vis2png.assignHTMLItem(item,tmpHTMLElement);
                 }
 
                 const appliedFilters = visHandlers.getAppliedFilters();
 
-                const array = await vis2png.checkArray(idArray)
+                const array = await vis2png.checkArray(idArray);
                 const name  = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${Date.now() / 1000 | 0}.pdf`
 
                 const data = {
@@ -46,12 +46,13 @@ uiModules.get('app/wazuh', [])
                     filters: appliedFilters.filters,
                     time: appliedFilters.time,
                     searchBar: appliedFilters.searchBar,
+                    tables: appliedFilters.tables,
                     tab,
                     section: isAgents ? 'agents' : 'overview',
                     isAgents
                 };
 
-                const request = await genericReq.request('POST','/api/wazuh-api/report',data)
+                await genericReq.request('POST','/api/wazuh-reporting/report',data);
 
                 $rootScope.reportBusy = false;
                 $rootScope.reportStatus = false;
@@ -62,8 +63,8 @@ uiModules.get('app/wazuh', [])
             } catch (error) {
                 $rootScope.reportBusy = false;
                 $rootScope.reportStatus = false;
-                errorHandler.handle(error, 'Reporting')
+                errorHandler.handle(error, 'Reporting');
             }
         }
-    }
+    };
 });

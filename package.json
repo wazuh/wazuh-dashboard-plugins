@@ -36,7 +36,7 @@
         "lodash": "3.10.1",
         "needle": "^2.0.1",
         "node-cron": "^1.1.2",
-        "pdfkit": "^0.8.3",
+        "pdfmake": "^0.1.37",
         "query-string": "5.1.1",
         "timsort": "^0.3.0",
         "winston": "3.0.0-rc1"
