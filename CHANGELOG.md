@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 -   Fixed bug on _Agents CIS-CAT_ tab who wasn't loading the appropriate visualizations ([#626](https://github.com/wazuh/wazuh-kibana-app/pull/626)).
+-   Fixed a bug where sometimes the index pattern could be `undefined` during the healthcheck process, leading into a false error message when loading the app ([#640](https://github.com/wazuh/wazuh-kibana-app/pull/640)).
 
 ### Removed
 
