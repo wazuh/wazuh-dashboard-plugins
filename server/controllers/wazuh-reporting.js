@@ -96,10 +96,13 @@ export default class WazuhReportingCtrl {
                         -1 :
                         0;
                 TimSort.sort(rows, sortFunction);
+                const widths = Array(table.columns.length).fill('*');
+                
                 full_body.push(table.columns, ...rows);
                 this.dd.content.push({
                     fontSize:8,
                     table: {
+                        widths,
                         body: full_body
                     },
                     layout: 'lightHorizontalLines'
