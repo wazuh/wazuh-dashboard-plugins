@@ -49,7 +49,7 @@ export default class WazuhReportingCtrl {
                     bold: true
                 },
                 subtitlenobold: {
-                    fontSize: 14
+                    fontSize: 12
                 },
                 quote: {
                     color: 'gray',
@@ -88,7 +88,7 @@ export default class WazuhReportingCtrl {
             if (Array.isArray(rowsparsed) && rowsparsed.length) {
                 const rows = rowsparsed.length > 100 ? rowsparsed.slice(0,99) : rowsparsed;
                 this.dd.content.push({ text: table.title, style: 'subtitlenobold', pageBreak: 'before' });
-                this.dd.content.push('\n');
+
                 const full_body = [];
                 const sortFunction = (a, b) => parseInt(a[a.length - 1]) < parseInt(b[b.length - 1]) ?
                     1 :
@@ -98,6 +98,7 @@ export default class WazuhReportingCtrl {
                 TimSort.sort(rows, sortFunction);
                 full_body.push(table.columns, ...rows);
                 this.dd.content.push({
+                    fontSize:8,
                     table: {
                         body: full_body
                     },
@@ -116,12 +117,13 @@ export default class WazuhReportingCtrl {
                 {
 
                     image: path.join(__dirname, '../reporting/clock.png'),
-                    width: 14,
-                    height: 14
+                    width: 10,
+                    height: 10
                 },
                 {
-                    margin: [10, 0, 0, 0],
-                    text: str
+                    margin: [5, 0, 0, 0],
+                    text: str,
+                    fontSize: 10
                 }
             ]
         });
@@ -145,17 +147,18 @@ export default class WazuhReportingCtrl {
         this.dd.content.push({
             columns: [{
                 image: path.join(__dirname, '../reporting/filters.png'),
-                width: 14,
-                height: 14
+                width: 10,
+                height: 10
             },{
-                margin: [10, 0, 0, 0],
-                text: str
+                margin: [5, 0, 0, 0],
+                text: str,
+                fontSize: 10
             }]
         });
         this.dd.content.push('\n');
     }
 
-    renderHeader(section, tab) {
+    renderHeader(section, tab, isAgents) {
         if (section && typeof section === 'string') {
             this.dd.content.push({
                 text: descriptions[tab].title + ' report', style: 'title'
@@ -163,8 +166,15 @@ export default class WazuhReportingCtrl {
             this.dd.content.push('\n');
         }
 
-        this.dd.content.push({ text: descriptions[tab].description, style: 'quote' });
-        this.dd.content.push('\n');
+        if(isAgents && typeof isAgents === 'string'){
+            this.dd.content.push({text: `Report for agent ${isAgents}`, style:'subtitlenobold'});
+            this.dd.content.push('\n');
+        }
+
+        if(descriptions[tab] && descriptions[tab].description){
+            this.dd.content.push({ text: descriptions[tab].description, style: 'quote' });
+            this.dd.content.push('\n');
+        }
     }
 
     checkTitle(item, isAgents, tab) {
@@ -181,7 +191,7 @@ export default class WazuhReportingCtrl {
         for (const item of single_vis) {
             const title = this.checkTitle(item, isAgents, tab);
             this.dd.content.push({ text: title[0]._source.title, style: 'subtitlenobold' });
-            this.dd.content.push({ image: item.element, width: 280 * 2, margin: [0, 0, 10, 0] });
+            this.dd.content.push({ columns: [ { image: item.element, width: 500 } ] });
             this.dd.content.push('\n');
         }
 
@@ -202,8 +212,8 @@ export default class WazuhReportingCtrl {
 
                 this.dd.content.push({
                     columns: [
-                        { image: pair[0].element, width: 280 },
-                        { image: pair[1].element, width: 280 }
+                        { image: pair[0].element, width: 270 },
+                        { image: pair[1].element, width: 270 }
                     ]
                 });
 
@@ -238,7 +248,7 @@ export default class WazuhReportingCtrl {
             if (req.payload && req.payload.array) {
                 const tab = req.payload.tab;
 
-                this.renderHeader(req.payload.section, tab);
+                this.renderHeader(req.payload.section, tab, req.payload.isAgents);
 
                 if (req.payload.time) {
                     this.renderTimeRange(req.payload.time.from, req.payload.time.to);
