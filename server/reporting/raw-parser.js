@@ -18,22 +18,26 @@ const generate_tree = data_set => {
     if(!data_set || !data_set.aggregations|| !data_set.aggregations['2'] || !data_set.aggregations['2'].buckets) {
         return {};
     }
+    let min_size = 0;
     const tree = {};
     for (const main_bucket of data_set.aggregations['2'].buckets) {
         if (!tree[main_bucket.key]) tree[main_bucket.key] = {};
-
+        if(min_size < 1) min_size = 1
         if (main_bucket['3'] && main_bucket['3'].buckets) {
 
             for (const sub_bucket of main_bucket['3'].buckets) {
+                if(min_size < 3) min_size = 3
                 if (!tree[main_bucket.key][sub_bucket.key]) tree[main_bucket.key][sub_bucket.key] = {};
 
                 if (sub_bucket['4'] && sub_bucket['4'].buckets) {
 
                     for (const sub_sub_bucket of sub_bucket['4'].buckets) {
+                        if(min_size < 4) min_size = 4
                         if (!tree[main_bucket.key][sub_bucket.key][sub_sub_bucket.key]) tree[main_bucket.key][sub_bucket.key][sub_sub_bucket.key] = {}
 
                         if (sub_sub_bucket['5'] && sub_sub_bucket['5'].buckets) {
                             for (const sub_sub_sub_bucket of sub_sub_bucket['5'].buckets) {
+                                if(min_size < 5) min_size = 5
                                 if (!tree[main_bucket.key][sub_bucket.key][sub_sub_bucket.key][sub_sub_sub_bucket.key]) {
                                     tree[main_bucket.key][sub_bucket.key][sub_sub_bucket.key][sub_sub_sub_bucket.key] = {};
                                     tree[main_bucket.key][sub_bucket.key][sub_sub_bucket.key][sub_sub_sub_bucket.key][sub_sub_sub_bucket.doc_count] = false;
@@ -50,6 +54,7 @@ const generate_tree = data_set => {
 
                 if (sub_bucket['5'] && sub_bucket['5'].buckets) {
                     for (const sub_sub_bucket of sub_bucket['5'].buckets) {
+                        if(min_size < 4) min_size = 4
                         if (!tree[main_bucket.key][sub_bucket.key][sub_sub_bucket.key]) {
                             tree[main_bucket.key][sub_bucket.key][sub_sub_bucket.key] = {};
                             tree[main_bucket.key][sub_bucket.key][sub_sub_bucket.key][sub_sub_bucket.doc_count] = false;
@@ -68,6 +73,7 @@ const generate_tree = data_set => {
             tree[main_bucket.key][main_bucket.doc_count] = false;
         }
     }
+    tree.min_size = min_size;
     return tree;
 };
 
@@ -97,11 +103,15 @@ export default (data_set) => {
     try {
         const tree = generate_tree(data_set);
 
+        const min_size = tree.min_size;
+        delete tree.min_size;
+
         // Minimum validation for the generated tree
         if(!tree || !Object.keys(tree) || !Object.keys(tree).length) return [];
 
-        const rows = generate_rows(tree);
-
+        // All rows must have same length
+        const rows = generate_rows(tree).filter(item => item.length === min_size);
+        
         return rows;
     } catch (error) {
         return [];
