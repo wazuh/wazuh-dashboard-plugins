@@ -324,7 +324,7 @@ function (
         $scope.$broadcast('wazuhSearch',{term})
     }
 
-    $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab, true);
+    $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab, $scope.agent && $scope.agent.id ? $scope.agent.id : true);
 
     //Load
     try {
