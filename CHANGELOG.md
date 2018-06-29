@@ -2,9 +2,43 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.0 - Revision 398
+
+### Added
+
+-   Improvements for app tables ([#627](https://github.com/wazuh/wazuh-kibana-app/pull/627)):
+    -   Now the current page will be highlighted.
+    -   The gap has been fixed to the items per page value.
+    -   If there's no more pages for _Next_ or _Prev_ buttons, they will be hidden.
+-   Small app UI improvements ([#634](https://github.com/wazuh/wazuh-kibana-app/pull/634)):
+    -   Added link to the agents list on the Agents tab breadcrumbs.
+    -   Replaced the _Generate report_ button with a smaller one.
+    -   Redesigned _Management > Ruleset_ `md-chips` to look similar to Kibana filter pills.
+    -   Added agent information bar from _Agents > General_ to _Agents > Welcome_ too.
+    -   Refactored flex layout on _Welcome_ tabs to fix a height visual bug.
+    -   Removed duplicated loading rings on the _Agents_ tab.
+-   Changes to our reporting feature ([#639](https://github.com/wazuh/wazuh-kibana-app/pull/639)):
+    -   Now the generated reports will include tables for each section.
+    -   Added an parser for getting Elasticsearch data table responses.
+    -   The reporting feature is now a separated module, and the code has been refactored.
+
+### Changed
+
+-   Now the `pretty` parameter on the _Dev tools_ tab will be ignored to avoid `Unexpected error` messages ([#624](https://github.com/wazuh/wazuh-kibana-app/pull/624)).
+-   The `pdfkit` dependency has been replaced by `pdfmake` ([#639](https://github.com/wazuh/wazuh-kibana-app/pull/639)).
+
+### Fixed
+
+-   Fixed bug on _Agents CIS-CAT_ tab who wasn't loading the appropriate visualizations ([#626](https://github.com/wazuh/wazuh-kibana-app/pull/626)).
+
+### Removed
+
+-   Removed the app login system ([#636](https://github.com/wazuh/wazuh-kibana-app/pull/636)):
+    -   This feature was unstable, experimental and untested for a long time. We'll provide much better RBAC capabilities in the future.
+
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.0 - Revision 397
 
-## Added
+### Added
 
 -   Support for Elastic Stack v6.3.0 ([#579](https://github.com/wazuh/wazuh-kibana-app/pull/579) & [#612](https://github.com/wazuh/wazuh-kibana-app/pull/612) & [#615](https://github.com/wazuh/wazuh-kibana-app/pull/615)).
 -   Brand-new Wazuh app redesign for the _Monitoring_ tab ([#581](https://github.com/wazuh/wazuh-kibana-app/pull/581)):
@@ -30,19 +64,19 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   Performance and stability improvements when fetching API data.
     -   Now you can see the total amount of items and the elapsed time.
 
-## Changed
+### Changed
 
 -   Moved some logic from the _Agents preview_ tab to the server, to avoid excessive client-side workload ([#586](https://github.com/wazuh/wazuh-kibana-app/pull/586)).
 -   Changed the UI to use the same loading ring across all the app tabs ([#593](https://github.com/wazuh/wazuh-kibana-app/pull/593) & [#599](https://github.com/wazuh/wazuh-kibana-app/pull/599)).
 -   Changed the _No results_ message across all the tabs with visualizations ([#599](https://github.com/wazuh/wazuh-kibana-app/pull/599)).
 
-## Fixed
+### Fixed
 
 -   Fixed a bug on the _Settings/Extensions_ tab where enabling/disabling some extensions could make other ones to be disabled ([#591](https://github.com/wazuh/wazuh-kibana-app/pull/591)).
 
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.2.4 - Revision 396
 
-## Added
+### Added
 
 -   Support for Wazuh v3.3.1.
 -   Brand-new Wazuh app redesign for the _Settings_ tab ([#570](https://github.com/wazuh/wazuh-kibana-app/pull/570)):
@@ -54,11 +88,11 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   Added new services to provide similar functionality between different app tabs.
 -   Added `data.vulnerability.package.condition` to the list of known fields ([#566](https://github.com/wazuh/wazuh-kibana-app/pull/566)).
 
-## Changed
+### Changed
 
 -   The `wazuh-logs` and `wazuh-monitoring` folders have been moved to the Kibana's `optimize` directory in order to avoid some error messages when using the `kibana-plugin list` command ([#563](https://github.com/wazuh/wazuh-kibana-app/pull/563)).
 
-## Fixed
+### Fixed
 
 -   Fixed a bug on the _Settings_ tab where updating an API entry with wrong credentials would corrupt the existing one ([#558](https://github.com/wazuh/wazuh-kibana-app/pull/558)).
 -   Fixed a bug on the _Settings_ tab where removing an API entry while its edit form is opened would hide the `Add API` button unless the user reloads the tab ([#558](https://github.com/wazuh/wazuh-kibana-app/pull/558)).
