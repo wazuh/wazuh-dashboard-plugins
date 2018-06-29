@@ -33,6 +33,7 @@ routes
     .when('/health-check', {
         template: healthCheckTemplate,
         resolve: {
+            "ip": getIp,
             "checkAPI": settingsWizard
         }
     })
