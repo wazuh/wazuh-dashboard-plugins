@@ -57,41 +57,29 @@ export default class DataFactory {
     async fetch(options = {}) {
         try {     
             const start = new Date();
-            this.items       = [];       
-            let offset       = 0;
-            const limit      = options.limit || 2000;
+
+            // If offset is not given, it means we need to start again
+            if(!options.offset) this.items = [];       
+            const offset     = options.offset || 0;
+            const limit      = options.limit || 500;
             const parameters = { limit,offset };
             
             this.serializeFilters(parameters);
-            
 
-            const firstPage = await this.httpClient.request('GET', this.path, parameters)
-
-            this.items.push(...firstPage.data.data.items)
-            if(options.limit) {
-                if(this.path === '/agents') this.items = this.items.filter(item => item.id !== '000')
-                const end = new Date();
-                const elapsed = (end - start) / 1000
-                return {items:this.items, time:elapsed};   
-            }
+            // Fetch next <limit> items
+            const firstPage = await this.httpClient.request('GET', this.path, parameters);
+            this.items = this.items.filter(item => !!item);
+            this.items.push(...firstPage.data.data.items);
 
             const totalItems = firstPage.data.data.totalItems;
-            const remaining  = totalItems-firstPage.data.data.items.length;
 
-            const float_ops_number = remaining / limit;
-            const int_ops_number   = parseInt(float_ops_number);
-            const ops_number       = int_ops_number < float_ops_number ? int_ops_number + 1 : int_ops_number;     
+            const remaining  = this.items.length === totalItems ? 0 :
+                               totalItems-firstPage.data.data.items.length-this.items.length;
 
-            const ops = []
-            for(let i=0; i<ops_number; i++){
-                parameters.offset += limit;
-                const tmp_copy = {}
-                Object.assign(tmp_copy,parameters)
-                ops.push(this.httpClient.request('GET', this.path, tmp_copy))
-            }
-            const remainingItems = await Promise.all(ops);
-            remainingItems.map(page => this.items.push(...page.data.data.items))
-            if(this.path === '/agents') this.items = this.items.filter(item => item.id !== '000')
+            // Ignore manager as an agent, once the team solves this issue, review this line
+            if(this.path === '/agents') this.items = this.items.filter(item => item.id !== '000');
+
+            if(remaining > 0 )this.items.push(...Array(remaining).fill(null));
 
             const end = new Date();
             const elapsed = (end - start) / 1000;
@@ -105,7 +93,6 @@ export default class DataFactory {
 
     reset() {
         this.items   = [];
-        this.path    = path;
         this.filters = [];
         if(this.implicitFilter) this.filters.push(this.implicitFilter);
         this.sortValue = false;   
