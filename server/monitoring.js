@@ -65,12 +65,12 @@ export default (server, options) => {
     const checkStatus = async (apiEntry, maxSize) => {
         try {
             if (!maxSize) {
-                throw new Error('You must provide a max size')
+                throw new Error('You must provide a max size');
             }
 
             const payload = {
                 offset: 0,
-                limit : 1000
+                limit : 500
             };
 
             const options = {
