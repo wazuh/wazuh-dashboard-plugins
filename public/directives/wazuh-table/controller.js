@@ -10,10 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-import template        from './template.html'
-import { uiModules }   from 'ui/modules'
-import DataFactory     from '../../services/data-factory'
-import KeyEquivalenece from './key-equivalence'
+import template        from './template.html';
+import { uiModules }   from 'ui/modules';
+import DataFactory     from '../../services/data-factory';
+import KeyEquivalenece from './key-equivalence';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -93,20 +93,52 @@ app.directive('wazuhTable', function() {
                 return ret;
             };
         
-            $scope.prevPage = function () {
+            $scope.prevPage = () => {
                 if ($scope.currentPage > 0) {
                     $scope.currentPage--;
                 }
+                $scope.nextPage(true);
             };
             
-            $scope.nextPage = function () {
-                if ($scope.currentPage < $scope.pagedItems.length - 1) {
-                    $scope.currentPage++;
+            const fetch = async options => {
+                try {
+                    const result = await instance.fetch(options);
+                    items = result.items;
+                    $scope.time = result.time;
+                    $scope.totalItems = items.length;
+                    $scope.items = items;
+                    checkGap();
+                    $scope.searchTable();
+                    return;
+                } catch (error) {
+                    return Promise.reject(error);
                 }
             };
+
+            $scope.nextPage = async ignore_increment => {
+                try {
+                    if (!ignore_increment && ($scope.currentPage < $scope.pagedItems.length - 1)) {
+                        $scope.currentPage++;
+                    }
+                    if($scope.pagedItems[$scope.currentPage].includes(null)){
+                        const copy = $scope.currentPage;
+                        $scope.wazuh_table_loading = true;
+                        const currentNonNull = $scope.items.filter(item => !!item);
+                        await fetch({offset:currentNonNull.length});
+                        $scope.wazuh_table_loading = false;
+                        $scope.currentPage = copy;
+                        if(!$scope.$$phase) $scope.$digest();
+                    }
+                } catch (error) {
+                    errorHandler.handle(`Error paginating table due to ${error.message || error}`,'Data factory');
+                }
+                return;
+
+            };
             
-            $scope.setPage = function () {
+            $scope.setPage = () => {
                 $scope.currentPage = this.n;
+                $scope.nextPage(true);
             };
             ////////////////////////////////////
 
@@ -119,17 +151,11 @@ app.directive('wazuhTable', function() {
                     instance.addSorting(field.value || field);
                     $scope.sortValue = instance.sortValue;
                     $scope.sortDir   = instance.sortDir;
-                    const result = await instance.fetch();
-                    items = result.items;
-                    $scope.time = result.time;
-                    $scope.totalItems = items.length;
-                    $scope.items = items;
-                    checkGap();
-                    $scope.searchTable();
+                    await fetch();
                     $scope.wazuh_table_loading = false;
                     if(!$scope.$$phase) $scope.$digest()
                 } catch (error) {
-                    errorHandler.handle(error,'Data factory')
+                    errorHandler.handle(`Error sorting table by ${field ? field.value : 'undefined'} due to ${error.message || error}`,'Data factory');
                 }
                 return;
             };
@@ -139,18 +165,12 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = true;
                     if(removeFilters) instance.removeFilters();
                     instance.addFilter('search',term);
-                    wzTableFilter.set(instance.filters)
-                    const result = await instance.fetch();
-                    items = result.items;
-                    $scope.time = result.time;
-                    $scope.totalItems = items.length;
-                    $scope.items = items;
-                    checkGap();
-                    $scope.searchTable();
+                    wzTableFilter.set(instance.filters);
+                    await fetch();
                     $scope.wazuh_table_loading = false;
-                    if(!$scope.$$phase) $scope.$digest()
+                    if(!$scope.$$phase) $scope.$digest();
                 } catch(error) {
-                    errorHandler.handle(error,'Data factory')
+                    errorHandler.handle(`Error searching data due to ${error.message || error}`,'Data factory');
                 }
                 return;
             };
@@ -166,18 +186,12 @@ app.directive('wazuhTable', function() {
                     } else {
                         instance.addFilter(filter.name,filter.value);
                     }
-                    wzTableFilter.set(instance.filters)
-                    const result = await instance.fetch();
-                    items = result.items;
-                    $scope.time = result.time;
-                    $scope.totalItems = items.length;
-                    $scope.items = items;
-                    checkGap();
-                    $scope.searchTable();
+                    wzTableFilter.set(instance.filters);
+                    await fetch();
                     $scope.wazuh_table_loading = false;
-                    if(!$scope.$$phase) $scope.$digest()
+                    if(!$scope.$$phase) $scope.$digest();
                 } catch(error) {
-                    errorHandler.handle(error,'Data factory')                    
+                    errorHandler.handle(`Error filtering by ${filter ? filter.value : 'undefined'} due to ${error.message || error}`,'Data factory');                    
                 }
                 return;
             };
@@ -204,19 +218,13 @@ app.directive('wazuhTable', function() {
             const realTimeFunction = async () => {
                 try {
                     while(realTime) {
-                        const result = await instance.fetch({limit:10});
-                        items = result.items;
-                        $scope.time = result.time;
-                        $scope.totalItems = items.length;
-                        $scope.items = items;
-                        checkGap();
-                        $scope.searchTable();
-                        if(!$scope.$$phase) $scope.$digest()
+                        await fetch({limit:10});                        
+                        if(!$scope.$$phase) $scope.$digest();
                         await $timeout(1000);
                     }    
                 } catch(error) {
                     realTime = false;
-                    errorHandler.handle(error,'Data factory')                    
+                    errorHandler.handle(`Real time feature aborted due to ${error.message || error}`,'Data factory');                    
                 }
                 return;
             };
@@ -241,18 +249,12 @@ app.directive('wazuhTable', function() {
             const init = async () => {
                 try {
                     $scope.wazuh_table_loading = true;
-                    const result = await instance.fetch();
-                    wzTableFilter.set(instance.filters)
-                    items = result.items;
-                    $scope.time = result.time;
-                    $scope.totalItems = items.length;
-                    $scope.items = items;
-                    checkGap();
-                    $scope.searchTable();
+                    await fetch();
+                    wzTableFilter.set(instance.filters);                    
                     $scope.wazuh_table_loading = false;
-                    if(!$scope.$$phase) $scope.$digest()
+                    if(!$scope.$$phase) $scope.$digest();
                 } catch (error) {
-                    errorHandler.handle(error,'Data factory')                    
+                    errorHandler.handle(`Error while init table due to ${error.message || error}`,'Data factory');                    
                 }
                 return;
             };
