@@ -8,6 +8,7 @@
     <div class='uil-ring-css' ng-show="load">
         <div></div>
     </div>
+    <!-- End loading ring -->
 
     <!-- Navigation section (Breadcrumbs, etc) -->
     <div layout="row" layout-align="start center" ng-if="!load">
@@ -15,13 +16,11 @@
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
             <div ng-if="tab !== 'welcome'">
-                <i class="fa fa-fw fa-cog" aria-hidden="true"></i>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Settings</span>
                 <span> / {{ tabNames[tab] }}</span>
             </div>
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
             <div ng-if="tab === 'welcome'">
-                <i class="fa fa-fw fa-cog" aria-hidden="true"></i>
                 <span>Settings / Welcome</span>
             </div>
         </div>
@@ -29,7 +28,7 @@
     </div>
     <!-- End navigation section -->
 
-    <!-- Navigation tabs -->
+    <!-- Navigation bar -->
     <md-nav-bar
         ng-if="!load"
         class="wz-nav-bar"
@@ -41,4 +40,4 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pattern')" name="pattern">Pattern</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('about')" name="about">About</md-nav-item>
     </md-nav-bar>
-    <!-- End navigation tabs -->
+    <!-- End navigation bar -->
