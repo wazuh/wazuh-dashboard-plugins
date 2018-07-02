@@ -1,12 +1,30 @@
 <div flex layout="column" layout-align="start stretch" ng-if="tab === 'about' && !load">
 
+    <!-- About app section -->
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> Wazuh app description</span>
+        <span class="md-subheader">Learn more about this app</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- App information section -->
+    <div layout="row" layout-align="start center" ng-if="!load">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div class="wz-text-truncatable" flex>App version: <span class="wz-text-bold">{{appInfo["app-version"]}}</span></div>
+                <div class="wz-text-truncatable" flex>App revision: <span class="wz-text-bold">{{appInfo["revision"]}}</span></div>
+                <div class="wz-text-truncatable" flex>Install date: <span class="wz-text-bold">{{appInfo["installationDate"] | date : "medium"}}</span></div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- End app information section -->
+
     <!-- About card section -->
     <div layout="row" layout-align="start start">
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">App description</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="column" class="wz-padding-top-10">
+                <div layout="column">
                     <div layout-padding>
                         The Wazuh App brings together a new and useful web interface for managing and monitoring your Wazuh infrastructure. You can check agent status, alert evolution, most recent events, popular alerts, top alert groups, etc. You can also display configuration and logs of the manager.
                     </div>
