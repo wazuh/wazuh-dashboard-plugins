@@ -74,7 +74,7 @@ export default class DataFactory {
             const totalItems = firstPage.data.data.totalItems;
 
             const remaining  = this.items.length === totalItems ? 0 :
-                               totalItems-firstPage.data.data.items.length-this.items.length;
+                               totalItems-this.items.length;
 
             // Ignore manager as an agent, once the team solves this issue, review this line
             if(this.path === '/agents') this.items = this.items.filter(item => item.id !== '000');
