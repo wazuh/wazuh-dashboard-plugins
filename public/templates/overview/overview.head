@@ -10,17 +10,20 @@
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
             <div ng-if="tab !== 'welcome'">
-                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Overview</span>
-                <span> / {{ tabNames[tab] }}</span>
+                <span> / </span>
+                <span>{{ tabNames[tab] }}</span>
             </div>
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
             <div ng-if="tab === 'welcome'">
-                <i class="fa fa-fw fa-bar-chart" aria-hidden="true"></i>
                 <span>Overview / Welcome</span>
             </div>
         </div>
         <!-- End breadcrumbs -->
+
+        <!-- Separator -->
+        <span flex></span>
+        <!-- End separator -->
 
         <!-- Reporting button section -->
         <div ng-show="tab !== 'welcome'">
@@ -30,10 +33,6 @@
             </md-button>
         </div>
         <!-- End Reporting buttons section -->
-
-        <!-- Separator -->
-        <span flex></span>
-        <!-- End separator -->
 
         <!-- Discover/Panels buttons section -->
         <div ng-show="tab !== 'welcome'">
@@ -50,6 +49,57 @@
         <!-- End Discover/Panels buttons section -->
     </div>
     <!-- End navigation section -->
+
+    <!-- Host monitoring navigation bar -->
+    <md-nav-bar
+        ng-if="inArray(tab, hostMonitoringTabs)"
+        class="wz-nav-bar"
+        ng-show="tab !== 'welcome'"
+        md-selected-nav-item="tab"
+        nav-bar-aria-label="Host monitoring navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">General</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">File integrity</md-nav-item>
+        <md-nav-item ng-show="extensions.aws" class="wz-nav-item" md-nav-click="switchTab('aws')" name="aws">AWS</md-nav-item>
+    </md-nav-bar>
+    <!-- End Host monitoring navigation bar -->
+
+    <!-- System audit navigation bar -->
+    <md-nav-bar
+        ng-if="inArray(tab, systemAuditTabs) && (extensions.audit || extensions.oscap || extensions.ciscat)"
+        class="wz-nav-bar"
+        ng-show="tab !== 'welcome'"
+        md-selected-nav-item="tab"
+        nav-bar-aria-label="System audit navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pm')" name="pm">Policy monitoring</md-nav-item>
+        <md-nav-item ng-show="extensions.audit" class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">Audit</md-nav-item>
+        <md-nav-item ng-show="extensions.oscap" class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">Open SCAP</md-nav-item>
+        <md-nav-item ng-show="extensions.ciscat" class="wz-nav-item" md-nav-click="switchTab('ciscat')" name="ciscat">CIS-CAT</md-nav-item>
+    </md-nav-bar>
+    <!-- End System audit navigation bar -->
+
+    <!-- Security navigation bar -->
+    <md-nav-bar
+        ng-if="inArray(tab, securityTabs) && extensions.virustotal"
+        class="wz-nav-bar"
+        ng-show="tab !== 'welcome'"
+        md-selected-nav-item="tab"
+        nav-bar-aria-label="Security navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('vuls')" name="vuls">Vulnerabilities</md-nav-item>
+        <md-nav-item ng-show="extensions.virustotal" class="wz-nav-item" md-nav-click="switchTab('virustotal')" name="virustotal">VirusTotal</md-nav-item>
+    </md-nav-bar>
+    <!-- End Security navigation bar -->
+
+    <!-- Compliance navigation bar -->
+    <md-nav-bar
+        ng-if="inArray(tab, complianceTabs) && extensions.pci && extensions.gdpr"
+        class="wz-nav-bar"
+        ng-show="tab !== 'welcome'"
+        md-selected-nav-item="tab"
+        nav-bar-aria-label="Compliance navigation links">
+        <md-nav-item ng-show="extensions.pci" class="wz-nav-item" md-nav-click="switchTab('pci')" name="pci">PCI DSS</md-nav-item>
+        <md-nav-item ng-show="extensions.gdpr" class="wz-nav-item" md-nav-click="switchTab('gdpr')" name="gdpr">GDPR</md-nav-item>
+    </md-nav-bar>
+    <!-- End Compliance navigation bar -->
 
     <!-- Discover search bar section -->
     <kbn-dis ng-show="tab !== 'welcome'"></kbn-dis>
