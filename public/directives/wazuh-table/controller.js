@@ -93,11 +93,11 @@ app.directive('wazuhTable', function() {
                 return ret;
             };
         
-            $scope.prevPage = () => {
+            $scope.prevPage = function () {
                 if ($scope.currentPage > 0) {
                     $scope.currentPage--;
                 }
-                $scope.nextPage(true);
+                $scope.nextPage($scope.currentPage);
             };
             
             const fetch = async options => {
@@ -115,12 +115,12 @@ app.directive('wazuhTable', function() {
                 }
             };
 
-            $scope.nextPage = async ignore_increment => {
+            $scope.nextPage = async currentPage => {
                 try {
-                    if (!ignore_increment && ($scope.currentPage < $scope.pagedItems.length - 1)) {
+                    if (!currentPage && ($scope.currentPage < $scope.pagedItems.length - 1)) {
                         $scope.currentPage++;
                     }
-                    if($scope.pagedItems[$scope.currentPage].includes(null)){
+                    if($scope.pagedItems[currentPage || $scope.currentPage].includes(null)){
                         const copy = $scope.currentPage;
                         $scope.wazuh_table_loading = true;
                         const currentNonNull = $scope.items.filter(item => !!item);
@@ -136,9 +136,9 @@ app.directive('wazuhTable', function() {
 
             };
             
-            $scope.setPage = () => {
+            $scope.setPage = function () {
                 $scope.currentPage = this.n;
-                $scope.nextPage(true);
+                $scope.nextPage(this.n);
             };
             ////////////////////////////////////
 
