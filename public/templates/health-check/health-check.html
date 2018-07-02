@@ -30,10 +30,10 @@
             <li class="wz-hc-error" ng-repeat='error in errors'>{{error}}</li>
         </ul>
     </div>
-    <div layout="row" class="layout-align-center margin-top-30">
-            <md-button class="wz-button md-raised md-primary" ng-click="goApp()" aria-label="Go app">
-                <i class="fa fa-fw fa-sign-out"></i> Open the app
-            </md-button>
+    <div ng-if="errors.length" layout="row" class="layout-align-center margin-top-30">
+        <md-button class="wz-button md-raised md-primary" ng-click="goApp()" aria-label="Go app">
+            <i class="fa fa-fw fa-sign-out"></i> Open the app
+        </md-button>
     </div>
 
 </md-content>

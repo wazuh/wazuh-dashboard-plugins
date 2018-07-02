@@ -143,6 +143,10 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
             await Promise.all([ checkPatterns(), checkApiConnection() ]);
 
             $scope.checksDone = true;
+            if(!$scope.errors || !$scope.errors.length) {
+                $timeout(() => $location.path($rootScope.previousLocation || '/'), 800);
+                return;
+            }
 
             if(!$scope.$$phase) $scope.$digest();
             return;
