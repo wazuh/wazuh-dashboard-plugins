@@ -222,9 +222,55 @@ export default class ElasticWrapper {
     async updateIndexPatternKnownFields(id) {
         try {
             if(!id) return Promise.reject(new Error('No valid index pattern id for update index pattern'));
+            
+            const pattern = await this.getIndexPatternUsingGet(id);
 
-            const newFields = JSON.stringify(knownFields);
+            let currentFields = [];
 
+            // If true, it's an existing index pattern, we need to review its known fields
+            if(pattern && 
+               pattern._source &&
+               pattern._source['index-pattern'] &&
+               pattern._source['index-pattern'].fields) {
+
+                currentFields = JSON.parse(pattern._source['index-pattern'].fields);
+
+                if(Array.isArray(currentFields) && Array.isArray(knownFields)){
+
+                    for(const field of knownFields){
+                        // It has this field?
+                        const index = currentFields.map(item => item.name).indexOf(field.name);
+
+                        if((index >= 0) && currentFields[index]){
+                            // If field already exists, update its type
+                            currentFields[index].type = field.type;
+                        } else {
+                            // If field doesn't exist, add it
+                            currentFields.push(field);
+                        }
+                    }
+
+                }
+                
+            } else {
+                // It's a new index pattern, just add our known fields
+                currentFields = knownFields;
+            }
+
+            // This array always must has items
+            if(!currentFields || !currentFields.length) {
+                return Promise.reject(new Error(`Something went wrong while updating known fields for index pattern ${id}`));
+            }
+
+            let currentFieldsString = null;
+
+            try {
+                currentFieldsString = JSON.stringify(currentFields);
+            } catch(error) {
+                return Promise.reject(new Error(`Could not stringify known fields for index pattern ${id}`));
+            }
+
+            // Updating known fields
             const data = await this.elasticRequest.callWithInternalUser('update', {
                 index: this.WZ_KIBANA_INDEX,
                 type: 'doc',
@@ -233,7 +279,7 @@ export default class ElasticWrapper {
                     doc: {
                         "type": 'index-pattern',
                         "index-pattern": {
-                            "fields": newFields,
+                            "fields": currentFieldsString,
                             "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
                         }
                      }
