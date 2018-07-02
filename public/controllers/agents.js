@@ -19,13 +19,13 @@ import * as FileSaver from '../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsController', 
+app.controller('agentsController',
 
 function (
-    $timeout, $scope, $location, $rootScope, 
-    appState, apiReq, AgentsAutoComplete, errorHandler, 
-    tabVisualizations, vis2png, shareAgent, commonData, 
-    reportingService, visFactoryService, csvReq, 
+    $timeout, $scope, $location, $rootScope,
+    appState, apiReq, AgentsAutoComplete, errorHandler,
+    tabVisualizations, vis2png, shareAgent, commonData,
+    reportingService, visFactoryService, csvReq,
     wzTableFilter
 ) {
 
@@ -51,6 +51,15 @@ function (
     $scope.tabNames = TabNames;
 
     tabVisualizations.assign('agents');
+
+    $scope.hostMonitoringTabs = ['general', 'fim', 'configuration', 'syscollector'];
+    $scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    $scope.securityTabs = ['vuls', 'virustotal'];
+    $scope.complianceTabs = ['pci', 'gdpr'];
+
+    $scope.inArray = (item, array) => {
+        return (array.indexOf(item) !== -1);
+    };
 
     const createMetrics = metricsObject => {
         for(let key in metricsObject) {
@@ -229,7 +238,7 @@ function (
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'packages.csv');
-            
+
             return;
 
         } catch (error) {
