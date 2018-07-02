@@ -1,5 +1,4 @@
 <div layout="column" layout-align="start stretch" ng-if="!load && apiIsDown">
-
     <!-- API down card section -->
     <div layout="row" layout-align="start start">
         <md-card flex class="wz-md-card">
@@ -10,29 +9,24 @@
                     <div layout-padding>
                         Please, check if the Wazuh API is running with one of the commands below:
                     </div>
-
                     <div layout="row">
                         <div layout="column">
                             <div layout-padding>
                                 For <strong>systemd</strong>:
                             </div>
-
                             <div layout-padding>
                                 <pre class="json-beautifier"><code># systemctl status wazuh-api</code></pre>
                             </div>
                         </div>
-
                         <div layout="column">
                             <div layout-padding>
                                 For <strong>SysV Init</strong>:
                             </div>
-
                             <div layout-padding>
                                 <pre class="json-beautifier"><code># service wazuh-api status</code></pre>
                             </div>
                         </div>
                     </div>
-
                     <div layout-padding>
                         If the API is <strong>active (running)</strong>, please check the credentials below.
                     </div>
