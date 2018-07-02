@@ -100,10 +100,10 @@ app.directive('wazuhTable', function() {
                 $scope.nextPage($scope.currentPage);
             };
             
-            const fetch = async options => {
+            const fetch = async (options = {}) => {
                 try {
                     const result = await instance.fetch(options);
-                    items = result.items;
+                    items = options.realTime ? result.items.slice(0,10) : result.items;
                     $scope.time = result.time;
                     $scope.totalItems = items.length;
                     $scope.items = items;
@@ -217,8 +217,9 @@ app.directive('wazuhTable', function() {
 
             const realTimeFunction = async () => {
                 try {
+                    
                     while(realTime) {
-                        await fetch({limit:10});                        
+                        await fetch({realTime:true, limit:10});                        
                         if(!$scope.$$phase) $scope.$digest();
                         await $timeout(1000);
                     }    
