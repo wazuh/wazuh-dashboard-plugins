@@ -14,14 +14,11 @@
     <div layout="row" layout-align="start center" ng-if="!load">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
-            <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-            <div ng-if="tab !== 'welcome'">
-                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Settings</span>
-                <span> / {{ tabNames[tab] }}</span>
-            </div>
-            <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
-            <div ng-if="tab === 'welcome'">
-                <span>Settings / Welcome</span>
+            <!-- Always show a functional breadcrumb -->
+            <div>
+                <span>Settings</span>
+                <span> / </span>
+                <span>{{ tabNames[tab] }}</span>
             </div>
         </div>
         <!-- End breadcrumbs -->
@@ -32,7 +29,6 @@
     <md-nav-bar
         ng-if="!load"
         class="wz-nav-bar"
-        ng-show="tab !== 'welcome'"
         md-selected-nav-item="tab"
         nav-bar-aria-label="Settings navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('api')" name="api">API</md-nav-item>

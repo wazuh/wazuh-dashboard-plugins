@@ -27,7 +27,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Initialize
     let currentApiEntryIndex;
     $scope.formData            = {};
-    $scope.tab                 = 'welcome';
+    $scope.tab                 = 'api';
     $scope.load                = true;
     $scope.addManagerContainer = false;
     $scope.showEditForm        = {};
