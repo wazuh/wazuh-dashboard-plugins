@@ -1,19 +1,39 @@
-<div ng-cloak flex layout="column" ng-controller="healthCheck" layout-align="center center">
-    <div class="wz-text-center">
-        <div ng-show="errors.length == 0" class='uil-ring-css'><div></div></div>
-        <div ng-show="errors.length == 0"><img class="loading-logo" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_blue.svg"></img></div>
-        <div ng-show="errors.length > 0"><img class="loading-logo-fail" aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_fail.png"></img></div>
+<md-content ng-controller="healthCheck" layout="column" flex>
+    <div layout="row" class="layout-align-center margin-top-30">
+        <img aria-hidden="true" kbn-src="/plugins/wazuh/img/icon_blue.svg"></img>
+    </div>
+    <div layout="row" class="layout-align-center margin-top-30">
+        <table flex="50" class="table">
+            <thead class="kuiTableHeaderCell">
+                <th>Description</th>
+                <th>Status</th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="result in results">
+                    <td>{{result.description}}</td>
+                    <td ng-if="result.status === 'disabled'" class="discover-field-details">
+                        Disabled
+                    </td> 
+                    <td ng-if="result.status === 'Ready' || result.status === 'Error'">
+                        <i ng-if="result.status === 'Ready'" class="fa fa-fw fa-check wz-text-teal"></i>
+                        <i ng-if="result.status === 'Error'" class="fa fa-fw fa-warning wz-text-red"></i>
+                        {{result.status}}</td>
+                    <td ng-if="result.status !== 'Ready' && result.status !== 'Error' && result.status !== 'disabled'">
+                            <i class="fa fa-fw fa-spin fa-spinner"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div layout="row" ng-if="errors.length" class="layout-align-center margin-top-30">
+        <ul>
+            <li class="wz-text-red" ng-repeat='error in errors'>{{error}}</li>
+        </ul>
+    </div>
+    <div ng-if="errors.length" layout="row" class="layout-align-center margin-top-30">
+        <md-button class="wz-button md-raised md-primary" ng-click="goApp()" aria-label="Go app">
+            <i class="fa fa-fw fa-sign-out"></i> Open the app
+        </md-button>
     </div>
 
-    <div ng-class="{'checks': errors.length == 0, 'checks-fail': errors.length > 0}">
-        <div ng-if="!zeroChecks">&nbsp; Performing checks...({{processedChecks}}/{{totalChecks}})<i ng-class="{'fa-spinner': processedChecks != totalChecks && !checksDone, 'fa-spin': processedChecks != totalChecks && !checksDone}" class="fa fa-fw" aria-hidden="true"></i></div>
-        <div class="health-check-error" ng-show="errors.length > 0">
-            <div class="error-notify">Ups, something went wrong...</div>
-            <div>
-                <ul>
-                    <li ng-repeat='error in errors'>{{error}}</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+</md-content>

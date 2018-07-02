@@ -36,20 +36,26 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
             const patternTitle = data.title;
 
             if(checks.pattern) {
+                const i = $scope.results.map(item => item.id).indexOf(2);
                 const patternData = await genericReq.request('GET', `/api/wazuh-elastic/pattern/${patternTitle}`);
                 if (!patternData.data.status) {
                     $scope.errors.push("The selected index-pattern is not present.");
+                    $scope.results[i].status = 'Error';
                 } else {
                     $scope.processedChecks++;
+                    $scope.results[i].status = 'Ready';
                 }
             }
 
             if(checks.template) {
+                const i = $scope.results.map(item => item.id).indexOf(3);
                 const templateData = await genericReq.request('GET', `/api/wazuh-elastic/template/${patternTitle}`);
                 if (!templateData.data.status) {
                     $scope.errors.push("No template found for the selected index-pattern.");
+                    $scope.results[i].status = 'Error';
                 } else {
                     $scope.processedChecks++;
+                    $scope.results[i].status = 'Ready';
                 }
             }
 
@@ -57,18 +63,20 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
         } catch (error) {
             handleError(error);
         }
-    }
+    };
 
     const checkApiConnection = async () => {
         try {
             if(checks.api) {
                 const data = await testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id);
 
+                const i = $scope.results.map(item => item.id).indexOf(0);
                 if (data.data.error || data.data.data.apiIsDown) {
                     $scope.errors.push("Error connecting to the API.");
+                    $scope.results[i].status = 'Error';
                 } else {
                     $scope.processedChecks++;
-
+                    $scope.results[i].status = 'Ready';
                     if(checks.setup) {
                         const versionData = await apiReq.request('GET', '/version', {});
                         const apiVersion  = versionData.data.data;
@@ -80,10 +88,13 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
                         const apiSplit = apiVersion.split('v')[1].split('.');
                         const appSplit = setupData.data.data["app-version"].split('.');
 
+                        const i = $scope.results.map(item => item.id).indexOf(1);
                         if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
                             $scope.errors.push("API version mismatch. Expected v" + setupData.data.data["app-version"]);
+                            $scope.results[i].status = 'Error';
                         } else {
-                            $scope.processedChecks++;
+                            $scope.processedChecks++;                            
+                            $scope.results[i].status = 'Ready';
                         }
                     }
                 }
@@ -95,9 +106,11 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
         } catch(error) {
             handleError(error);
         }
-    }
+    };
 
-    const timer = () =>  $location.path($rootScope.previousLocation);
+    $scope.goApp = () => $location.path($rootScope.previousLocation || '/');
+    
+    $scope.results = [];
 
     const load = async () => {
         try {
@@ -118,6 +131,11 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
                 checks.setup    = typeof configuration.data.data['checks.setup']    !== 'undefined' ? configuration.data.data['checks.setup']    : true;
             }
 
+            $scope.results.push({ id:0,description: 'Check Wazuh API connection',status: checks.api ? 'Checking...' : 'disabled' });
+            $scope.results.push({ id:1,description: 'Check for Wazuh API version',status: checks.setup ? 'Checking...' : 'disabled' });
+            $scope.results.push({ id:2,description: 'Check Elasticsearch index pattern',status: checks.pattern ? 'Checking...' : 'disabled' });
+            $scope.results.push({ id:3,description: 'Check Elasticsearch template',status: checks.template ? 'Checking...' : 'disabled'});
+
             for(let key in checks) $scope.totalChecks += (checks[key]) ? 1 : 0;
 
             if ($scope.totalChecks == 0) $scope.zeroChecks = true;
@@ -125,9 +143,9 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
             await Promise.all([ checkPatterns(), checkApiConnection() ]);
 
             $scope.checksDone = true;
-
-            if ($scope.processedChecks === $scope.totalChecks && $scope.errors.length === 0) {
-                $timeout(timer, 1000);
+            if(!$scope.errors || !$scope.errors.length) {
+                $timeout(() => $location.path($rootScope.previousLocation || '/'), 800);
+                return;
             }
 
             if(!$scope.$$phase) $scope.$digest();
