@@ -578,7 +578,7 @@ export default class WazuhApi {
             const url = `${config.url}:${config.port}/agents`;
 
             const params = {
-                limit : 2000,
+                limit : 500,
                 offset: 0,
                 sort  :'-dateAdd'
             }

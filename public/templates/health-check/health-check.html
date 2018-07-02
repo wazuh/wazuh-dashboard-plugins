@@ -15,8 +15,8 @@
                         Disabled
                     </td> 
                     <td ng-if="result.status === 'Ready' || result.status === 'Error'">
-                        <i ng-if="result.status === 'Ready'" class="fa fa-fw fa-check wz-hc-ready"></i>
-                        <i ng-if="result.status === 'Error'" class="fa fa-fw fa-warning wz-hc-error"></i>
+                        <i ng-if="result.status === 'Ready'" class="fa fa-fw fa-check wz-text-teal"></i>
+                        <i ng-if="result.status === 'Error'" class="fa fa-fw fa-warning wz-text-red"></i>
                         {{result.status}}</td>
                     <td ng-if="result.status !== 'Ready' && result.status !== 'Error' && result.status !== 'disabled'">
                             <i class="fa fa-fw fa-spin fa-spinner"></i>
@@ -27,7 +27,7 @@
     </div>
     <div layout="row" ng-if="errors.length" class="layout-align-center margin-top-30">
         <ul>
-            <li class="wz-hc-error" ng-repeat='error in errors'>{{error}}</li>
+            <li class="wz-text-red" ng-repeat='error in errors'>{{error}}</li>
         </ul>
     </div>
     <div ng-if="errors.length" layout="row" class="layout-align-center margin-top-30">
