@@ -31,16 +31,11 @@ export default kibana => new kibana.Plugin({
                 'visEditorTypes',
                 'savedObjectTypes',   
                 'spyModes',
-                'fieldFormats',
-                'fieldFormatEditors',
-                'navbarExtensions',
-                'managementSections',
-                'devTools',
-                'docViews',
-                'embeddableFactories'
-            ]
+                'fieldFormats'
+            ],
+            injectVars: server => {
+                return server.plugins.kibana.injectVars(server);
+            }
         }
-    },
-    init: (server,options) => init(server,options)
-    
+    }    
 });
