@@ -4,6 +4,14 @@
     <div class='uil-ring-css' ng-show="loading">
         <div></div>
     </div>
+    <!-- End loading ring -->
+
+    <!-- Headline -->
+    <div ng-show="!loading" layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-file-text" aria-hidden="true"></i> Reporting</span>
+        <span class="md-subheader">List and download all the Wazuh app reports</span>
+    </div>
+    <!-- End headline -->
 
     <!-- No reports section -->
     <div flex layout="row" layout-align="start start" ng-show="!loading && (!pagedItems || !pagedItems.length)">

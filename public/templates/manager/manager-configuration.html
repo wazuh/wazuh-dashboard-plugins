@@ -5,6 +5,13 @@
         <div></div>
     </div>
 
+    <!-- Headline -->
+    <div ng-show="!load" layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
+        <span class="md-subheader">List the current Wazuh manager configuration</span>
+    </div>
+    <!-- End headline -->
+
     <!-- The section container -->
     <div flex layout="row" layout-align="start stretch" ng-show="!load"  ng-init="selectedItem='global'">
 

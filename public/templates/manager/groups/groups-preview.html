@@ -6,6 +6,13 @@
         <div></div>
     </div>
 
+    <!-- Headline -->
+    <div ng-show="!load" layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups</span>
+        <span class="md-subheader">List and check your groups, its agents and files</span>
+    </div>
+    <!-- End headline -->
+
     <div flex layout="column" layout-align="start stretch" ng-show="!load" ng-init="groupsSelectedTab='agents'">
 
         <!-- MD5 Sums and Details cards -->
@@ -63,10 +70,10 @@
 
         <!-- Groups table -->
         <div layout="row" ng-if="!lookingGroup" class="md-padding">
-            <wazuh-table 
-                flex 
-                path="'/agents/groups'" 
-                keys="['name','count','merged_sum']" 
+            <wazuh-table
+                flex
+                path="'/agents/groups'"
+                keys="['name','count','merged_sum']"
                 allow-click="true"
                 rows-per-page="19">
             </wazuh-table>
@@ -84,9 +91,9 @@
 
         <!-- Group agents table -->
         <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup" class="md-padding">
-            <wazuh-table 
-                flex 
-                path="'/agents/groups/' + currentGroup.name" 
+            <wazuh-table
+                flex
+                path="'/agents/groups/' + currentGroup.name"
                 keys="['id','name','ip','status','os.name','os.version','version']"
                 allow-click="true"
                 rows-per-page="14">
@@ -105,9 +112,9 @@
 
         <!-- Group files table -->
         <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup" class="md-padding">
-            <wazuh-table 
-                flex 
-                path="'/agents/groups/' + currentGroup.name + '/files'" 
+            <wazuh-table
+                flex
+                path="'/agents/groups/' + currentGroup.name + '/files'"
                 keys="[{value:'filename',size:2},{value:'hash',size:6}]"
                 allow-click="true"
                 rows-per-page="14">

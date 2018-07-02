@@ -36,6 +36,13 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
         $scope.$broadcast('rulesetIsReloaded')
     }
 
+    $scope.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
+    $scope.statusReportsTabs = ['status', 'logs', 'monitoring', 'reporting'];
+
+    $scope.inArray = (item, array) => {
+        return (array.indexOf(item) !== -1);
+    };
+
     // Watchers
     $scope.$watch('tab', () => {
         if($scope.tab === 'ruleset') {
