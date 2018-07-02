@@ -39,9 +39,7 @@ app.controller('managerController', function ($scope, $rootScope, $routeParams, 
     $scope.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     $scope.statusReportsTabs = ['status', 'logs', 'monitoring', 'reporting'];
 
-    $scope.inArray = (item, array) => {
-        return (array.indexOf(item) !== -1);
-    };
+    $scope.inArray = (item, array) => item && Array.isArray(array) && array.includes(item);
 
     // Watchers
     $scope.$watch('tab', () => {

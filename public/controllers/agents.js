@@ -57,9 +57,7 @@ function (
     $scope.securityTabs = ['vuls', 'virustotal'];
     $scope.complianceTabs = ['pci', 'gdpr'];
 
-    $scope.inArray = (item, array) => {
-        return (array.indexOf(item) !== -1);
-    };
+    $scope.inArray = (item, array) => item && Array.isArray(array) && array.includes(item);
 
     const createMetrics = metricsObject => {
         for(let key in metricsObject) {
