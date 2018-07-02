@@ -47,4 +47,4 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('monitoring')" name="monitoring">Monitoring</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('reporting')" name="reporting">Reporting</md-nav-item>
     </md-nav-bar>
-    <!-- End status and reports navigation bar -->
+    <!-- End Status and reports navigation bar -->
