@@ -44,12 +44,13 @@
     <!-- Navigation tabs -->
     <md-nav-bar
         ng-if="!load"
+        class="wz-nav-bar"
         ng-show="tab !== 'welcome'"
         md-selected-nav-item="tab"
         nav-bar-aria-label="Settings navigation links">
-        <md-nav-item md-nav-click="switchTab('api')" name="api">API</md-nav-item>
-        <md-nav-item md-nav-click="switchTab('extensions')" name="extensions">Extensions</md-nav-item>
-        <md-nav-item md-nav-click="switchTab('pattern')" name="pattern">Pattern</md-nav-item>
-        <md-nav-item md-nav-click="switchTab('about')" name="about">About</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('api')" name="api">API</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('extensions')" name="extensions">Extensions</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pattern')" name="pattern">Pattern</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('about')" name="about">About</md-nav-item>
     </md-nav-bar>
     <!-- End navigation tabs -->

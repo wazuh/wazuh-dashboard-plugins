@@ -1,5 +1,6 @@
 /*
- * Wazuh app - Stylesheets loader
+ * Wazuh app - Component stylesheet
+ * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,14 +11,12 @@
  */
 
 /* -------------------------------------------------------------------------- */
-/* ------------------------ Wazuh stylesheets loader ------------------------ */
+/* ----------------------- Wazuh component stylesheet ----------------------- */
 /* -------------------------------------------------------------------------- */
 
-import './common.less';
-import './component.less';
-import './height.less';
-import './layout.less';
-import './media-queries.less';
-import './typography.less';
-import './ui_framework.css';
-import 'ui/styles/theme.less';
+/* Custom nav bar styles */
+
+.wz-nav-bar md-nav-ink-bar {
+    color: rgb(0, 85, 113) !important;
+    background: rgb(0, 85, 113) !important;
+}
