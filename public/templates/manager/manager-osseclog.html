@@ -1,14 +1,22 @@
-<div ng-cloak flex layout="column" layout-padding class="mozilla-table-size-85" ng-controller="managerLogController" ng-if="!loading && tab == 'logs'">
+<div ng-cloak flex layout="column" class="mozilla-table-size-85" ng-controller="managerLogController" ng-if="!loading && tab == 'logs'">
+
+    <!-- Headline -->
+    <div ng-show="!loading" layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-pencil-square-o" aria-hidden="true"></i> Logs</span>
+        <span class="md-subheader">Review the logs of all Wazuh manager daemons</span>
+    </div>
+    <!-- End headline -->
+
     <!-- Filters and Realtime button section -->
-    <div ng-show="!loading" layout="row" layout-align="start center">
+    <div ng-show="!loading" layout="row" layout-align="start center" layout-padding>
         <div layout="column" flex="40" class="height-40 wz-margin-right-15">
             <div layout="row">
                 <input placeholder="Filter logs..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false" wz-enter="search(custom_search)">
                 <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
                     <span class="fa fa-search" aria-hidden="true"></span>
-                </button>  
-            </div>      
+                </button>
+            </div>
         </div>
         <!-- Daemon selector -->
         <div flex="20" layout="column" class="height-40 wz-margin-right-15 wz-select-input">
@@ -47,17 +55,17 @@
     <!-- End Filters and Realtime button section -->
 
     <!-- Logs table section -->
-    <div layout="row">
-        <wazuh-table 
-            flex 
-            path="'/manager/logs'" 
+    <div layout="row" layout-padding>
+        <wazuh-table
+            flex
+            path="'/manager/logs'"
             keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
             rows-per-page="19">
         </wazuh-table>
     </div>
     <!-- End Logs table section -->
 
-    <div layout="row" class="md-padding">
+    <div layout="row" layout-padding>
         <span flex></span>
         <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
     </div>

@@ -5,6 +5,13 @@
         <div></div>
     </div>
 
+    <!-- Headline -->
+    <div ng-show="!load" layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-heartbeat" aria-hidden="true"></i> Status</span>
+        <span class="md-subheader">Check the status of all Wazuh manager daemons</span>
+    </div>
+    <!-- End headline -->
+
     <!-- Daemons status section -->
     <div layout="row" layout-align="start stretch" ng-if="!load">
         <md-card flex class="wz-md-card" ng-repeat="(k,v) in daemons">
