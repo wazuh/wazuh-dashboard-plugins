@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules'
-import dateMath from '@kbn/datemath';
+import dateMath from '@elastic/datemath';
 const app = uiModules.get('app/wazuh', []);
 
 app.factory('visHandlers', function() {
