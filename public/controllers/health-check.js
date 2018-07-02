@@ -108,7 +108,7 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
         }
     };
 
-    $scope.goApp = () => $location.path($rootScope.previousLocation || '/overview');
+    $scope.goApp = () => $location.path($rootScope.previousLocation || '/');
     
     $scope.results = [];
 
