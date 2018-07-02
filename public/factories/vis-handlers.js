@@ -32,8 +32,9 @@ app.factory('visHandlers', function() {
         const tables = list.filter(item => item._scope &&
                                            item._scope.savedObj &&
                                            item._scope.savedObj.vis &&
-                                           item._scope.savedObj.vis.type &&
-                                           item._scope.savedObj.vis.type.type === 'table')
+                                           item._scope.savedObj.vis._state &&
+                                           item._scope.savedObj.vis._state.type === 'table'
+                            )
                             .map(item => {
                                 const columns = []; 
                                 for(const agg of item._scope.savedObj._source.visState.aggs){
@@ -45,7 +46,7 @@ app.factory('visHandlers', function() {
                                     }
                                 }
                                 columns.push('Count');
-                                
+
                                 return (item._scope &&
                                         item._scope.savedObj &&
                                         item._scope.savedObj.vis &&
