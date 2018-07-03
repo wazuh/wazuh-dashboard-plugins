@@ -276,11 +276,19 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
             }
 
-            await Promise.all([
-                genericReq.request('GET', '/api/wazuh-api/fetchAgents'),
-                getSettings()
-            ]);
+            try {
+                await genericReq.request('GET', '/api/wazuh-api/fetchAgents');            
+            } catch (error) {
 
+                if(error && error.status && error.status === -1) {
+                    errorHandler.handle('Wazuh API was inserted correctly, but something happened while fetching agents data.','Fetch agents',true);
+                } else {
+                    errorHandler.handle(error,'Fetch agents');
+                }
+                
+            }
+
+            await getSettings();
 
             if(!$scope.$$phase) $scope.$digest();
             return;
