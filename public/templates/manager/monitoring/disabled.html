@@ -12,6 +12,26 @@
     </div>
     <!-- End cluster disabled breadcrumbs -->
 
+    <!-- Status and reports navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        ng-show="tab !== 'welcome'"
+        md-selected-nav-item="tab"
+        nav-bar-aria-label="Status and reports navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('status')" name="status">Status</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('monitoring')" name="monitoring">Monitoring</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+    </md-nav-bar>
+    <!-- End status and reports navigation bar -->
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-search" aria-hidden="true"></i> Monitoring</span>
+        <span class="md-subheader">Visualize your Wazuh cluster nodes and its agents</span>
+    </div>
+    <!-- End headline -->
+
     <!-- Cluster disabled section -->
     <div flex layout="row" layout-align="start start">
         <md-card flex class="wz-md-card" flex>
