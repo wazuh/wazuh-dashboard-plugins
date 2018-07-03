@@ -14,7 +14,7 @@
             </th>
         </thead>
         <tbody>
-            <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage]" ng-click="clickAction(item)">
+            <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}" ng-click="clickAction(item)">
                 <td ng-repeat="key in keys" ng-if="path !== '/decoders'">
                     {{ 
                         key === 'os.name' ? 
