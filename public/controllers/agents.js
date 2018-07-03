@@ -307,7 +307,7 @@ function (
 
 
             const groupMergedSum  = agentGroups[0].data.data.items.filter(item => item.name === $scope.groupName);
-            $scope.groupMergedSum = (groupMergedSum.length) ? groupMergedSum[0].mergedSum : 'Unknown';
+            $scope.groupMergedSum = (groupMergedSum.length) ? groupMergedSum[0].merged_sum : 'Unknown';
 
             const agentMergedSum  = agentGroups[1].data.data.items.filter(item => item.id === $scope.agent.id);
             $scope.agentMergedSum = (agentMergedSum.length) ? agentMergedSum[0].merged_sum : 'Unknown';
