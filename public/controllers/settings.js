@@ -193,6 +193,9 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     }
 
     $scope.toggleEditor = entry => {
+        if($scope.formUpdate && $scope.formUpdate.password) {
+            $scope.formUpdate.password = '';
+        }
         for(const key in $scope.showEditForm) {
             if(entry && entry._id === key) continue;
             $scope.showEditForm[key] = false;
