@@ -27,7 +27,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Initialize
     let currentApiEntryIndex;
     $scope.formData            = {};
-    $scope.tab                 = 'welcome';
+    $scope.tab                 = 'api';
     $scope.load                = true;
     $scope.addManagerContainer = false;
     $scope.showEditForm        = {};
@@ -57,6 +57,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Remove API entry
     $scope.removeManager = async item => {
         try {
+
             let index = $scope.apiEntries.indexOf(item);
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
                 if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
@@ -70,6 +71,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             wzMisc.setApiIsDown(false)
             $scope.apiIsDown = false;
             $scope.isEditing = false;
+            for(const key in $scope.showEditForm) $scope.showEditForm[key] = false;
             errorHandler.info('The API was removed successfully','Settings');
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -191,6 +193,13 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     }
 
     $scope.toggleEditor = entry => {
+        if($scope.formUpdate && $scope.formUpdate.password) {
+            $scope.formUpdate.password = '';
+        }
+        for(const key in $scope.showEditForm) {
+            if(entry && entry._id === key) continue;
+            $scope.showEditForm[key] = false;
+        }
         $scope.showEditForm[entry._id] = !$scope.showEditForm[entry._id];
         $scope.isEditing = $scope.showEditForm[entry._id];
         $scope.addManagerContainer = false;
@@ -270,11 +279,19 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
             }
 
-            await Promise.all([
-                genericReq.request('GET', '/api/wazuh-api/fetchAgents'),
-                getSettings()
-            ]);
+            try {
+                await genericReq.request('GET', '/api/wazuh-api/fetchAgents');            
+            } catch (error) {
 
+                if(error && error.status && error.status === -1) {
+                    errorHandler.handle('Wazuh API was inserted correctly, but something happened while fetching agents data.','Fetch agents',true);
+                } else {
+                    errorHandler.handle(error,'Fetch agents');
+                }
+                
+            }
+
+            await getSettings();
 
             if(!$scope.$$phase) $scope.$digest();
             return;

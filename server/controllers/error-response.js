@@ -15,6 +15,7 @@
  * wazuh-api-elastic 20XX
  * wazuh-api         30XX
  * wazuh-elastic     40XX
+ * wazuh-reporting   50XX
  * unknown           1000
  */
 export default (message = null, code = null, statusCode = null, reply) => {
@@ -22,19 +23,20 @@ export default (message = null, code = null, statusCode = null, reply) => {
     if(code) {
         const isString = typeof message === 'string';
         if(isString && message === 'socket hang up' && code === 3005) {
-            filteredMessage = 'Wrong protocol being used to connect to the Wazuh API'
+            filteredMessage = 'Wrong protocol being used to connect to the Wazuh API';
         } else if(isString && 
                  (message.includes('ENOTFOUND') || message.includes('EHOSTUNREACH') || message.includes('EINVAL') || message.includes('EAI_AGAIN')) && 
                  code === 3005) {
-            filteredMessage = 'Wrong URL being used to connect to the Wazuh API'
+            filteredMessage = 'Wrong URL being used to connect to the Wazuh API';
         } else if(isString && message.includes('ECONNREFUSED') && code === 3005) {
-            filteredMessage = 'Wrong port being used to connect to the Wazuh API'
+            filteredMessage = 'Wrong port being used to connect to the Wazuh API';
         } else if(isString && message.toLowerCase().includes('not found') && code === 3002) {
-            filteredMessage = 'Wazuh API entry not found'
-        } else if(isString && message.includes('ENOENT') && message.toLowerCase().includes('no such file or directory') && message.toLowerCase().includes('data') && code === 3029 ) {
-            filteredMessage = 'Reporting was aborted'
+            filteredMessage = 'Wazuh API entry not found';
+        } else if(isString && message.includes('ENOENT') && message.toLowerCase().includes('no such file or directory') && message.toLowerCase().includes('data') && code === 5029 ) {
+            filteredMessage = 'Reporting was aborted';
+        }else if(isString && code === 5029 ) {
+            filteredMessage = `Reporting was aborted (${message})`;
         }
-
     }
 
     return reply({
@@ -46,4 +48,4 @@ export default (message = null, code = null, statusCode = null, reply) => {
         statusCode: statusCode ? statusCode : 500
     })
     .code(statusCode ? statusCode : 500);
-}
+};

@@ -1,13 +1,18 @@
 <div flex layout="column" layout-align="start stretch" ng-if="tab === 'api' && !load">
 
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> API configuration</span>
+        <span class="md-subheader">Administer your Wazuh API credentials</span>
+    </div>
+    <!-- End headline -->
+
     <!-- API configuration card section -->
     <div layout="row" layout-align="start start">
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-tasks" aria-hidden="true"></i> <span class="wz-headline-title">API configuration</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
                 <!-- API entries headings section -->
-                <div layout="row" class="wz-padding-top-10 wz-padding-bottom-14">
+                <div layout="row" class="wz-padding-bottom-14">
                     <p flex="15" class="wz-text-bold">Cluster</p>
                     <p flex="20" class="wz-text-bold">Manager</p>
                     <p flex="15" class="wz-text-bold">API URL</p>
@@ -121,4 +126,5 @@
         </md-card>
     </div>
     <!-- End API configuration card section -->
+
 </div>

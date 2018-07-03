@@ -4,6 +4,14 @@
     <div class='uil-ring-css' ng-show="loading">
         <div></div>
     </div>
+    <!-- End loading ring -->
+
+    <!-- Headline -->
+    <div ng-show="!loading" layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-file-text" aria-hidden="true"></i> Reporting</span>
+        <span class="md-subheader">List and download all the Wazuh app reports</span>
+    </div>
+    <!-- End headline -->
 
     <!-- No reports section -->
     <div flex layout="row" layout-align="start start" ng-show="!loading && (!pagedItems || !pagedItems.length)">
@@ -12,7 +20,7 @@
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No reports available</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column" class="wz-padding-top-10">
-                    <p>There are no reports yet. Go to the Overview or Agents tabs and click on the <span class="wz-agent-status-indicator wz-text-normal blue small">Generate report</span> button to create one.</p>
+                    <p>There are no reports yet. Go to the Overview or Agents tabs and click on the <i class="fa fa-fw fa-print" aria-hidden="true"></i> icon to create one.</p>
                 </div>
             </md-card-content>
         </md-card>
@@ -39,7 +47,7 @@
                                 <td>{{item.size / 1024 | number: 2}}KB</td>
                                 <td>{{item.date.split('T')[0]}} {{item.date.split('T')[1].split('.')[0]}}</td>
                                 <td>
-                                    <a ng-href="/api/wazuh-api/report/{{item.name}}" flex class="wz-text-right" target="_blank">
+                                    <a ng-href="/api/wazuh-reporting/report/{{item.name}}" flex class="wz-text-right" target="_blank">
                                         <i class="fa fa-fw fa-download"></i>
                                     </a>
                                     <a flex class="wz-text-right cursor-pointer" ng-click="deleteReport(item.name)">

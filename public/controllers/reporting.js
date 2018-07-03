@@ -16,7 +16,7 @@ const app = uiModules.get('app/wazuh', []);
 // Logs controller
 app.controller('reportingController', function ($scope, errorHandler, genericReq) {
     $scope.loading = true;
-    $scope.itemsPerPage = 20;
+    $scope.itemsPerPage = 15;
     $scope.pagedItems = [];
     $scope.currentPage = 0;
     let items = [];
@@ -25,11 +25,11 @@ app.controller('reportingController', function ($scope, errorHandler, genericReq
     const load = async () => {
         try {
             $scope.loading = true;
-            const data = await genericReq.request('GET','/api/wazuh-api/reports',{});
+            const data = await genericReq.request('GET','/api/wazuh-reporting/reports',{});
             items = data.data.list;
-            const gap = items.length / 20;
-            const gapInteger = parseInt(items.length / 20);
-            $scope.gap = gap - parseInt(items.length / 20) > 0 ? gapInteger + 1 : gapInteger;
+            const gap = items.length / 15;
+            const gapInteger = parseInt(items.length / 15);
+            $scope.gap = gap - parseInt(items.length / 15) > 0 ? gapInteger + 1 : gapInteger;
             if($scope.gap > 5) $scope.gap = 5;
             $scope.search();
             $scope.loading = false;
@@ -46,7 +46,7 @@ app.controller('reportingController', function ($scope, errorHandler, genericReq
     $scope.deleteReport = async name => {
         try {
             $scope.loading = true;
-            await genericReq.request('DELETE','/api/wazuh-api/report/' + name,{})
+            await genericReq.request('DELETE','/api/wazuh-reporting/report/' + name,{})
             await load();
             errorHandler.info('Success','Reporting');
         } catch (error) {

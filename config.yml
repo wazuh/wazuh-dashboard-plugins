@@ -45,13 +45,6 @@
 #extensions.aws       : false
 #extensions.virustotal: false
 #
-# ---------------------------- Basic authentication ----------------------------
-#
-# Defines if authentication is enabled or not.
-# Field enabled could be true or false, it means login is enabled/disabled.
-# Field password is the password used to authenticate on the Wazuh app.
-#login.enabled : false
-#login.password: changeme
 #
 # ---------------------------------- Time out ----------------------------------
 #

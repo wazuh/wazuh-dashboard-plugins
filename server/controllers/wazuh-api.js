@@ -11,29 +11,17 @@
  */
 
 // Require some libraries
-import needle              from 'needle'
-import path                from 'path'
-import colors              from 'ansicolors'
-import pciRequirementsFile from '../integration-files/pci-requirements'
-import gdprRequirementsFile from '../integration-files/gdpr-requirements'
-import ElasticWrapper      from '../lib/elastic-wrapper'
-import getPath             from '../../util/get-path'
-import packageInfo         from '../../package.json'
-import monitoring          from '../monitoring'
-import ErrorResponse       from './error-response'
-import { Parser }          from 'json2csv';
-import getConfiguration    from '../lib/get-configuration'
-import PDFDocument         from 'pdfkit'
-import fs                  from 'fs'
-import descriptions        from '../reporting/tab-description'
-import * as TimSort        from 'timsort'
-
-import { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations } from '../integration-files/visualizations'
-
-import { totalmem }        from 'os'
-
-
-const blueWazuh = colors.blue('wazuh');
+import needle               from 'needle';
+import pciRequirementsFile  from '../integration-files/pci-requirements';
+import gdprRequirementsFile from '../integration-files/gdpr-requirements';
+import ElasticWrapper       from '../lib/elastic-wrapper';
+import getPath              from '../../util/get-path';
+import packageInfo          from '../../package.json';
+import monitoring           from '../monitoring';
+import ErrorResponse        from './error-response';
+import { Parser }           from 'json2csv';
+import getConfiguration     from '../lib/get-configuration';
+import { totalmem }         from 'os';
 
 export default class WazuhApi {
     constructor(server){
@@ -43,7 +31,7 @@ export default class WazuhApi {
 
     async checkStoredAPI (req, reply) {
         try{
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3001, 401, reply);
+
             // Get config from elasticsearch
             const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
             if (wapi_config.error_code > 1) {
@@ -268,8 +256,6 @@ export default class WazuhApi {
     async getPciRequirement (req, reply) {
         try {
 
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3006, 401, reply);
-
             let pci_description = '';
 
             if (req.params.requirement === 'all') {
@@ -325,11 +311,6 @@ export default class WazuhApi {
 
     async getGdprRequirement (req, reply) {
         try {
-
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3023, 401, reply);
-
-
-
             let gdpr_description = '';
 
             if (req.params.requirement === 'all') {
@@ -445,7 +426,6 @@ export default class WazuhApi {
     }
 
     requestApi (req, reply) {
-        if(!protectedRoute(req)) return ErrorResponse('Session expired', 3014, 401, reply);
         if (!req.payload.method) {
             return ErrorResponse('Missing param: method', 3015, 400, reply);
         } else if (!req.payload.path) {
@@ -471,7 +451,6 @@ export default class WazuhApi {
     // Fetch agent status and insert it directly on demand
     async fetchAgents (req, reply) {
         try{
-            if(!protectedRoute(req)) return ErrorResponse('Session expired', 3017, 401, reply);
             const output = await this.fetchAgentsExternal();
             return reply({
                 'statusCode': 200,
@@ -488,10 +467,6 @@ export default class WazuhApi {
         try{
             const configFile = getConfiguration();
 
-            if(configFile && configFile['login.password']){
-                delete configFile['login.password'];
-            }
-
             return reply({
                 statusCode: 200,
                 error     : 0,
@@ -500,35 +475,6 @@ export default class WazuhApi {
 
         } catch (error) {
             return ErrorResponse(error.message || error, 3019, 500, reply);
-        }
-    }
-
-    login(req,reply) {
-        try{
-
-            const configFile = getConfiguration();
-
-            if(!configFile){
-                throw new Error('Configuration file not found');
-            }
-
-            if(!req.payload.password) {
-                return ErrorResponse('Please give me a password.', 3020, 401, reply);
-            } else if(req.payload.password !== configFile['login.password']){
-                return ErrorResponse('Wrong password, please try again.', 3021, 401, reply);
-            }
-
-            const code = (new Date()-1) + 'wazuhapp';
-
-            sessions[code] = {
-                created: new Date(),
-                exp    : 86400
-            }
-
-            return reply({ statusCode: 200, error: 0, code });
-
-        } catch (error) {
-            return ErrorResponse(error.message || error, 3022, 500, reply);
         }
     }
 
@@ -600,142 +546,7 @@ export default class WazuhApi {
         }
     }
 
-    async report(req,reply) {
-        try {
-
-            if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'))) {
-                fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
-            }
-  
-            if(req.payload && req.payload.array){
-                const doc = new PDFDocument();
-                doc.pipe(fs.createWriteStream(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name)));
-                doc.image(path.join(__dirname, '../../public/img/logo.png'),410,20,{fit:[150,70]})
-                doc.moveDown().fontSize(9).fillColor('blue').text('https://wazuh.com',442,50,{link: 'https://wazuh.com', underline:true, valign:'right', align: 'right'})
-
-                const tab     = req.payload.tab;
-                const section = req.payload.section;
-                
-                if(req.payload.section && typeof req.payload.section === 'string') {
-                    doc.fontSize(18).fillColor('black').text(descriptions[tab].title + ' report',45,70)
-                    doc.moveDown()
-                }
-
-                if(req.payload.time){
-                    const str = `${req.payload.time.from} to ${req.payload.time.to}`
-                    const currentY = doc.y;
-                    const currentX = doc.x;
-                    doc.fontSize(10).image(path.join(__dirname, '../reporting/clock.png'),currentX,currentY,{width:8, height:8}).text(str,currentX+10,currentY)
-                    doc.moveDown()
-                }
-                
-                if(req.payload.filters) {
-                    doc.x -= 10;
-                    let str = '';
-                    const len = req.payload.filters.length;
-                    for(let i=0; i < len; i++) {
-                        const filter = req.payload.filters[i];
-                        str += i === len - 1 ? 
-                                     filter.meta.key + ': ' + filter.meta.value :
-                                     filter.meta.key + ': ' + filter.meta.value + ' AND '
-                    }
-                    
-                    if(req.payload.searchBar) {
-                        str += ' AND ' + req.payload.searchBar;
-                    }
-
-                    const currentY = doc.y;
-                    const currentX = doc.x;
-                    doc.fontSize(10).image(path.join(__dirname, '../reporting/filters.png'),currentX,currentY,{width:8, height:8}).text(str,currentX+10,currentY)
-                    doc.moveDown()
-                    doc.x -= 10;
-                }
-
-
-                doc.fontSize(12).text(descriptions[tab].description)
-                doc.moveDown()
-                doc.moveDown()
-                let counter = 0;
-                let maxWidth = 0;
-                for(const item of req.payload.array){
-                    if(item.width > maxWidth) maxWidth = item.width;
-                }
-
-                const scaleFactor = 530 / maxWidth;
-
-                let pageNumber = 0;
-                doc.on('pageAdded', () => pageNumber++);
-                const len = req.payload.array.length;
-                for(let i = 0; i < len; i++){
-                    const item = req.payload.array[i]
-                    const title = req.payload.isAgents ? 
-                                  AgentsVisualizations[tab].filter(v => v._id === item.id) :
-                                  OverviewVisualizations[tab].filter(v => v._id === item.id);
-                    counter++;
-                    doc.fontSize(12).text(title[0]._source.title)
-                    doc.moveDown()
-                    doc.image(item.element,((doc.page.width - (item.width*scaleFactor)) / 2),doc.y,{ align: 'center', scale: scaleFactor });
-
-                    doc.moveDown()
-                    doc.moveDown()
-                    if(counter >= 3 || counter === 2 && pageNumber === 0) {
-                        doc.fontSize(7).text('Copyright © 2018 Wazuh, Inc.', 440, doc.page.height - 30, {
-                            lineBreak: false
-                        })
-                        if(i !== (len - 1)) doc.addPage();
-                        counter = 0;
-                    }
-                }
-
-                doc.fontSize(7).text('Copyright © 2018 Wazuh, Inc.', 440, doc.page.height - 30, {
-                    lineBreak: false
-                })
-
-                doc.end();
-            }
-            return reply({error: 0, data: null})
-        } catch (error) {
-            // Delete generated file if an error occurred
-            if(req && req.payload && req.payload.name && 
-               fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name))
-            ) {
-                fs.unlinkSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name))
-            }
-            return ErrorResponse(error.message || error, 3029, 500, reply);
-        }
-    }
-
-    async getReports(req,reply) {
-        try {
-            if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'))) {
-                fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
-            }
-            const list = [];
-            const reportDir = path.join(__dirname, '../../../../optimize/wazuh-reporting');
-            const sortFunction = (a,b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
-            fs.readdirSync(reportDir).forEach(file => {
-                const stats = fs.statSync(reportDir + '/' + file);
-                file = {
-                    name: file,
-                    size: stats.size,
-                    date: stats.birthtime
-                }
-                list.push(file)
-            })
-            TimSort.sort(list,sortFunction)
-            return reply({list: list});
-        } catch (error) {
-            return ErrorResponse(error.message || error, 3031, 500, reply);
-        }
-    }
-
-    async getReportByName(req,reply) {
-        try {
-            return reply.file(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.params.name));
-        } catch (error) {
-            return ErrorResponse(error.message || error, 3030, 500, reply);
-        }
-    }
+    
 
     async totalRam(req,reply) {
         try{
@@ -747,15 +558,6 @@ export default class WazuhApi {
         }
     }
 
-
-    async deleteReportByName(req,reply) {
-        try {
-            fs.unlinkSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.params.name))
-            return reply({error:0})
-        } catch (error) {
-            return ErrorResponse(error.message || error, 3032, 500, reply);
-        }
-    }
 
     async getAgentsFieldsUniqueCount(req, reply) {
         try {
@@ -776,7 +578,7 @@ export default class WazuhApi {
             const url = `${config.url}:${config.port}/agents`;
 
             const params = {
-                limit : 2000,
+                limit : 500,
                 offset: 0,
                 sort  :'-dateAdd'
             }

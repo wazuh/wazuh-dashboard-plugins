@@ -19,13 +19,13 @@ import * as FileSaver from '../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsController', 
+app.controller('agentsController',
 
 function (
-    $timeout, $scope, $location, $rootScope, 
-    appState, apiReq, AgentsAutoComplete, errorHandler, 
-    tabVisualizations, vis2png, shareAgent, commonData, 
-    reportingService, visFactoryService, csvReq, 
+    $timeout, $scope, $location, $rootScope,
+    appState, apiReq, AgentsAutoComplete, errorHandler,
+    tabVisualizations, vis2png, shareAgent, commonData,
+    reportingService, visFactoryService, csvReq,
     wzTableFilter
 ) {
 
@@ -51,6 +51,13 @@ function (
     $scope.tabNames = TabNames;
 
     tabVisualizations.assign('agents');
+
+    $scope.hostMonitoringTabs = ['general', 'fim', 'configuration', 'syscollector'];
+    $scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    $scope.securityTabs = ['vuls', 'virustotal'];
+    $scope.complianceTabs = ['pci', 'gdpr'];
+
+    $scope.inArray = (item, array) => item && Array.isArray(array) && array.includes(item);
 
     const createMetrics = metricsObject => {
         for(let key in metricsObject) {
@@ -229,7 +236,7 @@ function (
             const blob         = new Blob([output], {type: 'text/csv'});
 
             FileSaver.saveAs(blob, 'packages.csv');
-            
+
             return;
 
         } catch (error) {
@@ -324,7 +331,7 @@ function (
         $scope.$broadcast('wazuhSearch',{term})
     }
 
-    $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab, true);
+    $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab, $scope.agent && $scope.agent.id ? $scope.agent.id : true);
 
     //Load
     try {

@@ -14,8 +14,9 @@
 /* -------------------------------------------------------------------------- */
 
 import './common.less';
-import './layout.less';
+import './component.less';
 import './height.less';
-import './typography.less';
+import './layout.less';
 import './media-queries.less';
-import 'ui/styles/theme.less';
+import './typography.less';
+import './ui_framework.css';

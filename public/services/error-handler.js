@@ -17,7 +17,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
     const notify = new Notifier();
 
     const extractMessage = error => {
-        if(error && error.status && error.status === -1) return 'Could not reach server'
+        if(error && error.status && error.status === -1) return 'Server did not respond';
         if(error.data && error.data.errorData && error.data.errorData.message) return error.data.errorData.message;
         if(error.errorData && error.errorData.message) return error.errorData.message;
         if(error.data && typeof error.data === 'string') return error.data;
@@ -32,7 +32,6 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
         return error || 'Unexpected error';
     }
 
-    const isUnauthorized = error => (error.status && error.status === 401);
     const isAPIUnauthorized = error => (error && error.data && parseInt(error.data.statusCode) === 500 && parseInt(error.data.error) === 7 && error.data.message === '401 Unauthorized');
 
     const info = (message,location) => {
@@ -48,12 +47,8 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
             $location.path('/settings');
             return;
         }
+        
         const message = extractMessage(error);
-        if(isUnauthorized(error)){
-            appState.removeUserCode();
-            $location.path('/wlogin');
-            return;
-        }
 
         let text;
         text = isWarning ? `Warning. ${message}` : `Error. ${message}`;

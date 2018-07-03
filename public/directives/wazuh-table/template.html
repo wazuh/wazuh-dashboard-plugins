@@ -14,7 +14,7 @@
             </th>
         </thead>
         <tbody>
-            <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage]" ng-click="clickAction(item)">
+            <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}" ng-click="clickAction(item)">
                 <td ng-repeat="key in keys" ng-if="path !== '/decoders'">
                     {{ 
                         key === 'os.name' ? 
@@ -41,16 +41,16 @@
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}} seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
-                        <li ng-class="{disabled: currentPage == 0}" class="md-padding">
+                        <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">« Prev</a>
                         </li>
 
-                        <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{active: n == currentPage}" ng-click="setPage()"
+                        <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{'wz-text-active': n == currentPage}" ng-click="setPage()"
                             class="md-padding">
                             <a href ng-bind="n + 1">1</a>
                         </li>
 
-                        <li ng-class="{disabled: (currentPage) == pagedItems.length - 1}" class="md-padding">
+                        <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">Next »</a>
                         </li>
                     </ul>

@@ -1,12 +1,7 @@
-<md-content flex layout="column" ng-if="tab === 'configuration' && configurationError">
-
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
-    </div>
+<md-content flex layout="column" ng-if="tab === 'configuration' && configurationError" ng-show="!load">
 
     <!-- This container appears when there's some error getting the configuration -->
-    <div layout="column" layout-align="start stretch" ng-show="!load">
+    <div layout="column" layout-align="start stretch" >
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-warning"></i> Warning</span>
@@ -33,15 +28,10 @@
 
 </md-content>
 
-<md-content flex layout="column" layout-align="start" ng-if="tab === 'configuration' && !configurationError">
-
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
-    </div>
+<md-content flex layout="column" layout-align="start" ng-if="tab === 'configuration' && !configurationError" ng-show="!load">
 
     <!-- The section container -->
-    <div flex layout="column" layout-align="start stretch" ng-show="!load" ng-init="toggleRAW=false;selectedConfigTab='fim';">
+    <div flex layout="column" layout-align="start stretch" ng-init="toggleRAW=false;selectedConfigTab='fim';">
 
         <!-- First row - Configuration status and other details -->
         <div layout="row">
@@ -217,7 +207,7 @@
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
                             <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> File Integrity</span>
-                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                            <md-switch flex="15" class="wz-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -370,7 +360,7 @@
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
                             <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-check"></i> Policy Monitoring</span>
-                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                            <md-switch flex="15" class="wz-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -522,7 +512,7 @@
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
                             <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-laptop"></i> Syscollector</span>
-                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                            <md-switch flex="15" class="wz-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -563,7 +553,7 @@
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
                             <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-sliders"></i> OpenSCAP</span>
-                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                            <md-switch flex="15" class="wz-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -620,7 +610,7 @@
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
                             <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-rocket"></i> CIS-CAT</span>
-                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                            <md-switch flex="15" class="wz-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -661,7 +651,7 @@
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
                             <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-reorder"></i> Log Collection</span>
-                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                            <md-switch flex="15" class="wz-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -713,7 +703,7 @@
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
                             <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-terminal"></i> Remote Command</span>
-                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                            <md-switch flex="15" class="wz-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -757,7 +747,7 @@
                         <!-- Section title -->
                         <div layout="row" layout-align="start center">
                             <span flex="85" class="wz-headline-title"><i class="fa fa-fw fa-eye"></i> JSON viewer</span>
-                            <md-switch flex="15" class="wz-md-switch" ng-model="toggleRAW">View JSON</md-switch>
+                            <md-switch flex="15" class="wz-switch" ng-model="toggleRAW">View JSON</md-switch>
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>

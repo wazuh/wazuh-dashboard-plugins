@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import './blank-screen-controller'
-import './login'
 import './overview'
 import './manager'
 import './ruleset'

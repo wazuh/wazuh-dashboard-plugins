@@ -9,8 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import WazuhElastic    from './wazuh-elastic'
-import WazuhApiElastic from './wazuh-api-elastic'
-import WazuhApi        from './wazuh-api'
+import WazuhElastic       from './wazuh-elastic';
+import WazuhApiElastic    from './wazuh-api-elastic';
+import WazuhApi           from './wazuh-api';
+import WazuhReportingCtrl from './wazuh-reporting';
 
-export { WazuhElastic, WazuhApiElastic, WazuhApi }
+export { WazuhElastic, WazuhApiElastic, WazuhApi, WazuhReportingCtrl };

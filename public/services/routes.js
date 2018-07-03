@@ -24,7 +24,6 @@ import managerTemplate     from '../templates/manager/manager.jade'
 import overviewTemplate    from '../templates/overview/overview.jade'
 import discoverTemplate    from '../templates/discover/discover.jade'
 import settingsTemplate    from '../templates/settings/settings.jade'
-import loginTemplate       from '../templates/auth/login.html'
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html'
 import devToolsTemplate    from '../templates/dev-tools/dev-tools.html'
 
@@ -34,6 +33,7 @@ routes
     .when('/health-check', {
         template: healthCheckTemplate,
         resolve: {
+            "ip": getIp,
             "checkAPI": settingsWizard
         }
     })
@@ -95,9 +95,6 @@ routes
         resolve: {
             "checkAPI": goToKibana
         }
-    })
-    .when('/wlogin', {
-        template: loginTemplate
     })
     .when('/wazuh-dev', {
         template: devToolsTemplate,

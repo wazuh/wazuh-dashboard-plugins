@@ -44,6 +44,13 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
     // This object represents the number of visualizations per tab; used to show a progress bar
     tabVisualizations.assign('overview');
 
+    $scope.hostMonitoringTabs = ['general', 'fim', 'aws'];
+    $scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    $scope.securityTabs = ['vuls', 'virustotal'];
+    $scope.complianceTabs = ['pci', 'gdpr'];
+
+    $scope.inArray = (item, array) => item && Array.isArray(array) && array.includes(item);
+
     const createMetrics = metricsObject => {
         for(let key in metricsObject) {
             $scope[key] = () => generateMetric(metricsObject[key]);
