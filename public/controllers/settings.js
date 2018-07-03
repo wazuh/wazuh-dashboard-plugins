@@ -57,6 +57,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     // Remove API entry
     $scope.removeManager = async item => {
         try {
+
             let index = $scope.apiEntries.indexOf(item);
             if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
                 if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
@@ -70,6 +71,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             wzMisc.setApiIsDown(false)
             $scope.apiIsDown = false;
             $scope.isEditing = false;
+            for(const key in $scope.showEditForm) $scope.showEditForm[key] = false;
             errorHandler.info('The API was removed successfully','Settings');
             if(!$scope.$$phase) $scope.$digest();
             return;
@@ -191,6 +193,10 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     }
 
     $scope.toggleEditor = entry => {
+        for(const key in $scope.showEditForm) {
+            if(entry && entry._id === key) continue;
+            $scope.showEditForm[key] = false;
+        }
         $scope.showEditForm[entry._id] = !$scope.showEditForm[entry._id];
         $scope.isEditing = $scope.showEditForm[entry._id];
         $scope.addManagerContainer = false;
