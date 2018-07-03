@@ -97,7 +97,7 @@ app.directive('wazuhTable', function() {
                 if ($scope.currentPage > 0) {
                     $scope.currentPage--;
                 }
-                $scope.nextPage($scope.currentPage);
+
             };
             
             const fetch = async (options = {}) => {
