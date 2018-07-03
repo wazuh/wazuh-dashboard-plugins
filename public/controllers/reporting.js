@@ -16,7 +16,7 @@ const app = uiModules.get('app/wazuh', []);
 // Logs controller
 app.controller('reportingController', function ($scope, errorHandler, genericReq) {
     $scope.loading = true;
-    $scope.itemsPerPage = 20;
+    $scope.itemsPerPage = 15;
     $scope.pagedItems = [];
     $scope.currentPage = 0;
     let items = [];
@@ -27,9 +27,9 @@ app.controller('reportingController', function ($scope, errorHandler, genericReq
             $scope.loading = true;
             const data = await genericReq.request('GET','/api/wazuh-reporting/reports',{});
             items = data.data.list;
-            const gap = items.length / 20;
-            const gapInteger = parseInt(items.length / 20);
-            $scope.gap = gap - parseInt(items.length / 20) > 0 ? gapInteger + 1 : gapInteger;
+            const gap = items.length / 15;
+            const gapInteger = parseInt(items.length / 15);
+            $scope.gap = gap - parseInt(items.length / 15) > 0 ? gapInteger + 1 : gapInteger;
             if($scope.gap > 5) $scope.gap = 5;
             $scope.search();
             $scope.loading = false;
