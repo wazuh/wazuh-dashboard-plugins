@@ -17,21 +17,21 @@
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}" ng-click="clickAction(item)">
                 <td ng-repeat="key in keys" ng-if="path !== '/decoders'">
                     {{ 
-                        key === 'os.name' ? 
-                        item.os.name || '---' : 
-                        key === 'os.version' ? 
-                        item.os.version || '---' : 
-                        checkIfArray(item[key.value || key]) || '---' 
+                        nonDecoderValue(key,item) | limitTo: 25
                     }}
+                    <span ng-if="nonDecoderValue(key,item).length > 25">...</span>
+                    <md-tooltip ng-if="nonDecoderValue(key,item).length > 25" md-direction="bottom" class="wz-tooltip">
+                        {{ nonDecoderValue(key,item) }}
+                    </md-tooltip>
                 </td>
                 <td ng-repeat="key in keys" ng-if="path === '/decoders'">
                     {{ 
-                        key === 'details.program_name' || key.value === 'details.program_name' ? 
-                        item.details.program_name || '---' : 
-                        key === 'details.order' || key.value === 'details.order' ? 
-                        item.details.order || '---' : 
-                        checkIfArray(item[key.value || key]) || '---' 
+                        decoderValue(key,item) | limitTo: 25 
                     }}
+                    <span ng-if="decoderValue(key,item).length > 25">...</span>
+                    <md-tooltip ng-if="decoderValue(key,item).length > 25" md-direction="bottom" class="wz-tooltip">
+                        {{ decoderValue(key,item) }}
+                    </md-tooltip>
                 </td>
                 
             </tr>

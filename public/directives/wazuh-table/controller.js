@@ -273,16 +273,32 @@ app.directive('wazuhTable', function() {
                 return array;
             };
 
-            $scope.checkIfArray = item => {
-                return typeof item === 'object' ? 
-                       splitArray(item) :
-                       item == 0 ? '0' : item;
-            };
-
+            const checkIfArray = item => typeof item === 'object' ? 
+                                                 splitArray(item) :
+                                                        item == 0 ? 
+                                                              '0' : 
+                                                              item;
+            
             $scope.$on('$destroy',() => {
                 realTime = null;
                 wzTableFilter.set([]);
             });
+
+            $scope.nonDecoderValue = (key,item) => {
+                return  key === 'os.name' ? 
+                        item.os.name || '---' : 
+                        key === 'os.version' ? 
+                        item.os.version || '---' : 
+                        checkIfArray(item[key.value || key]) || '---';
+            };
+
+            $scope.decoderValue = (key,item) => {
+                return  key === 'details.program_name' || key.value === 'details.program_name' ? 
+                        item.details.program_name || '---' : 
+                        key === 'details.order' || key.value === 'details.order' ? 
+                        item.details.order || '---' : 
+                        checkIfArray(item[key.value || key]) || '---'; 
+            };
 
         },
         template: template
