@@ -580,7 +580,7 @@ export default class WazuhApi {
             const params = {
                 limit : 500,
                 offset: 0,
-                sort  :'-date_add'
+                sort  :'-dateAdd'
             }
             
             const items = [];

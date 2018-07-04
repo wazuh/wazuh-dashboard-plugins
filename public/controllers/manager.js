@@ -93,7 +93,7 @@ app.controller('managerStatusController', function ($scope, errorHandler, apiReq
         $scope.totalRules    = data[3].data.data.totalItems;
         $scope.totalDecoders = data[4].data.data.totalItems;
 
-        return apiReq.request('GET', '/agents', { limit: 1, sort: '-date_add' });
+        return apiReq.request('GET', '/agents', { limit: 1, sort: '-dateAdd' });
     })
     .then(lastAgent => apiReq.request('GET', `/agents/${lastAgent.data.data.items[0].id}`, {}))
     .then(agentInfo => {
