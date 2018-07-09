@@ -14,32 +14,11 @@ import fs      from 'fs';
 import path    from 'path';
 
 let allowed = false;
-let wazuhlogger = undefined;
-
-/**
- * Here we create the logger
- */
-const initLogger = () => {
-    wazuhlogger = winston.createLogger({
-        level     : 'info',
-        format    : winston.format.json(),
-        transports: [
-            new winston.transports.File({
-                filename: path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log')
-            })
-        ]
-    });
-    
-    /**
-     * Prevents from exit on error related to the logger.
-     */
-    wazuhlogger.exitOnError = false;  
-};
 
 /** 
  * Checks if wazuh-logs exists. If it doesn't exist, it will be created.
  */
-const initDirectory = async () => {
+const initDirectory = () => {
     try{
         if(!path.join(__dirname).includes('/usr/share/kibana') &&
             path.join(__dirname).includes('plugins') &&
@@ -51,15 +30,31 @@ const initDirectory = async () => {
         if (!fs.existsSync(path.join(__dirname, '../../../optimize/wazuh-logs'))) {
             fs.mkdirSync(path.join(__dirname, '../../../optimize/wazuh-logs'));
         }
-        if(typeof wazuhlogger === 'undefined') initLogger();
         allowed = true;
         return;
     } catch (error) {
         allowed = false;
-        return Promise.reject(error);
+        console.error(`Cannot create the logs directory due to:\n${error.message || error}`);
     }
 }
 
+/**
+ * Here we create the logger
+ */
+const wazuhlogger = winston.createLogger({
+    level     : 'info',
+    format    : winston.format.json(),
+    transports: [
+        new winston.transports.File({
+            filename: path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log')
+        })
+    ]
+});
+
+/**
+ * Prevents from exit on error related to the logger.
+ */
+wazuhlogger.exitOnError = false;
 
 /**
  * Returns given file size in MB, if the file doesn't exist returns 0
@@ -86,17 +81,10 @@ const checkFiles = () => {
             fs.renameSync(
                 path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log'),
                 path.join(__dirname, `../../../optimize/wazuh-logs/wazuhapp.${new Date().getTime()}.log`)
-            );
-            fs.writeFileSync(path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log'),JSON.stringify({
-                date    : new Date(),
-                level   : 'info',
-                location: 'logger',
-                message : 'Rotated log file'
-            }) + '\n');
+            )
         }
     }
 };
-
 
 /**
  * Main function to add a new log
@@ -105,17 +93,14 @@ const checkFiles = () => {
  * @param {*} level Optional, default is 'error'
  */
 export default (location, message, level) => {
-    initDirectory()
-    .then(() => {
-        if(allowed){
-            checkFiles();
-            wazuhlogger.log({
-                date    : new Date(),
-                level   : level || 'error',
-                location: location || 'unknown',
-                message : message || 'An error occurred'
-            });
-        }
-    })
-    .catch(error => console.error(`Cannot create the logs directory due to:\n${error.message || error}`));
+    initDirectory();
+    if(allowed){
+        checkFiles();
+        wazuhlogger.log({
+            date    : new Date(),
+            level   : level || 'error',
+            location: location || 'unknown',
+            message : message || 'An error occurred'
+        });
+    }
 };

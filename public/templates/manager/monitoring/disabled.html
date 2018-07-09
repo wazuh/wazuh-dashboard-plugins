@@ -4,9 +4,9 @@
     <div layout="row" layout-align="start center">
         <div layout="row" layout-padding>
             <div>
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
-                <span> / </span>
-                <span>{{ tabNames[tab] }}</span>
+                <span> / {{ tabNames[tab] }}</span>
             </div>
         </div>
     </div>
@@ -46,5 +46,4 @@
         </md-card>
     </div>
     <!-- End cluster disabled section -->
-
 </div>
