@@ -37,7 +37,7 @@ app.service('errorHandler', function ( Notifier, appState, $location) {
     const info = (message,location) => {
         if(typeof message === 'string') {
             message = location ? location + '. ' + message : message;
-            notify.custom(message,{ title: 'Information', icon: 'info', type: 'info'});
+            notify.info(message);
         }
         return;
     }

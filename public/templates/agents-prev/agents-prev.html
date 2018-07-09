@@ -104,7 +104,7 @@
         <wazuh-table 
             flex 
             path="'/agents'" 
-            keys="['id',{value:'name',size:2},'ip','status','group','os.name','os.version','version']" 
+            keys="['id',{value:'name',size:2},'ip','status',{value:'group',nosortable:true},'os.name','os.version','version']" 
             allow-click="true"
             rows-per-page="17">
         </wazuh-table>

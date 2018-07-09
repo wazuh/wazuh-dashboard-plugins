@@ -580,13 +580,13 @@ export default class WazuhApi {
             const params = {
                 limit : 500,
                 offset: 0,
-                sort  :'-dateAdd'
+                sort  :'-date_add'
             }
             
             const items = [];
 
             const output = await needle('get', url, params, headers)
-
+            
             items.push(...output.body.data.items)
 
             const totalItems = output.body.data.totalItems;

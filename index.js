@@ -29,18 +29,14 @@ export default kibana => new kibana.Plugin({
                 'visResponseHandlers',
                 'visRequestHandlers',
                 'visEditorTypes',
-                'savedObjectTypes',   
+                'savedObjectTypes',
                 'spyModes',
                 'fieldFormats',
-                'fieldFormatEditors',
-                'navbarExtensions',
-                'managementSections',
-                'devTools',
-                'docViews',
-                'embeddableFactories'
-            ]
+            ],
+            injectVars: server => {
+                return server.plugins.kibana.injectVars(server);
+            }
         }
     },
-    init: (server,options) => init(server,options)
-    
+    init
 });
