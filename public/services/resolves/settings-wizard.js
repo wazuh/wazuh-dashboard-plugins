@@ -13,7 +13,7 @@ import checkTimestamp from './check-timestamp'
 import healthCheck    from './health-check'
 import totalRAM       from './check-ram'
 
-export default ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc) => {
+export default ($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) => {
     try {
         const deferred = $q.defer();
 
@@ -75,36 +75,37 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
 
             appState.setClusterInfo(data.data.data.cluster_info);
             deferred.resolve();
-        }
+        };
 
         const callCheckStored = () => {
-            genericReq.request('GET', '/api/wazuh-api/configuration', {})
-            .then(config => {
-                const currentApi = appState.getCurrentAPI();
-                if(currentApi && !appState.getExtensions(JSON.parse(currentApi).id)){
-                    const extensions = {
-                        audit: typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true,
-                        pci:   typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true,
-                        gdpr:  typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true,
-                        oscap: typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true,
-                        ciscat: typeof config.data.data['extensions.ciscat'] !== 'undefined' ? config.data.data['extensions.ciscat'] : false,
-                        aws:   typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false,
-                        virustotal: typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false
-                    }
-                    appState.setExtensions(JSON.parse(currentApi).id,extensions)
-                }
-                return checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location);
-            })
+            const config = wazuhConfig.getConfig();
+
+            const currentApi = appState.getCurrentAPI();
+
+            if(currentApi && !appState.getExtensions(JSON.parse(currentApi).id)){
+                const extensions = {
+                    audit     : config['extensions.audit'],
+                    pci       : config['extensions.pci'],
+                    gdpr      : config['extensions.gdpr'],
+                    oscap     : config['extensions.oscap'],
+                    ciscat    : config['extensions.ciscat'],
+                    aws       : config['extensions.aws'],
+                    virustotal: config['extensions.virustotal']
+                };
+                appState.setExtensions(JSON.parse(currentApi).id,extensions);
+            }
+            
+            checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location)
             .then(() => testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id))
             .then(data => {
                 if(data && data === 'cookies_outdated'){
                     $location.search('tab','welcome');
-                    $location.path('/overview')
+                    $location.path('/overview');
                 } else {
                     if (data.data.error || data.data.data.apiIsDown) {
                         checkResponse(data);
                     } else {
-                        wzMisc.setApiIsDown(false)
+                        wzMisc.setApiIsDown(false);
                         changeCurrentApi(data);
                     }
                 }
@@ -117,7 +118,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 $location.search('tab', 'api');
                 $location.path('/settings');
             });
-        }
+        };
 
         if (!$location.path().includes("/health-check") && healthCheck($window, $rootScope)) {
             $location.path('/health-check');

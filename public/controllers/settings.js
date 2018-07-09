@@ -16,7 +16,8 @@ import TabNames      from '../utils/tab-names'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('settingsController', function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc) {
+app.controller('settingsController', 
+function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
     if (wzMisc.getValue('comeFromWizard')) {
         sessionStorage.removeItem('healthCheck');
         wzMisc.setWizard(false)
@@ -41,7 +42,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
     // Tab names
     $scope.tabNames = TabNames;
-
+    $scope.configuration = wazuhConfig.getConfig();
     $scope.indexPatterns = [];
     $scope.apiEntries    = [];
 
@@ -52,7 +53,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
     $scope.switchTab = tab => {
         $scope.tab = tab;
         $location.search('tab', $scope.tab);
-    }
+    };
 
     // Remove API entry
     $scope.removeManager = async item => {
@@ -229,26 +230,26 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
                 extensions  : {}
             };
 
-            const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-            appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
-            if(config.data && config.data.data) {
-                tmpData.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
-                tmpData.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
-                tmpData.extensions.gdpr = typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true;
-                tmpData.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
-                tmpData.extensions.ciscat = typeof config.data.data['extensions.ciscat'] !== 'undefined' ? config.data.data['extensions.ciscat'] : false;
-                tmpData.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
-                tmpData.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
-            }
+            const config = wazuhConfig.getConfig();
 
-            const checkData = await testAPI.check(tmpData)
+            appState.setPatternSelector(config['ip.selector']);
+     
+            tmpData.extensions.audit      = config['extensions.audit'];
+            tmpData.extensions.pci        = config['extensions.pci'];
+            tmpData.extensions.gdpr       = config['extensions.gdpr'];
+            tmpData.extensions.oscap      = config['extensions.oscap'];
+            tmpData.extensions.ciscat     = config['extensions.ciscat'];
+            tmpData.extensions.aws        = config['extensions.aws'];
+            tmpData.extensions.virustotal = config['extensions.virustotal'];
+        
+            const checkData = await testAPI.check(tmpData);
 
             // API Check correct. Get Cluster info
             tmpData.cluster_info = checkData.data;
 
             // Insert new API entry
             const data = await genericReq.request('PUT', '/api/wazuh-api/settings', tmpData);
-            appState.setExtensions(data.data.response._id,tmpData.extensions)
+            appState.setExtensions(data.data.response._id,tmpData.extensions);
             const newEntry = {
                 _id: data.data.response._id,
                 _source: {
@@ -266,7 +267,7 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             errorHandler.info('Wazuh API successfully added','Settings');
             $scope.addManagerContainer = false;
 
-            $scope.formData = {}
+            $scope.formData = {};
 
             // Setting current API as default if no one is in the cookies
             if (!appState.getCurrentAPI()) { // No cookie
@@ -441,23 +442,23 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
             $scope.appInfo["installationDate"] = data.data.data["installationDate"];
             $scope.appInfo["revision"]         = data.data.data["revision"];
             $scope.load = false;
-            const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-            appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
+            const config = wazuhConfig.getConfig();
+            appState.setPatternSelector(config['ip.selector']);
             if (appState.getCurrentPattern() !== undefined && appState.getCurrentPattern() !== null) { // There's a pattern in the cookies
                 $scope.selectedIndexPattern = appState.getCurrentPattern();
             } else { // There's no pattern in the cookies, pick the one in the settings
-               $scope.selectedIndexPattern = config.data.data["pattern"];
+               $scope.selectedIndexPattern = config['pattern'];
             }
 
-            if(config.data && config.data.data && !appState.getCurrentAPI()) {
+            if(!appState.getCurrentAPI()) {
                 $scope.extensions = {};
-                $scope.extensions.audit = typeof config.data.data['extensions.audit'] !== 'undefined' ? config.data.data['extensions.audit'] : true;
-                $scope.extensions.pci = typeof config.data.data['extensions.pci'] !== 'undefined' ? config.data.data['extensions.pci'] : true;
-                $scope.extensions.gdpr = typeof config.data.data['extensions.gdpr'] !== 'undefined' ? config.data.data['extensions.gdpr'] : true;
-                $scope.extensions.oscap = typeof config.data.data['extensions.oscap'] !== 'undefined' ? config.data.data['extensions.oscap'] : true;
-                $scope.extensions.ciscat = typeof config.data.data['extensions.ciscat'] !== 'undefined' ? config.data.data['extensions.ciscat'] : false;
-                $scope.extensions.aws = typeof config.data.data['extensions.aws'] !== 'undefined' ? config.data.data['extensions.aws'] : false;
-                $scope.extensions.virustotal = typeof config.data.data['extensions.virustotal'] !== 'undefined' ? config.data.data['extensions.virustotal'] : false;
+                $scope.extensions.audit      = config['extensions.audit'];
+                $scope.extensions.pci        = config['extensions.pci'];
+                $scope.extensions.gdpr       = config['extensions.gdpr'];
+                $scope.extensions.oscap      = config['extensions.oscap'];
+                $scope.extensions.ciscat     = config['extensions.ciscat'];
+                $scope.extensions.aws        = config['extensions.aws'];
+                $scope.extensions.virustotal = config['extensions.virustotal'];
             } else {
                 $scope.extensions = appState.getExtensions(JSON.parse(appState.getCurrentAPI()).id);
             }
