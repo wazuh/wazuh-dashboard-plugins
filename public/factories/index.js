@@ -18,3 +18,4 @@ import './vis-handlers';
 import './vis2png';
 import './share-agent';
 import './misc';
+import './wazuh-config';
