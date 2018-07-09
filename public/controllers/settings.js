@@ -384,7 +384,8 @@ app.controller('settingsController', function ($scope, $rootScope, $http, $route
 
             const tmpUrl = `/api/wazuh-api/updateApiHostname/${$scope.apiEntries[index]._id}`;
             await genericReq.request('PUT', tmpUrl , { cluster_info: tmpData.cluster_info });
-
+            // Emit updateAPI event cause the cluster info could had been changed
+            $scope.$emit('updateAPI',{ cluster_info: tmpData.cluster_info });
             $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
             wzMisc.setApiIsDown(false)
             $scope.apiIsDown = false;
