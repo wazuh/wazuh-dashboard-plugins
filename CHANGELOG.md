@@ -6,36 +6,51 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
--   Improvements for app tables ([#627](https://github.com/wazuh/wazuh-kibana-app/pull/627)):
-    -   Now the current page will be highlighted.
-    -   The gap has been fixed to the items per page value.
-    -   If there's no more pages for _Next_ or _Prev_ buttons, they will be hidden.
+-   Improvements for latest app redesign ([#652](https://github.com/wazuh/wazuh-kibana-app/pull/652)):
+    -   The _Welcome_ tabs have been simplified, following a more Elastic design.
+    -   Added again the `md-nav-bar` component with refined styles and limited to specific sections.
+    -   The _Settings > Welcome_ tab has been removed. You can use the nav bar to switch tabs.
+    -   Minor CSS adjustments and reordering.
 -   Small app UI improvements ([#634](https://github.com/wazuh/wazuh-kibana-app/pull/634)):
-    -   Added link to the agents list on the Agents tab breadcrumbs.
+    -   Added link to _Agents Preview_ on the _Agents_ tab breadcrumbs.
     -   Replaced the _Generate report_ button with a smaller one.
     -   Redesigned _Management > Ruleset_ `md-chips` to look similar to Kibana filter pills.
     -   Added agent information bar from _Agents > General_ to _Agents > Welcome_ too.
     -   Refactored flex layout on _Welcome_ tabs to fix a height visual bug.
     -   Removed duplicated loading rings on the _Agents_ tab.
+-   Improvements for app tables ([#627](https://github.com/wazuh/wazuh-kibana-app/pull/627)):
+    -   Now the current page will be highlighted.
+    -   The gap has been fixed to the items per page value.
+    -   If there are no more pages for _Next_ or _Prev_ buttons, they will be hidden.
+-   Improvements for app health check ([#637](https://github.com/wazuh/wazuh-kibana-app/pull/637)):
+    -   Improved design for the view.
+    -   The checks have been placed on a table, showing the current status of each one.
 -   Changes to our reporting feature ([#639](https://github.com/wazuh/wazuh-kibana-app/pull/639)):
     -   Now the generated reports will include tables for each section.
-    -   Added an parser for getting Elasticsearch data table responses.
+    -   Added a parser for getting Elasticsearch data table responses.
     -   The reporting feature is now a separated module, and the code has been refactored.
+-   Improvements for app tables pagination ([#646](https://github.com/wazuh/wazuh-kibana-app/pull/646)).
 
 ### Changed
 
 -   Now the `pretty` parameter on the _Dev tools_ tab will be ignored to avoid `Unexpected error` messages ([#624](https://github.com/wazuh/wazuh-kibana-app/pull/624)).
 -   The `pdfkit` dependency has been replaced by `pdfmake` ([#639](https://github.com/wazuh/wazuh-kibana-app/pull/639)).
+-   Changed some Kibana tables for performance improvements on the reporting feature ([#644](https://github.com/wazuh/wazuh-kibana-app/pull/644)).
+-   Changed the method to refresh the list of known fields on the index pattern ([#650](https://github.com/wazuh/wazuh-kibana-app/pull/650)):
+    -   Now when restarting Kibana, the app will update the fieldset preserving the custom user fields.
 
 ### Fixed
 
 -   Fixed bug on _Agents CIS-CAT_ tab who wasn't loading the appropriate visualizations ([#626](https://github.com/wazuh/wazuh-kibana-app/pull/626)).
--   Fixed a bug where sometimes the index pattern could be `undefined` during the healthcheck process, leading into a false error message when loading the app ([#640](https://github.com/wazuh/wazuh-kibana-app/pull/640)).
+-   Fixed a bug where sometimes the index pattern could be `undefined` during the health check process, leading into a false error message when loading the app ([#640](https://github.com/wazuh/wazuh-kibana-app/pull/640)).
+-   Fixed several bugs on the _Settings > API_ tab when removing, adding or editing new entries.
 
 ### Removed
 
 -   Removed the app login system ([#636](https://github.com/wazuh/wazuh-kibana-app/pull/636)):
     -   This feature was unstable, experimental and untested for a long time. We'll provide much better RBAC capabilities in the future.
+-   Removed the new Kuery language option on Discover app search bars.
+    -   This feature will be restored in the future, after more Elastic v6.3.0 adaptations.
 
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.0 - Revision 397
 

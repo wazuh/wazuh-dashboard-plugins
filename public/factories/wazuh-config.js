@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for app requirements and set up
+ * Wazuh app - Factory to store values from configuration file
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,13 +9,18 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './data-handler-composer';
-import './raw-visualizations';
-import './loaded-visualizations';
-import './tab-visualizations';
-import './discover-pending-updates';
-import './vis-handlers';
-import './vis2png';
-import './share-agent';
-import './misc';
-import './wazuh-config';
+import { uiModules } from 'ui/modules';
+
+uiModules
+.get('app/wazuh', [])
+.factory('wazuhConfig', 
+function() {
+    const config = {};
+
+    const setConfig = cfg => Object.assign(config,cfg);
+
+    const getConfig = () => config;
+
+    return { setConfig, getConfig };
+
+});

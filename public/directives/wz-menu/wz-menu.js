@@ -17,7 +17,7 @@ const app = uiModules.get('app/wazuh', []);;
 
 app.directive('wzMenu',function(){
     return {
-        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler, genericReq, $location, wzMisc) {
+        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler, genericReq, $location, wzMisc, wazuhConfig) {
 
             $rootScope.showSelector = appState.getPatternSelector();
 
@@ -38,8 +38,8 @@ app.directive('wzMenu',function(){
             const load = async () => {
                 try {
                     // Get the configuration to check if pattern selector is enabled
-                    const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-                    appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
+                    const config = wazuhConfig.getConfig();
+                    appState.setPatternSelector(config['ip.selector']);
 
                     // Abort if we have disabled the pattern selector
                     if(!appState.getPatternSelector()) return;
@@ -108,13 +108,24 @@ app.directive('wzMenu',function(){
                 }
             }
 
-            $scope.$on('updateAPI', () => {
-                if(appState.getCurrentAPI())
-                {
-                    $scope.theresAPI = true;
-                    $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
-                }
-                else {
+            $scope.$on('updateAPI', (evt,params) => {
+                const current = appState.getCurrentAPI();
+                if(current) {
+                    const parsed = JSON.parse(current);
+
+                    // If we've received cluster info as parameter, it means we must update our stored cookie
+                    if(params && params.cluster_info){
+                        if(params.cluster_info.status === 'enabled'){
+                            parsed.name = params.cluster_info.cluster;
+                        } else {
+                            parsed.name = params.cluster_info.manager;
+                        }
+                        appState.setCurrentAPI(JSON.stringify(parsed));
+                    }
+                    
+                    $scope.theresAPI  = true;
+                    $scope.currentAPI = parsed.name;
+                } else {
                     $scope.theresAPI = false;
                 }
             });

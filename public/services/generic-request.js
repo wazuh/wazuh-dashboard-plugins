@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 import chrome       from 'ui/chrome';
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 uiModules.get('app/wazuh', [])
-.service('genericReq', function ($q, $http, $location, $rootScope, appState,errorHandler) {
+.service('genericReq', function ($q, $http, $location, appState, wazuhConfig) {
 
     const _request = (method, url, payload = null) => {
-        let defered = $q.defer();
+        const defered = $q.defer();
 
         if (!method || !url) {
             defered.reject({
@@ -25,9 +25,13 @@ uiModules.get('app/wazuh', [])
             });
             return defered.promise;
         }
-        let requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: $rootScope.userTimeout || 8000 };
 
-        let tmpUrl = chrome.addBasePath(url), tmp = null;
+        const config = wazuhConfig.getConfig();
+        
+        const requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: config.timeout || 8000 };
+
+        const tmpUrl = chrome.addBasePath(url);
+        let tmp = null;
         if(appState.getUserCode()) requestHeaders.headers.code = appState.getUserCode();
         const id = appState.getCurrentAPI() ? JSON.parse(appState.getCurrentAPI()).id : false;
         if(id) requestHeaders.headers.id = id;

@@ -1,7 +1,7 @@
 {
     "name": "wazuh",
     "version": "3.3.1",
-    "revision": "0397",
+    "revision": "0398",
     "kibana": {
         "version": "6.3.0"
     },
@@ -39,6 +39,6 @@
         "pdfmake": "^0.1.37",
         "query-string": "5.1.1",
         "timsort": "^0.3.0",
-        "winston": "3.0.0-rc1"
+        "winston": "3.0.0"
     }
 }
