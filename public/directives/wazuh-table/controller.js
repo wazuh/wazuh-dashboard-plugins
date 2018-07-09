@@ -25,7 +25,8 @@ app.directive('wazuhTable', function() {
             keys: '=keys',
             allowClick: '=allowClick',
             implicitFilter: '=implicitFilter',
-            rowsPerPage: '=rowsPerPage'
+            rowsPerPage: '=rowsPerPage',
+            extraLimit: '=extraLimit'
         },
         controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter) {            
             $scope.keyEquivalence = KeyEquivalenece;
@@ -286,17 +287,17 @@ app.directive('wazuhTable', function() {
 
             $scope.nonDecoderValue = (key,item) => {
                 return  key === 'os.name' ? 
-                        item.os.name || '---' : 
+                        (item.os && item.os.name ? item.os.name : false) || '---' : 
                         key === 'os.version' ? 
-                        item.os.version || '---' : 
+                        (item.os && item.os.version ? item.os.version : false) || '---' : 
                         checkIfArray(item[key.value || key]) || '---';
             };
 
             $scope.decoderValue = (key,item) => {
                 return  key === 'details.program_name' || key.value === 'details.program_name' ? 
-                        item.details.program_name || '---' : 
+                        (item.details && item.details.program_name ? item.details.program_name : false) || '---' : 
                         key === 'details.order' || key.value === 'details.order' ? 
-                        item.details.order || '---' : 
+                        (item.details && item.details.order ? item.details.order : false) || '---' : 
                         checkIfArray(item[key.value || key]) || '---'; 
             };
 
