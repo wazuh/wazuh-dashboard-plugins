@@ -1,0 +1,13 @@
+<div layout="column" layout-align="start stretch" ng-if="tab === 'config' && !load">
+    <md-card flex="50" class="wz-md-card">
+        <md-card-content>
+            <i class="fa fa-fw fa-file-o" aria-hidden="true"></i>
+            <span class="wz-headline-title">config.yml content</span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <div layout="row" class="wz-padding-top-10" ng-repeat="(key,value) in configuration">
+                <span flex="25">{{key}}</span>
+                <span class="wz-text-right color-grey">{{value}}</span>
+            </div>
+        </md-card-content>
+    </md-card>
+</div>
