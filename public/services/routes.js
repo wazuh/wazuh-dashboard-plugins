@@ -33,16 +33,26 @@ routes
     .when('/health-check', {
         template: healthCheckTemplate,
         resolve: {
-            "getWzConfig": getWzConfig,
-            "ip": getIp,
-            "checkAPI": settingsWizard
+            "nestedResolve": function(
+                $q, genericReq, errorHandler, wazuhConfig,
+                $rootScope, $location, $window, testAPI, appState, wzMisc
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
+                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
+            },
+            "ip": getIp
         }
     })
     .when('/agents/:id?/:tab?/:view?', {
         template: agentsTemplate,
         resolve: {
-            "getWzConfig": getWzConfig,
-            "checkAPI": settingsWizard,
+            "nestedResolve": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $rootScope, $location, $window, testAPI, appState, wzMisc
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
+            },
             "ip": getIp,
             "savedSearch": getSavedSearch
         }
@@ -50,15 +60,25 @@ routes
     .when('/agents-preview/:tab?/', {
         template: agentsPrevTemplate,
         resolve: {
-            "getWzConfig": getWzConfig,
-            "checkAPI": settingsWizard
+            "nestedResolve": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $rootScope, $location, $window, testAPI, appState, wzMisc
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
+            },
         }
     })
     .when('/manager/:tab?/', {
         template: managerTemplate,
         resolve: {
-            "getWzConfig": getWzConfig,
-            "checkAPI": settingsWizard,
+            "nestedResolve": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $rootScope, $location, $window, testAPI, appState, wzMisc
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
+            },
             "ip": getIp,
             "savedSearch": getSavedSearch
         }
@@ -66,8 +86,13 @@ routes
     .when('/overview/', {
         template: overviewTemplate,
         resolve: {
-            "getWzConfig": getWzConfig,
-            "checkAPI": settingsWizard,
+            "nestedResolve": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $rootScope, $location, $window, testAPI, appState, wzMisc
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
+            },
             "ip": getIp,
             "savedSearch": getSavedSearch
         }
@@ -75,8 +100,13 @@ routes
     .when('/wazuh-discover/', {
         template: discoverTemplate,
         resolve: {
-            "getWzConfig": getWzConfig,
-            "checkAPI": settingsWizard,
+            "nestedResolve": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $rootScope, $location, $window, testAPI, appState, wzMisc
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
+            },
             "ip": getIp,
             "savedSearch": getSavedSearch
         }
@@ -111,8 +141,13 @@ routes
     .when('/wazuh-dev', {
         template: devToolsTemplate,
         resolve: {
-            "getWzConfig": getWzConfig,
-            "checkAPI": settingsWizard
+            "nestedResolve": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $rootScope, $location, $window, testAPI, appState, wzMisc
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
+            },
         }
     })
     .when('/blank-screen', {
