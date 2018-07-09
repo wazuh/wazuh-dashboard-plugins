@@ -17,7 +17,7 @@ const app = uiModules.get('app/wazuh', []);;
 
 app.directive('wzMenu',function(){
     return {
-        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler, genericReq, $location, wzMisc) {
+        controller: function ($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler, genericReq, $location, wzMisc, wazuhConfig) {
 
             $rootScope.showSelector = appState.getPatternSelector();
 
@@ -38,8 +38,8 @@ app.directive('wzMenu',function(){
             const load = async () => {
                 try {
                     // Get the configuration to check if pattern selector is enabled
-                    const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-                    appState.setPatternSelector(typeof config.data.data['ip.selector'] !== 'undefined' ? config.data.data['ip.selector'] : true)
+                    const config = wazuhConfig.getConfig();
+                    appState.setPatternSelector(config['ip.selector']);
 
                     // Abort if we have disabled the pattern selector
                     if(!appState.getPatternSelector()) return;
