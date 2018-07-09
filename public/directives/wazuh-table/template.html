@@ -17,19 +17,19 @@
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}" ng-click="clickAction(item)">
                 <td ng-repeat="key in keys" ng-if="path !== '/decoders'">
                     {{ 
-                        nonDecoderValue(key,item) | limitTo: 25
+                        nonDecoderValue(key,item) | limitTo: extraLimit ? 100 : 25
                     }}
-                    <span ng-if="nonDecoderValue(key,item).length > 25">...</span>
-                    <md-tooltip ng-if="nonDecoderValue(key,item).length > 25" md-direction="bottom" class="wz-tooltip">
+                    <span ng-if="nonDecoderValue(key,item).length > (extraLimit ? 100 : 25)">...</span>
+                    <md-tooltip ng-if="nonDecoderValue(key,item).length > (extraLimit ? 100 : 25)" md-direction="bottom" class="wz-tooltip">
                         {{ nonDecoderValue(key,item) }}
                     </md-tooltip>
                 </td>
                 <td ng-repeat="key in keys" ng-if="path === '/decoders'">
                     {{ 
-                        decoderValue(key,item) | limitTo: 25 
+                        decoderValue(key,item) | limitTo: extraLimit ? 100 : 25
                     }}
-                    <span ng-if="decoderValue(key,item).length > 25">...</span>
-                    <md-tooltip ng-if="decoderValue(key,item).length > 25" md-direction="bottom" class="wz-tooltip">
+                    <span ng-if="decoderValue(key,item).length > (extraLimit ? 100 : 25)">...</span>
+                    <md-tooltip ng-if="decoderValue(key,item).length > (extraLimit ? 100 : 25)" md-direction="bottom" class="wz-tooltip">
                         {{ decoderValue(key,item) }}
                     </md-tooltip>
                 </td>
