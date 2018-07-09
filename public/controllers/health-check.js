@@ -13,7 +13,11 @@ import { uiModules } from 'ui/modules'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location, courier, genericReq, apiReq, appState, testAPI, errorHandler) {
+app.controller('healthCheck', 
+function ($scope, $rootScope, $timeout, $location, 
+          courier, genericReq, apiReq, appState, testAPI, 
+          errorHandler, wazuhConfig
+) {
     const checks = {
         api     : true,
         pattern : true,
@@ -114,22 +118,14 @@ app.controller('healthCheck', function ($scope, $rootScope, $timeout, $location,
 
     const load = async () => {
         try {
-            const configuration = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
-            appState.setPatternSelector(typeof configuration.data.data['ip.selector'] !== 'undefined' ? configuration.data.data['ip.selector'] : true)
-            if('data' in configuration.data &&
-               'timeout' in configuration.data.data &&
-               Number.isInteger(configuration.data.data.timeout) &&
-               configuration.data.data.timeout >= 1500
-            ) {
-                $rootScope.userTimeout = configuration.data.data.timeout;
-            }
-
-            if('data' in configuration.data) {
-                checks.pattern  = typeof configuration.data.data['checks.pattern']  !== 'undefined' ? configuration.data.data['checks.pattern']  : true;
-                checks.template = typeof configuration.data.data['checks.template'] !== 'undefined' ? configuration.data.data['checks.template'] : true;
-                checks.api      = typeof configuration.data.data['checks.api']      !== 'undefined' ? configuration.data.data['checks.api']      : true;
-                checks.setup    = typeof configuration.data.data['checks.setup']    !== 'undefined' ? configuration.data.data['checks.setup']    : true;
-            }
+            const configuration = wazuhConfig.getConfig();
+            
+            appState.setPatternSelector(configuration['ip.selector']);
+            
+            checks.pattern  = configuration['checks.pattern'];
+            checks.template = configuration['checks.template'];
+            checks.api      = configuration['checks.api'];
+            checks.setup    = configuration['checks.setup'];
 
             $scope.results.push({ id:0,description: 'Check Wazuh API connection',status: checks.api ? 'Checking...' : 'disabled' });
             $scope.results.push({ id:1,description: 'Check for Wazuh API version',status: checks.setup ? 'Checking...' : 'disabled' });
