@@ -18,7 +18,12 @@ import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metrics
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('overviewController', function ($scope, $location, $rootScope, appState, genericReq, errorHandler, apiReq, tabVisualizations, commonData, reportingService, visFactoryService) {
+app.controller('overviewController', 
+function ($scope, $location, $rootScope, appState, 
+          genericReq, errorHandler, apiReq, tabVisualizations, 
+          commonData, reportingService, visFactoryService,
+          wazuhConfig
+) {
 
     $rootScope.reportStatus = false;
 
@@ -131,12 +136,11 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
 
     $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab);
 
-
     // PCI and GDPR requirements
     const loadPciAndGDPR = async () => {
         try {
 
-            const data = await Promise.all([commonData.getPCI(),commonData.getGDPR()])
+            const data = await Promise.all([commonData.getPCI(),commonData.getGDPR()]);
 
             $scope.pciTabs           = data[0];
             $scope.selectedPciIndex  = 0;
@@ -148,47 +152,42 @@ app.controller('overviewController', function ($scope, $location, $rootScope, ap
         } catch (error) {
             return Promise.reject(error)
         }
-    }
+    };
 
     const loadConfiguration = async () => {
         try {
-            const configuration = await genericReq.request('GET', '/api/wazuh-api/configuration', {})
+            const configuration = wazuhConfig.getConfig();
 
-            if(configuration && configuration.data && configuration.data.data) {
-                $scope.wzMonitoringEnabled = typeof configuration.data.data['wazuh.monitoring.enabled']  !== 'undefined' ?
-                                                !!configuration.data.data['wazuh.monitoring.enabled'] :
-                                                true;
-                if(!$scope.wzMonitoringEnabled){
-                    const data = await apiReq.request('GET', '/agents/summary', { })
+            $scope.wzMonitoringEnabled = !!configuration['wazuh.monitoring.enabled'];
 
-                    if(data && data.data && data.data.data){
-                        $scope.agentsCountActive         = data.data.data.Active;
-                        $scope.agentsCountDisconnected   = data.data.data.Disconnected;
-                        $scope.agentsCountNeverConnected = data.data.data['Never connected'];
-                        $scope.agentsCountTotal          = data.data.data.Total;
-                        $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
-                    } else {
-                        throw new Error('Error fetching /agents/summary from Wazuh API')
-                    }
+            if(!$scope.wzMonitoringEnabled){
+                const data = await apiReq.request('GET', '/agents/summary', { });
+
+                if(data && data.data && data.data.data){
+                    $scope.agentsCountActive         = data.data.data.Active;
+                    $scope.agentsCountDisconnected   = data.data.data.Disconnected;
+                    $scope.agentsCountNeverConnected = data.data.data['Never connected'];
+                    $scope.agentsCountTotal          = data.data.data.Total;
+                    $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
+                } else {
+                    throw new Error('Error fetching /agents/summary from Wazuh API');
                 }
-            } else {
-                $scope.wzMonitoringEnabled = true;
             }
 
             return;
 
         } catch (error) {
-            $scope.wzMonitoringEnabled = true
-            return Promise.reject(error)
+            $scope.wzMonitoringEnabled = true;
+            return Promise.reject(error);
         }
-    }
+    };
 
     const init = async () => {
         try {
             await Promise.all([
                 loadPciAndGDPR(),
                 loadConfiguration()
-            ])
+            ]);
 
             $scope.switchTab($scope.tab,true);
 
