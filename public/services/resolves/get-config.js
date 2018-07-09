@@ -39,9 +39,9 @@ export default ($q, genericReq, errorHandler, wazuhConfig) => {
     const deferred = $q.defer();
     genericReq.request('GET', '/api/wazuh-api/configuration', {})
     .then(config => {
-        const ymlContent = config.data.data;
-
         if(!config || !config.data || !config.data.data) throw new Error('No config available');
+
+        const ymlContent = config.data.data;        
 
         if(typeof ymlContent === 'object'){
             // Replace default values by custom values from config.yml file
