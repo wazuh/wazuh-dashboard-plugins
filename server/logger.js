@@ -87,6 +87,12 @@ const checkFiles = () => {
                 path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log'),
                 path.join(__dirname, `../../../optimize/wazuh-logs/wazuhapp.${new Date().getTime()}.log`)
             );
+            fs.writeFileSync(path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp.log'),JSON.stringify({
+                date    : new Date(),
+                level   : 'info',
+                location: 'logger',
+                message : 'Rotated log file'
+            }) + '\n');
         }
     }
 };
