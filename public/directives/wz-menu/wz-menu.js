@@ -108,13 +108,24 @@ app.directive('wzMenu',function(){
                 }
             }
 
-            $scope.$on('updateAPI', () => {
-                if(appState.getCurrentAPI())
-                {
-                    $scope.theresAPI = true;
-                    $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
-                }
-                else {
+            $scope.$on('updateAPI', (evt,params) => {
+                const current = appState.getCurrentAPI();
+                if(current) {
+                    const parsed = JSON.parse(current);
+
+                    // If we've received cluster info as parameter, it means we must update our stored cookie
+                    if(params && params.cluster_info){
+                        if(params.cluster_info.status === 'enabled'){
+                            parsed.name = params.cluster_info.cluster;
+                        } else {
+                            parsed.name = params.cluster_info.manager;
+                        }
+                        appState.setCurrentAPI(JSON.stringify(parsed));
+                    }
+                    
+                    $scope.theresAPI  = true;
+                    $scope.currentAPI = parsed.name;
+                } else {
                     $scope.theresAPI = false;
                 }
             });
