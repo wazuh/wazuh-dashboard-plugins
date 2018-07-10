@@ -17,10 +17,14 @@ import rawParser     from '../reporting/raw-parser';
 import PdfPrinter    from 'pdfmake/src/printer';
 import ErrorResponse from './error-response';
 
+import VulnerabilityRequest from '../reporting/vulnerability-request';
+import WazuhApi from './wazuh-api';
+
 import { AgentsVisualizations, OverviewVisualizations } from '../integration-files/visualizations';
 
 export default class WazuhReportingCtrl {
-    constructor(){
+    constructor(server){
+        this.server = server;
         this.fonts = {
             Roboto: {
                 normal: path.join(__dirname, '../../public/utils/roboto/Roboto-Regular.ttf'),
@@ -29,6 +33,8 @@ export default class WazuhReportingCtrl {
                 bolditalics: path.join(__dirname, '../../public/utils/roboto/Roboto-BoldItalic.ttf')
             }
         };
+
+        this.vulnerabilityRequest = new VulnerabilityRequest(this.server);
 
         this.printer = new PdfPrinter(this.fonts);
 
@@ -80,6 +86,8 @@ export default class WazuhReportingCtrl {
                 return false;
             }
         };
+
+        this.apiRequest = new WazuhApi(server);
     }
 
     renderTables(tables) {
@@ -238,9 +246,58 @@ export default class WazuhReportingCtrl {
             this.dd.content.push('\n');
         }
     }
+
+    async extendedInformation(section,tab,apiId,from,to) {
+        try {
+            if(section === 'overview' && tab === 'vuls'){
+                const agents = await this.apiRequest.makeGenericRequest('GET','/agents',{limit:1},apiId);
+                const totalAgents = agents.data.totalItems;
+                
+                const low      = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Low');
+                const medium   = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Medium');
+                const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High');
+                const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical');
+
+                this.dd.content.push({ text: 'Severity percentages', style: 'subtitlenobold' });
+                this.dd.content.push({ text: `${(low/totalAgents)*100}% of your agents have one or more low vulnerabilities.`, style: 'quote' });
+                this.dd.content.push({ text:`${(medium/totalAgents)*100}% of your agents have one or more medium vulnerabilities.`, style: 'quote' });
+                this.dd.content.push({ text:`${(high/totalAgents)*100}% of your agents have one or more high vulnerabilities.`, style: 'quote' });
+                this.dd.content.push({ text:`${(critical/totalAgents)*100}% of your agents have one or more critical vulnerabilities.`, style: 'quote' });
+                this.dd.content.push('\n');
+
+                const lowRank      = await this.vulnerabilityRequest.topCveCount(from,to,'Low');
+                const mediumRank   = await this.vulnerabilityRequest.topCveCount(from,to,'Medium');
+                const highRank     = await this.vulnerabilityRequest.topCveCount(from,to,'High');
+                const criticalRank = await this.vulnerabilityRequest.topCveCount(from,to,'Critical');
+
+                this.dd.content.push({ text: 'Low severity ranking', style: 'subtitlenobold' });
+                for(const item of lowRank){
+                    this.dd.content.push({ text: `${item.id} - ${item.count}`, style: 'quote' });
+                }
+                this.dd.content.push({ text: 'Medium severity ranking', style: 'subtitlenobold' });
+                for(const item of mediumRank){
+                    this.dd.content.push({ text: `${item.id} - ${item.count}`, style: 'quote' });
+                }
+                this.dd.content.push({ text: 'High severity ranking', style: 'subtitlenobold' });
+                for(const item of highRank){
+                    this.dd.content.push({ text: `${item.id} - ${item.count}`, style: 'quote' });
+                }
+                this.dd.content.push({ text: 'Critical severity ranking', style: 'subtitlenobold' });
+                for(const item of criticalRank){
+                    this.dd.content.push({ text: `${item.id} - ${item.count}`, style: 'quote' });
+                }
+
+                this.dd.content.push('\n');
+            }
+            return false;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
     
     async report(req, reply) {
         try {
+
             // Init
             this.printer    = new PdfPrinter(this.fonts);
             this.dd.content = [];
@@ -248,15 +305,18 @@ export default class WazuhReportingCtrl {
                 fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
             }
 
+            
             if (req.payload && req.payload.array) {
                 const tab = req.payload.tab;
 
                 this.renderHeader(req.payload.section, tab, req.payload.isAgents);
-
+                console.log()
                 if (req.payload.time) {
                     this.renderTimeRange(req.payload.time.from, req.payload.time.to);
+                    await this.extendedInformation(req.payload.section,req.payload.tab,req.headers.id,new Date(req.payload.time.from)-1,new Date(req.payload.time.to)-1);
                 }
 
+                
                 if (req.payload.filters) {
                     this.renderFilters(req.payload.filters, req.payload.searchBar);
                 }
