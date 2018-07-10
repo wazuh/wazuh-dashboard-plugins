@@ -146,9 +146,10 @@ export default class WazuhReportingCtrl {
         const len = filters.length;
         for (let i = 0; i < len; i++) {
             const filter = filters[i];
+            
             str += i === len - 1 ?
-                filter.meta.key + ': ' + filter.meta.value :
-                filter.meta.key + ': ' + filter.meta.value + ' AND ';
+                (filter.meta.negate ? 'NOT ' : '' ) + filter.meta.key + ': ' + filter.meta.value :
+                (filter.meta.negate ? 'NOT ' : '' ) + filter.meta.key + ': ' + filter.meta.value + ' AND ';
         }
 
         if (searchBar) {
@@ -167,6 +168,7 @@ export default class WazuhReportingCtrl {
             }]
         });
         this.dd.content.push('\n');
+        return str;
     }
 
     renderHeader(section, tab, isAgents) {
@@ -247,16 +249,16 @@ export default class WazuhReportingCtrl {
         }
     }
 
-    async extendedInformation(section,tab,apiId,from,to) {
+    async extendedInformation(section, tab, apiId, from, to, filters) {
         try {
             if(section === 'overview' && tab === 'vuls'){
                 const agents = await this.apiRequest.makeGenericRequest('GET','/agents',{limit:1},apiId);
                 const totalAgents = agents.data.totalItems;
                 
-                const low      = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Low');
-                const medium   = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Medium');
-                const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High');
-                const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical');
+                const low      = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Low',filters);
+                const medium   = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Medium',filters);
+                const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High',filters);
+                const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical',filters);
 
                 this.dd.content.push({ text: 'Severity percentages', style: 'subtitlenobold' });
                 this.dd.content.push({ text: `${(low/totalAgents)*100}% of your agents have one or more low vulnerabilities.`, style: 'quote' });
@@ -265,10 +267,10 @@ export default class WazuhReportingCtrl {
                 this.dd.content.push({ text:`${(critical/totalAgents)*100}% of your agents have one or more critical vulnerabilities.`, style: 'quote' });
                 this.dd.content.push('\n');
 
-                const lowRank      = await this.vulnerabilityRequest.topCveCount(from,to,'Low');
-                const mediumRank   = await this.vulnerabilityRequest.topCveCount(from,to,'Medium');
-                const highRank     = await this.vulnerabilityRequest.topCveCount(from,to,'High');
-                const criticalRank = await this.vulnerabilityRequest.topCveCount(from,to,'Critical');
+                const lowRank      = await this.vulnerabilityRequest.topCveCount(from,to,'Low',filters);
+                const mediumRank   = await this.vulnerabilityRequest.topCveCount(from,to,'Medium',filters);
+                const highRank     = await this.vulnerabilityRequest.topCveCount(from,to,'High',filters);
+                const criticalRank = await this.vulnerabilityRequest.topCveCount(from,to,'Critical',filters);
 
                 this.dd.content.push({ text: 'Low severity ranking', style: 'subtitlenobold' });
                 for(const item of lowRank){
@@ -310,15 +312,25 @@ export default class WazuhReportingCtrl {
                 const tab = req.payload.tab;
 
                 this.renderHeader(req.payload.section, tab, req.payload.isAgents);
-                console.log()
+
                 if (req.payload.time) {
                     this.renderTimeRange(req.payload.time.from, req.payload.time.to);
-                    await this.extendedInformation(req.payload.section,req.payload.tab,req.headers.id,new Date(req.payload.time.from)-1,new Date(req.payload.time.to)-1);
+                }
+                
+                let filters = false;
+                if (req.payload.filters) {
+                    filters = this.renderFilters(req.payload.filters, req.payload.searchBar);
                 }
 
-                
-                if (req.payload.filters) {
-                    this.renderFilters(req.payload.filters, req.payload.searchBar);
+                if (req.payload.time) {
+                    await this.extendedInformation(
+                            req.payload.section,
+                            req.payload.tab,
+                            req.headers.id,
+                            new Date(req.payload.time.from)-1,
+                            new Date(req.payload.time.to)-1,
+                            filters
+                        );
                 }
 
                 this.renderVisualizations(req.payload.array, req.payload.isAgents, tab)
