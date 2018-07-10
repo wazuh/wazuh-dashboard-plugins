@@ -154,13 +154,12 @@ export default [
     {
         "_id": "Wazuh-App-Overview-FIM-Root-user-file-changes",
         "_source": {
-            "title": "Root user file changes",
-            "visState": "{\"params\": {\"isDonut\": false, \"shareYAxis\": true, \"addTooltip\": true, \"addLegend\": true}, \"listeners\": {}, \"type\": \"pie\", \"aggs\": [{\"type\": \"count\", \"enabled\": true, \"id\": \"1\", \"params\": {}, \"schema\": \"metric\"}, {\"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"params\": {\"orderBy\": \"1\", \"field\": \"syscheck.path\", \"order\": \"desc\", \"size\": 10}, \"schema\": \"segment\"}], \"title\": \"Top 10 files with Root/Admin owner\"}",
+            "visState": "{\"title\":\"Root user file changes\",\"type\":\"pie\",\"params\":{\"isDonut\":false,\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"legendPosition\":\"right\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"syscheck.path\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
             "uiStateJSON": "{}",
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND (syscheck.udata.id_after:\\\"0\\\" OR syscheck.udata.id_before:\\\"0\\\" or syscheck.gudata.id_after:\\\"root\\\" or syscheck.gudata.id_before:\\\"0\\\")\",\"language\":\"lucene\"}}"
+              "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[{\"meta\":{\"index\":\"wazuh-alerts\",\"negate\":false,\"disabled\":false,\"alias\":null,\"type\":\"phrase\",\"key\":\"rule.groups\",\"value\":\"syscheck\",\"params\":{\"query\":\"syscheck\",\"type\":\"phrase\"}},\"query\":{\"match\":{\"rule.groups\":{\"query\":\"syscheck\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"query\":{\"query_string\":{\"query\":\"syscheck.uid_before:0 or syscheck.uid_after:0 or syscheck.gid_after:root or syscheck.gid_before:0\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"meta\":{\"negate\":false,\"index\":\"wazuh-alerts\",\"disabled\":false,\"alias\":null,\"type\":\"query_string\",\"key\":\"query\",\"value\":\"syscheck.uid_before:0 or syscheck.uid_after:0 or syscheck.gid_after:root or syscheck.gid_before:0\"},\"$state\":{\"store\":\"appState\"}}],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
