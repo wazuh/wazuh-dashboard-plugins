@@ -425,6 +425,47 @@ export default class WazuhApi {
         }
     }
 
+    async makeGenericRequest (method, path, data, id) {
+        try {
+            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
+
+            if (wapi_config.error_code > 1) {
+                //Can not connect to elasticsearch
+                throw new Error('Could not connect with elasticsearch');
+            } else if (wapi_config.error_code > 0) {
+                //Credentials not found
+                throw new Error('Credentials does not exists');
+            }
+
+            if (!data) {
+                data = {};
+            }
+
+            const options = {
+                headers: {
+                    'wazuh-app-version': packageInfo.version
+                },
+                username          : wapi_config.user,
+                password          : wapi_config.password,
+                rejectUnauthorized: !wapi_config.insecure
+            };
+
+            const fullUrl   = getPath(wapi_config) + path;
+            const response  = await needle(method, fullUrl, data, options);
+
+            if(response && response.body && !response.body.error && response.body.data) {
+                return response.body;
+            }
+
+            throw response && response.body && response.body.error && response.body.message ?
+                  new Error(response.body.message) :
+                  new Error('Unexpected error fetching data from the Wazuh API');
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
     requestApi (req, reply) {
         if (!req.payload.method) {
             return ErrorResponse('Missing param: method', 3015, 400, reply);
