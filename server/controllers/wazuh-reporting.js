@@ -60,6 +60,9 @@ export default class WazuhReportingCtrl {
                 quote: {
                     color: 'gray',
                     italics: true
+                },
+                gray: {
+                    color: 'gray'
                 }
             },
             header: {
@@ -260,11 +263,11 @@ export default class WazuhReportingCtrl {
                 const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High',filters);
                 const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical',filters);
 
-                this.dd.content.push({ text: 'Severity percentages', style: 'subtitlenobold' });
-                this.dd.content.push({ text: `${(low/totalAgents)*100}% of your agents have one or more low vulnerabilities.`, style: 'quote' });
-                this.dd.content.push({ text:`${(medium/totalAgents)*100}% of your agents have one or more medium vulnerabilities.`, style: 'quote' });
-                this.dd.content.push({ text:`${(high/totalAgents)*100}% of your agents have one or more high vulnerabilities.`, style: 'quote' });
-                this.dd.content.push({ text:`${(critical/totalAgents)*100}% of your agents have one or more critical vulnerabilities.`, style: 'quote' });
+                this.dd.content.push({ text: 'Severity percentages', style: 'subtitle' });
+                this.dd.content.push({ text: `${(low/totalAgents)*100}% of your agents have one or more low vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text:`${(medium/totalAgents)*100}% of your agents have one or more medium vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text:`${(high/totalAgents)*100}% of your agents have one or more high vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text:`${(critical/totalAgents)*100}% of your agents have one or more critical vulnerabilities.`, style: 'gray' });
                 this.dd.content.push('\n');
 
                 const lowRank      = await this.vulnerabilityRequest.topCveCount(from,to,'Low',filters);
@@ -272,24 +275,38 @@ export default class WazuhReportingCtrl {
                 const highRank     = await this.vulnerabilityRequest.topCveCount(from,to,'High',filters);
                 const criticalRank = await this.vulnerabilityRequest.topCveCount(from,to,'Critical',filters);
 
-                this.dd.content.push({ text: 'Low severity ranking', style: 'subtitlenobold' });
-                for(const item of lowRank){
-                    this.dd.content.push({ text: `${item.id} - ${item.count}`, style: 'quote' });
-                }
-                this.dd.content.push({ text: 'Medium severity ranking', style: 'subtitlenobold' });
-                for(const item of mediumRank){
-                    this.dd.content.push({ text: `${item.id} - ${item.count}`, style: 'quote' });
-                }
-                this.dd.content.push({ text: 'High severity ranking', style: 'subtitlenobold' });
-                for(const item of highRank){
-                    this.dd.content.push({ text: `${item.id} - ${item.count}`, style: 'quote' });
-                }
-                this.dd.content.push({ text: 'Critical severity ranking', style: 'subtitlenobold' });
-                for(const item of criticalRank){
-                    this.dd.content.push({ text: `${item.id} - ${item.count}`, style: 'quote' });
+
+                if(criticalRank.length){
+                    this.dd.content.push({ text: 'Critical severity ranking', style: 'subtitle' });
+                    for(const item of criticalRank){
+                        this.dd.content.push({ text: `Agent ${item.id} - ${item.count} unique critical vulnerabilities`, style: 'gray' });
+                    }
+                    this.dd.content.push('\n');
                 }
 
-                this.dd.content.push('\n');
+                if(highRank.length){
+                    this.dd.content.push({ text: 'High severity ranking', style: 'subtitle' });
+                    for(const item of highRank){
+                        this.dd.content.push({ text: `Agent ${item.id} - ${item.count} unique high vulnerabilities`, style: 'gray' });
+                    }
+                    this.dd.content.push('\n');
+                }
+
+                if(mediumRank.length){
+                    this.dd.content.push({ text: 'Medium severity ranking', style: 'subtitle' });
+                    for(const item of mediumRank){
+                        this.dd.content.push({ text: `Agent ${item.id} - ${item.count} unique medium vulnerabilities`, style: 'gray'});
+                    }
+                    this.dd.content.push('\n');  
+                }
+
+                if(lowRank.length){
+                    this.dd.content.push({ text: 'Low severity ranking', style: 'subtitle' });
+                    for(const item of lowRank){
+                        this.dd.content.push({ text: `Agent ${item.id} - ${item.count} unique low vulnerabilities`, style: 'gray'});
+                    }
+                    this.dd.content.push('\n');
+                }
             }
             return false;
         } catch (error) {
