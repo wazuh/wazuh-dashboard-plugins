@@ -19,6 +19,7 @@ import ErrorResponse from './error-response';
 
 import VulnerabilityRequest from '../reporting/vulnerability-request';
 import OverviewRequest      from '../reporting/overview-request';
+import RootcheckRequest     from '../reporting/rootcheck-request';
 
 import WazuhApi from './wazuh-api';
 
@@ -38,6 +39,7 @@ export default class WazuhReportingCtrl {
 
         this.vulnerabilityRequest = new VulnerabilityRequest(this.server);
         this.overviewRequest      = new OverviewRequest(this.server);
+        this.rootcheckRequest     = new RootcheckRequest(this.server);
 
         this.printer = new PdfPrinter(this.fonts);
 
@@ -320,6 +322,7 @@ export default class WazuhReportingCtrl {
                     this.dd.content.push('\n');
                 }
             }
+            
             if(section === 'overview' && tab === 'general'){
                 const level15Rank = await this.overviewRequest.topLevel15(from,to,filters);
                 if(level15Rank.length){
@@ -327,26 +330,6 @@ export default class WazuhReportingCtrl {
                     const rows = [];
                     for(const item of level15Rank){
                         const { data } = await this.apiRequest.makeGenericRequest('GET',`/agents/${item}`,{},apiId);
-                        /*
-
-                        { status: 'Active',
-                        name: 'osboxes',
-                        ip: '127.0.0.1',
-                        dateAdd: '2018-07-11 03:58:38',
-                        version: 'Wazuh v3.3.1',
-                        manager_host: 'osboxes',
-                        lastKeepAlive: '9999-12-31 23:59:59',
-                        os: 
-                        { major: '7',
-                            name: 'CentOS Linux',
-                            platform: 'centos',
-                            uname: 'Linux |osboxes |3.10.0-693.el7.x86_64 |#1 SMP Tue Aug 22 21:09:27 UTC 2017 |x86_64',
-                            version: '7',
-                            codename: 'Core',
-                            arch: 'x86_64' },
-                        id: '000' }
-
-                        */
                         const str = Array(6).fill('---');
                         str[0] = item;
                         if(data && data.name) str[1] = data.name;
@@ -370,9 +353,20 @@ export default class WazuhReportingCtrl {
                         layout: 'lightHorizontalLines'
                     });
                     this.dd.content.push('\n');
-                    
                 }
             }
+
+            if(section === 'overview' && tab === 'pm'){
+                const top3RootkitsRank = await this.rootcheckRequest.top3RootkitsDetected(from,to,filters);
+                if(top3RootkitsRank.length){
+                    this.dd.content.push({ text: 'Most common rootkits found along your agents', style: 'subtitle' });
+                    for(const item of top3RootkitsRank){
+                        this.dd.content.push({ text: `- ${item}`, style: 'gray' });
+                    }
+                    this.dd.content.push('\n');
+                }
+            }
+
             return false;
         } catch (error) {
             return Promise.reject(error);
