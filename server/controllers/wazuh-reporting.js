@@ -263,47 +263,47 @@ export default class WazuhReportingCtrl {
                 const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High',filters);
                 const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical',filters);
 
-                this.dd.content.push({ text: 'Severity percentages', style: 'subtitle' });
-                this.dd.content.push({ text: `${(low/totalAgents)*100}% of your agents have one or more low vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text:`${(medium/totalAgents)*100}% of your agents have one or more medium vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text:`${(high/totalAgents)*100}% of your agents have one or more high vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text:`${(critical/totalAgents)*100}% of your agents have one or more critical vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: 'Count summary', style: 'subtitle' });
+                this.dd.content.push({ text: `- ${critical+high+medium+low}/${totalAgents} agents have vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${critical}/${totalAgents} agents have critical vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${high}/${totalAgents} agents have high vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${medium}/${totalAgents} agents have medium vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${low}/${totalAgents} agents have low vulnerabilities.`, style: 'gray' });
                 this.dd.content.push('\n');
 
-                const lowRank      = await this.vulnerabilityRequest.topCveCount(from,to,'Low',filters);
-                const mediumRank   = await this.vulnerabilityRequest.topCveCount(from,to,'Medium',filters);
-                const highRank     = await this.vulnerabilityRequest.topCveCount(from,to,'High',filters);
-                const criticalRank = await this.vulnerabilityRequest.topCveCount(from,to,'Critical',filters);
-
+                const lowRank      = await this.vulnerabilityRequest.topAgentCount(from,to,'Low',filters);
+                const mediumRank   = await this.vulnerabilityRequest.topAgentCount(from,to,'Medium',filters);
+                const highRank     = await this.vulnerabilityRequest.topAgentCount(from,to,'High',filters);
+                const criticalRank = await this.vulnerabilityRequest.topAgentCount(from,to,'Critical',filters);
 
                 if(criticalRank.length){
-                    this.dd.content.push({ text: 'Critical severity ranking', style: 'subtitle' });
+                    this.dd.content.push({ text: 'Top 3 agents with critical severity vulnerabilities', style: 'subtitle' });
                     for(const item of criticalRank){
-                        this.dd.content.push({ text: `Agent ${item.id} - ${item.count} unique critical vulnerabilities`, style: 'gray' });
+                        this.dd.content.push({ text: `- Agent ${item}`, style: 'gray' });
                     }
                     this.dd.content.push('\n');
                 }
 
                 if(highRank.length){
-                    this.dd.content.push({ text: 'High severity ranking', style: 'subtitle' });
+                    this.dd.content.push({ text: 'Top 3 agents with high severity vulnerabilities', style: 'subtitle' });
                     for(const item of highRank){
-                        this.dd.content.push({ text: `Agent ${item.id} - ${item.count} unique high vulnerabilities`, style: 'gray' });
+                        this.dd.content.push({ text: `- Agent ${item}`, style: 'gray' });
                     }
                     this.dd.content.push('\n');
                 }
 
                 if(mediumRank.length){
-                    this.dd.content.push({ text: 'Medium severity ranking', style: 'subtitle' });
+                    this.dd.content.push({ text: 'Top 3 agents with medium severity vulnerabilities', style: 'subtitle' });
                     for(const item of mediumRank){
-                        this.dd.content.push({ text: `Agent ${item.id} - ${item.count} unique medium vulnerabilities`, style: 'gray'});
+                        this.dd.content.push({ text: `- Agent ${item}`, style: 'gray'});
                     }
                     this.dd.content.push('\n');  
                 }
 
                 if(lowRank.length){
-                    this.dd.content.push({ text: 'Low severity ranking', style: 'subtitle' });
+                    this.dd.content.push({ text: 'Top 3 agents with low severity vulnerabilities', style: 'subtitle' });
                     for(const item of lowRank){
-                        this.dd.content.push({ text: `Agent ${item.id} - ${item.count} unique low vulnerabilities`, style: 'gray'});
+                        this.dd.content.push({ text: `- Agent ${item}`, style: 'gray'});
                     }
                     this.dd.content.push('\n');
                 }
