@@ -27,13 +27,11 @@ export default class VulnerabilityRequest {
      * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
      * @returns {Array<String>} E.g:['000','130','300']
      */
-    async topLevel15(gte, lte, filters) {
+    async topLevel15(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
             const base = {
+                pattern,
                 "size": 0,
-                "_source": {
-                    "excludes": []
-                },
                 "aggs": {
                     "2": {
                         "terms": {
@@ -83,10 +81,7 @@ export default class VulnerabilityRequest {
                                     }
                                 }
                             }
-                        ],
-                        "filter": [],
-                        "should": [],
-                        "must_not": []
+                        ]
                     }
                 }
             };

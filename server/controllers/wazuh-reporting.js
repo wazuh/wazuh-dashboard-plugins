@@ -257,16 +257,16 @@ export default class WazuhReportingCtrl {
         }
     }
 
-    async extendedInformation(section, tab, apiId, from, to, filters) {
+    async extendedInformation(section, tab, apiId, from, to, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
             const agents = await this.apiRequest.makeGenericRequest('GET','/agents',{limit:1},apiId);
             const totalAgents = agents.data.totalItems;
 
             if(section === 'overview' && tab === 'vuls'){                
-                const low      = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Low',filters);
-                const medium   = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Medium',filters);
-                const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High',filters);
-                const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical',filters);
+                const low      = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Low',filters,pattern);
+                const medium   = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Medium',filters,pattern);
+                const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High',filters,pattern);
+                const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical',filters,pattern);
 
                 this.dd.content.push({ text: 'Count summary', style: 'subtitle' });
                 this.dd.content.push({ text: `- ${critical+high+medium+low} of ${totalAgents} agents have vulnerabilities.`, style: 'gray' });
@@ -276,10 +276,10 @@ export default class WazuhReportingCtrl {
                 this.dd.content.push({ text: `- ${low} of ${totalAgents} agents have low vulnerabilities.`, style: 'gray' });
                 this.dd.content.push('\n');
 
-                const lowRank      = await this.vulnerabilityRequest.topAgentCount(from,to,'Low',filters);
-                const mediumRank   = await this.vulnerabilityRequest.topAgentCount(from,to,'Medium',filters);
-                const highRank     = await this.vulnerabilityRequest.topAgentCount(from,to,'High',filters);
-                const criticalRank = await this.vulnerabilityRequest.topAgentCount(from,to,'Critical',filters);
+                const lowRank      = await this.vulnerabilityRequest.topAgentCount(from,to,'Low',filters,pattern);
+                const mediumRank   = await this.vulnerabilityRequest.topAgentCount(from,to,'Medium',filters,pattern);
+                const highRank     = await this.vulnerabilityRequest.topAgentCount(from,to,'High',filters,pattern);
+                const criticalRank = await this.vulnerabilityRequest.topAgentCount(from,to,'Critical',filters,pattern);
 
                 if(criticalRank.length){
                     this.dd.content.push({ text: 'Top 3 agents with critical severity vulnerabilities', style: 'subtitle' });
@@ -313,7 +313,7 @@ export default class WazuhReportingCtrl {
                     this.dd.content.push('\n');
                 }
 
-                const cveRank = await this.vulnerabilityRequest.topCVECount(from,to,filters);
+                const cveRank = await this.vulnerabilityRequest.topCVECount(from,to,filters,pattern);
                 if(cveRank.length){
                     this.dd.content.push({ text: 'Top 3 CVE', style: 'subtitle' });
                     for(const item of cveRank){
@@ -324,7 +324,7 @@ export default class WazuhReportingCtrl {
             }
             
             if(section === 'overview' && tab === 'general'){
-                const level15Rank = await this.overviewRequest.topLevel15(from,to,filters);
+                const level15Rank = await this.overviewRequest.topLevel15(from,to,filters,pattern);
                 if(level15Rank.length){
                     this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'subtitle' });
                     const rows = [];
@@ -357,7 +357,7 @@ export default class WazuhReportingCtrl {
             }
 
             if(section === 'overview' && tab === 'pm'){
-                const top3RootkitsRank = await this.rootcheckRequest.top3RootkitsDetected(from,to,filters);
+                const top3RootkitsRank = await this.rootcheckRequest.top3RootkitsDetected(from,to,filters,pattern);
                 if(top3RootkitsRank.length){
                     this.dd.content.push({ text: 'Most common rootkits found along your agents', style: 'subtitle' });
                     for(const item of top3RootkitsRank){
@@ -366,12 +366,11 @@ export default class WazuhReportingCtrl {
                     this.dd.content.push('\n');
                 }
 
-                const hiddenPids = await this.rootcheckRequest.agentsWithHiddenPids(from,to,filters);
+                const hiddenPids = await this.rootcheckRequest.agentsWithHiddenPids(from,to,filters,pattern);
                 this.dd.content.push({ text: `${hiddenPids} of ${totalAgents} agents have hidden processes`, style: 'subtitle' });
                 this.dd.content.push('\n');
 
-
-                const hiddenPorts = await this.rootcheckRequest.agentsWithHiddenPorts(from,to,filters);
+                const hiddenPorts = await this.rootcheckRequest.agentsWithHiddenPorts(from,to,filters,pattern);
                 this.dd.content.push({ text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`, style: 'subtitle' });
                 this.dd.content.push('\n');
             }
@@ -414,7 +413,8 @@ export default class WazuhReportingCtrl {
                             req.headers.id,
                             new Date(req.payload.time.from)-1,
                             new Date(req.payload.time.to)-1,
-                            filters
+                            filters,
+                            req.headers.pattern
                         );
                 }
 

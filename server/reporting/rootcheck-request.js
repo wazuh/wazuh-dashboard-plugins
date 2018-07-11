@@ -27,10 +27,11 @@ export default class RootcheckRequest {
      * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
      * @returns {Array<String>} 
      */
-    async top3RootkitsDetected(gte, lte, filters) {
+    async top3RootkitsDetected(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
 
             const base = {
+                pattern,
                 "size": 0,
                 "aggs": {
                     "2": {
@@ -101,9 +102,10 @@ export default class RootcheckRequest {
      * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
      * @returns {Array<String>} 
      */
-    async agentsWithHiddenPids(gte, lte, filters) {
+    async agentsWithHiddenPids(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
             const base = {
+                pattern,
                 "size": 0,
                 "aggs": {
                     "1": {
@@ -171,9 +173,10 @@ export default class RootcheckRequest {
      * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
      * @returns {Array<String>} 
      */
-    async agentsWithHiddenPorts(gte, lte, filters) {
+    async agentsWithHiddenPorts(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
             const base = {
+                pattern,
                 "size": 0,
                 "aggs": {
                     "1": {
