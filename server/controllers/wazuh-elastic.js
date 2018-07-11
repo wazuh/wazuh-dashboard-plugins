@@ -138,7 +138,7 @@ export default class WazuhElastic {
             );
 
             payload.aggs['2'].terms.field = req.params.field;
-
+            payload.pattern = req.params.pattern;
             const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
 
             return (data.hits.total === 0 || typeof data.aggregations['2'].buckets[0] === 'undefined') ?
