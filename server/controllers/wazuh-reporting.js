@@ -369,6 +369,11 @@ export default class WazuhReportingCtrl {
                 const hiddenPids = await this.rootcheckRequest.agentsWithHiddenPids(from,to,filters);
                 this.dd.content.push({ text: `${hiddenPids} of ${totalAgents} agents have hidden processes`, style: 'subtitle' });
                 this.dd.content.push('\n');
+
+
+                const hiddenPorts = await this.rootcheckRequest.agentsWithHiddenPorts(from,to,filters);
+                this.dd.content.push({ text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`, style: 'subtitle' });
+                this.dd.content.push('\n');
             }
 
             return false;

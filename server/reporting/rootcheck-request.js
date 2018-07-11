@@ -163,4 +163,74 @@ export default class RootcheckRequest {
             return Promise.reject(error);
         }
     }
+
+    /**
+     * Returns the number of agents that have one or more hidden ports
+     * @param {Number} gte Timestamp (ms) from
+     * @param {Number} lte Timestamp (ms) to
+     * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+     * @returns {Array<String>} 
+     */
+    async agentsWithHiddenPorts(gte, lte, filters) {
+        try {
+            const base = {
+                "size": 0,
+                "aggs": {
+                    "1": {
+                        "cardinality": {
+                            "field": "agent.id"
+                        }
+                    }
+                },
+                "stored_fields": [
+                    "*"
+                ],
+                "docvalue_fields": [
+                    "@timestamp",
+                    "data.vulnerability.published",
+                    "data.vulnerability.updated",
+                    "syscheck.mtime_after",
+                    "syscheck.mtime_before",
+                    "data.cis.timestamp"
+                ],
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "query_string": {
+                                    "query": filters + " AND \"port\" AND \"hidden\"",
+                                    "analyze_wildcard": true,
+                                    "default_field": "*"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "@timestamp": {
+                                        "gte": gte,
+                                        "lte": lte,
+                                        "format": "epoch_millis"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            };
+
+            // "aggregations": { "1": { "value": 1 } }
+            const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+           
+            return (response && 
+                    response.aggregations && 
+                    response.aggregations['1'] && 
+                    response.aggregations['1'].value) ?
+                 
+                    response.aggregations['1'].value :
+                 
+                    0;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 }
