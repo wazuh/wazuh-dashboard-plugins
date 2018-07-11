@@ -29,7 +29,7 @@ export default class RootcheckRequest {
      */
     async top3RootkitsDetected(gte, lte, filters) {
         try {
-            
+
             const base = {
                 "size": 0,
                 "aggs": {
@@ -80,14 +80,84 @@ export default class RootcheckRequest {
 
             const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
             const aggArray = response.aggregations['2'].buckets;
-            const mapped   = aggArray.map(item => item.key);
-            const result   = [];
-            
+            const mapped = aggArray.map(item => item.key);
+            const result = [];
+
             for (const item of mapped) {
                 result.push(item.split("'")[1].split("'")[0]);
             }
 
             return result.filter((item, pos) => result.indexOf(item) === pos);
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Returns the number of agents that have one or more hidden processes
+     * @param {Number} gte Timestamp (ms) from
+     * @param {Number} lte Timestamp (ms) to
+     * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+     * @returns {Array<String>} 
+     */
+    async agentsWithHiddenPids(gte, lte, filters) {
+        try {
+            const base = {
+                "size": 0,
+                "aggs": {
+                    "1": {
+                        "cardinality": {
+                            "field": "agent.id"
+                        }
+                    }
+                },
+                "stored_fields": [
+                    "*"
+                ],
+                "docvalue_fields": [
+                    "@timestamp",
+                    "data.vulnerability.published",
+                    "data.vulnerability.updated",
+                    "syscheck.mtime_after",
+                    "syscheck.mtime_before",
+                    "data.cis.timestamp"
+                ],
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "query_string": {
+                                    "query": filters + " AND \"process\" AND \"hidden\"",
+                                    "analyze_wildcard": true,
+                                    "default_field": "*"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "@timestamp": {
+                                        "gte": gte,
+                                        "lte": lte,
+                                        "format": "epoch_millis"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            };
+
+            // "aggregations": { "1": { "value": 1 } }
+            const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+           
+            return (response && 
+                    response.aggregations && 
+                    response.aggregations['1'] && 
+                    response.aggregations['1'].value) ?
+                 
+                    response.aggregations['1'].value :
+                 
+                    0;
 
         } catch (error) {
             return Promise.reject(error);

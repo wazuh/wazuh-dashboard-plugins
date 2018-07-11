@@ -259,21 +259,21 @@ export default class WazuhReportingCtrl {
 
     async extendedInformation(section, tab, apiId, from, to, filters) {
         try {
-            if(section === 'overview' && tab === 'vuls'){
-                const agents = await this.apiRequest.makeGenericRequest('GET','/agents',{limit:1},apiId);
-                const totalAgents = agents.data.totalItems;
-                
+            const agents = await this.apiRequest.makeGenericRequest('GET','/agents',{limit:1},apiId);
+            const totalAgents = agents.data.totalItems;
+
+            if(section === 'overview' && tab === 'vuls'){                
                 const low      = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Low',filters);
                 const medium   = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Medium',filters);
                 const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High',filters);
                 const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical',filters);
 
                 this.dd.content.push({ text: 'Count summary', style: 'subtitle' });
-                this.dd.content.push({ text: `- ${critical+high+medium+low}/${totalAgents} agents have vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text: `- ${critical}/${totalAgents} agents have critical vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text: `- ${high}/${totalAgents} agents have high vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text: `- ${medium}/${totalAgents} agents have medium vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text: `- ${low}/${totalAgents} agents have low vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${critical+high+medium+low} of ${totalAgents} agents have vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${critical} of ${totalAgents} agents have critical vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${high} of ${totalAgents} agents have high vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${medium} of ${totalAgents} agents have medium vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: `- ${low} of ${totalAgents} agents have low vulnerabilities.`, style: 'gray' });
                 this.dd.content.push('\n');
 
                 const lowRank      = await this.vulnerabilityRequest.topAgentCount(from,to,'Low',filters);
@@ -365,6 +365,10 @@ export default class WazuhReportingCtrl {
                     }
                     this.dd.content.push('\n');
                 }
+
+                const hiddenPids = await this.rootcheckRequest.agentsWithHiddenPids(from,to,filters);
+                this.dd.content.push({ text: `${hiddenPids} of ${totalAgents} agents have hidden processes`, style: 'subtitle' });
+                this.dd.content.push('\n');
             }
 
             return false;
