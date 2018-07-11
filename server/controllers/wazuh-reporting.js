@@ -18,6 +18,8 @@ import PdfPrinter    from 'pdfmake/src/printer';
 import ErrorResponse from './error-response';
 
 import VulnerabilityRequest from '../reporting/vulnerability-request';
+import OverviewRequest      from '../reporting/overview-request';
+
 import WazuhApi from './wazuh-api';
 
 import { AgentsVisualizations, OverviewVisualizations } from '../integration-files/visualizations';
@@ -35,6 +37,7 @@ export default class WazuhReportingCtrl {
         };
 
         this.vulnerabilityRequest = new VulnerabilityRequest(this.server);
+        this.overviewRequest      = new OverviewRequest(this.server);
 
         this.printer = new PdfPrinter(this.fonts);
 
@@ -315,6 +318,59 @@ export default class WazuhReportingCtrl {
                         this.dd.content.push({ text: `- CVE ${item}`, style: 'gray' });
                     }
                     this.dd.content.push('\n');
+                }
+            }
+            if(section === 'overview' && tab === 'general'){
+                const level15Rank = await this.overviewRequest.topLevel15(from,to,filters);
+                if(level15Rank.length){
+                    this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'subtitle' });
+                    const rows = [];
+                    for(const item of level15Rank){
+                        const { data } = await this.apiRequest.makeGenericRequest('GET',`/agents/${item}`,{},apiId);
+                        /*
+
+                        { status: 'Active',
+                        name: 'osboxes',
+                        ip: '127.0.0.1',
+                        dateAdd: '2018-07-11 03:58:38',
+                        version: 'Wazuh v3.3.1',
+                        manager_host: 'osboxes',
+                        lastKeepAlive: '9999-12-31 23:59:59',
+                        os: 
+                        { major: '7',
+                            name: 'CentOS Linux',
+                            platform: 'centos',
+                            uname: 'Linux |osboxes |3.10.0-693.el7.x86_64 |#1 SMP Tue Aug 22 21:09:27 UTC 2017 |x86_64',
+                            version: '7',
+                            codename: 'Core',
+                            arch: 'x86_64' },
+                        id: '000' }
+
+                        */
+                        const str = Array(6).fill('---');
+                        str[0] = item;
+                        if(data && data.name) str[1] = data.name;
+                        if(data && data.ip) str[2] = data.ip;
+                        if(data && data.version) str[3] = data.version;
+                        if(data && data.manager_host) str[4] = data.manager_host;
+                        if(data && data.os && data.os.name && data.os.version) str[5] = `${data.os.name} ${data.os.version}`;
+                        rows.push(str)
+                        
+                    }
+                    const full_body = [];
+                    const columns = ['ID','Name','IP','Version','Manager','OS'];
+                    const widths = Array(6).fill('*');
+                    full_body.push(columns, ...rows);
+                    this.dd.content.push({
+                        fontSize:8,
+                        table: {
+                            widths,
+                            body: full_body
+                        },
+                        layout: 'lightHorizontalLines'
+                    });
+                    this.dd.content.push('\n');
+                    
                 }
             }
             return false;
