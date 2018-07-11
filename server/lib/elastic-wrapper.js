@@ -366,9 +366,19 @@ export default class ElasticWrapper {
         try {
 
             if(!payload) return Promise.reject(new Error('No valid payload given'));
+            const pattern = payload.pattern;
+            delete payload.pattern;
+            const fullPattern = await this.getIndexPatternUsingGet(pattern);
 
+            const title = fullPattern &&
+                          fullPattern._source && 
+                          fullPattern._source['index-pattern'] &&
+                          fullPattern._source['index-pattern'].title ?
+                          fullPattern._source['index-pattern'].title :
+                          false;
+            
             const data = await this.elasticRequest.callWithInternalUser('search', {
-                index: 'wazuh-alerts-3.x-*',
+                index: title || 'wazuh-alerts-3.x-*',
                 type:  'wazuh',
                 body:  payload
             });
@@ -378,7 +388,7 @@ export default class ElasticWrapper {
         } catch (error) {
             return Promise.reject(error);
         }
-    };
+    }
 
     /**
      * Search for the Wazuh API configuration document using its own id (usually it's a timestamp)
