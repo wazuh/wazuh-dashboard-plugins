@@ -28,7 +28,7 @@ export default ($q, genericReq, errorHandler, wazuhConfig) => {
         timeout                : 8000,
         'wazuh.shards'         : 1,
         'wazuh.replicas'       : 1,
-        selector               : true,
+        'ip.selector'          : true,
         'xpack.rbac.enabled'   : true,
         'wazuh.wazuh-version.shards'  : 1,
         'wazuh.wazuh-version.shards.replicas': 1,            
