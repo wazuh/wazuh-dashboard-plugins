@@ -307,6 +307,15 @@ export default class WazuhReportingCtrl {
                     }
                     this.dd.content.push('\n');
                 }
+
+                const cveRank = await this.vulnerabilityRequest.topCVECount(from,to,filters);
+                if(cveRank.length){
+                    this.dd.content.push({ text: 'Top 3 CVE', style: 'subtitle' });
+                    for(const item of cveRank){
+                        this.dd.content.push({ text: `- CVE ${item}`, style: 'gray' });
+                    }
+                    this.dd.content.push('\n');
+                }
             }
             return false;
         } catch (error) {
