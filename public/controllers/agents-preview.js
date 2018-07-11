@@ -74,9 +74,11 @@ app.controller('agentsPreviewController', function ($scope, $routeParams, generi
             const firstUrlParam  = clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
             const secondUrlParam = clusterInfo[firstUrlParam];
 
+            const pattern = appState.getCurrentPattern();
+            
             const data = await Promise.all([
                 genericReq.request('GET', '/api/wazuh-api/agents-unique/' + api, {}),
-                genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name`)                
+                genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`)                
             ]);
             
             const unique = data[0].data.result;
@@ -97,7 +99,7 @@ app.controller('agentsPreviewController', function ($scope, $routeParams, generi
                 $scope.mostActiveAgent.id   = '000';
             } else {
                 $scope.mostActiveAgent.name = data[1].data.data;
-                const info = await genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id`);
+                const info = await genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`);
                 if (info.data.data === '' && $scope.mostActiveAgent.name !== '') {
                     $scope.mostActiveAgent.id = '000';
                 } else {
