@@ -32,7 +32,7 @@ export default (server, options) => {
     server.route({ method: 'GET', path: '/api/wazuh-elastic/pattern/{pattern}', handler: (req,res) => ctrl.checkPattern(req,res) });
 
     // Returns the agent with most alerts
-    server.route({ method: 'GET', path: '/api/wazuh-elastic/top/{mode}/{cluster}/{field}', handler: (req,res) => ctrl.getFieldTop(req,res) });
+    server.route({ method: 'GET', path: '/api/wazuh-elastic/top/{mode}/{cluster}/{field}/{pattern}', handler: (req,res) => ctrl.getFieldTop(req,res) });
 
     // Return Wazuh Appsetup info
     server.route({ method: 'GET', path: '/api/wazuh-elastic/setup', handler: (req,res) => ctrl.getSetupInfo(req,res) });
