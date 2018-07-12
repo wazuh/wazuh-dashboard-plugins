@@ -16,6 +16,7 @@ import * as TimSort  from 'timsort';
 import rawParser     from '../reporting/raw-parser';
 import PdfPrinter    from 'pdfmake/src/printer';
 import ErrorResponse from './error-response';
+import sanitize      from '../lib/sanitize-html';
 
 import VulnerabilityRequest from '../reporting/vulnerability-request';
 import OverviewRequest      from '../reporting/overview-request';
@@ -385,8 +386,7 @@ export default class WazuhReportingCtrl {
                 this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'subtitle' });
                 for(const item of topPciRequirements){
                     this.dd.content.push({ text: `- ${item}`, style: 'gray' });
-                    this.dd.content.push('\n');
-                    const description = PCI[item];
+                    const description = sanitize(PCI[item]);
                     if(description) {
                         this.dd.content.push({ text: description, style: 'quote' });
                         this.dd.content.push('\n');
