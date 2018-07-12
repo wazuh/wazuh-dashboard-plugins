@@ -22,8 +22,10 @@ import VulnerabilityRequest from '../reporting/vulnerability-request';
 import OverviewRequest      from '../reporting/overview-request';
 import RootcheckRequest     from '../reporting/rootcheck-request';
 import PciRequest           from '../reporting/pci-request';
+import GdprRequest          from '../reporting/gdpr-request';
 
-import PCI from '../integration-files/pci-requirements';
+import PCI  from '../integration-files/pci-requirements';
+import GDPR from '../integration-files/gdpr-requirements';
 
 import WazuhApi from './wazuh-api';
 
@@ -45,6 +47,7 @@ export default class WazuhReportingCtrl {
         this.overviewRequest      = new OverviewRequest(this.server);
         this.rootcheckRequest     = new RootcheckRequest(this.server);
         this.pciRequest           = new PciRequest(this.server);
+        this.gdprRequest          = new GdprRequest(this.server);
 
         this.printer = new PdfPrinter(this.fonts);
 
@@ -73,6 +76,9 @@ export default class WazuhReportingCtrl {
                 },
                 gray: {
                     color: 'gray'
+                },
+                bold: {
+                    bold: true
                 }
             },
             header: {
@@ -304,6 +310,31 @@ export default class WazuhReportingCtrl {
         }
     } 
 
+    buildSimpleRuleTable (rules) {
+       
+        const rows = [];
+        for(const item of rules){
+            const str = ['---','---'];
+            if(item.ruleId) str[0] = item.ruleId;
+            if(item.ruleDescription) str[1] = item.ruleDescription;
+            rows.push(str);                        
+        }
+        const full_body = [];
+        const columns = ['Rule ID','Description'];
+        const widths = ['auto','*'];
+        full_body.push(columns, ...rows);
+        this.dd.content.push({
+            fontSize:8,
+            table: {
+                widths,
+                body: full_body
+            },
+            layout: 'lightHorizontalLines'
+        });
+        this.dd.content.push('\n');
+
+    } 
+
     async extendedInformation(section, tab, apiId, from, to, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
             const agents = await this.apiRequest.makeGenericRequest('GET','/agents',{limit:1},apiId);
@@ -400,9 +431,31 @@ export default class WazuhReportingCtrl {
             if(section === 'overview' && tab === 'pci'){
                 const topPciRequirements = await this.pciRequest.topPCIRequirements(from,to,filters,pattern);
                 this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'subtitle' });
+                this.dd.content.push('\n');
                 for(const item of topPciRequirements){
-                    this.dd.content.push({ text: `- ${item}`, style: 'gray' });
+                    const rules = await this.pciRequest.getRulesByRequirement(from,to,filters,item,pattern);
+                    this.dd.content.push({ text: `Requirement ${item}`, style: 'bold'});
+                    this.dd.content.push('\n');
                     const description = sanitize(PCI[item]);
+                    if(description) {
+                        this.dd.content.push({ text: `"${description}"`, style: 'quote' });
+                        this.dd.content.push('\n');
+                    }
+                    this.dd.content.push({ text: `Top rules regarding to requirement ${item}`});
+                    this.dd.content.push('\n');
+                    this.buildSimpleRuleTable(rules);
+                    this.dd.content.push('\n');
+                }
+                
+                
+            }
+
+            if(section === 'overview' && tab === 'gdpr'){
+                const topGdprRequirements = await this.gdprRequest.topGDPRRequirements(from,to,filters,pattern);
+                this.dd.content.push({ text: 'Most common GDPR requirements alerts found', style: 'subtitle' });
+                for(const item of topGdprRequirements){
+                    this.dd.content.push({ text: `- ${item}`, style: 'gray' });
+                    const description = sanitize(GDPR[item]);
                     if(description) {
                         this.dd.content.push({ text: description, style: 'quote' });
                         this.dd.content.push('\n');

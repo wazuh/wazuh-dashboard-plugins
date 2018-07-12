@@ -28,86 +28,180 @@ export default class PciRequest {
      * @returns {Array<String>} 
      */
     async topPCIRequirements(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
-            if(filters.includes('rule.pci_dss: exists')){
-                const first = filters.split('AND rule.pci_dss: exists')[0];
-                const second = filters.split('AND rule.pci_dss: exists')[1];
-                filters = first + second;
-            }
+        if (filters.includes('rule.pci_dss: exists')) {
+            const first = filters.split('AND rule.pci_dss: exists')[0];
+            const second = filters.split('AND rule.pci_dss: exists')[1];
+            filters = first + second;
+        }
 
-            try {
-                const base = {
-                    pattern,
-                    "size": 0,
-                    "aggs": {
-                        "2": {
-                            "terms": {
-                                "field": "rule.pci_dss",
-                                "size": 5,
-                                "order": {
-                                    "_count": "desc"
+        try {
+            const base = {
+                pattern,
+                "size": 0,
+                "aggs": {
+                    "2": {
+                        "terms": {
+                            "field": "rule.pci_dss",
+                            "size": 5,
+                            "order": {
+                                "_count": "desc"
+                            }
+                        }
+                    }
+                },
+                "stored_fields": [
+                    "*"
+                ],
+                "script_fields": {},
+                "docvalue_fields": [
+                    "@timestamp",
+                    "data.vulnerability.published",
+                    "data.vulnerability.updated",
+                    "syscheck.mtime_after",
+                    "syscheck.mtime_before",
+                    "data.cis.timestamp"
+                ],
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "query_string": {
+                                    "query": filters,
+                                    "analyze_wildcard": true,
+                                    "default_field": "*"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "@timestamp": {
+                                        "gte": gte,
+                                        "lte": lte,
+                                        "format": "epoch_millis"
+                                    }
+                                }
+                            },
+                            {
+                                "exists": {
+                                    "field": "rule.pci_dss"
+                                }
+                            }
+                        ]
+                    }
+                }
+            };
+            const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+            const aggArray = response.aggregations['2'].buckets;
+            return aggArray.map(item => item.key).sort((a, b) => {
+                const a_split = a.split('.');
+                const b_split = b.split('.');
+                if (parseInt(a_split[0]) > parseInt(b_split[0])) return 1;
+                else if (parseInt(a_split[0]) < parseInt(b_split[0])) return -1;
+                else {
+                    if (parseInt(a_split[1]) > parseInt(b_split[1])) return 1;
+                    else if (parseInt(a_split[1]) < parseInt(b_split[1])) return -1;
+                    else {
+                        if (parseInt(a_split[2]) > parseInt(b_split[2])) return 1;
+                        else if (parseInt(a_split[2]) < parseInt(b_split[2])) return -1;
+                    }
+                }
+            });
+        } catch (error) {
+            return Promise.reject(error);
+        }
+
+    }
+
+    /**
+     * Returns top 3 rules for specific PCI DSS requirement
+     * @param {Number} gte Timestamp (ms) from
+     * @param {Number} lte Timestamp (ms) to
+     * @param {String} requirement PCI DSS requirement. E.g: '10.2.3'
+     * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+     * @returns {Array<String>} 
+     */
+    async getRulesByRequirement(gte, lte, filters, requirement, pattern = 'wazuh-alerts-3.x-*') {
+        if (filters.includes('rule.pci_dss: exists')) {
+            const first = filters.split('AND rule.pci_dss: exists')[0];
+            const second = filters.split('AND rule.pci_dss: exists')[1];
+            filters = first + second;
+        }
+
+        try {
+            const base = {
+                pattern,
+                "size": 0,
+                "aggs": {
+                    "2": {
+                        "terms": {
+                            "field": "rule.description",
+                            "size": 3,
+                            "order": {
+                                "_count": "desc"
+                            }
+                        },
+                        "aggs": {
+                            "3": {
+                                "terms": {
+                                    "field": "rule.id",
+                                    "size": 1,
+                                    "order": {
+                                        "_count": "desc"
+                                    }
                                 }
                             }
                         }
-                    },
-                    "stored_fields": [
-                        "*"
-                    ],
-                    "script_fields": {},
-                    "docvalue_fields": [
-                        "@timestamp",
-                        "data.vulnerability.published",
-                        "data.vulnerability.updated",
-                        "syscheck.mtime_after",
-                        "syscheck.mtime_before",
-                        "data.cis.timestamp"
-                    ],
-                    "query": {
-                        "bool": {
-                            "must": [
-                                {
-                                    "query_string": {
-                                        "query": filters,
-                                        "analyze_wildcard": true,
-                                        "default_field": "*"
-                                    }
-                                },
-                                {
-                                    "range": {
-                                        "@timestamp": {
-                                            "gte": gte,
-                                            "lte": lte,
-                                            "format": "epoch_millis"
-                                        }
-                                    }
-                                },
-                                {
-                                    "exists": {
-                                      "field": "rule.pci_dss"
-                                    }
-                                  }
-                            ]
-                        }
                     }
-                };
-                const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
-                const aggArray = response.aggregations['2'].buckets;
-                return aggArray.map(item => item.key).sort((a,b) => {
-                    const a_split = a.split('.');
-                    const b_split = b.split('.');   
-                    if(parseInt(a_split[0]) > parseInt(b_split[0])) return 1;
-                    else if(parseInt(a_split[0]) < parseInt(b_split[0])) return -1;
-                    else {
-                       if(parseInt(a_split[1]) > parseInt(b_split[1])) return 1;
-                        else if(parseInt(a_split[1]) < parseInt(b_split[1])) return -1;
-                        else {
-                            if(parseInt(a_split[2]) > parseInt(b_split[2])) return 1;
-                            else if(parseInt(a_split[2]) < parseInt(b_split[2])) return -1;
-                        } 
+                },
+                "stored_fields": [
+                    "*"
+                ],
+                "script_fields": {},
+                "docvalue_fields": [
+                    "@timestamp",
+                    "data.vulnerability.published",
+                    "data.vulnerability.updated",
+                    "syscheck.mtime_after",
+                    "syscheck.mtime_before",
+                    "data.cis.timestamp"
+                ],
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "query_string": {
+                                    "query": filters + " AND rule.pci_dss: \"" + requirement + "\"",
+                                    "analyze_wildcard": true,
+                                    "default_field": "*"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "@timestamp": {
+                                        "gte": gte,
+                                        "lte": lte,
+                                        "format": "epoch_millis"
+                                    }
+                                }
+                            }
+                        ]
                     }
-                });
-            } catch (error) {
-                return Promise.reject(error);
+                }
+            };
+            const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+            const { buckets } = response.aggregations['2'];
+            const result = [];
+            for (const bucket of buckets) {
+                if(!bucket || !bucket['3'] || !bucket['3'].buckets || !bucket['3'].buckets[0] || !bucket['3'].buckets[0].key || !bucket.key){
+                    continue;
+                }
+                const ruleId = bucket['3'].buckets[0].key;
+                const ruleDescription = bucket.key;
+                result.push({ ruleId, ruleDescription });
             }
-        
+
+            return result;
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }
 }
