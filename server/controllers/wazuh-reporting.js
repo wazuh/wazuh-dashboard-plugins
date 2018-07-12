@@ -20,6 +20,9 @@ import ErrorResponse from './error-response';
 import VulnerabilityRequest from '../reporting/vulnerability-request';
 import OverviewRequest      from '../reporting/overview-request';
 import RootcheckRequest     from '../reporting/rootcheck-request';
+import PciRequest           from '../reporting/pci-request';
+
+import PCI from '../integration-files/pci-requirements';
 
 import WazuhApi from './wazuh-api';
 
@@ -40,6 +43,7 @@ export default class WazuhReportingCtrl {
         this.vulnerabilityRequest = new VulnerabilityRequest(this.server);
         this.overviewRequest      = new OverviewRequest(this.server);
         this.rootcheckRequest     = new RootcheckRequest(this.server);
+        this.pciRequest           = new PciRequest(this.server);
 
         this.printer = new PdfPrinter(this.fonts);
 
@@ -151,6 +155,7 @@ export default class WazuhReportingCtrl {
 
     renderFilters(filters, searchBar) {
         let str = '';
+        
         const len = filters.length;
         for (let i = 0; i < len; i++) {
             const filter = filters[i];
@@ -372,6 +377,21 @@ export default class WazuhReportingCtrl {
 
                 const hiddenPorts = await this.rootcheckRequest.agentsWithHiddenPorts(from,to,filters,pattern);
                 this.dd.content.push({ text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`, style: 'subtitle' });
+                this.dd.content.push('\n');
+            }
+            
+            if(section === 'overview' && tab === 'pci'){
+                const topPciRequirements = await this.pciRequest.topPCIRequirements(from,to,filters,pattern);
+                this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'subtitle' });
+                for(const item of topPciRequirements){
+                    this.dd.content.push({ text: `- ${item}`, style: 'gray' });
+                    this.dd.content.push('\n');
+                    const description = PCI[item];
+                    if(description) {
+                        this.dd.content.push({ text: description, style: 'quote' });
+                        this.dd.content.push('\n');
+                    }
+                }
                 this.dd.content.push('\n');
             }
 

@@ -28,10 +28,73 @@ export default class PciRequest {
      * @returns {Array<String>} 
      */
     async topPCIRequirements(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
-        try {
+            if(filters.includes('rule.pci_dss: exists')){
+                const first = filters.split('AND rule.pci_dss: exists')[0];
+                const second = filters.split('AND rule.pci_dss: exists')[1];
+                filters = first + second;
+            }
 
-        } catch (error) {
-            return Promise.reject(error);
-        }
+            try {
+                const base = {
+                    pattern,
+                    "size": 0,
+                    "aggs": {
+                        "2": {
+                            "terms": {
+                                "field": "rule.pci_dss",
+                                "size": 5,
+                                "order": {
+                                    "_count": "desc"
+                                }
+                            }
+                        }
+                    },
+                    "stored_fields": [
+                        "*"
+                    ],
+                    "script_fields": {},
+                    "docvalue_fields": [
+                        "@timestamp",
+                        "data.vulnerability.published",
+                        "data.vulnerability.updated",
+                        "syscheck.mtime_after",
+                        "syscheck.mtime_before",
+                        "data.cis.timestamp"
+                    ],
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "query_string": {
+                                        "query": filters,
+                                        "analyze_wildcard": true,
+                                        "default_field": "*"
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "@timestamp": {
+                                            "gte": gte,
+                                            "lte": lte,
+                                            "format": "epoch_millis"
+                                        }
+                                    }
+                                },
+                                {
+                                    "exists": {
+                                      "field": "rule.pci_dss"
+                                    }
+                                  }
+                            ]
+                        }
+                    }
+                };
+                const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+                const aggArray = response.aggregations['2'].buckets;
+                return aggArray.map(item => item.key);
+            } catch (error) {
+                return Promise.reject(error);
+            }
+        
     }
 }
