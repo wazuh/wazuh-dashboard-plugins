@@ -263,6 +263,47 @@ export default class WazuhReportingCtrl {
         }
     }
 
+    async buildAgentsTable (ids) {
+        try {
+            const rows = [];
+            for(const item of ids){
+                let data = false;
+                try {
+                    const agent = await this.apiRequest.makeGenericRequest('GET',`/agents/${item}`,{},apiId);
+                    if(agent && agent.data) {
+                        data = {};
+                        Object.assign(data,agent.data);
+                    }
+                } catch (error) {
+                    continue;
+                }
+                const str = Array(6).fill('---');
+                str[0] = item;
+                if(data && data.name) str[1] = data.name;
+                if(data && data.ip) str[2] = data.ip;
+                if(data && data.version) str[3] = data.version;
+                if(data && data.manager_host) str[4] = data.manager_host;
+                if(data && data.os && data.os.name && data.os.version) str[5] = `${data.os.name} ${data.os.version}`;
+                rows.push(str);                        
+            }
+            const full_body = [];
+            const columns = ['ID','Name','IP','Version','Manager','OS'];
+            const widths = Array(6).fill('*');
+            full_body.push(columns, ...rows);
+            this.dd.content.push({
+                fontSize:8,
+                table: {
+                    widths,
+                    body: full_body
+                },
+                layout: 'lightHorizontalLines'
+            });
+            this.dd.content.push('\n');
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    } 
+
     async extendedInformation(section, tab, apiId, from, to, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
             const agents = await this.apiRequest.makeGenericRequest('GET','/agents',{limit:1},apiId);
@@ -327,38 +368,13 @@ export default class WazuhReportingCtrl {
                     }
                     this.dd.content.push('\n');
                 }
-            }
-            
+            }                    
+
             if(section === 'overview' && tab === 'general'){
                 const level15Rank = await this.overviewRequest.topLevel15(from,to,filters,pattern);
                 if(level15Rank.length){
                     this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'subtitle' });
-                    const rows = [];
-                    for(const item of level15Rank){
-                        const { data } = await this.apiRequest.makeGenericRequest('GET',`/agents/${item}`,{},apiId);
-                        const str = Array(6).fill('---');
-                        str[0] = item;
-                        if(data && data.name) str[1] = data.name;
-                        if(data && data.ip) str[2] = data.ip;
-                        if(data && data.version) str[3] = data.version;
-                        if(data && data.manager_host) str[4] = data.manager_host;
-                        if(data && data.os && data.os.name && data.os.version) str[5] = `${data.os.name} ${data.os.version}`;
-                        rows.push(str)
-                        
-                    }
-                    const full_body = [];
-                    const columns = ['ID','Name','IP','Version','Manager','OS'];
-                    const widths = Array(6).fill('*');
-                    full_body.push(columns, ...rows);
-                    this.dd.content.push({
-                        fontSize:8,
-                        table: {
-                            widths,
-                            body: full_body
-                        },
-                        layout: 'lightHorizontalLines'
-                    });
-                    this.dd.content.push('\n');
+                    await this.buildAgentsTable(level15Rank);
                 }
             }
 
@@ -410,7 +426,6 @@ export default class WazuhReportingCtrl {
             if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'))) {
                 fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
             }
-
             
             if (req.payload && req.payload.array) {
                 const tab = req.payload.tab;
