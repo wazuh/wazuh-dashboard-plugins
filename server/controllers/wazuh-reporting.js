@@ -453,13 +453,20 @@ export default class WazuhReportingCtrl {
             if(section === 'overview' && tab === 'gdpr'){
                 const topGdprRequirements = await this.gdprRequest.topGDPRRequirements(from,to,filters,pattern);
                 this.dd.content.push({ text: 'Most common GDPR requirements alerts found', style: 'subtitle' });
+                this.dd.content.push('\n');
                 for(const item of topGdprRequirements){
-                    this.dd.content.push({ text: `- ${item}`, style: 'gray' });
+                    const rules = await this.gdprRequest.getRulesByRequirement(from,to,filters,item,pattern);
+                    this.dd.content.push({ text: `Requirement ${item}`, style: 'bold'});
+                    this.dd.content.push('\n');
                     const description = sanitize(GDPR[item]);
                     if(description) {
-                        this.dd.content.push({ text: description, style: 'quote' });
+                        this.dd.content.push({ text: `"${description}"`, style: 'quote' });
                         this.dd.content.push('\n');
                     }
+                    this.dd.content.push({ text: `Top rules regarding to requirement ${item}`});
+                    this.dd.content.push('\n');
+                    this.buildSimpleRuleTable(rules);
+                    this.dd.content.push('\n');
                 }
                 this.dd.content.push('\n');
             }
