@@ -351,14 +351,14 @@ export default class WazuhReportingCtrl {
                 const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical',filters,pattern);
 
                 this.dd.content.push({ text: 'Summary', style: 'bold' });
+                const ulcustom = [`${critical+high+medium+low} of ${totalAgents} agents have vulnerabilities.`];
+                if(critical) ulcustom.push(`${critical} of ${totalAgents} agents have critical vulnerabilities.`);
+                if(high) ulcustom.push(`${high} of ${totalAgents} agents have high vulnerabilities.`);
+                if(medium) ulcustom.push(`${medium} of ${totalAgents} agents have medium vulnerabilities.`);
+                if(low) ulcustom.push(`${low} of ${totalAgents} agents have low vulnerabilities.`);
+
                 this.dd.content.push({
-                    ul: [
-                        `${critical+high+medium+low} of ${totalAgents} agents have vulnerabilities.`,
-                        `${critical} of ${totalAgents} agents have critical vulnerabilities.`,
-                        `${high} of ${totalAgents} agents have high vulnerabilities.`,
-                        `${medium} of ${totalAgents} agents have medium vulnerabilities.`,
-                        `${low} of ${totalAgents} agents have low vulnerabilities.`
-                    ]
+                    ul: ulcustom
                 });
                 this.dd.content.push('\n');
 
