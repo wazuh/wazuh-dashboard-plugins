@@ -85,10 +85,11 @@ export default class WazuhReportingCtrl {
             },
             header: {
                 columns: [
-                    { image: path.join(__dirname, '../../public/img/logo.png'), fit: [190, 90], style: 'rightme', margin: [0, 10, 0, 0] },
+                    { image: path.join(__dirname, '../../public/img/logo.png'), fit: [190, 90], style: 'rightme', margin: [0, 10, 0, 60] }
                 ]
             },
             content: [
+                
             ],
             footer: {
                 columns: [
@@ -116,7 +117,7 @@ export default class WazuhReportingCtrl {
             const rowsparsed = rawParser(table.rawResponse, table.columns);
             if (Array.isArray(rowsparsed) && rowsparsed.length) {
                 const rows = rowsparsed.length > 100 ? rowsparsed.slice(0,99) : rowsparsed;
-                this.dd.content.push({ text: table.title, style: 'subtitlenobold', pageBreak: 'before' });
+                this.dd.content.push({ text: table.title, style: 'bold', pageBreak: 'before' });
 
                 const full_body = [];
                 const sortFunction = (a, b) => parseInt(a[a.length - 1]) < parseInt(b[b.length - 1]) ?
@@ -125,7 +126,8 @@ export default class WazuhReportingCtrl {
                         -1 :
                         0;
                 TimSort.sort(rows, sortFunction);
-                const widths = Array(table.columns.length).fill('*');
+                const widths = Array(table.columns.length-1).fill('auto');
+                widths.push('*');
                 
                 full_body.push(table.columns, ...rows);
                 this.dd.content.push({
@@ -225,7 +227,7 @@ export default class WazuhReportingCtrl {
 
         for (const item of single_vis) {
             const title = this.checkTitle(item, isAgents, tab);
-            this.dd.content.push({ text: title[0]._source.title, style: 'subtitlenobold' });
+            this.dd.content.push({ text: title[0]._source.title, style: 'bold' });
             this.dd.content.push({ columns: [ { image: item.element, width: 500 } ] });
             this.dd.content.push('\n');
         }
@@ -240,8 +242,8 @@ export default class WazuhReportingCtrl {
 
                 this.dd.content.push({
                     columns: [
-                        { text: title_1[0]._source.title, style: 'subtitlenobold', width: 280 },
-                        { text: title_2[0]._source.title, style: 'subtitlenobold', width: 280 }
+                        { text: title_1[0]._source.title, style: 'bold', width: 280 },
+                        { text: title_2[0]._source.title, style: 'bold', width: 280 }
                     ]
                 });
 
@@ -263,7 +265,7 @@ export default class WazuhReportingCtrl {
             const title = this.checkTitle(item, isAgents, tab);
             this.dd.content.push({
                 columns: [
-                    { text: title[0]._source.title, style: 'subtitlenobold', width: 280 }
+                    { text: title[0]._source.title, style: 'bold', width: 280 }
                 ]
             });
             this.dd.content.push({ columns: [{ image: item.element, width: 280 }] });
@@ -296,7 +298,7 @@ export default class WazuhReportingCtrl {
             }
             const full_body = [];
             const columns = ['ID','Name','IP','Version','Manager','OS'];
-            const widths = Array(6).fill('*');
+            const widths = ['auto','auto','auto','auto','auto','*'];
             full_body.push(columns, ...rows);
             this.dd.content.push({
                 fontSize:8,
@@ -348,12 +350,16 @@ export default class WazuhReportingCtrl {
                 const high     = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'High',filters,pattern);
                 const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from,to,'Critical',filters,pattern);
 
-                this.dd.content.push({ text: 'Count summary', style: 'subtitle' });
-                this.dd.content.push({ text: `- ${critical+high+medium+low} of ${totalAgents} agents have vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text: `- ${critical} of ${totalAgents} agents have critical vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text: `- ${high} of ${totalAgents} agents have high vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text: `- ${medium} of ${totalAgents} agents have medium vulnerabilities.`, style: 'gray' });
-                this.dd.content.push({ text: `- ${low} of ${totalAgents} agents have low vulnerabilities.`, style: 'gray' });
+                this.dd.content.push({ text: 'Summary', style: 'bold' });
+                this.dd.content.push({
+                    ul: [
+                        `${critical+high+medium+low} of ${totalAgents} agents have vulnerabilities.`,
+                        `${critical} of ${totalAgents} agents have critical vulnerabilities.`,
+                        `${high} of ${totalAgents} agents have high vulnerabilities.`,
+                        `${medium} of ${totalAgents} agents have medium vulnerabilities.`,
+                        `${low} of ${totalAgents} agents have low vulnerabilities.`
+                    ]
+                });
                 this.dd.content.push('\n');
 
                 const lowRank      = await this.vulnerabilityRequest.topAgentCount(from,to,'Low',filters,pattern);
@@ -362,43 +368,33 @@ export default class WazuhReportingCtrl {
                 const criticalRank = await this.vulnerabilityRequest.topAgentCount(from,to,'Critical',filters,pattern);
 
                 if(criticalRank.length){
-                    this.dd.content.push({ text: 'Top 3 agents with critical severity vulnerabilities', style: 'subtitle' });
-                    for(const item of criticalRank){
-                        this.dd.content.push({ text: `- Agent ${item}`, style: 'gray' });
-                    }
+                    this.dd.content.push({ text: 'Top 3 agents with critical severity vulnerabilities', style: 'bold' });
+                    await this.buildAgentsTable(criticalRank,apiId);
                     this.dd.content.push('\n');
                 }
 
                 if(highRank.length){
-                    this.dd.content.push({ text: 'Top 3 agents with high severity vulnerabilities', style: 'subtitle' });
-                    for(const item of highRank){
-                        this.dd.content.push({ text: `- Agent ${item}`, style: 'gray' });
-                    }
+                    this.dd.content.push({ text: 'Top 3 agents with high severity vulnerabilities', style: 'bold' });
+                    await this.buildAgentsTable(highRank,apiId);
                     this.dd.content.push('\n');
                 }
 
                 if(mediumRank.length){
-                    this.dd.content.push({ text: 'Top 3 agents with medium severity vulnerabilities', style: 'subtitle' });
-                    for(const item of mediumRank){
-                        this.dd.content.push({ text: `- Agent ${item}`, style: 'gray'});
-                    }
+                    this.dd.content.push({ text: 'Top 3 agents with medium severity vulnerabilities', style: 'bold' });
+                    await this.buildAgentsTable(mediumRank,apiId);
                     this.dd.content.push('\n');  
                 }
 
                 if(lowRank.length){
-                    this.dd.content.push({ text: 'Top 3 agents with low severity vulnerabilities', style: 'subtitle' });
-                    for(const item of lowRank){
-                        this.dd.content.push({ text: `- Agent ${item}`, style: 'gray'});
-                    }
+                    this.dd.content.push({ text: 'Top 3 agents with low severity vulnerabilities', style: 'bold' });
+                    await this.buildAgentsTable(lowRank,apiId);
                     this.dd.content.push('\n');
                 }
 
                 const cveRank = await this.vulnerabilityRequest.topCVECount(from,to,filters,pattern);
                 if(cveRank.length){
-                    this.dd.content.push({ text: 'Top 3 CVE', style: 'subtitle' });
-                    for(const item of cveRank){
-                        this.dd.content.push({ text: `- CVE ${item}`, style: 'gray' });
-                    }
+                    this.dd.content.push({ text: 'Top 3 CVE', style: 'bold' });
+                    this.dd.content.push({ ol: cveRank });
                     this.dd.content.push('\n');
                 }
             }                    
@@ -406,7 +402,7 @@ export default class WazuhReportingCtrl {
             if(section === 'overview' && tab === 'general'){
                 const level15Rank = await this.overviewRequest.topLevel15(from,to,filters,pattern);
                 if(level15Rank.length){
-                    this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'subtitle' });
+                    this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'bold' });
                     await this.buildAgentsTable(level15Rank,apiId);
                 }
             }
@@ -414,25 +410,25 @@ export default class WazuhReportingCtrl {
             if(section === 'overview' && tab === 'pm'){
                 const top3RootkitsRank = await this.rootcheckRequest.top3RootkitsDetected(from,to,filters,pattern);
                 if(top3RootkitsRank.length){
-                    this.dd.content.push({ text: 'Most common rootkits found along your agents', style: 'subtitle' });
-                    for(const item of top3RootkitsRank){
-                        this.dd.content.push({ text: `- ${item}`, style: 'gray' });
-                    }
+                    this.dd.content.push({ text: 'Most common rootkits found along your agents', style: 'bold' });
+                    this.dd.content.push({ ol: top3RootkitsRank });
                     this.dd.content.push('\n');
                 }
 
                 const hiddenPids = await this.rootcheckRequest.agentsWithHiddenPids(from,to,filters,pattern);
-                this.dd.content.push({ text: `${hiddenPids} of ${totalAgents} agents have hidden processes`, style: 'subtitle' });
+                this.dd.content.push({ text: `${hiddenPids} of ${totalAgents} agents have hidden processes`, style: 'bold' });
+                this.dd.content.push({ text: `This situation is dangerous and it means ${hiddenPids} agents may have been infected by some kind of malware.`, style: 'quote' });
                 this.dd.content.push('\n');
 
                 const hiddenPorts = await this.rootcheckRequest.agentsWithHiddenPorts(from,to,filters,pattern);
-                this.dd.content.push({ text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`, style: 'subtitle' });
+                this.dd.content.push({ text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`, style: 'bold' });
+                this.dd.content.push({ text: `Netstat is not showing some ports but they are replying from ping command.`, style: 'quote' });
                 this.dd.content.push('\n');
             }
             
             if(section === 'overview' && tab === 'pci'){
                 const topPciRequirements = await this.pciRequest.topPCIRequirements(from,to,filters,pattern);
-                this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'subtitle' });
+                this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'bold' });
                 this.dd.content.push('\n');
                 for(const item of topPciRequirements){
                     const rules = await this.pciRequest.getRulesByRequirement(from,to,filters,item,pattern);
