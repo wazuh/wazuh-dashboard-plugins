@@ -23,6 +23,7 @@ import OverviewRequest      from '../reporting/overview-request';
 import RootcheckRequest     from '../reporting/rootcheck-request';
 import PciRequest           from '../reporting/pci-request';
 import GdprRequest          from '../reporting/gdpr-request';
+import AuditRequest         from '../reporting/audit-request';
 
 import PCI  from '../integration-files/pci-requirements';
 import GDPR from '../integration-files/gdpr-requirements';
@@ -48,6 +49,7 @@ export default class WazuhReportingCtrl {
         this.rootcheckRequest     = new RootcheckRequest(this.server);
         this.pciRequest           = new PciRequest(this.server);
         this.gdprRequest          = new GdprRequest(this.server);
+        this.auditRequest         = new AuditRequest(this.server);
 
         this.printer = new PdfPrinter(this.fonts);
 
@@ -269,7 +271,7 @@ export default class WazuhReportingCtrl {
         }
     }
 
-    async buildAgentsTable (ids) {
+    async buildAgentsTable (ids, apiId) {
         try {
             const rows = [];
             for(const item of ids){
@@ -405,7 +407,7 @@ export default class WazuhReportingCtrl {
                 const level15Rank = await this.overviewRequest.topLevel15(from,to,filters,pattern);
                 if(level15Rank.length){
                     this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'subtitle' });
-                    await this.buildAgentsTable(level15Rank);
+                    await this.buildAgentsTable(level15Rank,apiId);
                 }
             }
 
@@ -470,6 +472,42 @@ export default class WazuhReportingCtrl {
                 }
                 this.dd.content.push('\n');
             }
+
+            if(section === 'overview' && tab === 'audit'){
+                const auditAgentsNonSuccess = await this.auditRequest.getTop3AgentsSudoNonSuccessful(from,to,filters,pattern);
+                if(auditAgentsNonSuccess.length) {
+                    this.dd.content.push({ text: 'Agents with high number of failed sudo commands', style: 'bold' });
+                    await this.buildAgentsTable(auditAgentsNonSuccess,apiId);
+                }
+                const auditAgentsFailedSyscall = await this.auditRequest.getTop3AgentsFailedSyscalls(from,to,filters,pattern);
+                if(auditAgentsFailedSyscall.length) {
+                    this.dd.content.push({ text: 'Syscalls that usually are failing', style: 'bold' });
+                    this.dd.content.push({ text: 'The next table shows the top failing syscall for the top 3 agents that have more failed syscalls.', style: 'quote' });
+                    const rows = [];
+                    for(const item of auditAgentsFailedSyscall){
+                        const str = ['---','---','---'];
+                        if(item.agent) str[0] = item.agent;
+                        if(item.syscall) {
+                            if(item.syscall.id)      str[1] = item.syscall.id;
+                            if(item.syscall.syscall) str[2] = item.syscall.syscall;
+                        }
+                        rows.push(str);                        
+                    }
+                    const full_body = [];
+                    const columns = ['Agent ID','Syscall ID','Syscall'];
+                    const widths = ['auto','auto','*'];
+                    full_body.push(columns, ...rows);
+                    this.dd.content.push({
+                        fontSize:8,
+                        table: {
+                            widths,
+                            body: full_body
+                        },
+                        layout: 'lightHorizontalLines'
+                    });
+                    this.dd.content.push('\n');
+                }
+            }   
 
             return false;
         } catch (error) {
