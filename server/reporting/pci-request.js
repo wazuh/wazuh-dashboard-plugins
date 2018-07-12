@@ -91,7 +91,20 @@ export default class PciRequest {
                 };
                 const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
                 const aggArray = response.aggregations['2'].buckets;
-                return aggArray.map(item => item.key);
+                return aggArray.map(item => item.key).sort((a,b) => {
+                    const a_split = a.split('.');
+                    const b_split = b.split('.');   
+                    if(parseInt(a_split[0]) > parseInt(b_split[0])) return 1;
+                    else if(parseInt(a_split[0]) < parseInt(b_split[0])) return -1;
+                    else {
+                       if(parseInt(a_split[1]) > parseInt(b_split[1])) return 1;
+                        else if(parseInt(a_split[1]) < parseInt(b_split[1])) return -1;
+                        else {
+                            if(parseInt(a_split[2]) > parseInt(b_split[2])) return 1;
+                            else if(parseInt(a_split[2]) < parseInt(b_split[2])) return -1;
+                        } 
+                    }
+                });
             } catch (error) {
                 return Promise.reject(error);
             }
