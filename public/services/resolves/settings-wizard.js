@@ -80,9 +80,15 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
         const callCheckStored = () => {
             const config = wazuhConfig.getConfig();
 
-            const currentApi = appState.getCurrentAPI();
+            let currentApi = false;
+            
+            try {
+                currentApi = JSON.parse(appState.getCurrentAPI()).id;
+            } catch (error) {
+                // Intended empty catch
+            }
 
-            if(currentApi && !appState.getExtensions(JSON.parse(currentApi).id)){
+            if(currentApi && !appState.getExtensions(currentApi)){
                 const extensions = {
                     audit     : config['extensions.audit'],
                     pci       : config['extensions.pci'],
@@ -96,7 +102,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
             }
             
             checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location)
-            .then(() => testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id))
+            .then(() => testAPI.check_stored(currentApi))
             .then(data => {
                 if(data && data === 'cookies_outdated'){
                     $location.search('tab','welcome');
