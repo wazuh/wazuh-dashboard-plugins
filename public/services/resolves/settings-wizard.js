@@ -98,7 +98,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                     aws       : config['extensions.aws'],
                     virustotal: config['extensions.virustotal']
                 };
-                appState.setExtensions(JSON.parse(currentApi).id,extensions);
+                appState.setExtensions(currentApi,extensions);
             }
             
             checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location)
