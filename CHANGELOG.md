@@ -2,6 +2,25 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.1 - Revision 399
+
+### Added
+
+- Added a new Angular.js factory to store the Wazuh app configuration values. Also this factory is being used by the pre-routes functions (resolves), this way we are sure about having the real configuration at any time. These pre-routes functions have been improved too. ([#670](https://github.com/wazuh/wazuh-kibana-app/pull/670))
+  
+
+### Changed
+
+- Tables have been improved. Now they are truncating long fields and adding a tooltip if needed ([#671](https://github.com/wazuh/wazuh-kibana-app/pull/671))
+
+### Fixed
+
+- Fixed the top menu API indicator when checking API connection and the manager/cluster information had been changed ([#668](https://github.com/wazuh/wazuh-kibana-app/pull/668))
+- Fixed our logger module which was not writting logs the very first time Kibana is started neither after a log rotation ([#667](https://github.com/wazuh/wazuh-kibana-app/pull/667))
+- Fixed a regular expression in the server side when parsing URLs before registering a new Wazuh API ([#690](https://github.com/wazuh/wazuh-kibana-app/pull/690))
+- Fixed filters from specific visualization regarding to FIM section ([#694](https://github.com/wazuh/wazuh-kibana-app/pull/694))
+- Fixed filters parsing when generating a report. It was not parsing negated filters as expected ([#696](https://github.com/wazuh/wazuh-kibana-app/pull/696))
+
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.0 - Revision 398
 
 ### Added
