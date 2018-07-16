@@ -47,10 +47,10 @@ routes
         template: agentsTemplate,
         resolve: {
             "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $q, genericReq, errorHandler, wazuhConfig,
                 $rootScope, $location, $window, testAPI, appState, wzMisc
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
                 .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
             },
             "ip": getIp,
@@ -61,10 +61,10 @@ routes
         template: agentsPrevTemplate,
         resolve: {
             "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $q, genericReq, errorHandler, wazuhConfig,
                 $rootScope, $location, $window, testAPI, appState, wzMisc
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
                 .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
             },
         }
@@ -73,10 +73,10 @@ routes
         template: managerTemplate,
         resolve: {
             "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $q, genericReq, errorHandler, wazuhConfig,
                 $rootScope, $location, $window, testAPI, appState, wzMisc
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
                 .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
             },
             "ip": getIp,
@@ -87,10 +87,10 @@ routes
         template: overviewTemplate,
         resolve: {
             "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $q, genericReq, errorHandler, wazuhConfig,
                 $rootScope, $location, $window, testAPI, appState, wzMisc
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
                 .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
             },
             "ip": getIp,
@@ -101,10 +101,10 @@ routes
         template: discoverTemplate,
         resolve: {
             "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $q, genericReq, errorHandler, wazuhConfig,
                 $rootScope, $location, $window, testAPI, appState, wzMisc
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
                 .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
             },
             "ip": getIp,
@@ -115,9 +115,9 @@ routes
         template: settingsTemplate,
         resolve: {
             "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout
+                $q, genericReq, errorHandler, wazuhConfig
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
             }
         }
     })
@@ -125,9 +125,9 @@ routes
         redirectTo: function () {},
         resolve: {
             "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout
+                $q, genericReq, errorHandler, wazuhConfig
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
             },
             "checkAPI": goToKibana
         }
@@ -136,9 +136,9 @@ routes
         redirectTo: function () {},
         resolve: {
             "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout
+                $q, genericReq, errorHandler, wazuhConfig
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
             },
             "checkAPI": goToKibana
         }
@@ -147,9 +147,9 @@ routes
         redirectTo: function () {},
         resolve: {
             "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout
+                $q, genericReq, errorHandler, wazuhConfig
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
             },
             "checkAPI": goToKibana
         }
@@ -158,10 +158,10 @@ routes
         template: devToolsTemplate,
         resolve: {
             "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout,
+                $q, genericReq, errorHandler, wazuhConfig,
                 $rootScope, $location, $window, testAPI, appState, wzMisc
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout)
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
                 .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
             },
         }
@@ -170,9 +170,9 @@ routes
         template: blankScreenTemplate,
         resolve: {
             "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig, $timeout
+                $q, genericReq, errorHandler, wazuhConfig
             ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
             }
         }
     })
