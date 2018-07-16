@@ -171,7 +171,7 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = false;
                     if(!$scope.$$phase) $scope.$digest();
                 } catch(error) {
-                    errorHandler.handle(`Error searching data due to ${error.message || error}`,'Data factory');
+                    errorHandler.handle(error.message || error,'Data factory');
                 }
                 return;
             };

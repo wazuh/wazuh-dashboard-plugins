@@ -9,46 +9,39 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import chrome       from 'ui/chrome';
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.service('apiReq', function ($q, $http, genericReq, appState, $location, $rootScope) {
+app.service('apiReq', function ($q, genericReq, appState) {
     return {
-        request: (method, path, body) => {
-            const defered = $q.defer();
+        request: async (method, path, body) => {
+            try {
 
-            if (!method || !path || !body) {
-                defered.reject({
-                    error:   -1,
-                    message: 'Missing parameters'
-                });
-                return defered.promise;
-            }
-
-            if (!appState.getCurrentAPI()){
-                defered.reject({
-                    error:   -3,
-                    message: 'No API selected.'
-                });
-                return defered.promise;
-            }
-
-            const id = JSON.parse(appState.getCurrentAPI()).id;
-            const requestData = { method, path, body, id };
-
-            genericReq.request('POST', '/api/wazuh-api/request', requestData)
-            .then(data => {
-                if (data.error) {
-                    defered.reject(data);
-                } else {
-                    defered.resolve(data);
+                if (!method || !path || !body) {
+                    throw new Error('Missing parameters');
                 }
-            })
-            .catch(error => defered.reject(error));
+    
+                if (!appState.getCurrentAPI()){
+                    throw new Error('No API selected.');
+                }
+    
+                const { id }      = JSON.parse(appState.getCurrentAPI());
+                const requestData = { method, path, body, id };
 
-            return defered.promise;
+                const data = await genericReq.request('POST', '/api/wazuh-api/request', requestData);
+  
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                return $q.resolve(data);
+
+            } catch (error) {
+                return error && error.data && error.data.message ?
+                       $q.reject(error.data.message) :
+                       $q.reject(error.message || error);
+            }
         }
     };
 });
