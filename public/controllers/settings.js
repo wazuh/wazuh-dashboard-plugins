@@ -9,10 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import base64        from '../utils/base64.js'
-import chrome        from 'ui/chrome'
-import { uiModules } from 'ui/modules'
-import TabNames      from '../utils/tab-names'
+import base64        from '../utils/base64.js';
+import { uiModules } from 'ui/modules';
+import TabNames      from '../utils/tab-names';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -132,7 +131,7 @@ function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, a
             const patternList = await genericReq.request('GET','/get-list',{});
             $scope.indexPatterns = patternList.data.data;
 
-            if(!patternList.data.data.length){
+            if(patternList.data.data.length){
                 wzMisc.setBlankScr('Sorry but no valid index patterns were found')
                 $location.search('tab',null);
                 $location.path('/blank-screen');
