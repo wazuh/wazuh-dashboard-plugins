@@ -156,7 +156,7 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = false;
                     if(!$scope.$$phase) $scope.$digest()
                 } catch (error) {
-                    errorHandler.handle(`Error sorting table by ${field ? field.value : 'undefined'} due to ${error.message || error}`,'Data factory');
+                    errorHandler.handle(`Error sorting table by ${field ? field.value : 'undefined'}. ${error.message || error}`,'Data factory');
                 }
                 return;
             };
@@ -171,7 +171,7 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = false;
                     if(!$scope.$$phase) $scope.$digest();
                 } catch(error) {
-                    errorHandler.handle(error.message || error,'Data factory');
+                    errorHandler.handle(`Error searching. ${error.message || error}`,'Data factory');
                 }
                 return;
             };
@@ -192,7 +192,7 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = false;
                     if(!$scope.$$phase) $scope.$digest();
                 } catch(error) {
-                    errorHandler.handle(`Error filtering by ${filter ? filter.value : 'undefined'} due to ${error.message || error}`,'Data factory');                    
+                    errorHandler.handle(`Error filtering by ${filter ? filter.value : 'undefined'}. ${error.message || error}`,'Data factory');                    
                 }
                 return;
             };
@@ -226,7 +226,7 @@ app.directive('wazuhTable', function() {
                     }    
                 } catch(error) {
                     realTime = false;
-                    errorHandler.handle(`Real time feature aborted due to ${error.message || error}`,'Data factory');                    
+                    errorHandler.handle(`Real time feature aborted. ${error.message || error}`,'Data factory');                    
                 }
                 return;
             };
@@ -256,7 +256,7 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = false;
                     if(!$scope.$$phase) $scope.$digest();
                 } catch (error) {
-                    errorHandler.handle(`Error while init table due to ${error.message || error}`,'Data factory');                    
+                    errorHandler.handle(`Error while init table. ${error.message || error}`,'Data factory');                    
                 }
                 return;
             };
