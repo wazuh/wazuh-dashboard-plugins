@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Wazuh table keys 
+ * Wazuh app - Wazuh CSV column keys 
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,6 @@ export default {
     version: 'Version',
     'os.name': 'OS name',
     'os.version': 'OS version',
-    version: 'Version',
     status: 'Status',
     group: 'Group',
     ip: 'IP',
@@ -25,6 +24,7 @@ export default {
     level: 'Level',
     merged_sum: 'MD5 agent.conf',
     hash: 'MD5 agent.conf',
+    conf_sum: 'Group MD5',
     filename: 'File',
     file:'File',
     gdpr: 'GDPR',
