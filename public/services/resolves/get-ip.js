@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { StateProvider } from 'ui/state_management/state';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import healthCheck from './health-check'
@@ -27,7 +26,6 @@ export default (Promise, courier, config, $q, $rootScope, $window, $location, Pr
         deferred.reject();
         $location.path('/health-check');
     } else {
-        const State = Private(StateProvider);
         const savedObjectsClient = Private(SavedObjectsClientProvider);
         savedObjectsClient.find({
             type   : 'index-pattern',
