@@ -35,6 +35,7 @@ uiModules.get('app/wazuh', [])
         if(appState.getUserCode()) requestHeaders.headers.code = appState.getUserCode();
         const id = appState.getCurrentAPI() ? JSON.parse(appState.getCurrentAPI()).id : false;
         if(id) requestHeaders.headers.id = id;
+        requestHeaders.headers.pattern = appState.getCurrentPattern();
         if (method === "GET")    tmp = $http.get(tmpUrl, requestHeaders);
         if (method === "PUT")    tmp = $http.put(tmpUrl, payload, requestHeaders);
         if (method === "POST")   tmp = $http.post(tmpUrl, payload, requestHeaders);
