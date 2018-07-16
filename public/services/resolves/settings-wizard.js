@@ -28,10 +28,13 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
             let fromElastic = false;
             if (parseInt(data.data.error) === 2){
                 errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
-            } else if((data.data && (data.data.apiIsDown || data.data.message === 'socket hang up')) ||
-                    (data.data.data && (data.data.data.apiIsDown || data.data.data.message === 'socket hang up'))){
+            } else if(JSON.stringify(data).includes('socket hang up') || 
+                     (data && data.data && data.data.apiIsDown) || 
+                     (data && data.data && data.data.data && data.data.data.apiIsDown)) {
+
                 wzMisc.setApiIsDown(true)
                 errorHandler.handle('Wazuh RESTful API seems to be down.','Routes');
+                
             } else {
                 fromElastic = true;
                 wzMisc.setBlankScr(errorHandler.handle(data,'Routes'));
@@ -60,21 +63,16 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
         }
 
         const changeCurrentApi = data => {
-            // Should change the currentAPI configuration depending on cluster
-            if (data.data.data.cluster_info.status === 'disabled'){
-                appState.setCurrentAPI(JSON.stringify({
-                    name: data.data.data.cluster_info.manager,
-                    id: JSON.parse(appState.getCurrentAPI()).id
-                }));
-            } else {
-                appState.setCurrentAPI(JSON.stringify({
-                    name: data.data.data.cluster_info.cluster,
-                    id: JSON.parse(appState.getCurrentAPI()).id
-                }));
-            }
+            const currenApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const clusterInfo = data.data.data.cluster_info;
 
-            appState.setClusterInfo(data.data.data.cluster_info);
-            deferred.resolve();
+            // Should change the currentAPI configuration depending on cluster
+            const str = clusterInfo.status === 'disabled' ?
+                        JSON.stringify({ name: clusterInfo.manager, id: currenApi }) :
+                        JSON.stringify({ name: clusterInfo.cluster, id: currenApi });
+           
+            appState.setCurrentAPI(str);
+            appState.setClusterInfo(clusterInfo);
         };
 
         const callCheckStored = () => {
@@ -113,6 +111,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                     } else {
                         wzMisc.setApiIsDown(false);
                         changeCurrentApi(data);
+                        deferred.resolve();
                     }
                 }
             })
