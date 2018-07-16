@@ -9,11 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import $              from 'jquery';
-import { uiModules } from 'ui/modules'
-import FilterHandler  from '../utils/filter-handler'
-import generateMetric from '../utils/generate-metric'
-import TabNames       from '../utils/tab-names'
+
+import { uiModules } from 'ui/modules';
+import FilterHandler  from '../utils/filter-handler';
+import generateMetric from '../utils/generate-metric';
+import TabNames       from '../utils/tab-names';
+
 import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
 
 const app = uiModules.get('app/wazuh', []);
@@ -93,6 +94,25 @@ function ($scope, $location, $rootScope, appState,
         }
     }
 
+    const initCommonData = () => {
+        $scope.loadingStatus = 'Rendering visualizations...';
+        $scope.rendered = false;
+        $scope.resultState = 'ready';
+    }
+
+    initCommonData();
+
+    $scope.$on('wzRenderStatus',(event,parameters) => {
+        $scope.loadingStatus = parameters.loadingStatus;
+        if(!$scope.$$phase) $scope.$digest()
+    })
+
+    $scope.$on('wzRendered',(event,parameters) => {
+        $scope.rendered = parameters.rendered;
+        $scope.resultState = parameters.resultState;
+        if(!$scope.$$phase) $scope.$digest()
+    })
+
     // Switch subtab
     $scope.switchSubtab = async (subtab, force = false, sameTab = true, preserveDiscover = false) => {
         try {
@@ -106,8 +126,10 @@ function ($scope, $location, $rootScope, appState,
 
             if(subtab === 'panels' && $scope.tab !== 'welcome'){
                 await visFactoryService.buildOverviewVisualizations(filterHandler, $scope.tab, subtab, localChange || preserveDiscover)
+                $scope.$broadcast('changeTabView',{tabView:subtab})
+                $scope.$broadcast('updateVis');
             } else {
-                $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+                $scope.$broadcast('changeTabView',{tabView:$scope.tabView})
             }
 
             checkMetrics($scope.tab, subtab)
@@ -126,6 +148,7 @@ function ($scope, $location, $rootScope, appState,
         if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
+        initCommonData();
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
         const preserveDiscover = tabHistory.length === 2 && tabHistory[0] === tabHistory[1];

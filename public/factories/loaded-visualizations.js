@@ -10,28 +10,16 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
 app.factory('loadedVisualizations', function() {
     let list = [];
 
-    const addItem = item => {
-        list.push(item);
-    }
-
-    const getList = () => {
-        return list;
-    }
-
-    const removeAll = () => {
-        list = [];
-    }
-  
-    return {
-      addItem    : addItem,
-      getList    : getList,
-      removeAll  : removeAll
-    };
+    const addItem   = item => list.push(item);
+    const getList   = () => list;   
+    const removeAll = () => list = [];
+    
+    return { addItem, getList, removeAll };
 });
