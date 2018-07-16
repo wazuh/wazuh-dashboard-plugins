@@ -32,11 +32,11 @@ app.service('genericReq', function ($q, $http, $location, appState, wazuhConfig)
                     // Intended 
                 }
 
-                let data = false;
-                if (method === "GET")    data = await $http.get(tmpUrl, requestHeaders);
-                if (method === "PUT")    data = await $http.put(tmpUrl, payload, requestHeaders);
-                if (method === "POST")   data = await $http.post(tmpUrl, payload, requestHeaders);
-                if (method === "DELETE") data = await $http.delete(tmpUrl);
+                const data = {};
+                if (method === "GET")    Object.assign(data, await $http.get(tmpUrl, requestHeaders));
+                if (method === "PUT")    Object.assign(data, await $http.put(tmpUrl, payload, requestHeaders));
+                if (method === "POST")   Object.assign(data, await $http.post(tmpUrl, payload, requestHeaders));
+                if (method === "DELETE") Object.assign(data, await $http.delete(tmpUrl));
 
                 if (!data) {
                     throw new Error(`Error doing a request to ${tmpUrl}, method: ${method}.`);
