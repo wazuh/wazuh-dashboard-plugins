@@ -13,7 +13,7 @@
 import template        from './template.html';
 import { uiModules }   from 'ui/modules';
 import DataFactory     from '../../services/data-factory';
-import KeyEquivalenece from './key-equivalence';
+import KeyEquivalenece from '../../../util/csv-key-equivalence';
 
 const app = uiModules.get('app/wazuh', []);
 
