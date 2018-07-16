@@ -14,7 +14,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.service('genericReq', function ($q, $http, $location, appState, wazuhConfig) {
+app.service('genericReq', function ($q, $http, appState, wazuhConfig) {
     return {
         request: async (method, path, payload = null) => {
             try {
