@@ -24,6 +24,7 @@ import RootcheckRequest     from '../reporting/rootcheck-request';
 import PciRequest           from '../reporting/pci-request';
 import GdprRequest          from '../reporting/gdpr-request';
 import AuditRequest         from '../reporting/audit-request';
+import SyscheckRequest      from '../reporting/syscheck-request';
 
 import PCI  from '../integration-files/pci-requirements';
 import GDPR from '../integration-files/gdpr-requirements';
@@ -50,6 +51,7 @@ export default class WazuhReportingCtrl {
         this.pciRequest           = new PciRequest(this.server);
         this.gdprRequest          = new GdprRequest(this.server);
         this.auditRequest         = new AuditRequest(this.server);
+        this.syscheckRequest      = new SyscheckRequest(this.server);
 
         this.printer = new PdfPrinter(this.fonts);
 
@@ -275,6 +277,7 @@ export default class WazuhReportingCtrl {
 
     async buildAgentsTable (ids, apiId) {
         try {
+
             const rows = [];
             for(const item of ids){
                 let data = false;
@@ -299,6 +302,7 @@ export default class WazuhReportingCtrl {
             const full_body = [];
             const columns = ['ID','Name','IP','Version','Manager','OS'];
             const widths = ['auto','auto','auto','auto','auto','*'];
+
             full_body.push(columns, ...rows);
             this.dd.content.push({
                 fontSize:8,
@@ -504,6 +508,24 @@ export default class WazuhReportingCtrl {
                     this.dd.content.push('\n');
                 }
             }   
+
+            if(section === 'overview' && tab === 'fim') {
+                const rules = await this.syscheckRequest.top3Rules(from,to,filters,pattern);
+                this.dd.content.push({ text: 'Top 3 FIM rules', style: 'bold' });
+                this.dd.content.push({ 
+                    text: 'The next table shows the top 3 rules that are generating most alerts.', 
+                    style: 'quote' 
+                });
+                this.buildSimpleRuleTable(rules);
+
+                const agents = await this.syscheckRequest.top3agents(from,to,filters,pattern);
+                this.dd.content.push({ text: 'Agents with suspicious FIM activity', style: 'bold' });
+                this.dd.content.push({ 
+                    text: 'The next table shows the top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.', 
+                    style: 'quote' 
+                });
+                await this.buildAgentsTable(agents,apiId);
+            }
 
             return false;
         } catch (error) {
