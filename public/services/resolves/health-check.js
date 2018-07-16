@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default ($window, $rootScope) => {
+export default $window => {
     if (!$window.sessionStorage.getItem('healthCheck')) { // New session, execute health check
         $window.sessionStorage.setItem('healthCheck', 'executed');
         return true;
-    } else {
-        return false;
-    }
-}
+    } 
+        
+    return false;
+};
