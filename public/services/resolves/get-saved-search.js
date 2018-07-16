@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import healthCheck from './health-check'
+import healthCheck from './health-check';
 
-export default (courier, $q, $window, $rootScope, savedSearches, $route) => {
+export default (courier, $location, $window, $rootScope, savedSearches, $route) => {
     if (healthCheck($window, $rootScope)) {
         $location.path('/health-check');
         return Promise.reject();
