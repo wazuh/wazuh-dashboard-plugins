@@ -38,7 +38,6 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, wzMisc,
                     /** End of checks for outdated cookies */
 
                 } else {
-                    if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
 
                     const result = await $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers);
 
@@ -60,7 +59,6 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, wzMisc,
         check: async data => {
             try {
                 const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
-                if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
 
                 const url = chrome.addBasePath("/api/wazuh-api/checkAPI");
                 const response = await $http.post(url, data, headers);

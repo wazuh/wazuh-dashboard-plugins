@@ -77,23 +77,11 @@ uiModules.get('app/wazuh', [])
                 $cookies.putObject('API', API, { 'expires': exp});
             }
         },
-        setUserCode: code => {
-            $cookies.putObject('userCode', code);
-        },
-        getUserCode: () => {
-            return $cookies.getObject('userCode');
-        },
-        removeUserCode: () => {
-            return $cookies.remove('userCode');
-        },
         getPatternSelector: () => {
             return $cookies.getObject('patternSelector');
         },
         setPatternSelector: value => {
             $cookies.putObject('patternSelector', value);
-        },
-        removePatternSelector: () => {
-            return $cookies.remove('patternSelector');
         },
         setCurrentDevTools: current => {
             $window.localStorage.setItem('currentDevTools',current);
