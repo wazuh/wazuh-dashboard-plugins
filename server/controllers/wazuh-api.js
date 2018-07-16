@@ -23,6 +23,8 @@ import { Parser }           from 'json2csv';
 import getConfiguration     from '../lib/get-configuration';
 import { totalmem }         from 'os';
 
+import CsvKeys from '../../util/csv-key-equivalence';
+
 export default class WazuhApi {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
@@ -504,7 +506,7 @@ export default class WazuhApi {
             if(!path_tmp) throw new Error('An error occurred parsing path field')
 
             // Real limit, regardless the user query
-            const params = { limit: 45000 };
+            const params = { limit: 1000 };
 
             if(filters.length) {
                 for(const filter of filters) {
@@ -513,27 +515,45 @@ export default class WazuhApi {
                 }
             }
 
-            const output = await needle('get', `${config.url}:${config.port}/${path_tmp}`, params, {
+            const cred = {
                 headers: {
                     'wazuh-app-version': packageInfo.version
                 },
                 username          : config.user,
                 password          : config.password,
                 rejectUnauthorized: !config.insecure
-            })
+            };
+
+            const itemsArray = [];
+            const output = await needle('get', `${config.url}:${config.port}/${path_tmp}`, params, cred);
+            if(output && output.body && output.body.data && output.body.data.totalItems) {
+                params.offset = 0;
+                const { totalItems } = output.body.data;
+                itemsArray.push(...output.body.data.items);
+                while(itemsArray.length < totalItems){
+                    params.offset += params.limit;
+                    const tmpData = await needle('get', `${config.url}:${config.port}/${path_tmp}`, params, cred);
+                    itemsArray.push(...tmpData.body.data.items);
+                }
+            }
 
             if(output && output.body && output.body.data && output.body.data.totalItems) {
                 const fields = Object.keys(output.body.data.items[0]);
-                const data   = output.body.data.items;
 
                 const json2csvParser = new Parser({ fields });
-                const csv            = json2csvParser.parse(data);
-
-                return reply(csv).type('text/csv')
+                let csv              = json2csvParser.parse(itemsArray);
+          
+                for(const field of fields) {
+                    if(csv.includes(field)) {
+                        csv = csv.replace(field,CsvKeys[field] || field);
+                    }
+                }
+                
+                return reply(csv).type('text/csv');
 
             } else if (output && output.body && output.body.data && !output.body.data.totalItems) {
 
-                throw new Error('No results')
+                throw new Error('No results');
 
             } else {
 
