@@ -114,27 +114,43 @@ routes
     .when('/settings/:tab?/', {
         template: settingsTemplate,
         resolve: {
-            "getWzConfig": getWzConfig
+            "getWzConfig": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+            }
         }
     })
     .when('/visualize/create?', {
         redirectTo: function () {},
         resolve: {
-            "getWzConfig": getWzConfig,
+            "getWzConfig": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+            },
             "checkAPI": goToKibana
         }
     })
     .when('/context/:pattern?/:type?/:id?', {
         redirectTo: function () {},
         resolve: {
-            "getWzConfig": getWzConfig,
+            "getWzConfig": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+            },
             "checkAPI": goToKibana
         }
     })
     .when('/doc/:pattern?/:index?/:type?/:id?', {
         redirectTo: function () {},
         resolve: {
-            "getWzConfig": getWzConfig,
+            "getWzConfig": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+            },
             "checkAPI": goToKibana
         }
     })
@@ -153,7 +169,11 @@ routes
     .when('/blank-screen', {
         template: blankScreenTemplate,
         resolve: {
-            "getWzConfig": getWzConfig,
+            "getWzConfig": function(
+                $q, genericReq, errorHandler, wazuhConfig, $timeout
+            ) {
+                return getWzConfig($q, genericReq, errorHandler, wazuhConfig, $timeout);
+            }
         }
     })
     .when('/', {

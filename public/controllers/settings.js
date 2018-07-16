@@ -16,10 +16,10 @@ import TabNames      from '../utils/tab-names';
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('settingsController', 
-function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
+function ($scope, $routeParams, $window, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
     if (wzMisc.getValue('comeFromWizard')) {
-        sessionStorage.removeItem('healthCheck');
-        wzMisc.setWizard(false)
+        $window.sessionStorage.removeItem('healthCheck');
+        wzMisc.setWizard(false);
     }
 
     $scope.apiIsDown = wzMisc.getValue('apiIsDown');
@@ -131,7 +131,7 @@ function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, a
             const patternList = await genericReq.request('GET','/get-list',{});
             $scope.indexPatterns = patternList.data.data;
 
-            if(patternList.data.data.length){
+            if(!patternList.data.data.length){
                 wzMisc.setBlankScr('Sorry but no valid index patterns were found')
                 $location.search('tab',null);
                 $location.path('/blank-screen');
