@@ -42,7 +42,7 @@
         index-patterns="[indexPattern]" 
       ></filter-bar-w>
     </div>
-    <div class="row" ng-show="tabView === 'discover'">
+    <div class="row" ng-if="tabView === 'discover'">
       <div class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">
         <disc-field-chooser
           columns="state.columns"
