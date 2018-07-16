@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export default ($q, genericReq, errorHandler, wazuhConfig) => {
+export default async ($q, genericReq, errorHandler, wazuhConfig) => {
     // Remember to keep this values equal to default config.yml values
     const defaultConfig = {
         pattern                : 'wazuh-alerts-3.x-*',
@@ -36,9 +36,10 @@ export default ($q, genericReq, errorHandler, wazuhConfig) => {
         'wazuh.monitoring.frequency': 3600
     };
 
-    const deferred = $q.defer();
-    genericReq.request('GET', '/api/wazuh-api/configuration', {})
-    .then(config => {
+    try {
+        
+        const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+
         if(!config || !config.data || !config.data.data) throw new Error('No config available');
 
         const ymlContent = config.data.data;        
@@ -52,12 +53,11 @@ export default ($q, genericReq, errorHandler, wazuhConfig) => {
 
         wazuhConfig.setConfig(defaultConfig);
 
-        deferred.resolve();
-    })
-    .catch(() => {
+    } catch (error) {
         wazuhConfig.setConfig(defaultConfig);
         errorHandler.handle('Error parsing config.yml, using default values.', 'Config', true);
-        deferred.resolve();
-    });
-    return deferred.promise;
+    }
+
+    return $q.resolve();
+
 };
