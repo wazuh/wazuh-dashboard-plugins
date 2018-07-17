@@ -44,4 +44,7 @@ export default (server, options) => {
 
     // Returns unique fields from the agents such OS, agent version ...
     server.route({ method: 'GET', path: '/api/wazuh-api/agents-unique/{api}', handler: (req,res) => ctrl.getAgentsFieldsUniqueCount(req,res)});
+
+    // Returns Wazuh app logs ...
+    server.route({ method: 'GET', path: '/api/wazuh-api/logs', handler: (req,res) => ctrl.getAppLogs(req,res)});
 };

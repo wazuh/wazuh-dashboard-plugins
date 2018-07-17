@@ -22,6 +22,8 @@ import ErrorResponse        from './error-response';
 import { Parser }           from 'json2csv';
 import getConfiguration     from '../lib/get-configuration';
 import { totalmem }         from 'os';
+import simpleTail           from 'simple-tail';
+import path                 from 'path';
 
 export default class WazuhApi {
     constructor(server){
@@ -645,6 +647,17 @@ export default class WazuhApi {
 
         } catch (error) {
             return ErrorResponse(error.message || error, 3035, 500, reply)
+        }
+    }
+
+    async getAppLogs(req, reply) {
+        try {
+            const lastLogs = await simpleTail(path.join(__dirname, '../../../../optimize/wazuh-logs/wazuhapp.log'),20);
+            return lastLogs && Array.isArray(lastLogs) ? 
+                             reply({error:0,lastLogs: lastLogs.filter(item => typeof item === 'string' && item.length)}) :
+                             reply({error:0,lastLogs:[]});
+        } catch (error) {
+            return ErrorResponse(error.message || error, 3036, 500, reply);
         }
     }
 

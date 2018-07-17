@@ -462,6 +462,13 @@ function ($scope, $routeParams, $window, $route, $location, testAPI, appState, g
             } else {
                 $scope.extensions = appState.getExtensions(JSON.parse(appState.getCurrentAPI()).id);
             }
+
+            try {
+                const logs = await genericReq.request('GET','/api/wazuh-api/logs',{});
+                $scope.logs = logs.data.lastLogs.map(item => JSON.parse(item));
+            } catch(error) {
+                $scope.logs = [{date: new Date(), level:'error', message: 'Error when loading Wazuh app logs'}];
+            }
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
