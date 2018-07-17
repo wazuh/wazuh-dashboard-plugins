@@ -29,6 +29,8 @@ import SyscheckRequest      from '../reporting/syscheck-request';
 import PCI  from '../integration-files/pci-requirements';
 import GDPR from '../integration-files/gdpr-requirements';
 
+import PdfTable from '../reporting/generic-table';
+
 import WazuhApi from './wazuh-api';
 
 import { AgentsVisualizations, OverviewVisualizations } from '../integration-files/visualizations';
@@ -287,7 +289,6 @@ export default class WazuhReportingCtrl {
 
     async buildAgentsTable (ids, apiId) {
         try {
-
             const rows = [];
             for(const item of ids){
                 let data = false;
@@ -309,48 +310,13 @@ export default class WazuhReportingCtrl {
                 if(data && data.os && data.os.name && data.os.version) str[5] = `${data.os.name} ${data.os.version}`;
                 rows.push(str);                        
             }
-            const full_body = [];
-            const columns = ['ID','Name','IP','Version','Manager','OS'];
-            const widths = ['auto','auto','auto','auto','auto','*'];
 
-            full_body.push(columns, ...rows);
-            this.dd.content.push({
-                fontSize:8,
-                table: {
-                    widths,
-                    body: full_body
-                },
-                layout: 'lightHorizontalLines'
-            });
+            PdfTable(this.dd,rows,['ID','Name','IP','Version','Manager','OS'],null,null,true);
+
             this.dd.content.push('\n');
         } catch (error) {
             return Promise.reject(error);
         }
-    } 
-
-    buildSimpleRuleTable (rules) {
-       
-        const rows = [];
-        for(const item of rules){
-            const str = ['---','---'];
-            if(item.ruleId) str[0] = item.ruleId;
-            if(item.ruleDescription) str[1] = item.ruleDescription;
-            rows.push(str);                        
-        }
-        const full_body = [];
-        const columns = ['Rule ID','Description'];
-        const widths = ['auto','*'];
-        full_body.push(columns, ...rows);
-        this.dd.content.push({
-            fontSize:8,
-            table: {
-                widths,
-                body: full_body
-            },
-            layout: 'lightHorizontalLines'
-        });
-        this.dd.content.push('\n');
-
     } 
 
     async extendedInformation(section, tab, apiId, from, to, filters, pattern = 'wazuh-alerts-3.x-*', agent = null) {
@@ -460,13 +426,9 @@ export default class WazuhReportingCtrl {
                         this.dd.content.push({ text: `"${description}"`, style: 'quote' });
                         this.dd.content.push('\n');
                     }
-                    this.dd.content.push({ text: `Top rules regarding to requirement ${item}`});
-                    this.dd.content.push('\n');
-                    this.buildSimpleRuleTable(rules);
+                    PdfTable(this.dd,rules,['Rule ID','Description'],['ruleId','ruleDescription'],`Top rules regarding to requirement ${item}`);
                     this.dd.content.push('\n');
                 }
-                
-                
             }
 
             if(section === 'overview' && tab === 'gdpr'){
@@ -482,9 +444,7 @@ export default class WazuhReportingCtrl {
                         this.dd.content.push({ text: `"${description}"`, style: 'quote' });
                         this.dd.content.push('\n');
                     }
-                    this.dd.content.push({ text: `Top rules regarding to requirement ${item}`});
-                    this.dd.content.push('\n');
-                    this.buildSimpleRuleTable(rules);
+                    PdfTable(this.dd,rules,['Rule ID','Description'],['ruleId','ruleDescription'],`Top rules regarding to requirement ${item}`);
                     this.dd.content.push('\n');
                 }
                 this.dd.content.push('\n');
@@ -500,28 +460,7 @@ export default class WazuhReportingCtrl {
                 if(auditAgentsFailedSyscall.length) {
                     this.dd.content.push({ text: 'Syscalls that usually are failing', style: 'bold' });
                     this.dd.content.push({ text: 'The next table shows the top failing syscall for the top 3 agents that have more failed syscalls.', style: 'quote' });
-                    const rows = [];
-                    for(const item of auditAgentsFailedSyscall){
-                        const str = ['---','---','---'];
-                        if(item.agent) str[0] = item.agent;
-                        if(item.syscall) {
-                            if(item.syscall.id)      str[1] = item.syscall.id;
-                            if(item.syscall.syscall) str[2] = item.syscall.syscall;
-                        }
-                        rows.push(str);                        
-                    }
-                    const full_body = [];
-                    const columns = ['Agent ID','Syscall ID','Syscall'];
-                    const widths = ['auto','auto','*'];
-                    full_body.push(columns, ...rows);
-                    this.dd.content.push({
-                        fontSize:8,
-                        table: {
-                            widths,
-                            body: full_body
-                        },
-                        layout: 'lightHorizontalLines'
-                    });
+                    PdfTable(this.dd,auditAgentsFailedSyscall,['Agent ID','Syscall ID','Syscall'],['agent','syscall.id','syscall.syscall'],null,false);
                     this.dd.content.push('\n');
                 }
             }   
@@ -533,7 +472,7 @@ export default class WazuhReportingCtrl {
                     text: 'Top 3 rules that are generating most alerts.', 
                     style: 'quote' 
                 });
-                this.buildSimpleRuleTable(rules);
+                PdfTable(this.dd,rules,['Rule ID','Description'],['ruleId','ruleDescription'],null);
 
                 const agents = await this.syscheckRequest.top3agents(from,to,filters,pattern);
                 this.dd.content.push({ text: 'Agents with suspicious FIM activity', style: 'bold' });
@@ -549,8 +488,8 @@ export default class WazuhReportingCtrl {
                 const cis = await this.apiRequest.makeGenericRequest('GET',`/rootcheck/${agent}/cis`,{},apiId);
                 const pci = await this.apiRequest.makeGenericRequest('GET',`/rootcheck/${agent}/pci`,{},apiId);
                 const lastScan = await this.apiRequest.makeGenericRequest('GET',`/rootcheck/${agent}/last_scan`,{},apiId);
-                if(lastScan && lastScan.data){
 
+                if(lastScan && lastScan.data){
                     if(lastScan.data.start && lastScan.data.end) {
                         this.dd.content.push({ text: `Last policy monitoring scan was from ${lastScan.data.start} to ${lastScan.data.end}.` });
                     } else if(lastScan.data.start){
@@ -560,29 +499,9 @@ export default class WazuhReportingCtrl {
                     }
                     this.dd.content.push('\n');
                 }
+
                 if(database && database.data && database.data.items){
-                    this.dd.content.push({ text: 'Last entries from policy monitoring scan', style: 'bold' });
-                    const rows = [];
-                    for(const item of database.data.items){
-                        const str = ['---','---','---'];
-                        if(item.readDay) str[0] = item.readDay;
-                        if(item.status)  str[1] = item.status;
-                        if(item.event)   str[2] = item.event;
-                        
-                        rows.push(str);                        
-                    }
-                    const full_body = [];
-                    const columns = ['Date','Status','Event'];
-                    const widths = ['auto','auto','*'];
-                    full_body.push(columns, ...rows);
-                    this.dd.content.push({
-                        fontSize:8,
-                        table: {
-                            widths,
-                            body: full_body
-                        },
-                        layout: 'lightHorizontalLines'
-                    });
+                    PdfTable(this.dd,database.data.items,['Date','Status','Event'],['readDay','status','event'],'Last entries from policy monitoring scan');
                     this.dd.content.push('\n');
                 }
 
@@ -597,9 +516,7 @@ export default class WazuhReportingCtrl {
                             this.dd.content.push({ text: `"${description}"`, style: 'quote' });
                             this.dd.content.push('\n');
                         }
-                        this.dd.content.push({ text: `Top rules regarding to requirement ${item}`});
-                        this.dd.content.push('\n');
-                        this.buildSimpleRuleTable(rules);
+                        PdfTable(this.dd,rules,['Rule ID','Description'],['ruleId','ruleDescription']);
                         this.dd.content.push('\n');
                     }
                 }
@@ -617,28 +534,8 @@ export default class WazuhReportingCtrl {
             }
 
             if(section === 'agents' && tab === 'audit'){
-                this.dd.content.push({ text: 'Syscalls that usually are failing', style: 'bold' });
                 const auditFailedSyscall = await this.auditRequest.getTopFailedSyscalls(from,to,filters,pattern);
-                const rows = [];
-
-                for(const item of auditFailedSyscall){
-                    const str = ['---','---'];
-                    if(item.id)      str[0] = item.id;
-                    if(item.syscall) str[1] = item.syscall;
-                    rows.push(str);                        
-                }
-                const full_body = [];
-                const columns = ['Syscall ID','Syscall'];
-                const widths = ['auto','*'];
-                full_body.push(columns, ...rows);
-                this.dd.content.push({
-                    fontSize:8,
-                    table: {
-                        widths,
-                        body: full_body
-                    },
-                    layout: 'lightHorizontalLines'
-                });
+                PdfTable(this.dd,auditFailedSyscall,['Syscall ID','Syscall'],['id','syscall'],'Syscalls that usually are failing');
                 this.dd.content.push('\n');
             }
 
