@@ -391,8 +391,8 @@ export default class ElasticWrapper {
 
             const data = await this.elasticRequest.callWithInternalUser('get', {
                 index: '.wazuh',
-                type : 'wazuh-configuration',
-                id   : id
+                id   : id,
+                q    : 'type:wazuh-configuration'
             });
 
             return {
@@ -418,8 +418,16 @@ export default class ElasticWrapper {
 
             const data = await this.elasticRequest.callWithInternalUser('search', {
                 index: '.wazuh',
-                type : 'wazuh-configuration',
-                size : '100'
+                size : '100',
+                query: {
+                    bool: {
+                        must: {
+                            match: {
+                                type : 'wazuh-configuration'
+                            }
+                        }
+                    }
+                }
             });
 
             return data;
@@ -438,9 +446,11 @@ export default class ElasticWrapper {
         try {
             if(!doc) return Promise.reject(new Error('No valid document given'))
 
+            doc['type'] = 'wazuh-configuration';
+
             const data = await this.elasticRequest.callWithRequest(req,'create', {
                 index  : '.wazuh',
-                type   : 'wazuh-configuration',
+                type   : '_doc',
                 id     : new Date().getTime(),
                 body   : doc,
                 refresh: true
@@ -462,9 +472,11 @@ export default class ElasticWrapper {
         try {
             if(!id || !doc) return Promise.reject(new Error('No valid parameters given'))
 
+            doc['type'] = 'wazuh-configuration';
+
             const data = await this.elasticRequest.callWithInternalUser('update', {
                 index: '.wazuh',
-                type : 'wazuh-configuration',
+                type : '_doc',
                 id   : id,
                 body : doc
             });
@@ -486,8 +498,7 @@ export default class ElasticWrapper {
 
             const data = await this.elasticRequest.callWithRequest(req,'search', {
                 index: '.wazuh',
-                type : 'wazuh-configuration',
-                q    : 'active:true'
+                q    : 'active:true AND type:wazuh-configuration'
             });
 
             return data;
@@ -507,7 +518,6 @@ export default class ElasticWrapper {
 
             const data = await this.elasticRequest.callWithRequest(req,'delete', {
                 index: '.wazuh',
-                type : 'wazuh-configuration',
                 id   : req.params.id
             });
 
