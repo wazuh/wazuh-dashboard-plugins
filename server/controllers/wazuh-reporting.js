@@ -197,22 +197,32 @@ export default class WazuhReportingCtrl {
         return str;
     }
 
-    renderHeader(section, tab, isAgents) {
-        if (section && typeof section === 'string') {
-            this.dd.content.push({
-                text: descriptions[tab].title + ' report', style: 'title'
-            });
-            this.dd.content.push('\n');
-        }
-
-        if(isAgents && typeof isAgents === 'string'){
-            this.dd.content.push({text: `Report for agent ${isAgents}`, style:'subtitlenobold'});
-            this.dd.content.push('\n');
-        }
-
-        if(descriptions[tab] && descriptions[tab].description){
-            this.dd.content.push({ text: descriptions[tab].description, style: 'quote' });
-            this.dd.content.push('\n');
+    async renderHeader(section, tab, isAgents,apiId) {
+        try {
+            if (section && typeof section === 'string') {
+                this.dd.content.push({
+                    text: descriptions[tab].title + ' report', style: 'title'
+                });
+                this.dd.content.push('\n');
+            }
+    
+            if(isAgents && typeof isAgents === 'string'){
+                const status = await this.apiRequest.makeGenericRequest('GET',`/agents/${isAgents}`,{select:'status'},apiId);
+                if(status && status.data && typeof status.data.status === 'string' && status.data.status !== 'Active') {
+                    this.dd.content.push({ text: `Warning. Agent is ${status.data.status.toLowerCase()}`, style: 'bold' });
+                    this.dd.content.push('\n');
+                }
+                await this.buildAgentsTable([isAgents],apiId);
+            }
+    
+            if(descriptions[tab] && descriptions[tab].description){
+                this.dd.content.push({ text: descriptions[tab].description, style: 'quote' });
+                this.dd.content.push('\n');
+            }
+       
+            return;
+        } catch (error) {
+            return Promise.reject(error);
         }
     }
 
@@ -343,8 +353,12 @@ export default class WazuhReportingCtrl {
 
     } 
 
-    async extendedInformation(section, tab, apiId, from, to, filters, pattern = 'wazuh-alerts-3.x-*') {
+    async extendedInformation(section, tab, apiId, from, to, filters, pattern = 'wazuh-alerts-3.x-*', agent = null) {
         try {
+            if(section === 'agents' && !agent) { 
+                throw new Error('Reporting for specific agent needs an agent ID in order to work properly');
+            }
+
             const agents = await this.apiRequest.makeGenericRequest('GET','/agents',{limit:1},apiId);
             const totalAgents = agents.data.totalItems;
 
@@ -412,10 +426,13 @@ export default class WazuhReportingCtrl {
             }
 
             if(section === 'overview' && tab === 'pm'){
-                const top3RootkitsRank = await this.rootcheckRequest.top3RootkitsDetected(from,to,filters,pattern);
-                if(top3RootkitsRank.length){
+                const top5RootkitsRank = await this.rootcheckRequest.top3RootkitsDetected(from,to,filters,pattern);
+                if(top5RootkitsRank.length){
                     this.dd.content.push({ text: 'Most common rootkits found along your agents', style: 'bold' });
-                    this.dd.content.push({ ol: top3RootkitsRank });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',style: 'quote'});
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ ol: top5RootkitsRank });
                     this.dd.content.push('\n');
                 }
 
@@ -513,7 +530,7 @@ export default class WazuhReportingCtrl {
                 const rules = await this.syscheckRequest.top3Rules(from,to,filters,pattern);
                 this.dd.content.push({ text: 'Top 3 FIM rules', style: 'bold' });
                 this.dd.content.push({ 
-                    text: 'The next table shows the top 3 rules that are generating most alerts.', 
+                    text: 'Top 3 rules that are generating most alerts.', 
                     style: 'quote' 
                 });
                 this.buildSimpleRuleTable(rules);
@@ -521,10 +538,108 @@ export default class WazuhReportingCtrl {
                 const agents = await this.syscheckRequest.top3agents(from,to,filters,pattern);
                 this.dd.content.push({ text: 'Agents with suspicious FIM activity', style: 'bold' });
                 this.dd.content.push({ 
-                    text: 'The next table shows the top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.', 
+                    text: 'Top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.', 
                     style: 'quote' 
                 });
                 await this.buildAgentsTable(agents,apiId);
+            }
+
+            if(section === 'agents' && tab === 'pm'){
+                const database = await this.apiRequest.makeGenericRequest('GET',`/rootcheck/${agent}`,{limit:15},apiId);
+                const cis = await this.apiRequest.makeGenericRequest('GET',`/rootcheck/${agent}/cis`,{},apiId);
+                const pci = await this.apiRequest.makeGenericRequest('GET',`/rootcheck/${agent}/pci`,{},apiId);
+                const lastScan = await this.apiRequest.makeGenericRequest('GET',`/rootcheck/${agent}/last_scan`,{},apiId);
+                if(lastScan && lastScan.data){
+
+                    if(lastScan.data.start && lastScan.data.end) {
+                        this.dd.content.push({ text: `Last policy monitoring scan was from ${lastScan.data.start} to ${lastScan.data.end}.` });
+                    } else if(lastScan.data.start){
+                        this.dd.content.push({ text: `Policy monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}.` });
+                    } else {
+                        this.dd.content.push({ text: `Policy monitoring scan is currently in progress for this agent.` });
+                    }
+                    this.dd.content.push('\n');
+                }
+                if(database && database.data && database.data.items){
+                    this.dd.content.push({ text: 'Last entries from policy monitoring scan', style: 'bold' });
+                    const rows = [];
+                    for(const item of database.data.items){
+                        const str = ['---','---','---'];
+                        if(item.readDay) str[0] = item.readDay;
+                        if(item.status)  str[1] = item.status;
+                        if(item.event)   str[2] = item.event;
+                        
+                        rows.push(str);                        
+                    }
+                    const full_body = [];
+                    const columns = ['Date','Status','Event'];
+                    const widths = ['auto','auto','*'];
+                    full_body.push(columns, ...rows);
+                    this.dd.content.push({
+                        fontSize:8,
+                        table: {
+                            widths,
+                            body: full_body
+                        },
+                        layout: 'lightHorizontalLines'
+                    });
+                    this.dd.content.push('\n');
+                }
+
+                if(pci && pci.data && pci.data.items) {
+                    this.dd.content.push({ text: 'Rules being fired due to PCI requirements', style: 'bold', pageBreak: 'before' });
+                    for(const item of pci.data.items){
+                        const rules = await this.pciRequest.getRulesByRequirement(from,to,filters,item,pattern);
+                        this.dd.content.push({ text: `Requirement ${item}`, style: 'bold'});
+                        this.dd.content.push('\n');
+                        const description = sanitize(PCI[item]);
+                        if(description) {
+                            this.dd.content.push({ text: `"${description}"`, style: 'quote' });
+                            this.dd.content.push('\n');
+                        }
+                        this.dd.content.push({ text: `Top rules regarding to requirement ${item}`});
+                        this.dd.content.push('\n');
+                        this.buildSimpleRuleTable(rules);
+                        this.dd.content.push('\n');
+                    }
+                }
+
+                const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(from,to,filters,pattern,10);
+                if(top5RootkitsRank.length){
+                    this.dd.content.push({ text: 'Rootkits files found', style: 'bold' });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',style: 'quote'});
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ ol: top5RootkitsRank });
+                    this.dd.content.push('\n');
+                }
+
+            }
+
+            if(section === 'agents' && tab === 'audit'){
+                this.dd.content.push({ text: 'Syscalls that usually are failing', style: 'bold' });
+                const auditFailedSyscall = await this.auditRequest.getTopFailedSyscalls(from,to,filters,pattern);
+                const rows = [];
+
+                for(const item of auditFailedSyscall){
+                    const str = ['---','---'];
+                    if(item.id)      str[0] = item.id;
+                    if(item.syscall) str[1] = item.syscall;
+                    rows.push(str);                        
+                }
+                const full_body = [];
+                const columns = ['Syscall ID','Syscall'];
+                const widths = ['auto','*'];
+                full_body.push(columns, ...rows);
+                this.dd.content.push({
+                    fontSize:8,
+                    table: {
+                        widths,
+                        body: full_body
+                    },
+                    layout: 'lightHorizontalLines'
+                });
+                this.dd.content.push('\n');
             }
 
             return false;
@@ -546,7 +661,7 @@ export default class WazuhReportingCtrl {
             if (req.payload && req.payload.array) {
                 const tab = req.payload.tab;
 
-                this.renderHeader(req.payload.section, tab, req.payload.isAgents);
+                await this.renderHeader(req.payload.section, tab, req.payload.isAgents, req.headers.id);
 
                 if (req.payload.time) {
                     this.renderTimeRange(req.payload.time.from, req.payload.time.to);
@@ -565,7 +680,8 @@ export default class WazuhReportingCtrl {
                             new Date(req.payload.time.from)-1,
                             new Date(req.payload.time.to)-1,
                             filters,
-                            req.headers.pattern
+                            req.headers.pattern,
+                            req.payload.isAgents
                         );
                 }
 

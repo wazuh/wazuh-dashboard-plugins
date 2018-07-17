@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import ElasticWrapper from '../lib/elastic-wrapper';
+import Base from './base-query';
 
 export default class PciRequest {
     /**
@@ -35,62 +36,31 @@ export default class PciRequest {
         }
 
         try {
-            const base = {
-                pattern,
-                "size": 0,
-                "aggs": {
-                    "2": {
-                        "terms": {
-                            "field": "rule.pci_dss",
-                            "size": 5,
-                            "order": {
-                                "_count": "desc"
-                            }
+            const base = {};
+
+            Object.assign(base, Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs, {
+                "2": {
+                    "terms": {
+                        "field": "rule.pci_dss",
+                        "size": 5,
+                        "order": {
+                            "_count": "desc"
                         }
                     }
-                },
-                "stored_fields": [
-                    "*"
-                ],
-                "script_fields": {},
-                "docvalue_fields": [
-                    "@timestamp",
-                    "data.vulnerability.published",
-                    "data.vulnerability.updated",
-                    "syscheck.mtime_after",
-                    "syscheck.mtime_before",
-                    "data.cis.timestamp"
-                ],
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "query_string": {
-                                    "query": filters,
-                                    "analyze_wildcard": true,
-                                    "default_field": "*"
-                                }
-                            },
-                            {
-                                "range": {
-                                    "@timestamp": {
-                                        "gte": gte,
-                                        "lte": lte,
-                                        "format": "epoch_millis"
-                                    }
-                                }
-                            },
-                            {
-                                "exists": {
-                                    "field": "rule.pci_dss"
-                                }
-                            }
-                        ]
-                    }
                 }
-            };
+            });
+
+            base.query.bool.must.push({
+                "exists": {
+                    "field": "rule.pci_dss"
+                }
+            });
+
             const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
             const aggArray = response.aggregations['2'].buckets;
+
             return aggArray.map(item => item.key).sort((a, b) => {
                 const a_split = a.split('.');
                 const b_split = b.split('.');
@@ -105,10 +75,10 @@ export default class PciRequest {
                     }
                 }
             });
+
         } catch (error) {
             return Promise.reject(error);
         }
-
     }
 
     /**
@@ -127,71 +97,41 @@ export default class PciRequest {
         }
 
         try {
-            const base = {
-                pattern,
-                "size": 0,
-                "aggs": {
-                    "2": {
-                        "terms": {
-                            "field": "rule.description",
-                            "size": 3,
-                            "order": {
-                                "_count": "desc"
-                            }
-                        },
-                        "aggs": {
-                            "3": {
-                                "terms": {
-                                    "field": "rule.id",
-                                    "size": 1,
-                                    "order": {
-                                        "_count": "desc"
-                                    }
+            const base = {};
+
+            Object.assign(base, Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs, {
+                "2": {
+                    "terms": {
+                        "field": "rule.description",
+                        "size": 3,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    },
+                    "aggs": {
+                        "3": {
+                            "terms": {
+                                "field": "rule.id",
+                                "size": 1,
+                                "order": {
+                                    "_count": "desc"
                                 }
                             }
                         }
                     }
-                },
-                "stored_fields": [
-                    "*"
-                ],
-                "script_fields": {},
-                "docvalue_fields": [
-                    "@timestamp",
-                    "data.vulnerability.published",
-                    "data.vulnerability.updated",
-                    "syscheck.mtime_after",
-                    "syscheck.mtime_before",
-                    "data.cis.timestamp"
-                ],
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "query_string": {
-                                    "query": filters + " AND rule.pci_dss: \"" + requirement + "\"",
-                                    "analyze_wildcard": true,
-                                    "default_field": "*"
-                                }
-                            },
-                            {
-                                "range": {
-                                    "@timestamp": {
-                                        "gte": gte,
-                                        "lte": lte,
-                                        "format": "epoch_millis"
-                                    }
-                                }
-                            }
-                        ]
-                    }
                 }
-            };
-            const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+            });
+
+            base.query.bool.must[0].query_string.query = base.query.bool.must[0].query_string.query + " AND rule.pci_dss: \"" + requirement + "\"";
+
+            const response    = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
             const { buckets } = response.aggregations['2'];
+
             const result = [];
             for (const bucket of buckets) {
-                if(!bucket || !bucket['3'] || !bucket['3'].buckets || !bucket['3'].buckets[0] || !bucket['3'].buckets[0].key || !bucket.key){
+                if (!bucket || !bucket['3'] || !bucket['3'].buckets || !bucket['3'].buckets[0] || !bucket['3'].buckets[0].key || !bucket.key) {
                     continue;
                 }
                 const ruleId = bucket['3'].buckets[0].key;
@@ -200,6 +140,7 @@ export default class PciRequest {
             }
 
             return result;
+            
         } catch (error) {
             return Promise.reject(error);
         }

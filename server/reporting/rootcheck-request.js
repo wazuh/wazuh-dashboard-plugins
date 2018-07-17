@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import ElasticWrapper from '../lib/elastic-wrapper';
+import Base from './base-query';
 
 export default class RootcheckRequest {
     /**
@@ -27,57 +28,25 @@ export default class RootcheckRequest {
      * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
      * @returns {Array<String>} 
      */
-    async top3RootkitsDetected(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
-        try {
+    async top5RootkitsDetected(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*',size = 5) {
+        try {   
+            const base = {};
 
-            const base = {
-                pattern,
-                "size": 0,
-                "aggs": {
-                    "2": {
-                        "terms": {
-                            "field": "data.title",
-                            "size": 5,
-                            "order": {
-                                "_count": "desc"
-                            }
+            Object.assign(base, Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs,{
+                "2": {
+                    "terms": {
+                        "field": "data.title",
+                        "size": size,
+                        "order": {
+                            "_count": "desc"
                         }
                     }
-                },
-                "stored_fields": [
-                    "*"
-                ],
-                "docvalue_fields": [
-                    "@timestamp",
-                    "data.vulnerability.published",
-                    "data.vulnerability.updated",
-                    "syscheck.mtime_after",
-                    "syscheck.mtime_before",
-                    "data.cis.timestamp"
-                ],
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "query_string": {
-                                    "query": filters + " AND \"rootkit\" AND \"detected\"",
-                                    "analyze_wildcard": true,
-                                    "default_field": "*"
-                                }
-                            },
-                            {
-                                "range": {
-                                    "@timestamp": {
-                                        "gte": gte,
-                                        "lte": lte,
-                                        "format": "epoch_millis"
-                                    }
-                                }
-                            }
-                        ]
-                    }
                 }
-            };
+            });
+
+            base.query.bool.must[0].query_string.query = base.query.bool.must[0].query_string.query + " AND \"rootkit\" AND \"detected\"";
 
             const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
             const aggArray = response.aggregations['2'].buckets;
@@ -104,50 +73,19 @@ export default class RootcheckRequest {
      */
     async agentsWithHiddenPids(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
-            const base = {
-                pattern,
-                "size": 0,
-                "aggs": {
-                    "1": {
-                        "cardinality": {
-                            "field": "agent.id"
-                        }
-                    }
-                },
-                "stored_fields": [
-                    "*"
-                ],
-                "docvalue_fields": [
-                    "@timestamp",
-                    "data.vulnerability.published",
-                    "data.vulnerability.updated",
-                    "syscheck.mtime_after",
-                    "syscheck.mtime_before",
-                    "data.cis.timestamp"
-                ],
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "query_string": {
-                                    "query": filters + " AND \"process\" AND \"hidden\"",
-                                    "analyze_wildcard": true,
-                                    "default_field": "*"
-                                }
-                            },
-                            {
-                                "range": {
-                                    "@timestamp": {
-                                        "gte": gte,
-                                        "lte": lte,
-                                        "format": "epoch_millis"
-                                    }
-                                }
-                            }
-                        ]
+            const base = {};
+
+            Object.assign(base, Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs,{
+                "1": {
+                    "cardinality": {
+                        "field": "agent.id"
                     }
                 }
-            };
+            });
+
+            base.query.bool.must[0].query_string.query = base.query.bool.must[0].query_string.query + " AND \"process\" AND \"hidden\"";
 
             // "aggregations": { "1": { "value": 1 } }
             const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
@@ -175,50 +113,19 @@ export default class RootcheckRequest {
      */
     async agentsWithHiddenPorts(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
-            const base = {
-                pattern,
-                "size": 0,
-                "aggs": {
-                    "1": {
-                        "cardinality": {
-                            "field": "agent.id"
-                        }
-                    }
-                },
-                "stored_fields": [
-                    "*"
-                ],
-                "docvalue_fields": [
-                    "@timestamp",
-                    "data.vulnerability.published",
-                    "data.vulnerability.updated",
-                    "syscheck.mtime_after",
-                    "syscheck.mtime_before",
-                    "data.cis.timestamp"
-                ],
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "query_string": {
-                                    "query": filters + " AND \"port\" AND \"hidden\"",
-                                    "analyze_wildcard": true,
-                                    "default_field": "*"
-                                }
-                            },
-                            {
-                                "range": {
-                                    "@timestamp": {
-                                        "gte": gte,
-                                        "lte": lte,
-                                        "format": "epoch_millis"
-                                    }
-                                }
-                            }
-                        ]
+            const base = {};
+
+            Object.assign(base, Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs,{
+                "1": {
+                    "cardinality": {
+                        "field": "agent.id"
                     }
                 }
-            };
+            });
+
+            base.query.bool.must[0].query_string.query = base.query.bool.must[0].query_string.query + " AND \"port\" AND \"hidden\"";
 
             // "aggregations": { "1": { "value": 1 } }
             const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);

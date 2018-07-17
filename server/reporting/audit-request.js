@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import ElasticWrapper from '../lib/elastic-wrapper';
+import Base from './base-query';
 import AuditMap from './audit-map';
 
 export default class PciRequest {
@@ -30,78 +31,45 @@ export default class PciRequest {
      */
     async getTop3AgentsSudoNonSuccessful(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
-            const base = {
-                pattern,
-                "size": 0,
-                "aggs": {
-                    "3": {
-                        "terms": {
-                            "field": "agent.id",
-                            "size": 3,
-                            "order": {
-                                "_count": "desc"
-                            }
+            const base = {};
+
+            Object.assign(base,Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs,{
+                "3": {
+                    "terms": {
+                        "field": "agent.id",
+                        "size": 3,
+                        "order": {
+                            "_count": "desc"
                         }
                     }
-                },
-                "stored_fields": [
-                    "*"
-                ],
-                "script_fields": {},
-                "docvalue_fields": [
-                    "@timestamp",
-                    "data.vulnerability.published",
-                    "data.vulnerability.updated",
-                    "syscheck.mtime_after",
-                    "syscheck.mtime_before",
-                    "data.cis.timestamp"
-                ],
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "query_string": {
-                                    "query": filters,
-                                    "analyze_wildcard": true,
-                                    "default_field": "*"
-                                }
-                            },
-                            {
-                                "range": {
-                                    "@timestamp": {
-                                        "gte": gte,
-                                        "lte": lte,
-                                        "format": "epoch_millis"
-                                    }
-                                }
-                            },
-                            {
-                                "match_phrase": {
-                                    "data.audit.uid": {
-                                        "query": "0"
-                                    }
-                                }
-                            },
-                            {
-                                "match_phrase": {
-                                    "data.audit.success": {
-                                        "query": "no"
-                                    }
-                                }
-                            }
-                        ],
-                        "must_not": [
-                            {
-                                "match_phrase": {
-                                    "data.audit.auid": {
-                                        "query": "0"
-                                    }
-                                }
-                            }
-                        ]
+                }
+            });
+
+            base.query.bool.must.push({
+                "match_phrase": {
+                    "data.audit.uid": {
+                        "query": "0"
                     }
                 }
-            };
+            });
+
+            base.query.bool.must.push({
+                "match_phrase": {
+                    "data.audit.success": {
+                        "query": "no"
+                    }
+                }
+            });
+
+            base.query.bool.must_not.push({
+                "match_phrase": {
+                    "data.audit.auid": {
+                        "query": "0"
+                    }
+                }
+            });
 
             const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
             const { buckets } = response.aggregations['3'];
@@ -121,89 +89,40 @@ export default class PciRequest {
      */
     async getTop3AgentsFailedSyscalls(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
         try {
-            const base = {
-                pattern,
-                "size": 0,
-                "aggs": {
-                    "3": {
-                        "terms": {
-                            "field": "agent.id",
-                            "size": 3,
-                            "order": {
-                                "_count": "desc"
-                            }
-                        },
-                        "aggs": {
-                            "4": {
-                                "terms": {
-                                    "field": "data.audit.syscall",
-                                    "size": 1,
-                                    "order": {
-                                        "_count": "desc"
-                                    }
+            const base = {};
+
+            Object.assign(base,Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs,{
+                "3": {
+                    "terms": {
+                        "field": "agent.id",
+                        "size": 3,
+                        "order": {
+                            "_count": "desc"
+                        }
+                    },
+                    "aggs": {
+                        "4": {
+                            "terms": {
+                                "field": "data.audit.syscall",
+                                "size": 1,
+                                "order": {
+                                    "_count": "desc"
                                 }
                             }
                         }
                     }
-                },
-                "stored_fields": [
-                    "*"
-                ],
-                "script_fields": {},
-                "docvalue_fields": [
-                    "@timestamp",
-                    "data.vulnerability.published",
-                    "data.vulnerability.updated",
-                    "syscheck.mtime_after",
-                    "syscheck.mtime_before",
-                    "data.cis.timestamp"
-                ],
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "query_string": {
-                                    "query": filters,
-                                    "analyze_wildcard": true,
-                                    "default_field": "*"
-                                }
-                            },
-                            {
-                                "range": {
-                                    "@timestamp": {
-                                        "gte": gte,
-                                        "lte": lte,
-                                        "format": "epoch_millis"
-                                    }
-                                }
-                            },
-                            {
-                                "match_phrase": {
-                                    "data.audit.uid": {
-                                        "query": "0"
-                                    }
-                                }
-                            },
-                            {
-                                "match_phrase": {
-                                    "data.audit.success": {
-                                        "query": "no"
-                                    }
-                                }
-                            }
-                        ],
-                        "must_not": [
-                            {
-                                "match_phrase": {
-                                    "data.audit.auid": {
-                                        "query": "0"
-                                    }
-                                }
-                            }
-                        ]
+                }
+            });
+
+            base.query.bool.must.push({
+                "match_phrase": {
+                    "data.audit.success": {
+                        "query": "no"
                     }
                 }
-            };
+            });
 
             const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
             const { buckets } = response.aggregations['3'];
@@ -222,6 +141,42 @@ export default class PciRequest {
 
             }
             return result;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async getTopFailedSyscalls(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
+        try {
+            const base = {};
+
+            Object.assign(base,Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs,{
+                "2": {
+                  "terms": {
+                    "field": "data.audit.syscall",
+                    "size": 10,
+                    "order": {
+                      "_count": "desc"
+                    }
+                  }
+                }
+            });
+
+            base.query.bool.must.push({
+                "match_phrase": {
+                    "data.audit.success": {
+                        "query": "no"
+                    }
+                }
+            });
+
+            const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+            const { buckets } = response.aggregations['2'];
+
+            return buckets.map(item => { return { id:item.key, syscall:AuditMap[item.key] };});
 
         } catch (error) {
             return Promise.reject(error);
