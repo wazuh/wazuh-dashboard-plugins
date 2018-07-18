@@ -25,17 +25,18 @@ export default (document, items, columns, keys, title, givenRows = false) => {
     }
 
     if(title) {
-        document.content.push({ text: title, style: 'bold' });
+        document.content.push({ text: title, style: 'h4' });
+        document.content.push({text:'\n'})
     }
 
     if(!items || !items.length) {
-        document.content.push({ text: 'No results match your search criteria'});
+        document.content.push({ text: 'No results match your search criteria', style:'standard'});
         return;
     }
 
     const rowSize = givenRows ? items[0].length : keys.length;
     const rows    = givenRows ? items : [];
-
+    const modifiedRows = [];
     if(!givenRows){
         for(const item of items){
             const str = new Array(rowSize).fill('---');
@@ -50,7 +51,16 @@ export default (document, items, columns, keys, title, givenRows = false) => {
                     str[i] = item[keys[i]];
                 }                
             }
-            rows.push(str);                        
+            rows.push(str.map(cell => {
+                return {text:cell,style:'standard'};
+            }));                        
+        }
+    } else {
+        
+        for(const row of rows){
+            modifiedRows.push(row.map(cell => {
+                return {text:cell,style:'standard'};
+            }));
         }
     }
 
@@ -58,13 +68,44 @@ export default (document, items, columns, keys, title, givenRows = false) => {
 
     const widths = new Array(rowSize-1).fill('auto');
     widths.push('*');
-    fullBody.push(columns, ...rows);
+    fullBody.push(
+        columns.map(col => {
+            return {text:col,style:'whiteColor',border:[0,0,0,0]};
+        }) 
+    );
+
+    if(givenRows){
+        fullBody.push(...modifiedRows);
+    } else {
+        fullBody.push(...rows);
+    }
+
     document.content.push({
         fontSize:8,
         table: {
             widths,
             body: fullBody
         },
-        layout: 'lightHorizontalLines'
+        layout: {
+            fillColor: function (i, node) {
+                return (i === 0) ? '#78C8DE' : null;
+            },
+            hLineColor: function (i, node) {
+                return '#78C8DE';
+            },
+            hLineWidth: function (i, node) {
+                return 1;
+            },
+            vLineWidth: function (i, node) {
+                return 0;
+            }
+        }
     });
+
+    /*table: {
+        body: [
+            [{text:'Column 1',color:'white',border:[0,0,0,0]}, {text:'Column 1',color:'white',border:[0,0,0,0]}, {text:'Column 1',color:'white',border:[0,0,0,0]}],
+            [{text:'One value goes here',border:[0,1,0,1]}, {text:'One value goes here',border:[0,1,0,1]}, {text:'One value goes here',border:[0,1,0,1]}]
+        ]
+    }*/
 };
