@@ -40,10 +40,11 @@ export default class WazuhReportingCtrl {
         this.server = server;
         this.fonts = {
             Roboto: {
-                normal: path.join(__dirname, '../../public/utils/roboto/Roboto-Regular.ttf'),
-                bold: path.join(__dirname, '../../public/utils/roboto/Roboto-Bold.ttf'),
-                italics: path.join(__dirname, '../../public/utils/roboto/Roboto-Italic.ttf'),
-                bolditalics: path.join(__dirname, '../../public/utils/roboto/Roboto-BoldItalic.ttf')
+                normal: path.join(__dirname, '../../public/utils/opensans/OpenSans-Light.ttf'),
+                bold: path.join(__dirname, '../../public/utils/opensans/OpenSans-Bold.ttf'),
+                italics: path.join(__dirname, '../../public/utils/opensans/OpenSans-Italic.ttf'),
+                bolditalics: path.join(__dirname, '../../public/utils/opensans/OpenSans-BoldItalic.ttf'),
+                monslight: path.join(__dirname, '../../public/utils/opensans/Montserrat-Light.ttf')
             }
         };
 
@@ -65,39 +66,53 @@ export default class WazuhReportingCtrl {
                 centerme: {
                     alignment: 'center'
                 },
-                title: {
+                h1: {
                     fontSize: 22,
-                    bold: true
+                    monslight: true,
+                    color: '#1ea5c8'
                 },
-                subtitle: {
+                h2: {
+                    fontSize: 18,
+                    monslight: true,
+                    color: '#1ea5c8'
+                },
+                h3: {
                     fontSize: 16,
-                    bold: true
+                    monslight: true,
+                    color: '#1ea5c8'
                 },
-                subtitlenobold: {
-                    fontSize: 12
+                h4: {
+                    fontSize: 14,
+                    monslight: true,
+                    color: '#1ea5c8'
                 },
-                quote: {
-                    color: 'gray',
-                    italics: true
-                },
-                gray: {
-                    color: 'gray'
+                standard: {
+                    color: '#333'
                 },
                 bold: {
                     bold: true
+                },
+                whiteColor: {
+                    color: '#FFF'
                 }
             },
+            pageMargins: [40, 80, 40, 40],
             header: {
+                margin: [40, 20, 0, 0],
                 columns: [
-                    { image: path.join(__dirname, '../../public/img/logo.png'), fit: [190, 90], style: 'rightme', margin: [0, 10, 0, 60] }
+                    {
+                        image: path.join(__dirname, '../../public/img/logo.png'),
+                        width: 190
+                    },
+                    { text: 'info@wazuh.com\nhttps://wazuh.com',alignment:'right',margin:[0,0,10,0],color:'#1EA5C8' }
                 ]
             },
             content: [
-                
+
             ],
             footer: {
                 columns: [
-                    { text: 'Copyright © 2018 Wazuh, Inc.', alignment: 'right', fontSize: 10, margin: [0, 0, 10, 0] }
+                    { text: 'Copyright © 2018 Wazuh, Inc.', alignment: 'right',color:'#1EA5C8', fontSize: 10, margin: [0, 0, 10, 0] }
                 ]
             },
             pageBreakBefore: function (currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
@@ -121,26 +136,54 @@ export default class WazuhReportingCtrl {
             const rowsparsed = rawParser(table.rawResponse, table.columns);
             if (Array.isArray(rowsparsed) && rowsparsed.length) {
                 const rows = rowsparsed.length > 100 ? rowsparsed.slice(0,99) : rowsparsed;
-                this.dd.content.push({ text: table.title, style: 'bold', pageBreak: 'before' });
-
+                this.dd.content.push({ text: table.title, style: 'h3', pageBreak: 'before' });
+                this.dd.content.push('\n');
                 const full_body = [];
                 const sortFunction = (a, b) => parseInt(a[a.length - 1]) < parseInt(b[b.length - 1]) ?
                     1 :
                     parseInt(a[a.length - 1]) > parseInt(b[b.length - 1]) ?
                         -1 :
                         0;
+
+  
                 TimSort.sort(rows, sortFunction);
+
+                const modifiedRows = [];
+                for(const row of rows){
+                    modifiedRows.push(row.map(cell => {
+                        return {text:cell,style:'standard'};
+                    }));
+                }
+                
                 const widths = Array(table.columns.length-1).fill('auto');
                 widths.push('*');
-                
-                full_body.push(table.columns, ...rows);
+
+                full_body.push(
+                    table.columns.map(col => {
+                        return {text:col,style:'whiteColor',border:[0,0,0,0]};
+                    })
+                    , ...modifiedRows);
                 this.dd.content.push({
                     fontSize:8,
                     table: {
                         widths,
                         body: full_body
                     },
-                    layout: 'lightHorizontalLines'
+                    layout: {
+                        fillColor: function (i, node) {
+                            return (i === 0) ? '#78C8DE' : null;
+                        },
+                        hLineColor: function (i, node) {
+                            return '#78C8DE';
+                        },
+                        hLineWidth: function (i, node) {
+                            return 1;
+                        },
+                        vLineWidth: function (i, node) {
+                            return 0;
+                        }
+                    }
+                   
                 });
                 this.dd.content.push('\n');
             }
@@ -161,7 +204,7 @@ export default class WazuhReportingCtrl {
                 {
                     margin: [5, 0, 0, 0],
                     text: str,
-                    fontSize: 10
+                    fontSize: 10,
                 }
             ]
         });
@@ -204,7 +247,7 @@ export default class WazuhReportingCtrl {
         try {
             if (section && typeof section === 'string') {
                 this.dd.content.push({
-                    text: descriptions[tab].title + ' report', style: 'title'
+                    text: descriptions[tab].title + ' report', style: 'h1'
                 });
                 this.dd.content.push('\n');
             }
@@ -212,14 +255,14 @@ export default class WazuhReportingCtrl {
             if(isAgents && typeof isAgents === 'string'){
                 const status = await this.apiRequest.makeGenericRequest('GET',`/agents/${isAgents}`,{select:'status'},apiId);
                 if(status && status.data && typeof status.data.status === 'string' && status.data.status !== 'Active') {
-                    this.dd.content.push({ text: `Warning. Agent is ${status.data.status.toLowerCase()}`, style: 'bold' });
+                    this.dd.content.push({ text: `Warning. Agent is ${status.data.status.toLowerCase()}`, style: 'standard' });
                     this.dd.content.push('\n');
                 }
                 await this.buildAgentsTable([isAgents],apiId);
             }
     
             if(descriptions[tab] && descriptions[tab].description){
-                this.dd.content.push({ text: descriptions[tab].description, style: 'quote' });
+                this.dd.content.push({ text: descriptions[tab].description, style: 'standard' });
                 this.dd.content.push('\n');
             }
        
@@ -242,7 +285,7 @@ export default class WazuhReportingCtrl {
 
         for (const item of single_vis) {
             const title = this.checkTitle(item, isAgents, tab);
-            this.dd.content.push({ text: title[0]._source.title, style: 'bold' });
+            this.dd.content.push({ text: title[0]._source.title, style: 'h3' });
             this.dd.content.push({ columns: [ { image: item.element, width: 500 } ] });
             this.dd.content.push('\n');
         }
@@ -257,8 +300,8 @@ export default class WazuhReportingCtrl {
 
                 this.dd.content.push({
                     columns: [
-                        { text: title_1[0]._source.title, style: 'bold', width: 280 },
-                        { text: title_2[0]._source.title, style: 'bold', width: 280 }
+                        { text: title_1[0]._source.title, style: 'h3', width: 280 },
+                        { text: title_2[0]._source.title, style: 'h3', width: 280 }
                     ]
                 });
 
@@ -280,7 +323,7 @@ export default class WazuhReportingCtrl {
             const title = this.checkTitle(item, isAgents, tab);
             this.dd.content.push({
                 columns: [
-                    { text: title[0]._source.title, style: 'bold', width: 280 }
+                    { text: title[0]._source.title, style: 'h3', width: 280 }
                 ]
             });
             this.dd.content.push({ columns: [{ image: item.element, width: 280 }] });
@@ -416,15 +459,15 @@ export default class WazuhReportingCtrl {
             
             if(['overview','agents'].includes(section) && tab === 'pci'){
                 const topPciRequirements = await this.pciRequest.topPCIRequirements(from,to,filters,pattern);
-                this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'bold' });
+                this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'h2' });
                 this.dd.content.push('\n');
                 for(const item of topPciRequirements){
                     const rules = await this.pciRequest.getRulesByRequirement(from,to,filters,item,pattern);
-                    this.dd.content.push({ text: `Requirement ${item}`, style: 'bold'});
+                    this.dd.content.push({ text: `Requirement ${item}`, style: 'h3'});
                     this.dd.content.push('\n');
                     const description = sanitize(PCI[item]);
                     if(description) {
-                        this.dd.content.push({ text: `"${description}"`, style: 'quote' });
+                        this.dd.content.push({ text: `"${description}"`, style: 'standard' });
                         this.dd.content.push('\n');
                     }
                     PdfTable(this.dd,rules,['Rule ID','Description'],['ruleId','ruleDescription'],`Top rules regarding to requirement ${item}`);
@@ -492,11 +535,11 @@ export default class WazuhReportingCtrl {
 
                 if(lastScan && lastScan.data){
                     if(lastScan.data.start && lastScan.data.end) {
-                        this.dd.content.push({ text: `Last policy monitoring scan was from ${lastScan.data.start} to ${lastScan.data.end}.` });
+                        this.dd.content.push({ text: `Last policy monitoring scan was from ${lastScan.data.start} to ${lastScan.data.end}.` ,style:'standard'});
                     } else if(lastScan.data.start){
-                        this.dd.content.push({ text: `Policy monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}.` });
+                        this.dd.content.push({ text: `Policy monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}.`,style:'standard' });
                     } else {
-                        this.dd.content.push({ text: `Policy monitoring scan is currently in progress for this agent.` });
+                        this.dd.content.push({ text: `Policy monitoring scan is currently in progress for this agent.`,style:'standard' });
                     }
                     this.dd.content.push('\n');
                 }
@@ -507,14 +550,15 @@ export default class WazuhReportingCtrl {
                 }
 
                 if(pci && pci.data && pci.data.items) {
-                    this.dd.content.push({ text: 'Rules being fired due to PCI requirements', style: 'bold', pageBreak: 'before' });
+                    this.dd.content.push({ text: 'Rules being fired due to PCI requirements', style: 'h2', pageBreak: 'before' });
+                    this.dd.content.push('\n');
                     for(const item of pci.data.items){
                         const rules = await this.pciRequest.getRulesByRequirement(from,to,filters,item,pattern);
-                        this.dd.content.push({ text: `Requirement ${item}`, style: 'bold'});
+                        this.dd.content.push({ text: `Requirement ${item}`, style: 'h3'});
                         this.dd.content.push('\n');
                         const description = sanitize(PCI[item]);
                         if(description) {
-                            this.dd.content.push({ text: `"${description}"`, style: 'quote' });
+                            this.dd.content.push({ text: `"${description}"`, style: 'standard' });
                             this.dd.content.push('\n');
                         }
                         PdfTable(this.dd,rules,['Rule ID','Description'],['ruleId','ruleDescription']);
@@ -524,9 +568,9 @@ export default class WazuhReportingCtrl {
 
                 const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(from,to,filters,pattern,10);
                 if(top5RootkitsRank.length){
-                    this.dd.content.push({ text: 'Rootkits files found', style: 'bold' });
+                    this.dd.content.push({ text: 'Rootkits files found', style: 'h2' });
                     this.dd.content.push('\n');
-                    this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',style: 'quote'});
+                    this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.',style: 'standard'});
                     this.dd.content.push('\n');
                     this.dd.content.push({ ol: top5RootkitsRank });
                     this.dd.content.push('\n');
@@ -610,6 +654,44 @@ export default class WazuhReportingCtrl {
                     PdfTable(this.dd,affected,['Package','Severity'],['package','severity'],null);
                     this.dd.content.push('\n');
                 }
+            }
+
+
+            if(section === 'agents' && tab === 'vuls'){
+                const topCriticalPackages = await this.vulnerabilityRequest.topPackagesWithCVE(from,to,'Critical',filters,pattern);
+                if(topCriticalPackages.length){
+                    this.dd.content.push({ text: 'Critical severity', color:'white', background: '#78C8DE', });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'Next vulnerabilties are critical, you should review your installed packages. Click on each link to read more about each found vulnerability.',style: 'quote'});
+                    this.dd.content.push('\n');
+                    const customul = [];
+                    for(const critical of topCriticalPackages){
+                        customul.push({text:critical.package,style:'bold'});
+                        customul.push({
+                            ul: critical.references.map(item => {return {text: item, link:item, color:'blue',decoration:"underline"}})
+                        });
+                    }
+                    this.dd.content.push({ul:customul})
+                    this.dd.content.push('\n');
+                }
+
+                const topHighPackages = await this.vulnerabilityRequest.topPackagesWithCVE(from,to,'High',filters,pattern);
+                if(topHighPackages.length){
+                    this.dd.content.push({ text: 'High severity', style: 'bold' });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'Click on each link to read more about each found vulnerability.',style: 'quote'});
+                    this.dd.content.push('\n');
+                    const customul = [];
+                    for(const critical of topHighPackages){
+                        customul.push({text:critical.package,style:'bold'});
+                        customul.push({
+                            ul: critical.references.map(item => {return {text: item, link:item, color:'blue',decoration:"underline"}})
+                        });
+                    }
+                    this.dd.content.push({ul:customul})
+                    this.dd.content.push('\n');
+                }
+
             }
 
             return false;
