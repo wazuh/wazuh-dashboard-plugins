@@ -413,7 +413,7 @@ export default class WazuhReportingCtrl {
                 this.dd.content.push('\n');
             }
             
-            if(section === 'overview' && tab === 'pci'){
+            if(['overview','agents'].includes(section) && tab === 'pci'){
                 const topPciRequirements = await this.pciRequest.topPCIRequirements(from,to,filters,pattern);
                 this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'bold' });
                 this.dd.content.push('\n');
@@ -431,7 +431,7 @@ export default class WazuhReportingCtrl {
                 }
             }
 
-            if(section === 'overview' && tab === 'gdpr'){
+            if(['overview','agents'].includes(section) && tab === 'gdpr'){
                 const topGdprRequirements = await this.gdprRequest.topGDPRRequirements(from,to,filters,pattern);
                 this.dd.content.push({ text: 'Most common GDPR requirements alerts found', style: 'subtitle' });
                 this.dd.content.push('\n');
