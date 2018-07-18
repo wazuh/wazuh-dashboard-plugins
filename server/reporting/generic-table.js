@@ -24,7 +24,7 @@ export default (document, items, columns, keys, title, givenRows = false) => {
     }
 
     if(title) {
-        document.content.push({ text: 'Syscalls that usually are failing', style: 'bold' });
+        document.content.push({ text: title, style: 'bold' });
     }
 
     const rowSize = givenRows ? items[0].length : keys.length;
