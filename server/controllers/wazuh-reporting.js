@@ -539,6 +539,29 @@ export default class WazuhReportingCtrl {
                 this.dd.content.push('\n');
             }
 
+            if(section === 'agents' && tab === 'fim'){
+                const lastScan = await this.apiRequest.makeGenericRequest('GET',`/syscheck/${agent}/last_scan`,{},apiId);
+
+                if(lastScan && lastScan.data){
+                    if(lastScan.data.start && lastScan.data.end) {
+                        this.dd.content.push({ text: `Last file integrity monitoring scan was from ${lastScan.data.start} to ${lastScan.data.end}.` });
+                    } else if(lastScan.data.start){
+                        this.dd.content.push({ text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}.` });
+                    } else {
+                        this.dd.content.push({ text: `File integrity monitoring scan is currently in progress for this agent.` });
+                    }
+                    this.dd.content.push('\n');
+                }
+
+                const lastTenDeleted = await this.syscheckRequest.lastTenDeletedFiles(from,to,filters,pattern);
+                PdfTable(this.dd,lastTenDeleted,['Path','Date'],['path','date'],'Last ten deleted files');
+                this.dd.content.push('\n');
+
+                const lastTenModified = await this.syscheckRequest.lastTenModifiedFiles(from,to,filters,pattern);
+                PdfTable(this.dd,lastTenModified,['Path','Date'],['path','date'],'Last ten modified files');
+                this.dd.content.push('\n');
+            }
+
             return false;
         } catch (error) {
             return Promise.reject(error);

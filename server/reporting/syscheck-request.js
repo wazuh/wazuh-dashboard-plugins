@@ -103,7 +103,7 @@ export default class SyscheckRequest {
 
             const response    = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
             const { buckets } = response.aggregations['2'];
-            
+
             const result = [];
             for (const bucket of buckets) {
                 if(!bucket || !bucket['3'] || !bucket['3'].buckets || !bucket['3'].buckets[0] || !bucket['3'].buckets[0].key || !bucket.key){
@@ -116,6 +116,100 @@ export default class SyscheckRequest {
 
             return result;
 
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async lastTenDeletedFiles(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
+        try {
+            const base = {};
+
+            Object.assign(base, Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs,{
+                "2": {
+                  "terms": {
+                    "field": "syscheck.path",
+                    "size": 10,
+                    "order": {
+                      "1": "desc"
+                    }
+                  },
+                  "aggs": {
+                    "1": {
+                      "max": {
+                        "field": "@timestamp"
+                      }
+                    }
+                  }
+                }
+              });
+
+            base.query.bool.must.push({
+                "match_phrase": {
+                  "syscheck.event": {
+                    "query": "deleted"
+                  }
+                }
+            });
+            
+            const response    = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+            const { buckets } = response.aggregations['2'];
+
+            return buckets
+                    .map(item => {
+                        return{ date: item['1'].value_as_string, path: item.key };
+                    })
+                    .sort((a,b) => (a.date > b.date) ? -1 : (a.date < b.date ? 1 : 0));
+        
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async lastTenModifiedFiles(gte, lte, filters, pattern = 'wazuh-alerts-3.x-*') {
+        try {
+            const base = {};
+
+            Object.assign(base, Base(pattern, filters, gte, lte));
+
+            Object.assign(base.aggs,{
+                "2": {
+                  "terms": {
+                    "field": "syscheck.path",
+                    "size": 10,
+                    "order": {
+                      "1": "desc"
+                    }
+                  },
+                  "aggs": {
+                    "1": {
+                      "max": {
+                        "field": "@timestamp"
+                      }
+                    }
+                  }
+                }
+              });
+
+            base.query.bool.must.push({
+                "match_phrase": {
+                  "syscheck.event": {
+                    "query": "modified"
+                  }
+                }
+            });
+            
+            const response    = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+            const { buckets } = response.aggregations['2'];
+
+            return buckets
+                    .map(item => {
+                        return{ date: item['1'].value_as_string, path: item.key };
+                    })
+                    .sort((a,b) => (a.date > b.date) ? -1 : (a.date < b.date ? 1 : 0));
+        
         } catch (error) {
             return Promise.reject(error);
         }
