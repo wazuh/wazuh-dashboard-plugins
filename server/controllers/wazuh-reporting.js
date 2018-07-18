@@ -170,7 +170,7 @@ export default class WazuhReportingCtrl {
 
     renderFilters(filters, searchBar) {
         let str = '';
-        
+
         const len = filters.length;
         for (let i = 0; i < len; i++) {
             const filter = filters[i];
@@ -196,6 +196,7 @@ export default class WazuhReportingCtrl {
             }]
         });
         this.dd.content.push('\n');
+        
         return str;
     }
 
@@ -562,6 +563,55 @@ export default class WazuhReportingCtrl {
                 this.dd.content.push('\n');
             }
 
+            if(section === 'agents' && tab === 'syscollector'){
+
+                const hardware = await this.apiRequest.makeGenericRequest('GET',`/syscollector/${agent}/hardware`,{},apiId);
+
+                if(hardware.data){
+                    this.dd.content.push({ text: 'Hardware information', style: 'bold' });
+                    this.dd.content.push('\n');
+                    const ulcustom = [];
+                    if(hardware.data.cpu && hardware.data.cpu.cores) ulcustom.push(hardware.data.cpu.cores + ' cores ');
+                    if(hardware.data.cpu && hardware.data.cpu.name) ulcustom.push(hardware.data.cpu.name);
+                    if(hardware.data.ram && hardware.data.ram.total) ulcustom.push(Math.round(((hardware.data.ram.total/1024)/1024),2) + 'GB RAM');
+                    this.dd.content.push({
+                        ul: ulcustom
+                    });
+                    this.dd.content.push('\n');                    
+                }
+
+                const os = await this.apiRequest.makeGenericRequest('GET',`/syscollector/${agent}/os`,{},apiId);
+
+                if(os.data){
+                    this.dd.content.push({ text: 'OS information', style: 'bold' });
+                    this.dd.content.push('\n');
+                    const ulcustom = [];
+                    if(os.data.sysname) ulcustom.push(os.data.sysname);
+                    if(os.data.version) ulcustom.push(os.data.version);
+                    if(os.data.architecture) ulcustom.push(os.data.architecture);
+                    if(os.data.release) ulcustom.push(os.data.release);
+                    if(os.data.os && os.data.os.name && os.data.os.version) ulcustom.push(os.data.os.name + ' ' + os.data.os.version);
+                    this.dd.content.push({
+                        ul: ulcustom
+                    });
+                    this.dd.content.push('\n');
+                }
+
+                const topCriticalPackages = await this.vulnerabilityRequest.topPackages(from,to,'Critical',filters,pattern);
+                const topHighPackages     = await this.vulnerabilityRequest.topPackages(from,to,'High',filters,pattern);
+   
+                const affected = [];
+                affected.push(...topCriticalPackages,...topHighPackages);
+                if(affected.length) {
+                    this.dd.content.push({ text: 'Packages with known vulnerabilities',style: 'bold'});
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'Vulnerable packages found in the last 24 hours. These packages are installed on your agent, take care about them because they are vulnerable.',style: 'quote'});
+                    this.dd.content.push('\n');
+                    PdfTable(this.dd,affected,['Package','Severity'],['package','severity'],null);
+                    this.dd.content.push('\n');
+                }
+            }
+
             return false;
         } catch (error) {
             return Promise.reject(error);
@@ -583,31 +633,31 @@ export default class WazuhReportingCtrl {
 
                 await this.renderHeader(req.payload.section, tab, req.payload.isAgents, req.headers.id);
 
-                if (req.payload.time) {
+                if (tab !== 'syscollector' && req.payload.time) {
                     this.renderTimeRange(req.payload.time.from, req.payload.time.to);
                 }
-                
+
                 let filters = false;
                 if (req.payload.filters) {
                     filters = this.renderFilters(req.payload.filters, req.payload.searchBar);
                 }
 
-                if (req.payload.time) {
-                    await this.extendedInformation(
+                if (req.payload.time || tab === 'syscollector') {
+                        await this.extendedInformation(
                             req.payload.section,
                             req.payload.tab,
                             req.headers.id,
-                            new Date(req.payload.time.from)-1,
-                            new Date(req.payload.time.to)-1,
-                            filters,
+                            tab === 'syscollector' ? req.payload.time.from : new Date(req.payload.time.from)-1,
+                            tab === 'syscollector' ? req.payload.time.to : new Date(req.payload.time.to)-1,
+                            tab === 'syscollector' ? filters + ' AND rule.groups: "vulnerability-detector"' : filters,
                             req.headers.pattern,
                             req.payload.isAgents
                         );
-                }
+                } 
 
-                this.renderVisualizations(req.payload.array, req.payload.isAgents, tab)
+                tab !== 'syscollector' && this.renderVisualizations(req.payload.array, req.payload.isAgents, tab)
 
-                if (req.payload.tables) {
+                if (tab !== 'syscollector' && req.payload.tables) {
                     this.renderTables(req.payload.tables);                    
                 }
 
