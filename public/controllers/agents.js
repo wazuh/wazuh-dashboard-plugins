@@ -331,7 +331,17 @@ function (
         $scope.$broadcast('wazuhSearch',{term})
     }
 
-    $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab, $scope.agent && $scope.agent.id ? $scope.agent.id : true);
+    $scope.startVis2Png = () => {
+        const syscollectorFilters = [];
+        if($scope.tab === 'syscollector' && $scope.agent && $scope.agent.id){
+            syscollectorFilters.push(filterHandler.managerQuery(
+                appState.getClusterInfo().cluster, 
+                true
+            ));
+            syscollectorFilters.push(filterHandler.agentQuery($scope.agent.id));
+        }
+        reportingService.startVis2Png($scope.tab, $scope.agent && $scope.agent.id ? $scope.agent.id : true, syscollectorFilters.length ? syscollectorFilters : null);
+    }
 
     //Load
     try {
