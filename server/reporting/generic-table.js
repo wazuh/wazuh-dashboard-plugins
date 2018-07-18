@@ -19,12 +19,18 @@
  * @param {String} title Optional. Title for the table
  */
 export default (document, items, columns, keys, title, givenRows = false) => {
-    if(!document || !items || !items.length || !columns || !columns.length) {
+
+    if(!document || !columns || !columns.length) {
         throw new Error('Missing parameters when building table');
     }
 
     if(title) {
         document.content.push({ text: title, style: 'bold' });
+    }
+
+    if(!items || !items.length) {
+        document.content.push({ text: 'No results match your search criteria'});
+        return;
     }
 
     const rowSize = givenRows ? items[0].length : keys.length;
