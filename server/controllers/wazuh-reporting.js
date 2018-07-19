@@ -16,7 +16,6 @@ import * as TimSort from 'timsort';
 import rawParser from '../reporting/raw-parser';
 import PdfPrinter from 'pdfmake/src/printer';
 import ErrorResponse from './error-response';
-import sanitize from '../lib/sanitize-html';
 import VulnerabilityRequest from '../reporting/vulnerability-request';
 import OverviewRequest from '../reporting/overview-request';
 import RootcheckRequest from '../reporting/rootcheck-request';
@@ -24,13 +23,15 @@ import PciRequest from '../reporting/pci-request';
 import GdprRequest from '../reporting/gdpr-request';
 import AuditRequest from '../reporting/audit-request';
 import SyscheckRequest from '../reporting/syscheck-request';
-import PCI  from '../integration-files/pci-requirements';
+import PCI  from '../integration-files/pci-requirements-pdfmake';
 import GDPR from '../integration-files/gdpr-requirements';
 import PdfTable from '../reporting/generic-table';
 import WazuhApi from './wazuh-api';
 import clockIconRaw from '../reporting/clock-icon-raw';
 import filterIconRaw from '../reporting/filter-icon-raw';
 import { AgentsVisualizations, OverviewVisualizations } from '../integration-files/visualizations';
+
+const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
 export default class WazuhReportingCtrl {
     constructor(server) {
@@ -57,12 +58,6 @@ export default class WazuhReportingCtrl {
 
         this.dd = {
             styles: {
-                rightme: {
-                    alignment: 'right'
-                },
-                centerme: {
-                    alignment: 'center'
-                },
                 h1: {
                     fontSize: 22,
                     monslight: true,
@@ -85,9 +80,6 @@ export default class WazuhReportingCtrl {
                 },
                 standard: {
                     color: '#333'
-                },
-                bold: {
-                    bold: true
                 },
                 whiteColorFilters: {
                     color: '#FFF',
@@ -124,14 +116,15 @@ export default class WazuhReportingCtrl {
                 };
             },
             pageBreakBefore: function (currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-                //check if signature part is completely on the last page, add pagebreak if not
-                if (currentNode.id === 'signature' && (currentNode.pageNumbers.length != 1 || currentNode.pageNumbers[0] != currentNode.pages)) {
-                    return true;
+                if (currentNode.id && currentNode.id.includes('splitvis')) {
+                    return followingNodesOnPage.length === 6 || followingNodesOnPage.length === 7;
                 }
-                //check if last paragraph is entirely on a single page, add pagebreak if not
-                else if (currentNode.id === 'closingParagraph' && currentNode.pageNumbers.length != 1) {
-                    return true;
+                if ((currentNode.id && currentNode.id.includes('splitsinglevis')) || 
+                    (currentNode.id && currentNode.id.includes('singlevis'))
+                ) {
+                    return followingNodesOnPage.length === 6;
                 }
+
                 return false;
             }
         };
@@ -266,12 +259,26 @@ export default class WazuhReportingCtrl {
             }
 
             if (isAgents && typeof isAgents === 'string') {
-                const status = await this.apiRequest.makeGenericRequest('GET', `/agents/${isAgents}`, { select: 'status' }, apiId);
-                if (status && status.data && typeof status.data.status === 'string' && status.data.status !== 'Active') {
-                    this.dd.content.push({ text: `Warning. Agent is ${status.data.status.toLowerCase()}`, style: 'standard' });
+                const agent = await this.apiRequest.makeGenericRequest('GET', `/agents/${isAgents}`, { }, apiId);
+                if (agent && agent.data && typeof agent.data.status === 'string' && agent.data.status !== 'Active') {
+                    this.dd.content.push({ text: `Warning. Agent is ${agent.data.status.toLowerCase()}`, style: 'standard' });
                     this.dd.content.push('\n');
                 }
                 await this.buildAgentsTable([isAgents], apiId);
+
+                let datesStr = '';
+                if(agent && agent.data && agent.data.dateAdd){
+                    datesStr = `Registration date for this agent was on ${agent.data.dateAdd}.`;
+                }
+
+                if(agent && agent.data && agent.data.lastKeepAlive){
+                    datesStr += ` Its last keep alive has been received on ${agent.data.lastKeepAlive}.`;
+                }
+
+                if(datesStr.length) {
+                    this.dd.content.push({text: datesStr, style: 'standard'});
+                    this.dd.content.push('\n');
+                }
             }
 
             if (descriptions[tab] && descriptions[tab].description) {
@@ -298,7 +305,7 @@ export default class WazuhReportingCtrl {
 
         for (const item of single_vis) {
             const title = this.checkTitle(item, isAgents, tab);
-            this.dd.content.push({ text: title[0]._source.title, style: 'h3' });
+            this.dd.content.push({ id:'singlevis' + title[0]._source.title,text: title[0]._source.title, style: 'h3' });
             this.dd.content.push({ columns: [{ image: item.element, width: 500 }] });
             this.dd.content.push('\n');
         }
@@ -313,8 +320,8 @@ export default class WazuhReportingCtrl {
 
                 this.dd.content.push({
                     columns: [
-                        { text: title_1[0]._source.title, style: 'h3', width: 280 },
-                        { text: title_2[0]._source.title, style: 'h3', width: 280 }
+                        { id:'splitvis' + title_1[0]._source.title, text: title_1[0]._source.title, style: 'h3', width: 280 },
+                        { id:'splitvis' + title_2[0]._source.title, text: title_2[0]._source.title, style: 'h3', width: 280 }
                     ]
                 });
 
@@ -336,7 +343,7 @@ export default class WazuhReportingCtrl {
             const title = this.checkTitle(item, isAgents, tab);
             this.dd.content.push({
                 columns: [
-                    { text: title[0]._source.title, style: 'h3', width: 280 }
+                    { id:'splitsinglevis' + title[0]._source.title, text: title[0]._source.title, style: 'h3', width: 280 }
                 ]
             });
             this.dd.content.push({ columns: [{ image: item.element, width: 280 }] });
@@ -345,6 +352,7 @@ export default class WazuhReportingCtrl {
     }
 
     async buildAgentsTable(ids, apiId) {
+        if(!ids || !ids.length) return;
         try {
             const rows = [];
             for (const item of ids) {
@@ -391,7 +399,7 @@ export default class WazuhReportingCtrl {
                 const high = await this.vulnerabilityRequest.uniqueSeverityCount(from, to, 'High', filters, pattern);
                 const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from, to, 'Critical', filters, pattern);
 
-                this.dd.content.push({ text: 'Summary', style: 'bold' });
+                this.dd.content.push({ text: 'Summary', style: 'h2' });
                 const ulcustom = [`${critical + high + medium + low} of ${totalAgents} agents have vulnerabilities.`];
                 if (critical) ulcustom.push(`${critical} of ${totalAgents} agents have critical vulnerabilities.`);
                 if (high) ulcustom.push(`${high} of ${totalAgents} agents have high vulnerabilities.`);
@@ -409,32 +417,32 @@ export default class WazuhReportingCtrl {
                 const criticalRank = await this.vulnerabilityRequest.topAgentCount(from, to, 'Critical', filters, pattern);
 
                 if (criticalRank.length) {
-                    this.dd.content.push({ text: 'Top 3 agents with critical severity vulnerabilities', style: 'bold' });
+                    this.dd.content.push({ text: 'Top 3 agents with critical severity vulnerabilities', style: 'h3' });
                     await this.buildAgentsTable(criticalRank, apiId);
                     this.dd.content.push('\n');
                 }
 
                 if (highRank.length) {
-                    this.dd.content.push({ text: 'Top 3 agents with high severity vulnerabilities', style: 'bold' });
+                    this.dd.content.push({ text: 'Top 3 agents with high severity vulnerabilities', style: 'h3' });
                     await this.buildAgentsTable(highRank, apiId);
                     this.dd.content.push('\n');
                 }
 
                 if (mediumRank.length) {
-                    this.dd.content.push({ text: 'Top 3 agents with medium severity vulnerabilities', style: 'bold' });
+                    this.dd.content.push({ text: 'Top 3 agents with medium severity vulnerabilities', style: 'h3' });
                     await this.buildAgentsTable(mediumRank, apiId);
                     this.dd.content.push('\n');
                 }
 
                 if (lowRank.length) {
-                    this.dd.content.push({ text: 'Top 3 agents with low severity vulnerabilities', style: 'bold' });
+                    this.dd.content.push({ text: 'Top 3 agents with low severity vulnerabilities', style: 'h3' });
                     await this.buildAgentsTable(lowRank, apiId);
                     this.dd.content.push('\n');
                 }
 
                 const cveRank = await this.vulnerabilityRequest.topCVECount(from, to, filters, pattern);
                 if (cveRank.length) {
-                    this.dd.content.push({ text: 'Top 3 CVE', style: 'bold' });
+                    this.dd.content.push({ text: 'Top 3 CVE', style: 'h2' });
                     this.dd.content.push({ ol: cveRank });
                     this.dd.content.push('\n');
                 }
@@ -443,7 +451,7 @@ export default class WazuhReportingCtrl {
             if (section === 'overview' && tab === 'general') {
                 const level15Rank = await this.overviewRequest.topLevel15(from, to, filters, pattern);
                 if (level15Rank.length) {
-                    this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'bold' });
+                    this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'h2' });
                     await this.buildAgentsTable(level15Rank, apiId);
                 }
             }
@@ -451,22 +459,22 @@ export default class WazuhReportingCtrl {
             if (section === 'overview' && tab === 'pm') {
                 const top5RootkitsRank = await this.rootcheckRequest.top3RootkitsDetected(from, to, filters, pattern);
                 if (top5RootkitsRank.length) {
-                    this.dd.content.push({ text: 'Most common rootkits found along your agents', style: 'bold' });
+                    this.dd.content.push({ text: 'Most common rootkits found along your agents', style: 'h2' });
                     this.dd.content.push('\n');
-                    this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.', style: 'quote' });
+                    this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.', style: 'standard' });
                     this.dd.content.push('\n');
                     this.dd.content.push({ ol: top5RootkitsRank });
                     this.dd.content.push('\n');
                 }
 
                 const hiddenPids = await this.rootcheckRequest.agentsWithHiddenPids(from, to, filters, pattern);
-                this.dd.content.push({ text: `${hiddenPids} of ${totalAgents} agents have hidden processes`, style: 'bold' });
-                this.dd.content.push({ text: `This situation is dangerous and it means ${hiddenPids} agents may have been infected by some kind of malware.`, style: 'quote' });
+                this.dd.content.push({ text: `${hiddenPids} of ${totalAgents} agents have hidden processes`, style: 'h3' });
+                this.dd.content.push({ text: `This situation is dangerous and it means ${hiddenPids} agents may have been infected by some kind of malware.`, style: 'standard' });
                 this.dd.content.push('\n');
 
                 const hiddenPorts = await this.rootcheckRequest.agentsWithHiddenPorts(from, to, filters, pattern);
-                this.dd.content.push({ text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`, style: 'bold' });
-                this.dd.content.push({ text: `Netstat is not showing some ports but they are replying from ping command.`, style: 'quote' });
+                this.dd.content.push({ text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`, style: 'h3' });
+                this.dd.content.push({ text: `Netstat is not showing some ports but they are replying from ping command.`, style: 'standard' });
                 this.dd.content.push('\n');
             }
 
@@ -478,30 +486,38 @@ export default class WazuhReportingCtrl {
                     const rules = await this.pciRequest.getRulesByRequirement(from, to, filters, item, pattern);
                     this.dd.content.push({ text: `Requirement ${item}`, style: 'h3' });
                     this.dd.content.push('\n');
-                    const description = sanitize(PCI[item]);
-                    if (description) {
-                        this.dd.content.push({ text: `"${description}"`, style: 'standard' });
+
+                    if (PCI[item]) {
+                        const content = typeof PCI[item] === 'string' ?
+                                        { text: PCI[item], style: 'standard'} :
+                                        PCI[item];
+                        this.dd.content.push(content);
                         this.dd.content.push('\n');
                     }
-                    PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], `Top rules regarding to requirement ${item}`);
+
+                    rules && rules.length && PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], `Top rules regarding to requirement ${item}`);
                     this.dd.content.push('\n');
                 }
             }
 
             if (['overview', 'agents'].includes(section) && tab === 'gdpr') {
                 const topGdprRequirements = await this.gdprRequest.topGDPRRequirements(from, to, filters, pattern);
-                this.dd.content.push({ text: 'Most common GDPR requirements alerts found', style: 'subtitle' });
+                this.dd.content.push({ text: 'Most common GDPR requirements alerts found', style: 'h2' });
                 this.dd.content.push('\n');
                 for (const item of topGdprRequirements) {
                     const rules = await this.gdprRequest.getRulesByRequirement(from, to, filters, item, pattern);
-                    this.dd.content.push({ text: `Requirement ${item}`, style: 'bold' });
+                    this.dd.content.push({ text: `Requirement ${item}`, style: 'h3' });
                     this.dd.content.push('\n');
-                    const description = sanitize(GDPR[item]);
-                    if (description) {
-                        this.dd.content.push({ text: `"${description}"`, style: 'quote' });
+
+                    if (GDPR && GDPR[item]) {
+                        const content = typeof GDPR[item] === 'string' ?
+                                        { text: GDPR[item], style: 'standard'} :
+                                        GDPR[item];
+                        this.dd.content.push(content);
                         this.dd.content.push('\n');
                     }
-                    PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], `Top rules regarding to requirement ${item}`);
+
+                    rules && rules.length && PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], `Top rules regarding to requirement ${item}`);
                     this.dd.content.push('\n');
                 }
                 this.dd.content.push('\n');
@@ -509,14 +525,14 @@ export default class WazuhReportingCtrl {
 
             if (section === 'overview' && tab === 'audit') {
                 const auditAgentsNonSuccess = await this.auditRequest.getTop3AgentsSudoNonSuccessful(from, to, filters, pattern);
-                if (auditAgentsNonSuccess.length) {
-                    this.dd.content.push({ text: 'Agents with high number of failed sudo commands', style: 'bold' });
+                if (auditAgentsNonSuccess && auditAgentsNonSuccess.length) {
+                    this.dd.content.push({ text: 'Agents with high number of failed sudo commands', style: 'h2' });
                     await this.buildAgentsTable(auditAgentsNonSuccess, apiId);
                 }
                 const auditAgentsFailedSyscall = await this.auditRequest.getTop3AgentsFailedSyscalls(from, to, filters, pattern);
-                if (auditAgentsFailedSyscall.length) {
-                    this.dd.content.push({ text: 'Syscalls that usually are failing', style: 'bold' });
-                    this.dd.content.push({ text: 'The next table shows the top failing syscall for the top 3 agents that have more failed syscalls.', style: 'quote' });
+                if (auditAgentsFailedSyscall && auditAgentsFailedSyscall.length) {
+                    this.dd.content.push({ text: 'Syscalls that usually are failing', style: 'h2' });
+                    this.dd.content.push({ text: 'The next table shows the top failing syscall for the top 3 agents that have more failed syscalls.', style: 'standard' });
                     PdfTable(this.dd, auditAgentsFailedSyscall, ['Agent ID', 'Syscall ID', 'Syscall'], ['agent', 'syscall.id', 'syscall.syscall'], null, false);
                     this.dd.content.push('\n');
                 }
@@ -524,20 +540,26 @@ export default class WazuhReportingCtrl {
 
             if (section === 'overview' && tab === 'fim') {
                 const rules = await this.syscheckRequest.top3Rules(from, to, filters, pattern);
-                this.dd.content.push({ text: 'Top 3 FIM rules', style: 'bold' });
-                this.dd.content.push({
-                    text: 'Top 3 rules that are generating most alerts.',
-                    style: 'quote'
-                });
-                PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], null);
+                
+                if(rules && rules.length){
+                    this.dd.content.push({ text: 'Top 3 FIM rules', style: 'h2' });
+                    this.dd.content.push({
+                        text: 'Top 3 rules that are generating most alerts.',
+                        style: 'standard'
+                    });
+                    PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], null);
+                }
 
                 const agents = await this.syscheckRequest.top3agents(from, to, filters, pattern);
-                this.dd.content.push({ text: 'Agents with suspicious FIM activity', style: 'bold' });
-                this.dd.content.push({
-                    text: 'Top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.',
-                    style: 'quote'
-                });
-                await this.buildAgentsTable(agents, apiId);
+                
+                if(agents && agents.length){
+                    this.dd.content.push({ text: 'Agents with suspicious FIM activity', style: 'h2' });
+                    this.dd.content.push({
+                        text: 'Top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.',
+                        style: 'standard'
+                    });
+                    await this.buildAgentsTable(agents, apiId);
+                }                
             }
 
             if (section === 'agents' && tab === 'pm') {
@@ -569,18 +591,22 @@ export default class WazuhReportingCtrl {
                         const rules = await this.pciRequest.getRulesByRequirement(from, to, filters, item, pattern);
                         this.dd.content.push({ text: `Requirement ${item}`, style: 'h3' });
                         this.dd.content.push('\n');
-                        const description = sanitize(PCI[item]);
-                        if (description) {
-                            this.dd.content.push({ text: `"${description}"`, style: 'standard' });
+
+                        if (PCI[item]) {
+                            const content = typeof PCI[item] === 'string' ?
+                                        { text: PCI[item], style: 'standard'} :
+                                        PCI[item];
+                            this.dd.content.push(content);
                             this.dd.content.push('\n');
                         }
+
                         PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription']);
                         this.dd.content.push('\n');
                     }
                 }
 
                 const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(from, to, filters, pattern, 10);
-                if (top5RootkitsRank.length) {
+                if (top5RootkitsRank && top5RootkitsRank.length) {
                     this.dd.content.push({ text: 'Rootkits files found', style: 'h2' });
                     this.dd.content.push('\n');
                     this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.', style: 'standard' });
@@ -593,7 +619,7 @@ export default class WazuhReportingCtrl {
 
             if (section === 'agents' && tab === 'audit') {
                 const auditFailedSyscall = await this.auditRequest.getTopFailedSyscalls(from, to, filters, pattern);
-                PdfTable(this.dd, auditFailedSyscall, ['Syscall ID', 'Syscall'], ['id', 'syscall'], 'Syscalls that usually are failing');
+                auditFailedSyscall && auditFailedSyscall.length && PdfTable(this.dd, auditFailedSyscall, ['Syscall ID', 'Syscall'], ['id', 'syscall'], 'Syscalls that usually are failing');
                 this.dd.content.push('\n');
             }
 
@@ -612,11 +638,11 @@ export default class WazuhReportingCtrl {
                 }
 
                 const lastTenDeleted = await this.syscheckRequest.lastTenDeletedFiles(from, to, filters, pattern);
-                PdfTable(this.dd, lastTenDeleted, ['Path', 'Date'], ['path', 'date'], 'Last ten deleted files');
+                lastTenDeleted && lastTenDeleted.length && PdfTable(this.dd, lastTenDeleted, ['Path', 'Date'], ['path', 'date'], 'Last ten deleted files');
                 this.dd.content.push('\n');
 
                 const lastTenModified = await this.syscheckRequest.lastTenModifiedFiles(from, to, filters, pattern);
-                PdfTable(this.dd, lastTenModified, ['Path', 'Date'], ['path', 'date'], 'Last ten modified files');
+                lastTenModified && lastTenModified.length && PdfTable(this.dd, lastTenModified, ['Path', 'Date'], ['path', 'date'], 'Last ten modified files');
                 this.dd.content.push('\n');
             }
 
@@ -624,14 +650,14 @@ export default class WazuhReportingCtrl {
 
                 const hardware = await this.apiRequest.makeGenericRequest('GET', `/syscollector/${agent}/hardware`, {}, apiId);
 
-                if (hardware.data) {
-                    this.dd.content.push({ text: 'Hardware information', style: 'bold' });
+                if (hardware && hardware.data) {
+                    this.dd.content.push({ text: 'Hardware information', style: 'h2' });
                     this.dd.content.push('\n');
                     const ulcustom = [];
                     if (hardware.data.cpu && hardware.data.cpu.cores) ulcustom.push(hardware.data.cpu.cores + ' cores ');
                     if (hardware.data.cpu && hardware.data.cpu.name) ulcustom.push(hardware.data.cpu.name);
                     if (hardware.data.ram && hardware.data.ram.total) ulcustom.push(Math.round(((hardware.data.ram.total / 1024) / 1024), 2) + 'GB RAM');
-                    this.dd.content.push({
+                    ulcustom && ulcustom.length && this.dd.content.push({
                         ul: ulcustom
                     });
                     this.dd.content.push('\n');
@@ -639,8 +665,8 @@ export default class WazuhReportingCtrl {
 
                 const os = await this.apiRequest.makeGenericRequest('GET', `/syscollector/${agent}/os`, {}, apiId);
 
-                if (os.data) {
-                    this.dd.content.push({ text: 'OS information', style: 'bold' });
+                if (os && os.data) {
+                    this.dd.content.push({ text: 'OS information', style: 'h2' });
                     this.dd.content.push('\n');
                     const ulcustom = [];
                     if (os.data.sysname) ulcustom.push(os.data.sysname);
@@ -648,7 +674,7 @@ export default class WazuhReportingCtrl {
                     if (os.data.architecture) ulcustom.push(os.data.architecture);
                     if (os.data.release) ulcustom.push(os.data.release);
                     if (os.data.os && os.data.os.name && os.data.os.version) ulcustom.push(os.data.os.name + ' ' + os.data.os.version);
-                    this.dd.content.push({
+                    ulcustom && ulcustom.length && this.dd.content.push({
                         ul: ulcustom
                     });
                     this.dd.content.push('\n');
@@ -659,10 +685,10 @@ export default class WazuhReportingCtrl {
 
                 const affected = [];
                 affected.push(...topCriticalPackages, ...topHighPackages);
-                if (affected.length) {
-                    this.dd.content.push({ text: 'Packages with known vulnerabilities', style: 'bold' });
+                if (affected && affected.length) {
+                    this.dd.content.push({ text: 'Packages with known vulnerabilities', style: 'h2' });
                     this.dd.content.push('\n');
-                    this.dd.content.push({ text: 'Vulnerable packages found in the last 24 hours. These packages are installed on your agent, take care about them because they are vulnerable.', style: 'quote' });
+                    this.dd.content.push({ text: 'Vulnerable packages found in the last 24 hours. These packages are installed on your agent, take care about them because they are vulnerable.', style: 'standard' });
                     this.dd.content.push('\n');
                     PdfTable(this.dd, affected, ['Package', 'Severity'], ['package', 'severity'], null);
                     this.dd.content.push('\n');
@@ -672,16 +698,16 @@ export default class WazuhReportingCtrl {
 
             if (section === 'agents' && tab === 'vuls') {
                 const topCriticalPackages = await this.vulnerabilityRequest.topPackagesWithCVE(from, to, 'Critical', filters, pattern);
-                if (topCriticalPackages.length) {
-                    this.dd.content.push({ text: 'Critical severity', color: 'white', background: '#78C8DE', });
+                if (topCriticalPackages && topCriticalPackages.length) {
+                    this.dd.content.push({ text: 'Critical severity', style: 'h2' });
                     this.dd.content.push('\n');
-                    this.dd.content.push({ text: 'Next vulnerabilties are critical, you should review your installed packages. Click on each link to read more about each found vulnerability.', style: 'quote' });
+                    this.dd.content.push({ text: 'Next vulnerabilties are critical, you should review your installed packages. Click on each link to read more about each found vulnerability.', style: 'standard' });
                     this.dd.content.push('\n');
                     const customul = [];
                     for (const critical of topCriticalPackages) {
-                        customul.push({ text: critical.package, style: 'bold' });
+                        customul.push({ text: critical.package, style: 'standard' });
                         customul.push({
-                            ul: critical.references.map(item => { return { text: item, link: item, color: 'blue', decoration: "underline" } })
+                            ul: critical.references.map(item => { return { text: item, color: '#1EA5C8' }; })
                         });
                     }
                     this.dd.content.push({ ul: customul })
@@ -689,19 +715,19 @@ export default class WazuhReportingCtrl {
                 }
 
                 const topHighPackages = await this.vulnerabilityRequest.topPackagesWithCVE(from, to, 'High', filters, pattern);
-                if (topHighPackages.length) {
-                    this.dd.content.push({ text: 'High severity', style: 'bold' });
+                if (topHighPackages && topHighPackages.length) {
+                    this.dd.content.push({ text: 'High severity', style: 'h2' });
                     this.dd.content.push('\n');
-                    this.dd.content.push({ text: 'Click on each link to read more about each found vulnerability.', style: 'quote' });
+                    this.dd.content.push({ text: 'Click on each link to read more about each found vulnerability.', style: 'standard' });
                     this.dd.content.push('\n');
                     const customul = [];
                     for (const critical of topHighPackages) {
-                        customul.push({ text: critical.package, style: 'bold' });
+                        customul.push({ text: critical.package, style: 'standard' });
                         customul.push({
-                            ul: critical.references.map(item => { return { text: item, link: item, color: 'blue', decoration: "underline" } })
+                            ul: critical.references.map(item => { return { text: item, color: '#1EA5C8' }; })
                         });
                     }
-                    this.dd.content.push({ ul: customul })
+                    customul && customul.length && this.dd.content.push({ ul: customul });
                     this.dd.content.push('\n');
                 }
 
@@ -719,54 +745,69 @@ export default class WazuhReportingCtrl {
             // Init
             this.printer = new PdfPrinter(this.fonts);
             this.dd.content = [];
-            if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'))) {
-                fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
+            if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
+                fs.mkdirSync(path.join(__dirname, REPORTING_PATH));
             }
 
             if (req.payload && req.payload.array) {
-                const tab = req.payload.tab;
+                const name     = req.payload.name;
+                const tab      = req.payload.tab;
+                const section  = req.payload.section;
+                const apiId    = req.headers && req.headers.id      ? req.headers.id      : false;
+                const pattern  = req.headers && req.headers.pattern ? req.headers.pattern : false;
+                const kfilters = req.payload.filters;
+                const isAgents = req.payload.isAgents;
+                const from     = req.payload.time && req.payload.time.from ? req.payload.time.from : false;
+                const to       = req.payload.time && req.payload.time.to   ? req.payload.time.to   : false;
 
-                await this.renderHeader(req.payload.section, tab, req.payload.isAgents, req.headers.id);
+                if(!tab)     throw new Error('Reporting needs a valid app tab in order to work properly');
+                if(!section) throw new Error('Reporting needs a valid app section in order to work properly');
+                if(!apiId)   throw new Error('Reporting needs a valid Wazuh API ID in order to work properly');
+                if(!name)    throw new Error('Reporting needs a valid file name in order to work properly');
+
+                const isSycollector = tab === 'syscollector';
+
+                await this.renderHeader(section, tab, isAgents, apiId);
 
                 let filters = false;
-                if (req.payload.filters) {
-                    filters = this.sanitizeFilters(req.payload.filters, req.payload.searchBar);
+                if (kfilters) {
+                    filters = this.sanitizeFilters(kfilters, req.payload.searchBar);
                 }
 
-                if (tab !== 'syscollector' && req.payload.time && filters) {
-                    this.renderTimeRangeAndFilters(req.payload.time.from, req.payload.time.to, filters);
+                if (!isSycollector && req.payload.time && filters) {
+                    this.renderTimeRangeAndFilters(from, to, filters);
                 }
 
-                if (req.payload.time || tab === 'syscollector') {
+                if (req.payload.time || isSycollector) {
                     await this.extendedInformation(
-                        req.payload.section,
-                        req.payload.tab,
-                        req.headers.id,
-                        tab === 'syscollector' ? req.payload.time.from : new Date(req.payload.time.from) - 1,
-                        tab === 'syscollector' ? req.payload.time.to : new Date(req.payload.time.to) - 1,
-                        tab === 'syscollector' ? filters + ' AND rule.groups: "vulnerability-detector"' : filters,
-                        req.headers.pattern,
-                        req.payload.isAgents
+                        section,
+                        tab,
+                        apiId,
+                        isSycollector ? from : new Date(from) - 1,
+                        isSycollector ? to   : new Date(to)   - 1,
+                        isSycollector ? filters + ' AND rule.groups: "vulnerability-detector"' : filters,
+                        pattern,
+                        isAgents
                     );
                 }
 
-                tab !== 'syscollector' && this.renderVisualizations(req.payload.array, req.payload.isAgents, tab)
+                !isSycollector && this.renderVisualizations(req.payload.array, isAgents, tab);
 
-                if (tab !== 'syscollector' && req.payload.tables) {
+                if (!isSycollector && req.payload.tables) {
                     this.renderTables(req.payload.tables);
                 }
 
                 const pdfDoc = this.printer.createPdfKitDocument(this.dd);
-                await pdfDoc.pipe(fs.createWriteStream(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name)));
+                await pdfDoc.pipe(fs.createWriteStream(path.join(__dirname, REPORTING_PATH + '/' + req.payload.name)));
                 pdfDoc.end();
             }
             return reply({ error: 0, data: null });
         } catch (error) {
             // Delete generated file if an error occurred
             if (req && req.payload && req.payload.name &&
-                fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name))
+                fs.existsSync(path.join(__dirname, REPORTING_PATH + '/' + req.payload.name))
             ) {
-                fs.unlinkSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.payload.name));
+                fs.unlinkSync(path.join(__dirname, REPORTING_PATH + '/' + req.payload.name));
             }
             return ErrorResponse(error.message || error, 5029, 500, reply);
         }
@@ -774,11 +815,11 @@ export default class WazuhReportingCtrl {
 
     async getReports(req, reply) {
         try {
-            if (!fs.existsSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'))) {
-                fs.mkdirSync(path.join(__dirname, '../../../../optimize/wazuh-reporting'));
+            if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
+                fs.mkdirSync(path.join(__dirname, REPORTING_PATH));
             }
             const list = [];
-            const reportDir = path.join(__dirname, '../../../../optimize/wazuh-reporting');
+            const reportDir = path.join(__dirname, REPORTING_PATH);
             const sortFunction = (a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
             fs.readdirSync(reportDir).forEach(file => {
                 const stats = fs.statSync(reportDir + '/' + file);
@@ -798,7 +839,8 @@ export default class WazuhReportingCtrl {
 
     async getReportByName(req, reply) {
         try {
-            return reply.file(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.params.name));
+            if(!req.params || !req.params.name) throw new Error('Invalid file name');
+            return reply.file(path.join(__dirname, REPORTING_PATH + '/' + req.params.name));
         } catch (error) {
             return ErrorResponse(error.message || error, 5030, 500, reply);
         }
@@ -806,7 +848,8 @@ export default class WazuhReportingCtrl {
 
     async deleteReportByName(req, reply) {
         try {
-            fs.unlinkSync(path.join(__dirname, '../../../../optimize/wazuh-reporting/' + req.params.name));
+            if(!req.params || !req.params.name) throw new Error('Invalid file name');
+            fs.unlinkSync(path.join(__dirname, REPORTING_PATH + '/' + req.params.name));
             return reply({ error: 0 });
         } catch (error) {
             return ErrorResponse(error.message || error, 5032, 500, reply);
