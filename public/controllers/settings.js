@@ -9,18 +9,17 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import base64        from '../utils/base64.js'
-import chrome        from 'ui/chrome'
-import { uiModules } from 'ui/modules'
-import TabNames      from '../utils/tab-names'
+import base64        from '../utils/base64.js';
+import { uiModules } from 'ui/modules';
+import TabNames      from '../utils/tab-names';
 
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('settingsController', 
-function ($scope, $rootScope, $http, $routeParams, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
+function ($scope, $routeParams, $window, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
     if (wzMisc.getValue('comeFromWizard')) {
-        sessionStorage.removeItem('healthCheck');
-        wzMisc.setWizard(false)
+        $window.sessionStorage.removeItem('healthCheck');
+        wzMisc.setWizard(false);
     }
 
     $scope.apiIsDown = wzMisc.getValue('apiIsDown');

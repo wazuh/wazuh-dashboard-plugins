@@ -10,21 +10,22 @@
  * Find more information about this on the LICENSE file.
  */
 import chrome       from 'ui/chrome';
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.service('testAPI', function ($http, $location, $rootScope, appState, wzMisc, wazuhConfig) {
+app.service('testAPI', function ($http, $rootScope, appState, wzMisc, wazuhConfig) {
     return {
         check_stored: async data => {
             try {
-                const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
+                const configuration = wazuhConfig.getConfig();
+                const timeout = configuration ? configuration.timeout : 8000;
+                const headers = {headers:{ "Content-Type": 'application/json' }, timeout: timeout || 8000};
 
                 /** Checks for outdated cookies */
                 const current     = appState.getCreatedAt();
                 const lastRestart = $rootScope.lastRestart;
-                const configuration = wazuhConfig.getConfig();
-
+                
                 if(current && lastRestart && lastRestart > current){
                     appState.removeCurrentPattern();
                     appState.removeCurrentAPI();
@@ -38,7 +39,6 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, wzMisc,
                     /** End of checks for outdated cookies */
 
                 } else {
-                    if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
 
                     const result = await $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers);
 
@@ -59,8 +59,9 @@ app.service('testAPI', function ($http, $location, $rootScope, appState, wzMisc,
         },
         check: async data => {
             try {
-                const headers = {headers:{ "Content-Type": 'application/json' },timeout: $rootScope.userTimeout || 8000};
-                if(appState.getUserCode()) headers.headers.code = appState.getUserCode();
+                const { timeout } = wazuhConfig.getConfig();
+
+                const headers = {headers:{ "Content-Type": 'application/json' },timeout: timeout || 8000};
 
                 const url = chrome.addBasePath("/api/wazuh-api/checkAPI");
                 const response = await $http.post(url, data, headers);

@@ -238,8 +238,8 @@ export default class WazuhReportingCtrl {
             const filter = filters[i];
 
             str += i === len - 1 ?
-                (filter.meta.negate ? 'NOT ' : '') + filter.meta.key + ': ' + filter.meta.value :
-                (filter.meta.negate ? 'NOT ' : '') + filter.meta.key + ': ' + filter.meta.value + ' AND ';
+                   (filter.meta.negate ? 'NOT ' : '' ) + filter.meta.key + ': ' + filter.meta.value :
+                   (filter.meta.negate ? 'NOT ' : '' ) + filter.meta.key + ': ' + filter.meta.value + ' AND ';
         }
 
         if (searchBar) {

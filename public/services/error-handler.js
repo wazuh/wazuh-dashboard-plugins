@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.service('errorHandler', function ( Notifier, appState, $location) {
+app.service('errorHandler', function ( Notifier, $location) {
     const notify = new Notifier();
 
     const extractMessage = error => {

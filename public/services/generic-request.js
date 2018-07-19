@@ -9,72 +9,50 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import chrome       from 'ui/chrome';
+import chrome from 'ui/chrome';
 import { uiModules } from 'ui/modules';
 
-uiModules.get('app/wazuh', [])
-.service('genericReq', function ($q, $http, $location, appState, wazuhConfig) {
+const app = uiModules.get('app/wazuh', []);
 
-    const _request = (method, url, payload = null) => {
-        const defered = $q.defer();
-
-        if (!method || !url) {
-            defered.reject({
-                'error':   -1,
-                'message': 'Missing parameters'
-            });
-            return defered.promise;
-        }
-
-        const config = wazuhConfig.getConfig();
-        
-        const requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: config.timeout || 8000 };
-
-        const tmpUrl = chrome.addBasePath(url);
-        let tmp = null;
-        if(appState.getUserCode()) requestHeaders.headers.code = appState.getUserCode();
-        const id = appState.getCurrentAPI() ? JSON.parse(appState.getCurrentAPI()).id : false;
-        if(id) requestHeaders.headers.id = id;
-        requestHeaders.headers.pattern = appState.getCurrentPattern();
-        if (method === "GET")    tmp = $http.get(tmpUrl, requestHeaders);
-        if (method === "PUT")    tmp = $http.put(tmpUrl, payload, requestHeaders);
-        if (method === "POST")   tmp = $http.post(tmpUrl, payload, requestHeaders);
-        if (method === "DELETE") tmp = $http.delete(tmpUrl);
-
-        if(!tmp) {
-            defered.reject({
-                error: -2,
-                message: `Error doing a request to ${tmpUrl}, method: ${method}.`
-            });
-            return defered.promise;
-        }
-
-        tmp
-        .then(data => {
-            if (data.error && data.error !== '0') {
-                defered.reject(data);
-            } else {
-                defered.resolve(data);
-            }
-        })
-        .catch(defered.reject);
-
-        return defered.promise;
-    };
-
+app.service('genericReq', function ($q, $http, appState, wazuhConfig) {
     return {
-        request: (method, path, payload = null) => {
-            if (!method || !path) {
-                return Promise.reject(new Error('Missing parameters'));
+        request: async (method, path, payload = null) => {
+            try {
+                if (!method || !path) {
+                    throw new Error('Missing parameters');
+                }
+
+                const { timeout }    = wazuhConfig.getConfig();
+                const requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: timeout || 8000 };
+                const tmpUrl         = chrome.addBasePath(path);
+              
+                requestHeaders.headers.pattern = appState.getCurrentPattern();
+              
+                try { 
+                    requestHeaders.headers.id = JSON.parse(appState.getCurrentAPI()).id; 
+                } catch (error) { 
+                    // Intended 
+                }
+
+                const data = {};
+                if (method === "GET")    Object.assign(data, await $http.get(tmpUrl, requestHeaders));
+                if (method === "PUT")    Object.assign(data, await $http.put(tmpUrl, payload, requestHeaders));
+                if (method === "POST")   Object.assign(data, await $http.post(tmpUrl, payload, requestHeaders));
+                if (method === "DELETE") Object.assign(data, await $http.delete(tmpUrl));
+
+                if (!data) {
+                    throw new Error(`Error doing a request to ${tmpUrl}, method: ${method}.`);
+                }
+
+                if (data.error && data.error !== '0') {
+                    throw new Error(data.error);
+                } 
+
+                return $q.resolve(data);
+                        
+            } catch (error) {
+                return $q.reject(error);
             }
-
-            const defered = $q.defer();
-            
-            _request(method, path, payload)
-            .then(defered.resolve)
-            .catch(defered.reject);
-
-            return defered.promise;
         }
     };
 });
