@@ -83,29 +83,15 @@ export default (document, items, columns, keys, title, givenRows = false) => {
     document.content.push({
         fontSize:8,
         table: {
+            headerRows:1,
             widths,
             body: fullBody
         },
         layout: {
-            fillColor: function (i, node) {
-                return (i === 0) ? '#78C8DE' : null;
-            },
-            hLineColor: function (i, node) {
-                return '#78C8DE';
-            },
-            hLineWidth: function (i, node) {
-                return 1;
-            },
-            vLineWidth: function (i, node) {
-                return 0;
-            }
+            fillColor: i => i === 0 ? '#78C8DE' : null,
+            hLineColor: () => '#78C8DE',
+            hLineWidth: () => 1,
+            vLineWidth: () => 0
         }
     });
-
-    /*table: {
-        body: [
-            [{text:'Column 1',color:'white',border:[0,0,0,0]}, {text:'Column 1',color:'white',border:[0,0,0,0]}, {text:'Column 1',color:'white',border:[0,0,0,0]}],
-            [{text:'One value goes here',border:[0,1,0,1]}, {text:'One value goes here',border:[0,1,0,1]}, {text:'One value goes here',border:[0,1,0,1]}]
-        ]
-    }*/
 };
