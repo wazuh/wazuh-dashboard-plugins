@@ -15,6 +15,7 @@ export default {
     "1.4": {
         stack: [
             "Install personal firewall software or equivalent functionality on any portable computing devices (including company and/or employee-owned) that connect to the Internet when outside the network (for example, laptops used by employees), and which are also used to access the CDE. Firewall (or equivalent) configurations include:",
+            {text:'\n'},
             {
                 ul: [
                     "Specific configuration settings are defined.",
@@ -31,6 +32,7 @@ export default {
     "4.1": {
         stack: [
             "Use strong cryptography and security protocols (for example, SSL/TLS, IPSEC, SSH, etc.) to safeguard sensitive cardholder data during transmission over open, public networks, including the following:",
+            {text:'\n'},
             {
                 ul: [
                     "Only trusted keys and certificates are accepted.",
@@ -44,6 +46,7 @@ export default {
     "5.2": {
         stack: [
             "Ensure that all anti-virus mechanisms are maintained as follows:",
+            {text:'\n'},
             {
                 ul: [
                     "Are kept current.",
@@ -57,6 +60,7 @@ export default {
     "6.5":  {
         stack: [
             "Address common coding vulnerabilities in software development processes as follows:",
+            {text:'\n'},
             {
                 ul: [
                     "Train developers in secure coding techniques, including how to avoid common coding vulnerabilities, and understanding how sensitive data is handled in memory.",
@@ -74,6 +78,7 @@ export default {
     "6.6":     {
         stack: [
             "For public-facing web applications, address new threats and vulnerabilities on an ongoing basis and ensure these applications are protected against known attacks by either of the following methods:",
+            {text:'\n'},
             {
                 ul: [
                     "Reviewing public-facing web applications via manual or automated application vulnerability security assessment tools or methods, at least annually and after any changes",
@@ -88,6 +93,7 @@ export default {
     {
         stack: [
             "Manage IDs used by third parties to access, support, or maintain system components via remote access as follows:",
+            {text:'\n'},
             {
                 ul: [
                     "Enabled only during the time period needed and disabled when not in use.",
@@ -103,6 +109,7 @@ export default {
     "8.7": {
         stack: [
             "All access to any database containing cardholder data (including access by applications, administrators, and all other users) is restricted as follows:",
+            {text:'\n'},
             {
                 ul: [
                     "All user access to, user queries of, and user actions on databases are through programmatic methods.",
@@ -126,6 +133,7 @@ export default {
     "10.6.1": {
         stack: [
             "Review the following at least daily:",
+            {text:'\n'},
             {
                 ul: [
                     "All security events.",

@@ -56,6 +56,6 @@ export default {
     },
     syscollector: {
         title: 'Inventory',
-        description: 'Scan the system for the presence and version of all software packages, also it retrieves hardware information.'
+        description: 'Scan the system to retrieve OS, hardware and installed packages related information.'
     }
 }
