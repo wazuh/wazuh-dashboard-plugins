@@ -15,7 +15,7 @@ import $             from 'jquery';
 uiModules.get('app/wazuh', [])
 .service('reportingService', function ($rootScope, vis2png, rawVisualizations, visHandlers, genericReq, errorHandler) {
     return {
-        startVis2Png: async (tab,isAgents = false) => {
+        startVis2Png: async (tab, isAgents = false, syscollectorFilters = null) => {
             try {
                 if(vis2png.isWorking()){
                     errorHandler.handle('Report in progress', 'Reporting',true);
@@ -34,8 +34,8 @@ uiModules.get('app/wazuh', [])
                     vis2png.assignHTMLItem(item,tmpHTMLElement);
                 }
 
-                const appliedFilters = visHandlers.getAppliedFilters();
-
+                const appliedFilters = visHandlers.getAppliedFilters(syscollectorFilters);
+                
                 const array = await vis2png.checkArray(idArray);
                 const name  = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${Date.now() / 1000 | 0}.pdf`
 

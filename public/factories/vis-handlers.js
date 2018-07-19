@@ -25,9 +25,22 @@ app.factory('visHandlers', function() {
         return list;
     };
 
-    const getAppliedFilters = () => {
-        let appliedFilters = {};
+    const getAppliedFilters = syscollector => {
+        const appliedFilters = {};
 
+        if(syscollector){
+            Object.assign(appliedFilters, {
+                filters: syscollector,
+                time:{
+                    from: 'now-1d/d',
+                    to: 'now'
+                },
+                searchBar: false,
+                tables:[]
+            });
+            return appliedFilters;
+        }
+        
         // Check raw response from all rendered tables
         const tables = list.filter(item => item._scope &&
                                            item._scope.savedObj &&
@@ -65,11 +78,11 @@ app.factory('visHandlers', function() {
         if(list && list.length) {
             // Parse applied filters for the first visualization
             const filters = list[0]._scope.savedObj.vis.API.queryFilter.getFilters();
-
+     
             // Parse current time range
             const { from, to } = list[0]._scope.savedObj.vis.API.timeFilter.time;
 
-            appliedFilters = {
+            Object.assign(appliedFilters, {
                 filters,
                 time:{
                     from: dateMath.parse(from),
@@ -79,8 +92,9 @@ app.factory('visHandlers', function() {
                            list[0]._scope.appState.query.query :
                            false,
                 tables
-            };
+            });
         }
+
         return appliedFilters;
     };
 

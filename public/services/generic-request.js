@@ -25,7 +25,9 @@ app.service('genericReq', function ($q, $http, appState, wazuhConfig) {
                 const { timeout }    = wazuhConfig.getConfig();
                 const requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: timeout || 8000 };
                 const tmpUrl         = chrome.addBasePath(path);
-     
+              
+                requestHeaders.headers.pattern = appState.getCurrentPattern();
+              
                 try { 
                     requestHeaders.headers.id = JSON.parse(appState.getCurrentAPI()).id; 
                 } catch (error) { 

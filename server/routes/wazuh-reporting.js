@@ -12,7 +12,7 @@
 import { WazuhReportingCtrl } from '../controllers';
 
 export default (server, options) => {
-    const ctrl = new WazuhReportingCtrl();
+    const ctrl = new WazuhReportingCtrl(server);
 
     // Builds a PDF report from multiple PNG images
     server.route({ method: 'POST', path: '/api/wazuh-reporting/report', handler: (req,res) => ctrl.report(req,res)});
