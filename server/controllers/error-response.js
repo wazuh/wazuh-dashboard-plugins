@@ -31,7 +31,7 @@ export default (message = null, code = null, statusCode = null, reply) => {
         } else if(isString && message.includes('ECONNREFUSED') && code === 3005) {
             filteredMessage = 'Wrong port being used to connect to the Wazuh API';
         } else if(isString && message.toLowerCase().includes('not found') && code === 3002) {
-            filteredMessage = 'Wazuh API entry not found';
+            filteredMessage = 'It seems the selected API was deleted.';
         } else if(isString && message.includes('ENOENT') && message.toLowerCase().includes('no such file or directory') && message.toLowerCase().includes('data') && code === 5029 ) {
             filteredMessage = 'Reporting was aborted';
         }else if(isString && code === 5029 ) {
