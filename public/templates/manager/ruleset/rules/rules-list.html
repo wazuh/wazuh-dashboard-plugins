@@ -17,7 +17,7 @@
         </md-button>
     </div>
 
-    <md-chips class="wz-chips" readonly="true" ng-show="appliedFilters.length || implicitFilterFromDetail">
+    <md-chips class="wz-chips" readonly="true" ng-show="appliedFilters.length">
         <md-chip class="wz-chip" ng-show="includesFilter('file')">
             <span>File: {{getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
@@ -51,20 +51,13 @@
     </md-chips>
 
     <div layout="row">
-        <wazuh-table ng-if="implicitFilterFromDetail"
-            implicit-filter="implicitFilterFromDetail"
+        <wazuh-table 
+            implicit-filter="appliedFilters"
             flex
             path="'/rules'"
             keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
             allow-click="true"
             rows-per-page="14">
-        </wazuh-table>
-        <wazuh-table ng-if="!implicitFilterFromDetail"
-                flex
-                path="'/rules'"
-                keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
-                allow-click="true"
-                rows-per-page="14">
         </wazuh-table>
     </div>
 
