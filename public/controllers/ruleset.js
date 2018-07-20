@@ -23,52 +23,55 @@ const colors = [
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq, wzTableFilter) {
-    $scope.implicitFilterFromDetail = false;
+
     $scope.appliedFilters = [];
     $scope.search = term => {
         if(term && term.startsWith('group:') && term.split('group:')[1].trim()) {
             $scope.custom_search = ''
             const filter = {name:'group',value:term.split('group:')[1].trim()};
+            $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== 'group');
             $scope.appliedFilters.push(filter)
             $scope.$broadcast('wazuhFilter',{filter})
         } else if(term && term.startsWith('level:') && term.split('level:')[1].trim()) {
             $scope.custom_search = ''
             const filter = {name:'level',value:term.split('level:')[1].trim()};
+            $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== 'level');
             $scope.appliedFilters.push(filter)
             $scope.$broadcast('wazuhFilter',{filter})
         } else if(term && term.startsWith('pci:') && term.split('pci:')[1].trim()) {
             $scope.custom_search = ''
             const filter = {name:'pci',value:term.split('pci:')[1].trim()};
+            $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== 'pci');
             $scope.appliedFilters.push(filter)
             $scope.$broadcast('wazuhFilter',{filter})
         } else if(term && term.startsWith('gdpr:') && term.split('gdpr:')[1].trim()) {
             $scope.custom_search = ''
             const filter = {name:'gdpr',value:term.split('gdpr:')[1].trim()};
+            $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== 'gdpr');
             $scope.appliedFilters.push(filter)
             $scope.$broadcast('wazuhFilter',{filter})
         } else if(term && term.startsWith('file:') && term.split('file:')[1].trim()) {
             $scope.custom_search = ''
             const filter = {name:'file',value:term.split('file:')[1].trim()};
+            $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== 'file');
             $scope.appliedFilters.push(filter)
             $scope.$broadcast('wazuhFilter',{filter})
         } else {
-            $scope.$broadcast('wazuhSearch',{term,removeFilters: true})
+            $scope.$broadcast('wazuhSearch',{term,removeFilters: 0})
         }
     }
 
-    $scope.includesFilter = filterName => {
-        return $scope.appliedFilters.filter(item => item.name === filterName).length ||
-               $scope.implicitFilterFromDetail && $scope.implicitFilterFromDetail.name === filterName;
-    }
+    $scope.includesFilter = filterName => $scope.appliedFilters.map(item => item.name).includes(filterName);
+    
     $scope.getFilter      = filterName => {
         const filtered = $scope.appliedFilters.filter(item => item.name === filterName);
-        return filtered.length ? filtered[0].value :  $scope.implicitFilterFromDetail.value;
-    }
+        return filtered.length ? filtered[0].value :  '';
+    };
+
     $scope.removeFilter   = filterName => {
-        $scope.implicitFilterFromDetail = false;
         $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== filterName);
         return $scope.$broadcast('wazuhRemoveFilter',{filterName});
-    }
+    };
 
     $scope.setRulesTab = tab => $rootScope.globalRulesetTab = tab;
 
@@ -122,7 +125,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
      * This function takes back to the list but adding a filter from the detail view
      */
     $scope.addDetailFilter = (name, value) => {
-        $scope.implicitFilterFromDetail = {name,value}
+        $scope.appliedFilters.push({name,value});                        
         // Clear the autocomplete component
         $scope.searchTerm = '';
         // Go back to the list
@@ -139,7 +142,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
      * This function changes to the rules list view
      */
     $scope.closeDetailView = clear => {
-        if(clear) $scope.implicitFilterFromDetail = false;
+        if(clear) $scope.appliedFilters = $scope.appliedFilters.slice(0,$scope.appliedFilters.length-1);
         $scope.viewingDetail = false;
         $scope.currentRule = false;
         if(!$scope.$$phase) $scope.$digest();
@@ -150,7 +153,6 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq, wzTableFilter) {
     $scope.setRulesTab = tab => $rootScope.globalRulesetTab = tab;
 
-    $scope.implicitFilterFromDetail = false;
     $scope.appliedFilters = [];
 
     //Initialization
@@ -160,16 +162,14 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
     $scope.setRulesTab('decoders');
     $scope.isArray = angular.isArray;
 
-    $scope.includesFilter = filterName => {
-        return $scope.appliedFilters.filter(item => item.name === filterName).length ||
-               $scope.implicitFilterFromDetail && $scope.implicitFilterFromDetail.name === filterName;
-    }
+    $scope.includesFilter = filterName => $scope.appliedFilters.map(item => item.name).includes(filterName);
+    
     $scope.getFilter      = filterName => {
         const filtered = $scope.appliedFilters.filter(item => item.name === filterName);
-        return filtered.length ? filtered[0].value :  $scope.implicitFilterFromDetail.value;
+        return filtered.length ? filtered[0].value : '';
     }
+
     $scope.removeFilter   = filterName => {
-        $scope.implicitFilterFromDetail = false;
         $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== filterName);
         return $scope.$broadcast('wazuhRemoveFilter',{filterName});
     }
@@ -204,11 +204,13 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         if(term && term.startsWith('path:') && term.split('path:')[1].trim()) {
             $scope.custom_search = ''
             const filter = {name:'path',value:term.split('path:')[1].trim()};
+            $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== 'path');
             $scope.appliedFilters.push(filter)
             $scope.$broadcast('wazuhFilter',{filter})
         } else if(term && term.startsWith('file:') && term.split('file:')[1].trim()) {
             $scope.custom_search = ''
             const filter = {name:'file',value:term.split('file:')[1].trim()};
+            $scope.appliedFilters = $scope.appliedFilters.filter(item => item.name !== 'file');
             $scope.appliedFilters.push(filter)
             $scope.$broadcast('wazuhFilter',{filter})
         } else {
@@ -241,7 +243,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
      * This function takes back to the list but adding a filter from the detail view
      */
     $scope.addDetailFilter = (name, value) => {
-        $scope.implicitFilterFromDetail = {name,value}
+        $scope.appliedFilters.push({name,value})
         // Clear the autocomplete component
         $scope.searchTerm = '';
         // Go back to the list
@@ -258,7 +260,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
      * This function changes to the decoders list view
      */
     $scope.closeDetailView = clear => {
-        if(clear) $scope.implicitFilterFromDetail = false;
+        if(clear) $scope.appliedFilters = $scope.appliedFilters.slice(0,$scope.appliedFilters.length-1);
         $scope.viewingDetail = false;
         $scope.currentDecoder = false;
         if(!$scope.$$phase) $scope.$digest();
