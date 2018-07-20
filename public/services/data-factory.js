@@ -20,7 +20,7 @@ export default class DataFactory {
         this.sortValue = false;   
         this.sortDir   = false;     
         this.sortValue = false;
-        if(this.implicitFilter) this.filters.push(this.implicitFilter);
+        if(this.implicitFilter) this.filters.push(...this.implicitFilter);
     }
 
     addSorting(value) {
@@ -30,7 +30,7 @@ export default class DataFactory {
 
     removeFilters(){
         this.filters = [];
-        if(this.implicitFilter) this.filters.push(this.implicitFilter);
+        if(this.implicitFilter) this.filters.push(...this.implicitFilter);
     }
 
     serializeFilters(parameters) {
@@ -94,7 +94,7 @@ export default class DataFactory {
     reset() {
         this.items   = [];
         this.filters = [];
-        if(this.implicitFilter) this.filters.push(this.implicitFilter);
+        if(this.implicitFilter) this.filters.push(...this.implicitFilter);
         this.sortValue = false;   
         this.sortDir   = false;     
         this.sortValue = false;
