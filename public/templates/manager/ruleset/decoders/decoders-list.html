@@ -24,7 +24,7 @@
         </md-button>
     </div>
 
-    <md-chips class="wz-chips" readonly="true" ng-show="appliedFilters.length || implicitFilterFromDetail">
+    <md-chips class="wz-chips" readonly="true" ng-show="appliedFilters.length">
         <md-chip class="wz-chip" ng-if="includesFilter('file');">
             <span>File: {{getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
@@ -38,20 +38,13 @@
     </md-chips>
 
     <div layout="row">
-        <wazuh-table ng-if="implicitFilterFromDetail"
-            implicit-filter="implicitFilterFromDetail"
+        <wazuh-table
+            implicit-filter="appliedFilters"
             flex
             path="'/decoders'"
             keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
             allow-click="true"
             rows-per-page="14">
-        </wazuh-table>
-        <wazuh-table ng-if="!implicitFilterFromDetail"
-                flex
-                path="'/decoders'"
-                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
-                allow-click="true"
-                rows-per-page="14">
         </wazuh-table>
     </div>
 

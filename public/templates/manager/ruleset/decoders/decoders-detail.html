@@ -167,7 +167,7 @@
             <wazuh-table
                 flex 
                 path="'/decoders'" 
-                implicit-filter="{ name:'file',value: currentDecoder.file}"
+                implicit-filter="[{ name:'file',value: currentDecoder.file}]"
                 keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']" 
                 allow-click="true">
             </wazuh-table>
