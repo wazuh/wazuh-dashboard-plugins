@@ -36,5 +36,19 @@ export default {
     'details.order': 'Order',
     vendor: 'Vendor',
     type: 'Type',
-    architecture: 'Architecture'
-}
+    architecture: 'Architecture',
+    node_name: 'Node',
+    dateAdd: 'Registration date',
+    manager_host: 'Manager',
+    lastKeepAlive: 'Last keep alive',
+    os: 'OS',
+    path: 'Path',
+    details: 'Details',
+    position: 'Position',
+    configSum: 'Group MD5',
+    mergedSum: 'MD5 agent.conf',
+    key: 'Key',
+    scan_id: 'Scan ID',
+    format: 'Format',
+    scan_time: 'Scan date'
+};
