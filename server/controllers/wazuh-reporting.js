@@ -412,7 +412,7 @@ export default class WazuhReportingCtrl {
 
                 this.dd.content.push({ text: 'Summary', style: 'h2' });
                 this.dd.content.push('\n');
-                const ulcustom = [`${critical + high + medium + low} of ${totalAgents} agents have vulnerabilities.`];
+                const ulcustom = [];
                 if (critical) ulcustom.push(`${critical} of ${totalAgents} agents have critical vulnerabilities.`);
                 if (high) ulcustom.push(`${high} of ${totalAgents} agents have high vulnerabilities.`);
                 if (medium) ulcustom.push(`${medium} of ${totalAgents} agents have medium vulnerabilities.`);
@@ -428,28 +428,28 @@ export default class WazuhReportingCtrl {
                 const highRank = await this.vulnerabilityRequest.topAgentCount(from, to, 'High', filters, pattern);
                 const criticalRank = await this.vulnerabilityRequest.topAgentCount(from, to, 'Critical', filters, pattern);
 
-                if (criticalRank.length) {
+                if (criticalRank && criticalRank.length) {
                     this.dd.content.push({ text: 'Top 3 agents with critical severity vulnerabilities', style: 'h3' });
                     this.dd.content.push('\n');
                     await this.buildAgentsTable(criticalRank, apiId);
                     this.dd.content.push('\n');
                 }
 
-                if (highRank.length) {
+                if (highRank && highRank.length) {
                     this.dd.content.push({ text: 'Top 3 agents with high severity vulnerabilities', style: 'h3' });
                     this.dd.content.push('\n');
                     await this.buildAgentsTable(highRank, apiId);
                     this.dd.content.push('\n');
                 }
 
-                if (mediumRank.length) {
+                if (mediumRank && mediumRank.length) {
                     this.dd.content.push({ text: 'Top 3 agents with medium severity vulnerabilities', style: 'h3' });
                     this.dd.content.push('\n');
                     await this.buildAgentsTable(mediumRank, apiId);
                     this.dd.content.push('\n');
                 }
 
-                if (lowRank.length) {
+                if (lowRank && lowRank.length) {
                     this.dd.content.push({ text: 'Top 3 agents with low severity vulnerabilities', style: 'h3' });
                     this.dd.content.push('\n');
                     await this.buildAgentsTable(lowRank, apiId);
@@ -457,10 +457,10 @@ export default class WazuhReportingCtrl {
                 }
 
                 const cveRank = await this.vulnerabilityRequest.topCVECount(from, to, filters, pattern);
-                if (cveRank.length) {
+                if (cveRank && cveRank.length) {
                     this.dd.content.push({ text: 'Top 3 CVE', style: 'h2' });
                     this.dd.content.push('\n');
-                    this.dd.content.push({ ol: cveRank });
+                    PdfTable(this.dd, cveRank.map(item => { return {top: cveRank.indexOf(item) + 1, name: item}; }),['Top','CVE'],['top','name']);
                     this.dd.content.push('\n');
                 }
             }
@@ -475,12 +475,12 @@ export default class WazuhReportingCtrl {
 
             if (section === 'overview' && tab === 'pm') {
                 const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(from, to, filters, pattern);
-                if (top5RootkitsRank.length) {
+                if (top5RootkitsRank && top5RootkitsRank.length) {
                     this.dd.content.push({ text: 'Most common rootkits found among your agents', style: 'h2' });
                     this.dd.content.push('\n');
                     this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.', style: 'standard' });
                     this.dd.content.push('\n');
-                    this.dd.content.push({ ol: top5RootkitsRank });
+                    PdfTable(this.dd, top5RootkitsRank.map(item => { return {top: top5RootkitsRank.indexOf(item) + 1, name: item}; }),['Top','Rootkit'],['top','name']);
                     this.dd.content.push('\n');
                 }
 
@@ -633,7 +633,7 @@ export default class WazuhReportingCtrl {
                     this.dd.content.push('\n');
                     this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.', style: 'standard' });
                     this.dd.content.push('\n');
-                    this.dd.content.push({ ol: top5RootkitsRank });
+                    PdfTable(this.dd, top5RootkitsRank.map(item => { return {top: top5RootkitsRank.indexOf(item) + 1, name: item}; }),['Top','Rootkit'],['top','name']);
                     this.dd.content.push('\n');
                 }
 
