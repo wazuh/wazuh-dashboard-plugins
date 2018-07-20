@@ -238,7 +238,404 @@ export default class WazuhReportingCtrl {
             this.dd.content.push('\n');
         }
     }
-    
+
+    async buildAgentsTable(ids, apiId) {
+        if (!ids || !ids.length) return;
+        try {
+            const rows = [];
+            for (const item of ids) {
+                let data = false;
+                try {
+                    const agent = await this.apiRequest.makeGenericRequest('GET', `/agents/${item}`, {}, apiId);
+                    if (agent && agent.data) {
+                        data = {};
+                        Object.assign(data, agent.data);
+                    }
+                } catch (error) {
+                    continue;
+                }
+                const str = Array(6).fill('---');
+                str[0] = item;
+                if (data && data.name) str[1] = data.name;
+                if (data && data.ip) str[2] = data.ip;
+                if (data && data.version) str[3] = data.version;
+                if (data && data.manager_host) str[4] = data.manager_host;
+                if (data && data.os && data.os.name && data.os.version) str[5] = `${data.os.name} ${data.os.version}`;
+                rows.push(str);
+            }
+
+            PdfTable(this.dd, rows, ['ID', 'Name', 'IP', 'Version', 'Manager', 'OS'], null, null, true);
+
+            this.dd.content.push('\n');
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async extendedInformation(section, tab, apiId, from, to, filters, pattern = 'wazuh-alerts-3.x-*', agent = null) {
+        try {
+            if (section === 'agents' && !agent) {
+                throw new Error('Reporting for specific agent needs an agent ID in order to work properly');
+            }
+
+            const agents = await this.apiRequest.makeGenericRequest('GET', '/agents', { limit: 1 }, apiId);
+            const totalAgents = agents.data.totalItems;
+
+            if (section === 'overview' && tab === 'vuls') {
+                const low = await this.vulnerabilityRequest.uniqueSeverityCount(from, to, 'Low', filters, pattern);
+                const medium = await this.vulnerabilityRequest.uniqueSeverityCount(from, to, 'Medium', filters, pattern);
+                const high = await this.vulnerabilityRequest.uniqueSeverityCount(from, to, 'High', filters, pattern);
+                const critical = await this.vulnerabilityRequest.uniqueSeverityCount(from, to, 'Critical', filters, pattern);
+
+                this.dd.content.push({ text: 'Summary', style: 'h2' });
+                this.dd.content.push('\n');
+                const ulcustom = [];
+                if (critical) ulcustom.push(`${critical} of ${totalAgents} agents have critical vulnerabilities.`);
+                if (high) ulcustom.push(`${high} of ${totalAgents} agents have high vulnerabilities.`);
+                if (medium) ulcustom.push(`${medium} of ${totalAgents} agents have medium vulnerabilities.`);
+                if (low) ulcustom.push(`${low} of ${totalAgents} agents have low vulnerabilities.`);
+
+                this.dd.content.push({
+                    ul: ulcustom
+                });
+                this.dd.content.push('\n');
+
+                const lowRank = await this.vulnerabilityRequest.topAgentCount(from, to, 'Low', filters, pattern);
+                const mediumRank = await this.vulnerabilityRequest.topAgentCount(from, to, 'Medium', filters, pattern);
+                const highRank = await this.vulnerabilityRequest.topAgentCount(from, to, 'High', filters, pattern);
+                const criticalRank = await this.vulnerabilityRequest.topAgentCount(from, to, 'Critical', filters, pattern);
+
+                if (criticalRank && criticalRank.length) {
+                    this.dd.content.push({ text: 'Top 3 agents with critical severity vulnerabilities', style: 'h3' });
+                    this.dd.content.push('\n');
+                    await this.buildAgentsTable(criticalRank, apiId);
+                    this.dd.content.push('\n');
+                }
+
+                if (highRank && highRank.length) {
+                    this.dd.content.push({ text: 'Top 3 agents with high severity vulnerabilities', style: 'h3' });
+                    this.dd.content.push('\n');
+                    await this.buildAgentsTable(highRank, apiId);
+                    this.dd.content.push('\n');
+                }
+
+                if (mediumRank && mediumRank.length) {
+                    this.dd.content.push({ text: 'Top 3 agents with medium severity vulnerabilities', style: 'h3' });
+                    this.dd.content.push('\n');
+                    await this.buildAgentsTable(mediumRank, apiId);
+                    this.dd.content.push('\n');
+                }
+
+                if (lowRank && lowRank.length) {
+                    this.dd.content.push({ text: 'Top 3 agents with low severity vulnerabilities', style: 'h3' });
+                    this.dd.content.push('\n');
+                    await this.buildAgentsTable(lowRank, apiId);
+                    this.dd.content.push('\n');
+                }
+
+                const cveRank = await this.vulnerabilityRequest.topCVECount(from, to, filters, pattern);
+                if (cveRank && cveRank.length) {
+                    this.dd.content.push({ text: 'Top 3 CVE', style: 'h2' });
+                    this.dd.content.push('\n');
+                    PdfTable(this.dd, cveRank.map(item => { return {top: cveRank.indexOf(item) + 1, name: item}; }),['Top','CVE'],['top','name']);
+                    this.dd.content.push('\n');
+                }
+            }
+
+            if (section === 'overview' && tab === 'general') {
+                const level15Rank = await this.overviewRequest.topLevel15(from, to, filters, pattern);
+                if (level15Rank.length) {
+                    this.dd.content.push({ text: 'Top 3 agents with level 15 alerts', style: 'h2' });
+                    await this.buildAgentsTable(level15Rank, apiId);
+                }
+            }
+
+            if (section === 'overview' && tab === 'pm') {
+                const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(from, to, filters, pattern);
+                if (top5RootkitsRank && top5RootkitsRank.length) {
+                    this.dd.content.push({ text: 'Most common rootkits found among your agents', style: 'h2' });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.', style: 'standard' });
+                    this.dd.content.push('\n');
+                    PdfTable(this.dd, top5RootkitsRank.map(item => { return {top: top5RootkitsRank.indexOf(item) + 1, name: item}; }),['Top','Rootkit'],['top','name']);
+                    this.dd.content.push('\n');
+                }
+
+                const hiddenPids = await this.rootcheckRequest.agentsWithHiddenPids(from, to, filters, pattern);
+                hiddenPids && this.dd.content.push({ text: `${hiddenPids} of ${totalAgents} agents have hidden processes`, style: 'h3' });
+                !hiddenPids && this.dd.content.push({ text: `No agents have hidden processes`, style: 'h3' });
+                this.dd.content.push('\n');
+
+                const hiddenPorts = await this.rootcheckRequest.agentsWithHiddenPorts(from, to, filters, pattern);
+                hiddenPorts && this.dd.content.push({ text: `${hiddenPorts} of ${totalAgents} agents have hidden ports`, style: 'h3' });
+                !hiddenPorts && this.dd.content.push({ text: `No agents have hidden ports`, style: 'h3' });
+                this.dd.content.push('\n');
+            }
+
+            if (['overview', 'agents'].includes(section) && tab === 'pci') {
+                const topPciRequirements = await this.pciRequest.topPCIRequirements(from, to, filters, pattern);
+                this.dd.content.push({ text: 'Most common PCI DSS requirements alerts found', style: 'h2' });
+                this.dd.content.push('\n');
+                for (const item of topPciRequirements) {
+                    const rules = await this.pciRequest.getRulesByRequirement(from, to, filters, item, pattern);
+                    this.dd.content.push({ text: `Requirement ${item}`, style: 'h3' });
+                    this.dd.content.push('\n');
+
+                    if (PCI[item]) {
+                        const content = typeof PCI[item] === 'string' ?
+                            { text: PCI[item], style: 'standard' } :
+                            PCI[item];
+                        this.dd.content.push(content);
+                        this.dd.content.push('\n');
+                    }
+
+                    rules && rules.length && PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], `Top rules for ${item} requirement`);
+                    this.dd.content.push('\n');
+                }
+            }
+
+            if (['overview', 'agents'].includes(section) && tab === 'gdpr') {
+                const topGdprRequirements = await this.gdprRequest.topGDPRRequirements(from, to, filters, pattern);
+                this.dd.content.push({ text: 'Most common GDPR requirements alerts found', style: 'h2' });
+                this.dd.content.push('\n');
+                for (const item of topGdprRequirements) {
+                    const rules = await this.gdprRequest.getRulesByRequirement(from, to, filters, item, pattern);
+                    this.dd.content.push({ text: `Requirement ${item}`, style: 'h3' });
+                    this.dd.content.push('\n');
+
+                    if (GDPR && GDPR[item]) {
+                        const content = typeof GDPR[item] === 'string' ?
+                            { text: GDPR[item], style: 'standard' } :
+                            GDPR[item];
+                        this.dd.content.push(content);
+                        this.dd.content.push('\n');
+                    }
+
+                    rules && rules.length && PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], `Top rules for ${item} requirement`);
+                    this.dd.content.push('\n');
+                }
+                this.dd.content.push('\n');
+            }
+
+            if (section === 'overview' && tab === 'audit') {
+                const auditAgentsNonSuccess = await this.auditRequest.getTop3AgentsSudoNonSuccessful(from, to, filters, pattern);
+                if (auditAgentsNonSuccess && auditAgentsNonSuccess.length) {
+                    this.dd.content.push({ text: 'Agents with high number of failed sudo commands', style: 'h2' });
+                    await this.buildAgentsTable(auditAgentsNonSuccess, apiId);
+                }
+                const auditAgentsFailedSyscall = await this.auditRequest.getTop3AgentsFailedSyscalls(from, to, filters, pattern);
+                if (auditAgentsFailedSyscall && auditAgentsFailedSyscall.length) {
+                    this.dd.content.push({ text: 'Most common failing syscalls', style: 'h2' });
+                    this.dd.content.push('\n');
+                    PdfTable(this.dd, auditAgentsFailedSyscall, ['Agent ID', 'Syscall ID', 'Syscall'], ['agent', 'syscall.id', 'syscall.syscall'], null, false);
+                    this.dd.content.push('\n');
+                }
+            }
+
+            if (section === 'overview' && tab === 'fim') {
+                const rules = await this.syscheckRequest.top3Rules(from, to, filters, pattern);
+
+                if (rules && rules.length) {
+                    this.dd.content.push({ text: 'Top 3 FIM rules', style: 'h2' });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({
+                        text: 'Top 3 rules that are generating most alerts.',
+                        style: 'standard'
+                    });
+                    this.dd.content.push('\n');
+                    PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription'], null);
+                    this.dd.content.push('\n');
+                }
+
+                const agents = await this.syscheckRequest.top3agents(from, to, filters, pattern);
+
+                if (agents && agents.length) {
+                    this.dd.content.push({ text: 'Agents with suspicious FIM activity', style: 'h2' });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({
+                        text: 'Top 3 agents that have most FIM alerts from level 7 to level 15. Take care about them.',
+                        style: 'standard'
+                    });
+                    this.dd.content.push('\n');
+                    await this.buildAgentsTable(agents, apiId);
+                }
+            }
+
+            if (section === 'agents' && tab === 'pm') {
+                const database = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}`, { limit: 15 }, apiId);
+                const cis = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}/cis`, {}, apiId);
+                const pci = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}/pci`, {}, apiId);
+                const lastScan = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}/last_scan`, {}, apiId);
+
+                if (lastScan && lastScan.data) {
+                    if (lastScan.data.start && lastScan.data.end) {
+                        this.dd.content.push({ text: `Last policy monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`, style: 'standard' });
+                    } else if (lastScan.data.start) {
+                        this.dd.content.push({ text: `Policy monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`, style: 'standard' });
+                    } else {
+                        this.dd.content.push({ text: `Policy monitoring scan is currently in progress for this agent.`, style: 'standard' });
+                    }
+                    this.dd.content.push('\n');
+                }
+
+                if (database && database.data && database.data.items) {
+                    PdfTable(this.dd, database.data.items, ['Date', 'Status', 'Event'], ['readDay', 'status', 'event'], 'Last entries from policy monitoring scan');
+                    this.dd.content.push('\n');
+                }
+
+                if (pci && pci.data && pci.data.items) {
+                    this.dd.content.push({ text: 'Fired rules due to PCI requirements', style: 'h2', pageBreak: 'before' });
+                    this.dd.content.push('\n');
+                    for (const item of pci.data.items) {
+                        const rules = await this.pciRequest.getRulesByRequirement(from, to, filters, item, pattern);
+                        this.dd.content.push({ text: `Requirement ${item}`, style: 'h3' });
+                        this.dd.content.push('\n');
+
+                        if (PCI[item]) {
+                            const content = typeof PCI[item] === 'string' ?
+                                { text: PCI[item], style: 'standard' } :
+                                PCI[item];
+                            this.dd.content.push(content);
+                            this.dd.content.push('\n');
+                        }
+
+                        PdfTable(this.dd, rules, ['Rule ID', 'Description'], ['ruleId', 'ruleDescription']);
+                        this.dd.content.push('\n');
+                    }
+                }
+
+                const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(from, to, filters, pattern, 10);
+                if (top5RootkitsRank && top5RootkitsRank.length) {
+                    this.dd.content.push({ text: 'Rootkits files found', style: 'h2' });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'Rootkits are a set of software tools that enable an unauthorized user to gain control of a computer system without being detected.', style: 'standard' });
+                    this.dd.content.push('\n');
+                    PdfTable(this.dd, top5RootkitsRank.map(item => { return {top: top5RootkitsRank.indexOf(item) + 1, name: item}; }),['Top','Rootkit'],['top','name']);
+                    this.dd.content.push('\n');
+                }
+
+            }
+
+            if (section === 'agents' && tab === 'audit') {
+                const auditFailedSyscall = await this.auditRequest.getTopFailedSyscalls(from, to, filters, pattern);
+                auditFailedSyscall && auditFailedSyscall.length && PdfTable(this.dd, auditFailedSyscall, ['Syscall ID', 'Syscall'], ['id', 'syscall'], 'Most common failing syscalls');
+                this.dd.content.push('\n');
+            }
+
+            if (section === 'agents' && tab === 'fim') {
+                const lastScan = await this.apiRequest.makeGenericRequest('GET', `/syscheck/${agent}/last_scan`, {}, apiId);
+
+                if (lastScan && lastScan.data) {
+                    if (lastScan.data.start && lastScan.data.end) {
+                        this.dd.content.push({ text: `Last file integrity monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.` });
+                    } else if (lastScan.data.start) {
+                        this.dd.content.push({ text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).` });
+                    } else {
+                        this.dd.content.push({ text: `File integrity monitoring scan is currently in progress for this agent.` });
+                    }
+                    this.dd.content.push('\n');
+                }
+
+                const lastTenDeleted = await this.syscheckRequest.lastTenDeletedFiles(from, to, filters, pattern);
+                lastTenDeleted && lastTenDeleted.length && PdfTable(this.dd, lastTenDeleted, ['Path', 'Date'], ['path', 'date'], 'Last 10 deleted files');
+                this.dd.content.push('\n');
+
+                const lastTenModified = await this.syscheckRequest.lastTenModifiedFiles(from, to, filters, pattern);
+                lastTenModified && lastTenModified.length && PdfTable(this.dd, lastTenModified, ['Path', 'Date'], ['path', 'date'], 'Last 10 modified files');
+                this.dd.content.push('\n');
+            }
+
+            if (section === 'agents' && tab === 'syscollector') {
+
+                const hardware = await this.apiRequest.makeGenericRequest('GET', `/syscollector/${agent}/hardware`, {}, apiId);
+
+                if (hardware && hardware.data) {
+                    this.dd.content.push({ text: 'Hardware information', style: 'h2' });
+                    this.dd.content.push('\n');
+                    const ulcustom = [];
+                    if (hardware.data.cpu && hardware.data.cpu.cores) ulcustom.push(hardware.data.cpu.cores + ' cores ');
+                    if (hardware.data.cpu && hardware.data.cpu.name) ulcustom.push(hardware.data.cpu.name);
+                    if (hardware.data.ram && hardware.data.ram.total) ulcustom.push(Math.round(((hardware.data.ram.total / 1024) / 1024), 2) + 'GB RAM');
+                    ulcustom && ulcustom.length && this.dd.content.push({
+                        ul: ulcustom
+                    });
+                    this.dd.content.push('\n');
+                }
+
+                const os = await this.apiRequest.makeGenericRequest('GET', `/syscollector/${agent}/os`, {}, apiId);
+
+                if (os && os.data) {
+                    this.dd.content.push({ text: 'OS information', style: 'h2' });
+                    this.dd.content.push('\n');
+                    const ulcustom = [];
+                    if (os.data.sysname) ulcustom.push(os.data.sysname);
+                    if (os.data.version) ulcustom.push(os.data.version);
+                    if (os.data.architecture) ulcustom.push(os.data.architecture);
+                    if (os.data.release) ulcustom.push(os.data.release);
+                    if (os.data.os && os.data.os.name && os.data.os.version) ulcustom.push(os.data.os.name + ' ' + os.data.os.version);
+                    ulcustom && ulcustom.length && this.dd.content.push({
+                        ul: ulcustom
+                    });
+                    this.dd.content.push('\n');
+                }
+
+                const topCriticalPackages = await this.vulnerabilityRequest.topPackages(from, to, 'Critical', filters, pattern);
+                const topHighPackages = await this.vulnerabilityRequest.topPackages(from, to, 'High', filters, pattern);
+
+                const affected = [];
+                affected.push(...topCriticalPackages, ...topHighPackages);
+                if (affected && affected.length) {
+                    this.dd.content.push({ text: 'Vulnerable packages found (last 24 hours)', style: 'h2' });
+                    this.dd.content.push('\n');
+                    PdfTable(this.dd, affected, ['Package', 'Severity'], ['package', 'severity'], null);
+                    this.dd.content.push('\n');
+                }
+            }
+
+
+            if (section === 'agents' && tab === 'vuls') {
+                const topCriticalPackages = await this.vulnerabilityRequest.topPackagesWithCVE(from, to, 'Critical', filters, pattern);
+                if (topCriticalPackages && topCriticalPackages.length) {
+                    this.dd.content.push({ text: 'Critical severity', style: 'h2' });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'These vulnerabilties are critical, please review your agent. Click on each link to read more about each found vulnerability.', style: 'standard' });
+                    this.dd.content.push('\n');
+                    const customul = [];
+                    for (const critical of topCriticalPackages) {
+                        customul.push({ text: critical.package, style: 'standard' });
+                        customul.push({
+                            ul: critical.references.map(item => { return { text: item, color: '#1EA5C8' }; })
+                        });
+                    }
+                    this.dd.content.push({ ul: customul })
+                    this.dd.content.push('\n');
+                }
+
+                const topHighPackages = await this.vulnerabilityRequest.topPackagesWithCVE(from, to, 'High', filters, pattern);
+                if (topHighPackages && topHighPackages.length) {
+                    this.dd.content.push({ text: 'High severity', style: 'h2' });
+                    this.dd.content.push('\n');
+                    this.dd.content.push({ text: 'Click on each link to read more about each found vulnerability.', style: 'standard' });
+                    this.dd.content.push('\n');
+                    const customul = [];
+                    for (const critical of topHighPackages) {
+                        customul.push({ text: critical.package, style: 'standard' });
+                        customul.push({
+                            ul: critical.references.map(item => { return { text: item, color: '#1EA5C8' }; })
+                        });
+                    }
+                    customul && customul.length && this.dd.content.push({ ul: customul });
+                    this.dd.content.push('\n');
+                }
+
+            }
+
+            return false;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
     async report(req, reply) {
         try {
             // Init
