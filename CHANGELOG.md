@@ -7,11 +7,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Added a new Angular.js factory to store the Wazuh app configuration values. Also this factory is being used by the pre-routes functions (resolves), this way we are sure about having the real configuration at any time. These pre-routes functions have been improved too. ([#670](https://github.com/wazuh/wazuh-kibana-app/pull/670))
+- Added extended information for reports from reporting feature ([#701](https://github.com/wazuh/wazuh-kibana-app/pull/701))
   
-
 ### Changed
 
 - Tables have been improved. Now they are truncating long fields and adding a tooltip if needed ([#671](https://github.com/wazuh/wazuh-kibana-app/pull/671))
+- Services have been improved ([#715](https://github.com/wazuh/wazuh-kibana-app/pull/715))
+- CSV formatted files have been improved. Now they are showing a more human readable column names ([#717](https://github.com/wazuh/wazuh-kibana-app/pull/717), [#726](https://github.com/wazuh/wazuh-kibana-app/pull/726)).
+- Added/Modified some visualization titles ([#728](https://github.com/wazuh/wazuh-kibana-app/pull/728))
+- Improved Discover perfomance when in background mode ([#719](https://github.com/wazuh/wazuh-kibana-app/pull/719))
+- Reports from reporting feature have suffered a fully redesign ([#701](https://github.com/wazuh/wazuh-kibana-app/pull/701))
 
 ### Fixed
 
@@ -20,6 +25,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a regular expression in the server side when parsing URLs before registering a new Wazuh API ([#690](https://github.com/wazuh/wazuh-kibana-app/pull/690))
 - Fixed filters from specific visualization regarding to FIM section ([#694](https://github.com/wazuh/wazuh-kibana-app/pull/694))
 - Fixed filters parsing when generating a report. It was not parsing negated filters as expected ([#696](https://github.com/wazuh/wazuh-kibana-app/pull/696))
+- Fixed visualization counter from OSCAP tab ([#722](https://github.com/wazuh/wazuh-kibana-app/pull/722))
+
+# Removed
+
+- Temporary removed CSV download from agent inventory section due to Wazuh API bug ([#727](https://github.com/wazuh/wazuh-kibana-app/pull/727))
 
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.0 - Revision 398
 
