@@ -46,41 +46,25 @@ export default class WazuhElastic {
 
     async getTemplate(req, reply) {
         try {
-            const data = await this.wzWrapper.getTemplates();
-
-            if (req.params.pattern == "wazuh-alerts-3.x-*" && data.includes("wazuh-alerts-3.*")) {
-                return reply({
-                    statusCode: 200,
-                    status    : true,
-                    data      : `Template found for ${req.params.pattern}`
-                });
-            } else {
-
-                const lastChar = req.params.pattern[req.params.pattern.length -1];
-                const array    = data.match(/[^\s]+/g);
-
-                let pattern = req.params.pattern;
-                if (lastChar === '*') { // Remove last character if it is a '*'
-                    pattern = pattern.slice(0, -1);
-                }
-
-                for (let i = 1; i < array.length; i++) {
-                    if (array[i].includes(pattern) && array[i-1] == `wazuh`) {
-                        return reply({
-                            statusCode: 200,
-                            status    : true,
-                            data      : `Template found for ${req.params.pattern}`
-                        });
-                    }
-                }
-
-                return reply({
-                    statusCode: 200,
-                    status    : false,
-                    data      : `No template found for ${req.params.pattern}`
-                });
+            if(!req.params || !req.params.pattern) {
+                throw new Error('An index pattern is needed for checking the Elasticsearch template existance');
             }
 
+            const data = await this.wzWrapper.getTemplates();
+            
+            if(!data || typeof data !== 'string') {
+                throw new Error('An unknown error occurred when fetching templates from Elasticseach');
+            }
+
+            const lastChar   = req.params.pattern[req.params.pattern.length -1];
+            const array      = data.match(/[^\s]+/g).filter(item => item.includes('[') && item.includes(']'));
+            const pattern    = lastChar === '*' ? req.params.pattern.slice(0, -1) : req.params.pattern;
+            const isIncluded = array.filter(item => item.includes(pattern));
+
+            return isIncluded && Array.isArray(isIncluded) && isIncluded.length ? 
+                    reply({ statusCode: 200, status: true, data: `Template found for ${req.params.pattern}` }) :
+                    reply({ statusCode: 200, status: false, data: `No template found for ${req.params.pattern}` });
+            
         } catch (error){
             return ErrorResponse(`Could not retrieve templates from Elasticsearch due to ${error.message || error}`, 4002, 500, reply);
         }
