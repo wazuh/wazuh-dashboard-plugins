@@ -19,8 +19,10 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
     $scope.search = term => {
         $scope.$broadcast('wazuhSearch',{term})
     }
-    const clusterEnabled = appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled';
+
+    const clusterEnabled = appState.getClusterInfo() && appState.getClusterInfo().status  === 'enabled';
     $scope.isClusterEnabled = clusterEnabled;
+    $scope.isClusterRunning = true;
     $location.search('tabView','cluster-monitoring');
     $location.search('tab','monitoring')
     $location.search('_a',null)
@@ -156,8 +158,15 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             rawVisualizations.removeAll();
             loadedVisualizations.removeAll();
 
+
+            const status = await apiReq.request('GET','/cluster/status',{});
+            $scope.status = status.data.data.running;
+            if($scope.status === 'no') {
+                $scope.isClusterRunning = false;
+                throw new Error('Cluster is not running');
+            }
+
             const data = await Promise.all([
-                apiReq.request('GET','/cluster/status',{}),
                 apiReq.request('GET','/cluster/nodes',{}),
                 apiReq.request('GET','/cluster/config',{}),
                 apiReq.request('GET','/version',{}),
@@ -165,25 +174,22 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
                 apiReq.request('GET','/cluster/healthcheck',{})
             ]);
 
-            const status = data[0]
-            $scope.status = status.data.data.running;
-            
-            const nodesCount = data[1].data.data.totalItems
+            const nodesCount = data[0].data.data.totalItems;
             $scope.nodesCount = nodesCount;
 
-            const configuration = data[2]
+            const configuration = data[1];
             $scope.configuration = configuration.data.data;
             
-            const version = data[3]
+            const version = data[2];
             $scope.version = version.data.data;
 
-            const agents = data[4]
+            const agents = data[3];
             $scope.agentsCount = agents.data.data.totalItems - 1;
 
-            const health = data[5];
+            const health = data[4];
             $scope.healthCheck = health.data.data;
 
-            const nodes = data[1].data.data;
+            const nodes = data[0].data.data;
 
             nodes.name        = $scope.configuration.name;
             nodes.master_node = $scope.configuration.node_name;
@@ -198,7 +204,8 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch(error) {
-            errorHandler.handle(error,'Cluster')
+            $scope.loading = false;
+            errorHandler.handle(error,'Cluster');
         }
     }
 
