@@ -116,7 +116,11 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 }
             })
             .catch(error => {
-                const apiNotFound = error && error.data && error.data.code && error.data.code === 3002;
+
+                const apiNotFound = error && error.data && error.data.code && error.data.code === 3002 && 
+                                    typeof error.data.message === 'string' && 
+                                    !error.data.message.includes("Invalid 'wazuh-app-version' header");
+
                 appState.removeCurrentAPI();
                 if(!apiNotFound) {
                     errorHandler.handle(error,'Routes');
