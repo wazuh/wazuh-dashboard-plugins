@@ -20,7 +20,7 @@ export default [
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector\",\"language\":\"lucene\"}}"
+				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
 			}
 		}
 	},
@@ -34,7 +34,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     },
@@ -48,7 +48,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     },
@@ -62,7 +62,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector AND data.vulnerability.severity: Critical\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.vulnerability.severity",
+                              "value": "Critical",
+                              "params": {
+                                "query": "Critical",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.vulnerability.severity": {
+                                  "query": "Critical",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -76,7 +107,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector AND data.vulnerability.severity: High\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.vulnerability.severity",
+                              "value": "High",
+                              "params": {
+                                "query": "High",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.vulnerability.severity": {
+                                  "query": "High",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -90,7 +152,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector AND data.vulnerability.severity: Medium\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.vulnerability.severity",
+                              "value": "Medium",
+                              "params": {
+                                "query": "Medium",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.vulnerability.severity": {
+                                  "query": "Medium",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -104,7 +197,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector AND data.vulnerability.severity: Low\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.vulnerability.severity",
+                              "value": "Low",
+                              "params": {
+                                "query": "Low",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.vulnerability.severity": {
+                                  "query": "Low",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -118,7 +242,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: vulnerability-detector\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     }
