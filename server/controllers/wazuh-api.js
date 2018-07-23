@@ -116,6 +116,10 @@ export default class WazuhApi {
                 }
 
             } else {
+                if(response && response.body && response.body.error && response.body.message){
+                    throw new Error(response.body.message)
+                }
+                
                 throw new Error(`${wapi_config.url}:${wapi_config.port}/version is unreachable`)
             }
         } catch(error){
