@@ -257,7 +257,7 @@ export default class WazuhElastic {
             const visArray = [];
             let aux_source, bulk_content;
             for (let element of app_objects) {
-            	// Stringify and replace index-pattern for visualizations
+                // Stringify and replace index-pattern for visualizations
                 aux_source = JSON.stringify(element._source);
                 aux_source = aux_source.replace("wazuh-alerts", id);
                 aux_source = JSON.parse(aux_source);
@@ -293,7 +293,7 @@ export default class WazuhElastic {
             let aux_source, bulk_content;
 
             for (const element of app_objects) {
-            	// Stringify and replace index-pattern for visualizations
+                // Stringify and replace index-pattern for visualizations
                 aux_source = JSON.stringify(element._source);
                 aux_source = aux_source.replace("wazuh-alerts", id);
                 aux_source = JSON.parse(aux_source);
@@ -375,11 +375,6 @@ export default class WazuhElastic {
             ) {
                 throw new Error('Missing parameters creating visualizations');
             }
-
-            const tabPrefix = 'cluster';
-
-            const tabSplit = req.params.tab.split('-');
-            const tabSufix = tabSplit[1];
 
             const file        = ClusterVisualizations['monitoring'];
             const nodes       = req.payload.nodes.items;
