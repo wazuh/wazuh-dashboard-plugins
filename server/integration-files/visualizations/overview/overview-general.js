@@ -45,13 +45,41 @@ export default [
 		"_source": {
 			"title": "Level 12 alerts",
 			"visState":
-				"{\"title\":\"Count Level 12 Alerts\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"gauge\",\"gauge\":{\"verticalSplit\":false,\"autoExtend\":false,\"percentageMode\":false,\"gaugeType\":\"Metric\",\"gaugeStyle\":\"Full\",\"backStyle\":\"Full\",\"orientation\":\"vertical\",\"colorSchema\":\"Green to Red\",\"gaugeColorMode\":\"None\",\"useRange\":false,\"colorsRange\":[{\"from\":0,\"to\":100}],\"invertColors\":false,\"labels\":{\"show\":true,\"color\":\"black\"},\"scale\":{\"show\":false,\"labels\":false,\"color\":\"#333\",\"width\":2},\"type\":\"simple\",\"style\":{\"fontSize\":20,\"bgColor\":false,\"labelColor\":false,\"subText\":\"\"}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"Level 12 or above alerts\"}}]}",
-			"uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}}}",
+				'{"title":"Count Level 12 Alerts","type":"metric","params":{"addTooltip":true,"addLegend":false,"type":"gauge","gauge":{"verticalSplit":false,"autoExtend":false,"percentageMode":false,"gaugeType":"Metric","gaugeStyle":"Full","backStyle":"Full","orientation":"vertical","colorSchema":"Green to Red","gaugeColorMode":"None","useRange":false,"colorsRange":[{"from":0,"to":100}],"invertColors":false,"labels":{"show":true,"color":"black"},"scale":{"show":false,"labels":false,"color":"#333","width":2},"type":"simple","style":{"fontSize":20,"bgColor":false,"labelColor":false,"subText":""}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Level 12 or above alerts"}}]}',
+			"uiStateJSON": '{"vis":{"defaultColors":{"0 - 100":"rgb(0,104,55)"}}}',
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.level:[12 TO *]\",\"language\":\"lucene\"}}"
+				"searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                        "$state": {
+                          "store": "appState"
+                        },
+                        "meta": {
+                          "alias": null,
+                          "disabled": false,
+                          "index": "wazuh-alerts",
+                          "key": "rule.level",
+                          "negate": false,
+                          "params": {
+                            "gte": 12,
+                            "lt": null
+                          },
+                          "type": "range",
+                          "value": "12 to +∞"
+                        },
+                        "range": {
+                          "rule.level": {
+                            "gte": 12,
+                            "lt": null
+                          }
+                        }
+                      }
+                    ],
+                    "query":{ "query": "", "language": "lucene" } 
+                }`
 			}
 		},
 		"_type": "visualization"
@@ -66,8 +94,47 @@ export default [
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: authentication_failed OR rule.groups: authentication_failures\",\"language\":\"lucene\"}}"
+				"searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "type": "phrases",
+                              "key": "rule.groups",
+                              "value": "authentication_failed, authentication_failures",
+                              "params": [
+                                "authentication_failed",
+                                "authentication_failures"
+                              ],
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null
+                            },
+                            "query": {
+                              "bool": {
+                                "should": [
+                                  {
+                                    "match_phrase": {
+                                      "rule.groups": "authentication_failed"
+                                    }
+                                  },
+                                  {
+                                    "match_phrase": {
+                                      "rule.groups": "authentication_failures"
+                                    }
+                                  }
+                                ],
+                                "minimum_should_match": 1
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
 			}
 		},
 		"_type": "visualization"
@@ -82,8 +149,38 @@ export default [
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: authentication_success\",\"language\":\"lucene\"}}"
+				"searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "rule.groups",
+                              "value": "authentication_success",
+                              "params": {
+                                "query": "authentication_success",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "rule.groups": {
+                                  "query": "authentication_success",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
 			}
 		},
 		"_type": "visualization"
