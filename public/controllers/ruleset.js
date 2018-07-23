@@ -219,6 +219,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
     }
 
     $scope.onlyParents = typeFilter => {
+        $scope.appliedFilters = [];
         if(typeFilter === 'all') $scope.$broadcast('wazuhUpdateInstancePath',{path:'/decoders'})
         else $scope.$broadcast('wazuhUpdateInstancePath',{path:'/decoders/parents'})
     }
