@@ -382,18 +382,18 @@ function discoverController(
         // update data source when filters update
         $scope.$listen(queryFilter, 'update', function () {
           return $scope.updateDataSource().then(function () {
-
+  
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////    
+            //////////////////////////////////////////////////////////////////////////// 
             discoverPendingUpdates.removeAll();
             discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
             $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
             if($location.search().tab != 'configuration') {
               loadedVisualizations.removeAll();
-              $rootScope.rendered = false;
-              $rootScope.loadingStatus = "Fetching data...";
+              $rootScope.$broadcast('wzRenderStatus',{ loadingStatus: "Fetching data..." });
+              $rootScope.$broadcast('wzRendered',{ rendered: false, resultState: 'ready' });
             }
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
@@ -481,7 +481,7 @@ function discoverController(
               /////////////////////////////////////////////////////////////////
               // Copying it to the rootScope to access it from the Wazuh App //
               /////////////////////////////////////////////////////////////////
-              $rootScope.resultState = $scope.resultState;
+              //
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
               /////////////////////////////////////////////////////////////////
@@ -548,6 +548,7 @@ function discoverController(
 
   $scope.updateQueryAndFetch = function (query) {
 
+
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -566,6 +567,11 @@ function discoverController(
     discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
     $rootScope.$broadcast('fetch');
+    if($location.search().tab != 'configuration') {
+      loadedVisualizations.removeAll();
+      $rootScope.$broadcast('wzRenderStatus',{ loadingStatus: "Fetching data..." });
+      $rootScope.$broadcast('wzRendered',{ rendered: false, resultState: 'ready' });
+    }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -705,8 +711,9 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     if($location.search().tab != 'configuration') {
       loadedVisualizations.removeAll();
-      $rootScope.rendered = false;
-      $rootScope.loadingStatus = "Fetching data...";
+      $rootScope.$broadcast('wzRendered',{ rendered: false, resultState: 'ready' });
+      $rootScope.$broadcast('wzRenderStatus',{loadingStatus: "Fetching data..."});
+                    
     }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -878,14 +885,13 @@ function discoverController(
 
 
   $scope.tabView = $location.search().tabView || 'panels';
-  const changeTabViewListener = $rootScope.$on('changeTabView',(evt,parameters) => {
+  $scope.$on('changeTabView',(evt,parameters) => {
     $scope.tabView = parameters.tabView || 'panels';
     $scope.updateQueryAndFetch($state.query);
   });
 
   $scope.$on('$destroy', () => {
     wzEventFiltersListener();
-    changeTabViewListener();
   });
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

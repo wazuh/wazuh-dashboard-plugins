@@ -56,7 +56,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             monitoring: 1
         });
         assignFilters();
-        $rootScope.$broadcast('updateVis');
+        $scope.$broadcast('updateVis');
     }
 
     $scope.goNodes = () => {
@@ -65,7 +65,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             monitoring: 1
         });
         assignFilters();
-        $rootScope.$broadcast('updateVis');
+        $scope.$broadcast('updateVis');
     }
 
     $scope.goBack = () => {
@@ -74,7 +74,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             monitoring: 2
         });
         assignFilters();
-        $rootScope.$broadcast('updateVis');
+        $scope.$broadcast('updateVis');
     }
 
     $scope.$on('wazuhShowClusterNode',async (event,parameters) => {
@@ -116,7 +116,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             }
 
             assignFilters($scope.currentNode.name);
-            $rootScope.$broadcast('updateVis');
+            $scope.$broadcast('updateVis');
 
             if(!$scope.$$phase) $scope.$digest();
         } catch(error) {
@@ -192,7 +192,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
     
             rawVisualizations.assignItems(visData.data.raw);
             assignFilters();
-            $rootScope.$broadcast('updateVis');
+            $scope.$broadcast('updateVis');
 
             $scope.loading = false;
             if(!$scope.$$phase) $scope.$digest();
@@ -201,6 +201,25 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
             errorHandler.handle(error,'Cluster')
         }
     }
+
+    const initCommonData = () => {
+        $scope.loadingStatus = 'Rendering visualizations...';
+        $scope.rendered = false;
+        $scope.resultState = 'ready';
+    }
+
+    initCommonData();
+
+    $scope.$on('wzRenderStatus',(event,parameters) => {
+        $scope.loadingStatus = parameters.loadingStatus;
+        if(!$scope.$$phase) $scope.$digest()
+    })
+
+    $scope.$on('wzRendered',(event,parameters) => {
+        $scope.rendered = parameters.rendered;
+        $scope.resultState = parameters.resultState;
+        if(!$scope.$$phase) $scope.$digest()
+    })
 
     if(clusterEnabled) load();
 

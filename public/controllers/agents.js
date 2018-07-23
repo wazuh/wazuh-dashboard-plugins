@@ -100,9 +100,11 @@ function (
             if(subtab === 'panels' && $scope.tab !== 'configuration' && $scope.tab !== 'welcome' && $scope.tab !== 'syscollector'){
                 const condition = !changeAgent && localChange || !changeAgent && preserveDiscover;
                 await visFactoryService.buildAgentsVisualizations(filterHandler, $scope.tab, subtab, condition, $scope.agent.id)
+                $scope.$broadcast('changeTabView',{tabView:subtab});
+                $scope.$broadcast('updateVis');
                 changeAgent = false;
             } else {
-                $rootScope.$emit('changeTabView',{tabView:$scope.tabView})
+                $scope.$broadcast('changeTabView',{tabView:$scope.tabView})
             }
 
             checkMetrics($scope.tab, subtab);
@@ -124,6 +126,7 @@ function (
         if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
         tabVisualizations.setTab(tab);
         if ($scope.tab === tab && !force) return;
+        initCommonData();
         const onlyAgent = $scope.tab === tab && force;
         const sameTab = $scope.tab === tab;
         $location.search('tab', tab);
@@ -244,6 +247,26 @@ function (
         }
         return;
     }
+
+
+    const initCommonData = () => {
+        $scope.loadingStatus = 'Rendering visualizations...';
+        $scope.rendered = false;
+        $scope.resultState = 'ready';
+    }
+
+    initCommonData();
+
+    $scope.$on('wzRenderStatus',(event,parameters) => {
+        $scope.loadingStatus = parameters.loadingStatus;
+        if(!$scope.$$phase) $scope.$digest()
+    })
+
+    $scope.$on('wzRendered',(event,parameters) => {
+        $scope.rendered = parameters.rendered;
+        $scope.resultState = parameters.resultState;
+        if(!$scope.$$phase) $scope.$digest()
+    })
 
 
     //Destroy

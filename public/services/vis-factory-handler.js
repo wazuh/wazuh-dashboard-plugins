@@ -9,11 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
-import $            from 'jquery'
+import { uiModules } from 'ui/modules';
 
-uiModules.get('app/wazuh', [])
-.service('visFactoryService', function ($rootScope, appState, genericReq, discoverPendingUpdates, rawVisualizations, tabVisualizations, loadedVisualizations, commonData, visHandlers) {
+const app = uiModules.get('app/wazuh', []);
+
+app.service('visFactoryService', 
+function (appState, genericReq, discoverPendingUpdates, rawVisualizations, 
+          tabVisualizations, loadedVisualizations, commonData, visHandlers) {
     
     const clear = (onlyAgent = false) => {
         if(!onlyAgent) visHandlers.removeAll();
@@ -32,8 +34,6 @@ uiModules.get('app/wazuh', [])
             const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${appState.getCurrentPattern()}`)
             rawVisualizations.assignItems(data.data.raw);
             commonData.assignFilters(filterHandler, tab, localChange);
-            $rootScope.$emit('changeTabView',{tabView:subtab})
-            $rootScope.$broadcast('updateVis');
             return;
         } catch (error) {
             return Promise.reject(error)
@@ -45,8 +45,6 @@ uiModules.get('app/wazuh', [])
             const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${appState.getCurrentPattern()}`)
             rawVisualizations.assignItems(data.data.raw);
             commonData.assignFilters(filterHandler, tab, localChange, id)
-            $rootScope.$emit('changeTabView',{tabView:subtab});
-            $rootScope.$broadcast('updateVis');
             return;
         } catch (error) {
             return Promise.reject(error)
