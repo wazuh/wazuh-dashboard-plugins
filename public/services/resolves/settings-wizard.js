@@ -116,18 +116,11 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 }
             })
             .catch(error => {
-
-                const apiNotFound = error && error.data && error.data.code && error.data.code === 3002 && 
-                                    typeof error.data.message === 'string' && 
-                                    !error.data.message.includes("Invalid 'wazuh-app-version' header");
-
                 appState.removeCurrentAPI();
-                if(!apiNotFound) {
-                    errorHandler.handle(error,'Routes');
-                    errorHandler.handle('Wazuh App: please add a new API.','Routes',true);
-                } else {
-                    errorHandler.handle('It seems the selected API was deleted. Please insert a new one or select an existing valid one.','Routes',true);
-                }
+           
+                errorHandler.handle(error,'Routes');
+                errorHandler.handle('Please insert a new Wazuh API or select an existing valid one.','Routes',true);
+      
                 $location.search('_a', null);
                 $location.search('tab', 'api');
                 $location.path('/settings');
