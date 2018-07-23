@@ -198,6 +198,7 @@ app.directive('wazuhTable', function() {
             };
 
             $scope.$on('wazuhUpdateInstancePath',(event,parameters) => {
+                instance.filters = [];
                 instance.path = parameters.path;
                 return init();
             });
