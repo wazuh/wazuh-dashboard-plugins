@@ -25,6 +25,7 @@ const app = uiModules.get('apps/webinar_app', [])
 
                 let originalImplicitFilter = '';
                 let implicitFilter         = '';
+                let rawFilters             = [];
                 let rendered               = false;
                 let visualization          = null;
                 let visHandler             = null;
@@ -33,11 +34,13 @@ const app = uiModules.get('apps/webinar_app', [])
                 const myRender = raw => {
                     if (raw && discoverPendingUpdates.getList().length) { // There are pending updates from the discover (which is the one who owns the true app state)
                         const discoverList = discoverPendingUpdates.getList();
+
                         if(!visualization && !rendered && !renderInProgress) { // There's no visualization object -> create it with proper filters
                             renderInProgress = true;
 
                             const rawVis = raw.filter(item => item && item.id === $scope.visID);
                             wzsavedVisualizations.get($scope.visID,rawVis[0]).then(savedObj => {
+                                rawFilters = savedObj.searchSource.get('filter');
                                 originalImplicitFilter = savedObj.searchSource.get('query')['query'];
                                 visualization = savedObj;
                                 
@@ -57,8 +60,8 @@ const app = uiModules.get('apps/webinar_app', [])
 
                                 if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status' && !$scope.visID.includes('Cluster')) { // We don't want to filter that visualization as it uses another index-pattern
                                     visualization.searchSource
-                                    .query({ language: 'lucene', query: implicitFilter })
-                                    .set('filter',  discoverList.length > 1 ? discoverList[1] : {});
+                                    .query({ language: discoverList[0].language || 'lucene', query: implicitFilter })
+                                    .set('filter',  discoverList.length > 1 ? [...discoverList[1],...rawFilters] : rawFilters);
                                 } else {
                                     
                                     // Checks for cluster.name filter existence 
@@ -114,8 +117,8 @@ const app = uiModules.get('apps/webinar_app', [])
                             
                             if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status') { // We don't want to filter that visualization as it uses another index-pattern
                                 visualization.searchSource
-                                .query({ language: 'lucene', query: implicitFilter })
-                                .set('filter', discoverList.length > 1 ? discoverList[1] : {});
+                                .query({ language: discoverList[0].language || 'lucene', query: implicitFilter })
+                                .set('filter', discoverList.length > 1 ? [...discoverList[1],...rawFilters] : rawFilters);
                             } else {
                                     
                                 // Checks for cluster.name filter existence 
