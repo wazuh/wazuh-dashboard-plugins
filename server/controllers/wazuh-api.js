@@ -635,77 +635,67 @@ export default class WazuhApi {
                 password          : config.password,
                 rejectUnauthorized: !config.insecure
             };
+
+            const distinctUrl = '/agents/stats/distinct'
+
+            const data = await Promise.all([
+                needle('get', `${config.url}:${config.port}${distinctUrl}`, { fields: 'node_name', select: 'node_name' }, headers),
+                needle('get', `${config.url}:${config.port}${distinctUrl}`, { fields: 'group', select: 'group' }, headers),
+                needle('get', `${config.url}:${config.port}${distinctUrl}`, { fields: 'os.name,os.platform,os.version', select: 'os.name,os.platform,os.version' }, headers),
+                needle('get', `${config.url}:${config.port}${distinctUrl}`, { fields: 'version', select: 'version' }, headers),
+                needle('get', `${config.url}:${config.port}/agents/summary`, { }, headers),
+                needle('get', `${config.url}:${config.port}/agents`, { limit:1, sort: '-dateAdd' }, headers)
+            ]); 
             
-            const url = `${config.url}:${config.port}/agents`;
-
-            const params = {
-                limit : 500,
-                offset: 0,
-                sort  :'-dateAdd'
-            }
-            
-            const items = [];
-
-            const output = await needle('get', url, params, headers)
-
-            items.push(...output.body.data.items)
-
-            const totalItems = output.body.data.totalItems;
-
-            while(items.length < totalItems){
-                params.offset += params.limit;
-                const tmp = await needle('get', url, params, headers)
-                items.push(...tmp.body.data.items)
-            }
-
             const result = {
                 groups     : [],
                 nodes      : [],
                 versions   : [],
                 osPlatforms: [],
-                lastAgent  : items[0],
+                lastAgent  : {},
                 summary: {
-                    agentsCountActive        :0,
-                    agentsCountDisconnected  :0,
-                    agentsCountNeverConnected:0,
-                    agentsCountTotal         :0,
-                    agentsCoverity           :0
+                    agentsCountActive        : 0,
+                    agentsCountDisconnected  : 0,
+                    agentsCountNeverConnected: 0,
+                    agentsCountTotal         : 0,
+                    agentsCoverity           : 0
                 }
+            };
+
+            if(data && data[0] && data[0].body && data[0].body.data && !data[0].body.error && data[0].body.data.items) {
+                result.nodes = data[0].body.data.items.filter(item => !!item.node_name).map(item => item.node_name);
             }
 
-            for(const agent of items){
-                if(agent.id === '000') continue;
-                if(agent.group && !result.groups.includes(agent.group)) result.groups.push(agent.group);
-                if(agent.node_name && !result.nodes.includes(agent.node_name)) result.nodes.push(agent.node_name);
-                if(agent.version && !result.versions.includes(agent.version)) result.versions.push(agent.version);
-                if(agent.os && agent.os.name){
-                    const exists = result.osPlatforms.filter((e) => e.name === agent.os.name && e.platform === agent.os.platform && e.version === agent.os.version);
-                    if(!exists.length){
-                        result.osPlatforms.push({
-                            name:     agent.os.name,
-                            platform: agent.os.platform,
-                            version:  agent.os.version
-                        });
-                    }
-                }
+            if(data && data[1] && data[1].body && data[1].body.data && !data[1].body.error && data[1].body.data.items) {
+                result.groups = data[1].body.data.items.filter(item => !!item.group).map(item => item.group);
             }
 
-            const summary = await needle('get', url + '/summary', {}, headers)
+            if(data && data[2] && data[2].body && data[2].body.data && !data[2].body.error && data[1].body.data.items) {
+                result.osPlatforms = data[2].body.data.items.filter(item => !!item.os && item.os.platform && item.os.name && item.os.version).map(item => item.os);
+            }
 
-            // Once Wazuh core fixes agent 000 issues, this should be adjusted
-            const active = summary.body.data.Active - 1;
-            const total  = summary.body.data.Total - 1;
+            if(data && data[3] && data[3].body && data[3].body.data && !data[3].body.error && data[3].body.data.items) {
+                result.versions = data[3].body.data.items.filter(item => !!item.version).map(item => item.version);
+            }
 
-            result.summary.agentsCountActive         = active;
-            result.summary.agentsCountDisconnected   = summary.body.data.Disconnected;
-            result.summary.agentsCountNeverConnected = summary.body.data['Never connected'];
-            result.summary.agentsCountTotal          = total;
-            result.summary.agentsCoverity            = (active / total) * 100;
-            
-            return reply({error:0, result})
+            if(data[4] && data[4].body && !data[4].body.error && data[4].body.data){
+                Object.assign(result.summary,{
+                    agentsCountActive        : data[4].body.data.Active - 1,
+                    agentsCountDisconnected  : data[4].body.data.Disconnected,
+                    agentsCountNeverConnected: data[4].body.data['Never connected'],
+                    agentsCountTotal         : data[4].body.data.Total - 1,
+                    agentsCoverity           : ((data[4].body.data.Active - 1) / (data[4].body.data.Total - 1 )) * 100
+                });
+            }
+
+            if(data[5] && data[5].body && !data[5].body.error && data[5].body.data && data[5].body.data.items && data[5].body.data.items.length){
+                Object.assign(result.lastAgent,data[5].body.data.items[0]);
+            }
+
+            return reply({error: 0, result });
 
         } catch (error) {
-            return ErrorResponse(error.message || error, 3035, 500, reply)
+            return ErrorResponse(error.message || error, 3035, 500, reply);
         }
     }
 
