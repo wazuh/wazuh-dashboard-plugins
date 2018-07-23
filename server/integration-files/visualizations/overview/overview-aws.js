@@ -19,8 +19,34 @@ export default [
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon AND rule.description: *AuthorizeSecurity*\",\"language\":\"lucene\"}}"
-			}
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "query": {
+                              "regexp": {
+                                "rule.description": {
+                                  "value": ".*AuthorizeSecurity.*"
+                                }
+                              }
+                            },
+                            "meta": {
+                              "negate": false,
+                              "index": "wazuh-alerts",
+                              "disabled": false,
+                              "alias": null,
+                              "type": "custom",
+                              "key": "query",
+                              "value": "{"regexp":{"rule.description":{"value":".*AuthorizeSecurity.*"}}}"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }` 
+            }
 		},
 		"_type": "visualization"
 	},
@@ -33,7 +59,33 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon AND rule.description: *RevokeSecurity*\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "query": {
+                              "regexp": {
+                                "rule.description": {
+                                  "value": ".*RevokeSecurity.*"
+                                }
+                              }
+                            },
+                            "meta": {
+                              "negate": false,
+                              "index": "wazuh-alerts",
+                              "disabled": false,
+                              "alias": null,
+                              "type": "custom",
+                              "key": "query",
+                              "value": "{"regexp":{"rule.description":{"value":".*RevokeSecurity.*"}}}"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }` 
             }
         },
         "_type": "visualization"
@@ -47,7 +99,33 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon AND data.aws.eventName: *Instances*\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "query": {
+                              "regexp": {
+                                "data.aws.eventName": {
+                                  "value": ".*Instances.*"
+                                }
+                              }
+                            },
+                            "meta": {
+                              "negate": false,
+                              "index": "wazuh-alerts",
+                              "disabled": false,
+                              "alias": null,
+                              "type": "custom",
+                              "key": "query",
+                              "value": "{"regexp":{"data.aws.eventName":{"value":".*Instances.*"}}}"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -61,7 +139,33 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon AND rule.description: *Login?Success*\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "query": {
+                              "regexp": {
+                                "rule.description": {
+                                  "value": ".*Login?Success.*"
+                                }
+                              }
+                            },
+                            "meta": {
+                              "negate": false,
+                              "index": "wazuh-alerts",
+                              "disabled": false,
+                              "alias": null,
+                              "type": "custom",
+                              "key": "query",
+                              "value": "{"regexp":{"rule.description":{"value":".*Login?Success.*"}}}"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -89,7 +193,33 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon AND rule.description: *Security*\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "query": {
+                              "regexp": {
+                                "rule.description": {
+                                  "value": ".*Security.*"
+                                }
+                              }
+                            },
+                            "meta": {
+                              "negate": false,
+                              "index": "wazuh-alerts",
+                              "disabled": false,
+                              "alias": null,
+                              "type": "custom",
+                              "key": "query",
+                              "value": "{"regexp":{"rule.description":{"value":".*Security.*"}}}"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -103,7 +233,33 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon AND rule.description: *Login?Success*\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "query": {
+                              "regexp": {
+                                "rule.description": {
+                                  "value": ".*Login?Success.*"
+                                }
+                              }
+                            },
+                            "meta": {
+                              "negate": false,
+                              "index": "wazuh-alerts",
+                              "disabled": false,
+                              "alias": null,
+                              "type": "custom",
+                              "key": "query",
+                              "value": "{"regexp":{"rule.description":{"value":".*Login?Success.*"}}}"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -117,7 +273,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -131,7 +287,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -146,7 +302,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: amazon\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     }
