@@ -48,7 +48,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"data.virustotal.malicious: 1\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.virustotal.malicious",
+                              "value": "1",
+                              "params": {
+                                "query": "1",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.virustotal.malicious": {
+                                  "query": "1",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -62,7 +93,55 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"_exists_:data.virustotal.positives AND NOT data.virustotal.positives: 0\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "exists",
+                              "key": "data.virustotal.positives",
+                              "value": "exists"
+                            },
+                            "exists": {
+                              "field": "data.virustotal.positives"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          },
+                          {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": true,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.virustotal.positives",
+                              "value": "0",
+                              "params": {
+                                "query": 0,
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.virustotal.positives": {
+                                  "query": 0,
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -76,7 +155,55 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"_exists_:data.virustotal.malicious AND NOT data.virustotal.malicious: 0\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "exists",
+                              "key": "data.virustotal.malicious",
+                              "value": "exists"
+                            },
+                            "exists": {
+                              "field": "data.virustotal.malicious"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          },
+                          {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": true,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.virustotal.malicious",
+                              "value": "0",
+                              "params": {
+                                "query": 0,
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.virustotal.malicious": {
+                                  "query": 0,
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -90,7 +217,27 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"_exists_:data.virustotal\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[{
+                        "meta": {
+                        "index": "wazuh-alerts",
+                        "negate": false,
+                        "disabled": false,
+                        "alias": null,
+                        "type": "exists",
+                        "key": "data.virustotal",
+                        "value": "exists"
+                        },
+                        "exists": {
+                        "field": "data.virustotal"
+                        },
+                        "$state": {
+                        "store": "appState"
+                        }
+                    }],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -104,7 +251,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"NOT data.virustotal.malicious: 0\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": true,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.virustotal.malicious",
+                              "value": "0",
+                              "params": {
+                                "query": "0",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.virustotal.malicious": {
+                                  "query": "0",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -118,7 +296,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"NOT data.virustotal.malicious: 0\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": true,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.virustotal.malicious",
+                              "value": "0",
+                              "params": {
+                                "query": "0",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.virustotal.malicious": {
+                                  "query": "0",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     },
@@ -132,7 +341,55 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"_exists_:data.virustotal AND NOT data.virustotal.positives: 0\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "exists",
+                              "key": "data.virustotal",
+                              "value": "exists"
+                            },
+                            "exists": {
+                              "field": "data.virustotal"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          },
+                          {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": true,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.virustotal.positives",
+                              "value": "0",
+                              "params": {
+                                "query": 0,
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.virustotal.positives": {
+                                  "query": 0,
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         }
     }
