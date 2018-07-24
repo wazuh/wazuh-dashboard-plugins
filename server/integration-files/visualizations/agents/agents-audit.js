@@ -20,8 +20,38 @@ export default [
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id : 80790\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                                "index": "wazuh-alerts",
+                                "negate": false,
+                                "disabled": false,
+                                "alias": null,
+                                "type": "phrase",
+                                "key": "rule.id",
+                                "value": "80790",
+                                "params": {
+                                "query": "80790",
+                                "type": "phrase"
+                                }
+                            },
+                            "query": {
+                                "match": {
+                                "rule.id": {
+                                    "query": "80790",
+                                    "type": "phrase"
+                                }
+                                }
+                            },
+                            "$state": {
+                                "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
 			}
 		},
 		"_type": "visualization"
@@ -35,7 +65,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80784\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                                "index": "wazuh-alerts",
+                                "negate": false,
+                                "disabled": false,
+                                "alias": null,
+                                "type": "phrase",
+                                "key": "rule.id",
+                                "value": "80784",
+                                "params": {
+                                "query": "80784",
+                                "type": "phrase"
+                                }
+                            },
+                            "query": {
+                                "match": {
+                                "rule.id": {
+                                    "query": "80784",
+                                    "type": "phrase"
+                                }
+                                }
+                            },
+                            "$state": {
+                                "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -49,7 +110,47 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND (rule.id: 80781 OR rule.id: 80787)\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "type": "phrases",
+                              "key": "rule.id",
+                              "value": "80781, 80787",
+                              "params": [
+                                "80781",
+                                "80787"
+                              ],
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null
+                            },
+                            "query": {
+                              "bool": {
+                                "should": [
+                                  {
+                                    "match_phrase": {
+                                      "rule.id": "80781"
+                                    }
+                                  },
+                                  {
+                                    "match_phrase": {
+                                      "rule.id": "80787"
+                                    }
+                                  }
+                                ],
+                                "minimum_should_match": 1
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -63,7 +164,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80791\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                                "index": "wazuh-alerts",
+                                "negate": false,
+                                "disabled": false,
+                                "alias": null,
+                                "type": "phrase",
+                                "key": "rule.id",
+                                "value": "80791",
+                                "params": {
+                                "query": "80791",
+                                "type": "phrase"
+                                }
+                            },
+                            "query": {
+                                "match": {
+                                "rule.id": {
+                                    "query": "80791",
+                                    "type": "phrase"
+                                }
+                                }
+                            },
+                            "$state": {
+                                "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -77,7 +209,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -91,7 +223,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -105,7 +237,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -119,7 +251,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -133,7 +265,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -147,7 +279,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80784\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                                "index": "wazuh-alerts",
+                                "negate": false,
+                                "disabled": false,
+                                "alias": null,
+                                "type": "phrase",
+                                "key": "rule.id",
+                                "value": "80784",
+                                "params": {
+                                "query": "80784",
+                                "type": "phrase"
+                                }
+                            },
+                            "query": {
+                                "match": {
+                                "rule.id": {
+                                    "query": "80784",
+                                    "type": "phrase"
+                                }
+                                }
+                            },
+                            "$state": {
+                                "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -161,7 +324,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80781\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "rule.id",
+                              "value": "80781",
+                              "params": {
+                                "query": "80781",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "rule.id": {
+                                  "query": "80781",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -175,7 +369,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -189,7 +383,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80790\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "rule.id",
+                              "value": "80790",
+                              "params": {
+                                "query": "80790",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "rule.id": {
+                                  "query": "80790",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -203,7 +428,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit AND rule.id: 80791\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "rule.id",
+                              "value": "80791",
+                              "params": {
+                                "query": "80791",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "rule.id": {
+                                  "query": "80791",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -218,7 +474,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: audit\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     }
