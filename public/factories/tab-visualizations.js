@@ -33,7 +33,7 @@ app.factory('tabVisualizations', function() {
     const overview = {
         welcome   : 0,
         general   : 11,
-        fim       : 9,
+        fim       : 10,
         pm        : 5,
         vuls      : 8,
         oscap     : 11,
