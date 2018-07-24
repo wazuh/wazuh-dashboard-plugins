@@ -20,46 +20,46 @@ export default [
 			"version": 1,
 			"kibanaSavedObjectMeta": {
 				"searchSourceJSON":`{
-                    "index":"wazuh-alerts",
-                    "filter":[
-                        {
-                            "meta": {
-                              "index": "wazuh-alerts",
-                              "type": "phrases",
-                              "key": "syscheck.event",
-                              "value": "added, readded",
-                              "params": [
-                                "added",
-                                "readded"
-                              ],
-                              "negate": false,
-                              "disabled": false,
-                              "alias": null
-                            },
-                            "query": {
-                              "bool": {
-                                "should": [
-                                  {
-                                    "match_phrase": {
-                                      "syscheck.event": "added"
-                                    }
-                                  },
-                                  {
-                                    "match_phrase": {
-                                      "syscheck.event": "readded"
-                                    }
-                                  }
-                                ],
-                                "minimum_should_match": 1
-                              }
-                            },
-                            "$state": {
-                              "store": "appState"
+            "index":"wazuh-alerts",
+            "filter":[
+                {
+                    "meta": {
+                      "index": "wazuh-alerts",
+                      "type": "phrases",
+                      "key": "syscheck.event",
+                      "value": "added, readded",
+                      "params": [
+                        "added",
+                        "readded"
+                      ],
+                      "negate": false,
+                      "disabled": false,
+                      "alias": null
+                    },
+                    "query": {
+                      "bool": {
+                        "should": [
+                          {
+                            "match_phrase": {
+                              "syscheck.event": "added"
+                            }
+                          },
+                          {
+                            "match_phrase": {
+                              "syscheck.event": "readded"
                             }
                           }
-                    ],
-                    "query":{"query":"","language":"lucene"}
-                }`
+                        ],
+                        "minimum_should_match": 1
+                      }
+                    },
+                    "$state": {
+                      "store": "appState"
+                    }
+                  }
+            ],
+            "query":{"query":"","language":"lucene"}
+        }`
 			}
 		},
 		"_type": "visualization"
