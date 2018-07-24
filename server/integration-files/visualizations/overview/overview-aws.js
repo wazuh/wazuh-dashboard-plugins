@@ -37,7 +37,7 @@ export default [
                               "alias": null,
                               "type": "custom",
                               "key": "query",
-                              "value": "{"regexp":{"rule.description":{"value":".*AuthorizeSecurity.*"}}}"
+                              "value": {"regexp":{"rule.description":".*AuthorizeSecurity.*"}}
                             },
                             "$state": {
                               "store": "appState"
@@ -77,7 +77,7 @@ export default [
                               "alias": null,
                               "type": "custom",
                               "key": "query",
-                              "value": "{"regexp":{"rule.description":{"value":".*RevokeSecurity.*"}}}"
+                              "value": {"regexp":{"rule.description":".*RevokeSecurity.*"}}
                             },
                             "$state": {
                               "store": "appState"
@@ -117,7 +117,7 @@ export default [
                               "alias": null,
                               "type": "custom",
                               "key": "query",
-                              "value": "{"regexp":{"data.aws.eventName":{"value":".*Instances.*"}}}"
+                              "value": {"regexp":{"data.aws.eventName":".*Instances.*"}}
                             },
                             "$state": {
                               "store": "appState"
@@ -157,7 +157,7 @@ export default [
                               "alias": null,
                               "type": "custom",
                               "key": "query",
-                              "value": "{"regexp":{"rule.description":{"value":".*Login?Success.*"}}}"
+                              "value": {"regexp":{"rule.description":".*Login?Success.*"}}
                             },
                             "$state": {
                               "store": "appState"
@@ -211,7 +211,7 @@ export default [
                               "alias": null,
                               "type": "custom",
                               "key": "query",
-                              "value": "{"regexp":{"rule.description":{"value":".*Security.*"}}}"
+                              "value": {"regexp":{"rule.description":".*Security.*"}}
                             },
                             "$state": {
                               "store": "appState"
@@ -251,7 +251,7 @@ export default [
                               "alias": null,
                               "type": "custom",
                               "key": "query",
-                              "value": "{"regexp":{"rule.description":{"value":".*Login?Success.*"}}}"
+                              "value": {"regexp":{"rule.description":".*Login?Success.*"}}
                             },
                             "$state": {
                               "store": "appState"
