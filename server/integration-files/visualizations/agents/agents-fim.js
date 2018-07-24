@@ -21,7 +21,7 @@ export default [
 			"version": 1,
 			"kibanaSavedObjectMeta": {
 				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: syscheck\",\"language\":\"lucene\"}}"
+					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
 			}
 		},
 		"_type": "visualization"
@@ -35,7 +35,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: syscheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -49,7 +49,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: syscheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -63,7 +63,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: syscheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -77,7 +77,47 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.id: 554 AND NOT location: syscheck-registry\",\"language\":\"lucene\"}}"
+                "searchSourceJSON":`{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "type": "phrases",
+                              "key": "syscheck.event",
+                              "value": "added, readded",
+                              "params": [
+                                "added",
+                                "readded"
+                              ],
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null
+                            },
+                            "query": {
+                              "bool": {
+                                "should": [
+                                  {
+                                    "match_phrase": {
+                                      "syscheck.event": "added"
+                                    }
+                                  },
+                                  {
+                                    "match_phrase": {
+                                      "syscheck.event": "readded"
+                                    }
+                                  }
+                                ],
+                                "minimum_should_match": 1
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -91,7 +131,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"(rule.id: 550 OR rule.id: 551 OR rule.id: 552 OR rule.id: 555) AND NOT location: syscheck-registry\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "syscheck.event",
+                              "value": "modified",
+                              "params": {
+                                "query": "modified",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "syscheck.event": {
+                                  "query": "modified",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -105,7 +176,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.id: 553 AND NOT location: syscheck-registry\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "syscheck.event",
+                              "value": "deleted",
+                              "params": {
+                                "query": "deleted",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "syscheck.event": {
+                                  "query": "deleted",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -120,7 +222,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: syscheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     }
