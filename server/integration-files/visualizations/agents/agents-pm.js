@@ -21,7 +21,7 @@ export default [
 			"version": 1,
 			"kibanaSavedObjectMeta": {
 				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: rootcheck\",\"language\":\"lucene\"}}"
+					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
 			}
 		},
 		"_type": "visualization"
@@ -35,7 +35,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: rootcheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -49,7 +49,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: rootcheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -64,7 +64,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: rootcheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     }
