@@ -1,5 +1,17 @@
 <md-content flex layout="column" ng-if="tab === 'syscollector'" ng-show="!load">
-    <div layout="row" class="layout-padding">
+    <div layout="row" layout-align="layout-padding" ng-if="!syscollector">
+        <md-card flex class="wz-md-card" flex>
+            <md-card-content class="wz-text-center">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Inventory disabled</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column" class="wz-padding-top-10">
+                    <p>Inventory (syscollector) is disabled for this agent. Visit the documentation on <a target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html">this link</a> to learn about how to enable it.
+                    </p>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <div layout="row" class="layout-padding" ng-if="syscollector">
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title">OS information</span>
@@ -31,7 +43,7 @@
 
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-if="syscollector">
             <md-card-content>
                 <span class="wz-headline-title">Hardware information</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -55,7 +67,7 @@
         </md-card>
     </div>
 
-    <div layout="row" class="md-padding">
+    <div layout="row" class="md-padding" ng-if="syscollector">
         <input placeholder="Filter packages..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="search(custom_search)">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
@@ -63,7 +75,7 @@
         </button>
     </div>
 
-    <div layout="row" ng-if="agent" class="md-padding">
+    <div layout="row" ng-if="agent && syscollector" class="md-padding">
         <wazuh-table 
             flex 
             path="'/syscollector/' + agent.id + '/packages'" 
