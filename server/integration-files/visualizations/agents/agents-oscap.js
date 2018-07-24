@@ -63,7 +63,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.result: fail AND rule.groups: oscap\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.result",
+                              "value": "fail",
+                              "params": {
+                                "query": "fail",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.result": {
+                                  "query": "fail",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -91,7 +122,64 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.result: fail AND rule.groups:oscap AND NOT rule.groups: syslog\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.result",
+                              "value": "fail",
+                              "params": {
+                                "query": "fail",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.result": {
+                                  "query": "fail",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          },
+                          {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": true,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "rule.groups",
+                              "value": "syslog",
+                              "params": {
+                                "query": "syslog",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "rule.groups": {
+                                  "query": "syslog",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                     ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -105,7 +193,64 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.result: fail AND rule.groups:oscap AND NOT rule.groups: syslog\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.result",
+                              "value": "fail",
+                              "params": {
+                                "query": "fail",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.result": {
+                                  "query": "fail",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          },
+                          {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": true,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "rule.groups",
+                              "value": "syslog",
+                              "params": {
+                                "query": "syslog",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "rule.groups": {
+                                  "query": "syslog",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                     ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -119,7 +264,64 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.result: fail AND rule.groups:oscap AND NOT rule.groups: syslog\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.result",
+                              "value": "fail",
+                              "params": {
+                                "query": "fail",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.result": {
+                                  "query": "fail",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          },
+                          {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": true,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "rule.groups",
+                              "value": "syslog",
+                              "params": {
+                                "query": "syslog",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "rule.groups": {
+                                  "query": "syslog",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                     ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -133,7 +335,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: oscap AND data.oscap.check.result:fail\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.result",
+                              "value": "fail",
+                              "params": {
+                                "query": "fail",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.result": {
+                                  "query": "fail",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -147,7 +380,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.result: fail AND rule.groups:oscap AND rule.groups: oscap-result AND data.oscap.check.result:fail\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.result",
+                              "value": "fail",
+                              "params": {
+                                "query": "fail",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.result": {
+                                  "query": "fail",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -161,7 +425,64 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.severity: high AND data.oscap.check.result: fail AND rule.groups:oscap AND rule.groups: oscap-result AND data.oscap.check.result:fail\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.result",
+                              "value": "fail",
+                              "params": {
+                                "query": "fail",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.result": {
+                                  "query": "fail",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        },
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.severity",
+                              "value": "high",
+                              "params": {
+                                "query": "high",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.severity": {
+                                  "query": "high",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -175,7 +496,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"data.oscap.check.result: fail AND rule.groups:oscap\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "data.oscap.check.result",
+                              "value": "fail",
+                              "params": {
+                                "query": "fail",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "data.oscap.check.result": {
+                                  "query": "fail",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                        }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -189,7 +541,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: oscap\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     }
