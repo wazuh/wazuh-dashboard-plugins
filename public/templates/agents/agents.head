@@ -103,7 +103,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">General</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">File integrity</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="configuration">Configuration</md-nav-item>
-        <md-nav-item ng-show="syscollector && syscollector.os && syscollector.os.sysname" class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">Inventory</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">Inventory</md-nav-item>
     </md-nav-bar>
     <!-- End Host monitoring navigation bar -->
 

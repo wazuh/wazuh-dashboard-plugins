@@ -192,9 +192,14 @@ function (
 
             $scope.switchTab($scope.tab, true);
 
-            $scope.syscollector = {
-                hardware: data[3].data.data,
-                os: data[4].data.data
+            if(!data[3] || !data[3].data || !data[3].data.data || typeof data[3].data.data !== 'object' || !Object.keys(data[3].data.data).length ||
+               !data[4] || !data[4].data || !data[4].data.data || typeof data[4].data.data !== 'object' || !Object.keys(data[4].data.data).length){
+                $scope.syscollector = null;
+            } else {
+                $scope.syscollector = {
+                    hardware: data[3].data.data,
+                    os: data[4].data.data
+                };
             }
 
             $scope.load = false;
