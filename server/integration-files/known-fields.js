@@ -1659,6 +1659,123 @@ export default [
         "readFromDocValues": true
     },
     {
+        "name": "syscheck.audit.proccess.id",
+        "type": "number",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.proccess.name",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.proccess.ppid",
+        "type": "number",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.user.id",
+        "type": "number",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.user.name",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.group.id",
+        "type": "number",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.group.name",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.login_user.id",
+        "type": "number",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.login_user.name",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.effective_user.id",
+        "type": "number",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.effective_user.name",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.sha256_after",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.sha256_before",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
         "name": "title",
         "type": "string",
         "count": 0,
