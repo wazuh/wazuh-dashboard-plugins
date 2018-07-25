@@ -4,37 +4,33 @@
 
 
         <div layout="row" class="height-230">
-            <md-card flex="33" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Users</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-FIM-Users" vis-id="'Wazuh-App-Agents-FIM-Users'">
-                </md-card-content>
-            </md-card>
-            <md-card flex="33" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Groups</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-FIM-Groups" vis-id="'Wazuh-App-Agents-FIM-Groups'">
-                </md-card-content>
-            </md-card>
-            <md-card flex="33" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Permissions</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-FIM-Permissions" vis-id="'Wazuh-App-Agents-FIM-Permissions'">
-                </md-card-content>
-            </md-card>
-        </div>
-
-        <div layout="row" class="height-230">
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Events</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-FIM-Events" vis-id="'Wazuh-App-Agents-FIM-Events'"></kbn-vis>
-                </md-card-content>
-            </md-card>
+            <div layout="column" flex>
+                <div layout="row" class="height-230">
+                    <md-card flex class="wz-md-card">
+                        <md-card-content class="wazuh-column">
+                            <span class="wz-headline-title">Users</span>
+                            <md-divider class="wz-margin-top-10"></md-divider>
+                            <kbn-vis id="Wazuh-App-Agents-FIM-Users" vis-id="'Wazuh-App-Agents-FIM-Users'">
+                        </md-card-content>
+                    </md-card>
+                    <md-card flex class="wz-md-card">
+                        <md-card-content class="wazuh-column">
+                            <span class="wz-headline-title">Permissions</span>
+                            <md-divider class="wz-margin-top-10"></md-divider>
+                            <kbn-vis id="Wazuh-App-Agents-FIM-Permissions" vis-id="'Wazuh-App-Agents-FIM-Permissions'">
+                        </md-card-content>
+                    </md-card>
+                </div>
+            </div>
+            <div layout="column" flex>
+                <md-card flex class="wz-md-card">
+                    <md-card-content class="wazuh-column">
+                        <span class="wz-headline-title">Events</span>
+                        <md-divider class="wz-margin-top-10"></md-divider>
+                        <kbn-vis id="Wazuh-App-Agents-FIM-Events" vis-id="'Wazuh-App-Agents-FIM-Events'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
         </div>
 
         <div layout="row" class="height-230">
