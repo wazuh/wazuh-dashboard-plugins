@@ -18,7 +18,7 @@ app.factory('tabVisualizations', function() {
     const agents = {
         welcome      : 0,
         general      : 7,
-        fim          : 8,
+        fim          : 7,
         pm           : 4,
         vuls         : 7,
         oscap        : 13,
