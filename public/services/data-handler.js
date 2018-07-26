@@ -26,15 +26,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             this.regularBatch    = 15;
             this.busy            = false;
             this.end             = false;
-            this.onlyParents     = false;
-            this.ruleID          = null;
-            this.decoderPosition = null;
-        }
-
-        toggleOnlyParents(value){
-            this.reset();
-            this.onlyParents = !value;
-            return this.nextPage();
         }
 
         nextPage () {
@@ -96,18 +87,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                 this.offset += items.length;
                 if (this.offset >= this.totalItems) this.end = true;
                 if (data.data.data !== 0){
-                    if(this.path === '/agents/groups'){
-                        let filtered = this.items.filter((elem, index, self) => self.findIndex(
-                            (t) => {return (t.merged_sum === elem.merged_sum)}) === index);
-                        if(filtered.length !== this.items.length) this.items = filtered;
-                    }
-
-                    // Remove the current decoder (by its position) from the list of related decoders
-                    if (this.decoderPosition || this.decoderPosition === 0) {
-                        const filteredDecoders = this.items.filter(item => item.position !== this.decoderPosition);
-                        this.items = filteredDecoders;
-                    }
-
                     deferred.resolve(true);
                 }
                 this.busy = false;
@@ -120,16 +99,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             return deferred.promise;
         }
 
-        getFilter (filterName) {
-            let filtered = this.filters.filter(element => element.name === filterName);
-            return (filtered.length !== 0) ? filtered[0].value : null;
-        }
-
-        hasFilter (filterName) {
-            let filtered = this.filters.filter(element => element.name === filterName);
-            return filtered.length !== 0;
-        }
-
         addFilter (filterName, value) {
             this.removeFilter(filterName, false);
             
@@ -140,15 +109,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             return this.search();
         }
 
-        ///////////////////////////////////////////////////////////////
-        // Only used by agents preview, don't use for any thing more //
-        ///////////////////////////////////////////////////////////////
-        addMultipleFilters (arrayOfFilters) {
-            for(const filter of arrayOfFilters) this.removeFilter(filter.name,false)
-            this.filters.push(...arrayOfFilters);
-            return this.search();
-        }
-
         removeFilter (filterName, search) {
             this.end = false;
             if(search) this.filters = this.filters.filter(filter => filterName !== filter.name && filter.value !== search);
@@ -156,22 +116,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
 
             if (search) this.search();
 
-        }
-
-        removeAllFilters () {
-            for (let filter of this.filters) {
-                this.removeFilter(filter.name, true);
-            }
-            // this.filters = [];
-            // return this.search();
-        }
-
-        delete (name, index) {
-            apiReq.request('DELETE', this.path, {})
-            .then(function (data) {
-                this.items.splice(index, 1);
-            }.bind(this))
-            .catch(error => errorHandler.handle(error,'Datahandler factory'));
         }
 
         search () {
@@ -213,11 +157,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
                     this.items = this.items.filter(item => typeof item.os === 'undefined');
                 }
 
-                // Remove the current rule (by its ID) from the list of related rules
-                if (this.ruleID) {
-                    const filteredRules = this.items.filter(item => item.id !== this.ruleID);
-                    this.items = filteredRules;
-                }
                 // Prevents from any manager
                 if (this.path === '/agents') {
                     const filteredAgents = this.items.filter(item => item && item.id !== '000');
@@ -235,12 +174,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             return deferred.promise;
         }
 
-        sort(by) {
-            this.sortValue = by;
-            this.sortDir   = !this.sortDir;
-            return this.search();
-        }
-
         reset() {
             this.items           = [];
             this.filters         = [];
@@ -249,9 +182,6 @@ app.factory('DataHandler', function ($q, apiReq,errorHandler) {
             this.initial         = true;
             this.end             = false;
             this.busy            = false;
-            this.ruleID          = null;
-            this.decoderPosition = null;
-            this.onlyParents     = false;
         }
     }
 
