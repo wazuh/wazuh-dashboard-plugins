@@ -25,11 +25,11 @@
 
                     <div layout="row" class="wz-padding-top-10">
                         <span flex="25">Configuration sum</span>
-                        <span class="wz-text-right color-grey">{{ currentGroup.conf_sum }}</span>
+                        <span class="wz-text-right color-grey">{{ currentGroup.configSum }}</span>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex="25">Merged sum</span>
-                        <span class="wz-text-right color-grey">{{ currentGroup.merged_sum }}</span>
+                        <span class="wz-text-right color-grey">{{ currentGroup.mergedSum }}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -74,7 +74,7 @@
                 flex
                 extra-limit="true"
                 path="'/agents/groups'"
-                keys="['name',{value:'count',size:1},{value:'merged_sum',size:3}]"
+                keys="['name',{value:'count',size:1},{value:'mergedSum',size:3}]"
                 allow-click="true"
                 rows-per-page="14">
             </wazuh-table>

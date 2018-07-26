@@ -24,7 +24,7 @@ app.controller('agentsController',
 function (
     $timeout, $scope, $location, $rootScope,
     appState, apiReq, AgentsAutoComplete, errorHandler,
-    tabVisualizations, vis2png, shareAgent, commonData,
+    tabVisualizations, shareAgent, commonData,
     reportingService, visFactoryService, csvReq,
     wzTableFilter
 ) {
@@ -310,7 +310,7 @@ function (
             $scope.groupMergedSum = (groupMergedSum.length) ? groupMergedSum[0].mergedSum : 'Unknown';
 
             const agentMergedSum  = agentGroups[1].data.data.items.filter(item => item.id === $scope.agent.id);
-            $scope.agentMergedSum = (agentMergedSum.length) ? agentMergedSum[0].merged_sum : 'Unknown';
+            $scope.agentMergedSum = (agentMergedSum.length) ? agentMergedSum[0].mergedSum : 'Unknown';
 
             $scope.isSynchronized = (($scope.agentMergedSum === $scope.groupMergedSum) && !([$scope.agentMergedSum,$scope.groupMergedSum].includes('Unknown')) ) ? true : false;
 
