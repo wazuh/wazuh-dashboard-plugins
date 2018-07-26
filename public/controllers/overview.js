@@ -97,6 +97,10 @@ function ($scope, $location, $rootScope, appState,
     $scope.switchSubtab = async (subtab, force = false, sameTab = true, preserveDiscover = false) => {
         try {
 
+            if($scope.tab && $scope.tab === 'welcome' && typeof $scope.agentsCountTotal === 'undefined'){
+                await getSummary();
+            }
+            
             if ($scope.tabView === subtab && !force) return;
 
             visFactoryService.clear()
