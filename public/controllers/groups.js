@@ -54,16 +54,15 @@ function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState,
         try {
             // If come from agents
             if(globalAgent) {
-                let len = 0;
                 // Get ALL groups
-                const data = await apiReq.request('GET','/agents/groups/',{limit:99999})
+                const data = await apiReq.request('GET','/agents/groups/',{limit:1000});
 
                 const filtered = data.data.data.items.filter(group => group.name === globalAgent.group);
 
                 if(Array.isArray(filtered) && filtered.length){
                     // Load that our group
                     $scope.loadGroup(filtered[0],true);
-                    $scope.lookingGroup=true
+                    $scope.lookingGroup = true;
                 } else {
                     throw Error(`Group ${globalAgent.group} not found`);
                 }
