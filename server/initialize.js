@@ -54,8 +54,8 @@ export default (server, options) => {
             const xpack = await wzWrapper.getPlugins();
 
             log('[initialize][checkKnownFields]', `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`,'info');
-            server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);  
-                    
+            server.log([blueWazuh, 'initialize', 'info'], `x-pack enabled: ${typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'}`);
+
             const indexPatternList = await wzWrapper.getAllIndexPatterns();
 
             log('[initialize][checkKnownFields]', `Found ${indexPatternList.hits.total} index patterns`,'info')
@@ -210,12 +210,12 @@ export default (server, options) => {
         try {
             log('[initialize][checkAPIEntriesExtensions]', `Checking extensions consistency for all API entries`,'info')
             server.log([blueWazuh, '[initialize][checkAPIEntriesExtensions]', 'info'],  `Checking extensions consistency for all API entries`)
-             
+
             const apiEntries = await wzWrapper.getWazuhAPIEntries();
             const configFile = await getConfiguration();
 
             if (apiEntries && apiEntries.hits && apiEntries.hits.total > 0) {
-                
+
                 const currentExtensions = !configFile ? defaultExt : {};
 
                 if(configFile) {
@@ -227,7 +227,7 @@ export default (server, options) => {
                 }
 
                 for(const item of apiEntries.hits.hits) {
-                    for(const key in currentExtensions){ 
+                    for(const key in currentExtensions){
                         if(item && item._source && item._source.extensions && typeof item._source.extensions[key] !== 'undefined'){
                             continue;
                         } else {
@@ -244,7 +244,7 @@ export default (server, options) => {
                         log('[initialize][checkAPIEntriesExtensions]', `Error updating API entry with ID: ${item._id} due to ${error.message || error}`)
                         server.log([blueWazuh, '[initialize][checkAPIEntriesExtensions]', 'error'], `Error updating API entry extensions with ID: ${item._id} due to ${error.message || error}`);
                     }
-                    
+
                 }
             } else {
                 log('[initialize][checkAPIEntriesExtensions]', 'There are no API entries, skipping extensions check','info')
@@ -292,10 +292,10 @@ export default (server, options) => {
                         throw new Error('Error creating index .wazuh.');
                     }
 
-                } else { 
-                    
+                } else {
+
                     await checkAPIEntriesExtensions();
-                
+
                     // The .wazuh index exists, we now proceed to check whether it's from an older version
                     try{
                         await wzWrapper.getOldWazuhSetup();

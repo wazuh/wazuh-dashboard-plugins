@@ -166,8 +166,8 @@ export default class WazuhElastic {
     /**
      * Checks one by one if the requesting user has enough privileges to use
      * an index pattern from the list.
-     * @param {Array<Object>} list List of index patterns 
-     * @param {*} req 
+     * @param {Array<Object>} list List of index patterns
+     * @param {*} req
      */
     async filterAllowedIndexPatternList (list,req) {
         let finalList = [];
@@ -181,9 +181,9 @@ export default class WazuhElastic {
             if((results && results.hits && results.hits.total >= 1) ||
                (!forbidden && results && results.hits && results.hits.total === 0)
             ) {
-               
+
                 finalList.push(item);
-            
+
             }
         }
         return finalList;
@@ -219,15 +219,15 @@ export default class WazuhElastic {
         try {
             const xpack          = await this.wzWrapper.getPlugins();
 
-            const isXpackEnabled = typeof XPACK_RBAC_ENABLED !== 'undefined' && 
-                                   XPACK_RBAC_ENABLED && 
-                                   typeof xpack === 'string' && 
+            const isXpackEnabled = typeof XPACK_RBAC_ENABLED !== 'undefined' &&
+                                   XPACK_RBAC_ENABLED &&
+                                   typeof xpack === 'string' &&
                                    xpack.includes('x-pack');
-            
-            const isSuperUser    = isXpackEnabled && 
-                                   req.auth && 
-                                   req.auth.credentials && 
-                                   req.auth.credentials.roles && 
+
+            const isSuperUser    = isXpackEnabled &&
+                                   req.auth &&
+                                   req.auth.credentials &&
+                                   req.auth.credentials.roles &&
                                    req.auth.credentials.roles.includes('superuser');
 
             const data = await this.wzWrapper.getAllIndexPatterns();
@@ -236,7 +236,7 @@ export default class WazuhElastic {
 
             if(data && data.hits && data.hits.hits){
                 const list = this.validateIndexPattern(data.hits.hits);
-                
+
                 return reply({data: isXpackEnabled && !isSuperUser ? await this.filterAllowedIndexPatternList(list,req) : list});
             }
 
@@ -297,7 +297,7 @@ export default class WazuhElastic {
                 aux_source = JSON.stringify(element._source);
                 aux_source = aux_source.replace("wazuh-alerts", id);
                 aux_source = JSON.parse(aux_source);
-    
+
                 // Bulk source
                 bulk_content = {};
                 bulk_content[element._type] = aux_source;
@@ -314,12 +314,12 @@ export default class WazuhElastic {
                         query = query.substring(0, query.length - 1);
                     } else if(title === 'Wazuh App Cluster Overview Manager') {
                         query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`
-                    }                   
-  
+                    }
+
                     visState.params.expression = query;
                     bulk_content.visualization.visState = JSON.stringify(visState);
                 }
-  
+
                 visArray.push({
                     attributes: bulk_content.visualization,
                     type      : element._type,
@@ -329,7 +329,7 @@ export default class WazuhElastic {
             }
 
             return visArray;
-        
+
         } catch (error) {
             return Promise.reject(error)
         }
@@ -354,10 +354,10 @@ export default class WazuhElastic {
             const file = tabPrefix === 'overview' ?
                          OverviewVisualizations[tabSufix] :
                          AgentsVisualizations[tabSufix];
-           
+
             const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
             return reply({acknowledge: true, raw: raw });
-            
+
         } catch(error){
             return ErrorResponse(error.message || error, 4007, 500, reply);
         }
@@ -385,14 +385,14 @@ export default class WazuhElastic {
             const nodes       = req.payload.nodes.items;
             const name        = req.payload.nodes.name;
             const master_node = req.payload.nodes.master_node;
-            
+
             const pattern_doc  = await this.wzWrapper.getIndexPatternUsingGet(req.params.pattern);
             const pattern_name = pattern_doc._source['index-pattern'].title;
 
             const raw = await this.buildClusterVisualizationsRaw(file, req.params.pattern, nodes, name, master_node, pattern_name);
 
             return reply({acknowledge: true, raw: raw });
-            
+
         } catch(error){
             return ErrorResponse(error.message || error, 4009, 500, reply);
         }
