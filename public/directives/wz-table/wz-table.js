@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import template        from './template.html';
+import template        from './wz-table.html';
 import { uiModules }   from 'ui/modules';
 import DataFactory     from '../../services/data-factory';
 import KeyEquivalenece from '../../../util/csv-key-equivalence';
