@@ -97,6 +97,10 @@ function ($scope, $location, $rootScope, appState,
     $scope.switchSubtab = async (subtab, force = false, sameTab = true, preserveDiscover = false) => {
         try {
 
+            if($scope.tab && $scope.tab === 'welcome' && typeof $scope.agentsCountTotal === 'undefined'){
+                await getSummary();
+            }
+            
             if ($scope.tabView === subtab && !force) return;
 
             visFactoryService.clear()
@@ -154,6 +158,25 @@ function ($scope, $location, $rootScope, appState,
         }
     };
 
+    const getSummary = async () => {
+        try {
+            const data = await apiReq.request('GET', '/agents/summary', { });
+
+            if(data && data.data && data.data.data){
+                $scope.agentsCountActive         = data.data.data.Active;
+                $scope.agentsCountDisconnected   = data.data.data.Disconnected;
+                $scope.agentsCountNeverConnected = data.data.data['Never connected'];
+                $scope.agentsCountTotal          = data.data.data.Total;
+                $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
+            } else {
+                throw new Error('Error fetching /agents/summary from Wazuh API');
+            }
+            return;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
     const loadConfiguration = async () => {
         try {
             const configuration = wazuhConfig.getConfig();
@@ -161,17 +184,7 @@ function ($scope, $location, $rootScope, appState,
             $scope.wzMonitoringEnabled = !!configuration['wazuh.monitoring.enabled'];
 
             if(!$scope.wzMonitoringEnabled){
-                const data = await apiReq.request('GET', '/agents/summary', { });
-
-                if(data && data.data && data.data.data){
-                    $scope.agentsCountActive         = data.data.data.Active;
-                    $scope.agentsCountDisconnected   = data.data.data.Disconnected;
-                    $scope.agentsCountNeverConnected = data.data.data['Never connected'];
-                    $scope.agentsCountTotal          = data.data.data.Total;
-                    $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
-                } else {
-                    throw new Error('Error fetching /agents/summary from Wazuh API');
-                }
+                await getSummary();
             }
 
             return;
@@ -184,6 +197,7 @@ function ($scope, $location, $rootScope, appState,
 
     const init = async () => {
         try {
+            
             await Promise.all([
                 loadPciAndGDPR(),
                 loadConfiguration()
@@ -191,13 +205,19 @@ function ($scope, $location, $rootScope, appState,
 
             $scope.switchTab($scope.tab,true);
 
+            if($scope.tab && $scope.tab === 'welcome'){
+                await getSummary();
+            }
+
+            if(!$scope.$$phase) $scope.$digest()
+
             return;
 
         } catch (error) {
             errorHandler.handle(error, 'Overview (init)')
             return;
         }
-    }
+    };
 
     init();
 
