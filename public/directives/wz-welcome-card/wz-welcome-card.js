@@ -11,7 +11,8 @@ app.directive('wzWelcomeCard',function(){
             description: '=description',
             logo:        '=logo',
             switchTab:   '&',
-            currentTab:  '=currentTab'
+            currentTab:  '=currentTab',
+            wzLogo:      '=wzLogo'
         },
         replace: true,
         link: function(scope,elm,attrs){
