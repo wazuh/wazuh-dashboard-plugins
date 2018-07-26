@@ -16,7 +16,7 @@ app.directive('wzWelcomeCard',function(){
         },
         replace: true,
         link: function(scope,elm,attrs){
-            scope.callSwitchTab = () => scope.switchTab()(scope.currentTab);
+            scope.callSwitchTab = () => scope.switchTab();
         },
         template
     };
