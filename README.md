@@ -38,6 +38,16 @@ Install the app
 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.4.0_6.3.2.zip
 ```
 
+Restart Kibana
+
+```
+// Systemd
+systemctl restart kibana
+
+// SysV Init
+service kibana restart
+```
+
 ## Upgrade
 
 Stop Kibana
@@ -66,6 +76,16 @@ Install the app
 
 ```
 /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.x.x_6.x.x.zip
+```
+
+Restart Kibana
+
+```
+// Systemd
+systemctl restart kibana
+
+// SysV Init
+service kibana restart
 ```
 
 ## Older packages
