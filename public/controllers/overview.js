@@ -163,11 +163,13 @@ function ($scope, $location, $rootScope, appState,
             const data = await apiReq.request('GET', '/agents/summary', { });
 
             if(data && data.data && data.data.data){
-                $scope.agentsCountActive         = data.data.data.Active;
+                const active = data.data.data.Active - 1;
+                const total  = data.data.data.Total  - 1;
+                $scope.agentsCountActive         = active;
                 $scope.agentsCountDisconnected   = data.data.data.Disconnected;
                 $scope.agentsCountNeverConnected = data.data.data['Never connected'];
-                $scope.agentsCountTotal          = data.data.data.Total;
-                $scope.agentsCoverity            = (data.data.data.Active / data.data.data.Total) * 100;
+                $scope.agentsCountTotal          = total;
+                $scope.agentsCoverity            = total ? (active / total) * 100 : 0;
             } else {
                 throw new Error('Error fetching /agents/summary from Wazuh API');
             }
