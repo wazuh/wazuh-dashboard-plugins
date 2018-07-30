@@ -40,11 +40,15 @@ Install the app
 
 Restart Kibana
 
-```
-// Systemd
-systemctl restart kibana
+- Systemd:
 
-// SysV Init
+```
+systemctl restart kibana
+```
+
+- SysV Init:
+
+```
 service kibana restart
 ```
 
@@ -52,11 +56,15 @@ service kibana restart
 
 Stop Kibana
 
-```
-// Systemd
-systemctl stop kibana
+- Systemd:
 
-// SysV Init
+```
+systemctl stop kibana
+```
+
+- SysV Init:
+
+```
 service kibana stop
 ```
 
@@ -80,11 +88,15 @@ Install the app
 
 Restart Kibana
 
-```
-// Systemd
-systemctl restart kibana
+- Systemd:
 
-// SysV Init
+```
+systemctl restart kibana
+```
+
+- SysV Init:
+
+```
 service kibana restart
 ```
 
