@@ -38,12 +38,12 @@ app.directive('kbnVis', [function () {
                         .query({ language: discoverList[0].language || 'lucene', query: implicitFilter })
                         .set('filter', discoverList.length > 1 ? [...discoverList[1], ...rawFilters] : rawFilters);
                 } else {
-                    // Checks for cluster.name filter existence 
-                    const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && item.meta.key.includes('cluster.name'));
-
-                    // Applying specific filter to Agents status
+                    // Checks for cluster.name or cluster.node filter existence 
+                    const monitoringFilter = discoverList[1].filter(item => item && item.meta && item.meta.key && (item.meta.key.includes('cluster.name') || item.meta.key.includes('cluster.node')));
+                    
+                    // Applying specific filter to cluster monitoring vis
                     if (Array.isArray(monitoringFilter) && monitoringFilter.length) {
-                        visualization.searchSource.filter(monitoringFilter[0]);
+                        visualization.searchSource.set('filter',monitoringFilter);
                     }
                 }
             };
