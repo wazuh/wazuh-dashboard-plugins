@@ -21,7 +21,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 - [Wazuh installation guide](https://documentation.wazuh.com/current/installation-guide/index.html)
 - [Screenshots](https://documentation.wazuh.com/current/index.html#example-screenshots)
 
-![Overview](https://documentation.wazuh.com/current/_images/overview-general.png)
+![Overview](/public/img/app.png)
 
 ## Requisites
 
