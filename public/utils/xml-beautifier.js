@@ -38,8 +38,7 @@ export default xml => {
         'other->other': 0
     };
 
-    for (var i = 0; i < lines.length; i++) {
-        var ln = lines[i];
+    for (const ln of lines) {
 
         // Luca Viggiani 2017-07-03: handle optional <?xml ... ?> declaration
         if (ln.match(/\s*<\?xml/)) {
@@ -48,16 +47,16 @@ export default xml => {
         }
         // ---
 
-        var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
-        var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
-        var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-        var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
-        var fromTo = lastType + '->' + type;
+        const single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
+        const closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
+        const opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
+        const type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
+        const fromTo = lastType + '->' + type;
         lastType = type;
-        var padding = '';
+        let padding = '';
 
         indent += transitions[fromTo];
-        for (var j = 0; j < indent; j++) {
+        for (let j = 0; j < indent; j++) {
             padding += '\t';
         }
         if (fromTo == 'opening->closing')
