@@ -21,7 +21,7 @@ const app = uiModules.get('app/wazuh', []);
 
 app.controller('overviewController', 
 function ($scope, $location, $rootScope, appState, 
-          genericReq, errorHandler, apiReq, tabVisualizations, 
+          errorHandler, apiReq, tabVisualizations, 
           commonData, reportingService, visFactoryService,
           wazuhConfig
 ) {
