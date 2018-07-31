@@ -9,26 +9,28 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier    from '../utils/json-beautifier';
-import { uiModules } from 'ui/modules'
-import FilterHandler from '../utils/filter-handler'
-import generateMetric from '../utils/generate-metric'
-import TabNames       from '../utils/tab-names'
-import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal } from '../utils/agents-metrics'
-import * as FileSaver from '../services/file-saver'
+import beautifier     from '../utils/json-beautifier';
+import { uiModules }  from 'ui/modules';
+import FilterHandler  from '../utils/filter-handler';
+import generateMetric from '../utils/generate-metric';
+import TabNames       from '../utils/tab-names';
+import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal } from '../utils/agents-metrics';
+import * as FileSaver from '../services/file-saver';
+
+import DataFactory from '../services/data-factory';
 
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('agentsController',
 
 function (
-    $timeout, $scope, $location, $rootScope,
-    appState, apiReq, AgentsAutoComplete, errorHandler,
-    tabVisualizations, vis2png, shareAgent, commonData,
+    $scope, $location, $rootScope,
+    appState, apiReq, errorHandler,
+    tabVisualizations, shareAgent, commonData,
     reportingService, visFactoryService, csvReq,
     wzTableFilter
 ) {
-
+    const agentFactory = new DataFactory(apiReq,'/agents');
     $rootScope.reportStatus = false;
 
     $location.search('_a',null)
@@ -38,8 +40,6 @@ function (
     const currentApi  = JSON.parse(appState.getCurrentAPI()).id;
     const extensions  = appState.getExtensions(currentApi);
     $scope.extensions = extensions;
-
-    $scope.agentsAutoComplete = AgentsAutoComplete;
 
     $scope.tabView = commonData.checkTabViewLocation();
     $scope.tab     = commonData.checkTabLocation();
@@ -154,7 +154,7 @@ function (
         $scope.agent.syscheck = result;
     }
 
-    $scope.getAgent = async (newAgentId,fromAutocomplete) => {
+    $scope.getAgent = async newAgentId => {
         try {
             $scope.load = true;
             changeAgent = true;
@@ -212,25 +212,19 @@ function (
     };
 
     $scope.goGroups = agent => {
-        $scope.agentsAutoComplete.reset();
         visFactoryService.clearAll()
         shareAgent.setAgent(agent)
         $location.search('tab', 'groups');
         $location.path('/manager');
     };
 
-    $scope.analyzeAgents = async search => {
-        try {
-            await $timeout(200);
-            $scope.agentsAutoComplete.filters = [];
-            await $scope.agentsAutoComplete.addFilter('search',search);
+    $scope.analyzeAgents = search => {
+        agentFactory.items = [];
+        agentFactory.addFilter('search',search);
+        return agentFactory.fetch({nonull: true})
+                .then(data => data.items)
+                .catch(error => errorHandler.handle(error,'Agents'))
 
-            if(!$scope.$$phase) $scope.$digest();
-            return $scope.agentsAutoComplete.items;
-        } catch (error) {
-            errorHandler.handle(error,'Agents');
-        }
-        return;
     }
 
     $scope.downloadCsv = async data_path => {
@@ -254,7 +248,6 @@ function (
     //Destroy
     $scope.$on("$destroy", () => {
         visFactoryService.clearAll()
-        $scope.agentsAutoComplete.reset();
     });
 
     // PCI and GDPR requirements
@@ -351,7 +344,6 @@ function (
     //Load
     try {
         $scope.getAgent();
-        $scope.agentsAutoComplete.nextPage('');
     } catch (e) {
         errorHandler.handle('Unexpected exception loading controller','Agents');
     }
