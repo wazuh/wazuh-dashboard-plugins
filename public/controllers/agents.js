@@ -9,13 +9,15 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier    from '../utils/json-beautifier';
-import { uiModules } from 'ui/modules'
-import FilterHandler from '../utils/filter-handler'
-import generateMetric from '../utils/generate-metric'
-import TabNames       from '../utils/tab-names'
-import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal } from '../utils/agents-metrics'
-import * as FileSaver from '../services/file-saver'
+import beautifier     from '../utils/json-beautifier';
+import { uiModules }  from 'ui/modules';
+import FilterHandler  from '../utils/filter-handler';
+import generateMetric from '../utils/generate-metric';
+import TabNames       from '../utils/tab-names';
+import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal } from '../utils/agents-metrics';
+import * as FileSaver from '../services/file-saver';
+
+import TabDescription from '../../server/reporting/tab-description';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -28,7 +30,7 @@ function (
     reportingService, visFactoryService, csvReq,
     wzTableFilter
 ) {
-
+    $scope.TabDescription = TabDescription;
     $rootScope.reportStatus = false;
 
     $location.search('_a',null)
