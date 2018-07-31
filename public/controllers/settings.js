@@ -16,7 +16,7 @@ import TabNames      from '../utils/tab-names';
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('settingsController', 
-function ($scope, $routeParams, $window, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
+function ($scope, $routeParams, $window, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
     if (wzMisc.getValue('comeFromWizard')) {
         $window.sessionStorage.removeItem('healthCheck');
         wzMisc.setWizard(false);
@@ -82,7 +82,7 @@ function ($scope, $routeParams, $window, $route, $location, testAPI, appState, g
 
     // Get current API index
     const getCurrentAPIIndex = () => {
-        $scope.apiEntries.map((entry,index,array) => {
+        $scope.apiEntries.map((entry,index,array) => { // eslint-disable-line
             if(entry._id === $scope.currentDefault) currentApiEntryIndex = index;
         })
     }

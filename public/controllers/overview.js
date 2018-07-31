@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import $              from 'jquery';
 import { uiModules } from 'ui/modules'
 import FilterHandler  from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
@@ -20,7 +19,7 @@ const app = uiModules.get('app/wazuh', []);
 
 app.controller('overviewController', 
 function ($scope, $location, $rootScope, appState, 
-          genericReq, errorHandler, apiReq, tabVisualizations, 
+          errorHandler, apiReq, tabVisualizations, 
           commonData, reportingService, visFactoryService,
           wazuhConfig
 ) {
