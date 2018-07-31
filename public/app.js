@@ -41,13 +41,13 @@ import './utils/codemirror/mark-selection.js'
 
 
 // Material
-import './../node_modules/angular-material/angular-material.css';
-import './../node_modules/angular-aria/angular-aria.js';
-import './../node_modules/angular-animate/angular-animate.js';
-import './../node_modules/angular-material/angular-material.js';
+import 'angular-material/angular-material.css';
+import 'angular-aria/angular-aria';
+import 'angular-animate/angular-animate';
+import 'angular-material/angular-material';
 
 // Cookies
-import './../node_modules/angular-cookies/angular-cookies.min.js';
+import 'angular-cookies/angular-cookies';
 
 import 'ui/autoload/all';
 import 'ui/chrome';
