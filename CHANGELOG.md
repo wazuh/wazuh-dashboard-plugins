@@ -2,6 +2,14 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.5.0 - Kibana v6.3.1/6.3.2 - Revision 402
+
+### Added
+
+- Support for Wazuh v3.5.0
+- Added new fields for Vulnerability detector alerts ([#752](https://github.com/wazuh/wazuh-kibana-app/pull/752)).
+- Added multi table search for wz-table directive. Added two new log levels for Management > Logs section ([#753](https://github.com/wazuh/wazuh-kibana-app/pull/753))
+
 ## Wazuh v3.4.0 - Kibana v6.3.1/6.3.2 - Revision 401
 
 ### Added
