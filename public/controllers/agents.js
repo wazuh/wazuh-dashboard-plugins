@@ -26,7 +26,7 @@ app.controller('agentsController',
 function (
     $timeout, $scope, $location, $rootScope,
     appState, apiReq, AgentsAutoComplete, errorHandler,
-    tabVisualizations, vis2png, shareAgent, commonData,
+    tabVisualizations, shareAgent, commonData,
     reportingService, visFactoryService, csvReq,
     wzTableFilter
 ) {
