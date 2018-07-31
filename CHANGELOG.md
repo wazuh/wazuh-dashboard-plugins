@@ -2,6 +2,29 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.4.0 - Kibana v6.3.1/6.3.2 - Revision 401
+
+### Added
+
+- Added few new fields for Kibana due to new Wazuh feature named _who-data_ ([#763](https://github.com/wazuh/wazuh-kibana-app/pull/763)).
+- Added XML / JSON viewer for each card under Management > Configuration ([#764](https://github.com/wazuh/wazuh-kibana-app/pull/764)).
+
+### Changed
+
+- Improved error handling for Dev tools. Also removed some unused dependencies from Dev tools ([#760](https://github.com/wazuh/wazuh-kibana-app/pull/760)).
+- Unified origin for tab descriptions. Reviewed some grammar typos ([#765](https://github.com/wazuh/wazuh-kibana-app/pull/765)).
+- Refactored agents autocomplete component. Removed unused/deprecated modules ([#766](https://github.com/wazuh/wazuh-kibana-app/pull/766))
+- Simplified route resolves section ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+
+### Fixed
+
+- Fixed missing cluster node filter for the visualization shown when looking for specific node under Management > Monitoring section ([#758](https://github.com/wazuh/wazuh-kibana-app/pull/758)).
+- Fixed missing dependency injection for wzMisc factory ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+
+### Removed
+
+- Removed `angular-aria`, `angular-md5`, `ansicolors`, `js-yaml`, `querystring` and `lodash` dependencies because Kibana includes all of them. Removed unused images ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+
 ## Wazuh v3.4.0 - Kibana v6.3.1/6.3.2 - Revision 400
 
 ### Added
