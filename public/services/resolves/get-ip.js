@@ -16,7 +16,7 @@ import healthCheck from './health-check'
 
 export default (Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc) => {
     const deferred = $q.defer();
-
+    console.log(wzMisc)
     const catchFunction = error => {
         deferred.reject(error);
         wzMisc.setBlankScr(errorHandler.handle(error,'Elasticsearch',false,true));
