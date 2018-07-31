@@ -27,8 +27,8 @@ import settingsTemplate    from '../templates/settings/settings.jade'
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html'
 import devToolsTemplate    from '../templates/dev-tools/dev-tools.html'
 
-function ip(Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc){
-    return getIp(Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc);
+function ip(courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc){
+    return getIp(courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc);
 }
 
 function nestedResolve(
