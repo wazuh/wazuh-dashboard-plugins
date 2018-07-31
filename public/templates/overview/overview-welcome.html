@@ -40,14 +40,12 @@
                         <wz-welcome-card 
                             class="euiFlexItem" logo="'app_logging.svg'" title="'File integrity'"
                             switch-tab="switchTab('fim')" current-tab="'fim'"
-                            description="'Wazuh’s File integrity monitoring (FIM) watches specified files triggering
-                            alerts when these files are modified.'"
+                            description="TabDescription.fim.description"
                         ></wz-welcome-card>
                         <wz-welcome-card 
                             ng-if="extensions.aws" class="euiFlexItem" logo="'app_index_pattern.svg'" 
                             title="'AWS'" switch-tab="switchTab('aws')" current-tab="'aws'"
-                            description="'Amazon CloudTrail support is now a built-in Wazuh capability, giving you
-                            the ability to search, analyze, and alert on AWS CloudTrail events.'"
+                            description="TabDescription.aws.description"
                         ></wz-welcome-card>
                     </div>
                 </div>
@@ -60,27 +58,22 @@
                         <wz-welcome-card 
                             class="euiFlexItem" logo="'app_advanced_settings.svg'" 
                             title="'Policy monitoring'" switch-tab="switchTab('pm')" current-tab="'pm'"
-                            description="'Policy monitoring is the process of verifying that all systems conform to
-                            a set of predefined rules regarding configuration settings and approved
-                            application usage.'"
+                            description="TabDescription.pm.description"
                         ></wz-welcome-card>
                         <wz-welcome-card 
                             ng-if="extensions.audit" class="euiFlexItem" logo="'app_monitoring.svg'" 
                             title="'Audit'" switch-tab="switchTab('audit')" current-tab="'audit'"
-                            description="'The Linux auditd system is an extensive auditing facility, which we will
-                            only touch on here.'"
+                            description="TabDescription.audit.description"
                         ></wz-welcome-card>
                         <wz-welcome-card 
                             ng-if="extensions.oscap" class="euiFlexItem" logo="'app_discover.svg'" 
                             title="'Open SCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'"
-                            description="'SCAP jointly uses several specifications in order to automate continuous
-                            monitoring, vulnerability management, and reporting on results of security
-                            compliance scans.'"
+                            description="TabDescription.oscap.description"
                         ></wz-welcome-card>
                         <wz-welcome-card 
                             ng-if="extensions.ciscat" class="euiFlexItem" logo="'app_management.svg'" 
                             title="'CIS-CAT'" switch-tab="switchTab('ciscat')" current-tab="'ciscat'"
-                            description="'Integrated CIS benchmark assessments into Wazuh agents.'"
+                            description="TabDescription.ciscat.description"
                         ></wz-welcome-card>
                     </div>
                 </div>
@@ -99,12 +92,12 @@
                             <wz-welcome-card 
                                 class="euiFlexItem" logo="'app_security.svg'" 
                                 title="'Vulnerabilities'" switch-tab="switchTab('vuls')" current-tab="'vuls'"
-                                description="'Detect applications that are known to be vulnerable (affected by a CVE).'"
+                                description="TabDescription.vuls.description"
                             ></wz-welcome-card>
                             <wz-welcome-card 
                                 ng-if="extensions.virustotal" class="euiFlexItem" logo="'app_saved_objects.svg'" 
                                 title="'Virustotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
-                                description="'Scans monitored files for malicious content.'"
+                                description="TabDescription.virustotal.description"
                             ></wz-welcome-card>
                         </div>
                     </div>
@@ -119,16 +112,12 @@
                             <wz-welcome-card 
                                 ng-if="extensions.pci" class="euiFlexItem" logo="'app_apm.svg'" 
                                 title="'PCI DSS'" switch-tab="switchTab('pci')" current-tab="'pci'"
-                                description="'Wazuh helps to implement PCI DSS by performing log analysis, file integrity
-                                checking, policy monitoring, intrusion detection, real-time alerting
-                                and active response.'"
+                                description="TabDescription.pci.description"
                             ></wz-welcome-card>
                             <wz-welcome-card 
                                 ng-if="extensions.gdpr" class="euiFlexItem" logo="'app_visualize.svg'" 
                                 title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'"
-                                description="'The General Data Protection Regulation took effect on 25th May 2018.
-                                Wazuh helps with most technical requirements, taking advantage of
-                                features such as File Integrity or Policy monitoring.'"
+                                description="TabDescription.gdpr.description"
                             ></wz-welcome-card>
                         </div>
                     </div>
