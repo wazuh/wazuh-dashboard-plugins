@@ -79,7 +79,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
     $scope.searchTerm = '';
     $scope.viewingDetail = false;
     $scope.setRulesTab('rules');
-    $scope.isArray = angular.isArray;
+    $scope.isArray = Array.isArray;
 
     $scope.colorRuleArg = ruleArg => {
         ruleArg = ruleArg.toString();
@@ -160,7 +160,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
     $scope.viewingDetail = false;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
-    $scope.isArray = angular.isArray;
+    $scope.isArray = Array.isArray;
 
     $scope.includesFilter = filterName => $scope.appliedFilters.map(item => item.name).includes(filterName);
     
