@@ -13,7 +13,7 @@ import { uiModules } from 'ui/modules'
 import beautifier    from '../utils/json-beautifier'
 import CodeMirror    from '../utils/codemirror/lib/codemirror'
 import jsonLint      from '../utils/codemirror/json-lint'
-import queryString   from 'query-string'
+import queryString   from 'querystring-browser'
 
 const app = uiModules.get('app/wazuh', []);
 
