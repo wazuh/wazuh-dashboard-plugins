@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules'
-import beautifier    from '../utils/json-beautifier'
 import CodeMirror    from '../utils/codemirror/lib/codemirror'
 import jsonLint      from '../utils/codemirror/json-lint'
 import queryString   from 'query-string'
+import $             from 'jquery'
 
 const app = uiModules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('devToolsController', function($scope, $rootScope, errorHandler, apiReq, $window, appState) {
+app.controller('devToolsController', function($scope, apiReq, $window, appState, errorHandler, $document) {
     let groups = [];
 
-    const apiInputBox = CodeMirror.fromTextArea(document.getElementById('api_input'),{
+    const apiInputBox = CodeMirror.fromTextArea($document[0].getElementById('api_input'),{
         lineNumbers      : true,
         matchBrackets    : true,
         mode             : { name: "javascript", json: true },
@@ -136,14 +136,14 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
                     jsonLint.parse(item.requestTextJson)
                 } catch(error) { 
                     affectedGroups.push(item.requestText);               
-                    const msg = document.createElement("div");
+                    const msg = $document[0].createElement("div");
                     msg.id = new Date().getTime()/1000;
-                    const icon = msg.appendChild(document.createElement("div"));
+                    const icon = msg.appendChild($document[0].createElement("div"));
           
                     icon.className = "lint-error-icon";
                     icon.id = new Date().getTime()/1000;
                     icon.onmouseover = () => {
-                        const advice = msg.appendChild(document.createElement("span"));
+                        const advice = msg.appendChild($document[0].createElement("span"));
                         advice.id = new Date().getTime()/1000;
                         advice.innerText = error.message || 'Error parsing query'
                         advice.className = 'lint-block-wz'
@@ -181,7 +181,7 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
         highlightGroup(currentGroup); 
     }
 
-    const apiOutputBox = CodeMirror.fromTextArea(document.getElementById('api_output'),{
+    const apiOutputBox = CodeMirror.fromTextArea($document[0].getElementById('api_output'),{
         lineNumbers    : true,
         matchBrackets  : true,
         mode           : { name: "javascript", json: true },
@@ -279,9 +279,14 @@ app.controller('devToolsController', function($scope, $rootScope, errorHandler, 
             )
 
         } catch(error) {
-            error && error.data ? 
-            apiOutputBox.setValue(JSON.stringify(error.data)) :
-            apiOutputBox.setValue('Empty')
+            const parsedError = errorHandler.handle(error,null,null,true);
+            if(typeof parsedError === 'string') {
+                return apiOutputBox.setValue(parsedError);
+            } else if(error && error.data && typeof error.data === 'object') {
+                return apiOutputBox.setValue(JSON.stringify(error.data))
+            } else {
+                return apiOutputBox.setValue('Empty')
+            }
         }
 
     }

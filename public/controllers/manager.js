@@ -9,9 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
-import beautifier    from '../utils/json-beautifier'
-import TabNames     from '../utils/tab-names'
+import { uiModules } from 'ui/modules';
+import beautifier    from '../utils/json-beautifier';
+import TabNames      from '../utils/tab-names';
+import js2xmlparser  from 'js2xmlparser';
+import XMLBeautifier from '../utils/xml-beautifier';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -115,15 +117,41 @@ app.controller('managerConfigurationController', function ($scope, errorHandler,
     $scope.isArray = angular.isArray;
 
     $scope.switchItem = item => {
+        $scope.XMLContent   = false;
+        $scope.JSONContent  = false;
         $scope.selectedItem = item;
         if(!$scope.$$phase) $scope.$digest();
     }
 
+    $scope.getXML = name => {
+        $scope.JSONContent = false;
+        if($scope.XMLContent){
+            $scope.XMLContent = false;
+        } else {
+            try {
+                $scope.XMLContent = XMLBeautifier(js2xmlparser.parse(name,configRaw[name]));
+            } catch (error) { $scope.XMLContent = false; }
+        }        
+        if(!$scope.$$phase) $scope.$digest();
+    }
+
+    $scope.getJSON = name => {
+        $scope.XMLContent = false;
+        if($scope.JSONContent){
+            $scope.JSONContent = false;
+        } else {
+            try {
+                $scope.JSONContent = beautifier.prettyPrint(configRaw[name]);
+            } catch (error) { $scope.JSONContent = false; }
+        }
+        if(!$scope.$$phase) $scope.$digest();
+    }
+    const configRaw = {};
     //Functions
     const load = async () => {
         try{
             const data = await apiReq.request('GET', '/manager/configuration', {});
-
+            Object.assign(configRaw,angular.copy(data.data.data))
             $scope.managerConfiguration = data.data.data;
 
             if($scope.managerConfiguration && $scope.managerConfiguration['active-response']){

@@ -18,19 +18,22 @@ import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metrics
 import * as FileSaver from '../services/file-saver';
 
 import DataFactory from '../services/data-factory';
+import TabDescription from '../../server/reporting/tab-description';
 
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('agentsController',
 
 function (
-    $scope, $location, $rootScope,
-    appState, apiReq, errorHandler,
+    $timeout, $scope, $location, $rootScope,
+    appState, apiReq, AgentsAutoComplete, errorHandler,
     tabVisualizations, shareAgent, commonData,
     reportingService, visFactoryService, csvReq,
     wzTableFilter
 ) {
     const agentFactory = new DataFactory(apiReq,'/agents');
+    $scope.TabDescription = TabDescription;
+
     $rootScope.reportStatus = false;
 
     $location.search('_a',null)
