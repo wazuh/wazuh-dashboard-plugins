@@ -139,7 +139,7 @@ function discoverController(
       else                                                      wzInterval = 'M';
 
 
-    } catch (error) {}
+    } catch (error) {} // eslint-disable-line
 
     return wzInterval;
   };
@@ -373,7 +373,8 @@ function discoverController(
           if (!sort) return;
 
           // get the current sort from {key: val} to ["key", "val"];
-          const currentSort = _.pairs($scope.searchSource.get('sort')).pop();
+          // WAZUH: replaced _.pairs by Object.entries due to Lodash compatibility
+          const currentSort = Object.entries($scope.searchSource.get('sort')).pop(); // eslint-disable-line
 
           // if the searchSource doesn't know, tell it so
           if (!angular.equals(sort, currentSort)) $scope.fetch();

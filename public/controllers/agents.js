@@ -183,7 +183,7 @@ function (
             if ($scope.agent.os) {
                 $scope.agentOS = $scope.agent.os.name + ' ' + $scope.agent.os.version;
             }
-            else { $scope.agentOS = 'Unknown' };
+            else { $scope.agentOS = 'Unknown' }
 
             // Syscheck
             $scope.agent.syscheck = data[1].data.data;
@@ -235,7 +235,7 @@ function (
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch(data_path, currentApi, wzTableFilter.get());
-            const blob         = new Blob([output], {type: 'text/csv'});
+            const blob         = new Blob([output], {type: 'text/csv'}); // eslint-disable-line
 
             FileSaver.saveAs(blob, 'packages.csv');
 
@@ -263,7 +263,7 @@ function (
     })
     .catch(error => errorHandler.handle(error,'Agents'));
 
-    $scope.isArray = angular.isArray;
+    $scope.isArray = Array.isArray;
 
     $scope.getAgentConfig = newAgentId => {
         if (newAgentId) {

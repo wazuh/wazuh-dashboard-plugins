@@ -9,12 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { StateProvider } from 'ui/state_management/state';
+
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import healthCheck from './health-check'
 
-export default (Promise, courier, config, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc) => {
+export default (courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc) => {
     const deferred = $q.defer();
 
     const catchFunction = error => {
@@ -27,7 +27,7 @@ export default (Promise, courier, config, $q, $rootScope, $window, $location, Pr
         deferred.reject();
         $location.path('/health-check');
     } else {
-        const State = Private(StateProvider);
+
         const savedObjectsClient = Private(SavedObjectsClientProvider);
         savedObjectsClient.find({
             type   : 'index-pattern',
@@ -41,7 +41,7 @@ export default (Promise, courier, config, $q, $rootScope, $window, $location, Pr
                 if (appState.getCurrentPattern()) { // There's cookie for the pattern
                     currentPattern = appState.getCurrentPattern();
                 } else {
-                    if(!data.data.data.length){
+                    if(!data || !data.data || !data.data.data || !data.data.data.length){
                         wzMisc.setBlankScr('Sorry but no valid index patterns were found')
                         $location.search('tab',null);
                         $location.path('/blank-screen');
@@ -53,7 +53,7 @@ export default (Promise, courier, config, $q, $rootScope, $window, $location, Pr
 
                 const onlyWazuhAlerts = savedObjects.filter(element => element.id === currentPattern);
 
-                if (onlyWazuhAlerts.length === 0) { // There's now selected ip
+                if (!onlyWazuhAlerts || !onlyWazuhAlerts.length) { // There's now selected ip
                     deferred.resolve('No ip');
                     return;
                 }

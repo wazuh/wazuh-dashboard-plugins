@@ -12,8 +12,7 @@
 import { uiModules } from 'ui/modules'
 import CodeMirror    from '../utils/codemirror/lib/codemirror'
 import jsonLint      from '../utils/codemirror/json-lint'
-import queryString   from 'query-string'
-import $             from 'jquery'
+import queryString   from 'querystring-browser'
 
 const app = uiModules.get('app/wazuh', []);
 

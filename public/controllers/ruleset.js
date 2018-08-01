@@ -22,7 +22,7 @@ const colors = [
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq, wzTableFilter) {
+app.controller('rulesController', function ($scope, $rootScope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
 
     $scope.appliedFilters = [];
     $scope.search = term => {
@@ -79,7 +79,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
     $scope.searchTerm = '';
     $scope.viewingDetail = false;
     $scope.setRulesTab('rules');
-    $scope.isArray = angular.isArray;
+    $scope.isArray = Array.isArray;
 
     $scope.colorRuleArg = ruleArg => {
         ruleArg = ruleArg.toString();
@@ -109,7 +109,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/rules', currentApi, wzTableFilter.get());
-            const blob         = new Blob([output], {type: 'text/csv'});
+            const blob         = new Blob([output], {type: 'text/csv'}); // eslint-disable-line
 
             FileSaver.saveAs(blob, 'rules.csv');
 
@@ -150,7 +150,7 @@ app.controller('rulesController', function ($timeout, $scope, $rootScope, $sce, 
 
 });
 
-app.controller('decodersController', function ($timeout, $scope, $rootScope, $sce, errorHandler, genericReq, appState, csvReq, wzTableFilter) {
+app.controller('decodersController', function ($scope, $rootScope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
     $scope.setRulesTab = tab => $rootScope.globalRulesetTab = tab;
 
     $scope.appliedFilters = [];
@@ -160,7 +160,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
     $scope.viewingDetail = false;
     $scope.typeFilter = "all";
     $scope.setRulesTab('decoders');
-    $scope.isArray = angular.isArray;
+    $scope.isArray = Array.isArray;
 
     $scope.includesFilter = filterName => $scope.appliedFilters.map(item => item.name).includes(filterName);
     
@@ -228,7 +228,7 @@ app.controller('decodersController', function ($timeout, $scope, $rootScope, $sc
         try {
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/decoders', currentApi, wzTableFilter.get());
-            const blob         = new Blob([output], {type: 'text/csv'});
+            const blob         = new Blob([output], {type: 'text/csv'}); // eslint-disable-line
 
             FileSaver.saveAs(blob, 'decoders.csv');
 

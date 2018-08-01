@@ -114,7 +114,7 @@ app.controller('managerStatusController', function ($scope, errorHandler, apiReq
 app.controller('managerConfigurationController', function ($scope, errorHandler, apiReq) {
     //Initialization
     $scope.load    = true;
-    $scope.isArray = angular.isArray;
+    $scope.isArray = Array.isArray;
 
     $scope.switchItem = item => {
         $scope.XMLContent   = false;

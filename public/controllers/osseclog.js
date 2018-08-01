@@ -42,7 +42,7 @@ app.controller('managerLogController', function ($scope, apiReq, errorHandler, c
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/manager/logs', currentApi, wzTableFilter.get());
-            const blob         = new Blob([output], {type: 'text/csv'});
+            const blob         = new Blob([output], {type: 'text/csv'}); // eslint-disable-line
 
             FileSaver.saveAs(blob, 'logs.csv');
             
