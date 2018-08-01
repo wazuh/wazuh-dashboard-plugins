@@ -15,6 +15,8 @@ import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
 import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
 
+import TabDescription from '../../server/reporting/tab-description';
+
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('overviewController', 
@@ -23,7 +25,7 @@ function ($scope, $location, $rootScope, appState,
           commonData, reportingService, visFactoryService,
           wazuhConfig
 ) {
-
+    $scope.TabDescription = TabDescription;
     $rootScope.reportStatus = false;
 
     $location.search('_a',null)

@@ -62,7 +62,7 @@
 
         <!-- Agent autocomplete selector section -->
         <div flex="30" class="wz-margin-8-no-left">
-            <md-autocomplete id="agentsAutocomplete" flex class="wz-autocomplete wz-select-input"
+            <md-autocomplete flex class="wz-autocomplete wz-select-input"
             md-no-cache="true"
             md-select-on-match="false"
             md-selected-item="_swpagent"
@@ -74,8 +74,7 @@
             md-no-asterisk="false"
             md-menu-class="autocomplete-custom-agents-bar"
             md-search-text-change="analyzeAgents(searchTerm)"
-            placeholder="Search by name, ID or IP address"
-            lazy-load-data="agentsAutoComplete.nextPage('')">
+            placeholder="Search by name, ID or IP address">
                 <md-item-template>
                     <span class="item-title">
                         <span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>

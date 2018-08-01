@@ -12,7 +12,8 @@
 
 // Require CSS
 import './less/loader';
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
+
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
@@ -26,19 +27,9 @@ app.config(['$httpProvider', function($httpProvider) {
 
 // Font Awesome, Kibana UI framework and others
 import './utils/fontawesome/css/font-awesome.min.css';
-import './utils/when-scrolled/when-scrolled.js';
 
 // Dev tools
-import './utils/codemirror/codemirror.css'
-import './utils/codemirror/foldgutter.css'
-import './utils/codemirror/ttcn.css'
-import './utils/codemirror/javascript.js'
-import './utils/codemirror/brace-fold.js'
-import './utils/codemirror/foldcode.js'
-import './utils/codemirror/foldgutter.js'
-import './utils/codemirror/search-cursor.js'
-import './utils/codemirror/mark-selection.js'
-
+import './utils/codemirror'
 
 // Material
 import 'angular-material/angular-material.css';

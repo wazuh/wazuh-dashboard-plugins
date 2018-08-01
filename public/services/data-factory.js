@@ -79,7 +79,7 @@ export default class DataFactory {
             // Ignore manager as an agent, once the team solves this issue, review this line
             if(this.path === '/agents') this.items = this.items.filter(item => item.id !== '000');
 
-            if(remaining > 0 )this.items.push(...Array(remaining).fill(null));
+            if((!options || !options.nonull) && remaining > 0 ) this.items.push(...Array(remaining).fill(null));
 
             const end = new Date();
             const elapsed = (end - start) / 1000;
