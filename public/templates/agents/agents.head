@@ -62,7 +62,7 @@
 
         <!-- Agent autocomplete selector section -->
         <div flex="30" class="wz-margin-8-no-left">
-            <md-autocomplete id="agentsAutocomplete" flex class="wz-autocomplete wz-select-input"
+            <md-autocomplete flex class="wz-autocomplete wz-select-input"
             md-no-cache="true"
             md-select-on-match="false"
             md-selected-item="_swpagent"
@@ -74,8 +74,7 @@
             md-no-asterisk="false"
             md-menu-class="autocomplete-custom-agents-bar"
             md-search-text-change="analyzeAgents(searchTerm)"
-            placeholder="Search by name, ID or IP address"
-            lazy-load-data="agentsAutoComplete.nextPage('')">
+            placeholder="Search by name, ID or IP address">
                 <md-item-template>
                     <span class="item-title">
                         <span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>
@@ -103,7 +102,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">General</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">File integrity</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="configuration">Configuration</md-nav-item>
-        <md-nav-item ng-show="syscollector && syscollector.os && syscollector.os.sysname" class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">Inventory</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">Inventory</md-nav-item>
     </md-nav-bar>
     <!-- End Host monitoring navigation bar -->
 

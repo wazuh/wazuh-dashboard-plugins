@@ -1,1 +1,0 @@
-<div flex layout="column" class="mozilla-table-size-85" ng-controller="groupsController" ng-if="tab == 'groups'">

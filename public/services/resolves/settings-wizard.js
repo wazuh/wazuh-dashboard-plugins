@@ -99,7 +99,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 appState.setExtensions(currentApi,extensions);
             }
             
-            checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location)
+            checkTimestamp(appState, genericReq, $rootScope, $location, wzMisc)
             .then(() => testAPI.check_stored(currentApi))
             .then(data => {
                 if(data && data === 'cookies_outdated'){
@@ -116,14 +116,11 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 }
             })
             .catch(error => {
-                const apiNotFound = error && error.data && error.data.code && error.data.code === 3002;
                 appState.removeCurrentAPI();
-                if(!apiNotFound) {
-                    errorHandler.handle(error,'Routes');
-                    errorHandler.handle('Wazuh App: please add a new API.','Routes',true);
-                } else {
-                    errorHandler.handle('It seems the selected API was deleted. Please insert a new one or select an existing valid one.','Routes',true);
-                }
+           
+                errorHandler.handle(error,'Routes');
+                errorHandler.handle('Please insert a new Wazuh API or select an existing valid one.','Routes',true);
+      
                 $location.search('_a', null);
                 $location.search('tab', 'api');
                 $location.path('/settings');

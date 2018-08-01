@@ -1695,6 +1695,33 @@ export default [
         "readFromDocValues": true
     },
     {
+        "name": "syscheck.audit.audit_uid",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.changed_fields",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
+        "name": "syscheck.audit.audit_name",
+        "type": "string",
+        "count": 0,
+        "scripted": false,
+        "searchable": true,
+        "aggregatable": true,
+        "readFromDocValues": true
+    },
+    {
         "name": "syscheck.audit.proccess.name",
         "type": "string",
         "count": 0,

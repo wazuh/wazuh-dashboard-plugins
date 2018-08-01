@@ -12,7 +12,7 @@
 // Manage leaving the app to another Kibana tab
 export default ($location, $window) => {
 
-    let url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
+    const url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
 
     if ($window.sessionStorage.getItem(`lastSubUrl:${url}`).includes('/wazuh#/visualize') ||
         $window.sessionStorage.getItem(`lastSubUrl:${url}`).includes('/wazuh#/doc') ||

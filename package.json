@@ -1,9 +1,9 @@
 {
     "name": "wazuh",
     "version": "3.4.0",
-    "revision": "0399",
+    "revision": "0400",
     "kibana": {
-        "version": "6.3.1"
+        "version": "6.3.2"
     },
     "description": "Wazuh app",
     "main": "index.js",
@@ -24,20 +24,16 @@
     "homepage": "https://www.wazuh.com/",
     "dependencies": {
         "angular-animate": "1.6.5",
-        "angular-aria": "1.6.5",
         "angular-cookies": "1.6.5",
-        "angular-material": "1.1.1",
-        "angular-md5": "^0.1.10",
-        "ansicolors": "^0.3.2",
+        "angular-material": "1.1.10",
         "dom-to-image": "^2.6.0",
         "install": "^0.10.1",
-        "js-yaml": "3.10.0",
         "json2csv": "^4.1.2",
-        "lodash": "3.10.1",
         "needle": "^2.0.1",
         "node-cron": "^1.1.2",
         "pdfmake": "^0.1.37",
-        "query-string": "5.1.1",
+        "querystring-browser": "1.0.4",
+        "simple-tail": "^1.1.0",
         "timsort": "^0.3.0",
         "winston": "3.0.0"
     }

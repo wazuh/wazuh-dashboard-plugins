@@ -20,7 +20,7 @@ export default class DataFactory {
         this.sortValue = false;   
         this.sortDir   = false;     
         this.sortValue = false;
-        if(this.implicitFilter) this.filters.push(this.implicitFilter);
+        if(this.implicitFilter) this.filters.push(...this.implicitFilter);
     }
 
     addSorting(value) {
@@ -30,7 +30,7 @@ export default class DataFactory {
 
     removeFilters(){
         this.filters = [];
-        if(this.implicitFilter) this.filters.push(this.implicitFilter);
+        if(this.implicitFilter) this.filters.push(...this.implicitFilter);
     }
 
     serializeFilters(parameters) {
@@ -79,7 +79,7 @@ export default class DataFactory {
             // Ignore manager as an agent, once the team solves this issue, review this line
             if(this.path === '/agents') this.items = this.items.filter(item => item.id !== '000');
 
-            if(remaining > 0 )this.items.push(...Array(remaining).fill(null));
+            if((!options || !options.nonull) && remaining > 0 ) this.items.push(...Array(remaining).fill(null));
 
             const end = new Date();
             const elapsed = (end - start) / 1000;
@@ -94,7 +94,7 @@ export default class DataFactory {
     reset() {
         this.items   = [];
         this.filters = [];
-        if(this.implicitFilter) this.filters.push(this.implicitFilter);
+        if(this.implicitFilter) this.filters.push(...this.implicitFilter);
         this.sortValue = false;   
         this.sortDir   = false;     
         this.sortValue = false;

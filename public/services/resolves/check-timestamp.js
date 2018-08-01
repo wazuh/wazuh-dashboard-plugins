@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default async (appState,genericReq,errorHandler,$rootScope,$location, wzMisc) => {
+export default async (appState, genericReq, $rootScope, $location, wzMisc) => {
     try {
         const data = await genericReq.request('GET', '/api/wazuh-elastic/timestamp');
         const current = appState.getCreatedAt();
