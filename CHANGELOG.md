@@ -2,83 +2,91 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.4.0 - Kibana v6.3.1/6.3.2 - Revision 401
+## Wazuh v3.5.0 - Kibana v6.3.1/v6.3.2 - Revision 402
 
 ### Added
 
-- Added few new fields for Kibana due to new Wazuh feature named _who-data_ ([#763](https://github.com/wazuh/wazuh-kibana-app/pull/763)).
-- Added XML / JSON viewer for each card under Management > Configuration ([#764](https://github.com/wazuh/wazuh-kibana-app/pull/764)).
+-   Support for Wazuh v3.5.0.
+-   Added new fields for _Vulnerability detector_ alerts ([#752](https://github.com/wazuh/wazuh-kibana-app/pull/752)).
+-   Added multi table search for `wz-table` directive. Added two new log levels for _Management > Logs_ section ([#753](https://github.com/wazuh/wazuh-kibana-app/pull/753)).
+
+## Wazuh v3.4.0 - Kibana v6.3.1/v6.3.2 - Revision 401
+
+### Added
+
+-   Added a few new fields for Kibana due to the new Wazuh _who-data_ feature ([#763](https://github.com/wazuh/wazuh-kibana-app/pull/763)).
+-   Added XML/JSON viewer for each card under _Management > Configuration_ ([#764](https://github.com/wazuh/wazuh-kibana-app/pull/764)).
 
 ### Changed
 
-- Improved error handling for Dev tools. Also removed some unused dependencies from Dev tools ([#760](https://github.com/wazuh/wazuh-kibana-app/pull/760)).
-- Unified origin for tab descriptions. Reviewed some grammar typos ([#765](https://github.com/wazuh/wazuh-kibana-app/pull/765)).
-- Refactored agents autocomplete component. Removed unused/deprecated modules ([#766](https://github.com/wazuh/wazuh-kibana-app/pull/766))
-- Simplified route resolves section ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+-   Improved error handling for Dev tools. Also removed some unused dependencies from the _Dev tools_ tab ([#760](https://github.com/wazuh/wazuh-kibana-app/pull/760)).
+-   Unified origin for tab descriptions. Reviewed some grammar typos ([#765](https://github.com/wazuh/wazuh-kibana-app/pull/765)).
+-   Refactored agents autocomplete component. Removed unused/deprecated modules ([#766](https://github.com/wazuh/wazuh-kibana-app/pull/766)).
+-   Simplified route resolves section ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
 
 ### Fixed
 
-- Fixed missing cluster node filter for the visualization shown when looking for specific node under Management > Monitoring section ([#758](https://github.com/wazuh/wazuh-kibana-app/pull/758)).
-- Fixed missing dependency injection for wzMisc factory ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+-   Fixed missing cluster node filter for the visualization shown when looking for specific node under _Management > Monitoring_ section ([#758](https://github.com/wazuh/wazuh-kibana-app/pull/758)).
+-   Fixed missing dependency injection for `wzMisc` factory ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
 
 ### Removed
 
-- Removed `angular-aria`, `angular-md5`, `ansicolors`, `js-yaml`, `querystring` and `lodash` dependencies because Kibana includes all of them. Removed unused images ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+-   Removed `angular-aria`, `angular-md5`, `ansicolors`, `js-yaml`, `querystring` and `lodash` dependencies since Kibana includes all of them. Removed some unused images ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
 
-## Wazuh v3.4.0 - Kibana v6.3.1/6.3.2 - Revision 400
+## Wazuh v3.4.0 - Kibana v6.3.1/v6.3.2 - Revision 400
 
 ### Added
 
-- Support for Wazuh v3.4.0.
-- Support for Kibana 6.3.2.
-- Support for Kuery as accepted query language ([#742](https://github.com/wazuh/wazuh-kibana-app/pull/742)). _Experimental feature_.
-- Added new _Who data_ fields from file integrity monitoring features ([#746](https://github.com/wazuh/wazuh-kibana-app/pull/746)).
-- Added tab in _Settings_ section where you can see the last logs from the Wazuh App server ([#723](https://github.com/wazuh/wazuh-kibana-app/pull/723)).
+-   Support for Wazuh v3.4.0.
+-   Support for Elastic Stack v6.3.2.
+-   Support for Kuery as accepted query language ([#742](https://github.com/wazuh/wazuh-kibana-app/pull/742)).
+    -   This feature is experimental.
+-   Added new _Who data_ fields from file integrity monitoring features ([#746](https://github.com/wazuh/wazuh-kibana-app/pull/746)).
+-   Added tab in _Settings_ section where you can see the last logs from the Wazuh app server ([#723](https://github.com/wazuh/wazuh-kibana-app/pull/723)).
 
 ### Changed
 
-- Fully redesigned of the welcome screen along the different App sections ([#751](https://github.com/wazuh/wazuh-kibana-app/pull/751)).
-- Now any agent can go to inventory tab regardless if it's enabled or not. The content will change properly according to the agent configuration ([#744](https://github.com/wazuh/wazuh-kibana-app/pull/744)).
-- Updated `angular-material` version ([#743](https://github.com/wazuh/wazuh-kibana-app/pull/743)).
-- Any API entry is now removable regardless if it's the only one API entry ([#740](https://github.com/wazuh/wazuh-kibana-app/pull/740)).
-- Performance has been improved regarding to agents stats, they are now being fetched using _distinct_ routes from the Wazuh API ([#738](https://github.com/wazuh/wazuh-kibana-app/pull/738)).
-- Improved the way we are parsing some Wazuh API errors regarding to version mismatching ([#735](https://github.com/wazuh/wazuh-kibana-app/pull/735)).
+-   Fully redesigned of the welcome screen along the different app sections ([#751](https://github.com/wazuh/wazuh-kibana-app/pull/751)).
+-   Now any agent can go to the _Inventory_ tab regardless if it's enabled or not. The content will change properly according to the agent configuration ([#744](https://github.com/wazuh/wazuh-kibana-app/pull/744)).
+-   Updated the `angular-material` dependency to `1.1.10` ([#743](https://github.com/wazuh/wazuh-kibana-app/pull/743)).
+-   Any API entry is now removable regardless if it's the only one API entry ([#740](https://github.com/wazuh/wazuh-kibana-app/pull/740)).
+-   Performance has been improved regarding to agents status, they are now being fetched using _distinct_ routes from the Wazuh API ([#738](https://github.com/wazuh/wazuh-kibana-app/pull/738)).
+-   Improved the way we are parsing some Wazuh API errors regarding to version mismatching ([#735](https://github.com/wazuh/wazuh-kibana-app/pull/735)).
 
 ### Fixed
 
-- Fixed wrong filters being applied in ruleset/rules and ruleset/decoders sections when using Lucene like filters plus path filters ([#736](https://github.com/wazuh/wazuh-kibana-app/pull/736)).
-- Fixed the template checking from the healthcheck, now it allows to use custom index patterns ([#739](https://github.com/wazuh/wazuh-kibana-app/pull/739)).
-- Fixed infinite white screen from Management > Monitoring when the Wazuh cluster is enabled but not running ([#741](https://github.com/wazuh/wazuh-kibana-app/pull/741)).
-
+-   Fixed wrong filters being applied in _Ruleset > Rules_ and _Ruleset > Decoders_ sections when using Lucene like filters plus path filters ([#736](https://github.com/wazuh/wazuh-kibana-app/pull/736)).
+-   Fixed the template checking from the healthcheck, now it allows to use custom index patterns ([#739](https://github.com/wazuh/wazuh-kibana-app/pull/739)).
+-   Fixed infinite white screen from _Management > Monitoring_ when the Wazuh cluster is enabled but not running ([#741](https://github.com/wazuh/wazuh-kibana-app/pull/741)).
 
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.1 - Revision 399
 
 ### Added
 
-- Added a new Angular.js factory to store the Wazuh app configuration values. Also this factory is being used by the pre-routes functions (resolves), this way we are sure about having the real configuration at any time. These pre-routes functions have been improved too. ([#670](https://github.com/wazuh/wazuh-kibana-app/pull/670))
-- Added extended information for reports from reporting feature ([#701](https://github.com/wazuh/wazuh-kibana-app/pull/701))
-  
+-   Added a new Angular.js factory to store the Wazuh app configuration values. Also, this factory is being used by the pre-routes functions (resolves); this way we are sure about having the real configuration at any time. These pre-routes functions have been improved too ([#670](https://github.com/wazuh/wazuh-kibana-app/pull/670)).
+-   Added extended information for reports from _Reporting_ feature ([#701](https://github.com/wazuh/wazuh-kibana-app/pull/701)).
+
 ### Changed
 
-- Tables have been improved. Now they are truncating long fields and adding a tooltip if needed ([#671](https://github.com/wazuh/wazuh-kibana-app/pull/671))
-- Services have been improved ([#715](https://github.com/wazuh/wazuh-kibana-app/pull/715))
-- CSV formatted files have been improved. Now they are showing a more human readable column names ([#717](https://github.com/wazuh/wazuh-kibana-app/pull/717), [#726](https://github.com/wazuh/wazuh-kibana-app/pull/726)).
-- Added/Modified some visualization titles ([#728](https://github.com/wazuh/wazuh-kibana-app/pull/728))
-- Improved Discover perfomance when in background mode ([#719](https://github.com/wazuh/wazuh-kibana-app/pull/719))
-- Reports from reporting feature have suffered a fully redesign ([#701](https://github.com/wazuh/wazuh-kibana-app/pull/701))
+-   Tables have been improved. Now they are truncating long fields and adding a tooltip if needed ([#671](https://github.com/wazuh/wazuh-kibana-app/pull/671)).
+-   Services have been improved ([#715](https://github.com/wazuh/wazuh-kibana-app/pull/715)).
+-   CSV formatted files have been improved. Now they are showing a more human readable column names ([#717](https://github.com/wazuh/wazuh-kibana-app/pull/717), [#726](https://github.com/wazuh/wazuh-kibana-app/pull/726)).
+-   Added/Modified some visualization titles ([#728](https://github.com/wazuh/wazuh-kibana-app/pull/728)).
+-   Improved Discover perfomance when in background mode ([#719](https://github.com/wazuh/wazuh-kibana-app/pull/719)).
+-   Reports from the _Reporting_ feature have been fulyl redesigned ([#701](https://github.com/wazuh/wazuh-kibana-app/pull/701)).
 
 ### Fixed
 
-- Fixed the top menu API indicator when checking API connection and the manager/cluster information had been changed ([#668](https://github.com/wazuh/wazuh-kibana-app/pull/668))
-- Fixed our logger module which was not writting logs the very first time Kibana is started neither after a log rotation ([#667](https://github.com/wazuh/wazuh-kibana-app/pull/667))
-- Fixed a regular expression in the server side when parsing URLs before registering a new Wazuh API ([#690](https://github.com/wazuh/wazuh-kibana-app/pull/690))
-- Fixed filters from specific visualization regarding to FIM section ([#694](https://github.com/wazuh/wazuh-kibana-app/pull/694))
-- Fixed filters parsing when generating a report. It was not parsing negated filters as expected ([#696](https://github.com/wazuh/wazuh-kibana-app/pull/696))
-- Fixed visualization counter from OSCAP tab ([#722](https://github.com/wazuh/wazuh-kibana-app/pull/722))
+-   Fixed the top menu API indicator when checking the API connection and the manager/cluster information had been changed ([#668](https://github.com/wazuh/wazuh-kibana-app/pull/668)).
+-   Fixed our logger module which was not writting logs the very first time Kibana is started neither after a log rotation ([#667](https://github.com/wazuh/wazuh-kibana-app/pull/667)).
+-   Fixed a regular expression in the server side when parsing URLs before registering a new Wazuh API ([#690](https://github.com/wazuh/wazuh-kibana-app/pull/690)).
+-   Fixed filters from specific visualization regarding to _File integrity_ section ([#694](https://github.com/wazuh/wazuh-kibana-app/pull/694)).
+-   Fixed filters parsing when generating a report because it was not parsing negated filters as expected ([#696](https://github.com/wazuh/wazuh-kibana-app/pull/696)).
+-   Fixed visualization counter from _OSCAP_ tab ([#722](https://github.com/wazuh/wazuh-kibana-app/pull/722)).
 
-# Removed
+### Removed
 
-- Temporary removed CSV download from agent inventory section due to Wazuh API bug ([#727](https://github.com/wazuh/wazuh-kibana-app/pull/727))
+-   Temporary removed CSV download from agent inventory section due to Wazuh API bug ([#727](https://github.com/wazuh/wazuh-kibana-app/pull/727)).
 
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.0 - Revision 398
 
@@ -654,7 +662,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   A new extension for Amazon Web Services alerts.
 -   A new extension for VirusTotal alerts.
 -   New agent configuration tab:
-    -   Visualize the current group configuration for the currently selected agent on the App.
+    -   Visualize the current group configuration for the currently selected agent on the app.
     -   Navigate through the different tabs to see which configuration is being used.
     -   Check the synchronization status for the configuration.
     -   View the current group of the agent and click on it to go to the Groups tab.
