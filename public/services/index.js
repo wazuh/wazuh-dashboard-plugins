@@ -13,7 +13,6 @@ import './error-handler'
 import './theming';
 import './api-request'
 import './generic-request'
-import './data-handler'
 import './app-state'
 import './api-tester'
 import './pattern-handler'

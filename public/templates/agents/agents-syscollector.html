@@ -67,10 +67,10 @@
         </md-card>
     </div>
 
-    <div layout="row" class="md-padding" ng-if="syscollector">
-        <input placeholder="Filter packages..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-            aria-invalid="false" wz-enter="search(custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+    <div layout="row" class="md-padding">
+        <input placeholder="Filter packages..." ng-model="packageSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+            aria-invalid="false" wz-enter="search(packageSearch,'packages')">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(packageSearch,'packages')">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
     </div>
@@ -81,6 +81,22 @@
             path="'/syscollector/' + agent.id + '/packages'" 
             rows-per-page="8"
             keys="[{value:'name',size:2},'architecture',{value:'version',size:2},{value:'vendor',size:2},{value:'description',size:3}]">
+        </wazuh-table>
+    </div>
+
+    <div layout="row" class="md-padding">
+        <input placeholder="Filter network interfaces..." ng-model="netifaceSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+            aria-invalid="false" wz-enter="search(netifaceSearch,'netiface')">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(netifaceSearch,'netiface')">
+            <span class="fa fa-search" aria-hidden="true"></span>
+        </button>
+    </div>
+    <div layout="row" ng-if="agent" class="md-padding">
+        <wazuh-table 
+            flex 
+            path="'/syscollector/' + agent.id + '/netiface'" 
+            rows-per-page="8"
+            keys="['name','mac','state','type']">
         </wazuh-table>
     </div>
     <!-- Temporary removed -->

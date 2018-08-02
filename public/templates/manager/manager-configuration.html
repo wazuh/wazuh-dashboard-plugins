@@ -7,13 +7,14 @@
 
     <!-- Headline -->
     <div ng-show="!load" layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
+        <span class="font-size-18">
+            <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
         <span class="md-subheader">List the current Wazuh manager configuration</span>
     </div>
     <!-- End headline -->
 
     <!-- The section container -->
-    <div flex layout="row" layout-align="start stretch" ng-show="!load"  ng-init="selectedItem='global'">
+    <div flex layout="row" layout-align="start stretch" ng-show="!load" ng-init="selectedItem='global'">
 
         <!-- Left column - Configuration summary and section links -->
         <div flex="25">
@@ -193,7 +194,8 @@
             <md-card flex class="wz-md-card" ng-if="managerConfiguration['active-response'].length > 0">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('active-response')" tooltip="Click to see more details" tooltip-placement="right">Active response</span>
+                    <span class="wz-headline-title wz-text-link" ng-click="switchItem('active-response')" tooltip="Click to see more details"
+                        tooltip-placement="right">Active response</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <span flex>Active response settings</span>
@@ -214,7 +216,6 @@
                 </md-card-content>
             </md-card>
             <!-- END REMOTE -->
-
         </div>
         <!-- End left column -->
 
@@ -225,63 +226,77 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'global'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-dashboard"></i> Global</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-dashboard"></i> Global</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('global')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('global')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.jsonout_output">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.jsonout_output">
                         <span flex="25">JSON output</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.jsonout_output}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.logall">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.logall">
                         <span flex="25">Log all</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.logall}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.logall">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.logall">
                         <span flex="25">Log all in JSON</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.logall_json}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.white_list">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.white_list">
                         <span flex="25">White list</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.white_list.length
-                            <= 5 ? managerConfiguration.global.white_list : managerConfiguration.global.white_list.length}}</span>
+                            <=5 ? managerConfiguration.global.white_list : managerConfiguration.global.white_list.length}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.stats">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.stats">
                         <span flex="25">Stats</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.stats}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.host_infomation">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.host_infomation">
                         <span flex="25">Host information</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.host_infomation}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.alerts.log_alert_level">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.alerts.log_alert_level">
                         <span flex="25">Log alert level</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.alerts.log_alert_level}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_notification">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.email_notification">
                         <span flex="25">E-mail notifications</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.email_notification}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.alerts.email_alert_level">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.alerts.email_alert_level">
                         <span flex="25">E-mail alert level</span>
                         <span class="wz-text-right color-grey">{{ managerConfiguration.alerts.email_alert_level }}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_to">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.email_to">
                         <span flex="25">E-mail to</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.email_to}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_from">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.email_from">
                         <span flex="25">E-mail from</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.email_from}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.smtp_server">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.smtp_server">
                         <span flex="25">SMTP server</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.smtp_server}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_maxperhour">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.email_maxperhour">
                         <span flex="25">Max email per hour</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.email_maxperhour}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.global.email_idsname">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.global.email_idsname">
                         <span flex="25">E-mail IDS name</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.global.email_idsname}}</span>
                     </div>
@@ -293,42 +308,54 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'cluster'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-server"></i> Cluster</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-server"></i> Cluster</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('cluster')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('cluster')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.disabled">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.disabled">
                         <span flex="25">Disabled</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.disabled}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.hidden">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.hidden">
                         <span flex="25">Hidden</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.hidden}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.name">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.name">
                         <span flex="25">Name</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.name}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.interval">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.interval">
                         <span flex="25">Interval</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.interval}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.node_name">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.node_name">
                         <span flex="25">Node name</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.node_name}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.node_type">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.node_type">
                         <span flex="25">Node type</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.node_type}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.port">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.port">
                         <span flex="25">Port</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.port}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.bind_addr">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.bind_addr">
                         <span flex="25">Bind address</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.bind_addr}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.cluster.nodes">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.cluster.nodes">
                         <span flex="25">Nodes</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.cluster.nodes}}</span>
                     </div>
@@ -340,53 +367,68 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'syscheck'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> Syscheck</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-shield"></i> Syscheck</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('syscheck')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('syscheck')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.disabled">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.disabled">
                         <span flex="25">Disabled</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.disabled}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.frequency">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.frequency">
                         <span flex="25">Frequency</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.frequency}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_time">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.scan_time">
                         <span flex="25">Scan time</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.scan_time}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_day">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.scan_day">
                         <span flex="25">Scan day</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.scan_day}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.auto_ignore">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.auto_ignore">
                         <span flex="25">Auto ignore</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.auto_ignore}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.alert_new_files">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.alert_new_files">
                         <span flex="25">Alert new files</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.alert_new_files}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.scan_on_start">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.scan_on_start">
                         <span flex="25">Scan on start</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.scan_on_start}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.nodiff">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.nodiff">
                         <span flex="25">No diff</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.nodiff}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscheck.skip_nfs">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscheck.skip_nfs">
                         <span flex="25">Skip NFS</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscheck.skip_nfs}}</span>
                     </div>
 
                     <!-- Section title -->
                     <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-headline-title"><i class="fa fa-fw fa-folder-o"></i> Monitoring directories</span>
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-folder-o"></i> Monitoring directories</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <!-- Full details -->
-                    <div ng-repeat="item in managerConfiguration.syscheck.directories">
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.syscheck.directories">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.path">
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item.path}}</span>
@@ -453,45 +495,59 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'rootcheck'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-check"></i> Rootcheck</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-shield"></i> Rootcheck</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('rootcheck')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('rootcheck')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.disabled">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.rootcheck.disabled">
                         <span flex="25">Disabled</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.disabled}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.rootkit_files">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.rootcheck.rootkit_files">
                         <span flex="25">Rootkit files</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.rootkit_files}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.rootkit_trojans">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.rootcheck.rootkit_trojans">
                         <span flex="25">Rootkit trojans</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.rootkit_trojans}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.base_directory">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.rootcheck.base_directory">
                         <span flex="25">Base directory</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.base_directory}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.scanall">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.rootcheck.scanall">
                         <span flex="25">Scan all</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.scanall}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.frequency">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.rootcheck.frequency">
                         <span flex="25">Frequency</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.frequency}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.rootcheck.skip_nfs">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.rootcheck.skip_nfs">
                         <span flex="25">Skip NFS</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.rootcheck.skip_nfs}}</span>
                     </div>
 
                     <!-- Section title -->
-                    <div layout="row" class="wz-padding-top-10">
-                        <span class="wz-headline-title"><i class="fa fa-fw fa-file-o"></i> System audit files</span>
+                    <div ng-if="!XMLContent && !JSONContent" layout="row" class="wz-padding-top-10">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-file-o"></i> System audit files</span>
                     </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <md-divider ng-if="!XMLContent && !JSONContent" class="wz-margin-top-10"></md-divider>
                     <!-- Full details -->
-                    <div ng-repeat="item in managerConfiguration.rootcheck.system_audit">
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.rootcheck.system_audit">
                         <div layout="row" class="wz-padding-top-10" ng-if="item">
                             <span flex="25">File</span>
                             <span class="wz-text-right color-grey">{{item}}</span>
@@ -506,13 +562,26 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'ruleset'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-dot-circle-o"></i> Ruleset</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-shield"></i> Ruleset</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('ruleset')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('ruleset')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
                     <!-- Decoder directories -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.decoder_dir">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.ruleset.decoder_dir">
                         <span class="wz-headline-title">Decoder directories</span>
                     </div>
-                    <div ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.ruleset.decoder_dir|orderBy">
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item}}</span>
@@ -521,10 +590,10 @@
                     </div>
 
                     <!-- Decoder excludes -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.decoder_exclude">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.ruleset.decoder_exclude">
                         <span class="wz-headline-title">Decoder excludes</span>
                     </div>
-                    <div ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.ruleset.decoder_exclude|orderBy">
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item}}</span>
@@ -533,10 +602,10 @@
                     </div>
 
                     <!-- Decoder files -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.decoder">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.ruleset.decoder">
                         <span class="wz-headline-title">Decoder files</span>
                     </div>
-                    <div ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.ruleset.decoder|orderBy">
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item}}</span>
@@ -545,10 +614,10 @@
                     </div>
 
                     <!-- Rules directories -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.rule_dir">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.ruleset.rule_dir">
                         <span class="wz-headline-title">Rules directories</span>
                     </div>
-                    <div ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.ruleset.rule_dir|orderBy">
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item}}</span>
@@ -557,10 +626,10 @@
                     </div>
 
                     <!-- Rules files -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.include">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.ruleset.include">
                         <span class="wz-headline-title">Rules files</span>
                     </div>
-                    <div ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.ruleset.include|orderBy">
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item}}</span>
@@ -569,10 +638,10 @@
                     </div>
 
                     <!-- Rule excludes -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.rule_exclude">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.ruleset.rule_exclude">
                         <span class="wz-headline-title">Rule excludes</span>
                     </div>
-                    <div ng-if="isArray(managerConfiguration.ruleset.rule_exclude)" ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index">
+                    <div ng-if="!XMLContent && !JSONContent && isArray(managerConfiguration.ruleset.rule_exclude)" ng-repeat="item in managerConfiguration.ruleset['rule_exclude'] track by $index">
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item}}</span>
@@ -585,17 +654,17 @@
                     </div>
 
                     <!-- CDB Lists -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.ruleset.list">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.ruleset.list">
                         <span class="wz-headline-title">CDB Lists</span>
                     </div>
-                    <div ng-if="isArray(managerConfiguration.ruleset.list)" ng-repeat="item in managerConfiguration.ruleset.list|orderBy">
+                    <div ng-if="!XMLContent && !JSONContent && isArray(managerConfiguration.ruleset.list)" ng-repeat="item in managerConfiguration.ruleset.list|orderBy">
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="25">Path</span>
                             <span class="wz-text-right color-grey">{{item}}</span>
                         </div>
                         <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="!isArray(managerConfiguration.ruleset.list)">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && !isArray(managerConfiguration.ruleset.list)">
                         <span flex="25">Path</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.ruleset.list}}</span>
                     </div>
@@ -607,30 +676,43 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'syscollector'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-laptop"></i> Syscollector</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-laptop"></i> Syscollector</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('syscollector')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('syscollector')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
                     <!-- Main settings -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.disabled">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscollector.disabled">
                         <span flex="25">Disabled</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.disabled}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.interval">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscollector.interval">
                         <span flex="25">Interval</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.interval}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.scan_on_start">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscollector.scan_on_start">
                         <span flex="25">Scan on start</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.scan_on_start}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.hardware">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscollector.hardware">
                         <span flex="25">Hardware</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.hardware}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.os">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscollector.os">
                         <span flex="25">OS</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.os}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.syscollector.packages">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.syscollector.packages">
                         <span flex="25">Packages</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.syscollector.packages}}</span>
                     </div>
@@ -642,10 +724,23 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'logcollector'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-reorder"></i> Logcollector</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-laptop"></i> Logcollector</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('localfile')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('localfile')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div ng-repeat="item in managerConfiguration['localfile'] | orderBy:['location', 'command']">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- Full details -->
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration['localfile'] | orderBy:['location', 'command']">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.location">
                             <span flex="25">Location</span>
                             <span class="wz-text-right color-grey">{{item.location}}</span>
@@ -680,38 +775,51 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'email_alerts'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-envelope-o"></i> E-mail alerts</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-laptop"></i> E-mail alerts</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('email_alerts')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('email_alerts')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.email_to">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.email_alerts.email_to">
                         <span flex="25">Email to</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.email_to}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.alert_level">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.email_alerts.alert_level">
                         <span flex="25">Alert level</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.alert_level}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.group">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.email_alerts.group">
                         <span flex="25">Group</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.group}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.event_location">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.email_alerts.event_location">
                         <span flex="25">Event location</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.event_location}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.format">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.email_alerts.format">
                         <span flex="25">Format</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.format}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.rule_id">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.email_alerts.rule_id">
                         <span flex="25">Rule ID</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.rule_id}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.do_not_delay">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.email_alerts.do_not_delay">
                         <span flex="25">Do not delay</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.do_not_delay}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.email_alerts.do_not_group">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.email_alerts.do_not_group">
                         <span flex="25">Do not group</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.email_alerts.do_not_group}}</span>
                     </div>
@@ -723,58 +831,71 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'auth'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-server"></i> Auth</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-laptop"></i> Auth</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('auth')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('auth')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.disabled">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- Full details -->
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.disabled">
                         <span flex="25">Disabled</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.disabled}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.purge">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.purge">
                         <span flex="25">Purge</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.purge}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.force_insert">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.force_insert">
                         <span flex="25">Force insert</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.force_insert}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_verify_host">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.ssl_verify_host">
                         <span flex="25">SSL verify host</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.ssl_verify_host}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.limit_maxagents">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.limit_maxagents">
                         <span flex="25">Limit max agents</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.limit_maxagents}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.force_time">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.force_time">
                         <span flex="25">Force time</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.force_time}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_manager_key">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.ssl_manager_key">
                         <span flex="25">SSL manager key</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.ssl_manager_key}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_manager_cert">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.ssl_manager_cert">
                         <span flex="25">SSL manager cert</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.ssl_manager_cert}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.use_source_ip">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.use_source_ip">
                         <span flex="25">Use source IP</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.use_source_ip}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.use_password">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.use_password">
                         <span flex="25">Use password</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.use_password}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.port">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.port">
                         <span flex="25">Port</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.port}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ssl_auto_negotiate">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.ssl_auto_negotiate">
                         <span flex="25">SSL auto negotiate</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.ssl_auto_negotiate}}</span>
                     </div>
-                    <div layout="row" class="wz-padding-top-10" ng-if="managerConfiguration.auth.ciphers">
+                    <div layout="row" class="wz-padding-top-10" ng-if="!XMLContent && !JSONContent && managerConfiguration.auth.ciphers">
                         <span flex="25">Ciphers</span>
                         <span class="wz-text-right color-grey">{{managerConfiguration.auth.ciphers}}</span>
                     </div>
@@ -786,10 +907,23 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'command'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-terminal"></i> Command</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-laptop"></i> Command</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('command')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('command')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div ng-repeat="item in managerConfiguration.command|orderBy:'name'">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- Full details -->
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.command|orderBy:'name'">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.name">
                             <span flex="25">Name</span>
                             <span class="wz-text-right color-grey">{{item.name}}</span>
@@ -816,10 +950,23 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'active-response'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-random"></i> Active response</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-laptop"></i> Active response</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('active-response')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('active-response')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- Full details -->
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration['active-response']|orderBy:'command'">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.command">
                             <span flex="25">Command</span>
                             <span class="wz-text-right color-grey">{{item.command}}</span>
@@ -857,7 +1004,7 @@
                             <span flex="25">Rules IDs</span>
                             <span class="wz-text-right color-grey">{{item.rules_id}}</span>
                         </div>
-                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id && item.rules"  ng-repeat="rule in item.rules">
+                        <div layout="row" class="wz-padding-top-10" ng-if="item.rules_id && item.rules" ng-repeat="rule in item.rules">
                             <span flex="25">{{rule.file}}</span>
                             <span class="wz-text-right color-grey">{{rule.description}}</span>
                         </div>
@@ -881,10 +1028,23 @@
             <md-card flex class="wz-md-card" ng-show="selectedItem === 'remote'">
                 <md-card-content>
                     <!-- Section title -->
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-feed"></i> Remote</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div layout="row">
+                        <span class="wz-headline-title">
+                            <i class="fa fa-fw fa-laptop"></i> Remote</span>
+                        <span flex></span>
+                        <span class="wz-text-link" ng-click="getXML('remote')">XML</span> |
+                        <span class="wz-text-link" ng-click="getJSON('remote')">JSON</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10" ng-if="!XMLContent && !JSONContent"></md-divider>
                     <!-- Full details -->
-                    <div ng-repeat="item in managerConfiguration.remote">
+                    <div layout="row" class="wz-margin-top-10" ng-if="XMLContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto">{{XMLContent}}</pre>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="JSONContent">
+                        <pre flex class="height-full wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- Full details -->
+                    <div ng-if="!XMLContent && !JSONContent" ng-repeat="item in managerConfiguration.remote">
                         <div layout="row" class="wz-padding-top-10" ng-if="item.connection">
                             <span flex="25">Connection</span>
                             <span class="wz-text-right color-grey">{{item.connection}}</span>
@@ -905,7 +1065,6 @@
 
         </div>
         <!-- End right column -->
-
     </div>
 
 </div>

@@ -99,7 +99,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 appState.setExtensions(currentApi,extensions);
             }
             
-            checkTimestamp(appState,genericReq,errorHandler,$rootScope,$location)
+            checkTimestamp(appState, genericReq, $rootScope, $location, wzMisc)
             .then(() => testAPI.check_stored(currentApi))
             .then(data => {
                 if(data && data === 'cookies_outdated'){

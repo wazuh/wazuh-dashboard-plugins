@@ -50,5 +50,13 @@ export default {
     key: 'Key',
     scan_id: 'Scan ID',
     format: 'Format',
-    scan_time: 'Scan date'
+    scan_time: 'Scan date',
+    state: 'State',
+    mac: 'MAC',
+    gateway: 'Gateway',
+    dhcp: 'DHCP',
+    iface: 'Interface',
+    broadcast: 'Broadcast',
+    proto: 'Protocol',
+    address: 'Address'
 };

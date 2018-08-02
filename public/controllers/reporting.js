@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
-import $ from 'jquery'
+import { uiModules } from 'ui/modules';
+
 const app = uiModules.get('app/wazuh', []);
 
 // Logs controller

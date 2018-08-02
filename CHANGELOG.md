@@ -7,26 +7,26 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 -   Support for Wazuh v3.5.0.
--   Added new fields for *Vulnerability detector* alerts ([#752](https://github.com/wazuh/wazuh-kibana-app/pull/752)).
--   Added multi table search for `wz-table` directive. Added two new log levels for *Management > Logs* section ([#753](https://github.com/wazuh/wazuh-kibana-app/pull/753)).
+-   Added new fields for _Vulnerability detector_ alerts ([#752](https://github.com/wazuh/wazuh-kibana-app/pull/752)).
+-   Added multi table search for `wz-table` directive. Added two new log levels for _Management > Logs_ section ([#753](https://github.com/wazuh/wazuh-kibana-app/pull/753)).
 
 ## Wazuh v3.4.0 - Kibana v6.3.1/v6.3.2 - Revision 401
 
 ### Added
 
 -   Added a few new fields for Kibana due to the new Wazuh _who-data_ feature ([#763](https://github.com/wazuh/wazuh-kibana-app/pull/763)).
--   Added XML/JSON viewer for each card under *Management > Configuration* ([#764](https://github.com/wazuh/wazuh-kibana-app/pull/764)).
+-   Added XML/JSON viewer for each card under _Management > Configuration_ ([#764](https://github.com/wazuh/wazuh-kibana-app/pull/764)).
 
 ### Changed
 
--   Improved error handling for Dev tools. Also removed some unused dependencies from the *Dev tools* tab ([#760](https://github.com/wazuh/wazuh-kibana-app/pull/760)).
+-   Improved error handling for Dev tools. Also removed some unused dependencies from the _Dev tools_ tab ([#760](https://github.com/wazuh/wazuh-kibana-app/pull/760)).
 -   Unified origin for tab descriptions. Reviewed some grammar typos ([#765](https://github.com/wazuh/wazuh-kibana-app/pull/765)).
 -   Refactored agents autocomplete component. Removed unused/deprecated modules ([#766](https://github.com/wazuh/wazuh-kibana-app/pull/766)).
 -   Simplified route resolves section ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
 
 ### Fixed
 
--   Fixed missing cluster node filter for the visualization shown when looking for specific node under *Management > Monitoring* section ([#758](https://github.com/wazuh/wazuh-kibana-app/pull/758)).
+-   Fixed missing cluster node filter for the visualization shown when looking for specific node under _Management > Monitoring_ section ([#758](https://github.com/wazuh/wazuh-kibana-app/pull/758)).
 -   Fixed missing dependency injection for `wzMisc` factory ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
 
 ### Removed
@@ -47,7 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 -   Fully redesigned of the welcome screen along the different app sections ([#751](https://github.com/wazuh/wazuh-kibana-app/pull/751)).
--   Now any agent can go to the *Inventory* tab regardless if it's enabled or not. The content will change properly according to the agent configuration ([#744](https://github.com/wazuh/wazuh-kibana-app/pull/744)).
+-   Now any agent can go to the _Inventory_ tab regardless if it's enabled or not. The content will change properly according to the agent configuration ([#744](https://github.com/wazuh/wazuh-kibana-app/pull/744)).
 -   Updated the `angular-material` dependency to `1.1.10` ([#743](https://github.com/wazuh/wazuh-kibana-app/pull/743)).
 -   Any API entry is now removable regardless if it's the only one API entry ([#740](https://github.com/wazuh/wazuh-kibana-app/pull/740)).
 -   Performance has been improved regarding to agents status, they are now being fetched using _distinct_ routes from the Wazuh API ([#738](https://github.com/wazuh/wazuh-kibana-app/pull/738)).
@@ -55,9 +55,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
--   Fixed wrong filters being applied in *Ruleset > Rules* and *Ruleset > Decoders* sections when using Lucene like filters plus path filters ([#736](https://github.com/wazuh/wazuh-kibana-app/pull/736)).
+-   Fixed wrong filters being applied in _Ruleset > Rules_ and _Ruleset > Decoders_ sections when using Lucene like filters plus path filters ([#736](https://github.com/wazuh/wazuh-kibana-app/pull/736)).
 -   Fixed the template checking from the healthcheck, now it allows to use custom index patterns ([#739](https://github.com/wazuh/wazuh-kibana-app/pull/739)).
--   Fixed infinite white screen from *Management > Monitoring* when the Wazuh cluster is enabled but not running ([#741](https://github.com/wazuh/wazuh-kibana-app/pull/741)).
+-   Fixed infinite white screen from _Management > Monitoring_ when the Wazuh cluster is enabled but not running ([#741](https://github.com/wazuh/wazuh-kibana-app/pull/741)).
 
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.1 - Revision 399
 

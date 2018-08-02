@@ -9,22 +9,23 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import $              from 'jquery';
 import { uiModules } from 'ui/modules'
 import FilterHandler  from '../utils/filter-handler'
 import generateMetric from '../utils/generate-metric'
 import TabNames       from '../utils/tab-names'
 import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
 
+import TabDescription from '../../server/reporting/tab-description';
+
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('overviewController', 
 function ($scope, $location, $rootScope, appState, 
-          genericReq, errorHandler, apiReq, tabVisualizations, 
+          errorHandler, apiReq, tabVisualizations, 
           commonData, reportingService, visFactoryService,
           wazuhConfig
 ) {
-
+    $scope.TabDescription = TabDescription;
     $rootScope.reportStatus = false;
 
     $location.search('_a',null)
