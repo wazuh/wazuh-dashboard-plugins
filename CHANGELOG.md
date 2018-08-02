@@ -2,11 +2,54 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.4.0 - Kibana v6.3.1 - Revision 399
+## Wazuh v3.4.0 - Kibana v6.3.1/6.3.2 - Revision 401
 
 ### Added
 
--   Support for Wazuh v3.4.0.
+- Added few new fields for Kibana due to new Wazuh feature named _who-data_ ([#763](https://github.com/wazuh/wazuh-kibana-app/pull/763)).
+- Added XML / JSON viewer for each card under Management > Configuration ([#764](https://github.com/wazuh/wazuh-kibana-app/pull/764)).
+
+### Changed
+
+- Improved error handling for Dev tools. Also removed some unused dependencies from Dev tools ([#760](https://github.com/wazuh/wazuh-kibana-app/pull/760)).
+- Unified origin for tab descriptions. Reviewed some grammar typos ([#765](https://github.com/wazuh/wazuh-kibana-app/pull/765)).
+- Refactored agents autocomplete component. Removed unused/deprecated modules ([#766](https://github.com/wazuh/wazuh-kibana-app/pull/766))
+- Simplified route resolves section ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+
+### Fixed
+
+- Fixed missing cluster node filter for the visualization shown when looking for specific node under Management > Monitoring section ([#758](https://github.com/wazuh/wazuh-kibana-app/pull/758)).
+- Fixed missing dependency injection for wzMisc factory ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+
+### Removed
+
+- Removed `angular-aria`, `angular-md5`, `ansicolors`, `js-yaml`, `querystring` and `lodash` dependencies because Kibana includes all of them. Removed unused images ([#768](https://github.com/wazuh/wazuh-kibana-app/pull/768)).
+
+## Wazuh v3.4.0 - Kibana v6.3.1/6.3.2 - Revision 400
+
+### Added
+
+- Support for Wazuh v3.4.0.
+- Support for Kibana 6.3.2.
+- Support for Kuery as accepted query language ([#742](https://github.com/wazuh/wazuh-kibana-app/pull/742)). _Experimental feature_.
+- Added new _Who data_ fields from file integrity monitoring features ([#746](https://github.com/wazuh/wazuh-kibana-app/pull/746)).
+- Added tab in _Settings_ section where you can see the last logs from the Wazuh App server ([#723](https://github.com/wazuh/wazuh-kibana-app/pull/723)).
+
+### Changed
+
+- Fully redesigned of the welcome screen along the different App sections ([#751](https://github.com/wazuh/wazuh-kibana-app/pull/751)).
+- Now any agent can go to inventory tab regardless if it's enabled or not. The content will change properly according to the agent configuration ([#744](https://github.com/wazuh/wazuh-kibana-app/pull/744)).
+- Updated `angular-material` version ([#743](https://github.com/wazuh/wazuh-kibana-app/pull/743)).
+- Any API entry is now removable regardless if it's the only one API entry ([#740](https://github.com/wazuh/wazuh-kibana-app/pull/740)).
+- Performance has been improved regarding to agents stats, they are now being fetched using _distinct_ routes from the Wazuh API ([#738](https://github.com/wazuh/wazuh-kibana-app/pull/738)).
+- Improved the way we are parsing some Wazuh API errors regarding to version mismatching ([#735](https://github.com/wazuh/wazuh-kibana-app/pull/735)).
+
+### Fixed
+
+- Fixed wrong filters being applied in ruleset/rules and ruleset/decoders sections when using Lucene like filters plus path filters ([#736](https://github.com/wazuh/wazuh-kibana-app/pull/736)).
+- Fixed the template checking from the healthcheck, now it allows to use custom index patterns ([#739](https://github.com/wazuh/wazuh-kibana-app/pull/739)).
+- Fixed infinite white screen from Management > Monitoring when the Wazuh cluster is enabled but not running ([#741](https://github.com/wazuh/wazuh-kibana-app/pull/741)).
+
 
 ## Wazuh v3.3.0/v3.3.1 - Kibana v6.3.1 - Revision 399
 

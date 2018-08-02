@@ -16,7 +16,7 @@ import TabNames      from '../utils/tab-names';
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('settingsController', 
-function ($scope, $routeParams, $window, $route, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
+function ($scope, $routeParams, $window, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
     if (wzMisc.getValue('comeFromWizard')) {
         $window.sessionStorage.removeItem('healthCheck');
         wzMisc.setWizard(false);
@@ -59,16 +59,15 @@ function ($scope, $routeParams, $window, $route, $location, testAPI, appState, g
         try {
 
             let index = $scope.apiEntries.indexOf(item);
-            if (appState.getCurrentAPI() !== undefined && appState.getCurrentAPI() !== null) {
+            if (appState.getCurrentAPI()) {
                 if ($scope.apiEntries[index]._id === JSON.parse(appState.getCurrentAPI()).id) { // We are trying to remove the one selected as default
-                    errorHandler.handle("Can't delete the currently selected API. Please, select another API as default before deleting this one.",'Settings',true);
-                    return;
+                    appState.removeCurrentAPI();
                 }
             }
             await genericReq.request('DELETE', `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`);
             $scope.showEditForm[$scope.apiEntries[index]._id] = false;
             $scope.apiEntries.splice(index, 1);
-            wzMisc.setApiIsDown(false)
+            wzMisc.setApiIsDown(false);
             $scope.apiIsDown = false;
             $scope.isEditing = false;
             for(const key in $scope.showEditForm) $scope.showEditForm[key] = false;
@@ -83,7 +82,7 @@ function ($scope, $routeParams, $window, $route, $location, testAPI, appState, g
 
     // Get current API index
     const getCurrentAPIIndex = () => {
-        $scope.apiEntries.map((entry,index,array) => {
+        $scope.apiEntries.map((entry,index,array) => { // eslint-disable-line
             if(entry._id === $scope.currentDefault) currentApiEntryIndex = index;
         })
     }
@@ -461,6 +460,13 @@ function ($scope, $routeParams, $window, $route, $location, testAPI, appState, g
                 $scope.extensions.virustotal = config['extensions.virustotal'];
             } else {
                 $scope.extensions = appState.getExtensions(JSON.parse(appState.getCurrentAPI()).id);
+            }
+
+            try {
+                const logs = await genericReq.request('GET','/api/wazuh-api/logs',{});
+                $scope.logs = logs.data.lastLogs.map(item => JSON.parse(item));
+            } catch(error) {
+                $scope.logs = [{date: new Date(), level:'error', message: 'Error when loading Wazuh app logs'}];
             }
             if(!$scope.$$phase) $scope.$digest();
             return;

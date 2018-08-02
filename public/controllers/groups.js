@@ -17,7 +17,7 @@ const app = uiModules.get('app/wazuh', []);
 
 // Groups preview controller
 app.controller('groupsPreviewController',
-function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState, shareAgent, wzTableFilter) {
+function ($scope, $location, apiReq, errorHandler, csvReq, appState, shareAgent, wzTableFilter) {
     $scope.$on('groupsIsReloaded',() => {    
         $scope.currentGroup = false;    
         $scope.lookingGroup = false;
@@ -31,7 +31,7 @@ function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState,
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch(data_path, currentApi, wzTableFilter.get());
-            const blob         = new Blob([output], {type: 'text/csv'});
+            const blob         = new Blob([output], {type: 'text/csv'}); // eslint-disable-line
 
             FileSaver.saveAs(blob, 'groups.csv');
             
@@ -54,16 +54,15 @@ function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState,
         try {
             // If come from agents
             if(globalAgent) {
-                let len = 0;
                 // Get ALL groups
-                const data = await apiReq.request('GET','/agents/groups/',{limit:99999})
+                const data = await apiReq.request('GET','/agents/groups/',{limit:1000});
 
                 const filtered = data.data.data.items.filter(group => group.name === globalAgent.group);
 
                 if(Array.isArray(filtered) && filtered.length){
                     // Load that our group
                     $scope.loadGroup(filtered[0],true);
-                    $scope.lookingGroup=true
+                    $scope.lookingGroup = true;
                 } else {
                     throw Error(`Group ${globalAgent.group} not found`);
                 }
@@ -162,13 +161,5 @@ function ($scope, $rootScope, $location, apiReq, errorHandler, csvReq, appState,
             $scope.file     = false;
             $scope.filename = false;
         }
-    });
-});
-
-app.controller('groupsController', function ($scope,$rootScope) {
-    $scope.groupsMenu = 'preview';
-    $scope.groupName  = '';
-    $scope.$on("$destroy", () => {
-
     });
 });

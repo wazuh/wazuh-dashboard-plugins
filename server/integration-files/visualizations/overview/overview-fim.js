@@ -19,8 +19,47 @@ export default [
 			"description": "",
 			"version": 1,
 			"kibanaSavedObjectMeta": {
-				"searchSourceJSON":
-					"{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: \\\"syscheck\\\" AND syscheck.event: (added OR readded)\",\"language\":\"lucene\"}}"
+				"searchSourceJSON":`{
+            "index":"wazuh-alerts",
+            "filter":[
+                {
+                    "meta": {
+                      "index": "wazuh-alerts",
+                      "type": "phrases",
+                      "key": "syscheck.event",
+                      "value": "added, readded",
+                      "params": [
+                        "added",
+                        "readded"
+                      ],
+                      "negate": false,
+                      "disabled": false,
+                      "alias": null
+                    },
+                    "query": {
+                      "bool": {
+                        "should": [
+                          {
+                            "match_phrase": {
+                              "syscheck.event": "added"
+                            }
+                          },
+                          {
+                            "match_phrase": {
+                              "syscheck.event": "readded"
+                            }
+                          }
+                        ],
+                        "minimum_should_match": 1
+                      }
+                    },
+                    "$state": {
+                      "store": "appState"
+                    }
+                  }
+            ],
+            "query":{"query":"","language":"lucene"}
+        }`
 			}
 		},
 		"_type": "visualization"
@@ -34,7 +73,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: \\\"syscheck\\\" syscheck.event: \\\"modified\\\"\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "syscheck.event",
+                              "value": "modified",
+                              "params": {
+                                "query": "modified",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "syscheck.event": {
+                                  "query": "modified",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -48,7 +118,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: \\\"syscheck\\\" AND syscheck.event: \\\"deleted\\\"\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "syscheck.event",
+                              "value": "deleted",
+                              "params": {
+                                "query": "deleted",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "syscheck.event": {
+                                  "query": "deleted",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -62,7 +163,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: syscheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         },
         "_type": "visualization"
@@ -77,7 +178,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\"\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     },
@@ -91,51 +192,9 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\"\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
-    },
-    {
-        "_id": "Wazuh-App-Overview-FIM-Last-file-modified",
-        "_source": {
-            "title": "Last file modified",
-            "visState": "{\"title\":\"Last file modified\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"syscheck.path\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"_term\"}}]}",
-            "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":2,\"direction\":\"desc\"}}}}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"syscheck.event: modified AND location: syscheck\",\"language\":\"lucene\"}}"
-            }
-        },
-        "_type": "visualization"
-    },
-    {
-        "_id": "Wazuh-App-Overview-FIM-Last-file-added",
-        "_source": {
-            "title": "Last file added",
-            "visState": "{\"title\":\"Last file added\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"syscheck.path\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"_term\"}}]}",
-            "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":2,\"direction\":\"desc\"}}}}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"syscheck.event: added AND location: syscheck\",\"language\":\"lucene\"}}"
-            }
-        },
-        "_type": "visualization"
-    },
-    {
-        "_id": "Wazuh-App-Overview-FIM-Last-file-deleted",
-        "_source": {
-            "title": "Last file deleted",
-            "visState": "{\"title\":\"Last file deleted\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"syscheck.path\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"_term\"}}]}",
-            "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":2,\"direction\":\"desc\"}}}}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"syscheck.event: deleted AND location: syscheck\",\"language\":\"lucene\"}}"
-            }
-        },
-        "_type": "visualization"
     },
     {
         "_id": "Wazuh-App-Overview-FIM-Top-file-changes",
@@ -146,7 +205,38 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND syscheck.event: \\\"modified\\\"\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "syscheck.event",
+                              "value": "modified",
+                              "params": {
+                                "query": "modified",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "syscheck.event": {
+                                  "query": "modified",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -155,7 +245,7 @@ export default [
         "_id": "Wazuh-App-Overview-FIM-Root-user-file-changes",
         "_source": {
             "title": "Root user file changes",
-            "visState": "{\"title\":\"Root user file changes\",\"type\":\"pie\",\"params\":{\"isDonut\":false,\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"legendPosition\":\"right\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"syscheck.path\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+            "visState": "{\"title\":\"Root user file changes\",\"type\":\"pie\",\"params\":{\"isDonut\":false,\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"type\":\"pie\",\"legendPosition\":\"right\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"syscheck.path\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
             "uiStateJSON": "{}",
             "description": "",
             "version": 1,
@@ -174,63 +264,48 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups:\\\"syscheck\\\" AND _exists_:syscheck.perm_after AND (syscheck.perm_after:/[0-7]{5}([2367]).*/)\",\"language\":\"lucene\"}}"
-            }
-        },
-        "_type": "visualization"
-    },
-    {
-        "_id": "Wazuh-App-Overview-FIM-Top-agent",
-        "_source": {
-            "title": "Top agent",
-            "visState": "{\"title\":\"Top agent\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"agent.name\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
-            "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":2,\"direction\":\"desc\"}}}}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"location: syscheck\",\"language\":\"lucene\"}}"
-            }
-        },
-        "_type": "visualization"
-    },
-    {
-        "_id": "Wazuh-App-Overview-FIM-Top-PCI-requirement",
-        "_source": {
-            "title": "Top PCI requirement",
-            "visState": "{\"title\":\"Top PCI requirement\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"rule.pci_dss\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
-            "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"location: syscheck\",\"language\":\"lucene\"}}"
-            }
-        },
-        "_type": "visualization"
-    },
-    {
-        "_id": "Wazuh-App-Overview-FIM-Most-common-permissions",
-        "_source": {
-            "title": "Most common permissions",
-            "visState": "{\"title\":\"Most common permissions\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"syscheck.perm_after\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
-            "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"location: syscheck\",\"language\":\"lucene\"}}"
-            }
-        },
-        "_type": "visualization"
-    },
-    {
-        "_id": "Wazuh-App-Overview-FIM-Most-modified-file",
-        "_source": {
-            "title": "Most modified file",
-            "visState": "{\"title\":\"Most modified file\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"syscheck.path\",\"size\":1,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
-            "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-            "description": "",
-            "version": 1,
-            "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"location: syscheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                          {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "exists",
+                              "key": "syscheck.perm_after",
+                              "value": "exists"
+                            },
+                            "exists": {
+                              "field": "syscheck.perm_after"
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          },
+                          {
+                            "query": {
+                              "regexp": {
+                                "syscheck.perm_after": "[0-7]{5}([2367])"                                
+                              }
+                            },
+                            "meta": {
+                              "negate": false,
+                              "index": "wazuh-alerts",
+                              "disabled": false,
+                              "alias": null,
+                              "type": "custom",
+                              "key": "query",
+                              "value": {"regexp":{"syscheck.perm_after": "[0-7]{5}([2367])" }}
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
             }
         },
         "_type": "visualization"
@@ -245,7 +320,7 @@ export default [
             "description": "",
             "version": 1,
             "kibanaSavedObjectMeta": {
-                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"rule.groups: syscheck\",\"language\":\"lucene\"}}"
+                "searchSourceJSON": "{\"index\":\"wazuh-alerts\",\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"}}"
             }
         }
     }

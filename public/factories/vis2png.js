@@ -25,12 +25,12 @@ app.factory('vis2png', function ($rootScope) {
             working = true;
             const len = visArray.length;
             let currentCompleted = 0;
-            await Promise.all(visArray.map(async (currentValue, index, array) => {
+            await Promise.all(visArray.map(async currentValue => {
                 const tmpNode = htmlObject[currentValue]
                 try {
                     const tmpResult = await domtoimage.toPng(tmpNode[0]);
                     rawArray.push({element:tmpResult,width:tmpNode.width(),height:tmpNode.height(), id: currentValue});
-                } catch (error) {}
+                } catch (error) {} // eslint-disable-line
                 currentCompleted++;
                 $rootScope.reportStatus = `Generating report...${Math.round((currentCompleted/len) * 100)}%`
                 if(!$rootScope.$$phase) $rootScope.$digest()

@@ -27,154 +27,81 @@ import settingsTemplate    from '../templates/settings/settings.jade'
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html'
 import devToolsTemplate    from '../templates/dev-tools/dev-tools.html'
 
+function ip(courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc){
+    return getIp(courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc);
+}
+
+function nestedResolve(
+    $q, genericReq, errorHandler, wazuhConfig,
+    $rootScope, $location, $window, testAPI, appState, wzMisc
+) {
+    return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
+    .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
+}
+
+function savedSearch(courier, $location, $window, $rootScope, savedSearches, $route){
+    return getSavedSearch(courier, $location, $window, $rootScope, savedSearches, $route);
+}
+
+function wzConfig($q, genericReq, errorHandler, wazuhConfig) {
+    return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
+}
+
+function wzKibana($location, $window) {
+    return goToKibana($location, $window);
+}
+
+
 //Routes
 routes.enable();
 routes
     .when('/health-check', {
         template: healthCheckTemplate,
-        resolve: {
-            "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig,
-                $rootScope, $location, $window, testAPI, appState, wzMisc
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
-                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
-            },
-            "ip": getIp
-        }
+        resolve: { nestedResolve, ip }
     })
     .when('/agents/:id?/:tab?/:view?', {
         template: agentsTemplate,
-        resolve: {
-            "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig,
-                $rootScope, $location, $window, testAPI, appState, wzMisc
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
-                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
-            },
-            "ip": getIp,
-            "savedSearch": getSavedSearch
-        }
+        resolve: { nestedResolve, ip, savedSearch }
     })
     .when('/agents-preview/:tab?/', {
         template: agentsPrevTemplate,
-        resolve: {
-            "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig,
-                $rootScope, $location, $window, testAPI, appState, wzMisc
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
-                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
-            },
-        }
+        resolve: { nestedResolve }
     })
     .when('/manager/:tab?/', {
         template: managerTemplate,
-        resolve: {
-            "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig,
-                $rootScope, $location, $window, testAPI, appState, wzMisc
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
-                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
-            },
-            "ip": getIp,
-            "savedSearch": getSavedSearch
-        }
+        resolve: { nestedResolve, ip, savedSearch }
     })
     .when('/overview/', {
         template: overviewTemplate,
-        resolve: {
-            "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig,
-                $rootScope, $location, $window, testAPI, appState, wzMisc
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
-                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
-            },
-            "ip": getIp,
-            "savedSearch": getSavedSearch
-        }
+        resolve: { nestedResolve, ip, savedSearch }
     })
     .when('/wazuh-discover/', {
         template: discoverTemplate,
-        resolve: {
-            "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig,
-                $rootScope, $location, $window, testAPI, appState, wzMisc
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
-                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
-            },
-            "ip": getIp,
-            "savedSearch": getSavedSearch
-        }
+        resolve: { nestedResolve, ip, savedSearch }
     })
     .when('/settings/:tab?/', {
         template: settingsTemplate,
-        resolve: {
-            "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
-            }
-        }
+        resolve: { wzConfig }
     })
     .when('/visualize/create?', {
         redirectTo: function () {},
-        resolve: {
-            "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
-            },
-            "checkAPI": goToKibana
-        }
+        resolve: { wzConfig, wzKibana }
     })
     .when('/context/:pattern?/:type?/:id?', {
         redirectTo: function () {},
-        resolve: {
-            "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
-            },
-            "checkAPI": goToKibana
-        }
+        resolve: { wzConfig,wzKibana }
     })
     .when('/doc/:pattern?/:index?/:type?/:id?', {
         redirectTo: function () {},
-        resolve: {
-            "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
-            },
-            "checkAPI": goToKibana
-        }
+        resolve: { wzConfig, wzKibana }
     })
     .when('/wazuh-dev', {
         template: devToolsTemplate,
-        resolve: {
-            "nestedResolve": function(
-                $q, genericReq, errorHandler, wazuhConfig,
-                $rootScope, $location, $window, testAPI, appState, wzMisc
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
-                .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
-            },
-        }
+        resolve: { nestedResolve }
     })
     .when('/blank-screen', {
         template: blankScreenTemplate,
-        resolve: {
-            "getWzConfig": function(
-                $q, genericReq, errorHandler, wazuhConfig
-            ) {
-                return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
-            }
-        }
+        resolve: { wzConfig }
     })
     .when('/', {
         redirectTo: '/overview/'
