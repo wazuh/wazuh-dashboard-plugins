@@ -208,6 +208,9 @@ app.directive('wazuhTable', function() {
             });
 
             $scope.$on('wazuhSearch',(event,parameters) => {
+                if(parameters && parameters.specificPath && !instance.path.includes(parameters.specificPath)){
+                    return;
+                }
                 return search(parameters.term,parameters.removeFilters)
             });
 

@@ -328,9 +328,7 @@ function (
     }
     /** End of agent configuration */
 
-    $scope.search = term => {
-        $scope.$broadcast('wazuhSearch',{term})
-    }
+    $scope.search = (term,specificPath) => $scope.$broadcast('wazuhSearch',{term,specificPath});
 
     $scope.startVis2Png = () => {
         const syscollectorFilters = [];
