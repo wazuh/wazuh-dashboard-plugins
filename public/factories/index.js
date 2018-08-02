@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './data-handler-composer';
 import './raw-visualizations';
 import './loaded-visualizations';
 import './tab-visualizations';
