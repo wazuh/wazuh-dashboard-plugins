@@ -29,6 +29,7 @@
         "angular-material": "1.1.10",
         "dom-to-image": "^2.6.0",
         "install": "^0.10.1",
+        "js2xmlparser": "^3.0.0",
         "json2csv": "^4.1.2",
         "needle": "^2.0.1",
         "node-cron": "^1.1.2",
