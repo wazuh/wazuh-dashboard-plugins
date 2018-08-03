@@ -26,7 +26,7 @@ app.controller('agentsController',
 
 function (
     $timeout, $scope, $location, $rootScope,
-    appState, apiReq, AgentsAutoComplete, errorHandler,
+    appState, apiReq, errorHandler,
     tabVisualizations, shareAgent, commonData,
     reportingService, visFactoryService, csvReq,
     wzTableFilter
@@ -336,7 +336,7 @@ function (
         const syscollectorFilters = [];
         if($scope.tab === 'syscollector' && $scope.agent && $scope.agent.id){
             syscollectorFilters.push(filterHandler.managerQuery(
-                appState.getClusterInfo().cluster, 
+                appState.getClusterInfo().cluster,
                 true
             ));
             syscollectorFilters.push(filterHandler.agentQuery($scope.agent.id));
