@@ -34,7 +34,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('api')" name="api">API</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('extensions')" name="extensions">Extensions</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pattern')" name="pattern">Pattern</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('config')" name="config">Configuration</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="config">Configuration</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('about')" name="about">About</md-nav-item>
     </md-nav-bar>
