@@ -156,7 +156,7 @@
     <!-- End loading status section -->
 
     <!-- Report status section -->
-    <div layout="column" layout-align="center center" ng-if="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'" ng-show="reportBusy && reportStatus">
+    <div layout="column" layout-align="center center" ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{reportStatus}}</div>
     </div>
