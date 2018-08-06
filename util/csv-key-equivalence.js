@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Wazuh CSV column keys 
+ * Wazuh app - Wazuh CSV column keys
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,9 +22,9 @@ export default {
     description: 'Description',
     tag: 'Tag',
     level: 'Level',
-    merged_sum: 'MD5 agent.conf',
-    hash: 'MD5 agent.conf',
-    conf_sum: 'Group MD5',
+    mergedSum: '"agent.conf" MD5 sum',
+    hash: 'MD5 sum',
+    configSum: 'Group MD5 sum',
     filename: 'File',
     file:'File',
     gdpr: 'GDPR',
