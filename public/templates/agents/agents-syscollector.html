@@ -76,15 +76,16 @@
     </div>
 
     <div layout="row" ng-if="agent && syscollector" class="md-padding">
-        <wazuh-table 
-            flex 
-            path="'/syscollector/' + agent.id + '/packages'" 
+        <wazuh-table
+            flex
+            path="'/syscollector/' + agent.id + '/packages'"
             rows-per-page="8"
             keys="[{value:'name',size:2},'architecture',{value:'version',size:2},{value:'vendor',size:2},{value:'description',size:3}]">
         </wazuh-table>
     </div>
 
-    <div layout="row" class="md-padding">
+    <!-- Temporary removed -->
+    <!-- <div layout="row" class="md-padding">
         <input placeholder="Filter network interfaces..." ng-model="netifaceSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="search(netifaceSearch,'netiface')">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(netifaceSearch,'netiface')">
@@ -92,13 +93,13 @@
         </button>
     </div>
     <div layout="row" ng-if="agent" class="md-padding">
-        <wazuh-table 
-            flex 
-            path="'/syscollector/' + agent.id + '/netiface'" 
+        <wazuh-table
+            flex
+            path="'/syscollector/' + agent.id + '/netiface'"
             rows-per-page="8"
             keys="['name','mac','state','type']">
         </wazuh-table>
-    </div>
+    </div> -->
     <!-- Temporary removed -->
     <!--<div layout="row" class="md-padding" ng-if="agent">
         <span flex></span>
