@@ -75,7 +75,7 @@
         </button>
     </div>
 
-    <div layout="row" ng-if="agent && syscollector" class="md-padding">
+    <div layout="row" ng-if="agent && syscollector && !load" class="md-padding">
         <wazuh-table
             flex
             path="'/syscollector/' + agent.id + '/packages'"

@@ -71,6 +71,7 @@
             md-items="agentAutoComplete in analyzeAgents(searchTerm)"
             md-item-text="agentAutoComplete.name"
             md-min-length="0"
+            md-clear-button="true"
             md-no-asterisk="false"
             placeholder="Search by name, ID or IP address">
                 <md-item-template>
