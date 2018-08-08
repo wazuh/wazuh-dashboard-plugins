@@ -80,7 +80,8 @@
             flex
             path="'/syscollector/' + agent.id + '/packages'"
             rows-per-page="8"
-            keys="[{value:'name',size:2},'architecture',{value:'version',size:2},{value:'vendor',size:2},{value:'description',size:3}]">
+            extra-limit="true"
+            keys="[{value:'name',size:3},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]">
         </wazuh-table>
     </div>
 
