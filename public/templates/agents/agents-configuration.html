@@ -90,6 +90,10 @@
                             <span flex>Disabled</span>
                             <span flex class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.disabled}}</span>
                         </div>
+                        <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.scan_on_start">
+                            <span flex>Scan on start</span>
+                            <span flex class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.scan_on_start}}</span>
+                        </div>
                         <div layout="row" class="wz-padding-top-10" ng-if="groupConfiguration.config.syscheck.frequency">
                             <span flex>Frequency</span>
                             <span flex class="wz-text-right color-grey">{{groupConfiguration.config.syscheck.frequency}}</span>
@@ -282,6 +286,10 @@
                             <div ng-if="item.realtime" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Realtime</span>
                                 <span class="wz-text-right color-grey">{{item.realtime}}</span>
+                            </div>
+                            <div ng-if="item.whodata" layout="row" class="wz-padding-top-10">
+                                <span flex="25">Whodata</span>
+                                <span class="wz-text-right color-grey">{{item.whodata}}</span>
                             </div>
                             <div ng-if="item.report_changes" layout="row" class="wz-padding-top-10">
                                 <span flex="25">Report changes</span>
