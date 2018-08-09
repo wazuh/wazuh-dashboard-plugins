@@ -71,9 +71,8 @@
             md-items="agentAutoComplete in analyzeAgents(searchTerm)"
             md-item-text="agentAutoComplete.name"
             md-min-length="0"
+            md-clear-button="true"
             md-no-asterisk="false"
-            md-menu-class="autocomplete-custom-agents-bar"
-            md-search-text-change="analyzeAgents(searchTerm)"
             placeholder="Search by name, ID or IP address">
                 <md-item-template>
                     <span class="item-title">
@@ -102,7 +101,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">General</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">File integrity</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="configuration">Configuration</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">Inventory</md-nav-item>
+        <md-nav-item ng-show="syscollector && syscollector.os && syscollector.hardware" class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">Inventory</md-nav-item>
     </md-nav-bar>
     <!-- End Host monitoring navigation bar -->
 

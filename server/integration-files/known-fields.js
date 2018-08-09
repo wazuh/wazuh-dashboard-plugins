@@ -1660,7 +1660,7 @@ export default [
     },
     {
         "name": "syscheck.audit.proccess.id",
-        "type": "number",
+        "type": "string",
         "count": 0,
         "scripted": false,
         "searchable": true,
@@ -1705,7 +1705,7 @@ export default [
     },
     {
         "name": "syscheck.audit.proccess.ppid",
-        "type": "number",
+        "type": "string",
         "count": 0,
         "scripted": false,
         "searchable": true,
@@ -1714,7 +1714,7 @@ export default [
     },
     {
         "name": "syscheck.audit.user.id",
-        "type": "number",
+        "type": "string",
         "count": 0,
         "scripted": false,
         "searchable": true,
@@ -1732,7 +1732,7 @@ export default [
     },
     {
         "name": "syscheck.audit.group.id",
-        "type": "number",
+        "type": "string",
         "count": 0,
         "scripted": false,
         "searchable": true,
@@ -1750,7 +1750,7 @@ export default [
     },
     {
         "name": "syscheck.audit.login_user.id",
-        "type": "number",
+        "type": "string",
         "count": 0,
         "scripted": false,
         "searchable": true,
@@ -1768,7 +1768,7 @@ export default [
     },
     {
         "name": "syscheck.audit.effective_user.id",
-        "type": "number",
+        "type": "string",
         "count": 0,
         "scripted": false,
         "searchable": true,
