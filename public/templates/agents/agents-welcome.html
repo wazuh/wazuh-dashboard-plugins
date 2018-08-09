@@ -68,23 +68,23 @@
                     <h3 class="euiTitle">Host monitoring</h3>
                     <div class="euiSpacer euiSpacer--m"></div>
                     <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card 
+                        <wz-welcome-card
                             class="euiFlexItem" logo="'app_dashboard.svg'" title="'General'"
                             switch-tab="switchTab('general')" current-tab="'general'"
                             description="'Explore your alerts.'"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
+                        <wz-welcome-card
                             class="euiFlexItem" logo="'app_logging.svg'" title="'File integrity'"
                             switch-tab="switchTab('fim')" current-tab="'fim'"
                             description="TabDescription.fim.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            class="euiFlexItem" logo="'app_devtools.svg'" 
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_devtools.svg'"
                             title="'Configuration'" switch-tab="switchTab('configuration')" current-tab="'configuration'"
                             description="TabDescription.configuration.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            ng-if="syscollector && syscollector.os && syscollector.os.sysname" class="euiFlexItem" logo="'app_index_pattern.svg'" 
+                        <wz-welcome-card
+                            ng-if="syscollector && syscollector.os && syscollector.hardware" class="euiFlexItem" logo="'app_index_pattern.svg'" 
                             title="'Inventory'" switch-tab="switchTab('syscollector')" current-tab="'syscollector'"
                             description="TabDescription.syscollector.description"
                         ></wz-welcome-card>
@@ -96,23 +96,23 @@
                     <h3 class="euiTitle">System audit</h3>
                     <div class="euiSpacer euiSpacer--m"></div>
                     <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card 
-                            class="euiFlexItem" logo="'app_advanced_settings.svg'" 
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_advanced_settings.svg'"
                             title="'Policy monitoring'" switch-tab="switchTab('pm')" current-tab="'pm'"
                             description="TabDescription.pm.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            ng-if="extensions.audit" class="euiFlexItem" logo="'app_monitoring.svg'" 
+                        <wz-welcome-card
+                            ng-if="extensions.audit" class="euiFlexItem" logo="'app_monitoring.svg'"
                             title="'Audit'" switch-tab="switchTab('audit')" current-tab="'audit'"
                             description="TabDescription.audit.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            ng-if="extensions.oscap" class="euiFlexItem" logo="'app_discover.svg'" 
+                        <wz-welcome-card
+                            ng-if="extensions.oscap" class="euiFlexItem" logo="'app_discover.svg'"
                             title="'Open SCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'"
                             description="TabDescription.oscap.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            ng-if="extensions.ciscat" class="euiFlexItem" logo="'app_management.svg'" 
+                        <wz-welcome-card
+                            ng-if="extensions.ciscat" class="euiFlexItem" logo="'app_management.svg'"
                             title="'CIS-CAT'" switch-tab="switchTab('ciscat')" current-tab="'ciscat'"
                             description="TabDescription.ciscat.description"
                         ></wz-welcome-card>
@@ -130,13 +130,13 @@
                         <h3 class="euiTitle">Security</h3>
                         <div class="euiSpacer euiSpacer--m"></div>
                         <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card 
-                                class="euiFlexItem" logo="'app_security.svg'" 
+                            <wz-welcome-card
+                                class="euiFlexItem" logo="'app_security.svg'"
                                 title="'Vulnerabilities'" switch-tab="switchTab('vuls')" current-tab="'vuls'"
                                 description="TabDescription.vuls.description"
                             ></wz-welcome-card>
-                            <wz-welcome-card 
-                                ng-if="extensions.virustotal" class="euiFlexItem" logo="'app_saved_objects.svg'" 
+                            <wz-welcome-card
+                                ng-if="extensions.virustotal" class="euiFlexItem" logo="'app_saved_objects.svg'"
                                 title="'Virustotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
                                 description="TabDescription.virustotal.description"
                             ></wz-welcome-card>
@@ -150,13 +150,13 @@
                         <h3 class="euiTitle">Compliance</h3>
                         <div class="euiSpacer euiSpacer--m"></div>
                         <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card 
-                                ng-if="extensions.pci" class="euiFlexItem" logo="'app_apm.svg'" 
+                            <wz-welcome-card
+                                ng-if="extensions.pci" class="euiFlexItem" logo="'app_apm.svg'"
                                 title="'PCI DSS'" switch-tab="switchTab('pci')" current-tab="'pci'"
                                 description="TabDescription.pci.description"
                             ></wz-welcome-card>
-                            <wz-welcome-card 
-                                ng-if="extensions.gdpr" class="euiFlexItem" logo="'app_visualize.svg'" 
+                            <wz-welcome-card
+                                ng-if="extensions.gdpr" class="euiFlexItem" logo="'app_visualize.svg'"
                                 title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'"
                                 description="TabDescription.gdpr.description"
                             ></wz-welcome-card>

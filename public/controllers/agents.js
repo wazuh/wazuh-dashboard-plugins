@@ -221,13 +221,20 @@ function (
         $location.path('/manager');
     };
 
-    $scope.analyzeAgents = search => {
-        agentFactory.items = [];
-        agentFactory.addFilter('search',search);
-        return agentFactory.fetch({nonull: true})
-                .then(data => data.items)
-                .catch(error => errorHandler.handle(error,'Agents'))
+    $scope.analyzeAgents = async (searchTerm) => {
+        try {
+            if (searchTerm) {
+                const reqData = await apiReq.request('GET', '/agents', { search: searchTerm});
+                return reqData.data.data.items.filter(item => item.id !== '000');
+            } else {
+                const reqData = await apiReq.request('GET', '/agents', {});
+                return reqData.data.data.items.filter(item => item.id !== '000');
+            }
 
+        } catch (error) {
+            errorHandler.handle(error, 'Agents');
+        }
+        return;
     }
 
     $scope.downloadCsv = async data_path => {
