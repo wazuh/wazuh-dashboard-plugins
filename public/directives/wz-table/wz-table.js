@@ -28,7 +28,7 @@ app.directive('wazuhTable', function() {
             rowsPerPage: '=rowsPerPage',
             extraLimit: '=extraLimit'
         },
-        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter) {            
+        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter) {
             $scope.keyEquivalence = KeyEquivalenece;
             $scope.totalItems = 0;
 
@@ -43,7 +43,7 @@ app.directive('wazuhTable', function() {
                     $scope.$emit('wazuhShowGroupFile',{groupName:instance.path.split('groups/')[1].split('/files')[0],fileName:item.filename})
                 } else if(instance.path === '/rules') {
                     $scope.$emit('wazuhShowRule',{rule:item})
-                } else if(instance.path === '/decoders') {
+                } else if(instance.path.includes('/decoders')) {
                     $scope.$emit('wazuhShowDecoder',{decoder:item})
                 } else if(instance.path === '/cluster/nodes') {
                     $scope.$emit('wazuhShowClusterNode',{node:item})
@@ -59,7 +59,7 @@ app.directive('wazuhTable', function() {
             $scope.currentPage = 0;
             let items = [];
             $scope.gap = 0;
-            
+
             // init the filtered items
             $scope.searchTable = function () {
                 $scope.filteredItems = items;
@@ -71,7 +71,7 @@ app.directive('wazuhTable', function() {
             // calculate page in place
             $scope.groupToPages = function () {
                 $scope.pagedItems = [];
-                
+
                 for (let i = 0; i < $scope.filteredItems.length; i++) {
                     if (i % $scope.itemsPerPage === 0) {
                         $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [ $scope.filteredItems[i] ];
@@ -82,25 +82,25 @@ app.directive('wazuhTable', function() {
             };
 
             $scope.range = function (size,start, end) {
-                const ret = [];        
-                            
+                const ret = [];
+
                 if (size < end) {
                     end = size;
                     start = size-$scope.gap;
                 }
                 for (let i = start; i < end; i++) {
                     ret.push(i);
-                }              
+                }
                 return ret;
             };
-        
+
             $scope.prevPage = function () {
                 if ($scope.currentPage > 0) {
                     $scope.currentPage--;
                 }
 
             };
-            
+
             const fetch = async (options = {}) => {
                 try {
                     const result = await instance.fetch(options);
@@ -136,7 +136,7 @@ app.directive('wazuhTable', function() {
                 return;
 
             };
-            
+
             $scope.setPage = function () {
                 $scope.currentPage = this.n;
                 $scope.nextPage(this.n);
@@ -192,7 +192,7 @@ app.directive('wazuhTable', function() {
                     $scope.wazuh_table_loading = false;
                     if(!$scope.$$phase) $scope.$digest();
                 } catch(error) {
-                    errorHandler.handle(`Error filtering by ${filter ? filter.value : 'undefined'}. ${error.message || error}`,'Data factory');                    
+                    errorHandler.handle(`Error filtering by ${filter ? filter.value : 'undefined'}. ${error.message || error}`,'Data factory');
                 }
                 return;
             };
@@ -222,15 +222,15 @@ app.directive('wazuhTable', function() {
 
             const realTimeFunction = async () => {
                 try {
-                    
+
                     while(realTime) {
-                        await fetch({realTime:true, limit:10});                        
+                        await fetch({realTime:true, limit:10});
                         if(!$scope.$$phase) $scope.$digest();
                         await $timeout(1000);
-                    }    
+                    }
                 } catch(error) {
                     realTime = false;
-                    errorHandler.handle(`Real time feature aborted. ${error.message || error}`,'Data factory');                    
+                    errorHandler.handle(`Real time feature aborted. ${error.message || error}`,'Data factory');
                 }
                 return;
             };
@@ -256,11 +256,11 @@ app.directive('wazuhTable', function() {
                 try {
                     $scope.wazuh_table_loading = true;
                     await fetch();
-                    wzTableFilter.set(instance.filters);                    
+                    wzTableFilter.set(instance.filters);
                     $scope.wazuh_table_loading = false;
                     if(!$scope.$$phase) $scope.$digest();
                 } catch (error) {
-                    errorHandler.handle(`Error while init table. ${error.message || error}`,'Data factory');                    
+                    errorHandler.handle(`Error while init table. ${error.message || error}`,'Data factory');
                 }
                 return;
             };
@@ -278,31 +278,31 @@ app.directive('wazuhTable', function() {
                 return array;
             };
 
-            const checkIfArray = item => typeof item === 'object' ? 
+            const checkIfArray = item => typeof item === 'object' ?
                                                  splitArray(item) :
-                                                        item == 0 ? 
-                                                              '0' : 
+                                                        item == 0 ?
+                                                              '0' :
                                                               item;
-            
+
             $scope.$on('$destroy',() => {
                 realTime = null;
                 wzTableFilter.set([]);
             });
 
             $scope.nonDecoderValue = (key,item) => {
-                return  key === 'os.name' ? 
-                        (item.os && item.os.name ? item.os.name : false) || '---' : 
-                        key === 'os.version' ? 
-                        (item.os && item.os.version ? item.os.version : false) || '---' : 
+                return  key === 'os.name' ?
+                        (item.os && item.os.name ? item.os.name : false) || '---' :
+                        key === 'os.version' ?
+                        (item.os && item.os.version ? item.os.version : false) || '---' :
                         checkIfArray(item[key.value || key]) || '---';
             };
 
             $scope.decoderValue = (key,item) => {
-                return  key === 'details.program_name' || key.value === 'details.program_name' ? 
-                        (item.details && item.details.program_name ? item.details.program_name : false) || '---' : 
-                        key === 'details.order' || key.value === 'details.order' ? 
-                        (item.details && item.details.order ? item.details.order : false) || '---' : 
-                        checkIfArray(item[key.value || key]) || '---'; 
+                return  key === 'details.program_name' || key.value === 'details.program_name' ?
+                        (item.details && item.details.program_name ? item.details.program_name : false) || '---' :
+                        key === 'details.order' || key.value === 'details.order' ?
+                        (item.details && item.details.order ? item.details.order : false) || '---' :
+                        checkIfArray(item[key.value || key]) || '---';
             };
 
         },
