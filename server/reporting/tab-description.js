@@ -11,55 +11,55 @@
  */
 export default {
     general: {
-        title: 'General',
-        description: ''
+        title: 'Security events',
+        description: 'Browse through your security alerts, identifying issues and threats in your environment.'
     },
     fim: {
-        title: 'File integrity monitoring',
-        description: 'Wazuh\'s File integrity monitoring (FIM) system watches selected files, triggering alerts when these files are modified.'
+        title: 'Integrity monitoring',
+        description: 'Alerts related to file changes, including permissions, content, ownership and attributes.'
     },
     pm: {
         title: 'Policy monitoring',
-        description: 'Policy monitoring is the process of verifying that all systems conform to a set of predefined rules regarding configuration settings and approved application usage.'
+        description: 'Verify that your systems are configured according to your security policies baseline.'
     },
     vuls: {
-        title: 'Vulnerability detector',
-        description: 'Detect applications that are known to be vulnerable (affected by a CVE).'
+        title: 'Vulnerabilities',
+        description: 'Discover what applications in your environment are affected by well-known vulnerabilities.'
     },
     oscap: {
-        title: 'Security Content Automation Protocol (SCAP)',
-        description: 'SCAP uses several specifications in order to automate continuous monitoring, vulnerability management, and reporting the results of security compliance scans.'
+        title: 'OpenSCAP',
+        description: 'Configuration assessment and automation of compliance monitoring using SCAP checks.'
     },
     audit: {
-        title: 'Linux Audit',
-        description: 'The Linux auditd system is an extensive auditing tool, which we will only touch on here.'
+        title: 'System auditing',
+        description: 'Audit users behavior, monitoring command execution and alerting on access to critical files.'
     },
     pci: {
         title: 'PCI DSS',
-        description: 'Wazuh helps to implement PCI DSS by performing log analysis, file integrity checking, policy monitoring, intrusion detection, real-time alerting and active response.'
+        description: 'Global security standard for entities that process, store or transmit payment cardholder data.'
     },
     gdpr: {
         title: 'GDPR',
-        description: 'The General Data Protection Regulation took effect on May 25, 2018.  Wazuh helps with most technical requirements by making the most of features such as File Integrity or Policy monitoring.'
+        description: 'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.'
     },
     ciscat: {
         title: 'CIS-CAT',
-        description: 'Integrates CIS benchmark assessments into Wazuh agents.'
+        description: 'Configuration assessment using Center of Internet Security scanner and SCAP checks.'
     },
     aws: {
-        title: 'Amazon web services',
-        description: 'Wazuh AWS rules focus on providing the desired visibility within the Amazon Web Services platform.'
+        title: 'Amazon AWS',
+        description: 'Security events related to your Amazon AWS services, collected directly via AWS API.'
     },
     virustotal: {
-        title: 'Virustotal',
-        description: 'Scans monitored files for malicious content.'
+        title: 'VirusTotal',
+        description: 'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.'
     },
     syscollector: {
-        title: 'Inventory',
-        description: 'Scan the system to retrieve information related to OS, hardware and installed packages.'
+        title: 'Inventory data',
+        description: 'Applications, network configuration, open ports and processes running on your monitored systems.'
     },
     configuration: {
         title: 'Configuration',
-        description: 'Agents can be configured remotely by using the agent.conf file. Check the agent configuration here.'
+        description: 'Check the current agent configuration remotely applied by its group.'
     }
 }
