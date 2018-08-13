@@ -29,22 +29,22 @@
         <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
             <div class="euiFlexItem">
                 <div class="euiPanel euiPanel--paddingLarge">
-                    <h3 class="euiTitle">Host monitoring</h3>
+                    <h3 class="euiTitle">Security Information Management</h3>
                     <div class="euiSpacer euiSpacer--m"></div>
                     <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card 
-                            class="euiFlexItem" logo="'app_dashboard.svg'" title="'General'"
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_dashboard.svg'" title="'Security events'"
                             switch-tab="switchTab('general')" current-tab="'general'"
-                            description="'Explore your alerts.'"
+                            description="TabDescription.general.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            class="euiFlexItem" logo="'app_logging.svg'" title="'File integrity'"
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_logging.svg'" title="'Integrity monitoring'"
                             switch-tab="switchTab('fim')" current-tab="'fim'"
                             description="TabDescription.fim.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            ng-if="extensions.aws" class="euiFlexItem" logo="'app_index_pattern.svg'" 
-                            title="'AWS'" switch-tab="switchTab('aws')" current-tab="'aws'"
+                        <wz-welcome-card
+                            ng-if="extensions.aws" class="euiFlexItem" logo="'app_index_pattern.svg'"
+                            title="'Amazon AWS'" switch-tab="switchTab('aws')" current-tab="'aws'"
                             description="TabDescription.aws.description"
                         ></wz-welcome-card>
                     </div>
@@ -52,26 +52,26 @@
             </div>
             <div class="euiFlexItem">
                 <div class="euiPanel euiPanel--paddingLarge">
-                    <h3 class="euiTitle">System audit</h3>
+                    <h3 class="euiTitle">Auditing and Policy Monitoring</h3>
                     <div class="euiSpacer euiSpacer--m"></div>
                     <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card 
-                            class="euiFlexItem" logo="'app_advanced_settings.svg'" 
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_advanced_settings.svg'"
                             title="'Policy monitoring'" switch-tab="switchTab('pm')" current-tab="'pm'"
                             description="TabDescription.pm.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            ng-if="extensions.audit" class="euiFlexItem" logo="'app_monitoring.svg'" 
-                            title="'Audit'" switch-tab="switchTab('audit')" current-tab="'audit'"
+                        <wz-welcome-card
+                            ng-if="extensions.audit" class="euiFlexItem" logo="'app_monitoring.svg'"
+                            title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'"
                             description="TabDescription.audit.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            ng-if="extensions.oscap" class="euiFlexItem" logo="'app_discover.svg'" 
-                            title="'Open SCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'"
+                        <wz-welcome-card
+                            ng-if="extensions.oscap" class="euiFlexItem" logo="'app_discover.svg'"
+                            title="'OpenSCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'"
                             description="TabDescription.oscap.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card 
-                            ng-if="extensions.ciscat" class="euiFlexItem" logo="'app_management.svg'" 
+                        <wz-welcome-card
+                            ng-if="extensions.ciscat" class="euiFlexItem" logo="'app_management.svg'"
                             title="'CIS-CAT'" switch-tab="switchTab('ciscat')" current-tab="'ciscat'"
                             description="TabDescription.ciscat.description"
                         ></wz-welcome-card>
@@ -86,17 +86,17 @@
             <div class="euiFlexItem">
                 <div class="euiFlexItem">
                     <div class="euiPanel euiPanel--paddingLarge">
-                        <h3 class="euiTitle">Security</h3>
+                        <h3 class="euiTitle">Threat Detection and Response</h3>
                         <div class="euiSpacer euiSpacer--m"></div>
                         <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card 
-                                class="euiFlexItem" logo="'app_security.svg'" 
+                            <wz-welcome-card
+                                class="euiFlexItem" logo="'app_security.svg'"
                                 title="'Vulnerabilities'" switch-tab="switchTab('vuls')" current-tab="'vuls'"
                                 description="TabDescription.vuls.description"
                             ></wz-welcome-card>
-                            <wz-welcome-card 
-                                ng-if="extensions.virustotal" class="euiFlexItem" logo="'app_saved_objects.svg'" 
-                                title="'Virustotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
+                            <wz-welcome-card
+                                ng-if="extensions.virustotal" class="euiFlexItem" logo="'app_saved_objects.svg'"
+                                title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
                                 description="TabDescription.virustotal.description"
                             ></wz-welcome-card>
                         </div>
@@ -106,16 +106,16 @@
             <div class="euiFlexItem" ng-if="extensions && (extensions.pci || extensions.gdpr)">
                 <div class="euiFlexItem">
                     <div class="euiPanel euiPanel--paddingLarge">
-                        <h3 class="euiTitle">Compliance</h3>
+                        <h3 class="euiTitle">Regulatory Compliance</h3>
                         <div class="euiSpacer euiSpacer--m"></div>
                         <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card 
-                                ng-if="extensions.pci" class="euiFlexItem" logo="'app_apm.svg'" 
+                            <wz-welcome-card
+                                ng-if="extensions.pci" class="euiFlexItem" logo="'app_apm.svg'"
                                 title="'PCI DSS'" switch-tab="switchTab('pci')" current-tab="'pci'"
                                 description="TabDescription.pci.description"
                             ></wz-welcome-card>
-                            <wz-welcome-card 
-                                ng-if="extensions.gdpr" class="euiFlexItem" logo="'app_visualize.svg'" 
+                            <wz-welcome-card
+                                ng-if="extensions.gdpr" class="euiFlexItem" logo="'app_visualize.svg'"
                                 title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'"
                                 description="TabDescription.gdpr.description"
                             ></wz-welcome-card>
