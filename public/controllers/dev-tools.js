@@ -39,7 +39,7 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
             const splitted  = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
             let   start     = 0;
             let   end       = 0;
-
+            
             const slen = splitted.length;
             for(let i=0; i < slen; i++){ 
                 let tmp    = splitted[i].split('\n');
@@ -48,7 +48,7 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
 
                 if(cursor.findNext()) start = cursor.from().line
                 else return [];
-
+  
                 end = start + tmp.length;
 
                 const tmpRequestText     = tmp[0];
@@ -192,17 +192,20 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
         gutters        : ["CodeMirror-foldgutter"]
     });
 
-    const calculateWhichGroup = () => {
+    const calculateWhichGroup = firstTime => {
         try {
-            const selection    = apiInputBox.getCursor()
-            const desiredGroup = groups.filter(item => item.end >= selection.line && item.start <= selection.line);
+            const selection = apiInputBox.getCursor()
+
+            const desiredGroup = firstTime ?
+                                 groups.filter(item => item.requestText) :
+                                 groups.filter(item => item.requestText && (item.end >= selection.line && item.start <= selection.line));
 
             // Place play button at first line from the selected group
             const cords = apiInputBox.cursorCoords({line:desiredGroup[0].start,ch:0});
             if(!$('#play_button').is(":visible")) $('#play_button').show()
             const currentPlayButton = $('#play_button').offset();
             $('#play_button').offset({top:cords.top,left:currentPlayButton.left})
-            
+            if(firstTime) highlightGroup(desiredGroup[0])
             return desiredGroup[0];
         } catch(error) {
             $('#play_button').hide()
@@ -214,68 +217,72 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
     $scope.send = async firstTime => {
         try {
             groups = analyzeGroups();
-            
-            const desiredGroup   = calculateWhichGroup();
-            if(!desiredGroup) throw Error('not desired');
-            if(firstTime){
-                const cords = apiInputBox.cursorCoords({line:desiredGroup.start,ch:0});
-                const currentPlayButton = $('#play_button').offset();
-                $('#play_button').offset({top:cords.top+10,left:currentPlayButton.left})
+
+            const desiredGroup = calculateWhichGroup(firstTime);
+
+            if(desiredGroup) {
+                if(firstTime){
+                    const cords = apiInputBox.cursorCoords({line:desiredGroup.start,ch:0});
+                    const currentPlayButton = $('#play_button').offset();
+                    $('#play_button').offset({top:cords.top+10,left:currentPlayButton.left})
+                }
+
+                const affectedGroups         = checkJsonParseError();
+                const filteredAffectedGroups = affectedGroups.filter(item => item === desiredGroup.requestText);
+                if(filteredAffectedGroups.length) {apiOutputBox.setValue('Error parsing JSON query'); return;}
+    
+                const method = desiredGroup.requestText.startsWith('GET') ? 
+                               'GET' :
+                               desiredGroup.requestText.startsWith('POST') ?
+                               'POST' :
+                               desiredGroup.requestText.startsWith('PUT') ?
+                               'PUT' :
+                               desiredGroup.requestText.startsWith('DELETE') ?
+                               'DELETE' :
+                               'GET';
+    
+                const requestCopy = desiredGroup.requestText.includes(method) ?
+                                    desiredGroup.requestText.split(method)[1].trim() :
+                                    desiredGroup.requestText;
+    
+                // Checks for inline parameters
+                const inlineSplit = requestCopy.split('?');
+    
+                const extra = inlineSplit && inlineSplit[1] ? 
+                              queryString.parse(inlineSplit[1]) :
+                              {};
+               
+                const req = requestCopy ?
+                            requestCopy.startsWith('/') ? 
+                            requestCopy :  
+                            `/${requestCopy}` :
+                            '/';
+    
+                let JSONraw = {};
+                try {
+                    JSONraw = JSON.parse(desiredGroup.requestTextJson);
+                } catch(error) {
+                    JSONraw = {}
+                }
+    
+                if(typeof extra.pretty !== 'undefined')   delete extra.pretty;
+                if(typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
+    
+                // Assign inline parameters
+                for(const key in extra) JSONraw[key] = extra[key];
+    
+                const path   = req.includes('?') ? req.split('?')[0] : req;
+    
+                if(typeof JSONraw === 'object') JSONraw.devTools = true;                
+                const output = await apiReq.request(method, path, JSONraw)
+    
+                apiOutputBox.setValue(
+                    JSON.stringify(output.data.data,null,2)
+                )
+            } else {
+                apiOutputBox.setValue('Welcome!')
             }
 
-            const affectedGroups         = checkJsonParseError();
-            const filteredAffectedGroups = affectedGroups.filter(item => item === desiredGroup.requestText);
-            if(filteredAffectedGroups.length) {apiOutputBox.setValue('Error parsing JSON query'); return;}
-      
-
-            const method = desiredGroup.requestText.startsWith('GET') ? 
-                           'GET' :
-                           desiredGroup.requestText.startsWith('POST') ?
-                           'POST' :
-                           desiredGroup.requestText.startsWith('PUT') ?
-                           'PUT' :
-                           desiredGroup.requestText.startsWith('DELETE') ?
-                           'DELETE' :
-                           'GET';
-
-            const requestCopy = desiredGroup.requestText.includes(method) ?
-                                desiredGroup.requestText.split(method)[1].trim() :
-                                desiredGroup.requestText;
-
-            // Checks for inline parameters
-            const inlineSplit = requestCopy.split('?');
-
-            const extra = inlineSplit && inlineSplit[1] ? 
-                          queryString.parse(inlineSplit[1]) :
-                          {};
-           
-            const req = requestCopy ?
-                        requestCopy.startsWith('/') ? 
-                        requestCopy :  
-                        `/${requestCopy}` :
-                        '/';
-
-            let JSONraw = {};
-            try {
-                JSONraw = JSON.parse(desiredGroup.requestTextJson);
-            } catch(error) {
-                JSONraw = {}
-            }
-
-            if(typeof extra.pretty !== 'undefined')   delete extra.pretty;
-            if(typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
-
-            // Assign inline parameters
-            for(const key in extra) JSONraw[key] = extra[key];
-
-            const path   = req.includes('?') ? req.split('?')[0] : req;
-
-            if(typeof JSONraw === 'object') JSONraw.devTools = true;
-            const output = await apiReq.request(method, path, JSONraw)
-
-            apiOutputBox.setValue(
-                JSON.stringify(output.data.data,null,2)
-            )
 
         } catch(error) {
             const parsedError = errorHandler.handle(error,null,null,true);
