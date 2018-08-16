@@ -14,6 +14,7 @@ import template        from './wz-table.html';
 import { uiModules }   from 'ui/modules';
 import DataFactory     from '../../services/data-factory';
 import KeyEquivalenece from '../../../util/csv-key-equivalence';
+import CheckRows       from './wz-table-rows'
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -25,10 +26,25 @@ app.directive('wazuhTable', function() {
             keys: '=keys',
             allowClick: '=allowClick',
             implicitFilter: '=implicitFilter',
-            rowsPerPage: '=rowsPerPage',
+            rowSizes: '=rowSizes',
             extraLimit: '=extraLimit'
         },
-        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter) {            
+        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter, $window) {          
+            /**
+             * Calculate number of table rows depending on the screen height 
+             */
+            const rowSizes = $scope.rowSizes || [15,13,11]
+            let doit;
+            $window.onresize = () => {
+                clearTimeout(doit);
+                doit = setTimeout(() => {
+                    $scope.rowsPerPage = CheckRows($window.innerHeight,rowSizes);
+                    $scope.itemsPerPage = $scope.rowsPerPage;
+                    init()
+                }, 150);        
+            };    
+            $scope.rowsPerPage = CheckRows($window.innerHeight,rowSizes);
+            
             $scope.keyEquivalence = KeyEquivalenece;
             $scope.totalItems = 0;
 
@@ -285,6 +301,7 @@ app.directive('wazuhTable', function() {
                                                               item;
             
             $scope.$on('$destroy',() => {
+                $window.onresize = null;
                 realTime = null;
                 wzTableFilter.set([]);
             });
@@ -304,7 +321,6 @@ app.directive('wazuhTable', function() {
                         (item.details && item.details.order ? item.details.order : false) || '---' : 
                         checkIfArray(item[key.value || key]) || '---'; 
             };
-
         },
         template: template
     }
