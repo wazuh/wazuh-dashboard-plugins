@@ -37,7 +37,7 @@ export default class WazuhApi {
         try{
 
             // Get config from elasticsearch
-            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)
+            const wapi_config = await this.wzWrapper.getWazuhConfigurationById(req.payload)         
             if (wapi_config.error_code > 1) {
                 throw new Error(`Could not find Wazuh API entry on Elasticsearch.`)
             } else if (wapi_config.error_code > 0) {
@@ -126,6 +126,30 @@ export default class WazuhApi {
             if(error.code === 'ECONNREFUSED'){
                 return reply({ statusCode: 200, data: {password: '****', apiIsDown: true } });
             } else {
+                // Check if we can connect to a different API
+                if(error && error.body && typeof error.body.found !== 'undefined' && !error.body.found){
+                    try {
+                        const apis = await this.wzWrapper.getWazuhAPIEntries();
+                        for(const api of apis.hits.hits){
+                            try {
+                                const response = await needle('get', `${api._source.url}:${api._source.api_port}/version`, {}, {
+                                    headers: {
+                                        'wazuh-app-version': packageInfo.version
+                                    },
+                                    username          : api._source.api_user,
+                                    password          : Buffer.from(api._source.api_password, 'base64').toString("ascii"),
+                                    rejectUnauthorized: !api._source.insecure
+                                })
+                                if(response && response.body && response.body.error === 0 && response.body.data) {
+                                    req.payload = api._id;
+                                    return this.checkStoredAPI(req,reply);                                   
+                                }
+                            } catch(error) {   } // eslint-disable-line                            
+                        }
+                    } catch (error) {
+                        return ErrorResponse(error.message || error, 3020, 500, reply);
+                    }
+                }
                 return ErrorResponse(error.message || error, 3002, 500, reply);
             }
         }
