@@ -23,7 +23,7 @@
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="filter({name:'category',value:category})"
             aria-label="Logs category">
                 <option value="all">All daemons</option>
-                <option ng-repeat="(key, value) in summary" value="{{key}}">{{key}}</option>
+                <option ng-repeat="daemon in daemons | orderObjectBy: 'title'" value="{{daemon.title}}">{{daemon.title}}</option>
             </select>
         </div>
         <!-- End daemon selector -->
