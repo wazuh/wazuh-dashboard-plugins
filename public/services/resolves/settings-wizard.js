@@ -140,7 +140,8 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
                         callCheckStored();
                     } else {
-                        errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
+                        const comeFromWizard = wzMisc.getValue('comeFromWizard');
+                        !comeFromWizard && errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
                         wzMisc.setWizard(true);
                         if(!$location.path().includes("/settings")) {
                             $location.search('_a', null);
