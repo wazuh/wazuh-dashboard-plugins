@@ -58,13 +58,13 @@
 
     <!-- Logs table section -->
     <div layout="row" layout-padding>
-        <wazuh-table
+        <wz-table
             flex
             extra-limit="true"
             path="'/manager/logs'"
             keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
-            rows-per-page="15">
-        </wazuh-table>
+            row-sizes="[15,13,11]">
+        </wz-table>
     </div>
     <!-- End Logs table section -->
 

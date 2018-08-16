@@ -164,13 +164,13 @@
             <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related decoders</h1>
         </div>
         <div layout="row" ng-if="currentDecoder" class="md-padding">
-            <wazuh-table
+            <wz-table
                 flex 
                 path="'/decoders'" 
                 implicit-filter="[{ name:'file',value: currentDecoder.file}]"
                 keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']" 
                 allow-click="true">
-            </wazuh-table>
+            </wz-table>
         </div>
         <!-- End related decoders section -->
 

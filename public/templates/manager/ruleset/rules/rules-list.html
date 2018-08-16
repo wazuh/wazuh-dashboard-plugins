@@ -51,14 +51,14 @@
     </md-chips>
 
     <div layout="row">
-        <wazuh-table
+        <wz-table
             implicit-filter="appliedFilters"
             flex
             path="'/rules'"
             keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
             allow-click="true"
-            rows-per-page="14">
-        </wazuh-table>
+            row-sizes="[15,13,11]">
+        </wz-table>
     </div>
 
     <div layout="row" class="wz-margin-top-10">
