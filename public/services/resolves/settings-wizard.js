@@ -19,11 +19,6 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
 
         totalRAM(genericReq,errorHandler);
 
-        // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
-        if (!$location.path().includes("/health-check")) {
-            $rootScope.previousLocation = $location.path();
-        }
-
         const checkResponse = data => {
             let fromElastic = false;
             if (parseInt(data.data.error) === 2){
