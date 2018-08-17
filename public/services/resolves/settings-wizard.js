@@ -58,13 +58,13 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
         }
 
         const changeCurrentApi = data => {
-            const currenApi   = JSON.parse(appState.getCurrentAPI()).id;
+            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const clusterInfo = data.data.data.cluster_info;
 
             // Should change the currentAPI configuration depending on cluster
             const str = clusterInfo.status === 'disabled' ?
-                        JSON.stringify({ name: clusterInfo.manager, id: currenApi }) :
-                        JSON.stringify({ name: clusterInfo.cluster, id: currenApi });
+                        JSON.stringify({ name: clusterInfo.manager, id: currentApi }) :
+                        JSON.stringify({ name: clusterInfo.cluster, id: currentApi });
            
             appState.setCurrentAPI(str);
             appState.setClusterInfo(clusterInfo);
@@ -104,6 +104,10 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                     if (data.data.error || data.data.data.apiIsDown) {
                         checkResponse(data);
                     } else {
+                        if(data && data.data && data.data.idChanged) {
+                            const apiRaw = JSON.parse(appState.getCurrentAPI());
+                            appState.setCurrentAPI(JSON.stringify({name: apiRaw.name, id: data.data.idChanged }));
+                        }
                         wzMisc.setApiIsDown(false);
                         changeCurrentApi(data);
                         deferred.resolve();
