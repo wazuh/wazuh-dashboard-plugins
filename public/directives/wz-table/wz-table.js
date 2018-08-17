@@ -18,7 +18,7 @@ import CheckRows       from './wz-table-rows'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wazuhTable', function() {
+app.directive('wzTable', function() {
     return {
         restrict: 'E',
         scope: {
