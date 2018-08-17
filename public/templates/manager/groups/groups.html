@@ -71,9 +71,9 @@
 
             <!-- Groups table -->
             <div layout="row" ng-if="!lookingGroup" class="md-padding">
-                <wazuh-table flex extra-limit="true" path="'/agents/groups'" keys="['name',{value:'count',size:1},{value:'mergedSum',size:3}]"
-                    allow-click="true" rows-per-page="14">
-                </wazuh-table>
+                <wz-table flex extra-limit="true" path="'/agents/groups'" keys="['name',{value:'count',size:1},{value:'mergedSum',size:3}]"
+                    allow-click="true" row-sizes="[14,12,10]">
+                </wz-table>
             </div>
             <!-- End groups table -->
 
@@ -88,9 +88,9 @@
 
             <!-- Group agents table -->
             <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup" class="md-padding">
-                <wazuh-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
-                    allow-click="true" rows-per-page="14">
-                </wazuh-table>
+                <wz-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
+                    allow-click="true" row-sizes="[14,12,10]">
+                </wz-table>
             </div>
             <!-- End Group agents table -->
 
@@ -105,9 +105,9 @@
 
             <!-- Group files table -->
             <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup" class="md-padding">
-                <wazuh-table extra-limit="true" flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
-                    allow-click="true" rows-per-page="10">
-                </wazuh-table>
+                <wz-table extra-limit="true" flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
+                    allow-click="true" row-sizes="[10,8,6]">
+                </wz-table>
             </div>
             <!-- End Group files table -->
 

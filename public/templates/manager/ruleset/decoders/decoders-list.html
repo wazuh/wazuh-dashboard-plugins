@@ -38,14 +38,14 @@
     </md-chips>
 
     <div layout="row">
-        <wazuh-table
+        <wz-table
             implicit-filter="appliedFilters"
             flex
             path="'/decoders'"
             keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
             allow-click="true"
-            rows-per-page="14">
-        </wazuh-table>
+            row-sizes="[15,13,11]">
+        </wz-table>
     </div>
 
     <div layout="row" class="wz-margin-top-10">

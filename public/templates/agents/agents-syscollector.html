@@ -76,13 +76,13 @@
     </div>
 
     <div layout="row" ng-if="agent && syscollector && !load" class="md-padding">
-        <wazuh-table
+        <wz-table
             flex
             path="'/syscollector/' + agent.id + '/packages'"
-            rows-per-page="8"
+            row-sizes="[8,6,4]"
             extra-limit="true"
             keys="[{value:'name',size:3},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]">
-        </wazuh-table>
+        </wz-table>
     </div>
 
     <!-- Temporary removed -->
@@ -94,12 +94,12 @@
         </button>
     </div>
     <div layout="row" ng-if="agent" class="md-padding">
-        <wazuh-table
+        <wz-table
             flex
             path="'/syscollector/' + agent.id + '/netiface'"
             rows-per-page="8"
             keys="['name','mac','state','type']">
-        </wazuh-table>
+        </wz-table>
     </div> -->
     <!-- Temporary removed -->
     <!--<div layout="row" class="md-padding" ng-if="agent">

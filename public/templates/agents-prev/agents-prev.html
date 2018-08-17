@@ -101,13 +101,13 @@
     </div>
 
     <div layout="row" class="margin-top-30">
-        <wazuh-table 
+        <wz-table 
             flex 
             path="'/agents'" 
             keys="['id',{value:'name',size:2},'ip','status','group','os.name','os.version','version']" 
             allow-click="true"
-            rows-per-page="17">
-        </wazuh-table>
+            row-sizes="[17,15,13]">
+        </wz-table>
     </div>
 
     <div layout="row" class="wz-margin-top-10">
