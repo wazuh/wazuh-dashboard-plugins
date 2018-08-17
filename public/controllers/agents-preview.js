@@ -84,8 +84,8 @@ app.controller('agentsPreviewController', function ($scope, $routeParams, generi
             const unique = data[0].data.result;
 
             $scope.groups                    = unique.groups;
-            $scope.nodes                     = unique.nodes;
-            $scope.versions                  = unique.versions;
+            $scope.nodes                     = unique.nodes.map(item => { return {id: item} });
+            $scope.versions                  = unique.versions.map(item => { return {id: item} });
             $scope.osPlatforms               = unique.osPlatforms;
             $scope.lastAgent                 = unique.lastAgent;
             $scope.agentsCountActive         = unique.summary.agentsCountActive;

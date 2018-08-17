@@ -27,7 +27,15 @@ import settingsTemplate    from '../templates/settings/settings.jade'
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html'
 import devToolsTemplate    from '../templates/dev-tools/dev-tools.html'
 
+const assignPreviousLocation = ($rootScope,$location) => {
+    // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
+    if (!$location.path().includes("/health-check")) {
+        $rootScope.previousLocation = $location.path();
+    }
+}
+
 function ip(courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc){
+    assignPreviousLocation($rootScope,$location);
     return getIp(courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc);
 }
 
@@ -35,19 +43,23 @@ function nestedResolve(
     $q, genericReq, errorHandler, wazuhConfig,
     $rootScope, $location, $window, testAPI, appState, wzMisc
 ) {
+    assignPreviousLocation($rootScope,$location);
     return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
     .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
 }
 
 function savedSearch(courier, $location, $window, $rootScope, savedSearches, $route){
+    assignPreviousLocation($rootScope,$location);
     return getSavedSearch(courier, $location, $window, $rootScope, savedSearches, $route);
 }
 
-function wzConfig($q, genericReq, errorHandler, wazuhConfig) {
+function wzConfig($q, genericReq, errorHandler, wazuhConfig, $rootScope, $location) {
+    assignPreviousLocation($rootScope,$location);
     return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
 }
 
-function wzKibana($location, $window) {
+function wzKibana($location, $window, $rootScope) {
+    assignPreviousLocation($rootScope,$location);
     return goToKibana($location, $window);
 }
 

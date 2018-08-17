@@ -56,8 +56,9 @@ app.controller('managerLogController', function ($scope, apiReq, errorHandler, c
 
     const initialize = async () => {
         try{   
-            const data = await apiReq.request('GET', '/manager/logs/summary', {});
-            $scope.summary = data.data.data;
+            const data     = await apiReq.request('GET', '/manager/logs/summary', {});
+            const daemons  = data.data.data;
+            $scope.daemons = Object.keys(daemons).map(item => { return { title: item } })
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
