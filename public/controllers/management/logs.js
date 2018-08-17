@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Manager logs controller
+ * Wazuh app - Management logs controller
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules }  from 'ui/modules'
-import * as FileSaver from '../services/file-saver'
+import * as FileSaver from '../../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 

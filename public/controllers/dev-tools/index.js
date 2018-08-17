@@ -10,8 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules'
-import CodeMirror    from '../utils/codemirror/lib/codemirror'
-import jsonLint      from '../utils/codemirror/json-lint'
+import CodeMirror    from '../../utils/codemirror/lib/codemirror'
+import jsonLint      from '../../utils/codemirror/json-lint'
 import queryString   from 'querystring-browser'
 
 const app = uiModules.get('app/wazuh', []);

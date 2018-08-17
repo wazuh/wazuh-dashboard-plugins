@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-import './overview'
-import './management'
-import './agents-preview'
-import './agents'
-import './settings'
-import './dev-tools'
-import './misc'
+import './manager'
+import './configuration'
+import './status'
+import './logs'
+import './groups'
+import './rules'
+import './decoders'
+import './monitoring'
