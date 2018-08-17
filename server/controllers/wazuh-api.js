@@ -446,6 +446,9 @@ export default class WazuhApi {
             const response  = await needle(method, fullUrl, data, options);
 
             if(response && response.body && !response.body.error && response.body.data) {
+                if(path.includes('/manager/configuration') && response.body.data.cluster && response.body.data.cluster.key){
+                    response.body.data.cluster.key = '*************'
+                }
                 return reply(response.body)
             }
 
