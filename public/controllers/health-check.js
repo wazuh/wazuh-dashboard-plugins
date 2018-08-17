@@ -73,7 +73,10 @@ function ($scope, $rootScope, $timeout, $location,
         try {
             if(checks.api) {
                 const data = await testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id);
-
+                if(data && data.data && data.data.idChanged) {
+                    const apiRaw = JSON.parse(appState.getCurrentAPI());
+                    appState.setCurrentAPI(JSON.stringify({name: apiRaw.name, id: data.data.idChanged }));
+                }
                 const i = $scope.results.map(item => item.id).indexOf(0);
                 if (data.data.error || data.data.data.apiIsDown) {
                     $scope.errors.push("Error connecting to the API.");

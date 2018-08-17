@@ -85,7 +85,7 @@ export default class WazuhApi {
                             wapi_config.cluster_info.node    = response.body.data.node;
                             wapi_config.cluster_info.cluster = response.body.data.cluster;
                             wapi_config.password = '****'
-                            return reply({ statusCode: 200, data: wapi_config });
+                            return reply({ statusCode: 200, data: wapi_config, idChanged: req.idChanged || null });
 
                         } else if (response.body.error){
                             const tmpMsg = response && response.body && response.body.message ?
@@ -104,7 +104,7 @@ export default class WazuhApi {
                         wapi_config.cluster_info.manager = managerName;
                         wapi_config.password = '****'
 
-                        return reply({ statusCode: 200, data: wapi_config });
+                        return reply({ statusCode: 200, data: wapi_config, idChanged: req.idChanged || null });
                     }
 
                 } else {
@@ -142,6 +142,7 @@ export default class WazuhApi {
                                 })
                                 if(response && response.body && response.body.error === 0 && response.body.data) {
                                     req.payload = api._id;
+                                    req.idChanged = api._id;
                                     return this.checkStoredAPI(req,reply);                                   
                                 }
                             } catch(error) {   } // eslint-disable-line                            
