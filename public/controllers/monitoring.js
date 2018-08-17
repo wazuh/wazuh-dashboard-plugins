@@ -211,7 +211,7 @@ app.controller('clusterController', function ($scope, $rootScope, $timeout, erro
 
     if(clusterEnabled) load();
 
-    $scope.$on('destroy',() => {
+    $scope.$on('$destroy',() => {
         $location.search('tabView',null);
         discoverPendingUpdates.removeAll();
         tabVisualizations.removeAll();
