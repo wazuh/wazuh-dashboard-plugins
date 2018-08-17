@@ -106,7 +106,7 @@
             <!-- Group files table -->
             <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup" class="md-padding">
                 <wz-table extra-limit="true" flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
-                    allow-click="true" row-sizes="[10,8,6]">
+                    allow-click="true" row-sizes="[10,8,6,4]">
                 </wz-table>
             </div>
             <!-- End Group files table -->
