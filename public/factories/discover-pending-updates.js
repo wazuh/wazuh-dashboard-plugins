@@ -14,24 +14,22 @@ import { uiModules } from 'ui/modules'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.factory('discoverPendingUpdates', function() {
-    let pendingUpdates = [];
-
-    const addItem = (query, filters) => {
-        pendingUpdates.push(query, filters);
+class DiscoverPendingUpdates {
+    constructor(){
+        this.pendingUpdates = [];
     }
 
-    const getList = () => {
-        return pendingUpdates;
+    addItem (query, filters) {
+        this.pendingUpdates.push(query, filters);
     }
 
-    const removeAll = () => {
-        pendingUpdates = [];
+    getList () {
+        return this.pendingUpdates;
     }
-  
-    return {
-      addItem    : addItem,
-      getList    : getList,
-      removeAll  : removeAll
-    };
-});
+
+    removeAll () {
+        this.pendingUpdates = [];
+    }
+}
+
+app.service('discoverPendingUpdates', DiscoverPendingUpdates);

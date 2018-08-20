@@ -13,9 +13,18 @@ import { uiModules } from 'ui/modules'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.service('commonData', function ($rootScope, $timeout, genericReq, appState, errorHandler, $location, shareAgent) {
+class CommonData {
+    constructor($rootScope, $timeout, genericReq, appState, errorHandler, $location, shareAgent) {
+        this.$rootScope   = $rootScope;
+        this.$timeout     = $timeout;
+        this.genericReq   = genericReq;
+        this.appState     = appState;
+        this.errorHandler = errorHandler;
+        this.$location    = $location;
+        this.shareAgent   = shareAgent;
+    }
 
-    const af = (filterHandler, tab, localChange, agent) => {
+    af(filterHandler, tab, localChange, agent) {
         try{
             const tabFilters = {
                 general   : { group: '' },
@@ -32,11 +41,11 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
             };
 
             const filters = [];
-            const isCluster = appState.getClusterInfo().status == 'enabled';
+            const isCluster = this.appState.getClusterInfo().status == 'enabled';
             filters.push(filterHandler.managerQuery(
                 isCluster ?
-                appState.getClusterInfo().cluster :
-                appState.getClusterInfo().manager,
+                this.appState.getClusterInfo().cluster :
+                this.appState.getClusterInfo().manager,
                 isCluster
             ))
 
@@ -50,91 +59,99 @@ app.service('commonData', function ($rootScope, $timeout, genericReq, appState, 
                 }
             }
             if(agent) filters.push(filterHandler.agentQuery(agent));
-            $rootScope.$emit('wzEventFilters',{filters, localChange});
-            if(!$rootScope.$$listenerCount['wzEventFilters']){
-                $timeout(100)
-                .then(() => af(filterHandler, tab, localChange, agent = false))
+            this.$rootScope.$emit('wzEventFilters',{filters, localChange});
+            if(!this.$rootScope.$$listenerCount['wzEventFilters']){
+                this.$timeout(100)
+                .then(() => this.af(filterHandler, tab, localChange, agent = false))
             }
         } catch(error) {
-            errorHandler.handle('An error occurred while creating custom filters for visualizations',agent ? 'Agents' : 'Overview',true);
+            this.errorHandler.handle('An error occurred while creating custom filters for visualizations', agent ? 'Agents' : 'Overview',true);
         }
-    };
-    return {
-        getGDPR: async () => {
-            try {
-                const gdprTabs = [];
-                const data = await genericReq.request('GET', '/api/wazuh-api/gdpr/all')
-                if(!data.data) return [];
-                for(const key in data.data){
-                    gdprTabs.push({ title: key, content: data.data[key] });
-                }
-                return gdprTabs;
-            } catch(error) {
-                return Promise.reject(error);
-            }
-        },
-        getPCI: async () => {
-            try {
-                const pciTabs = [];
-                const data = await genericReq.request('GET', '/api/wazuh-api/pci/all')
-                if(!data.data) return [];
-                for(const key in data.data){
-                    pciTabs.push({ title: key, content: data.data[key] });
-                }
-                return pciTabs;
-            } catch(error) {
-                return Promise.reject(error);
-            }
-        },
-        assignFilters: (filterHandler, tab, localChange, agent) => af(filterHandler, tab, localChange, agent),
-        validateRange: data => {
-            const result = {
-                duration  : 'Unknown',
-                inProgress: false,
-                end       : data.end || 'Unknown',
-                start     : data.start || 'Unknown'
-            }
+    }
 
-            if(data.end && data.start) {
-                result.duration = ((new Date(data.end) - new Date(data.start))/1000)/60;
-                result.duration = Math.round(result.duration * 100) / 100;
-                if(result.duration <= 0){
-                    result.inProgress = true;
-                }
+    async getGDPR() {
+        try {
+            const gdprTabs = [];
+            const data = await this.genericReq.request('GET', '/api/wazuh-api/gdpr/all')
+            if(!data.data) return [];
+            for(const key in data.data){
+                gdprTabs.push({ title: key, content: data.data[key] });
             }
+            return gdprTabs;
+        } catch(error) {
+            return Promise.reject(error);
+        }
+    }
 
-            return result;
-        },
-        checkTabLocation: () => {
-            if ($location.search().tab){
-                return $location.search().tab;
-            } else {
-                $location.search('tab', 'welcome');
-                return 'welcome';
+    async getPCI() {
+        try {
+            const pciTabs = [];
+            const data = await this.genericReq.request('GET', '/api/wazuh-api/pci/all')
+            if(!data.data) return [];
+            for(const key in data.data){
+                pciTabs.push({ title: key, content: data.data[key] });
             }
-        },
-        checkTabViewLocation: () => {
-            if ($location.search().tabView){
-                return $location.search().tabView;
-            } else {
-                $location.search('tabView', 'panels');
-                return 'panels'
-            }
+            return pciTabs;
+        } catch(error) {
+            return Promise.reject(error);
+        }
+    }
 
-        },
-        checkLocationAgentId: (newAgentId, globalAgent) => {
-            if (newAgentId) {
-                $location.search('agent', newAgentId);
-                return newAgentId;
+    assignFilters(filterHandler, tab, localChange, agent) {
+        return this.af(filterHandler, tab, localChange, agent);
+    } 
+
+    validateRange(data) {
+        const result = {
+            duration  : 'Unknown',
+            inProgress: false,
+            end       : data.end || 'Unknown',
+            start     : data.start || 'Unknown'
+        }
+
+        if(data.end && data.start) {
+            result.duration = ((new Date(data.end) - new Date(data.start))/1000)/60;
+            result.duration = Math.round(result.duration * 100) / 100;
+            if(result.duration <= 0){
+                result.inProgress = true;
+            }
+        }
+
+        return result;
+    }
+
+    checkTabLocation() {
+        if (this.$location.search().tab){
+            return this.$location.search().tab;
+        } else {
+            this.$location.search('tab', 'welcome');
+            return 'welcome';
+        }
+    }
+
+    checkTabViewLocation() {
+        if (this.$location.search().tabView){
+            return this.$location.search().tabView;
+        } else {
+            this.$location.search('tabView', 'panels');
+            return 'panels'
+        }
+    }
+
+    checkLocationAgentId(newAgentId, globalAgent) {
+        if (newAgentId) {
+            this.$location.search('agent', newAgentId);
+            return newAgentId;
+        } else {
+            if (this.$location.search().agent && !globalAgent) { // There's one in the url
+                return this.$location.search().agent;
             } else {
-                if ($location.search().agent && !globalAgent) { // There's one in the url
-                    return $location.search().agent;
-                } else {
-                    shareAgent.deleteAgent();
-                    $location.search('agent', globalAgent.id);
-                    return globalAgent.id;
-                }
+                this.shareAgent.deleteAgent();
+                this.$location.search('agent', globalAgent.id);
+                return globalAgent.id;
             }
         }
     }
-});
+}
+
+app.service('commonData', CommonData);

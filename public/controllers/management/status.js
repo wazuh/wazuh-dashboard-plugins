@@ -13,47 +13,72 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('managerStatusController', function ($scope, errorHandler, apiReq) {
-    //Initialization
-    $scope.load  = true;
+class StatusController {
+    constructor($scope, errorHandler, apiReq){
+        this.$scope       = $scope;
+        this.errorHandler = errorHandler;
+        this.apiReq       = apiReq;
+        this.$scope.load  = true;
 
-    //Functions
-    $scope.getDaemonStatusClass = daemonStatus => (daemonStatus === 'running') ? 'status teal' : 'status red';
+        this.$scope.getDaemonStatusClass = daemonStatus => this.getDaemonStatusClass(daemonStatus);
+    }
 
-    Promise.all([
-        apiReq.request('GET', '/agents/summary', {}),
-        apiReq.request('GET', '/manager/status', {}),
-        apiReq.request('GET', '/manager/info', {}),
-        apiReq.request('GET', '/rules', { offset: 0, limit: 1 }),
-        apiReq.request('GET', '/decoders', { offset: 0, limit: 1 })
-    ])
-    .then(data => {
-        // Once Wazuh core fixes agent 000 issues, this should be adjusted
-        const active = data[0].data.data.Active - 1;
-        const total  = data[0].data.data.Total - 1;
-        $scope.agentsCountActive         = active;
-        $scope.agentsCountDisconnected   = data[0].data.data.Disconnected;
-        $scope.agentsCountNeverConnected = data[0].data.data['Never connected'];
-        $scope.agentsCountTotal          = total;
-        $scope.agentsCoverity            = (active / total) * 100;
+    /**
+     * Initialize
+     */
+    $onInit() {
+        return this.init();
+    }
 
-        $scope.daemons       = data[1].data.data;
-        $scope.managerInfo   = data[2].data.data;
-        $scope.totalRules    = data[3].data.data.totalItems;
-        $scope.totalDecoders = data[4].data.data.totalItems;
+    /**
+     * Used to show green/red depending on daemon status
+     * @param {*} daemonStatus 
+     */
+    getDaemonStatusClass(daemonStatus) {
+        return (daemonStatus === 'running') ? 'status teal' : 'status red';
+    }
 
-        return apiReq.request('GET', '/agents', { limit: 1, sort: '-dateAdd' });
-    })
-    .then(lastAgent => apiReq.request('GET', `/agents/${lastAgent.data.data.items[0].id}`, {}))
-    .then(agentInfo => {
-        $scope.agentInfo = agentInfo.data.data;
-        $scope.load = false;
-        if(!$scope.$$phase) $scope.$digest();
-    })
-    .catch(error => errorHandler.handle(error,'Manager'));
+    /**
+     * Fetchs all required data
+     */
+    async init() {
+        try {
+            const data = await Promise.all([
+                this.apiReq.request('GET', '/agents/summary', {}),
+                this.apiReq.request('GET', '/manager/status', {}),
+                this.apiReq.request('GET', '/manager/info', {}),
+                this.apiReq.request('GET', '/rules', { offset: 0, limit: 1 }),
+                this.apiReq.request('GET', '/decoders', { offset: 0, limit: 1 })
+            ])
+            
+            // Once Wazuh core fixes agent 000 issues, this should be adjusted
+            const active = data[0].data.data.Active - 1;
+            const total  = data[0].data.data.Total - 1;
+            this.$scope.agentsCountActive         = active;
+            this.$scope.agentsCountDisconnected   = data[0].data.data.Disconnected;
+            this.$scope.agentsCountNeverConnected = data[0].data.data['Never connected'];
+            this.$scope.agentsCountTotal          = total;
+            this.$scope.agentsCoverity            = (active / total) * 100;
+    
+            this.$scope.daemons       = data[1].data.data;
+            this.$scope.managerInfo   = data[2].data.data;
+            this.$scope.totalRules    = data[3].data.data.totalItems;
+            this.$scope.totalDecoders = data[4].data.data.totalItems;
+        
+            const lastAgent = await this.apiReq.request('GET', '/agents', { limit: 1, sort: '-dateAdd' });
+            const agentInfo = await this.apiReq.request('GET', `/agents/${lastAgent.data.data.items[0].id}`, {});
 
-    $scope.$on("$destroy", () => {
+            this.$scope.agentInfo = agentInfo.data.data;
+            this.$scope.load      = false;
 
-    });
+            if(!this.$scope.$$phase) this.$scope.$digest();
 
-});
+            return;
+
+        } catch (error) {
+            return this.errorHandler.handle(error,'Manager');
+        }
+    }
+}
+
+app.controller('managerStatusController', StatusController);

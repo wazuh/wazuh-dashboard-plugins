@@ -12,8 +12,8 @@
 
 import './overview'
 import './management'
-import './agents-preview'
-import './agents'
+import './agent/agents-preview'
+import './agent/agents'
 import './settings'
 import './dev-tools'
 import './misc'

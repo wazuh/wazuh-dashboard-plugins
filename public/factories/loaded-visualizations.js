@@ -14,24 +14,22 @@ import { uiModules } from 'ui/modules'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.factory('loadedVisualizations', function() {
-    let list = [];
-
-    const addItem = item => {
-        list.push(item);
+class LoadedVisualizations {
+    constructor(){
+        this.list = [];
     }
 
-    const getList = () => {
-        return list;
+    addItem(item) {
+        this.list.push(item);
     }
 
-    const removeAll = () => {
-        list = [];
+    getList() {
+        return this.list;
     }
-  
-    return {
-      addItem    : addItem,
-      getList    : getList,
-      removeAll  : removeAll
-    };
-});
+
+    removeAll() {
+        this.list = [];
+    }
+}
+
+app.service('loadedVisualizations', LoadedVisualizations);

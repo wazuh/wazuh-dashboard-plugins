@@ -41,8 +41,7 @@
                 <div flex class="wz-text-truncatable">Never connected: <span class="wz-text-bold">{{agentsCountNeverConnected}}</span>
                 </div>
                 <div flex class="wz-text-truncatable">Agents coverage:
-                    <span ng-if="agentsCoverity" class="wz-text-bold">{{(agentsCoverity | number:2)}}%</span>
-                    <span ng-if="!agentsCoverity" class="wz-text-bold">---</span>
+                    <span class="wz-text-bold">{{(agentsCoverity | number:2)}}%</span>
                 </div>
             </md-card-content>
         </md-card>

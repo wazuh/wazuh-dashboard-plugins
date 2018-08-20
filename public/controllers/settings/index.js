@@ -17,12 +17,12 @@ const app = uiModules.get('app/wazuh', []);
 
 app.controller('settingsController', 
 function ($scope, $routeParams, $window, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
-    if (wzMisc.getValue('comeFromWizard')) {
+    if (wzMisc.getWizard()) {
         $window.sessionStorage.removeItem('healthCheck');
         wzMisc.setWizard(false);
     }
 
-    $scope.apiIsDown = wzMisc.getValue('apiIsDown');
+    $scope.apiIsDown = wzMisc.getApiIsDown();
 
     // Initialize
     let currentApiEntryIndex;

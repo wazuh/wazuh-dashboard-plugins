@@ -72,7 +72,7 @@ function ($scope, $rootScope, $timeout, $location,
     const checkApiConnection = async () => {
         try {
             if(checks.api) {
-                const data = await testAPI.check_stored(JSON.parse(appState.getCurrentAPI()).id);
+                const data = await testAPI.checkStored(JSON.parse(appState.getCurrentAPI()).id);
                 if(data && data.data && data.data.idChanged) {
                     const apiRaw = JSON.parse(appState.getCurrentAPI());
                     appState.setCurrentAPI(JSON.stringify({name: apiRaw.name, id: data.data.idChanged }));

@@ -10,53 +10,55 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules'
-import domtoimage   from 'dom-to-image'
+import domtoimage    from 'dom-to-image'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.factory('vis2png', function ($rootScope) {
+class Vis2PNG {
+    constructor($rootScope) {
+        this.$rootScope = $rootScope;
+        this.rawArray   = [];
+        this.htmlObject = {};    
+        this.working    = false;
+    }
 
-    let rawArray = [];
-    let htmlObject = {};    
-    let working  = false;
-    
-    const checkArray = async visArray => {
+    async checkArray (visArray) {
         try {
-            working = true;
+            this.working = true;
             const len = visArray.length;
             let currentCompleted = 0;
             await Promise.all(visArray.map(async currentValue => {
-                const tmpNode = htmlObject[currentValue]
+                const tmpNode = this.htmlObject[currentValue]
                 try {
                     const tmpResult = await domtoimage.toPng(tmpNode[0]);
-                    rawArray.push({element:tmpResult,width:tmpNode.width(),height:tmpNode.height(), id: currentValue});
+                    this.rawArray.push({element:tmpResult,width:tmpNode.width(),height:tmpNode.height(), id: currentValue});
                 } catch (error) {} // eslint-disable-line
                 currentCompleted++;
-                $rootScope.reportStatus = `Generating report...${Math.round((currentCompleted/len) * 100)}%`
-                if(!$rootScope.$$phase) $rootScope.$digest()
+                this.$rootScope.reportStatus = `Generating report...${Math.round((currentCompleted/len) * 100)}%`
+                if(!this.$rootScope.$$phase) this.$rootScope.$digest()
             }))
 
-            working = false;
-            $rootScope.reportStatus = `Generating PDF document...`
-            return rawArray;
+            this.working = false;
+            this.$rootScope.reportStatus = `Generating PDF document...`
+            return this.rawArray;
         } catch (error) {
-            working = false;
+            this.working = false;
             return Promise.reject(error);
         }
     }
 
-    const isWorking  = () => working;
-    const clear = () => {
-        rawArray = []; 
-        htmlObject = {};
+    isWorking () {
+        return this.working;
     }
 
-    const assignHTMLItem = (id,content) => htmlObject[id] = content;
-
-    return {
-        checkArray,
-        assignHTMLItem,
-        isWorking,
-        clear
+    clear () {
+        this.rawArray = []; 
+        this.htmlObject = {};
     }
-});
+
+    assignHTMLItem (id,content) {
+        this.htmlObject[id] = content;
+    } 
+}
+
+app.service('vis2png', Vis2PNG);
