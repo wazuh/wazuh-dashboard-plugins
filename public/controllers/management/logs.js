@@ -14,58 +14,96 @@ import * as FileSaver from '../../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
-// Logs controller
-app.controller('managerLogController', function ($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
-    $scope.type_log    = 'all';
-    $scope.category    = 'all';
-    
-    $scope.search = term => {
-        $scope.$broadcast('wazuhSearch',{term})
+class Logs {
+    constructor($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
+        this.$scope        = $scope;
+        this.apiReq        = apiReq;
+        this.errorHandler  = errorHandler;
+        this.csvReq        = csvReq;
+        this.appState      = appState;
+        this.wzTableFilter = wzTableFilter;
+
+        this.$scope.type_log = 'all';
+        this.$scope.category = 'all';
+    }
+
+    /**
+     * Initialize
+     */
+    $onInit() {
+        this.initialize();
+        this.$scope.search = term => this.search(term);
+        this.$scope.filter = filter => this.filter(filter);
+        this.$scope.playRealtime = () => this.playRealtime();
+        this.$scope.stopRealtime = () => this.stopRealtime();
+        this.$scope.downloadCsv  = () => this.downloadCsv();
+    }
+
+    /**
+     * Event handler for the search bar.
+     * @param {string} term Term(s) to be searched
+     */
+    search(term) {
+        this.$scope.$broadcast('wazuhSearch',{term})
     }
    
-    $scope.filter = async filter => {
-        $scope.$broadcast('wazuhFilter',{filter})
+    /**
+     * Event handler for the selectors
+     * @param {*} filter Filter to be applied
+     */
+    filter(filter) {
+        this.$scope.$broadcast('wazuhFilter',{filter})
     }
 
-    $scope.playRealtime = () => {
-        $scope.realtime   = true;
-        $scope.$broadcast('wazuhPlayRealTime')
-    };
-
-    $scope.stopRealtime = () => {
-        $scope.realtime   = false;
-        $scope.$broadcast('wazuhStopRealTime')
+    /**
+     * Starts real time mode
+     */
+    playRealtime() {
+        this.$scope.realtime   = true;
+        this.$scope.$broadcast('wazuhPlayRealTime')
     }
 
-    $scope.downloadCsv = async () => {
+    /**
+     * Stops real time mode
+     */
+    stopRealtime() {
+        this.$scope.realtime   = false;
+        this.$scope.$broadcast('wazuhStopRealTime')
+    }
+
+    /**
+     * Builds a CSV file from the table and starts the download
+     */
+    async downloadCsv() {
         try {
-            errorHandler.info('Your download should begin automatically...', 'CSV')
-            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/manager/logs', currentApi, wzTableFilter.get());
+            this.errorHandler.info('Your download should begin automatically...', 'CSV')
+            const currentApi   = JSON.parse(this.appState.getCurrentAPI()).id;
+            const output       = await this.csvReq.fetch('/manager/logs', currentApi, this.wzTableFilter.get());
             const blob         = new Blob([output], {type: 'text/csv'}); // eslint-disable-line
-
             FileSaver.saveAs(blob, 'logs.csv');
-            
             return;
-
         } catch (error) {
-            errorHandler.handle(error,'Download CSV');
+            this.errorHandler.handle(error,'Download CSV');
         }
         return;
     }
 
-    const initialize = async () => {
+    /**
+     * Fetchs required data
+     */
+    async initialize() {
         try{   
-            const data     = await apiReq.request('GET', '/manager/logs/summary', {});
+            const data     = await this.apiReq.request('GET', '/manager/logs/summary', {});
             const daemons  = data.data.data;
-            $scope.daemons = Object.keys(daemons).map(item => { return { title: item } })
-            if(!$scope.$$phase) $scope.$digest();
+            this.$scope.daemons = Object.keys(daemons).map(item => { return { title: item } })
+            if(!this.$scope.$$phase) this.$scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle(error,'Logs');
+            this.errorHandler.handle(error,'Logs');
         }
         return;
     }
+}
 
-    initialize();
-});
+// Logs controller
+app.controller('managerLogController', Logs);

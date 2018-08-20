@@ -11,40 +11,50 @@
  */
 import { uiModules } from 'ui/modules'
 
-uiModules.get('app/wazuh', [])
-.service('patternHandler', function ($location, genericReq, appState, errorHandler, wzMisc) {
-    return {
-        getPatternList: async () => {
-            try {
-                const patternList = await genericReq.request('GET','/get-list',{});
+const app = uiModules.get('app/wazuh', []);
 
-                if(!patternList.data.data.length){
-                    wzMisc.setBlankScr('Sorry but no valid index patterns were found')
-                    $location.search('tab',null);
-                    $location.path('/blank-screen');
-                    return;
-                }
+class PatternHandler {
+    constructor($location, genericReq, appState, errorHandler, wzMisc) {
+        this.$location    = $location;
+        this.genericReq   = genericReq;
+        this.appState     = appState;
+        this.errorHandler = errorHandler;
+        this.wzMisc       = wzMisc;
+    }
 
-                if(appState.getCurrentPattern()){
-                    let filtered = patternList.data.data.filter(item => item.id.includes(appState.getCurrentPattern()))
-                    if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
-                }
+    async getPatternList() {
+        try {
+            const patternList = await this.genericReq.request('GET','/get-list',{});
 
-                return patternList.data.data;
-            } catch (error) {
-                errorHandler.handle(error,'Pattern Handler (getPatternList)');
+            if(!patternList.data.data.length){
+                this.wzMisc.setBlankScr('Sorry but no valid index patterns were found')
+                this.$location.search('tab',null);
+                this.$location.path('/blank-screen');
+                return;
             }
-            return;
-        },
-        changePattern: async selectedPattern => {
-            try {
-                appState.setCurrentPattern(selectedPattern);
-                await genericReq.request('GET',`/refresh-fields/${selectedPattern}`,{})
-                return appState.getCurrentPattern();
-            } catch (error) {
-                errorHandler.handle(error,'Pattern Handler (changePattern)');
+
+            if(this.appState.getCurrentPattern()){
+                let filtered = patternList.data.data.filter(item => item.id.includes(this.appState.getCurrentPattern()))
+                if(!filtered.length) this.appState.setCurrentPattern(patternList.data.data[0].id)
             }
-            return;
+
+            return patternList.data.data;
+        } catch (error) {
+            this.errorHandler.handle(error,'Pattern Handler (getPatternList)');
         }
-    };
-});
+        return;
+    }
+
+    async changePattern(selectedPattern) {
+        try {
+            this.appState.setCurrentPattern(selectedPattern);
+            await this.genericReq.request('GET',`/refresh-fields/${selectedPattern}`,{})
+            return this.appState.getCurrentPattern();
+        } catch (error) {
+            this.errorHandler.handle(error,'Pattern Handler (changePattern)');
+        }
+        return;
+    }
+}
+
+app.service('patternHandler', PatternHandler);

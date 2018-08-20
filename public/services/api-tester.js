@@ -14,67 +14,75 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.service('testAPI', function ($http, $rootScope, appState, wzMisc, wazuhConfig) {
-    return {
-        check_stored: async data => {
-            try {
-                const configuration = wazuhConfig.getConfig();
-                const timeout = configuration ? configuration.timeout : 8000;
-                const headers = {headers:{ "Content-Type": 'application/json' }, timeout: timeout || 8000};
+class ApiTester {
+    constructor($http, appState, wzMisc, wazuhConfig) {
+        this.$http       = $http
+        this.appState    = appState;
+        this.wzMisc      = wzMisc;
+        this.wazuhConfig = wazuhConfig;
+    }
 
-                /** Checks for outdated cookies */
-                const current     = appState.getCreatedAt();
-                const lastRestart = $rootScope.lastRestart;
-                
-                if(current && lastRestart && lastRestart > current){
-                    appState.removeCurrentPattern();
-                    appState.removeCurrentAPI();
-                    appState.removeClusterInfo();
-                    appState.removeCreatedAt();
-                    delete $rootScope.lastRestart;
+    async checkStored(data) {
+        try {
+            const configuration = this.wazuhConfig.getConfig();
+            const timeout = configuration ? configuration.timeout : 8000;
+            const headers = {headers:{ "Content-Type": 'application/json' }, timeout: timeout || 8000};
 
-                    appState.setPatternSelector(configuration['ip.selector']);
+            /** Checks for outdated cookies */
+            const current     = this.appState.getCreatedAt();
+            const lastRestart = this.wzMisc.getLastRestart();
+            
+            if(current && lastRestart && lastRestart > current){
+                this.appState.removeCurrentPattern();
+                this.appState.removeCurrentAPI();
+                this.appState.removeClusterInfo();
+                this.appState.removeCreatedAt();
+                this.wzMisc.setLastRestart(null);
 
-                    return 'cookies_outdated';
-                    /** End of checks for outdated cookies */
+                this.appState.setPatternSelector(configuration['ip.selector']);
 
-                } else {
+                return 'cookies_outdated';
+                /** End of checks for outdated cookies */
 
-                    const result = await $http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers);
+            } else {
 
-                    appState.setPatternSelector(configuration['ip.selector']);
+                const result = await this.$http.post(chrome.addBasePath('/api/wazuh-api/checkStoredAPI'), data,headers);
 
-                    if(result.error) {
-                        return Promise.reject(result);
-                    }
-                    return result;
+                this.appState.setPatternSelector(configuration['ip.selector']);
+
+                if(result.error) {
+                    return Promise.reject(result);
                 }
-            } catch (error) {
-                if(error.status && error.status === -1){
-                    wzMisc.setApiIsDown(true);
-                } 
-                return Promise.reject(error);
-                
+                return result;
             }
-        },
-        check: async data => {
-            try {
-                const { timeout } = wazuhConfig.getConfig();
-
-                const headers = {headers:{ "Content-Type": 'application/json' },timeout: timeout || 8000};
-
-                const url = chrome.addBasePath("/api/wazuh-api/checkAPI");
-                const response = await $http.post(url, data, headers);
-
-                if (response.error) {
-                    return Promise.reject(response);
-                }
-
-                return response;
-
-            } catch(error) {
-                return Promise.reject(error);
-            }
+        } catch (error) {
+            if(error.status && error.status === -1){
+                this.wzMisc.setApiIsDown(true);
+            } 
+            return Promise.reject(error);
+            
         }
-    };
-});
+    }
+
+    async check(data) {
+        try {
+            const { timeout } = this.wazuhConfig.getConfig();
+
+            const headers = {headers:{ "Content-Type": 'application/json' },timeout: timeout || 8000};
+
+            const url = chrome.addBasePath("/api/wazuh-api/checkAPI");
+            const response = await this.$http.post(url, data, headers);
+
+            if (response.error) {
+                return Promise.reject(response);
+            }
+
+            return response;
+
+        } catch(error) {
+            return Promise.reject(error);
+        }
+    }
+}
+
+app.service('testAPI', ApiTester);

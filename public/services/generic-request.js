@@ -14,45 +14,58 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.service('genericReq', function ($q, $http, appState, wazuhConfig) {
-    return {
-        request: async (method, path, payload = null) => {
-            try {
-                if (!method || !path) {
-                    throw new Error('Missing parameters');
-                }
+class GenericRequest {
+    constructor($q, $http, appState, wazuhConfig) {
+        this.$q          = $q;
+        this.$http       = $http;
+        this.appState    = appState;
+        this.wazuhConfig = wazuhConfig;
+    }
 
-                const { timeout }    = wazuhConfig.getConfig();
-                const requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: timeout || 8000 };
-                const tmpUrl         = chrome.addBasePath(path);
-              
-                requestHeaders.headers.pattern = appState.getCurrentPattern();
-              
-                try { 
-                    requestHeaders.headers.id = JSON.parse(appState.getCurrentAPI()).id; 
-                } catch (error) { 
-                    // Intended 
-                }
-
-                const data = {};
-                if (method === "GET")    Object.assign(data, await $http.get(tmpUrl, requestHeaders));
-                if (method === "PUT")    Object.assign(data, await $http.put(tmpUrl, payload, requestHeaders));
-                if (method === "POST")   Object.assign(data, await $http.post(tmpUrl, payload, requestHeaders));
-                if (method === "DELETE") Object.assign(data, await $http.delete(tmpUrl));
-
-                if (!data) {
-                    throw new Error(`Error doing a request to ${tmpUrl}, method: ${method}.`);
-                }
-
-                if (data.error && data.error !== '0') {
-                    throw new Error(data.error);
-                } 
-
-                return $q.resolve(data);
-                        
-            } catch (error) {
-                return $q.reject(error);
+    /**
+     * Executes a request to a remote host
+     * @param {string} method Request method (GET, PUT, POST, DELETE)
+     * @param {string} path Relative path to the remote host
+     * @param {object} payload 
+     */
+    async request(method, path, payload = null) {
+        try {
+            if (!method || !path) {
+                throw new Error('Missing parameters');
             }
+
+            const { timeout }    = this.wazuhConfig.getConfig();
+            const requestHeaders = { headers: { "Content-Type": 'application/json' }, timeout: timeout || 8000 };
+            const tmpUrl         = chrome.addBasePath(path);
+          
+            requestHeaders.headers.pattern = this.appState.getCurrentPattern();
+          
+            try { 
+                requestHeaders.headers.id = JSON.parse(this.appState.getCurrentAPI()).id; 
+            } catch (error) { 
+                // Intended 
+            }
+
+            const data = {};
+            if (method === "GET")    Object.assign(data, await this.$http.get(tmpUrl, requestHeaders));
+            if (method === "PUT")    Object.assign(data, await this.$http.put(tmpUrl, payload, requestHeaders));
+            if (method === "POST")   Object.assign(data, await this.$http.post(tmpUrl, payload, requestHeaders));
+            if (method === "DELETE") Object.assign(data, await this.$http.delete(tmpUrl));
+
+            if (!data) {
+                throw new Error(`Error doing a request to ${tmpUrl}, method: ${method}.`);
+            }
+
+            if (data.error && data.error !== '0') {
+                throw new Error(data.error);
+            } 
+
+            return this.$q.resolve(data);
+                    
+        } catch (error) {
+            return this.$q.reject(error);
         }
-    };
-});
+    }
+}
+
+app.service('genericReq', GenericRequest);

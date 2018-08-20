@@ -17,63 +17,63 @@ import healthCheck from './health-check'
 export default (courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc) => {
     const deferred = $q.defer();
 
-    const catchFunction = error => {
-        deferred.reject(error);
-        wzMisc.setBlankScr(errorHandler.handle(error,'Elasticsearch',false,true));
-        $location.path('/blank-screen');
+    const buildSavedObjectsClient = async () => {
+        try {
+            const savedObjectsClient = Private(SavedObjectsClientProvider);
+
+            const savedObjectsData = await savedObjectsClient.find({
+                type   : 'index-pattern',
+                fields : ['title'],
+                perPage: 10000
+            });
+
+            const { savedObjects } = savedObjectsData;
+
+            const data = await genericReq.request('GET', '/get-list')
+
+            let currentPattern = '';
+
+            if (appState.getCurrentPattern()) { // There's cookie for the pattern
+                currentPattern = appState.getCurrentPattern();
+            } else {
+                if(!data || !data.data || !data.data.data || !data.data.data.length){
+                    wzMisc.setBlankScr('Sorry but no valid index patterns were found')
+                    $location.search('tab',null);
+                    $location.path('/blank-screen');
+                    return;
+                }
+                currentPattern = data.data.data[0].id;
+                appState.setCurrentPattern(currentPattern);
+            }
+
+            const onlyWazuhAlerts = savedObjects.filter(element => element.id === currentPattern);
+
+            if (!onlyWazuhAlerts || !onlyWazuhAlerts.length) { // There's now selected ip
+                deferred.resolve('No ip');
+                return;
+            }
+
+            const courierData = await courier.indexPatterns.get(currentPattern)
+
+            deferred.resolve({
+                list         : onlyWazuhAlerts,
+                loaded       : courierData,
+                stateVal     : null,
+                stateValFound: false
+            });
+    
+        } catch (error) {
+            deferred.reject(error);
+            wzMisc.setBlankScr(errorHandler.handle(error,'Elasticsearch',false,true));
+            $location.path('/blank-screen');
+        }
     }
 
     if (healthCheck($window, $rootScope)) {
         deferred.reject();
         $location.path('/health-check');
     } else {
-
-        const savedObjectsClient = Private(SavedObjectsClientProvider);
-        savedObjectsClient.find({
-            type   : 'index-pattern',
-            fields : ['title'],
-            perPage: 10000
-        })
-        .then(({ savedObjects }) => {
-            genericReq.request('GET', '/get-list')
-            .then(data => {
-                let currentPattern = '';
-                if (appState.getCurrentPattern()) { // There's cookie for the pattern
-                    currentPattern = appState.getCurrentPattern();
-                } else {
-                    if(!data || !data.data || !data.data.data || !data.data.data.length){
-                        wzMisc.setBlankScr('Sorry but no valid index patterns were found')
-                        $location.search('tab',null);
-                        $location.path('/blank-screen');
-                        return;
-                    }
-                    currentPattern = data.data.data[0].id;
-                    appState.setCurrentPattern(currentPattern);
-                }
-
-                const onlyWazuhAlerts = savedObjects.filter(element => element.id === currentPattern);
-
-                if (!onlyWazuhAlerts || !onlyWazuhAlerts.length) { // There's now selected ip
-                    deferred.resolve('No ip');
-                    return;
-                }
-
-                courier.indexPatterns.get(currentPattern)
-                .then(data => {
-                    deferred.resolve({
-                        list         : onlyWazuhAlerts,
-                        loaded       : data,
-                        stateVal     : null,
-                        stateValFound: false
-                    });
-                })
-                .catch(catchFunction);
-
-            })
-            .catch(catchFunction);
-        })
-        .catch(catchFunction);
-
+        buildSavedObjectsClient();
     }
     return deferred.promise;
 }

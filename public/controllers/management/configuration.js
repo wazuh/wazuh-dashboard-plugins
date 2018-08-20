@@ -13,55 +13,86 @@ import { uiModules } from 'ui/modules';
 import beautifier    from '../../utils/json-beautifier';
 import js2xmlparser  from 'js2xmlparser';
 import XMLBeautifier from '../../utils/xml-beautifier';
+import angular       from 'angular';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('managerConfigurationController', function ($scope, errorHandler, apiReq) {
-    //Initialization
-    $scope.load    = true;
-    $scope.isArray = Array.isArray;
-
-    $scope.switchItem = item => {
-        $scope.XMLContent   = false;
-        $scope.JSONContent  = false;
-        $scope.selectedItem = item;
-        if(!$scope.$$phase) $scope.$digest();
+class ConfigurationController {
+    constructor($scope, errorHandler, apiReq) {
+        this.$scope         = $scope;
+        this.errorHandler   = errorHandler;
+        this.apiReq         = apiReq;
+        this.$scope.load    = true;
+        this.$scope.isArray = Array.isArray;
+        this.configRaw      = {};
+        
+        this.$scope.switchItem = item => this.switchItem(item);
+        this.$scope.getXML     = name => this.getXML(name);
+        this.$scope.getJSON    = name => this.getJSON(name);
     }
 
-    $scope.getXML = name => {
-        $scope.JSONContent = false;
-        if($scope.XMLContent){
-            $scope.XMLContent = false;
+    /**
+     * Initialize
+     */
+    $onInit() {
+        this.load();
+    }
+
+    /**
+     * Switchs between configuration sections
+     * @param {*} item 
+     */
+    switchItem(item) {
+        this.$scope.XMLContent   = false;
+        this.$scope.JSONContent  = false;
+        this.$scope.selectedItem = item;
+        if(!this.$scope.$$phase) this.$scope.$digest();
+    }
+
+    /**
+     * Assigns XML raw content for specific configuration
+     * @param {string} name Name of the configuration section
+     */
+    getXML(name) {
+        this.$scope.JSONContent = false;
+        if(this.$scope.XMLContent){
+            this.$scope.XMLContent = false;
         } else {
             try {
-                $scope.XMLContent = XMLBeautifier(js2xmlparser.parse(name,configRaw[name]));
-            } catch (error) { $scope.XMLContent = false; }
+                this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse(name, this.configRaw[name]));
+            } catch (error) { this.$scope.XMLContent = false; }
         }        
-        if(!$scope.$$phase) $scope.$digest();
+        if(!this.$scope.$$phase) this.$scope.$digest();
     }
 
-    $scope.getJSON = name => {
-        $scope.XMLContent = false;
-        if($scope.JSONContent){
-            $scope.JSONContent = false;
+    /**
+     * Assigns JSON raw content for specific configuration
+     * @param {string} name Name of the configuration section
+     */
+    getJSON(name) {
+        this.$scope.XMLContent = false;
+        if(this.$scope.JSONContent){
+            this.$scope.JSONContent = false;
         } else {
             try {
-                $scope.JSONContent = beautifier.prettyPrint(configRaw[name]);
-            } catch (error) { $scope.JSONContent = false; }
+                this.$scope.JSONContent = beautifier.prettyPrint(this.configRaw[name]);
+            } catch (error) { this.$scope.JSONContent = false; }
         }
-        if(!$scope.$$phase) $scope.$digest();
+        if(!this.$scope.$$phase) this.$scope.$digest();
     }
-    const configRaw = {};
-    //Functions
-    const load = async () => {
+
+    /**
+     * Fetchs required data
+     */
+    async load() {
         try{
-            const data = await apiReq.request('GET', '/manager/configuration', {});
-            Object.assign(configRaw,angular.copy(data.data.data))
-            $scope.managerConfiguration = data.data.data;
+            const data = await this.apiReq.request('GET', '/manager/configuration', {});
+            Object.assign(this.configRaw, angular.copy(data.data.data))
+            this.$scope.managerConfiguration = data.data.data;
 
-            if($scope.managerConfiguration && $scope.managerConfiguration['active-response']){
+            if(this.$scope.managerConfiguration && this.$scope.managerConfiguration['active-response']){
 
-                for(const ar of $scope.managerConfiguration['active-response']) {
+                for(const ar of this.$scope.managerConfiguration['active-response']) {
                     const rulesArray = ar.rules_id ?
                     ar.rules_id.split(',') :
                                        [];
@@ -69,30 +100,27 @@ app.controller('managerConfigurationController', function ($scope, errorHandler,
                         const tmp = [];
 
                         for(const id of rulesArray){
-                            const rule = await apiReq.request('GET',`/rules/${id}`,{});
+                            const rule = await this.apiReq.request('GET',`/rules/${id}`,{});
                             tmp.push(rule.data.data.items[0]);
                         }
 
                         ar.rules = tmp;
                     } else if(ar.rules_id){
-                        const rule = await apiReq.request('GET',`/rules/${ar.rules_id}`,{});
+                        const rule = await this.apiReq.request('GET',`/rules/${ar.rules_id}`,{});
                         ar.rule = rule.data.data.items[0];
                     }
                 }
             }
 
-            $scope.raw  = beautifier.prettyPrint(data.data.data);
-            $scope.load = false;
-            if(!$scope.$$phase) $scope.$digest();
+            this.$scope.raw  = beautifier.prettyPrint(data.data.data);
+            this.$scope.load = false;
+            if(!this.$scope.$$phase) this.$scope.$digest();
             return;
         } catch (error) {
-            errorHandler.handle(error,'Manager');
+            this.errorHandler.handle(error,'Manager');
         }
         return;
-    };
+    }
+}
 
-    load();
-    $scope.$on("$destroy", () => {
-
-    });
-});
+app.controller('managerConfigurationController', ConfigurationController);

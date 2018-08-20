@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './manager'
+import './management'
 import './configuration'
 import './status'
 import './logs'
