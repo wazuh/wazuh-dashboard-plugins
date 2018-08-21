@@ -2,8 +2,7 @@
     <div flex class="synopsis">
         <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
             <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                <img ng-if="logo" class="synopsisIcon" ng-src="/plugins/kibana/assets/{{logo}}" alt="">
-                <img ng-if="wzLogo" class="synopsisIcon" ng-src="/plugins/wazuh/img/{{wzLogo}}" alt="">
+                <img class="synopsisIcon" ng-src="/plugins/wazuh/img/{{logo || wzLogo}}" alt="">
             </div>
             <div class="euiFlexItem synopsisContent " ng-click="callSwitchTab()">
                 <h4 class="euiTitle euiTitle--small synopsisTitle wz-text-link">{{ title }}</h4>
