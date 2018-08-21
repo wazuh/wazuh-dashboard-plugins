@@ -9,6 +9,19 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import 'uiExports/visTypes'
+import 'uiExports/visResponseHandlers'
+import 'uiExports/visRequestHandlers'
+import 'uiExports/visEditorTypes'
+import 'uiExports/savedObjectTypes' 
+import 'uiExports/spyModes'
+import 'uiExports/fieldFormats'
+import 'uiExports/fieldFormatEditors'
+import 'uiExports/navbarExtensions'
+import 'uiExports/managementSections'
+import 'uiExports/devTools'
+import 'uiExports/docViews'
+import 'uiExports/embeddableFactories'
 
 // Require CSS
 import './less/loader';
