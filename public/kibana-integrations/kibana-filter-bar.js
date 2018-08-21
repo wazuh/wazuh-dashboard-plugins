@@ -9,10 +9,13 @@ import { FilterBarLibMapAndFlattenFiltersProvider } from 'ui/filter_bar/lib/map_
 import { FilterBarLibMapFlattenAndWrapFiltersProvider } from 'ui/filter_bar/lib/map_flatten_and_wrap_filters';
 import { FilterBarLibExtractTimeFilterProvider } from 'ui/filter_bar/lib/extract_time_filter';
 import { FilterBarLibFilterOutTimeBasedFilterProvider } from 'ui/filter_bar/lib/filter_out_time_based_filter';
-import { FilterBarLibChangeTimeFilterProvider } from 'ui/filter_bar/lib/change_time_filter';
+import { changeTimeFilter } from 'ui/filter_bar/lib/change_time_filter';
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { compareFilters } from 'ui/filter_bar/lib/compare_filters';
 import { uiModules } from 'ui/modules';
+
+export { disableFilter, enableFilter, toggleFilterDisabled } from 'ui/filter_bar/lib/disable_filter';
+
 
 const module = uiModules.get('kibana');
 
@@ -21,16 +24,16 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
   const mapFlattenAndWrapFilters = Private(FilterBarLibMapFlattenAndWrapFiltersProvider);
   const extractTimeFilter = Private(FilterBarLibExtractTimeFilterProvider);
   const filterOutTimeBasedFilter = Private(FilterBarLibFilterOutTimeBasedFilterProvider);
-  const changeTimeFilter = Private(FilterBarLibChangeTimeFilterProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
 
   return {
     template: templateBar,
     restrict: 'E',
     scope: {
-      indexPatterns: '='
+      indexPatterns: '=',
+      tooltipContent: '=',
     },
-    link: function ($scope) {
+    link: function ($scope, $elem) {
       // bind query filter actions to the scope
       [
         'addFilters',
@@ -48,8 +51,30 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
 
       $scope.state = getAppState();
 
-      $scope.showAddFilterButton = () => {
-        return _.compact($scope.indexPatterns).length > 0;
+      $scope.showCollapseLink = () => {
+        const pill = $elem.find('filter-pill-w');
+        return pill[pill.length - 1].offsetTop > 10;
+      };
+
+      $scope.filterNavToggle = {
+        isOpen: true,
+        tooltipContent: 'Collapse to hide filters'
+      };
+
+      $scope.toggleFilterShown = () => {
+        const collapser = $elem.find('.filter-nav-link__collapser');
+        const filterPanelPill = $elem.find('.filter-panel__pill');
+        if ($scope.filterNavToggle.isOpen) {
+          $scope.filterNavToggle.tooltipContent = 'Expand to show filters';
+          collapser.attr('aria-expanded', 'false');
+          filterPanelPill.attr('style', 'width: calc(100% - 80px)');
+        } else {
+          $scope.filterNavToggle.tooltipContent = 'Collapse to hide filters';
+          collapser.attr('aria-expanded', 'true');
+          filterPanelPill.attr('style', 'width: auto');
+        }
+
+        $scope.filterNavToggle.isOpen = !$scope.filterNavToggle.isOpen;
       };
 
       $scope.applyFilters = function (filters) {
@@ -69,10 +94,8 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
       };
 
       $scope.deleteFilter = (filter) => {
-        if (filter.removable != false) {
-          $scope.removeFilter(filter);
-          if (filter === $scope.editingFilter) $scope.cancelEdit();
-        }
+        $scope.removeFilter(filter);
+        if (filter === $scope.editingFilter) $scope.cancelEdit();
       };
 
       $scope.editFilter = (filter) => {
@@ -106,35 +129,35 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
 
       $scope.$watch('state.$newFilters', function (filters) {
         if (!filters) return;
-        
+
         // If filters is not undefined and the length is greater than
         // one we need to set the newFilters attribute and allow the
         // users to decide what they want to apply.
         if (filters.length > 1) {
           return mapFlattenAndWrapFilters(filters)
-          .then(function (results) {
-            extractTimeFilter(results).then(function (filter) {
-              $scope.changeTimeFilter = filter;
+            .then(function (results) {
+              extractTimeFilter(results).then(function (filter) {
+                $scope.changeTimeFilter = filter;
+              });
+              return results;
+            })
+            .then(filterOutTimeBasedFilter)
+            .then(function (results) {
+              $scope.newFilters = results;
             });
-            return results;
-          })
-          .then(filterOutTimeBasedFilter)
-          .then(function (results) {
-            $scope.newFilters = results;
-          });
         }
 
         // Just add single filters to the state.
         if (filters.length === 1) {
           Promise.resolve(filters).then(function (filters) {
             extractTimeFilter(filters)
-            .then(function (timeFilter) {
-              if (timeFilter) changeTimeFilter(timeFilter);
-            });
+              .then(function (timeFilter) {
+                if (timeFilter) changeTimeFilter(timeFilter);
+              });
             return filters;
           })
-          .then(filterOutTimeBasedFilter)
-          .then(addAndInvertFilters);
+            .then(filterOutTimeBasedFilter)
+            .then(addAndInvertFilters);
         }
       });
 
@@ -183,7 +206,7 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
     },
     bindToController: true,
     controllerAs: 'pill',
-    controller: function filterPillController($scope) {
+    controller: function filterPillController() {
 
       this.activateActions = () => {
         this.areActionsActivated = true;
@@ -193,6 +216,10 @@ module.directive('filterBarW', function (Private, Promise, getAppState) {
         this.areActionsActivated = false;
       };
 
+      this.isControlledByPanel = () => {
+        return _.has(this.filter, 'meta.controlledBy');
+      };
+
     }
   };
-});
+})
