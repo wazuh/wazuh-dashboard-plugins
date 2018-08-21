@@ -9,7 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
+import { uiModules }          from 'ui/modules';
+import { toastNotifications } from 'ui/notify';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -20,8 +21,8 @@ class ErrorHandler {
      * @param {*} $location Angular.js service to manage URL routing
      */
     constructor(Notifier, $location) {
-        this.$location = $location;
         this.notify = new Notifier();
+        this.$location = $location;
     }
 
     /**
@@ -60,7 +61,7 @@ class ErrorHandler {
     info(message,location) {
         if(typeof message === 'string') {
             message = location ? location + '. ' + message : message;
-            this.notify.custom(message,{ title: 'Information', icon: 'info', type: 'info'});
+            toastNotifications.addSuccess(message);
         }
         return;
     }
@@ -85,8 +86,17 @@ class ErrorHandler {
         if(error.extraMessage) text = error.extraMessage;
         text = location ? location + '. ' + text : text;
         if(!silent){
-            if(isWarning || (text && typeof text === 'string' && text.toLowerCase().includes('no results'))) this.notify.warning(text);
-            else          this.notify.error(text);
+            if(isWarning || (text && typeof text === 'string' && text.toLowerCase().includes('no results'))) {
+                toastNotifications.addWarning({
+                    title: location,
+                    text: text
+                });
+            } else {
+                this.notify.error({
+                    title: location,
+                    text: text
+                });
+            }
         }
         return text;
     }
