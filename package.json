@@ -37,5 +37,10 @@
         "simple-tail": "^1.1.0",
         "timsort": "^0.3.0",
         "winston": "3.0.0"
+    },
+    "devDependencies": {
+        "eslint": "^5.4.0",
+        "typescript-eslint-parser": "^18.0.0",
+        "kbn-plugin-helpers": "link:../../kibana/packages/kbn-plugin-helpers"
     }
 }
