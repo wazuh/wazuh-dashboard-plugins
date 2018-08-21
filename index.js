@@ -23,22 +23,7 @@ export default kibana => new kibana.Plugin({
             title: 'Wazuh',
             description: 'Wazuh app for Kibana',
             icon: 'plugins/wazuh/img/icon.png',
-            main: 'plugins/wazuh/app',
-            uses: [
-                'visTypes',
-                'visResponseHandlers',
-                'visRequestHandlers',
-                'visEditorTypes',
-                'savedObjectTypes',   
-                'spyModes',
-                'fieldFormats',
-                'fieldFormatEditors',
-                'navbarExtensions',
-                'managementSections',
-                'devTools',
-                'docViews',
-                'embeddableFactories'
-            ]
+            main: 'plugins/wazuh/app'
         }
     },
     init: (server,options) => init(server,options)
