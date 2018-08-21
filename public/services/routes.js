@@ -31,12 +31,14 @@ const assignPreviousLocation = ($rootScope,$location) => {
     // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
     if (!$location.path().includes("/health-check")) {
         $rootScope.previousLocation = $location.path();
+    } else {
+        $rootScope.previousLocation = false;
     }
 }
 
-function ip(courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc){
+function ip(indexPatterns, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc){
     assignPreviousLocation($rootScope,$location);
-    return getIp(courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc);
+    return getIp(indexPatterns, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc);
 }
 
 function nestedResolve(
@@ -48,9 +50,9 @@ function nestedResolve(
     .then(() => settingsWizard($rootScope, $location, $q, $window, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig));
 }
 
-function savedSearch(courier, $location, $window, $rootScope, savedSearches, $route){
+function savedSearch(redirectWhenMissing, $location, $window, $rootScope, savedSearches, $route){
     assignPreviousLocation($rootScope,$location);
-    return getSavedSearch(courier, $location, $window, $rootScope, savedSearches, $route);
+    return getSavedSearch(redirectWhenMissing, $location, $window, $rootScope, savedSearches, $route);
 }
 
 function wzConfig($q, genericReq, errorHandler, wazuhConfig, $rootScope, $location) {
