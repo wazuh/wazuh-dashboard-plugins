@@ -14,23 +14,6 @@
     <!-- Right-side: menu -->
     <div class="kuiLocalNavRow__section">
       <div class="kuiLocalMenu">
-        <!-- Removed due to Kibana 6.3.0
-          
-          <button
-          class="kuiLocalMenuItem"
-          ng-repeat="menuItem in wzKbnTopNav.menuItems"
-          aria-label="{{::menuItem.description}}"
-          aria-haspopup="{{!menuItem.hasFunction}}"
-          aria-expanded="{{wzKbnTopNav.isCurrent(menuItem.key)}}"
-          ng-class="{'kuiLocalMenuItem-isSelected': wzKbnTopNav.isCurrent(menuItem.key), 'kuiLocalMenuItem-isDisabled': menuItem.disableButton()}"
-          ng-click="wzKbnTopNav.handleClick(menuItem)"
-          ng-bind="menuItem.label"
-          tooltip="{{menuItem.tooltip()}}"
-          tooltip-placement="bottom"
-          tooltip-popup-delay="400"
-          tooltip-append-to-body="1"
-          data-test-subj="{{menuItem.testId}}"
-        ></button>-->
 
         <!-- Time-picker "menu item" -->
         <wz-kbn-global-timepicker></wz-kbn-global-timepicker>
