@@ -27,21 +27,22 @@
 
   <div
     class="filter-bar wz-background-transparent wz-border-0"
-    ng-show="filters.length || showAddFilterButton()"
+    ng-class="filterNavToggle.isOpen == true || !showCollapseLink() ? '' : 'filter-panel--close'"
   >
-    <filter-pill-w
-      ng-repeat="filter in filters track by $index"
-      filter="filter"
-      on-toggle-filter="toggleFilter"
-      on-pin-filter="pinFilter"
-      on-invert-filter="invertFilter"
-      on-delete-filter="deleteFilter"
-      on-edit-filter="editFilter"
-    ></filter-pill-w>
+    <div class="filter-panel__pill">
+      <filter-pill-w
+        ng-repeat="filter in filters track by $index"
+        filter="filter"
+        on-toggle-filter="toggleFilter"
+        on-pin-filter="pinFilter"
+        on-invert-filter="invertFilter"
+        on-delete-filter="deleteFilter"
+        on-edit-filter="editFilter"
+      ></filter-pill-w>
+    </div>
 
     <div
       class="filter-link"
-      ng-show="showAddFilterButton()"
     >
       <div class="filter-description small">
         <button
@@ -55,31 +56,24 @@
       </div>
     </div>
 
-    <!-- 
     <div
-      class="filter-link pull-right"
-      ng-show="filters.length"
+      class="filter-nav-link__icon"
+      tooltip="{{ filterNavToggle.tooltipContent }}"
+      tooltip-placement="left"
+      tooltip-popup-delay="0"
+      tooltip-append-to-body="1"
+      ng-show="filters.length && showCollapseLink()"
+      aria-hidden="!filters.length || !showCollapseLink()"
     >
-      <div class="filter-description small">
-        <a
-          ng-click="showFilterActions = !showFilterActions"
-          kbn-accessible-click
-          aria-expanded="{{!!showFilterActions}}"
-          aria-controls="filterActionsAllContainer"
-        >
-          Actions
-          <span
-            class="fa"
-            ng-class="{
-              'fa-caret-down': showFilterActions,
-              'fa-caret-right': !showFilterActions
-            }"
-            data-test-subj="showFilterActions"
-          ></span>
-        </a>
-      </div>
+      <button
+        class="filter-nav-link__collapser"
+        ng-click="toggleFilterShown($event)"
+        aria-expanded="true"
+        aria-label="Toggle filterbar"
+      >
+        <span class="kuiIcon" ng-class="filterNavToggle.isOpen == true ? 'fa-chevron-circle-up' : 'fa-chevron-circle-down'"></span>
+      </button>
     </div>
-   -->
 
     <div
       class="filter-edit-container"
@@ -101,7 +95,7 @@
     id="filterActionsAllContainer"
   >
   
-    <!-- 
+    <!--
     <div class="filter-actions-all">
       <div class="filter-link">
         <div class="filter-description"><strong>All filters:</strong></div>
@@ -127,7 +121,7 @@
       <div class="filter-link">
         <div class="filter-description"><a ng-click="removeAll()" data-test-subj="removeAllFilters" kbn-accessible-click>Remove</a></div>
       </div>
-   -->
+      -->
     </div>
   </div>
 </section>
