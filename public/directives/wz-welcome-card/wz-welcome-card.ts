@@ -16,6 +16,11 @@ import { uiModules } from 'ui/modules';
 const app = uiModules.get('app/wazuh', []);
 
 class WzWelcomeCard {
+    private replace: boolean;
+    private template: string;
+    private restrict: string;
+    private scope: object;
+    
     constructor() {
         this.restrict = 'E';
         this.scope = {
