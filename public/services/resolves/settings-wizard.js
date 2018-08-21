@@ -94,8 +94,8 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 appState.setExtensions(currentApi,extensions);
             }
             
-            checkTimestamp(appState, genericReq, $rootScope, $location, wzMisc)
-            .then(() => testAPI.check_stored(currentApi))
+            checkTimestamp(appState, genericReq, $location, wzMisc)
+            .then(() => testAPI.checkStored(currentApi))
             .then(data => {
                 if(data && data === 'cookies_outdated'){
                     $location.search('tab','welcome');
@@ -139,7 +139,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
                         callCheckStored();
                     } else {
-                        const comeFromWizard = wzMisc.getValue('comeFromWizard');
+                        const comeFromWizard = wzMisc.getWizard();
                         !comeFromWizard && errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
                         wzMisc.setWizard(true);
                         if(!$location.path().includes("/settings")) {

@@ -9,16 +9,22 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier     from '../utils/json-beautifier';
+import beautifier     from '../../utils/json-beautifier';
 import { uiModules }  from 'ui/modules';
-import FilterHandler  from '../utils/filter-handler';
-import generateMetric from '../utils/generate-metric';
-import TabNames       from '../utils/tab-names';
-import { metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal } from '../utils/agents-metrics';
-import * as FileSaver from '../services/file-saver';
+import FilterHandler  from '../../utils/filter-handler';
+import generateMetric from '../../utils/generate-metric';
+import TabNames       from '../../utils/tab-names';
+import * as FileSaver from '../../services/file-saver';
+import TabDescription from '../../../server/reporting/tab-description';
 
-import DataFactory from '../services/data-factory';
-import TabDescription from '../../server/reporting/tab-description';
+import { 
+    metricsAudit, 
+    metricsVulnerability, 
+    metricsScap, 
+    metricsCiscat, 
+    metricsVirustotal } from '../../utils/agents-metrics';
+
+
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -31,7 +37,6 @@ function (
     reportingService, visFactoryService, csvReq,
     wzTableFilter
 ) {
-    const agentFactory = new DataFactory(apiReq,'/agents');
     $scope.TabDescription = TabDescription;
 
     $rootScope.reportStatus = false;

@@ -14,65 +14,67 @@ import { uiModules } from 'ui/modules'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.factory('tabVisualizations', function() {
-    const agents = {
-        welcome      : 0,
-        general      : 7,
-        fim          : 7,
-        pm           : 4,
-        vuls         : 7,
-        oscap        : 13,
-        ciscat       : 11,
-        audit        : 15,
-        gdpr         : 3,
-        pci          : 3,
-        virustotal   : 6,
-        configuration: 0
+class TabVisualizations {
+    constructor(){
+        this.agents = {
+            welcome      : 0,
+            general      : 7,
+            fim          : 7,
+            pm           : 4,
+            vuls         : 7,
+            oscap        : 13,
+            ciscat       : 11,
+            audit        : 15,
+            gdpr         : 3,
+            pci          : 3,
+            virustotal   : 6,
+            configuration: 0
+        }
+    
+        this.overview = {
+            welcome   : 0,
+            general   : 11,
+            fim       : 10,
+            pm        : 5,
+            vuls      : 8,
+            oscap     : 11,
+            ciscat    : 11,
+            audit     : 15,
+            pci       : 6,
+            gdpr      : 6,
+            aws       : 10,
+            virustotal: 7
+        }
+    
+        this.tabVisualizations = {}
+        this.currentTab = '';
     }
 
-    const overview = {
-        welcome   : 0,
-        general   : 11,
-        fim       : 10,
-        pm        : 5,
-        vuls      : 8,
-        oscap     : 11,
-        ciscat    : 11,
-        audit     : 15,
-        pci       : 6,
-        gdpr      : 6,
-        aws       : 10,
-        virustotal: 7
+    setTab (tab) {
+        this.currentTab = tab;
     }
 
-    let tabVisualizations = {}
-    let currentTab = '';
-
-    const setTab = tab => currentTab = tab;
-
-    const getTab = () => {
-        return currentTab;
+    getTab () {
+        return this.currentTab;
     }
 
-    const getItem = item => tabVisualizations[item]
+    getItem (item) {
+        return this.tabVisualizations[item];
+    }
 
-    const assign = tabs => {
+    assign (tabs) {
         if(typeof tabs === 'object') {
-            tabVisualizations = tabs;
+            this.tabVisualizations = tabs;
         } else if(typeof tabs === 'string') {
-            tabVisualizations = tabs === 'overview' ?
-                                overview :
-                                agents;
+            this.tabVisualizations = tabs === 'overview' ?
+                                this.overview :
+                                this.agents;
         }
     }
 
-    const removeAll = () => tabVisualizations = {};
+    removeAll () {
+        this.tabVisualizations = {};
+    } 
+}
 
-    return {
-      getItem,
-      removeAll,
-      assign,
-      setTab,
-      getTab
-    };
-});
+app.service('tabVisualizations', TabVisualizations);

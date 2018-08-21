@@ -9,14 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default async (appState, genericReq, $rootScope, $location, wzMisc) => {
+export default async (appState, genericReq, $location, wzMisc) => {
     try {
         const data = await genericReq.request('GET', '/api/wazuh-elastic/timestamp');
         const current = appState.getCreatedAt();
         if(data && data.data){
             if(!current) appState.setCreatedAt(data.data.lastRestart);
-            $rootScope.lastRestart = data.data.lastRestart;
-            if(!$rootScope.$$phase) $rootScope.$digest();
+            wzMisc.setLastRestart(data.data.lastRestart);
         } else {
             wzMisc.setBlankScr('Your .wazuh-version index is empty or corrupt.')
             $location.search('tab',null);

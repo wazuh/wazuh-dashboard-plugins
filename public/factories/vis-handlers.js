@@ -14,18 +14,20 @@ import { uiModules } from 'ui/modules'
 import dateMath from '@kbn/datemath';
 const app = uiModules.get('app/wazuh', []);
 
-app.factory('visHandlers', function() {
-    let list = [];
+class VisHandlers {
+    constructor() {
+        this.list = [];
+    }
 
-    const addItem = item => {
-        list.push(item);
-    };
+    addItem(item) {
+        this.list.push(item);
+    }
 
-    const getList = () => {
-        return list;
-    };
+    getList() {
+        return this.list;
+    }
 
-    const getAppliedFilters = syscollector => {
+    getAppliedFilters(syscollector) {
         const appliedFilters = {};
 
         if(syscollector){
@@ -42,7 +44,7 @@ app.factory('visHandlers', function() {
         }
         
         // Check raw response from all rendered tables
-        const tables = list.filter(item => item._scope &&
+        const tables = this.list.filter(item => item._scope &&
                                            item._scope.savedObj &&
                                            item._scope.savedObj.vis &&
                                            item._scope.savedObj.vis._state &&
@@ -75,12 +77,12 @@ app.factory('visHandlers', function() {
                                         false;
                             });
         
-        if(list && list.length) {
+        if(this.list && this.list.length) {
             // Parse applied filters for the first visualization
-            const filters = list[0]._scope.savedObj.vis.API.queryFilter.getFilters();
+            const filters = this.list[0]._scope.savedObj.vis.API.queryFilter.getFilters();
      
             // Parse current time range
-            const { from, to } = list[0]._scope.savedObj.vis.API.timeFilter.time;
+            const { from, to } = this.list[0]._scope.savedObj.vis.API.timeFilter.time;
 
             Object.assign(appliedFilters, {
                 filters,
@@ -88,18 +90,18 @@ app.factory('visHandlers', function() {
                     from: dateMath.parse(from),
                     to: dateMath.parse(to)
                 },
-                searchBar: list[0] && list[0]._scope && list[0]._scope.appState && list[0]._scope.appState.query && list[0]._scope.appState.query.query ? 
-                           list[0]._scope.appState.query.query :
+                searchBar: this.list[0] && this.list[0]._scope && this.list[0]._scope.appState && this.list[0]._scope.appState.query && this.list[0]._scope.appState.query.query ? 
+                           this.list[0]._scope.appState.query.query :
                            false,
                 tables
             });
         }
 
         return appliedFilters;
-    };
+    }
 
-    const hasData = () => {
-        for(const item of list) {
+    hasData() {
+        for(const item of this.list) {
             if(item && item._scope && item._scope.savedObj && item._scope.savedObj.searchSource && 
                 item._scope.savedObj.searchSource.rawResponse &&
                 item._scope.savedObj.searchSource.rawResponse.hits &&
@@ -108,10 +110,10 @@ app.factory('visHandlers', function() {
                 }
         }
         return false;
-    };
+    }
 
-    const removeAll = () => {
-        for(const item of list){
+    removeAll() {
+        for(const item of this.list){
             if(item && item._scope){
                 item._scope.$destroy();
             }
@@ -119,14 +121,8 @@ app.factory('visHandlers', function() {
                 item._scope.savedObj.destroy();
             }
         }
-        list = [];
-    };
-  
-    return {
-      addItem,
-      getList,
-      removeAll,
-      hasData,
-      getAppliedFilters
-    };
-});
+        this.list = [];
+    }
+}
+
+app.service('visHandlers', VisHandlers);
