@@ -14,7 +14,7 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 import healthCheck from './health-check'
 
-export default (courier, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc) => {
+export default (indexPatterns, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc) => {
     const deferred = $q.defer();
 
     const buildSavedObjectsClient = async () => {
@@ -26,7 +26,7 @@ export default (courier, $q, $rootScope, $window, $location, Private, appState, 
                 fields : ['title'],
                 perPage: 10000
             });
-
+            
             const { savedObjects } = savedObjectsData;
 
             const data = await genericReq.request('GET', '/get-list')
@@ -53,7 +53,7 @@ export default (courier, $q, $rootScope, $window, $location, Private, appState, 
                 return;
             }
 
-            const courierData = await courier.indexPatterns.get(currentPattern)
+            const courierData = await indexPatterns.get(currentPattern)
 
             deferred.resolve({
                 list         : onlyWazuhAlerts,
