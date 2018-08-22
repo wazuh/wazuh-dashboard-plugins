@@ -222,7 +222,6 @@ $scope.toggleRefresh = () => {
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
 
-  console.log($scope.indexPattern)
   $scope.searchSource
     .setField('index', $scope.indexPattern)
     .setField('highlightAll', true)

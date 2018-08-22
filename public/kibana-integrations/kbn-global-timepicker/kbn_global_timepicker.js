@@ -44,7 +44,6 @@ uiModules
     };
 
     function setTimefilterValues($scope) {
-      console.log('setTimefilterValues')
       $rootScope.$broadcast('updateVis')
       const time = timefilter.getTime();
       const refreshInterval = timefilter.getRefreshInterval();
