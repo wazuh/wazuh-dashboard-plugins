@@ -11,6 +11,7 @@
  */
 import './management'
 import './configuration'
+import './new-configuration'
 import './status'
 import './logs'
 import './groups'

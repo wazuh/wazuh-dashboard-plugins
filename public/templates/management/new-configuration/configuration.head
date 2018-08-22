@@ -1,0 +1,6 @@
+<div flex layout="column" layout-align="start stretch" ng-controller="managementNewConfigurationController" ng-if="tab === 'new-configuration'">
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>

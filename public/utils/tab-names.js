@@ -35,5 +35,6 @@ export default {
     logs         : 'Logs',
     groups       : 'Groups',
     monitoring   : 'Monitoring',
-    reporting    : 'Reporting'
+    reporting    : 'Reporting',
+    'new-configuration': 'New configuration (BETA)'
 }

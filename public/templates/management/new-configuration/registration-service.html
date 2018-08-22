@@ -1,0 +1,207 @@
+<div flex layout="column" layout-align="start stretch" ng-if="!load && configurationTab === 'registration-service'">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Registration service</span>
+            <span class="wz-agent-status-indicator small teal">Enabled</span>
+        </div>
+        <span class="md-subheader">Automatic agent registration using the <span class="wz-text-monospace">ossec-authd</span> binary</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex layout="row">
+
+        <!-- This section is the main content -->
+        <div flex layout="column">
+
+            <!-- Main settings card -->
+            <md-card class="wz-md-card">
+                <md-card-content>
+                    <span class="font-size-16">Main settings</span>
+
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div layout="column" class="wz-padding-top-10">
+
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Current registration service status:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                enabled
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Use client's source IP address:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                enabled
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Use a password to register agents:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                disabled
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Limit registration to maximum number of agents:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                enabled
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Purge agents list when removing agents:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                disabled
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Force agent registration when using an existing IP address:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                enabled
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- End configuration block -->
+
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div layout="column" class="wz-padding-top-10">
+
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Listen to connections at port:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                1515
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- End configuration block -->
+                </md-card-content>
+            </md-card>
+            <!-- End main settings card -->
+
+            <!-- SSL settings card -->
+            <md-card class="wz-md-card">
+                <md-card-content>
+                    <span class="font-size-16">SSL settings</span>
+
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div layout="column" class="wz-padding-top-10">
+
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Verify the agents using a CA certificate:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                enabled
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Auto-select the SSL negotiation method:
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                disabled
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- End configuration block -->
+
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div layout="column" class="wz-padding-top-10">
+
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                The CA certificate used for registering agents is located at
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                /var/ossec/etc/cacertificate.cert
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                The server SSL certificate is located at
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                /var/ossec/etc/sslmanager.cert
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                The server SSL key is located at
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                /var/ossec/etc/sslmanager.key
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="start center" class="wz-configuration-item">
+                            <div flex="30" class="wz-configuration-label">
+                                Use the following list of SSL ciphers
+                            </div>
+                            <div flex="50" class="wz-configuration-value">
+                                HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- End configuration block -->
+                </md-card-content>
+            </md-card>
+            <!-- End SSL settings card -->
+
+        </div>
+        <!-- End main content section -->
+
+        <!-- This section is the right sidenav content -->
+        <md-sidenav
+            class="md-sidenav-right"
+            md-is-locked-open="true">
+            <md-list>
+                <md-subheader>Any questions?</md-subheader>
+                <md-list-item class="wz-text-link">How to use the registration service</md-list-item>
+                <md-list-item class="wz-text-link">Registration service reference</md-list-item>
+
+                <md-divider></md-divider>
+
+                <md-subheader>Having trouble?</md-subheader>
+                <md-list-item class="wz-text-link">Ask on the mailing list</md-list-item>
+                <md-list-item class="wz-text-link">Ask on GitHub</md-list-item>
+
+                <md-divider></md-divider>
+
+                <md-subheader>More options</md-subheader>
+                <md-list-item>
+                    <md-button class="wz-button md-raised md-primary small">Open JSON viewer</md-button>
+                    <md-button class="wz-button md-raised md-primary small">Open XML viewer</md-button>
+                </md-list-item>
+            </md-list>
+        </md-sidenav>
+        <!-- End right sidenav section -->
+
+    </div>
+    <!-- End main content and right sidenav section -->
+
+</div>
