@@ -1,7 +1,7 @@
 <div flex layout="column" layout-align="start stretch" ng-show="currentNode">
 
     <!-- Node alerts summary card -->
-    <div layout="row" layout-align="start stretch" class="height-250 wz-timelions" ng-show="!loading && currentNode && !showConfig">
+    <div layout="row" layout-align="start stretch" class="height-250 wz-timelions" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" ng-show="!loading && currentNode && !showConfig">
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">{{ currentNode.name }} alerts summary</span>

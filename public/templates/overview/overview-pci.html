@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="tab === 'pci' && tabView === 'panels'" ng-show="resultState === 'ready' && rendered" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'pci' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
     <div layout="row" layout-align="center stretch">
         <md-card flex class="wz-md-card">
