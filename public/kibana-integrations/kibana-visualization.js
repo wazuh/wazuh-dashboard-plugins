@@ -107,7 +107,6 @@ app.directive('kbnVis', [function () {
             const updateVisWatcher = $rootScope.$on('updateVis', () => {
                 if(!$rootScope.$$phase) $rootScope.$digest();
                 const rawVis = rawVisualizations.getList();
-                console.log('event received')
                 if(Array.isArray(rawVis) && rawVis.length){
                     myRender(rawVis);
                 }
