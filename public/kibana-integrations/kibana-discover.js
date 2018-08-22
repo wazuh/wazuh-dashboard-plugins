@@ -133,8 +133,8 @@ function discoverController(
   const calcWzInterval = () => {
     let wzInterval = false;
     try {
-      const from = dateMath.parse($scope.timefilter.time.from);
-      const to   = dateMath.parse($scope.timefilter.time.to);
+      const from = dateMath.parse(timefilter.getTime().from);
+      const to   = dateMath.parse(timefilter.getTime().to);
       
       const totalSeconds = (to - from) / 1000;
       if(totalSeconds <= 3600 )                                 wzInterval = 'm';
