@@ -8,7 +8,7 @@
 
   <div
     class="filter-description"
-    ng-class="{'filter-description-deactivated': pill.areActionsActivated}"
+    ng-class="{'filter-description-deactivated': pill.areActionsActivated && pill.filter.meta.removable !== false}"
     tabindex="0"
     aria-disabled="{{pill.filter.meta.disabled}}"
   >
