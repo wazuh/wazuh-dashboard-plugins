@@ -17,7 +17,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
     try {
         const deferred = $q.defer();
 
-        totalRAM(genericReq,errorHandler);
+        !$location.path().includes('health-check') && totalRAM(genericReq,errorHandler);
 
         const checkResponse = data => {
             let fromElastic = false;
