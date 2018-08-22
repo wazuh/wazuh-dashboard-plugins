@@ -1,4 +1,4 @@
-<div flex layout="column" layout-align="start stretch" ng-if="tab === 'welcome'">
+<div layout="column" layout-align="start stretch" ng-if="tab === 'welcome'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -84,42 +84,38 @@
     <div layout="row" layout-padding>
         <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
             <div class="euiFlexItem">
-                <div class="euiFlexItem">
-                    <div class="euiPanel euiPanel--paddingLarge">
-                        <h3 class="euiTitle">Threat Detection and Response</h3>
-                        <div class="euiSpacer euiSpacer--m"></div>
-                        <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card
-                                class="euiFlexItem" logo="'app_security.svg'"
-                                title="'Vulnerabilities'" switch-tab="switchTab('vuls')" current-tab="'vuls'"
-                                description="TabDescription.vuls.description"
-                            ></wz-welcome-card>
-                            <wz-welcome-card
-                                ng-if="extensions.virustotal" class="euiFlexItem" logo="'app_saved_objects.svg'"
-                                title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
-                                description="TabDescription.virustotal.description"
-                            ></wz-welcome-card>
-                        </div>
+                <div class="euiPanel euiPanel--paddingLarge">
+                    <h3 class="euiTitle">Threat Detection and Response</h3>
+                    <div class="euiSpacer euiSpacer--m"></div>
+                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_security.svg'"
+                            title="'Vulnerabilities'" switch-tab="switchTab('vuls')" current-tab="'vuls'"
+                            description="TabDescription.vuls.description"
+                        ></wz-welcome-card>
+                        <wz-welcome-card
+                            ng-if="extensions.virustotal" class="euiFlexItem" logo="'app_saved_objects.svg'"
+                            title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
+                            description="TabDescription.virustotal.description"
+                        ></wz-welcome-card>
                     </div>
                 </div>
             </div>
             <div class="euiFlexItem" ng-if="extensions && (extensions.pci || extensions.gdpr)">
-                <div class="euiFlexItem">
-                    <div class="euiPanel euiPanel--paddingLarge">
-                        <h3 class="euiTitle">Regulatory Compliance</h3>
-                        <div class="euiSpacer euiSpacer--m"></div>
-                        <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card
-                                ng-if="extensions.pci" class="euiFlexItem" logo="'app_apm.svg'"
-                                title="'PCI DSS'" switch-tab="switchTab('pci')" current-tab="'pci'"
-                                description="TabDescription.pci.description"
-                            ></wz-welcome-card>
-                            <wz-welcome-card
-                                ng-if="extensions.gdpr" class="euiFlexItem" logo="'app_visualize.svg'"
-                                title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'"
-                                description="TabDescription.gdpr.description"
-                            ></wz-welcome-card>
-                        </div>
+                <div class="euiPanel euiPanel--paddingLarge">
+                    <h3 class="euiTitle">Regulatory Compliance</h3>
+                    <div class="euiSpacer euiSpacer--m"></div>
+                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
+                        <wz-welcome-card
+                            ng-if="extensions.pci" class="euiFlexItem" logo="'app_apm.svg'"
+                            title="'PCI DSS'" switch-tab="switchTab('pci')" current-tab="'pci'"
+                            description="TabDescription.pci.description"
+                        ></wz-welcome-card>
+                        <wz-welcome-card
+                            ng-if="extensions.gdpr" class="euiFlexItem" logo="'app_visualize.svg'"
+                            title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'"
+                            description="TabDescription.gdpr.description"
+                        ></wz-welcome-card>
                     </div>
                 </div>
             </div>
