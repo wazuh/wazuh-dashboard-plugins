@@ -87,15 +87,9 @@ class ErrorHandler {
         text = location ? location + '. ' + text : text;
         if(!silent){
             if(isWarning || (text && typeof text === 'string' && text.toLowerCase().includes('no results'))) {
-                toastNotifications.addWarning({
-                    title: location,
-                    text: text
-                });
+                toastNotifications.addWarning(text);
             } else {
-                this.notify.error({
-                    title: location,
-                    text: text
-                });
+                this.notify.error(text);
             }
         }
         return text;
