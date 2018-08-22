@@ -65,9 +65,9 @@ class ReportingService {
 
             this.$rootScope.reportBusy = false;
             this.$rootScope.reportStatus = false;
-
+            if(!this.$rootScope.$$phase) this.$rootScope.$digest()
             this.errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-
+            
             return;
         } catch (error) {
             this.$rootScope.reportBusy = false;
