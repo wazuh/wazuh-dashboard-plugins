@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="tab === 'virustotal' && tabView === 'panels'" ng-show="resultState === 'ready' && rendered" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'virustotal' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">

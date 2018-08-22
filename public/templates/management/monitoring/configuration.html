@@ -2,7 +2,7 @@
 <div layout="row" layout-align="start stretch" class="wz-timelions" ng-show="showConfig">
 
     <!-- Overview visualization card -->
-    <md-card flex="30" class="wz-md-card">
+    <md-card flex="30" class="wz-md-card" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
         <md-card-content class="wazuh-column">
             <span class="wz-headline-title">Top 5 nodes</span>
             <md-divider class="wz-margin-top-10"></md-divider>
