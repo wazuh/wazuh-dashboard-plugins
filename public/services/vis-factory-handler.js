@@ -10,54 +10,59 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules'
-import $            from 'jquery'
 
-uiModules.get('app/wazuh', [])
-.service('visFactoryService', function ($rootScope, appState, genericReq, discoverPendingUpdates, rawVisualizations, tabVisualizations, loadedVisualizations, commonData, visHandlers) {
-    
-    const clear = (onlyAgent = false) => {
-        if(!onlyAgent) visHandlers.removeAll();
-        discoverPendingUpdates.removeAll();
-        rawVisualizations.removeAll();
-        loadedVisualizations.removeAll();
+const app = uiModules.get('app/wazuh', []);
+
+class VisFactoryService {
+    constructor($rootScope, appState, genericReq, discoverPendingUpdates, rawVisualizations, tabVisualizations, loadedVisualizations, commonData, visHandlers) {
+        this.$rootScope             = $rootScope;
+        this.appState               = appState;
+        this.genericReq             = genericReq;
+        this.discoverPendingUpdates = discoverPendingUpdates;
+        this.rawVisualizations      = rawVisualizations;
+        this.tabVisualizations      = tabVisualizations;
+        this.loadedVisualizations   = loadedVisualizations;
+        this.commonData             = commonData;
+        this.visHandlers            = visHandlers;
     }
 
-    const clearAll = () => {
-        clear();
-        tabVisualizations.removeAll();
+    clear(onlyAgent = false) {
+        if(!onlyAgent) this.visHandlers.removeAll();
+        this.discoverPendingUpdates.removeAll();
+        this.rawVisualizations.removeAll();
+        this.loadedVisualizations.removeAll();
     }
 
-    const buildOverviewVisualizations = async (filterHandler, tab, subtab, localChange) => {
+    clearAll() {
+        this.clear();
+        this.tabVisualizations.removeAll();
+    }
+
+    async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
         try {
-            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${appState.getCurrentPattern()}`)
-            rawVisualizations.assignItems(data.data.raw);
-            commonData.assignFilters(filterHandler, tab, localChange);
-            $rootScope.$emit('changeTabView',{tabView:subtab})
-            $rootScope.$broadcast('updateVis');
+            const data = await this.genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${this.appState.getCurrentPattern()}`)
+            this.rawVisualizations.assignItems(data.data.raw);
+            this.commonData.assignFilters(filterHandler, tab, localChange);
+            this.$rootScope.$emit('changeTabView',{tabView:subtab})
+            this.$rootScope.$broadcast('updateVis');
             return;
         } catch (error) {
             return Promise.reject(error)
         }
     }
 
-    const buildAgentsVisualizations = async (filterHandler, tab, subtab, localChange, id) => {
+    async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
         try {
-            const data = await genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${appState.getCurrentPattern()}`)
-            rawVisualizations.assignItems(data.data.raw);
-            commonData.assignFilters(filterHandler, tab, localChange, id)
-            $rootScope.$emit('changeTabView',{tabView:subtab});
-            $rootScope.$broadcast('updateVis');
+            const data = await this.genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${this.appState.getCurrentPattern()}`)
+            this.rawVisualizations.assignItems(data.data.raw);
+            this.commonData.assignFilters(filterHandler, tab, localChange, id)
+            this.$rootScope.$emit('changeTabView',{tabView:subtab});
+            this.$rootScope.$broadcast('updateVis');
             return;
         } catch (error) {
             return Promise.reject(error)
         }
     }
+}
 
-
-    return {
-        clear,
-        clearAll,
-        buildOverviewVisualizations,
-        buildAgentsVisualizations
-    }
-});
+app.service('visFactoryService', VisFactoryService);

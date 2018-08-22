@@ -20,7 +20,7 @@ import { settingsWizard, getSavedSearch, goToKibana, getIp, getWzConfig } from '
 import healthCheckTemplate from '../templates/health-check/health-check.html'
 import agentsTemplate      from '../templates/agents/agents.jade'
 import agentsPrevTemplate  from '../templates/agents-prev/agents-prev.jade'
-import managerTemplate     from '../templates/manager/manager.jade'
+import managementTemplate  from '../templates/management/management.jade'
 import overviewTemplate    from '../templates/overview/overview.jade'
 import discoverTemplate    from '../templates/discover/discover.jade'
 import settingsTemplate    from '../templates/settings/settings.jade'
@@ -80,7 +80,7 @@ routes
         resolve: { nestedResolve }
     })
     .when('/manager/:tab?/', {
-        template: managerTemplate,
+        template: managementTemplate,
         resolve: { nestedResolve, ip, savedSearch }
     })
     .when('/overview/', {

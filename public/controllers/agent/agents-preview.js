@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules }  from 'ui/modules'
-import * as FileSaver from '../services/file-saver'
+import * as FileSaver from '../../services/file-saver'
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -55,7 +55,7 @@ app.controller('agentsPreviewController', function ($scope, $routeParams, generi
             errorHandler.info('Your download should begin automatically...', 'CSV')
             const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
             const output       = await csvReq.fetch('/agents', currentApi, wzTableFilter.get());
-            const blob         = new Blob([output], {type: 'text/csv'});
+            const blob         = new Blob([output], {type: 'text/csv'}); // eslint-disable-line
 
             FileSaver.saveAs(blob, 'agents.csv');
 

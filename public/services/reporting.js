@@ -12,59 +12,69 @@
 import { uiModules } from 'ui/modules';
 import $             from 'jquery';
 
-uiModules.get('app/wazuh', [])
-.service('reportingService', function ($rootScope, vis2png, rawVisualizations, visHandlers, genericReq, errorHandler) {
-    return {
-        startVis2Png: async (tab, isAgents = false, syscollectorFilters = null) => {
-            try {
-                if(vis2png.isWorking()){
-                    errorHandler.handle('Report in progress', 'Reporting',true);
-                    return;
-                }
-                $rootScope.reportBusy = true;
-                $rootScope.reportStatus = 'Generating report...0%';
-                if(!$rootScope.$$phase) $rootScope.$digest();
+const app = uiModules.get('app/wazuh', []);
 
-                vis2png.clear();
+class ReportingService {
+    constructor($rootScope, vis2png, rawVisualizations, visHandlers, genericReq, errorHandler) {
+        this.$rootScope        = $rootScope;
+        this.vis2png           = vis2png;
+        this.rawVisualizations = rawVisualizations;
+        this.visHandlers       = visHandlers;
+        this.genericReq        = genericReq;
+        this.errorHandler      = errorHandler;
+    }
 
-                const idArray = rawVisualizations.getList().map(item => item.id);
-
-                for(const item of idArray) {
-                    const tmpHTMLElement = $(`#${item}`);
-                    vis2png.assignHTMLItem(item,tmpHTMLElement);
-                }
-
-                const appliedFilters = visHandlers.getAppliedFilters(syscollectorFilters);
-                
-                const array = await vis2png.checkArray(idArray);
-                const name  = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${Date.now() / 1000 | 0}.pdf`
-
-                const data = {
-                    array,
-                    name,
-                    title: isAgents ? `Agents ${tab}` : `Overview ${tab}`,
-                    filters: appliedFilters.filters,
-                    time: appliedFilters.time,
-                    searchBar: appliedFilters.searchBar,
-                    tables: appliedFilters.tables,
-                    tab,
-                    section: isAgents ? 'agents' : 'overview',
-                    isAgents
-                };
-
-                await genericReq.request('POST','/api/wazuh-reporting/report',data);
-
-                $rootScope.reportBusy = false;
-                $rootScope.reportStatus = false;
-
-                errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
-
+    async startVis2Png(tab, isAgents = false, syscollectorFilters = null) {
+        try {
+            if(this.vis2png.isWorking()){
+                this.errorHandler.handle('Report in progress', 'Reporting',true);
                 return;
-            } catch (error) {
-                $rootScope.reportBusy = false;
-                $rootScope.reportStatus = false;
-                errorHandler.handle(error, 'Reporting');
             }
+            this.$rootScope.reportBusy = true;
+            this.$rootScope.reportStatus = 'Generating report...0%';
+            if(!this.$rootScope.$$phase) this.$rootScope.$digest();
+
+            this.vis2png.clear();
+
+            const idArray = this.rawVisualizations.getList().map(item => item.id);
+
+            for(const item of idArray) {
+                const tmpHTMLElement = $(`#${item}`);
+                this.vis2png.assignHTMLItem(item,tmpHTMLElement);
+            }
+
+            const appliedFilters = this.visHandlers.getAppliedFilters(syscollectorFilters);
+            
+            const array = await this.vis2png.checkArray(idArray);
+            const name  = `wazuh-${isAgents ? 'agents' : 'overview'}-${tab}-${Date.now() / 1000 | 0}.pdf`
+
+            const data = {
+                array,
+                name,
+                title: isAgents ? `Agents ${tab}` : `Overview ${tab}`,
+                filters: appliedFilters.filters,
+                time: appliedFilters.time,
+                searchBar: appliedFilters.searchBar,
+                tables: appliedFilters.tables,
+                tab,
+                section: isAgents ? 'agents' : 'overview',
+                isAgents
+            };
+
+            await this.genericReq.request('POST','/api/wazuh-reporting/report',data);
+
+            this.$rootScope.reportBusy = false;
+            this.$rootScope.reportStatus = false;
+
+            this.errorHandler.info('Success. Go to Management -> Reporting', 'Reporting')
+
+            return;
+        } catch (error) {
+            this.$rootScope.reportBusy = false;
+            this.$rootScope.reportStatus = false;
+            this.errorHandler.handle(error, 'Reporting');
         }
-    };
-});
+    }
+}
+
+app.service('reportingService', ReportingService);
