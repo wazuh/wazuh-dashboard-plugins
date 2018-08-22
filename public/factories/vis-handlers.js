@@ -65,11 +65,13 @@ class VisHandlers {
                             });
         
         if(this.list && this.list.length) {
+            const visualization = this.list[0].vis;
             // Parse applied filters for the first visualization
-            const filters = this.list[0].vis.API.queryFilter.getFilters();
+            const filters = visualization.API.queryFilter.getFilters();
      
             // Parse current time range
-            const { from, to } = this.list[0].vis.API.timeFilter.getTime();
+            const { from, to } = visualization.API.timeFilter.getTime();
+            const { query } = visualization.searchSource._fields.query;
 
             Object.assign(appliedFilters, {
                 filters,
@@ -77,7 +79,7 @@ class VisHandlers {
                     from: dateMath.parse(from),
                     to: dateMath.parse(to)
                 },
-                searchBar: false,
+                searchBar: query,
                 tables
             });
         }
