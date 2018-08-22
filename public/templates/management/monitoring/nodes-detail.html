@@ -7,14 +7,13 @@
                 <span class="wz-headline-title">{{ currentNode.name }} alerts summary</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-Overview-Node'" id="Wazuh-App-Cluster-Overview-Node"></kbn-vis>
-                <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered">There are no results for selected time range. Try another one.</span>
             </md-card-content>
         </md-card>
     </div>
     <!-- End node alerts summary card -->
 
     <!-- Node info and files cards section -->
-    <div layout="row" layout-align="start stretch" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck">
+    <div layout="row" class="wz-margin-top-40" layout-align="start stretch" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck">
 
         <!-- Node information card -->
         <md-card flex class="wz-md-card" ng-show="currentNode && currentNode.healthCheck && currentNode.healthCheck.info">
