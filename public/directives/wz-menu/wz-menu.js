@@ -20,7 +20,7 @@ class WzMenu {
         this.template = menuTemplate;
     }
 
-    controller($scope, $window, $rootScope, appState, patternHandler, courier, errorHandler, genericReq, $location, wzMisc, wazuhConfig) {
+    controller($scope, $window, $rootScope, appState, patternHandler, indexPatterns, errorHandler, genericReq, $location, wzMisc, wazuhConfig) {
 
         $rootScope.showSelector = appState.getPatternSelector();
 
@@ -77,7 +77,7 @@ class WzMenu {
                     if(!filtered.length) appState.setCurrentPattern(patternList.data.data[0].id)
                 }
 
-                const data = filtered ? filtered : await courier.indexPatterns.get(appState.getCurrentPattern());
+                const data = filtered ? filtered : await indexPatterns.get(appState.getCurrentPattern());
                 $scope.theresPattern = true;
                 $scope.currentPattern = data.title;
                 const list = await patternHandler.getPatternList();
@@ -135,7 +135,7 @@ class WzMenu {
 
         $scope.$on('updatePattern', () => {
             if(!appState.getPatternSelector()) return;
-            courier.indexPatterns.get(appState.getCurrentPattern())
+            indexPatterns.get(appState.getCurrentPattern())
             .then(data => {
                 $scope.theresPattern = true;
                 $scope.currentSelectedPattern = appState.getCurrentPattern();
