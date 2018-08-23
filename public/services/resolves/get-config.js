@@ -28,12 +28,14 @@ export default async ($q, genericReq, errorHandler, wazuhConfig) => {
         timeout                : 8000,
         'wazuh.shards'         : 1,
         'wazuh.replicas'       : 1,
+        'wazuh-version.shards'  : 1,
+        'wazuh-version.replicas': 1,   
         'ip.selector'          : true,
         'xpack.rbac.enabled'   : true,
-        'wazuh.wazuh-version.shards'  : 1,
-        'wazuh.wazuh-version.shards.replicas': 1,            
         'wazuh.monitoring.enabled'  : true,
-        'wazuh.monitoring.frequency': 3600
+        'wazuh.monitoring.frequency': 3600,
+        'wazuh.monitoring.shards'  : 5,
+        'wazuh.monitoring.replicas': 1
     };
 
     try {
