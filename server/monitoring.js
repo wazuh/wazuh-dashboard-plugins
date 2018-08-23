@@ -19,6 +19,7 @@ import monitoringTemplate from './integration-files/monitoring-template'
 import packageJSON        from '../package.json'
 import getConfiguration   from './lib/get-configuration'
 import parseCron          from './lib/parse-cron'
+import { BuildBody }      from './lib/replicas-shards-helper'
 
 export default (server, options) => {
     const blueWazuh = colors.blue('wazuh');
@@ -281,7 +282,14 @@ export default (server, options) => {
 
             const result = await wzWrapper.checkIfIndexExists(todayIndex);
 
-            result ? await insertDocument(todayIndex,clusterName) : await createIndex(todayIndex,clusterName);
+            if(result) {
+                const configurationFile  = getConfiguration();
+                const shardConfiguration = BuildBody(configurationFile, 'wazuh.monitoring', 5, 1);
+                await wzWrapper.updateIndexSettings(todayIndex, shardConfiguration)
+                await insertDocument(todayIndex,clusterName);
+            } else {
+                await createIndex(todayIndex,clusterName);
+            }
 
             return;
 

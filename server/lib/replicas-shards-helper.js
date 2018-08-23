@@ -1,0 +1,43 @@
+/*
+ * Wazuh app - Elastic wrapper helper
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+/**
+ * Returns well formatted object to set shards and replicas when creating/updating indices.
+ * @param {object} file Parsed content from config.yml file
+ * @param {string} indexName Target index name
+ * @param {number} defaultShards Default shards value if missing in configuration
+ * @param {number} defaulReplicas Default replicas value if missing in configuration
+ */
+export function BuildBody(file, indexName, defaultShards = 5, defaulReplicas = 1) {
+    if(indexName) {
+        const shards = file && typeof file[`${indexName}.shards`] !== 'undefined' ?
+                              file[`${indexName}.shards`] :
+                              defaultShards;
+    
+        const replicas = file && typeof file[`${indexName}.replicas`] !== 'undefined' ?
+                                file[`${indexName}.replicas`] :
+                                defaulReplicas;
+    
+        const configuration = {
+            settings: {
+                index: {
+                    number_of_shards: shards,
+                    number_of_replicas: replicas
+                }
+            }
+        };
+
+        return configuration;
+    }
+
+    return null;    
+}

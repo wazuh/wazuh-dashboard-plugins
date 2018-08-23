@@ -817,5 +817,30 @@ export default class ElasticWrapper {
         }
     }
 
+    /**
+     * Updates replicas and few other settings (if they are given) for specific index
+     * @param {string} index Target index name
+     * @param {object} configuration Settings to be updated
+     */
+    async updateIndexSettings(index, configuration) {
+        try {
+            if(!index)         throw new Error('No valid index given');
+            if(!configuration) throw new Error('No valid configuration given');
+            
+            // Number of shards is not dynamic so delete that setting if it's given
+            if(configuration.settings && configuration.settings.index && configuration.settings.index.number_of_shards) {
+                delete configuration.settings.index.number_of_shards;
+            }
 
+            const data = await this.elasticRequest.callWithInternalUser('indices.putSettings', { 
+                index: index,
+                body: configuration 
+            })
+
+            return data;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
 }
