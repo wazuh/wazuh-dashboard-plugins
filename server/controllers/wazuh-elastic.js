@@ -10,9 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 import ElasticWrapper from '../lib/elastic-wrapper';
-import ErrorResponse  from './error-response'
+import ErrorResponse  from './error-response';
+import log            from '../logger';
 
-import { AgentsVisualizations, OverviewVisualizations, ClusterVisualizations }  from '../integration-files/visualizations'
+import { 
+    AgentsVisualizations, 
+    OverviewVisualizations, 
+    ClusterVisualizations 
+}  from '../integration-files/visualizations';
+
 
 export default class WazuhElastic {
     constructor(server){
@@ -66,6 +72,7 @@ export default class WazuhElastic {
                     reply({ statusCode: 200, status: false, data: `No template found for ${req.params.pattern}` });
             
         } catch (error){
+            log('GET /api/wazuh-elastic/template/{pattern}',error.message || error);
             return ErrorResponse(`Could not retrieve templates from Elasticsearch due to ${error.message || error}`, 4002, 500, reply);
         }
     }
@@ -81,6 +88,7 @@ export default class WazuhElastic {
                    reply({ statusCode: 500, status: false, error:10020, message: 'Index pattern not found' });
 
         } catch (error) {
+            log('GET /api/wazuh-elastic/pattern/{pattern}',error.message || error);
             return ErrorResponse(`Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message || error}`, 4003, 500, reply);
         }
     }
@@ -143,6 +151,7 @@ export default class WazuhElastic {
                    reply({ statusCode: 200, data: data.hits.hits[0]._source });
 
         } catch (error) {
+            log('GET /api/wazuh-elastic/setup',error.message || error);
             return ErrorResponse(`Could not get data from elasticsearch due to ${error.message || error}`, 4005, 500, reply);
         }
     }
@@ -227,6 +236,7 @@ export default class WazuhElastic {
             throw new Error('The Elasticsearch request didn\'t fetch the expected data');
 
         } catch(error){
+            log('GET /get-list',error.message || error);
             return ErrorResponse(error.message || error, 4006, 500, reply);
         }
     }
@@ -386,6 +396,7 @@ export default class WazuhElastic {
             return reply({acknowledge: true, output: output });
 
         } catch(error){
+            log('GET /refresh-fields/{pattern}',error.message || error);
             return ErrorResponse(error.message || error, 4008, 500, reply);
         }
     }
