@@ -234,7 +234,25 @@ export default (server, options) => {
     const createIndex = async (todayIndex,clusterName) => {
         try {
             if(!ENABLED) return;
-            await wzWrapper.createIndexByName(todayIndex);
+            const configFile = getConfiguration();
+
+            const shards = configFile && typeof configFile["wazuh-monitoring.shards"] !== 'undefined' ?
+                           configFile["wazuh-monitoring.shards"] : 5;
+
+            const replicas = configFile && typeof configFile["wazuh-monitoring.replicas"] !== 'undefined' ?
+                             configFile["wazuh-monitoring.replicas"] : 1;
+
+            const configuration = {
+                settings: {
+                    index: {
+                        number_of_shards: shards,
+                        number_of_replicas: replicas
+                    }
+                }
+            };
+
+            await wzWrapper.createIndexByName(todayIndex, configuration);
+
             log('[monitoring][createIndex]', 'Successfully created today index.', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], 'Successfully created today index.');
             await insertDocument(todayIndex,clusterName);
