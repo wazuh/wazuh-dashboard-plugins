@@ -1,4 +1,4 @@
-<div layout="column" layout-align="start stretch" ng-if="!load && configurationTab === 'welcome'">
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'welcome'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -8,32 +8,128 @@
     </div>
     <!-- End headline -->
 
-    <div layout="row" layout-align="center center" layout-wrap>
+    <!-- This section contains the main content and the right sidenav -->
+    <div layout="row">
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('registration-service')">Registration service</md-button>
+        <!-- This section is the main content -->
+        <div flex layout="column">
 
-        <!-- <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('cluster')">Cluster</md-button>
+            <!-- The main card will all the settings -->
+            <md-card class="wz-md-card">
+                <md-card-content>
+                    <span class="font-size-16">All configurations</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('wazuh-modules')">Wazuh modules</md-button>
+                    <md-list layout="row" layout-wrap>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('registration-service')">Registration service</h3>
+                                <p>Automatic agent registration using the <span class="wz-text-monospace">ossec-authd</span> binary</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('cluster')">Cluster</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('wazuh-modules')">Wazuh modules</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('commands-active-response')">Commands and active response</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('integrations')">Integrations</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('ruleset')">Ruleset</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('database-output')">Database output</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('alerts')">Alerts</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('global-configuration')">Global configuration</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('integrity-monitoring')">Integrity monitoring</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('policy-monitoring')">Policy monitoring</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('log-collection')">Log collection</h3>
+                                <p>Pending description</p>
+                            </div>
+                        </md-list-item>
+                    </md-list>
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('commands-active-response')">Commands and active response</md-button>
+                </md-card-content>
+            </md-card>
+            <!-- End main card with all the settings-->
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('integrations')">Integrations</md-button>
+        </div>
+        <!-- End main content section -->
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('ruleset')">Ruleset</md-button>
+        <!-- This section is the right sidenav content -->
+        <md-sidenav
+            class="md-sidenav-right"
+            md-is-locked-open="true">
+            <md-list>
+                <md-subheader>Any questions?</md-subheader>
+                <md-list-item class="wz-text-link">Wazuh administration documentation</md-list-item>
+                <md-list-item class="wz-text-link">Wazuh capabilities documentation</md-list-item>
+                <md-list-item class="wz-text-link">Local configuration reference</md-list-item>
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('database-output')">Database output</md-button>
+                <md-divider></md-divider>
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('alerts')">Alerts</md-button>
+                <md-subheader>Having trouble?</md-subheader>
+                <md-list-item class="wz-text-link">Ask on the mailing list</md-list-item>
+                <md-list-item class="wz-text-link">Ask on GitHub</md-list-item>
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('global-configuration')">Global configuration</md-button>
+                <md-divider></md-divider>
 
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('integrity-monitoring')">Integrity monitoring</md-button>
-
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('policy-monitoring')">Policy monitoring</md-button>
-
-        <md-button class="wz-button md-raised md-primary" ng-click="switchConfigurationTab('log-collection')">Log collection</md-button> -->
+                <md-subheader>More options</md-subheader>
+                <md-list-item>
+                    <md-button class="wz-button md-raised md-primary small">Open JSON viewer</md-button>
+                    <md-button class="wz-button md-raised md-primary small">Open XML viewer</md-button>
+                </md-list-item>
+            </md-list>
+        </md-sidenav>
+        <!-- End right sidenav section -->
 
     </div>
+    <!-- End main content and right sidenav section -->
 
 </div>
