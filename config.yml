@@ -56,11 +56,13 @@
 #
 # ------------------------------ Advanced indices ------------------------------
 #
-# Configure .wazuh and .wazuh-version indices shards and replicas.
+# Configure .wazuh, .wazuh-version, wazuh-monitoring-3.x-* indices shards and replicas.
 #wazuh.shards          : 1
 #wazuh.replicas        : 1
 #wazuh-version.shards  : 1
 #wazuh-version.replicas: 1
+#wazuh-monitoring.shards: 5
+#wazuh-monitoring.replicas: 1
 #
 # --------------------------- Index pattern selector ---------------------------
 #
