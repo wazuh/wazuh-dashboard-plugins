@@ -236,11 +236,11 @@ export default (server, options) => {
             if(!ENABLED) return;
             const configFile = getConfiguration();
 
-            const shards = configFile && typeof configFile["wazuh-monitoring.shards"] !== 'undefined' ?
-                           configFile["wazuh-monitoring.shards"] : 5;
+            const shards = configFile && typeof configFile['wazuh.monitoring.shards'] !== 'undefined' ?
+                           configFile['wazuh.monitoring.shards'] : 5;
 
-            const replicas = configFile && typeof configFile["wazuh-monitoring.replicas"] !== 'undefined' ?
-                             configFile["wazuh-monitoring.replicas"] : 1;
+            const replicas = configFile && typeof configFile['wazuh.monitoring.replicas'] !== 'undefined' ?
+                             configFile['wazuh.monitoring.replicas'] : 1;
 
             const configuration = {
                 settings: {
