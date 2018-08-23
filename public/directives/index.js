@@ -15,3 +15,5 @@ import './wz-menu/wz-menu';
 import './wz-menu/wz-menu.less';
 import './wz-table/wz-table';
 import './wz-welcome-card/wz-welcome-card';
+import './wz-config-item/wz-config-item';
+import './wz-config-item/wz-config-item.less';

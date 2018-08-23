@@ -25,62 +25,34 @@
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10">
 
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Service status
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                enabled
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Listen to connections at port
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                1515
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Use client's source IP address
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                enabled
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Use a password to register agents
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                disabled
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Purge agents list when removing agents
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                disabled
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Limit registration to maximum number of agents
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                enabled
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Force registration when using an existing IP address
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                enabled
-                            </div>
-                        </div>
+                        <wz-config-item
+                            label="Service status"
+                            value="enabled">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Listen to connections at port"
+                            value="1515">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Use client's source IP address"
+                            value="enabled">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Use a password to register agents"
+                            value="disabled">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Purge agents list when removing agents"
+                            value="disabled">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Limit registration to maximum number of agents"
+                            value="enabled">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Force registration when using an existing IP address"
+                            value="enabled">
+                        </wz-config-item>
 
                     </div>
                     <!-- End configuration block -->
@@ -91,54 +63,30 @@
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10">
 
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Verify agents using a CA certificate
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                enabled
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Auto-select the SSL negotiation method
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                disabled
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                CA certificate location
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                /var/ossec/etc/cacertificate.cert
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Server SSL certificate location
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                /var/ossec/etc/sslmanager.cert
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Server SSL key location
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                /var/ossec/etc/sslmanager.key
-                            </div>
-                        </div>
-                        <div layout="column" layout-gt-md="row" layout-align-gt-md="start center" class="wz-configuration-item">
-                            <div flex-gt-md="30" class="wz-configuration-label">
-                                Use the following SSL ciphers
-                            </div>
-                            <div flex-gt-md="50" class="wz-configuration-value">
-                                HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH
-                            </div>
-                        </div>
+                        <wz-config-item
+                            label="Verify agents using a CA certificate"
+                            value="enabled">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Auto-select the SSL negotiation method"
+                            value="disabled">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="CA certificate location"
+                            value="/var/ossec/etc/cacertificate.cert">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Server SSL certificate location"
+                            value="/var/ossec/etc/sslmanager.cert">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Server SSL key location"
+                            value="/var/ossec/etc/sslmanager.key">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Use the following SSL ciphers"
+                            value="HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH">
+                        </wz-config-item>
 
                     </div>
                     <!-- End configuration block -->
