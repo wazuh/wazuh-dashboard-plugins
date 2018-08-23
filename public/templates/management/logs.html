@@ -19,8 +19,8 @@
             </div>
         </div>
         <!-- Daemon selector -->
-        <div flex="20" layout="column" class="height-40 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="filter({name:'category',value:category})"
+        <div flex="20" layout="column" layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="filter({name:'category',value:category})"
             aria-label="Logs category">
                 <option value="all">All daemons</option>
                 <option ng-repeat="daemon in daemons | orderObjectBy: 'title'" value="{{daemon.title}}">{{daemon.title}}</option>
@@ -29,8 +29,8 @@
         <!-- End daemon selector -->
 
         <!-- Level selector -->
-        <div flex="20" layout="column" class="height-40 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="filter({name:'type_log',value:type_log})"
+        <div flex="20" layout="column" layout-align="center" class="height-40 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="filter({name:'type_log',value:type_log})"
             aria-label="Logs level">
                 <option value="all">All log levels</option>
                 <option value="info">Info</option>

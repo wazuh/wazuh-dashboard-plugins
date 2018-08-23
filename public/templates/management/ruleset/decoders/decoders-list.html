@@ -7,8 +7,8 @@
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
 
-        <div layout="column" class="height-40 wz-select-input wz-margin-right-8">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="typeFilter" ng-change="onlyParents(typeFilter)" aria-label="Filter by type" ng-init="'All decoders'">
+        <div layout="column" layout-align="center" class="height-40 wz-select-input wz-margin-right-8">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-model="typeFilter" ng-change="onlyParents(typeFilter)" aria-label="Filter by type" ng-init="'All decoders'">
                 <option value="all">All decoders</option>
                 <option value="parents">Parent decoders</option>
             </select>

@@ -59,8 +59,8 @@
             </div>
         </div>
 
-        <div flex layout="column" class="height-40 wz-margin-top-17 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox1" ng-model="status" ng-change="filter({name:'status',value:status})"
+        <div flex layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-margin-right-15 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox1" ng-model="status" ng-change="filter({name:'status',value:status})"
                 aria-label="Filter by status">
                 <option value="all">All states</option>
                 <option value="active">Active</option>
@@ -69,8 +69,8 @@
             </select>
         </div>
 
-        <div flex ng-show="isClusterEnabled" layout="column" class="height-40 wz-margin-top-17 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox2" ng-model="node_name" ng-change="filter({name:'node',value:node_name})"
+        <div flex ng-show="isClusterEnabled" layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-margin-right-15 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox2" ng-model="node_name" ng-change="filter({name:'node',value:node_name})"
                 aria-label="Filter by node">
                 <option value="all">All nodes</option>
                 <option ng-repeat="node in nodes | orderObjectBy: 'id'" value="{{node.id}}">
@@ -79,8 +79,8 @@
             </select>
         </div>
 
-        <div flex layout="column" class="height-40 wz-margin-top-17 wz-select-input wz-margin-right-15">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox3" ng-model="osPlatform" ng-change="filter({name:'platform',value:osPlatform})"
+        <div flex layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-select-input wz-margin-right-15">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox3" ng-model="osPlatform" ng-change="filter({name:'platform',value:osPlatform})"
                 aria-label="Filter by operative system">
                 <option value="all">All OS platforms</option>
                 <option ng-repeat="platform in osPlatforms | orderObjectBy: 'name'" value="{{platform.platform}} - {{platform.version}}">
@@ -88,8 +88,8 @@
                 </option>
             </select>
         </div>
-        <div flex layout="column" class="height-40 wz-margin-top-17 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" id="eventBox4" ng-model="version" ng-change="filter({name:'version',value:version})"
+        <div flex layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox4" ng-model="version" ng-change="filter({name:'version',value:version})"
                 aria-label="Filter by Wazuh version">
                 <option value="all">All versions</option>
                 <option ng-repeat="version in versions | orderObjectBy: 'id'" value="{{version.id}}">
