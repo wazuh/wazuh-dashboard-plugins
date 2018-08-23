@@ -664,11 +664,18 @@ export default class ElasticWrapper {
          }
     }
 
-    async createIndexByName(name) {
+    async createIndexByName(name, configuration = null) {
         try {
             if(!name) return Promise.reject(new Error('No valid name given'));
+            
+            const raw = { 
+                index: name,
+                body: configuration
+            }
 
-            const data = await this.elasticRequest.callWithInternalUser('indices.create', { index: name });
+            if(!configuration) delete raw.body;
+
+            const data = await this.elasticRequest.callWithInternalUser('indices.create', raw);
 
             return data;
 
