@@ -13,29 +13,26 @@ import { uiModules } from 'ui/modules'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.factory('rawVisualizations', function() {
-    let list = [];
-
-    const addItem = item => {
-        list.push(item);
+class RawVisualizations {
+    constructor() {
+        this.list = [];
     }
 
-    const assignItems = items => {
-        list = Array.isArray(items) ? items : [];
+    addItem(item) {
+        this.list.push(item);
     }
 
-    const getList = () => {
-        return list;
+    assignItems(items) {
+        this.list = Array.isArray(items) ? items : [];
     }
 
-    const removeAll = () => {
-        list = [];
+    getList() {
+        return this.list;
     }
-  
-    return {
-      addItem    : addItem,
-      getList    : getList,
-      removeAll  : removeAll,
-      assignItems: assignItems
-    };
-});
+
+    removeAll() {
+        this.list = [];
+    }
+}
+
+app.service('rawVisualizations', RawVisualizations);

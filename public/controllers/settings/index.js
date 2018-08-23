@@ -9,20 +9,20 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import base64        from '../utils/base64.js';
+import base64        from '../../utils/base64';
 import { uiModules } from 'ui/modules';
-import TabNames      from '../utils/tab-names';
+import TabNames      from '../../utils/tab-names';
 
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('settingsController', 
 function ($scope, $routeParams, $window, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
-    if (wzMisc.getValue('comeFromWizard')) {
+    if (wzMisc.getWizard()) {
         $window.sessionStorage.removeItem('healthCheck');
         wzMisc.setWizard(false);
     }
 
-    $scope.apiIsDown = wzMisc.getValue('apiIsDown');
+    $scope.apiIsDown = wzMisc.getApiIsDown();
 
     // Initialize
     let currentApiEntryIndex;

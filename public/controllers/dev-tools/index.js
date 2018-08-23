@@ -10,30 +10,80 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules'
-import CodeMirror    from '../utils/codemirror/lib/codemirror'
-import jsonLint      from '../utils/codemirror/json-lint'
+import CodeMirror    from '../../utils/codemirror/lib/codemirror'
+import jsonLint      from '../../utils/codemirror/json-lint'
 import queryString   from 'querystring-browser'
+import $             from 'jquery'
 
 const app = uiModules.get('app/wazuh', []);
 
-// Logs controller
-app.controller('devToolsController', function($scope, apiReq, $window, appState, errorHandler, $document) {
-    let groups = [];
+class DevToolsController {
+    constructor($scope, apiReq, $window, appState, errorHandler, $document) {
+        this.$scope         = $scope;
+        this.apiReq         = apiReq;
+        this.$window        = $window;
+        this.appState       = appState;
+        this.errorHandler   = errorHandler;
+        this.$document      = $document;
+        this.groups         = [];
+        this.linesWithClass = [];
+        this.widgets        = [];
+    }
 
-    const apiInputBox = CodeMirror.fromTextArea($document[0].getElementById('api_input'),{
-        lineNumbers      : true,
-        matchBrackets    : true,
-        mode             : { name: "javascript", json: true },
-        theme            : 'ttcn',
-        foldGutter       : true,
-        styleSelectedText: true,
-        gutters          : ["CodeMirror-foldgutter"]
-    });
+    $onInit() {
+        this.apiInputBox = CodeMirror.fromTextArea(this.$document[0].getElementById('api_input'),{
+            lineNumbers      : true,
+            matchBrackets    : true,
+            mode             : { name: "javascript", json: true },
+            theme            : 'ttcn',
+            foldGutter       : true,
+            styleSelectedText: true,
+            gutters          : ["CodeMirror-foldgutter"]
+        });
 
-    const analyzeGroups = () => {
+        this.apiInputBox.on('change',() => {
+            this.groups       = this.analyzeGroups();
+            const currentState = this.apiInputBox.getValue().toString();
+            this.appState.setCurrentDevTools(currentState)  
+            const currentGroup = this.calculateWhichGroup();
+            if(currentGroup){
+                const hasWidget = this.widgets.filter(item => item.start === currentGroup.start)
+                if(hasWidget.length) this.apiInputBox.removeLineWidget(hasWidget[0].widget)
+                setTimeout(() => this.checkJsonParseError(),450)
+            }
+        })
+
+        this.apiInputBox.on('cursorActivity',() => {
+            const currentGroup = this.calculateWhichGroup();
+            this.highlightGroup(currentGroup);        
+        })
+
+        this.apiOutputBox = CodeMirror.fromTextArea(this.$document[0].getElementById('api_output'),{
+            lineNumbers    : true,
+            matchBrackets  : true,
+            mode           : { name: "javascript", json: true },
+            readOnly       : true,
+            lineWrapping   : true,
+            styleActiveLine: true,
+            theme          : 'ttcn',
+            foldGutter     : true,
+            gutters        : ["CodeMirror-foldgutter"]
+        });
+
+        this.$scope.send = firstTime => this.send(firstTime);
+
+        this.$scope.help = () => {
+            this.$window.open('https://documentation.wazuh.com/current/user-manual/api/reference.html');
+        }
+    
+        this.init();
+        this.$scope.send(true);
+    }
+
+    analyzeGroups() {
         try{
-            const currentState = apiInputBox.getValue().toString();
-            appState.setCurrentDevTools(currentState)
+            const currentState = this.apiInputBox.getValue().toString();
+            this.appState.setCurrentDevTools(currentState)
 
             const tmpgroups = [];
             const splitted  = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
@@ -44,7 +94,7 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
             for(let i=0; i < slen; i++){ 
                 let tmp    = splitted[i].split('\n');
                 if(Array.isArray(tmp)) tmp = tmp.filter(item => !item.includes('#'))
-                const cursor = apiInputBox.getSearchCursor(splitted[i],null,{multiline:true})
+                const cursor = this.apiInputBox.getSearchCursor(splitted[i],null,{multiline:true})
 
                 if(cursor.findNext()) start = cursor.from().line
                 else return [];
@@ -94,55 +144,42 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
         }
     }
 
-    apiInputBox.on('change',() => {
-              groups       = analyzeGroups();
-        const currentState = apiInputBox.getValue().toString();
-        appState.setCurrentDevTools(currentState)  
-        const currentGroup = calculateWhichGroup();
-        if(currentGroup){
-            const hasWidget = widgets.filter(item => item.start === currentGroup.start)
-            if(hasWidget.length) apiInputBox.removeLineWidget(hasWidget[0].widget)
-            setTimeout(() => checkJsonParseError(),450)
+    highlightGroup(group) {
+        for(const line of this.linesWithClass){
+            this.apiInputBox.removeLineClass(line,'background',"CodeMirror-styled-background")
         }
-    })
-
-    let linesWithClass = [], widgets = [];
-    const highlightGroup = group => {
-        for(const line of linesWithClass){
-            apiInputBox.removeLineClass(line,'background',"CodeMirror-styled-background")
-        }
-        linesWithClass = [];
+        this.linesWithClass = [];
         if(group) {
             if(!group.requestTextJson) {
-                linesWithClass.push(apiInputBox.addLineClass(group.start,'background',"CodeMirror-styled-background"))
+                this.linesWithClass.push(this.apiInputBox.addLineClass(group.start,'background',"CodeMirror-styled-background"))
                 return;
             }
             for(let i=group.start; i<=group.end; i++){
-                linesWithClass.push(apiInputBox.addLineClass(i,'background',"CodeMirror-styled-background"))
+                this.linesWithClass.push(this.apiInputBox.addLineClass(i,'background',"CodeMirror-styled-background"))
             }                   
         }
     }
 
-    const checkJsonParseError = () => {
+    checkJsonParseError() {
         const affectedGroups = [];
-        for(const widget of widgets){
-            apiInputBox.removeLineWidget(widget.widget)
+        for(const widget of this.widgets){
+            this.apiInputBox.removeLineWidget(widget.widget)
         }
-        widgets = [];
-        for(const item of groups){
+        this.widgets = [];
+        for(const item of this.groups){
             if(item.requestTextJson){                
                 try {
                     jsonLint.parse(item.requestTextJson)
                 } catch(error) { 
                     affectedGroups.push(item.requestText);               
-                    const msg = $document[0].createElement("div");
-                    msg.id = new Date().getTime()/1000;
-                    const icon = msg.appendChild($document[0].createElement("div"));
+                    const msg = this.$document[0].createElement("div");
+                    msg.id = new Date().getTimDevToolsControllere()/1000;
+                    const icon = msg.appendChild(this.$document[0].createElement("div"));
           
                     icon.className = "lint-error-icon";
                     icon.id = new Date().getTime()/1000;
                     icon.onmouseover = () => {
-                        const advice = msg.appendChild($document[0].createElement("span"));
+                        const advice = msg.appendChild(this.$document[0].createElement("span"));
                         advice.id = new Date().getTime()/1000;
                         advice.innerText = error.message || 'Error parsing query'
                         advice.className = 'lint-block-wz'
@@ -152,60 +189,43 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
                         msg.removeChild(msg.lastChild)
                     }
 
-                    widgets.push({start:item.start,widget:apiInputBox.addLineWidget(item.start, msg, {coverGutter: false, noHScroll: true})});
+                    this.widgets.push({start:item.start,widget:this.apiInputBox.addLineWidget(item.start, msg, {coverGutter: false, noHScroll: true})});
                 }
             }
         }
         return affectedGroups;
     }
 
-    apiInputBox.on('cursorActivity',() => {
-        const currentGroup = calculateWhichGroup();
-        highlightGroup(currentGroup);        
-    })
-
-    const init = () => {
-        apiInputBox.setSize('auto','100%')
-        apiOutputBox.setSize('auto','100%')
-        const currentState = appState.getCurrentDevTools();
+    init() {
+        this.apiInputBox.setSize('auto','100%')
+        this.apiOutputBox.setSize('auto','100%')
+        const currentState = this.appState.getCurrentDevTools();
         if(!currentState){
             const demoStr = 'GET /\n\n# Comment here\nGET /agents\n' + JSON.stringify({limit:1},null,2);
-            appState.setCurrentDevTools(demoStr);
-            apiInputBox.getDoc().setValue(demoStr);
+            this.appState.setCurrentDevTools(demoStr);
+            this.apiInputBox.getDoc().setValue(demoStr);
         } else {
-            apiInputBox.getDoc().setValue(currentState)
+            this.apiInputBox.getDoc().setValue(currentState)
         }
-        groups = analyzeGroups();
-        const currentGroup = calculateWhichGroup();
-        highlightGroup(currentGroup); 
+        this.groups = this.analyzeGroups();
+        const currentGroup = this.calculateWhichGroup();
+        this.highlightGroup(currentGroup); 
     }
 
-    const apiOutputBox = CodeMirror.fromTextArea($document[0].getElementById('api_output'),{
-        lineNumbers    : true,
-        matchBrackets  : true,
-        mode           : { name: "javascript", json: true },
-        readOnly       : true,
-        lineWrapping   : true,
-        styleActiveLine: true,
-        theme          : 'ttcn',
-        foldGutter     : true,
-        gutters        : ["CodeMirror-foldgutter"]
-    });
-
-    const calculateWhichGroup = firstTime => {
+    calculateWhichGroup(firstTime) {
         try {
-            const selection = apiInputBox.getCursor()
+            const selection = this.apiInputBox.getCursor()
 
             const desiredGroup = firstTime ?
-                                 groups.filter(item => item.requestText) :
-                                 groups.filter(item => item.requestText && (item.end >= selection.line && item.start <= selection.line));
+            this.groups.filter(item => item.requestText) :
+            this.groups.filter(item => item.requestText && (item.end >= selection.line && item.start <= selection.line));
 
             // Place play button at first line from the selected group
-            const cords = apiInputBox.cursorCoords({line:desiredGroup[0].start,ch:0});
+            const cords = this.apiInputBox.cursorCoords({line:desiredGroup[0].start,ch:0});
             if(!$('#play_button').is(":visible")) $('#play_button').show()
             const currentPlayButton = $('#play_button').offset();
             $('#play_button').offset({top:cords.top,left:currentPlayButton.left})
-            if(firstTime) highlightGroup(desiredGroup[0])
+            if(firstTime) this.highlightGroup(desiredGroup[0])
             return desiredGroup[0];
         } catch(error) {
             $('#play_button').hide()
@@ -214,22 +234,22 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
 
     }
 
-    $scope.send = async firstTime => {
+    async send(firstTime) {
         try {
-            groups = analyzeGroups();
+            this.groups = this.analyzeGroups();
 
-            const desiredGroup = calculateWhichGroup(firstTime);
+            const desiredGroup = this.calculateWhichGroup(firstTime);
 
             if(desiredGroup) {
                 if(firstTime){
-                    const cords = apiInputBox.cursorCoords({line:desiredGroup.start,ch:0});
+                    const cords = this.apiInputBox.cursorCoords({line:desiredGroup.start,ch:0});
                     const currentPlayButton = $('#play_button').offset();
                     $('#play_button').offset({top:cords.top+10,left:currentPlayButton.left})
                 }
 
-                const affectedGroups         = checkJsonParseError();
+                const affectedGroups         = this.checkJsonParseError();
                 const filteredAffectedGroups = affectedGroups.filter(item => item === desiredGroup.requestText);
-                if(filteredAffectedGroups.length) {apiOutputBox.setValue('Error parsing JSON query'); return;}
+                if(filteredAffectedGroups.length) {this.apiOutputBox.setValue('Error parsing JSON query'); return;}
     
                 const method = desiredGroup.requestText.startsWith('GET') ? 
                                'GET' :
@@ -274,34 +294,29 @@ app.controller('devToolsController', function($scope, apiReq, $window, appState,
                 const path   = req.includes('?') ? req.split('?')[0] : req;
     
                 if(typeof JSONraw === 'object') JSONraw.devTools = true;                
-                const output = await apiReq.request(method, path, JSONraw)
+                const output = await this.apiReq.request(method, path, JSONraw)
     
-                apiOutputBox.setValue(
+                this.apiOutputBox.setValue(
                     JSON.stringify(output.data.data,null,2)
                 )
             } else {
-                apiOutputBox.setValue('Welcome!')
+                this.apiOutputBox.setValue('Welcome!')
             }
 
 
         } catch(error) {
-            const parsedError = errorHandler.handle(error,null,null,true);
+            const parsedError = this.errorHandler.handle(error,null,null,true);
             if(typeof parsedError === 'string') {
-                return apiOutputBox.setValue(parsedError);
+                return this.apiOutputBox.setValue(parsedError);
             } else if(error && error.data && typeof error.data === 'object') {
-                return apiOutputBox.setValue(JSON.stringify(error.data))
+                return this.apiOutputBox.setValue(JSON.stringify(error.data))
             } else {
-                return apiOutputBox.setValue('Empty')
+                return this.apiOutputBox.setValue('Empty')
             }
         }
 
     }
+}
 
-    $scope.help = () => {
-        $window.open('https://documentation.wazuh.com/current/user-manual/api/reference.html');
-    }
-
-    init();
-    $scope.send(true);
-
-});
+// Logs controller
+app.controller('devToolsController', DevToolsController);

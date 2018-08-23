@@ -9,11 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-import './overview'
-import './management'
-import './agent/agents-preview'
-import './agent/agents'
-import './settings'
-import './dev-tools'
-import './misc'
+import './blank-screen-controller'
+import './health-check'
+import './reporting'

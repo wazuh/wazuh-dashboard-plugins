@@ -10,12 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules'
-import FilterHandler  from '../utils/filter-handler'
-import generateMetric from '../utils/generate-metric'
-import TabNames       from '../utils/tab-names'
-import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal, metricsAws } from '../utils/overview-metrics'
+import FilterHandler  from '../../utils/filter-handler'
+import generateMetric from '../../utils/generate-metric'
+import TabNames       from '../../utils/tab-names'
+import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal, metricsAws } from '../../utils/overview-metrics'
 
-import TabDescription from '../../server/reporting/tab-description';
+import TabDescription from '../../../server/reporting/tab-description';
 
 const app = uiModules.get('app/wazuh', []);
 

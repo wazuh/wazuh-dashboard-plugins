@@ -14,24 +14,47 @@ import { uiModules } from 'ui/modules'
 
 const app = uiModules.get('app/wazuh', []);
 
-app.factory('wzMisc', function() {
-    const state = {
-        apiIsDown: false,
-        comeFromWizard: false,
-        blankScreenError: false
+class WzMisc {
+    constructor() {
+        this.state = {
+            apiIsDown       : false,
+            comeFromWizard  : false,
+            blankScreenError: false,
+            lastRestart     : null
+        }
     }
 
-    const setApiIsDown = value => state.apiIsDown = value;
-    const setWizard    = value => state.comeFromWizard = value;
-    const setGeneric   = (key,value) => state[key] = value;
-    const setBlankScr  = value => state.blankScreenError = value;
-    const getValue     = key   => state[key];
-  
-    return {
-       setGeneric,
-       setApiIsDown,
-       setWizard,
-       setBlankScr,
-       getValue
-    };
-});
+    setApiIsDown (value) {
+        this.state.apiIsDown = value;
+    }
+
+    getApiIsDown() {
+        return this.state.apiIsDown;
+    }
+
+    setWizard (value) {
+        this.state.comeFromWizard = value;
+    }
+
+    getWizard() {
+        return this.state.comeFromWizard;
+    }
+
+    setBlankScr (value) { 
+        this.state.blankScreenError = value;
+    }
+
+    getBlankScr() {
+        return this.state.blankScreenError;
+    }
+
+    setLastRestart (value) {
+        this.state.lastRestart = value;
+    }
+
+    getLastRestart() {
+        return this.state.lastRestart;
+    }
+}
+
+app.service('wzMisc', WzMisc);
