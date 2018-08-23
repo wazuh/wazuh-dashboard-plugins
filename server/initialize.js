@@ -17,6 +17,7 @@ import packageJSON        from '../package.json'
 import kibana_template    from './integration-files/kibana-template'
 import getConfiguration   from './lib/get-configuration'
 import defaultExt         from './lib/default-ext'
+import { BuildBody }      from './lib/replicas-shards-helper'
 
 export default (server, options) => {
     const blueWazuh = colors.blue('wazuh');
@@ -150,25 +151,9 @@ export default (server, options) => {
     // Save Wazuh App setup
     const saveConfiguration = async () => {
         try{
-            const shards = configurationFile && typeof configurationFile["wazuh-version.shards"] !== 'undefined' ?
-                           configurationFile["wazuh-version.shards"] :
-                           1;
+            const shardConfiguration = BuildBody(configurationFile, 'wazuh-version', 1, 1)
 
-            const replicas = configurationFile && typeof configurationFile["wazuh-version.replicas"] !== 'undefined' ?
-                             configurationFile["wazuh-version.replicas"] :
-                             1;
-
-
-            const shard_configuration = {
-                settings: {
-                    index: {
-                        number_of_shards  : shards,
-                        number_of_replicas: replicas
-                    }
-                }
-            };
-
-            await wzWrapper.createWazuhVersionIndex(shard_configuration);
+            await wzWrapper.createWazuhVersionIndex(shardConfiguration);
 
             const commonDate = new Date().toISOString();
 
@@ -264,26 +249,14 @@ export default (server, options) => {
 
                 const result = await wzWrapper.checkIfIndexExists('.wazuh');
 
+                const shardConfiguration = BuildBody(configurationFile, 'wazuh', 1, 1);
+
                 if (!result) {
-                    const shards = configurationFile && typeof configurationFile["wazuh.shards"] !== 'undefined' ?
-                                   configurationFile["wazuh.shards"] :
-                                   1;
-
-                    const replicas = configurationFile && typeof configurationFile["wazuh.replicas"] !== 'undefined' ?
-                                     configurationFile["wazuh.replicas"] :
-                                     1;
-
-                    let configuration = {
-                        "settings": {
-                            "index": {
-                                "number_of_shards": shards,
-                                "number_of_replicas": replicas
-                            }
-                        }
-                    };
+                   
+                    
 
                     try{
-                        await wzWrapper.createWazuhIndex(configuration);
+                        await wzWrapper.createWazuhIndex(shardConfiguration);
 
                         log('[initialize][checkWazuhIndex]', 'Index .wazuh created.','info')
                         server.log([blueWazuh, 'initialize', 'info'], 'Index .wazuh created.');
@@ -293,7 +266,8 @@ export default (server, options) => {
                     }
 
                 } else { 
-                    
+
+                    await wzWrapper.updateIndexSettings('.wazuh',shardConfiguration)
                     await checkAPIEntriesExtensions();
                 
                     // The .wazuh index exists, we now proceed to check whether it's from an older version
@@ -324,6 +298,8 @@ export default (server, options) => {
 
             try{
                 await wzWrapper.getWazuhVersionIndex();
+                const shardConfiguration = BuildBody(configurationFile, 'wazuh-version', 1, 1)
+                await wzWrapper.updateIndexSettings('.wazuh-version', shardConfiguration)
             } catch (error) {
                 log('[initialize][checkWazuhVersionIndex]','.wazuh-version document does not exist. Initializating configuration...','info');
                 server.log([blueWazuh, 'initialize', 'info'], '.wazuh-version document does not exist. Initializating configuration...');
