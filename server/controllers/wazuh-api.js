@@ -24,8 +24,8 @@ import getConfiguration     from '../lib/get-configuration';
 import { totalmem }         from 'os';
 import simpleTail           from 'simple-tail';
 import path                 from 'path';
-
-import CsvKeys from '../../util/csv-key-equivalence';
+import log                  from '../logger';
+import CsvKeys              from '../../util/csv-key-equivalence';
 
 export default class WazuhApi {
     constructor(server){
@@ -124,6 +124,7 @@ export default class WazuhApi {
             }
         } catch(error){
             if(error.code === 'ECONNREFUSED'){
+                log('POST /api/wazuh-api/checkStoredAPI',error.message || error);
                 return reply({ statusCode: 200, data: {password: '****', apiIsDown: true } });
             } else {
                 // Check if we can connect to a different API
@@ -148,9 +149,11 @@ export default class WazuhApi {
                             } catch(error) {   } // eslint-disable-line                            
                         }
                     } catch (error) {
+                        log('POST /api/wazuh-api/checkStoredAPI',error.message || error);
                         return ErrorResponse(error.message || error, 3020, 500, reply);
                     }
                 }
+                log('POST /api/wazuh-api/checkStoredAPI',error.message || error);
                 return ErrorResponse(error.message || error, 3002, 500, reply);
             }
         }
@@ -282,6 +285,7 @@ export default class WazuhApi {
             throw new Error(tmpMsg)
 
         } catch(error) {
+            log('POST /api/wazuh-api/checkAPI',error.message || error);
             return ErrorResponse(error.message || error, 3005, 500, reply);
         }
     }
