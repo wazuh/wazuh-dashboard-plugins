@@ -1,10 +1,7 @@
 {
-    // extend Kibana's tsconfig, or use your own settings
-    "extends": "../../tsconfig.json",
-  
-    // tell the TypeScript compiler where to find your source files
-    "include": [
-      "server/**/*",
-      "public/**/*"
-    ]
+  "extends": "../../tsconfig.json",
+  "include": [
+    "server/**/*",
+    "public/**/*"
+  ]
 }

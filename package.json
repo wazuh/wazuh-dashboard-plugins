@@ -22,6 +22,10 @@
         "url": "https://github.com/wazuh/wazuh-kibana-app/issues"
     },
     "homepage": "https://www.wazuh.com/",
+    "scripts": {
+        "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
+        "build": "plugin-helpers build"
+    },
     "dependencies": {
         "angular-animate": "1.6.5",
         "angular-cookies": "1.6.5",
@@ -40,7 +44,7 @@
     },
     "devDependencies": {
         "eslint": "^5.4.0",
-        "typescript-eslint-parser": "^18.0.0",
-        "kbn-plugin-helpers": "link:../../kibana/packages/kbn-plugin-helpers"
+        "@elastic/plugin-helpers": "^7.1.8",
+        "typescript-eslint-parser": "^18.0.0"
     }
 }
