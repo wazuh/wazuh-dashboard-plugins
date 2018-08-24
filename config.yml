@@ -45,7 +45,6 @@
 #extensions.aws       : false
 #extensions.virustotal: false
 #
-#
 # ---------------------------------- Time out ----------------------------------
 #
 # Defines maximum timeout to be used on the Wazuh app requests.
