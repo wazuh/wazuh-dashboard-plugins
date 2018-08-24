@@ -41,13 +41,6 @@ const initLogger = () => {
  */
 const initDirectory = async () => {
     try{
-        if(!path.join(__dirname).includes('/usr/share/kibana') &&
-            path.join(__dirname).includes('plugins') &&
-            path.join(__dirname).includes('kibana')){
-
-            throw new Error('Kibana is out of /usr/share/kibana path and the Wazuh App is inside plugins directory')
-
-        }
         if (!fs.existsSync(path.join(__dirname, '../../../optimize/wazuh-logs'))) {
             fs.mkdirSync(path.join(__dirname, '../../../optimize/wazuh-logs'));
         }

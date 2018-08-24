@@ -15,21 +15,24 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzWelcomeCard',function(){
-    return {
-        restrict: 'E',
-        scope: {
+class WzWelcomeCard {
+    constructor() {
+        this.restrict = 'E';
+        this.scope = {
             title:       '=title',
             description: '=description',
             logo:        '=logo',
             switchTab:   '&',
             currentTab:  '=currentTab',
             wzLogo:      '=wzLogo'
-        },
-        replace: true,
-        link: function(scope,elm,attrs){
-            scope.callSwitchTab = () => scope.switchTab();
-        },
-        template
-    };
-});
+        };
+        this.replace = true;
+        this.template = template;
+    }
+
+    link(scope, elm, attrs) { // eslint-disable-line
+        scope.callSwitchTab = () => scope.switchTab();
+    }
+}
+
+app.directive('wzWelcomeCard',() => new WzWelcomeCard());

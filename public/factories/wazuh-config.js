@@ -11,16 +11,20 @@
  */
 import { uiModules } from 'ui/modules';
 
-uiModules
-.get('app/wazuh', [])
-.factory('wazuhConfig', 
-function() {
-    const config = {};
+const app = uiModules.get('app/wazuh', []);
 
-    const setConfig = cfg => Object.assign(config,cfg);
+class WazuhConfig {
+    constructor(){
+        this.config = {};
+    }
 
-    const getConfig = () => config;
+    setConfig(cfg) {
+        Object.assign(this.config, cfg);
+    }
 
-    return { setConfig, getConfig };
+    getConfig() {
+        return this.config;
+    }
+}
 
-});
+app.service('wazuhConfig',WazuhConfig);

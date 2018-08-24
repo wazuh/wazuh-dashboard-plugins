@@ -1,0 +1,75 @@
+<div layout="column" class="mozilla-table-size-85" ng-controller="managerLogController" ng-if="!loading && tab == 'logs'">
+
+    <!-- Headline -->
+    <div ng-show="!loading" layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-pencil-square-o" aria-hidden="true"></i> Logs</span>
+        <span class="md-subheader">Review the logs of all Wazuh manager daemons</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Filters and Realtime button section -->
+    <div ng-show="!loading" layout="row" layout-align="start center" class="md-padding">
+        <div layout="column" flex="40" class="height-40 wz-margin-right-15">
+            <div layout="row">
+                <input placeholder="Filter logs..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                    aria-invalid="false" wz-enter="search(custom_search)">
+                <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+                    <span class="fa fa-search" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+        <!-- Daemon selector -->
+        <div flex="20" layout="column" class="height-40 wz-margin-right-15 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="filter({name:'category',value:category})"
+            aria-label="Logs category">
+                <option value="all">All daemons</option>
+                <option ng-repeat="daemon in daemons | orderObjectBy: 'title'" value="{{daemon.title}}">{{daemon.title}}</option>
+            </select>
+        </div>
+        <!-- End daemon selector -->
+
+        <!-- Level selector -->
+        <div flex="20" layout="column" class="height-40 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="filter({name:'type_log',value:type_log})"
+            aria-label="Logs level">
+                <option value="all">All log levels</option>
+                <option value="info">Info</option>
+                <option value="error">Error</option>
+                <option value="warning">Warning</option>
+                <option value="critical">Critical</option>
+                <option value="debug">Debug</option>
+            </select>
+        </div>
+        <!-- End Level selector -->
+
+        <!-- White space between filters and Realtime button -->
+        <span flex></span>
+
+        <md-button ng-if="!realtime" class="wz-button md-raised md-primary" ng-click="playRealtime()" aria-label="Play realtime button">
+            <i class="fa fa-play fa-fw" aria-hidden="true"></i>
+            Play realtime
+        </md-button>
+        <md-button ng-if="realtime" class="wz-button md-raised md-primary" ng-click="stopRealtime()" aria-label="Stop realtime button">
+            <i class="fa fa-stop fa-fw" aria-hidden="true"></i>
+            Stop realtime
+        </md-button>
+    </div>
+    <!-- End Filters and Realtime button section -->
+
+    <!-- Logs table section -->
+    <div layout="row" layout-padding>
+        <wz-table
+            flex
+            extra-limit="true"
+            path="'/manager/logs'"
+            keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
+            row-sizes="[15,13,11]">
+        </wz-table>
+    </div>
+    <!-- End Logs table section -->
+
+    <div layout="row" layout-padding>
+        <span flex></span>
+        <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+    </div>
+</div>

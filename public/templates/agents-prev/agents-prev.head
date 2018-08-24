@@ -1,4 +1,4 @@
-<div flex ng-controller="agentsPreviewController" layout="column" class="mozilla-table-size-99">
+<div ng-cloak flex="auto" ng-controller="agentsPreviewController" layout="column" class="mozilla-table-size-99">
 
     <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
 

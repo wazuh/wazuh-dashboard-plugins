@@ -17,7 +17,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
     try {
         const deferred = $q.defer();
 
-        totalRAM(genericReq,errorHandler);
+        !$location.path().includes('health-check') && totalRAM(genericReq,errorHandler);
 
         const checkResponse = data => {
             let fromElastic = false;
@@ -58,7 +58,12 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
         }
 
         const changeCurrentApi = data => {
-            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
+            let currentApi = false;
+            try {
+                currentApi = JSON.parse(appState.getCurrentAPI()).id;
+            } catch (error) {
+                console.log(`Error parsing JSON (settingsWizards.changeCurrentApi)`)
+            }
             const clusterInfo = data.data.data.cluster_info;
 
             // Should change the currentAPI configuration depending on cluster
@@ -78,7 +83,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
             try {
                 currentApi = JSON.parse(appState.getCurrentAPI()).id;
             } catch (error) {
-                // Intended empty catch
+                console.log(`Error parsing JSON (settingsWizards.callCheckStored 1)`)
             }
 
             if(currentApi && !appState.getExtensions(currentApi)){
@@ -94,8 +99,8 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                 appState.setExtensions(currentApi,extensions);
             }
             
-            checkTimestamp(appState, genericReq, $rootScope, $location, wzMisc)
-            .then(() => testAPI.check_stored(currentApi))
+            checkTimestamp(appState, genericReq, $location, wzMisc)
+            .then(() => testAPI.checkStored(currentApi))
             .then(data => {
                 if(data && data === 'cookies_outdated'){
                     $location.search('tab','welcome');
@@ -105,7 +110,12 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         checkResponse(data);
                     } else {
                         if(data && data.data && data.data.idChanged) {
-                            const apiRaw = JSON.parse(appState.getCurrentAPI());
+                            let apiRaw = false;
+                            try {
+                                apiRaw = JSON.parse(appState.getCurrentAPI());
+                            } catch (error) {
+                                console.log(`Error parsing JSON (settingsWizards.callCheckStored 2)`)
+                            }
                             appState.setCurrentAPI(JSON.stringify({name: apiRaw.name, id: data.data.idChanged }));
                         }
                         wzMisc.setApiIsDown(false);
@@ -139,7 +149,7 @@ export default ($rootScope, $location, $q, $window, testAPI, appState, genericRe
                         appState.setCurrentAPI(JSON.stringify({name: apiEntries[0]._source.cluster_info.manager, id: apiEntries[0]._id }));
                         callCheckStored();
                     } else {
-                        const comeFromWizard = wzMisc.getValue('comeFromWizard');
+                        const comeFromWizard = wzMisc.getWizard();
                         !comeFromWizard && errorHandler.handle('Wazuh App: Please set up Wazuh API credentials.','Routes',true);
                         wzMisc.setWizard(true);
                         if(!$location.path().includes("/settings")) {

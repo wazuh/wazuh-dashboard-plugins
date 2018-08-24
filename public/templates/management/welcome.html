@@ -1,0 +1,66 @@
+<div layout="column" layout-align="start stretch" ng-if="tab === 'welcome'">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-server" aria-hidden="true"></i> Management</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Wazuh management card -->
+
+    <div layout="row" layout-padding>
+        <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+            <div class="euiFlexItem">
+                <div class="euiPanel euiPanel--paddingLarge">
+                    <h3 class="euiTitle">Administration</h3>
+                    <div class="euiSpacer euiSpacer--m"></div>
+                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
+                        <wz-welcome-card
+                            class="euiFlexItem" wz-logo="'ruleset.png'" title="'Ruleset'"
+                            switch-tab="reloadRuleset()" current-tab="'rules'"
+                            description="'Explore your Wazuh cluster ruleset.'"
+                        ></wz-welcome-card>
+                        <wz-welcome-card
+                            class="euiFlexItem" wz-logo="'groups.png'"
+                            title="'Groups'" switch-tab="reloadGroups()" current-tab="'groups'"
+                            description="'Check your agent groups.'"
+                        ></wz-welcome-card>
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_devtools.svg'"
+                            title="'Configuration'" switch-tab="switchTab('configuration')" current-tab="'configuration'"
+                            description="'Check your Wazuh cluster configuration.'"
+                        ></wz-welcome-card>
+                    </div>
+                </div>
+            </div>
+            <div class="euiFlexItem">
+                <div class="euiPanel euiPanel--paddingLarge">
+                    <h3 class="euiTitle">Status and reports</h3>
+                    <div class="euiSpacer euiSpacer--m"></div>
+                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_monitoring.svg'" title="'Status'"
+                            switch-tab="switchTab('status')" current-tab="'status'"
+                            description="'Check your Wazuh cluster status.'"
+                        ></wz-welcome-card>
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_logging.svg'" title="'Logs'"
+                            switch-tab="switchTab('logs')" current-tab="'logs'"
+                            description="'Logs from your Wazuh cluster.'"
+                        ></wz-welcome-card>
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'app_index_pattern.svg'" title="'Monitoring'"
+                            switch-tab="switchTab('monitoring')" current-tab="'monitoring'"
+                            description="'Visualize your Wazuh cluster.'"
+                        ></wz-welcome-card>
+                        <wz-welcome-card
+                            class="euiFlexItem" wz-logo="'reporting.png'" title="'Reporting'"
+                            switch-tab="switchTab('reporting')" current-tab="'reporting'"
+                            description="'Check your stored Wazuh reports.'"
+                        ></wz-welcome-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

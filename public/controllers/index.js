@@ -9,16 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './blank-screen-controller'
+
 import './overview'
-import './manager'
-import './ruleset'
-import './osseclog'
-import './groups'
-import './agents'
-import './agents-preview'
+import './management'
+import './agent/agents-preview'
+import './agent/agents'
 import './settings'
-import './health-check'
 import './dev-tools'
-import './monitoring'
-import './reporting'
+import './misc'

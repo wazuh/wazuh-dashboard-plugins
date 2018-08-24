@@ -1,8 +1,0 @@
-<div flex layout="column" ng-if="globalRuleSet == 'ruleset'" class="mozilla-table-size-85">
-
-    <!-- Headline -->
-    <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Ruleset</span>
-        <span class="md-subheader">Review all your current rules and decoders</span>
-    </div>
-    <!-- End headline -->

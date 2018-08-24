@@ -1,4 +1,4 @@
-<div flex layout="column" layout-align="start stretch" ng-if="tab === 'extensions' && !load">
+<div layout="column" layout-align="start stretch" ng-if="tab === 'extensions' && !load">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -11,8 +11,8 @@
     <div layout="row" layout-align="start stretch" layout-wrap>
 
         <!-- PCI DSS -->
-        <md-card flex="45" class="wz-md-card">
-            <md-card-content flex layout="column">
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-credit-card" aria-hidden="true"></i> {{ tabNames['pci'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
@@ -32,8 +32,8 @@
         </md-card>
 
         <!-- GDPR -->
-        <md-card flex="45" class="wz-md-card">
-            <md-card-content flex layout="column">
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-list-ol" aria-hidden="true"></i> {{ tabNames['gdpr'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
@@ -53,8 +53,8 @@
         </md-card>
 
         <!-- Audit -->
-        <md-card flex="45" class="wz-md-card">
-            <md-card-content flex layout="column">
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-balance-scale" aria-hidden="true"></i> {{ tabNames['audit'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
@@ -74,8 +74,8 @@
         </md-card>
 
         <!-- Open SCAP -->
-        <md-card flex="45" class="wz-md-card">
-            <md-card-content flex layout="column">
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-search" aria-hidden="true"></i> {{ tabNames['oscap'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
@@ -95,8 +95,8 @@
         </md-card>
 
         <!-- CIS-CAT -->
-        <md-card flex="45" class="wz-md-card">
-            <md-card-content flex layout="column">
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> {{ tabNames['ciscat'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
@@ -115,8 +115,8 @@
         </md-card>
 
         <!-- Amazon -->
-        <md-card flex="45" class="wz-md-card">
-            <md-card-content flex layout="column">
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-amazon" aria-hidden="true"></i> {{ tabNames['aws'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
@@ -136,8 +136,8 @@
         </md-card>
 
         <!-- VirusTotal -->
-        <md-card flex="45" class="wz-md-card">
-            <md-card-content flex layout="column">
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-bug" aria-hidden="true"></i> {{ tabNames['virustotal'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">

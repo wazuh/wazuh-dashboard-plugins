@@ -1,0 +1,180 @@
+<div ng-if="!loading && viewingDetail" layout="column">
+
+    <!-- Back button and title -->
+    <div layout="row" layout-align="start center">
+        <!-- Back button -->
+        <md-button class="md-icon-button" aria-label="Back to decoders list" tooltip="Back" tooltip-placement="bottom" ng-click="closeDetailView()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
+        <!-- Decoder title -->
+        <h1 class="md-headline wz-headline">{{currentDecoder.name}}</h1>
+    </div>
+    <!-- End back button, title and status indicator -->
+
+    <!-- Decoder information ribbon -->
+    <div layout="row">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div flex="20" ng-if="currentDecoder.position || currentDecoder.position == 0" class="wz-text-truncatable">Position: <span class="wz-text-bold">{{currentDecoder.position}}</span></div>
+                <div flex="40" ng-if="currentDecoder.file" class="wz-text-truncatable">File: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('file', currentDecoder.file)" tooltip="Filter by this file" tooltip-placement="bottom">{{currentDecoder.file}}</span></div>
+                <div flex="40" ng-if="currentDecoder.path" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('path', currentDecoder.path)" tooltip="Filter by this path" tooltip-placement="bottom">{{currentDecoder.path}}</span></div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- End Decoder information ribbon -->
+
+    <!-- Rest of decoder information -->
+    <div layout="column" layout-align="start">
+
+        <div layout="row" layout-align="start stretch">
+
+            <!-- Details section -->
+            <md-card flex class="wz-md-card">
+                <md-card-content>
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div ng-if="currentDecoder.details.status" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Status</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.status}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.program_name" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Program name</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.program_name}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.category" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Category</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.category}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.noalert" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">No alert</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.noalert}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.regex && !isArray(currentDecoder.details.regex)" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Regex</span>
+                        <span class="wz-text-right color-grey" ng-bind-html="colorRegex(currentDecoder.details.regex)"></span>
+                    </div>
+                    <div ng-if="currentDecoder.details.order" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Order</span>
+                        <span class="wz-text-right color-grey" ng-bind-html="colorOrder(currentDecoder.details.order)"></span>
+                    </div>
+                    <div ng-if="currentDecoder.details.parent" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Parent</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.parent}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.frequency" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Frequency</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.frequency}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.ignore" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Ignore</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.ignore}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.info" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Info</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.info}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.timeframe" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Timeframe</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.timeframe}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.options" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Options</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.options}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.type" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Type</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.type}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.if_sid" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">If SID</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.if_sid}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.if_matched_sid" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">If matched SID</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.if_matched_sid}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.id" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">ID</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.id}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.match && !isArray(currentDecoder.details.match)" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Match</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.match}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.prematch && !isArray(currentDecoder.details.prematch)" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Prematch</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.prematch}}</span>
+                    </div>
+                    <div ng-if="currentDecoder.details.decoded_as" layout="row" layout-wrap class="wz-padding-top-10">
+                        <span flex="20">Decoded as</span>
+                        <span class="wz-text-right color-grey">{{currentDecoder.details.decoded_as}}</span>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End details section -->
+
+            <!-- Regex section -->
+            <md-card flex class="wz-md-card" ng-if="isArray(currentDecoder.details.regex)">
+                <md-card-content>
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-asterisk" aria-hidden="true"></i> Regex</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div ng-repeat="item in currentDecoder.details.regex">
+                        <div layout="row" layout-wrap class="wz-padding-top-10">
+                            <span ng-bind-html="colorRegex(item)"></span>
+                        </div>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End regex section -->
+
+        </div>
+
+        <div layout="row" layout-align="start stretch">
+
+            <!-- Match section -->
+            <md-card flex class="wz-md-card" ng-if="isArray(currentDecoder.details.match)">
+                <md-card-content>
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Match</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div ng-repeat="item in currentDecoder.details.match">
+                        <div layout="row" layout-wrap class="wz-padding-top-10">
+                            <span>{{item}}</span>
+                        </div>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End match section -->
+
+            <!-- Prematch section -->
+            <md-card flex class="wz-md-card" ng-if="isArray(currentDecoder.details.prematch)">
+                <md-card-content>
+                    <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Prematch</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <div ng-repeat="item in currentDecoder.details.prematch">
+                        <div layout="row" layout-wrap class="wz-padding-top-10">
+                            <span>{{item}}</span>
+                        </div>
+                    </div>
+                </md-card-content>
+            </md-card>
+            <!-- End prematch section -->
+
+        </div>
+
+        <!-- Related decoders section -->
+        <div layout="row" ng-if="currentDecoder">
+            <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related decoders</h1>
+        </div>
+        <div layout="row" ng-if="currentDecoder" class="md-padding">
+            <wz-table
+                flex
+                path="'/decoders'"
+                implicit-filter="[{ name:'file',value: currentDecoder.file}]"
+                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                allow-click="true">
+            </wz-table>
+        </div>
+        <!-- End related decoders section -->
+
+    </div>
+    <!-- End rest of decoder information -->
+
+</div>
