@@ -1,6 +1,7 @@
 {
     "buildSourcePatterns": [
       "package.json",
+      "LICENSE",
       "tsconfig.json",
       "config.yml",
       "index.js",
