@@ -1,4 +1,4 @@
-<div ng-if="!loading && viewingDetail" flex layout="column">
+<div ng-if="!loading && viewingDetail" layout="column">
 
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
@@ -31,7 +31,7 @@
 
             <!-- Groups section -->
             <md-card ng-if="currentRule.groups.length > 0" flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> Groups</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" layout-align="start start" layout-wrap>
@@ -45,7 +45,7 @@
 
             <!-- Details section -->
             <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-if="currentRule.details.status" layout="row" layout-wrap class="wz-padding-top-10">
@@ -126,7 +126,7 @@
 
             <!-- PCI section -->
             <md-card ng-if="currentRule.pci.length > 0" flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> PCI</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" layout-align="start start" layout-wrap>
@@ -140,7 +140,7 @@
 
             <!-- GDPR section -->
             <md-card ng-if="currentRule.gdpr.length > 0" flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-cogs" aria-hidden="true"></i> GDPR</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" layout-align="start start" layout-wrap>
@@ -158,7 +158,7 @@
 
             <!-- Regex section -->
             <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.regex)">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-asterisk" aria-hidden="true"></i> Regex</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in currentRule.details.regex">
@@ -172,7 +172,7 @@
 
             <!-- Match section -->
             <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.match)">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Match</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in currentRule.details.match">
@@ -186,7 +186,7 @@
 
             <!-- Prematch section -->
             <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.prematch)">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Prematch</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in currentRule.details.prematch">
@@ -205,11 +205,11 @@
             <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
         </div>
         <div layout="row" ng-if="currentRule" class="md-padding">
-            <wz-table 
-                    flex 
-                    path="'/rules'" 
+            <wz-table
+                    flex
+                    path="'/rules'"
                     implicit-filter="[{ name:'file',value: currentRule.file}]"
-                    keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']" 
+                    keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
                     allow-click="true">
             </wz-table>
         </div>

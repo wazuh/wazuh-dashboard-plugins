@@ -1,4 +1,4 @@
-<div flex layout="column" layout-align="start stretch" ng-if="tab === 'pattern' && !load">
+<div layout="column" layout-align="start stretch" ng-if="tab === 'pattern' && !load">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -15,7 +15,7 @@
                     <p class="md-body-1"><strong>Beware:</strong> the new index-pattern structure must be compatible with Wazuh alerts, otherwise you won't be able to select the pattern on the selector since visualizations would load erroneous data, or no data at all.<p>
                 </div>
                 <div flex="25" layout="column" class="wz-select-input wz-margin-top-10">
-                    <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
+                    <select class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
                         <option ng-repeat="indexPattern in indexPatterns | orderObjectBy:'title'" value="{{indexPattern.id}}">{{indexPattern.title}}</option>
                     </select>
                 </div>

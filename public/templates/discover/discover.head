@@ -1,4 +1,3 @@
-<div flex layout="column">
+<div flex="auto" layout="column">
 
     <wz-menu ng-init="menuNavItem = 'discover'"></wz-menu>
-    

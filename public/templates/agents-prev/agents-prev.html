@@ -1,4 +1,4 @@
-<div flex ng-if="!loading" class="md-padding" layout="column" layout-align="start space-around">
+<div ng-if="!loading" class="md-padding" layout="column" layout-align="start space-around">
     <div layout="row" layout-align="space-between stretch">
         <md-card flex class="no-margin-left wz-md-card">
             <md-card-content>
@@ -100,10 +100,10 @@
     </div>
 
     <div layout="row" class="margin-top-30">
-        <wz-table 
-            flex 
-            path="'/agents'" 
-            keys="['id',{value:'name',size:2},'ip','status','group','os.name','os.version','version']" 
+        <wz-table
+            flex
+            path="'/agents'"
+            keys="['id',{value:'name',size:2},'ip','status','group','os.name','os.version','version']"
             allow-click="true"
             row-sizes="[17,15,13]">
         </wz-table>

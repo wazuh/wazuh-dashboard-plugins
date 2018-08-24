@@ -1,4 +1,4 @@
-<div flex layout="column" ng-controller="clusterController" ng-if="tab === 'monitoring'" ng-show="isClusterEnabled && isClusterRunning">
+<div flex="auto" layout="column" ng-controller="clusterController" ng-if="tab === 'monitoring'" ng-show="isClusterEnabled && isClusterRunning">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="loading">
