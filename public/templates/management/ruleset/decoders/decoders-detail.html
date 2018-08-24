@@ -1,4 +1,4 @@
-<div ng-if="!loading && viewingDetail" flex layout="column">
+<div ng-if="!loading && viewingDetail" layout="column">
 
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
@@ -28,7 +28,7 @@
 
             <!-- Details section -->
             <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-if="currentDecoder.details.status" layout="row" layout-wrap class="wz-padding-top-10">
@@ -113,7 +113,7 @@
 
             <!-- Regex section -->
             <md-card flex class="wz-md-card" ng-if="isArray(currentDecoder.details.regex)">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-asterisk" aria-hidden="true"></i> Regex</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in currentDecoder.details.regex">
@@ -131,7 +131,7 @@
 
             <!-- Match section -->
             <md-card flex class="wz-md-card" ng-if="isArray(currentDecoder.details.match)">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Match</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in currentDecoder.details.match">
@@ -145,7 +145,7 @@
 
             <!-- Prematch section -->
             <md-card flex class="wz-md-card" ng-if="isArray(currentDecoder.details.prematch)">
-                <md-card-content class="wazuh-column">
+                <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Prematch</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in currentDecoder.details.prematch">
@@ -165,10 +165,10 @@
         </div>
         <div layout="row" ng-if="currentDecoder" class="md-padding">
             <wz-table
-                flex 
-                path="'/decoders'" 
+                flex
+                path="'/decoders'"
                 implicit-filter="[{ name:'file',value: currentDecoder.file}]"
-                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']" 
+                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
                 allow-click="true">
             </wz-table>
         </div>

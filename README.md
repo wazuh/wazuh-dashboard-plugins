@@ -83,7 +83,7 @@ rm -rf /usr/share/kibana/optimize/bundles
 Install the app
 
 ```
-/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.x.x_6.x.x.zip
+/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.5.0_6.3.2.zip
 ```
 
 Restart Kibana

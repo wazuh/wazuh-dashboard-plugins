@@ -2,6 +2,29 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.5.0 - Kibana v6.3.2 - Revision 403
+
+### Added
+
+-   The welcome tabs on _Overview_ and _Agents_ have been updated with a new name and description for the existing sections ([#788](https://github.com/wazuh/wazuh-kibana-app/pull/788)).
+-   Now the app tables will auto-resize depending on the screen height ([#792](https://github.com/wazuh/wazuh-kibana-app/pull/792)).
+
+### Changed
+
+-   Now all the app filters on several tables will present the values in alphabetical order ([#787](https://github.com/wazuh/wazuh-kibana-app/pull/787)).
+
+### Fixed
+
+-   Fixed a bug on _Decoders_ where clicking on the decoder wouldn't open the detail view if the `Parent decoders` filter was enabled ([#782](https://github.com/wazuh/wazuh-kibana-app/pull/782)).
+-   Fixed a bug on _Dev tools_ when the first line on the editor pane was empty or had a comment ([#790](https://github.com/wazuh/wazuh-kibana-app/pull/790)).
+-   Fixed a bug where the app was throwing multiple warning messages the first time you open it ([#791](https://github.com/wazuh/wazuh-kibana-app/pull/791)).
+-   Fixed a bug where clicking on a different tab from _Overview_ right after inserting the API credentials for the first time would always redirect to _Overview_ ([#791](https://github.com/wazuh/wazuh-kibana-app/pull/791)).
+-   Fixed a bug where the user could have a browser cookie with a reference to a non-existing API entry on Elasticsearch ([#794](https://github.com/wazuh/wazuh-kibana-app/pull/794) & [#795](https://github.com/wazuh/wazuh-kibana-app/pull/795)).
+
+### Removed
+
+-   The cluster key has been removed from the API requests to `/manager/configuration` ([#796](https://github.com/wazuh/wazuh-kibana-app/pull/796)).
+
 ## Wazuh v3.5.0 - Kibana v6.3.1/v6.3.2 - Revision 402
 
 ### Added
