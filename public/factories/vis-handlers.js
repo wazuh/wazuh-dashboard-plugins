@@ -98,9 +98,14 @@ app.factory('visHandlers', function() {
         return appliedFilters;
     };
 
-    const hasData = () => {
-        for(const item of list) {
-            if(item && item._scope && item._scope.savedObj && item._scope.savedObj.searchSource && 
+    hasData() {
+        for(const item of this.list) {
+            if( item && 
+                item._scope && 
+                item._scope.savedObj && 
+                item._scope.savedObj.vis && 
+                item._scope.savedObj.vis.title !== 'Agents status' &&
+                item._scope.savedObj.searchSource && 
                 item._scope.savedObj.searchSource.rawResponse &&
                 item._scope.savedObj.searchSource.rawResponse.hits &&
                 item._scope.savedObj.searchSource.rawResponse.hits.total){
@@ -108,7 +113,7 @@ app.factory('visHandlers', function() {
                 }
         }
         return false;
-    };
+    }
 
     const removeAll = () => {
         for(const item of list){
