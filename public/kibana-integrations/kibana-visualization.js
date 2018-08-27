@@ -113,9 +113,9 @@ app.directive('kbnVis', [function () {
             });
 
             $scope.$on('$destroy',() => {
-                updateVisWatcher()
-                visualization.destroy();
-                visHandler.destroy();
+                updateVisWatcher();
+                try { visualization.destroy(); } catch (error) {} // eslint-disable-line
+                try { visHandler.destroy(); } catch (error) {}    // eslint-disable-line
             });
 
             const renderComplete = () => {
