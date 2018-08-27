@@ -61,3 +61,7 @@ typings/
 .env
 
 package-lock.json
+
+build/
+
+yarn.lock
