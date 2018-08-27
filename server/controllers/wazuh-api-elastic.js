@@ -12,6 +12,7 @@
 
 import ElasticWrapper from '../lib/elastic-wrapper';
 import ErrorResponse  from './error-response';
+import log            from '../logger';
 
 const userRegEx  = new RegExp(/^.{3,100}$/);
 const passRegEx  = new RegExp(/^.{3,100}$/);
@@ -42,6 +43,7 @@ export default class WazuhApiElastic {
             return reply(result);
 
         } catch(error){
+            log('GET /api/wazuh-api/apiEntries',error.message || error);
             return ErrorResponse(error.message || error, 2001, 500, reply);
         }
     }
@@ -53,6 +55,7 @@ export default class WazuhApiElastic {
             return reply(data);
 
         } catch(error){
+            log('DELETE /api/wazuh-api/apiEntries/{id}',error.message || error);
             return ErrorResponse(error.message || error, 2002, 500, reply);
         }
     }
@@ -72,6 +75,7 @@ export default class WazuhApiElastic {
             return reply({ statusCode: 200, message: 'ok' });
 
         }catch(error){
+            log('PUT /api/wazuh-api/apiEntries/{id}',error.message || error);
             return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2003, 500, reply);
         }
     }
@@ -131,6 +135,7 @@ export default class WazuhApiElastic {
             return reply({ statusCode: 200, message: 'ok', response });
 
         } catch (error){
+            log('PUT /api/wazuh-api/settings',error.message || error);
             return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2011, 500, reply);
         }
     }
@@ -143,6 +148,7 @@ export default class WazuhApiElastic {
             return reply({ statusCode: 200, message: 'ok' });
 
         } catch (error) {
+            log('PUT /api/wazuh-api/updateApiHostname/{id}',error.message || error);
             return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2012, 500, reply);
         }
     }
@@ -163,6 +169,7 @@ export default class WazuhApiElastic {
             return reply({ statusCode: 200, message: 'ok' });
 
         } catch (error) {
+            log('PUT /api/wazuh-api/update-settings',error.message || error);
             return ErrorResponse(`Could not save data in elasticsearch due to ${error.message || error}`, 2014, 500, reply);
         }
     }
