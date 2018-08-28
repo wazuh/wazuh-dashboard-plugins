@@ -352,7 +352,7 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
             $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
             $scope.showEditForm[$scope.apiEntries[index]._id] = false;
 
-            errorHandler.info('Connection success','Settings');
+            errorHandler.info('The API was updated successfully','Settings');
 
             if(!$scope.$$phase) $scope.$digest();
             return;
