@@ -657,7 +657,9 @@ $scope.toggleRefresh = () => {
           .resolve(responseHandler($scope.vis, merged))
           .then(resp => {
             $scope.visData = resp;
-            if($scope.tabView !== 'panels' || $location.path().includes('wazuh-discover')) {
+            if(($scope.tabView !== 'panels' || $location.path().includes('wazuh-discover')) && 
+               ($scope.tabView !== 'cluster-monitoring')
+              ) {
               const visEl = $element.find('#discoverHistogram')[0];
               visualizationLoader.render(visEl, $scope.vis, $scope.visData, $scope.uiState, { listenOnChange: true });
             }
