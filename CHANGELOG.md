@@ -2,6 +2,30 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.5.0 - Kibana v6.4.0 - Revision 405
+
+### Added
+
+-   Support for Elastic Stack v6.4.0 ([#813](https://github.com/wazuh/wazuh-kibana-app/pull/813)).
+
+## Wazuh v3.5.0 - Kibana v6.3.2 - Revision 404
+
+### Added
+
+-   Added new options to `config.yml` to change shards and replicas settings for `wazuh-monitoring` indices ([#809](https://github.com/wazuh/wazuh-kibana-app/pull/809)).
+-   Added more error messages for `wazuhapp.log` in case of failure when performing some crucial functions ([#812](https://github.com/wazuh/wazuh-kibana-app/pull/812)).
+-   Now it's possible to change replicas settings for existing `.wazuh`, `.wazuh-version` and `wazuh-monitoring` indices on the `config.yml` file ([#817](https://github.com/wazuh/wazuh-kibana-app/pull/817)).
+
+### Changed
+
+-   App frontend code refactored and restructured ([#802](https://github.com/wazuh/wazuh-kibana-app/pull/802)).
+-   Now the _Overview > Security events_ tab won't show anything if the only visualization with data is _Agents status_ ([#811](https://github.com/wazuh/wazuh-kibana-app/pull/811)).
+
+### Fixed
+
+-   Fixed a bug where the RAM status message appreared twice the first time you opened the app ([#807](https://github.com/wazuh/wazuh-kibana-app/pull/807)).
+-   Fixed the app UI to make the app usable on Internet Explorer 11 ([#808](https://github.com/wazuh/wazuh-kibana-app/pull/808)).
+
 ## Wazuh v3.5.0 - Kibana v6.3.2 - Revision 403
 
 ### Added
