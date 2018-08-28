@@ -46,19 +46,19 @@
         </div>
         <!-- End Reporting buttons section -->
 
-        <!-- Discover/Panels buttons section -->
+        <!-- Discover/Dashboard buttons section -->
         <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'">
-            <!-- Panels button -->
-            <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')" aria-label="View panels button">
-                <i class="fa fa-fw fa-th" aria-hidden="true"></i> View panels
+            <!-- Dashboard button -->
+            <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')" aria-label="Dashboard button">
+                <i class="fa fa-fw fa-th" aria-hidden="true"></i> Dashboard
             </md-button>
 
             <!-- Discover button -->
-            <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')" aria-label="View Discover button">
-                <i class="fa fa-fw fa-compass" aria-hidden="true"></i> View Discover
+            <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')" aria-label="Discover button">
+                <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
             </md-button>
         </div>
-        <!-- End Discover/Panels buttons section -->
+        <!-- End Discover/Dashboard buttons section -->
 
         <!-- Agent autocomplete selector section -->
         <div flex="30" class="wz-margin-8-no-left">
