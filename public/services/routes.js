@@ -28,12 +28,11 @@ import blankScreenTemplate from '../templates/error-handler/blank-screen.html'
 import devToolsTemplate    from '../templates/dev-tools/dev-tools.html'
 
 const assignPreviousLocation = ($rootScope,$location) => {
+    const path = $location.path();
     // Save current location if we aren't performing a health-check, to later be able to come back to the same tab
-    if (!$location.path().includes("/health-check")) {
-        $rootScope.previousLocation = $location.path();
-    } else {
-        $rootScope.previousLocation = false;
-    }
+    if (!path.includes("/health-check")) {
+        $rootScope.previousLocation = path;
+    } 
 }
 
 function ip(indexPatterns, $q, $rootScope, $window, $location, Private, appState, genericReq,errorHandler, wzMisc){

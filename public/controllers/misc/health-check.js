@@ -157,7 +157,7 @@ class HealthCheck {
             this.$scope.checksDone = true;
             if(!this.$scope.errors || !this.$scope.errors.length) {
                 await this.$timeout(800);
-                this.$window.location.assign('/app/wazuh#/' + this.$rootScope.previousLocation || '');
+                this.$window.location.assign('/app/wazuh#' + this.$rootScope.previousLocation || '');
                 return;
             }
 
@@ -169,7 +169,7 @@ class HealthCheck {
     }
 
     $onInit(){
-        this.$scope.goApp = () => this.$window.location.assign('/app/wazuh#/' + this.$rootScope.previousLocation || '');
+        this.$scope.goApp = () => this.$window.location.assign('/app/wazuh#' + this.$rootScope.previousLocation || '');
         this.load();
     }
 }
