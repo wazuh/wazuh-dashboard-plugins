@@ -15,7 +15,7 @@ import TabNames      from '../../utils/tab-names';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('settingsController', 
+app.controller('settingsController',
 function ($scope, $routeParams, $window, $location, testAPI, appState, genericReq, errorHandler, wzMisc, wazuhConfig) {
     if (wzMisc.getWizard()) {
         $window.sessionStorage.removeItem('healthCheck');
@@ -29,6 +29,7 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
     $scope.formData            = {};
     $scope.tab                 = 'api';
     $scope.load                = true;
+    $scope.loadingLogs         = true;
     $scope.addManagerContainer = false;
     $scope.showEditForm        = {};
     $scope.formUpdate          = {};
@@ -231,7 +232,7 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
             const config = wazuhConfig.getConfig();
 
             appState.setPatternSelector(config['ip.selector']);
-     
+
             tmpData.extensions.audit      = config['extensions.audit'];
             tmpData.extensions.pci        = config['extensions.pci'];
             tmpData.extensions.gdpr       = config['extensions.gdpr'];
@@ -239,7 +240,7 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
             tmpData.extensions.ciscat     = config['extensions.ciscat'];
             tmpData.extensions.aws        = config['extensions.aws'];
             tmpData.extensions.virustotal = config['extensions.virustotal'];
-        
+
             const checkData = await testAPI.check(tmpData);
 
             // API Check correct. Get Cluster info
@@ -279,7 +280,7 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
             }
 
             try {
-                await genericReq.request('GET', '/api/wazuh-api/fetchAgents');            
+                await genericReq.request('GET', '/api/wazuh-api/fetchAgents');
             } catch (error) {
 
                 if(error && error.status && error.status === -1) {
@@ -287,7 +288,7 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
                 } else {
                     errorHandler.handle(error,'Fetch agents');
                 }
-                
+
             }
 
             await getSettings();
@@ -433,6 +434,18 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
         else          $scope.messageErrorUpdate = text;
     };
 
+    const getAppLogs = async () => {
+        try {
+            $scope.loadingLogs = true;
+            const logs = await genericReq.request('GET','/api/wazuh-api/logs',{});
+            $scope.logs = logs.data.lastLogs.map(item => JSON.parse(item));
+            $scope.loadingLogs = false;
+            if(!$scope.$$phase) $scope.$digest();
+        } catch (error) {
+            $scope.logs = [{date: new Date(), level:'error', message: 'Error when loading Wazuh app logs'}];
+        }
+    };
+
     const getAppInfo = async () => {
         try {
             const data = await genericReq.request('GET', '/api/wazuh-elastic/setup');
@@ -462,12 +475,10 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
                 $scope.extensions = appState.getExtensions(JSON.parse(appState.getCurrentAPI()).id);
             }
 
-            try {
-                const logs = await genericReq.request('GET','/api/wazuh-api/logs',{});
-                $scope.logs = logs.data.lastLogs.map(item => JSON.parse(item));
-            } catch(error) {
-                $scope.logs = [{date: new Date(), level:'error', message: 'Error when loading Wazuh app logs'}];
+            if ($scope.tab === 'logs') {
+                getAppLogs();
             }
+
             if(!$scope.$$phase) $scope.$digest();
             return;
         } catch (error) {
@@ -478,4 +489,6 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
 
     // Loading data
     getSettings().then(getAppInfo);
+
+    $scope.refreshLogs = () => getAppLogs();
 });
