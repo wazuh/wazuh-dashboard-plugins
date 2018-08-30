@@ -35,7 +35,7 @@
         <md-nav-item class="wz-nav-item" ng-if="apiEntries && apiEntries.length" md-nav-click="switchTab('extensions')" name="extensions">Extensions</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pattern')" name="pattern">Pattern</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="config">Configuration</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs'); refreshLogs()" name="logs">Logs</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('about')" name="about">About</md-nav-item>
     </md-nav-bar>
     <!-- End navigation bar -->
