@@ -722,7 +722,7 @@ export default class WazuhApi {
                     agentsCountDisconnected  : data[4].body.data.Disconnected,
                     agentsCountNeverConnected: data[4].body.data['Never connected'],
                     agentsCountTotal         : data[4].body.data.Total - 1,
-                    agentsCoverity           : ((data[4].body.data.Active - 1) / (data[4].body.data.Total - 1 )) * 100
+                    agentsCoverity           : (data[4].body.data.Total - 1) ? ((data[4].body.data.Active - 1) / (data[4].body.data.Total - 1 )) * 100 : 0
                 });
             }
 
