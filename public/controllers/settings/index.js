@@ -71,6 +71,7 @@ function ($scope, $routeParams, $window, $location, testAPI, appState, genericRe
             $scope.apiIsDown = false;
             $scope.isEditing = false;
             for(const key in $scope.showEditForm) $scope.showEditForm[key] = false;
+            $scope.$emit('updateAPI', {});
             errorHandler.info('The API was removed successfully','Settings');
             if(!$scope.$$phase) $scope.$digest();
             return;
