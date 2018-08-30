@@ -351,11 +351,11 @@ export default [
                               "disabled": false,
                               "alias": null,
                               "type": "exists",
-                              "key": "data.virustotal",
+                              "key": "data.virustotal.positives",
                               "value": "exists"
                             },
                             "exists": {
-                              "field": "data.virustotal"
+                              "field": "data.virustotal.positives"
                             },
                             "$state": {
                               "store": "appState"
