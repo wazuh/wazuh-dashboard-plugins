@@ -32,7 +32,7 @@
         md-selected-nav-item="tab"
         nav-bar-aria-label="Settings navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('api')" name="api">API</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('extensions')" name="extensions">Extensions</md-nav-item>
+        <md-nav-item class="wz-nav-item" ng-if="apiEntries && apiEntries.length" md-nav-click="switchTab('extensions')" name="extensions">Extensions</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pattern')" name="pattern">Pattern</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="config">Configuration</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
