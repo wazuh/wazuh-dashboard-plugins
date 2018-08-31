@@ -164,7 +164,7 @@ export default class WazuhApiElastic {
 
             const settings = this.buildSettingsObject(req.payload);
 
-            await this.wzWrapper.updateWazuhIndexDocument(req.payload.id, { doc: settings });
+            await this.wzWrapper.updateWazuhIndexDocument(req, { doc: settings });
 
             return reply({ statusCode: 200, message: 'ok' });
 
