@@ -173,7 +173,7 @@ class DevToolsController {
                 } catch(error) { 
                     affectedGroups.push(item.requestText);               
                     const msg = this.$document[0].createElement("div");
-                    msg.id = new Date().getTimDevToolsControllere()/1000;
+                    msg.id = new Date().getTime()/1000;
                     const icon = msg.appendChild(this.$document[0].createElement("div"));
           
                     icon.className = "lint-error-icon";
