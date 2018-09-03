@@ -14,8 +14,8 @@ import template        from './wz-table.html';
 import { uiModules }   from 'ui/modules';
 import DataFactory     from '../../services/data-factory';
 import KeyEquivalenece from '../../../util/csv-key-equivalence';
-import CheckRows       from './wz-table-rows'
-
+import CheckRows       from './wz-table-rows';
+import FilterHandler   from '../../utils/filter-handler';
 const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzTable', function() {
@@ -29,7 +29,32 @@ app.directive('wzTable', function() {
             rowSizes: '=rowSizes',
             extraLimit: '=extraLimit'
         },
-        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter, $window) {          
+        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter, $window, appState, globalState) {     
+            
+            if($scope.path.includes('/rules')) {
+                try {
+                    const filterHandler = new FilterHandler(appState.getCurrentPattern())
+
+                    const checkGlobalFilters = () => {
+                        if(!globalState.filters || !Array.isArray(globalState.filters) ){
+                            globalState.filters = [];
+                        }
+                    }
+
+                    $scope.searchRuleId = (e,ruleId) => {
+                        e.stopPropagation();
+                        checkGlobalFilters()
+                        const ruleIdFilter = filterHandler.ruleIdQuery(ruleId)
+                        if(globalState.filters.length) {
+                            globalState.filters = globalState.filters.filter(item => item && item.meta && item.meta.key !== 'rule.id')
+                        }
+                        globalState.filters.push(ruleIdFilter)
+                        $window.location.href = '#/wazuh-discover';
+                    }
+                    
+                } catch (error) { } // eslint-disable-line
+            }  
+               
             /**
              * Calculate number of table rows depending on the screen height 
              */
