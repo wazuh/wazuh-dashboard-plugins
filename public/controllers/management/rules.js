@@ -22,7 +22,7 @@ const colors = [
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('rulesController', function ($scope, $rootScope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
+app.controller('rulesController', function ($scope, $rootScope, $sce, errorHandler, appState, csvReq, wzTableFilter, $location, apiReq) {
 
     $scope.appliedFilters = [];
     $scope.search = term => {
@@ -148,4 +148,11 @@ app.controller('rulesController', function ($scope, $rootScope, $sce, errorHandl
         if(!$scope.$$phase) $scope.$digest();
     }
 
+    if($location.search() && $location.search().ruleid) {
+        const incomingRule = $location.search().ruleid;
+        $location.search('ruleid',null);
+        apiReq.request('get', `/rules/${incomingRule}`, {})
+        .then(data => $scope.$emit('wazuhShowRule',{rule: data.data.data.items[0]}))
+        .catch(error => errorHandler.handle(`Error fetching rule: ${incomingRule} from the Wazuh API`,'Ruleset'))
+    }
 });
