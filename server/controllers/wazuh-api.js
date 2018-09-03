@@ -14,23 +14,23 @@
 import needle               from 'needle';
 import pciRequirementsFile  from '../integration-files/pci-requirements';
 import gdprRequirementsFile from '../integration-files/gdpr-requirements';
-import ElasticWrapper       from '../lib/elastic-wrapper';
-import getPath              from '../../util/get-path';
+import { ElasticWrapper }   from '../lib/elastic-wrapper';
+import { getPath }          from '../../util/get-path';
 import packageInfo          from '../../package.json';
-import monitoring           from '../monitoring';
-import ErrorResponse        from './error-response';
+import { Monitoring }       from '../monitoring';
+import { ErrorResponse }    from './error-response';
 import { Parser }           from 'json2csv';
-import getConfiguration     from '../lib/get-configuration';
+import { getConfiguration } from '../lib/get-configuration';
 import { totalmem }         from 'os';
 import simpleTail           from 'simple-tail';
 import path                 from 'path';
-import log                  from '../logger';
+import { log }              from '../logger';
 import CsvKeys              from '../../util/csv-key-equivalence';
 
-export default class WazuhApi {
+export class WazuhApiCtrl {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
-        this.fetchAgentsExternal = monitoring(server,{disableCron:true})
+        this.fetchAgentsExternal = Monitoring(server,{disableCron:true})
     }
 
     async checkStoredAPI (req, reply) {

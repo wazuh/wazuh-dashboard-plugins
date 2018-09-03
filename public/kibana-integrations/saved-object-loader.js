@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { Scanner } from 'ui/utils/scanner';
 import { StringUtils } from 'ui/utils/string_utils';
 import { SavedObjectsClient } from 'ui/saved_objects';
-import { SavedObjectProvider } from './saved-objects';
+
 export class SavedObjectLoader {
   constructor(SavedObjectClass, kbnIndex, kbnUrl, $http, chrome ) {
     this.type = SavedObjectClass.type;
@@ -52,7 +52,7 @@ export class SavedObjectLoader {
               // just assign the defaults and be done
               _.assign(instance, instance.defaults);
               return instance.hydrateIndexPattern().then(() => {
-                return afterESResp.call(instance);
+                return afterESResp.call(instance); // eslint-disable-line
               });
             }
               return this.processFunc()

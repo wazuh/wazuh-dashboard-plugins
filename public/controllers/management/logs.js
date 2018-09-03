@@ -95,7 +95,7 @@ class Logs {
         try{   
             const data     = await this.apiReq.request('GET', '/manager/logs/summary', {});
             const daemons  = data.data.data;
-            this.$scope.daemons = Object.keys(daemons).map(item => { return { title: item } })
+            this.$scope.daemons = Object.keys(daemons).map(item => ({ title: item }))
             if(!this.$scope.$$phase) this.$scope.$digest();
             return;
         } catch (error) {

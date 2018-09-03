@@ -26,9 +26,11 @@
     },
     "homepage": "https://www.wazuh.com/",
     "scripts": {
+        "tslint": "tslint -c .tslint.yml server/**/*.ts server/**/*.tsx public/**/*.ts public/**/*.tsx",
         "lint": "eslint server/** server/*.js *.js public/**/*.js public/*.js util/*.js -c .eslintrc.json --color",
         "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
-        "build": "plugin-helpers build"
+        "build": "plugin-helpers build",
+        "test": "_mocha test/**/*"
     },
     "dependencies": {
         "angular-animate": "1.6.5",
@@ -53,6 +55,8 @@
         "eslint-plugin-async-await": "^0.0.0",
         "eslint-plugin-import": "^2.14.0",
         "eslint-plugin-node": "^7.0.1",
+        "mocha": "^5.2.0",
+        "chai": "^3.5.0",
         "tslint": "^5.11.0",
         "typescript": "^3.0.1",
         "typescript-eslint-parser": "^18.0.0"

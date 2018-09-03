@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import ElasticWrapper from '../lib/elastic-wrapper';
-import ErrorResponse  from './error-response';
-import log            from '../logger';
+import { ElasticWrapper }    from '../lib/elastic-wrapper';
+import { ErrorResponse } from './error-response';
+import { log }           from '../logger';
 
 import { 
     AgentsVisualizations, 
@@ -20,7 +20,7 @@ import {
 }  from '../integration-files/visualizations';
 
 
-export default class WazuhElastic {
+export class WazuhElasticCtrl {
     constructor(server){
         this.wzWrapper = new ElasticWrapper(server);
     }

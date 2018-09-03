@@ -18,7 +18,7 @@
  * wazuh-reporting   50XX
  * unknown           1000
  */
-export default (message = null, code = null, statusCode = null, reply) => {
+export function ErrorResponse (message = null, code = null, statusCode = null, reply) {
     let filteredMessage = '';
     if(code) {
         const isString = typeof message === 'string';
@@ -48,4 +48,4 @@ export default (message = null, code = null, statusCode = null, reply) => {
         statusCode: statusCode ? statusCode : 500
     })
     .code(statusCode ? statusCode : 500);
-};
+}
