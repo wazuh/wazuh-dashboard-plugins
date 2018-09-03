@@ -25,11 +25,15 @@ class NewConfigurationController {
         this.$scope.load    = true;
         this.$scope.isArray = Array.isArray;
         this.configRaw      = {};
-        this.$scope.configurationTab = 'welcome';
-        this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
-        this.$scope.switchItem             = item => this.switchItem(item);
-        this.$scope.getXML                 = name => this.getXML(name);
-        this.$scope.getJSON                = name => this.getJSON(name);
+
+        this.$scope.configurationTab    = 'welcome';
+        this.$scope.configurationSubTab = 'open-scap';
+
+        this.$scope.switchItem                = item => this.switchItem(item);
+        this.$scope.getXML                    = name => this.getXML(name);
+        this.$scope.getJSON                   = name => this.getJSON(name);
+        this.$scope.switchConfigurationTab    = configurationTab => this.switchConfigurationTab(configurationTab);
+        this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
     }
 
     /**
@@ -45,6 +49,15 @@ class NewConfigurationController {
      */
     switchConfigurationTab(configurationTab) {
         this.$scope.configurationTab = configurationTab;
+        if(!this.$scope.$$phase) this.$scope.$digest();
+    }
+
+    /**
+     * Switchs between configuration sections
+     * @param {*} configurationSubTab
+     */
+    switchConfigurationSubTab(configurationSubTab) {
+        this.$scope.configurationSubTab = configurationSubTab;
         if(!this.$scope.$$phase) this.$scope.$digest();
     }
 

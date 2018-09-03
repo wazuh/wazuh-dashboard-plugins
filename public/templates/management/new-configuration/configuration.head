@@ -12,14 +12,16 @@
             <!-- Welcome section -->
             <div ng-if="configurationTab === 'welcome'">
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
-                <span> / New configuration (Beta)</span>
+                <span> / </span>
+                <span>{{ tabNames[tab] }}</span>
             </div>
             <!-- First-level section -->
             <div ng-if="configurationTab !== 'welcome'">
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ tabNames[tab] }}</span>
-                <span> / {{ tabNames[configurationTab] }}</span>
+                <span> / </span>
+                <span>{{ tabNames[configurationTab] }}</span>
             </div>
         </div>
         <!-- End breadcrumbs -->
