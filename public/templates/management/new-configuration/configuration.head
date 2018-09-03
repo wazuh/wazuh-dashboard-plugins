@@ -4,3 +4,24 @@
     <div class='uil-ring-css' ng-show="load">
         <div></div>
     </div>
+
+    <!-- Navigation section (Breadcrumbs, etc) -->
+    <div layout="row" layout-align="start center" ng-if="!load">
+        <!-- Breadcrumbs -->
+        <div layout="row" layout-padding>
+            <!-- Welcome section -->
+            <div ng-if="configurationTab === 'welcome'">
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / New configuration (Beta)</span>
+            </div>
+            <!-- First-level section -->
+            <div ng-if="configurationTab !== 'welcome'">
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ tabNames[tab] }}</span>
+                <span> / {{ tabNames[configurationTab] }}</span>
+            </div>
+        </div>
+        <!-- End breadcrumbs -->
+    </div>
+    <!-- End navigation section -->

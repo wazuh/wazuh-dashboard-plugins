@@ -1,0 +1,100 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'cluster'">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Cluster</span>
+            <span class="wz-agent-status-indicator small teal">Enabled</span>
+        </div>
+        <span class="md-subheader">Deploy multiple managers and synchronize alerts between them</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- This section contains the main content and the right sidenav -->
+    <div layout="row">
+
+        <!-- This section is the main content -->
+        <div flex layout="column">
+
+            <!-- The main card will all the settings -->
+            <md-card class="wz-md-card">
+                <md-card-content>
+                    <span class="font-size-16">All settings</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div class="wz-padding-top-10">
+
+                        <wz-config-item
+                            label="Cluster status"
+                            value="enabled">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Cluster name"
+                            value="wazuh-cluster">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Node name"
+                            value="wazuh-node-01">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Node type"
+                            value="master">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Master node IP address"
+                            value="192.168.1.1">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Port to listen to cluster communications"
+                            value="1516">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="IP address to listen to cluster communications"
+                            value="0.0.0.0">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Hide cluster information in alerts"
+                            value="enabled">
+                        </wz-config-item>
+
+                    </div>
+                    <!-- End configuration block -->
+                </md-card-content>
+            </md-card>
+            <!-- End main card with all the settings-->
+
+        </div>
+        <!-- End main content section -->
+
+        <!-- This section is the right sidenav content -->
+        <md-sidenav
+            class="md-sidenav-right"
+            md-is-locked-open="true">
+            <md-list>
+                <md-subheader>Any questions?</md-subheader>
+                <md-list-item class="wz-text-link">How to configure the Wazuh cluster</md-list-item>
+                <md-list-item class="wz-text-link">Wazuh cluster reference</md-list-item>
+
+                <md-divider></md-divider>
+
+                <md-subheader>Having trouble?</md-subheader>
+                <md-list-item class="wz-text-link">Ask on the mailing list</md-list-item>
+                <md-list-item class="wz-text-link">Ask on GitHub</md-list-item>
+
+                <md-divider></md-divider>
+
+                <md-subheader>More options</md-subheader>
+                <md-list-item layout-wrap>
+                    <md-button class="wz-button md-raised md-primary small">Open JSON viewer</md-button>
+                    <md-button class="wz-button md-raised md-primary small">Open XML viewer</md-button>
+                    <md-button class="wz-button md-raised md-primary small">Open Monitoring tab</md-button>
+                </md-list-item>
+            </md-list>
+        </md-sidenav>
+        <!-- End right sidenav section -->
+
+    </div>
+    <!-- End main content and right sidenav section -->
+
+</div>

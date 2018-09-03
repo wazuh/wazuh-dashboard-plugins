@@ -27,9 +27,9 @@ class NewConfigurationController {
         this.configRaw      = {};
         this.$scope.configurationTab = 'welcome';
         this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
-        this.$scope.switchItem = item => this.switchItem(item);
-        this.$scope.getXML     = name => this.getXML(name);
-        this.$scope.getJSON    = name => this.getJSON(name);
+        this.$scope.switchItem             = item => this.switchItem(item);
+        this.$scope.getXML                 = name => this.getXML(name);
+        this.$scope.getJSON                = name => this.getJSON(name);
     }
 
     /**
