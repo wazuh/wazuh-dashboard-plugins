@@ -25,8 +25,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 3.6.0
-- Wazuh RESTful API 3.6.0
+- Wazuh HIDS 3.6.1
+- Wazuh RESTful API 3.6.1
 - Kibana 6.3.2
 - Elasticsearch 6.3.2
 
@@ -35,7 +35,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 Install the app
 
 ```
-/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.0_6.3.2.zip
+/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.3.2.zip
 ```
 
 Restart Kibana
@@ -83,7 +83,7 @@ rm -rf /usr/share/kibana/optimize/bundles
 Install the app
 
 ```
-/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.0_6.3.2.zip
+/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.3.2.zip
 ```
 
 Restart Kibana
@@ -133,6 +133,9 @@ service kibana restart
 |      6.3.2     |       3.4.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.4.0_6.3.2.zip> |
 |      6.3.2     |       3.5.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.5.0_6.3.2.zip> |
 |      6.3.2     |       3.6.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.0_6.3.2.zip> |
+|      6.4.0     |       3.6.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.0_6.4.0.zip> |
+|      6.3.2     |       3.6.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.3.2.zip> |
+|      6.4.0     |       3.6.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.0.zip> |
 
 ## Contribute
 

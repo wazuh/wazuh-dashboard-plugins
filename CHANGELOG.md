@@ -2,6 +2,22 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.6.1 - Kibana v6.3.2 - Revision 408
+
+### Added
+
+-   Support for Wazuh v3.6.1.
+
+### Fixed
+
+-   Fixed a bug on the _Dev tools_ tab ([4ca9ed5](https://github.com/wazuh/wazuh-kibana-app/commit/4ca9ed54f1b18e5d499d950e6ff0741946701988)).
+
+## Wazuh v3.6.0 - Kibana v6.4.0 - Revision 407
+
+### Added
+
+-   Support for Wazuh v3.6.0.
+
 ## Wazuh v3.6.0 - Kibana v6.3.2 - Revision 406
 
 ### Added
