@@ -11,13 +11,13 @@
     <!-- End headline -->
 
     <!-- This section contains the main content and the right sidenav -->
-    <div layout="row">
+    <div flex="auto" layout="row">
 
         <!-- This section is the main content -->
         <div flex layout="column">
 
             <!-- The main card will all the settings -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
                 <md-card-content>
                     <span class="font-size-16">All settings</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -62,7 +62,37 @@
                     <!-- End configuration block -->
                 </md-card-content>
             </md-card>
-            <!-- End main card with all the settings-->
+            <!-- End main card with all the settings -->
+
+            <!-- JSON card -->
+            <md-card flex="auto" class="wz-md-card" ng-if="JSONContent">
+                <md-card-content flex layout="column">
+                    <span class="font-size-16">JSON mode</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- The JSON viewer -->
+                    <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
+                        <pre><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- End JSON viewer -->
+                </md-card-content>
+            </md-card>
+            <!-- End JSON card -->
+
+            <!-- JSON card -->
+            <md-card flex="auto" class="wz-md-card" ng-if="XMLContent">
+                <md-card-content flex layout="column">
+                    <span class="font-size-16">XML mode</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- The JSON viewer -->
+                    <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
+                        <pre>{{ XMLContent }}</pre>
+                    </div>
+                    <!-- End JSON viewer -->
+                </md-card-content>
+            </md-card>
+            <!-- End JSON card -->
 
         </div>
         <!-- End main content section -->
@@ -85,10 +115,40 @@
                 <md-divider></md-divider>
 
                 <md-subheader>More options</md-subheader>
+                <md-list-item>
+                    <span flex></span>
+                    <md-button ng-class="JSONContent ? 'active' : ''" class="md-icon-button wz-button md-raised md-primary" ng-click="getJSON('cluster')"><i class="fa fa-fw fa-file-code-o" aria-hidden="true"></i></md-button>
+                    <span flex></span>
+                    <md-button ng-class="XMLContent ? 'active' : ''" class="md-icon-button wz-button md-raised md-primary" ng-click="getXML('cluster')"><i class="fa fa-fw fa-code" aria-hidden="true"></i></md-button>
+                    <span flex></span>
+                    <md-button ng-href="#/manager/monitoring" class="md-icon-button wz-button md-raised md-primary"><i class="fa fa-fw fa-external-link" aria-hidden="true"></i></md-button>
+                    <span flex></span>
+                </md-list-item>
+
+                <md-list-item>
+                    <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('cluster')"><i class="fa fa-fw fa-code" aria-hidden="true"></i> {{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
+                </md-list-item>
+                <md-list-item>
+                    <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('cluster')"><i class="fa fa-fw fa-code" aria-hidden="true"></i> {{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
+                </md-list-item>
+                <md-list-item>
+                    <md-button ng-href="#/manager/monitoring" class="wz-button md-raised md-primary small"><i class="fa fa-fw fa-share" aria-hidden="true"></i> Open Monitoring tab</md-button>
+                </md-list-item>
+
+                <md-list-item class="wz-text-link" ng-click="getJSON('cluster')">
+                    <i class="fa fa-fw fa-code" aria-hidden="true"></i> {{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}
+                </md-list-item>
+                <md-list-item class="wz-text-link" ng-click="getXML('cluster')">
+                    <i class="fa fa-fw fa-code" aria-hidden="true"></i> {{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}
+                </md-list-item>
+                <md-list-item class="wz-text-link" ng-href="#/manager/monitoring">
+                    <i class="fa fa-fw fa-share" aria-hidden="true"></i> Open Monitoring tab
+                </md-list-item>
+
                 <md-list-item layout-wrap>
-                    <md-button class="wz-button md-raised md-primary small">Open JSON viewer</md-button>
-                    <md-button class="wz-button md-raised md-primary small">Open XML viewer</md-button>
-                    <md-button class="wz-button md-raised md-primary small">Open Monitoring tab</md-button>
+                    <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('cluster')"><i class="fa fa-fw fa-code" aria-hidden="true"></i> {{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
+                    <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('cluster')"><i class="fa fa-fw fa-code" aria-hidden="true"></i> {{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
+                    <md-button ng-href="#/manager/monitoring" class="wz-button md-raised md-primary small"><i class="fa fa-fw fa-share" aria-hidden="true"></i> Open Monitoring tab</md-button>
                 </md-list-item>
             </md-list>
         </md-sidenav>
