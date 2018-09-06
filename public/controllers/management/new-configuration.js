@@ -48,6 +48,8 @@ class NewConfigurationController {
      * @param {*} configurationTab
      */
     switchConfigurationTab(configurationTab) {
+        this.$scope.XMLContent   = false;
+        this.$scope.JSONContent  = false;
         this.$scope.configurationTab = configurationTab;
         if(!this.$scope.$$phase) this.$scope.$digest();
     }
@@ -57,6 +59,8 @@ class NewConfigurationController {
      * @param {*} configurationSubTab
      */
     switchConfigurationSubTab(configurationSubTab) {
+        this.$scope.XMLContent   = false;
+        this.$scope.JSONContent  = false;
         this.$scope.configurationSubTab = configurationSubTab;
         if(!this.$scope.$$phase) this.$scope.$digest();
     }
@@ -82,7 +86,12 @@ class NewConfigurationController {
             this.$scope.XMLContent = false;
         } else {
             try {
-                this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse(name, this.configRaw[name]));
+                if (name) {
+                    this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse(name, this.configRaw[name]));
+                }
+                else {
+                    this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse('configuration', this.configRaw));
+                }
             } catch (error) { this.$scope.XMLContent = false; }
         }
         if(!this.$scope.$$phase) this.$scope.$digest();
@@ -98,7 +107,12 @@ class NewConfigurationController {
             this.$scope.JSONContent = false;
         } else {
             try {
-                this.$scope.JSONContent = beautifier.prettyPrint(this.configRaw[name]);
+                if (name) {
+                    this.$scope.JSONContent = beautifier.prettyPrint(this.configRaw[name]);
+                }
+                else {
+                    this.$scope.JSONContent = beautifier.prettyPrint(this.configRaw);
+                }
             } catch (error) { this.$scope.JSONContent = false; }
         }
         if(!this.$scope.$$phase) this.$scope.$digest();
@@ -135,7 +149,6 @@ class NewConfigurationController {
                 }
             }
 
-            this.$scope.raw  = beautifier.prettyPrint(data.data.data);
             this.$scope.load = false;
             if(!this.$scope.$$phase) this.$scope.$digest();
             return;
