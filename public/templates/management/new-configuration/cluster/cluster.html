@@ -115,6 +115,11 @@
                 <md-divider></md-divider>
 
                 <md-subheader>More options</md-subheader>
+                <div layout="row" layout-align="center center">
+                    <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button wz-button-group md-raised small left" ng-click="getJSON('cluster')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
+                    <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button wz-button-group md-raised small right" ng-click="getXML('cluster')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
+                </div>
+
                 <md-list-item>
                     <span flex></span>
                     <md-button ng-class="JSONContent ? 'active' : ''" class="md-icon-button wz-button md-raised md-primary" ng-click="getJSON('cluster')"><i class="fa fa-fw fa-file-code-o" aria-hidden="true"></i></md-button>
