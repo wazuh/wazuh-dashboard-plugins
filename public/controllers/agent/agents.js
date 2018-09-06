@@ -162,6 +162,43 @@ function (
         $scope.agent.syscheck = result;
     }
 
+    const loadSyscollector = async id => {
+        try {
+            const data = await Promise.all([
+                apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
+                apiReq.request('GET', `/syscollector/${id}/os`, {}),
+                apiReq.request('GET', `/syscollector/${id}/netiface`, {}),
+                apiReq.request('GET', `/syscollector/${id}/ports`, {}),
+                apiReq.request('GET', `/syscollector/${id}/packages`, {limit:1,select:'scan_time'})
+            ])
+            if(!data[0] || !data[0].data || !data[0].data.data || typeof data[0].data.data !== 'object' || !Object.keys(data[0].data.data).length ||
+               !data[1] || !data[1].data || !data[1].data.data || typeof data[1].data.data !== 'object' || !Object.keys(data[1].data.data).length){
+                $scope.syscollector = null;
+            } else {
+                const netiface = {};
+                const ports    = {};
+                const packagesDate = {};
+                if(data[2] && data[2].data && data[2].data.data) Object.assign(netiface,data[2].data.data)
+                if(data[3] && data[3].data && data[3].data.data) Object.assign(ports,data[3].data.data)
+                if(data[4] && data[4].data && data[4].data.data) Object.assign(packagesDate,data[4].data.data)
+                $scope.syscollector = {
+                    hardware: data[0].data.data,
+                    os: data[1].data.data,
+                    netiface: netiface,
+                    ports: ports,
+                    packagesDate: packagesDate && packagesDate.items && packagesDate.items.length ?
+                                  packagesDate.items[0].scan_time :
+                                  'Unknown'
+                };
+            }
+
+            return;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
     $scope.getAgent = async newAgentId => {
         try {
             $scope.load = true;
