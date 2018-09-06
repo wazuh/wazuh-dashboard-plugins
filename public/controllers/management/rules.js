@@ -152,7 +152,11 @@ app.controller('rulesController', function ($scope, $rootScope, $sce, errorHandl
         const incomingRule = $location.search().ruleid;
         $location.search('ruleid',null);
         apiReq.request('get', `/rules/${incomingRule}`, {})
-        .then(data => $scope.$emit('wazuhShowRule',{rule: data.data.data.items[0]}))
+        .then(data => {
+            $scope.currentRule = data.data.data.items[0];
+            $scope.viewingDetail = true;
+            if(!$scope.$$phase) $scope.$digest();  
+        })
         .catch(error => errorHandler.handle(`Error fetching rule: ${incomingRule} from the Wazuh API`,'Ruleset'))
     }
 });
