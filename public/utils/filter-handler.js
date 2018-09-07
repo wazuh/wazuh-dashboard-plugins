@@ -81,6 +81,21 @@ export class FilterHandler {
         return result;
     }
 
+    ruleIdQuery(ruleId) {
+        const result = this.base();
+        result.meta.removable = true;
+        result.meta.key = 'rule.id';
+        result.meta.value = ruleId;
+        result.meta.params.query = ruleId;
+        result.query.match = {
+            'rule.id': {
+                query: ruleId,
+                type: 'phrase'
+            }
+        };
+        return result;
+    }
+
     managerQuery(manager,isCluster) {
         const result = this.base();
         result.meta.key = isCluster ? 'cluster.name' : 'manager.name';
