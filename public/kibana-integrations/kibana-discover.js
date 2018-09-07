@@ -69,14 +69,13 @@ import { BasicResponseHandlerProvider } from 'ui/vis/response_handlers/basic';
 import { DocTitleProvider } from 'ui/doc_title';
 import PluginsKibanaDiscoverHitSortFnProvider from 'plugins/kibana/discover/_hit_sort_fn';
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
-import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
 import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
 import { FilterManagerProvider } from 'ui/filter_manager';
 import { visualizationLoader } from 'ui/visualize/loader/visualization_loader';
 import { getDocLink } from 'ui/documentation_links';
 
-import 'ui/courier/search_strategy/default_search_strategy'
+import 'ui/courier/search_strategy/default_search_strategy';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -413,7 +412,7 @@ $scope.toggleRefresh = () => {
             ////////////////////////////////////////////////////////////////////////////
 
             $state.save();
-          }).catch(console.error);
+          }).catch(console.error); // eslint-disable-line
         });
 
         // update data source when hitting forward/back and the query changes
@@ -689,7 +688,7 @@ $scope.toggleRefresh = () => {
         const fields = _.keys(indexPattern.flattenHit(hit));
         let n = fields.length;
         let field;
-        while (field = fields[--n]) {
+        while (field = fields[--n]) { // eslint-disable-line
           if (counts[field]) counts[field] += 1;
           else counts[field] = 1;
         }
@@ -921,7 +920,7 @@ $scope.toggleRefresh = () => {
 
       queryFilter.addFilters(wzCurrentFilters)
       .then(() => { })
-      .catch(error => console.log(error.message || error));
+      .catch(error => console.log(error.message || error)); // eslint-disable-line
     }
   };
 

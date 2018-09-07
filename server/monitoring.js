@@ -9,19 +9,19 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import cron               from 'node-cron'
-import needle             from 'needle'
-import getPath            from'../util/get-path'
-import colors             from 'ansicolors'
-import log                from './logger'
-import ElasticWrapper     from './lib/elastic-wrapper'
-import monitoringTemplate from './integration-files/monitoring-template'
-import packageJSON        from '../package.json'
-import getConfiguration   from './lib/get-configuration'
-import parseCron          from './lib/parse-cron'
-import { BuildBody }      from './lib/replicas-shards-helper'
+import cron                 from 'node-cron'
+import needle               from 'needle'
+import { getPath }          from'../util/get-path'
+import colors               from 'ansicolors'
+import { log }              from './logger'
+import { ElasticWrapper }   from './lib/elastic-wrapper'
+import monitoringTemplate   from './integration-files/monitoring-template'
+import packageJSON          from '../package.json'
+import { getConfiguration } from './lib/get-configuration'
+import { parseCron }        from './lib/parse-cron'
+import { BuildBody }        from './lib/replicas-shards-helper'
 
-export default (server, options) => {
+export function Monitoring (server, options) {
     const blueWazuh = colors.blue('wazuh');
 
     let ENABLED   = true;
@@ -280,7 +280,7 @@ export default (server, options) => {
                 }
                 if (body === '') return;
 
-                const response = await wzWrapper.pushBulkAnyIndex(todayIndex,body);
+                await wzWrapper.pushBulkAnyIndex(todayIndex,body);
 
                 agentsArray.length = 0;
             }
@@ -341,7 +341,7 @@ export default (server, options) => {
         try {
             log('[monitoring][checkTemplate]', 'Updating wazuh-monitoring template...', 'info');
             server.log([blueWazuh, 'monitoring', 'info'], "Updating wazuh-monitoring template...");
-            const data = await wzWrapper.putMonitoringTemplate(monitoringTemplate);
+            await wzWrapper.putMonitoringTemplate(monitoringTemplate);
             return;
         } catch(error){
             log('[monitoring][checkTemplate]', `Something went wrong updating wazuh-monitoring template... ${error.message || error}`);
@@ -452,4 +452,4 @@ export default (server, options) => {
     // Cron tab for getting agent status.
     if(!options && ENABLED) cron.schedule(CRON_FREQ, cronTask, true);
     return fetchAgentsExternal;
-};
+}

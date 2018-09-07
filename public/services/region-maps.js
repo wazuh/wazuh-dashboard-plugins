@@ -18,20 +18,20 @@ app
 .service('regionmapsConfig', function () {
     return {
         // Intended noop function and empty array
-        noop: () => {},
+        noop() {},
         layers: []
     }
 })
 .service('mapConfig', function () {
     return {
         // Intended noop function 
-        noop: () => {}
+        noop() {}
     }
 })
 .service('tilemapsConfig', function () {
     return {
         // Intended noop function and false properties
-        noop: () => {},
+        noop() {},
         deprecated: {
             config: {
                 options: false

@@ -9,10 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import ElasticWrapper from '../lib/elastic-wrapper';
+import { ElasticWrapper } from '../lib/elastic-wrapper';
 import Base from './base-query';
 
-export default class GdprRequest {
+export class GdprRequest {
     /**
      * Constructor
      * @param {*} server Hapi.js server object provided by Kibana

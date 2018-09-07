@@ -80,12 +80,12 @@ app.controller('agentsPreviewController', function ($scope, $routeParams, generi
                 genericReq.request('GET', '/api/wazuh-api/agents-unique/' + api, {}),
                 genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`)                
             ]);
-            
-            const unique = data[0].data.result;
+            const [agentsUnique,agentsTop] = data;
+            const unique = agentsUnique.data.result;
 
             $scope.groups                    = unique.groups;
-            $scope.nodes                     = unique.nodes.map(item => { return {id: item} });
-            $scope.versions                  = unique.versions.map(item => { return {id: item} });
+            $scope.nodes                     = unique.nodes.map(item => ({id: item}));
+            $scope.versions                  = unique.versions.map(item => ({id: item}));
             $scope.osPlatforms               = unique.osPlatforms;
             $scope.lastAgent                 = unique.lastAgent;
             $scope.agentsCountActive         = unique.summary.agentsCountActive;
@@ -94,11 +94,11 @@ app.controller('agentsPreviewController', function ($scope, $routeParams, generi
             $scope.agentsCountTotal          = unique.summary.agentsCountTotal;
             $scope.agentsCoverity            = unique.summary.agentsCoverity;
 
-            if (data[1].data.data === '') {
+            if (agentsTop.data.data === '') {
                 $scope.mostActiveAgent.name = appState.getClusterInfo().manager;
                 $scope.mostActiveAgent.id   = '000';
             } else {
-                $scope.mostActiveAgent.name = data[1].data.data;
+                $scope.mostActiveAgent.name = agentsTop.data.data;
                 const info = await genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`);
                 if (info.data.data === '' && $scope.mostActiveAgent.name !== '') {
                     $scope.mostActiveAgent.id = '000';

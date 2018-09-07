@@ -22,7 +22,7 @@ export default id => {
         html.split('ng-non-bindable')[1].split('>')[1].split('</') && 
         html.split('ng-non-bindable')[1].split('>')[1].split('</')[0]) {
 
-        return html.split('ng-non-bindable')[1].split('>')[1].split('</')[0]
+        return html.split('ng-non-bindable')[1].split('>')[1].split('</')[0];
     
     }
 
@@ -40,4 +40,4 @@ export default id => {
         }
     }
     return '';
-}
+};
