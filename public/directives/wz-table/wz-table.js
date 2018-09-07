@@ -15,7 +15,7 @@ import { uiModules }   from 'ui/modules';
 import DataFactory     from '../../services/data-factory';
 import KeyEquivalenece from '../../../util/csv-key-equivalence';
 import CheckRows       from './wz-table-rows';
-import FilterHandler   from '../../utils/filter-handler';
+import { FilterHandler }   from '../../utils/filter-handler';
 const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzTable', function() {
