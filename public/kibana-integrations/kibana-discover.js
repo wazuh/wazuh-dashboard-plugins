@@ -405,7 +405,7 @@ $scope.toggleRefresh = () => {
             if($location.search().tab != 'configuration') {
               loadedVisualizations.removeAll();
               $rootScope.rendered = false;
-              $rootScope.loadingStatus = "DEBUG 410 Fetching data...";
+              $rootScope.loadingStatus = "Fetching data...";
             }
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
