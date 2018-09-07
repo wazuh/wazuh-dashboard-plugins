@@ -29,32 +29,8 @@ app.directive('wzTable', function() {
             rowSizes: '=rowSizes',
             extraLimit: '=extraLimit'
         },
-        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter, $window, appState, globalState) {     
-            
-            if($scope.path.includes('/rules')) {
-                try {
-                    const filterHandler = new FilterHandler(appState.getCurrentPattern())
+        controller($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter, $window, appState, globalState) {          
 
-                    const checkGlobalFilters = () => {
-                        if(!globalState.filters || !Array.isArray(globalState.filters) ){
-                            globalState.filters = [];
-                        }
-                    }
-
-                    $scope.searchRuleId = (e,ruleId) => {
-                        e.stopPropagation();
-                        checkGlobalFilters()
-                        const ruleIdFilter = filterHandler.ruleIdQuery(ruleId)
-                        if(globalState.filters.length) {
-                            globalState.filters = globalState.filters.filter(item => item && item.meta && item.meta.key !== 'rule.id')
-                        }
-                        globalState.filters.push(ruleIdFilter)
-                        $window.location.href = '#/wazuh-discover';
-                    }
-                    
-                } catch (error) { } // eslint-disable-line
-            }  
-               
             /**
              * Calculate number of table rows depending on the screen height 
              */
@@ -90,6 +66,30 @@ app.directive('wzTable', function() {
                     $scope.$emit('wazuhShowClusterNode',{node:item})
                 }
             };
+
+            if($scope.path.includes('/rules')) {
+                try {
+                    const filterHandler = new FilterHandler(appState.getCurrentPattern())
+
+                    const checkGlobalFilters = () => {
+                        if(!globalState.filters || !Array.isArray(globalState.filters) ){
+                            globalState.filters = [];
+                        }
+                    }
+
+                    $scope.searchRuleId = (e,ruleId) => {
+                        e.stopPropagation();
+                        checkGlobalFilters()
+                        const ruleIdFilter = filterHandler.ruleIdQuery(ruleId)
+                        if(globalState.filters.length) {
+                            globalState.filters = globalState.filters.filter(item => item && item.meta && item.meta.key !== 'rule.id')
+                        }
+                        globalState.filters.push(ruleIdFilter)
+                        $window.location.href = '#/wazuh-discover';
+                    }
+                    
+                } catch (error) { } // eslint-disable-line
+            }  
 
             let realTime = false;
 
@@ -347,13 +347,13 @@ app.directive('wzTable', function() {
                         checkIfArray(item[key.value || key]) || '---';
             };
         },
-        template: template
+        template
     }
 })
 .service('wzTableFilter',() => {
     const filters = [];
     return {
-        set: array => { if(Array.isArray(array)) { filters.length = 0; filters.push(...array); } },
-        get: () => filters
+        set (array) { if(Array.isArray(array)) { filters.length = 0; filters.push(...array); } },
+        get () { return filters }
     };
 });

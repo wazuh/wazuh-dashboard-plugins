@@ -9,13 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier     from '../../utils/json-beautifier';
-import { uiModules }  from 'ui/modules';
-import FilterHandler  from '../../utils/filter-handler';
-import generateMetric from '../../utils/generate-metric';
-import TabNames       from '../../utils/tab-names';
-import * as FileSaver from '../../services/file-saver';
-import TabDescription from '../../../server/reporting/tab-description';
+import beautifier        from '../../utils/json-beautifier';
+import { uiModules }     from 'ui/modules';
+import { FilterHandler } from '../../utils/filter-handler';
+import generateMetric    from '../../utils/generate-metric';
+import TabNames          from '../../utils/tab-names';
+import * as FileSaver    from '../../services/file-saver';
+import TabDescription    from '../../../server/reporting/tab-description';
 
 import { 
     metricsAudit, 
@@ -162,6 +162,29 @@ function (
         $scope.agent.syscheck = result;
     }
 
+    const loadSyscollector = async id => {
+        try {
+            const data = await Promise.all([
+                apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
+                apiReq.request('GET', `/syscollector/${id}/os`, {})
+            ])
+            if(!data[0] || !data[0].data || !data[0].data.data || typeof data[0].data.data !== 'object' || !Object.keys(data[0].data.data).length ||
+               !data[1] || !data[1].data || !data[1].data.data || typeof data[1].data.data !== 'object' || !Object.keys(data[1].data.data).length){
+                $scope.syscollector = null;
+            } else {
+                $scope.syscollector = {
+                    hardware: data[0].data.data,
+                    os: data[1].data.data
+                };
+            }
+
+            return;
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
     $scope.getAgent = async newAgentId => {
         try {
             $scope.load = true;
@@ -169,18 +192,17 @@ function (
 
             const globalAgent = shareAgent.getAgent()
 
-            if($scope.tab === 'configuration'){
-                return $scope.getAgentConfig(newAgentId);
-            }
-
             const id = commonData.checkLocationAgentId(newAgentId, globalAgent)
+
+            if($scope.tab === 'configuration'){
+                await loadSyscollector(id)
+                return $scope.getAgentConfig(id);
+            }
 
             const data = await Promise.all([
                 apiReq.request('GET', `/agents/${id}`, {}),
                 apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-                apiReq.request('GET', `/rootcheck/${id}/last_scan`, {}),
-                apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
-                apiReq.request('GET', `/syscollector/${id}/os`, {})
+                apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
             ]);
 
             // Agent
@@ -200,15 +222,7 @@ function (
 
             $scope.switchTab($scope.tab, true);
 
-            if(!data[3] || !data[3].data || !data[3].data.data || typeof data[3].data.data !== 'object' || !Object.keys(data[3].data.data).length ||
-               !data[4] || !data[4].data || !data[4].data.data || typeof data[4].data.data !== 'object' || !Object.keys(data[4].data.data).length){
-                $scope.syscollector = null;
-            } else {
-                $scope.syscollector = {
-                    hardware: data[3].data.data,
-                    os: data[4].data.data
-                };
-            }
+            await loadSyscollector(id);
 
             $scope.load = false;
             if(!$scope.$$phase) $scope.$digest();

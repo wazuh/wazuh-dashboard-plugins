@@ -11,7 +11,7 @@
  */
 
 // Imports the init module
-import init from './init';
+import { initApp } from './init';
 
 export default kibana => new kibana.Plugin({
     id: 'wazuh',
@@ -26,6 +26,5 @@ export default kibana => new kibana.Plugin({
             main: 'plugins/wazuh/app'
         }
     },
-    init: (server,options) => init(server,options)
-    
+    init(server,options) { return initApp(server,options) }
 });

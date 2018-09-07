@@ -22,6 +22,7 @@ import 'uiExports/managementSections'
 import 'uiExports/devTools'
 import 'uiExports/docViews'
 import 'uiExports/embeddableFactories'
+import 'uiExports/autocompleteProviders'
 
 // Require CSS
 import './less/loader';

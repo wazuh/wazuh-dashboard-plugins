@@ -13,7 +13,7 @@ import fs   from 'fs'
 import yml  from 'js-yaml'
 import path from 'path'
 
-export default () => {
+export function getConfiguration() {
     try {
         const customPath = path.join(__dirname, '../../config.yml');
         const raw        = fs.readFileSync(customPath, { encoding: 'utf-8' })

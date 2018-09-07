@@ -1,7 +1,7 @@
 export default { 
     encode: text => {
-
-        if (/([^\u0000-\u00ff])/.test(text)){
+        const textRegex = /([^\u0000-\u00ff])/; // eslint-disable-line
+        if (textRegex.test(text)){
             throw new Error("Can't base64 encode non-ASCII characters.");
         } 
 
@@ -46,8 +46,8 @@ export default {
     decode: text => {
 
         text = text.replace(/\s/g,"");
-
-        if(!(/^[a-z0-9\-_\s]+\={0,2}$/i.test(text)) || text.length % 4 > 0){
+        const textRegex = /^[a-z0-9\-_\s]+\={0,2}$/i; // eslint-disable-line
+        if(!(textRegex.test(text)) || text.length % 4 > 0){
             throw new Error("Not a base64-encoded string.");
         }   
 

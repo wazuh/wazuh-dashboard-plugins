@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-import ElasticWrapper from '../lib/elastic-wrapper';
-import ErrorResponse  from './error-response';
-import log            from '../logger';
+import { ElasticWrapper }    from '../lib/elastic-wrapper';
+import { ErrorResponse } from './error-response';
+import { log }           from '../logger';
 
 const userRegEx  = new RegExp(/^.{3,100}$/);
 const passRegEx  = new RegExp(/^.{3,100}$/);
@@ -20,7 +20,7 @@ const urlRegEx   = new RegExp(/^https?:\/\/[a-zA-Z0-9-.]{1,300}$/);
 const urlRegExIP = new RegExp(/^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/);
 const portRegEx  = new RegExp(/^[0-9]{2,5}$/);
 
-export default class WazuhApiElastic {
+export class WazuhApiElasticCtrl {
     constructor(server) {
         this.wzWrapper = new ElasticWrapper(server);
     }
@@ -164,7 +164,7 @@ export default class WazuhApiElastic {
 
             const settings = this.buildSettingsObject(req.payload);
 
-            await this.wzWrapper.updateWazuhIndexDocument(req.payload.id, { doc: settings });
+            await this.wzWrapper.updateWazuhIndexDocument(req, { doc: settings });
 
             return reply({ statusCode: 200, message: 'ok' });
 
