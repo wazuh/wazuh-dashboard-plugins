@@ -101,7 +101,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">{{ tabNames['general'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">{{ tabNames['fim'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="configuration">{{ tabNames['configuration'] }}</md-nav-item>
-        <md-nav-item ng-show="syscollector && syscollector.os && syscollector.hardware" class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">{{ tabNames['syscollector'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">{{ tabNames['syscollector'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Host monitoring navigation bar -->
 

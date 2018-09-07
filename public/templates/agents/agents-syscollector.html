@@ -13,7 +13,7 @@
         </md-card>
     </div>
 
-    <div layout="row" class="inventory-metrics">
+    <div layout="row" class="inventory-metrics" ng-if="syscollector">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
                 <div flex="10">Cores: <span class="wz-text-bold">{{ syscollector.hardware.cpu.cores }}</span></div>
@@ -81,7 +81,7 @@
         </md-card>
     </div>
 
-    <div layout="row" class="layout-padding wz-padding-top-0">
+    <div layout="row" class="layout-padding wz-padding-top-0" ng-if="syscollector">
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-cubes"></i> Packages</span>
