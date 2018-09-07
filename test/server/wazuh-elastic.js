@@ -1,6 +1,6 @@
 const chai   = require('chai');
 const needle = require('needle')
-
+const { version, revision } = require('../../package.json')
 chai.should();
 
 const headers = {headers: {'kbn-xsrf': 'kibana', 'Content-Type': 'application/json'}}
@@ -76,8 +76,8 @@ describe('wazuh-elastic', () => {
             res.body.statusCode.should.be.eql(200)
             res.body.data.should.be.a('object')
             res.body.data.name.should.be.eql('Wazuh App')
-            res.body.data['app-version'].should.be.eql('3.6.0')
-            res.body.data.revision.should.be.eql('0407')
+            res.body.data['app-version'].should.be.eql(version)
+            res.body.data.revision.should.be.eql(revision)
             res.body.data.installationDate.should.be.a('string')
             res.body.data.lastRestart.should.be.a('string')                
         })
