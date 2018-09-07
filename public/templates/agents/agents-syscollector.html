@@ -1,4 +1,5 @@
 <md-content layout="column" ng-if="tab === 'syscollector'" ng-show="!load">
+    
     <div layout="row" layout-align="layout-padding" ng-if="!syscollector">
         <md-card flex class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
@@ -11,101 +12,94 @@
             </md-card-content>
         </md-card>
     </div>
-    <div layout="row" class="layout-padding" ng-if="syscollector">
+
+    <div layout="row" class="inventory-metrics">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div flex="10">Cores: <span class="wz-text-bold">{{ syscollector.hardware.cpu.cores }}</span></div>
+                <div flex="15">Memory: <span class="wz-text-bold">{{ (syscollector.hardware.ram.total / 1024) | number: 2 }} MB</span></div>
+                <div flex="10">Arch: <span class="wz-text-bold">{{ syscollector.os.architecture }}</span></div>
+                <div flex>OS: <span class="wz-text-bold">{{ syscollector.os.os.name }} {{ syscollector.os.os.version }}</span></div>
+                <div flex>CPU: <span class="wz-text-bold">{{ syscollector.hardware.cpu.name }}</span></div>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="syscollector">
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title">OS information</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-sitemap"></i> Network interfaces</span>
+                <span class="color-grey pull-right">Last scan: {{syscollector.netiface.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>Scan date</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.os.scan.time }}</span>
-                </div>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>Sysname</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.os.sysname }}</span>
-                </div>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>Version</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.os.version }}</span>
-                </div>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>Architecture</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.os.architecture }}</span>
-                </div>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>Release</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.os.release }}</span>
-                </div>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>Distribution</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.os.os.name }} {{ syscollector.os.os.version }}</span>
-                </div>
 
+                <table class="table table-striped table-condensed table-layout-fixed">
+                    <thead class="wz-text-bold">
+                        <th class="wz-text-left">Name</th>
+                        <th class="wz-text-left">Mac</th>
+                        <th class="wz-text-left">State</th>
+                        <th class="wz-text-left">MTU</th>
+                        <th class="wz-text-left">Type</th>
+                    </thead>
+                    <tbody>
+                        <tr class="wz-word-wrap" ng-repeat="interface in syscollector.netiface.items">
+                            <td>{{interface.name}}</td>
+                            <td>{{interface.mac}}</td>
+                            <td>
+                                <svg ng-if="interface.state !== 'up'" class="euiIcon euiIcon--medium euiIcon--warning" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><circle id="dot-a" cx="8" cy="8" r="4"></circle></defs><use xlink:href="#dot-a"></use></svg>
+                                <svg ng-if="interface.state === 'up'" class="euiIcon euiIcon--medium euiIcon--success" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><circle id="dot-a" cx="8" cy="8" r="4"></circle></defs><use xlink:href="#dot-a"></use></svg>
+                                 {{interface.state}}
+                            </td>
+                            <td>{{interface.mtu}}</td>
+                            <td>{{interface.type}}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card" ng-if="syscollector">
+        <md-card flex class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title">Hardware information</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
+                <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>Scan date</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.hardware.scan.time }}</span>
-                </div>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>Board</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.hardware.board_serial }}</span>
-                </div>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>RAM</span>
-                    <span flex class="wz-text-right color-grey">{{ (syscollector.hardware.ram.total / 1024) | number: 2 }} MB</span>
-                </div>
-                <div layout="row" class="wz-padding-top-10">
-                    <span>CPU</span>
-                    <span flex class="wz-text-right color-grey">{{ syscollector.hardware.cpu.name }} ({{ syscollector.hardware.cpu.cores }} cores)</span>
-                </div>
+                <table class="table table-striped table-condensed table-layout-fixed">
+                    <thead class="wz-text-bold">
+                        <th class="wz-text-left">Local</th>
+                        <th class="wz-text-left">Remote</th>
+                        <th class="wz-text-left">State</th>
+                        <th class="wz-text-left">Protocol</th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="port in syscollector.ports.items">
+                            <td>{{port.local.ip}}:{{port.local.port}}</td>
+                            <td>{{port.remote.ip}}:{{port.remote.port}}</td>
+                            <td>{{port.state}}</td>
+                            <td>{{port.protocol}}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </md-card-content>
         </md-card>
     </div>
 
-    <div layout="row" class="md-padding">
-        <input placeholder="Filter packages..." ng-model="packageSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-            aria-invalid="false" wz-enter="search(packageSearch,'packages')">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(packageSearch,'packages')">
-            <span class="fa fa-search" aria-hidden="true"></span>
-        </button>
+    <div layout="row" class="layout-padding wz-padding-top-0">
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-cubes"></i> Packages</span>
+                <span class="color-grey pull-right">Last scan: {{syscollector.packagesDate}}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-margin-top-10">
+                    <input placeholder="Filter packages..." ng-model="packageSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
+                        aria-invalid="false" wz-enter="search(packageSearch,'packages')">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="search(packageSearch,'packages')">
+                        <span class="fa fa-search" aria-hidden="true"></span>
+                    </button>
+                </div>
+    
+                <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
+                    <wz-table flex path="'/syscollector/' + agent.id + '/packages'" row-sizes="[6,4,3,3]" extra-limit="true" keys="[{value:'name',size:3},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]">
+                    </wz-table>
+                </div>
+            </md-card-content>
+        </md-card>
     </div>
-
-    <div layout="row" ng-if="agent && syscollector && !load" class="md-padding">
-        <wz-table
-            flex
-            path="'/syscollector/' + agent.id + '/packages'"
-            row-sizes="[8,6,4,4]"
-            extra-limit="true"
-            keys="[{value:'name',size:3},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]">
-        </wz-table>
-    </div>
-
-    <!-- Temporary removed -->
-    <!-- <div layout="row" class="md-padding">
-        <input placeholder="Filter network interfaces..." ng-model="netifaceSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-            aria-invalid="false" wz-enter="search(netifaceSearch,'netiface')">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(netifaceSearch,'netiface')">
-            <span class="fa fa-search" aria-hidden="true"></span>
-        </button>
-    </div>
-    <div layout="row" ng-if="agent" class="md-padding">
-        <wz-table
-            flex
-            path="'/syscollector/' + agent.id + '/netiface'"
-            rows-per-page="8"
-            keys="['name','mac','state','type']">
-        </wz-table>
-    </div> -->
-    <!-- Temporary removed -->
-    <!--<div layout="row" class="md-padding" ng-if="agent">
-        <span flex></span>
-        <a class="small" id="btnDownload" ng-click="downloadCsv('/syscollector/' + agent.id + '/packages')">Formatted
-            <i aria-hidden="true" class="fa fa-fw fa-download"></i>
-        </a>
-    </div>-->
 </md-content>
