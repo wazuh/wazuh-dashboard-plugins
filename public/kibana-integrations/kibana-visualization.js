@@ -9,20 +9,21 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import $              from 'jquery';
-import { uiModules }   from 'ui/modules';
+import $                      from 'jquery';
+import { uiModules }          from 'ui/modules';
 import { getVisualizeLoader } from './loader';
-import { timefilter } from 'ui/timefilter'
+import { timefilter }         from 'ui/timefilter';
+
 const app = uiModules.get('apps/webinar_app', []);
 
-app.directive('kbnVis', [function () {
+app.directive('kbnVis', function () {
     return {
         restrict: 'E',
         scope: {
             visID: '=visId',
             specificTimeRange: '=specificTimeRange'
         },
-        controller: function VisController($scope, $rootScope, wzsavedVisualizations, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
+        controller($scope, $rootScope, wzsavedVisualizations, errorHandler, rawVisualizations, loadedVisualizations, tabVisualizations, discoverPendingUpdates, visHandlers) {
 
             let implicitFilter         = '';
             let rawFilters             = [];
@@ -132,7 +133,7 @@ app.directive('kbnVis', [function () {
                         $rootScope.rendered = thereIsData;
                         if(!thereIsData) $rootScope.resultState = 'none';
                         else $rootScope.resultState = 'ready';
-                    }
+                    } 
                     // Forcing a digest cycle
                     if(!$rootScope.$$phase) $rootScope.$digest();
                 }
@@ -143,4 +144,4 @@ app.directive('kbnVis', [function () {
             let loader = null;
         }
     };
-}]);
+});

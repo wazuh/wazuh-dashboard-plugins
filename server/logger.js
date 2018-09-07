@@ -97,7 +97,7 @@ const checkFiles = () => {
  * @param {*} message Message to show
  * @param {*} level Optional, default is 'error'
  */
-export default (location, message, level) => {
+export function log(location, message, level) {
     initDirectory()
     .then(() => {
         if(allowed){
@@ -110,5 +110,5 @@ export default (location, message, level) => {
             });
         }
     })
-    .catch(error => console.error(`Cannot create the logs directory due to:\n${error.message || error}`));
-};
+    .catch(error => console.error(`Cannot create the logs directory due to:\n${error.message || error}`)); // eslint-disable-line
+}

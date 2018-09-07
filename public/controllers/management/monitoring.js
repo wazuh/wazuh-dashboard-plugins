@@ -9,8 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import FilterHandler from '../../utils/filter-handler'
-import { uiModules } from 'ui/modules'
+import { FilterHandler } from '../../utils/filter-handler'
+import { uiModules }     from 'ui/modules'
 
 const app = uiModules.get('app/wazuh', []);
 

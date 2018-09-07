@@ -9,13 +9,22 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
-import FilterHandler  from '../../utils/filter-handler'
-import generateMetric from '../../utils/generate-metric'
-import TabNames       from '../../utils/tab-names'
-import { metricsGeneral, metricsFim, metricsAudit, metricsVulnerability, metricsScap, metricsCiscat, metricsVirustotal, metricsAws } from '../../utils/overview-metrics'
-
+import { uiModules }     from 'ui/modules';
+import { FilterHandler } from '../../utils/filter-handler';
+import generateMetric    from '../../utils/generate-metric';
+import TabNames          from '../../utils/tab-names';
 import TabDescription from '../../../server/reporting/tab-description';
+
+import { 
+    metricsGeneral, 
+    metricsFim, 
+    metricsAudit, 
+    metricsVulnerability, 
+    metricsScap, 
+    metricsCiscat, 
+    metricsVirustotal, 
+    metricsAws 
+} from '../../utils/overview-metrics'
 
 const app = uiModules.get('app/wazuh', []);
 

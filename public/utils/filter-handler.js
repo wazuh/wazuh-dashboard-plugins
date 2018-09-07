@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default class FilterHandler {
+export class FilterHandler {
     constructor(pattern) {
         this.pattern = pattern;
     }
@@ -36,7 +36,7 @@ export default class FilterHandler {
             $state: {
                 store: 'appState'
             }
-        }
+        };
     }
 
     agentQuery(agent) {
@@ -81,6 +81,21 @@ export default class FilterHandler {
         return result;
     }
 
+    ruleIdQuery(ruleId) {
+        const result = this.base();
+        result.meta.removable = true;
+        result.meta.key = 'rule.id';
+        result.meta.value = ruleId;
+        result.meta.params.query = ruleId;
+        result.query.match = {
+            'rule.id': {
+                query: ruleId,
+                type: 'phrase'
+            }
+        };
+        return result;
+    }
+
     managerQuery(manager,isCluster) {
         const result = this.base();
         result.meta.key = isCluster ? 'cluster.name' : 'manager.name';
@@ -110,7 +125,7 @@ export default class FilterHandler {
         result.meta.key = 'rule.pci_dss';
         result.exists = {
             field: 'rule.pci_dss'
-        }
+        };
         delete result.query;
         return result;
     }
@@ -122,7 +137,7 @@ export default class FilterHandler {
         result.meta.key = 'rule.gdpr';
         result.exists = {
             field: 'rule.gdpr'
-        }
+        };
         delete result.query;
         return result;
     }

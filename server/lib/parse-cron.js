@@ -9,10 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import log from '../logger'
-import cron from 'node-cron'
+import { log } from '../logger'
+import cron    from 'node-cron'
 
-export default interval => {
+export function parseCron(interval) {
     try {
         if(!interval) throw new Error('Interval not found');
 

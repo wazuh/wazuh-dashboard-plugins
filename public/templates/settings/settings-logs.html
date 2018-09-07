@@ -5,7 +5,18 @@
         <span class="md-subheader">Logs located at /usr/share/kibana/optimize/wazuh-logs/wazuhapp.log</span>
     </div>
     <!-- End headline -->
-    <div layout="row" class="md-padding">
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="loadingLogs">
+        <div></div>
+    </div>
+    <!-- End loading ring -->
+
+    <div layout="row" ng-show="!loadingLogs">
+        <md-button class="wz-report-refresh-btn" ng-click="refreshLogs()"><i class="fa fa-fw fa-refresh"></i> Refresh</md-button>
+    </div>
+
+    <div layout="row" class="md-padding" ng-show="!loadingLogs">
         <table class="table table-striped table-condensed" style="table-layout: fixed !important" id="wz_table">
             <thead class="wz-text-bold">
                 <th class="wz-text-left col-lg-2"  >Date</th>
@@ -15,15 +26,15 @@
             <tbody>
                 <tr class="wz-word-wrap" ng-repeat="item in logs">
                     <td>
-                       {{ item.date }} 
+                       {{ item.date }}
                     </td>
                     <td>
-                        {{ item.level.toUpperCase() }} 
-                     </td>    
-                     <td>
-                        {{ item.message }} 
+                        {{ item.level.toUpperCase() }}
                      </td>
-                    
+                     <td>
+                        {{ item.message }}
+                     </td>
+
                 </tr>
             </tbody>
         </table>

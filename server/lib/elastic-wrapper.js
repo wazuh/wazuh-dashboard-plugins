@@ -11,7 +11,7 @@
  */
 import knownFields from '../integration-files/known-fields';
 
-export default class ElasticWrapper {
+export class ElasticWrapper {
     constructor(server){
         this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
         this.WZ_KIBANA_INDEX = server &&
@@ -280,7 +280,7 @@ export default class ElasticWrapper {
                         "type": 'index-pattern',
                         "index-pattern": {
                             "fields": currentFieldsString,
-                            "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}}'
+                            "fieldFormatMap": '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},"rule.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/manager/?tab=ruleset&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}}'
                         }
                      }
                 }
@@ -437,7 +437,7 @@ export default class ElasticWrapper {
         } catch(error){
             return Promise.reject(error);
         }
-    };
+    }
 
     /**
      * Usually used to save a new Wazuh API entry
@@ -468,11 +468,12 @@ export default class ElasticWrapper {
      * @param {*} id
      * @param {*} doc
      */
-    async updateWazuhIndexDocument(id,doc){
+    async updateWazuhIndexDocument(req,doc){
         try {
-            if(!id || !doc) return Promise.reject(new Error('No valid parameters given'))
+            const id = typeof req === 'object' && req.payload ? req.payload.id : req;
+            if(!id || !doc) throw new Error('No valid parameters given')
 
-            const data = await this.elasticRequest.callWithInternalUser('update', {
+            const data = await this.elasticRequest.callWithRequest(req, 'update', {
                 index: '.wazuh',
                 type : 'wazuh-configuration',
                 id   : id,
@@ -526,7 +527,7 @@ export default class ElasticWrapper {
         } catch(error){
             return Promise.reject(error);
         }
-    };
+    }
 
     /**
      * Same as curling the templates from Elasticsearch

@@ -86,10 +86,10 @@ class DevToolsController {
             this.appState.setCurrentDevTools(currentState)
 
             const tmpgroups = [];
-            const splitted  = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
+            const splitted  = currentState.split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm).filter(item => item.replace(/\s/g, '').length)
             let   start     = 0;
             let   end       = 0;
-            
+                       
             const slen = splitted.length;
             for(let i=0; i < slen; i++){ 
                 let tmp    = splitted[i].split('\n');
@@ -137,7 +137,7 @@ class DevToolsController {
                     end
                 })
             }
-            
+                     
             return tmpgroups;
         } catch(error){
             return [];
