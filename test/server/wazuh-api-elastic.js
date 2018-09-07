@@ -6,33 +6,9 @@ chai.should();
 const headers = {headers: {'kbn-xsrf': 'kibana', 'Content-Type': 'application/json'}}
 
 let API_ID   = null;
-let API_PORT = null;
-let API_URL  = null;
-let API_USER = null;
-
-const EXAMPLE_API = {};
 
 describe('wazuh-api-elastic', () => {
-    /*
 
-    // Save the given API into elasticsearch
-    server.route({ method: 'PUT', path: '/api/wazuh-api/settings', handler: (req,reply) => ctrl.saveAPI(req,reply) });
-
-    // Update the given API into elasticsearch
-    server.route({ method: 'PUT', path: '/api/wazuh-api/update-settings', handler: (req,reply) => ctrl.updateFullAPI(req,reply) });
-
-    // Get Wazuh-API entries list (Multimanager) from elasticsearch index
-    server.route({ method: 'GET', path: '/api/wazuh-api/apiEntries', handler: (req,reply) => ctrl.getAPIEntries(req,reply) });
-
-    // Delete Wazuh-API entry (multimanager) from elasticsearch index
-    server.route({ method: 'DELETE', path: '/api/wazuh-api/apiEntries/{id}', handler: (req,reply) => ctrl.deleteAPIEntries(req,reply) });
-
-    // Set Wazuh-API as default (multimanager) on elasticsearch index
-    server.route({ method: 'PUT', path: '/api/wazuh-api/apiEntries/{id}', handler: (req,reply) => ctrl.setAPIEntryDefault(req,reply) });
-
-    // Update the API hostname
-    server.route({ method: 'PUT', path: '/api/wazuh-api/updateApiHostname/{id}', handler: (req,reply) => ctrl.updateAPIHostname(req,reply) });
-    */
     before(async () => {
         const res = await needle('get', `localhost:5601/api/wazuh-api/apiEntries`, {}, {});
         if(!res.body || !res.body.length) {
@@ -40,9 +16,6 @@ describe('wazuh-api-elastic', () => {
             process.exit(1)
         }
         API_ID = res.body[0]._id;
-        API_URL = res.body[0]._source.url;
-        API_PORT = res.body[0]._source.api_port;
-        API_USER = res.body[0]._source.api_user;
     })
 
     it('PUT /api/wazuh-api/settings', async () => {
