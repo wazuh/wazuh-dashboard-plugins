@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import ElasticWrapper from '../lib/elastic-wrapper';
+import { ElasticWrapper } from '../lib/elastic-wrapper';
 import Base from './base-query';
 import AuditMap from './audit-map';
 
-export default class PciRequest {
+export class AuditRequest {
     /**
      * Constructor
      * @param {*} server Hapi.js server object provided by Kibana
@@ -176,7 +176,7 @@ export default class PciRequest {
             const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
             const { buckets } = response.aggregations['2'];
 
-            return buckets.map(item => { return { id:item.key, syscall:AuditMap[item.key] };});
+            return buckets.map(item => ({ id:item.key, syscall:AuditMap[item.key] }));
 
         } catch (error) {
             return Promise.reject(error);

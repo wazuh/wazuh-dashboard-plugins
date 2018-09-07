@@ -11,7 +11,7 @@
  */
 import knownFields from '../integration-files/known-fields';
 
-export default class ElasticWrapper {
+export class ElasticWrapper {
     constructor(server){
         this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
         this.WZ_KIBANA_INDEX = server &&
@@ -437,7 +437,7 @@ export default class ElasticWrapper {
         } catch(error){
             return Promise.reject(error);
         }
-    };
+    }
 
     /**
      * Usually used to save a new Wazuh API entry
@@ -527,7 +527,7 @@ export default class ElasticWrapper {
         } catch(error){
             return Promise.reject(error);
         }
-    };
+    }
 
     /**
      * Same as curling the templates from Elasticsearch

@@ -9,31 +9,35 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import path from 'path';
-import fs from 'fs';
-import descriptions from '../reporting/tab-description';
-import * as TimSort from 'timsort';
-import rawParser from '../reporting/raw-parser';
-import PdfPrinter from 'pdfmake/src/printer';
-import ErrorResponse from './error-response';
-import VulnerabilityRequest from '../reporting/vulnerability-request';
-import OverviewRequest from '../reporting/overview-request';
-import RootcheckRequest from '../reporting/rootcheck-request';
-import PciRequest from '../reporting/pci-request';
-import GdprRequest from '../reporting/gdpr-request';
-import AuditRequest from '../reporting/audit-request';
-import SyscheckRequest from '../reporting/syscheck-request';
-import PCI from '../integration-files/pci-requirements-pdfmake';
-import GDPR from '../integration-files/gdpr-requirements-pdfmake';
-import PdfTable from '../reporting/generic-table';
-import WazuhApi from './wazuh-api';
-import clockIconRaw from '../reporting/clock-icon-raw';
-import filterIconRaw from '../reporting/filter-icon-raw';
-import { AgentsVisualizations, OverviewVisualizations } from '../integration-files/visualizations';
+import path                     from 'path';
+import fs                       from 'fs';
+import descriptions             from '../reporting/tab-description';
+import * as TimSort             from 'timsort';
+import rawParser                from '../reporting/raw-parser';
+import PdfPrinter               from 'pdfmake/src/printer';
+import { ErrorResponse }        from './error-response';
+import { VulnerabilityRequest } from '../reporting/vulnerability-request';
+import { OverviewRequest }      from '../reporting/overview-request';
+import { RootcheckRequest }     from '../reporting/rootcheck-request';
+import { PciRequest }           from '../reporting/pci-request';
+import { GdprRequest }          from '../reporting/gdpr-request';
+import { AuditRequest }         from '../reporting/audit-request';
+import { SyscheckRequest }      from '../reporting/syscheck-request';
+import PCI                      from '../integration-files/pci-requirements-pdfmake';
+import GDPR                     from '../integration-files/gdpr-requirements-pdfmake';
+import PdfTable                 from '../reporting/generic-table';
+import { WazuhApiCtrl }         from './wazuh-api';
+import clockIconRaw             from '../reporting/clock-icon-raw';
+import filterIconRaw            from '../reporting/filter-icon-raw';
+
+import { 
+    AgentsVisualizations, 
+    OverviewVisualizations 
+} from '../integration-files/visualizations';
 
 const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
-export default class WazuhReportingCtrl {
+export class WazuhReportingCtrl {
     constructor(server) {
         this.server = server;
         this.fonts = {
@@ -103,7 +107,7 @@ export default class WazuhReportingCtrl {
             content: [
 
             ],
-            footer: function (currentPage, pageCount) {
+            footer (currentPage, pageCount) {
                 return {
                     columns: [
                         {
@@ -115,7 +119,7 @@ export default class WazuhReportingCtrl {
                     ]
                 };
             },
-            pageBreakBefore: function (currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
+            pageBreakBefore (currentNode, followingNodesOnPage) {
                 if (currentNode.id && currentNode.id.includes('splitvis')) {
                     return followingNodesOnPage.length === 6 || followingNodesOnPage.length === 7;
                 }
@@ -129,7 +133,7 @@ export default class WazuhReportingCtrl {
             }
         };
 
-        this.apiRequest = new WazuhApi(server);
+        this.apiRequest = new WazuhApiCtrl(server);
     }
 
     renderTables(tables) {
@@ -151,19 +155,14 @@ export default class WazuhReportingCtrl {
 
                 const modifiedRows = [];
                 for (const row of rows) {
-                    modifiedRows.push(row.map(cell => {
-                        return { text: cell, style: 'standard' };
-                    }));
+                    modifiedRows.push(row.map(cell => ({ text: cell, style: 'standard' })));
                 }
 
                 const widths = Array(table.columns.length - 1).fill('auto');
                 widths.push('*');
 
                 full_body.push(
-                    table.columns.map(col => {
-                        return { text: col, style: 'whiteColor', border: [0, 0, 0, 0] };
-                    })
-                    , ...modifiedRows);
+                    table.columns.map(col => ({ text: col, style: 'whiteColor', border: [0, 0, 0, 0]})), ...modifiedRows);
                 this.dd.content.push({
                     fontSize: 8,
                     table: {
@@ -586,7 +585,7 @@ export default class WazuhReportingCtrl {
 
             if (section === 'agents' && tab === 'pm') {
                 const database = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}`, { limit: 15 }, apiId);
-                const cis = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}/cis`, {}, apiId);
+                //const cis = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}/cis`, {}, apiId);
                 const pci = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}/pci`, {}, apiId);
                 const lastScan = await this.apiRequest.makeGenericRequest('GET', `/rootcheck/${agent}/last_scan`, {}, apiId);
 
@@ -727,7 +726,7 @@ export default class WazuhReportingCtrl {
                     for (const critical of topCriticalPackages) {
                         customul.push({ text: critical.package, style: 'standard' });
                         customul.push({
-                            ul: critical.references.map(item => { return { text: item, color: '#1EA5C8' }; })
+                            ul: critical.references.map(item => ({ text: item, color: '#1EA5C8' }))
                         });
                     }
                     this.dd.content.push({ ul: customul })
@@ -744,7 +743,7 @@ export default class WazuhReportingCtrl {
                     for (const critical of topHighPackages) {
                         customul.push({ text: critical.package, style: 'standard' });
                         customul.push({
-                            ul: critical.references.map(item => { return { text: item, color: '#1EA5C8' }; })
+                            ul: critical.references.map(item => ({ text: item, color: '#1EA5C8' }))
                         });
                     }
                     customul && customul.length && this.dd.content.push({ ul: customul });

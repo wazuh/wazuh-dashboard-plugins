@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default config => {
+export function getPath (config) {
     let path = config.url;
     let protocol;
     if (config.url.startsWith("https://")) {
@@ -26,4 +26,4 @@ export default config => {
         path = `${config.url}:${config.port}`;
     }
     return path;
-};
+}

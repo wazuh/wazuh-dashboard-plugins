@@ -9,17 +9,17 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import needle             from 'needle'
-import colors             from 'ansicolors'
-import log                from './logger'
-import ElasticWrapper     from './lib/elastic-wrapper'
-import packageJSON        from '../package.json'
-import kibana_template    from './integration-files/kibana-template'
-import getConfiguration   from './lib/get-configuration'
-import defaultExt         from './lib/default-ext'
-import { BuildBody }      from './lib/replicas-shards-helper'
+import needle               from 'needle'
+import colors               from 'ansicolors'
+import { log }              from './logger'
+import { ElasticWrapper }   from './lib/elastic-wrapper'
+import packageJSON          from '../package.json'
+import kibana_template      from './integration-files/kibana-template'
+import { getConfiguration } from './lib/get-configuration'
+import defaultExt           from './lib/default-ext'
+import { BuildBody }        from './lib/replicas-shards-helper'
 
-export default (server, options) => {
+export function Initialize(server) {
     const blueWazuh = colors.blue('wazuh');
 
     // Elastic JS Client
@@ -674,4 +674,4 @@ export default (server, options) => {
     // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
     checkStatus();
 
-};
+}

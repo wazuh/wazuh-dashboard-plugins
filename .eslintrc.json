@@ -11,17 +11,19 @@
             "jsx": true
         }
     },
+    "globals": {
+        "XPACK_RBAC_ENABLED": true
+    },
     "parser": "babel-eslint",
     "rules": {
         "node/exports-style": ["error", "module.exports"],
-        "semi": 0,
-        "no-console": 0,
-        "no-process-exit": 0,
+        "no-console": "warn",
+        "semi": "off",
+        "no-process-exit": "error",
+        "no-extra-boolean-cast": "off",
         "node/no-unpublished-require": 0,
         "node/no-unsupported-features": 0,
-        "node/no-unsupported-features/es-syntax": 0,
-        "no-extra-boolean-cast": 0,
-        "no-cond-assign": 0
+        "node/no-unsupported-features/es-syntax": 0
     },
     "plugins": ["node", "async-await"],
     "extends": ["eslint:recommended", "plugin:node/recommended"]

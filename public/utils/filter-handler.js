@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default class FilterHandler {
+export class FilterHandler {
     constructor(pattern) {
         this.pattern = pattern;
     }
@@ -36,7 +36,7 @@ export default class FilterHandler {
             $state: {
                 store: 'appState'
             }
-        }
+        };
     }
 
     agentQuery(agent) {
@@ -110,7 +110,7 @@ export default class FilterHandler {
         result.meta.key = 'rule.pci_dss';
         result.exists = {
             field: 'rule.pci_dss'
-        }
+        };
         delete result.query;
         return result;
     }
@@ -122,7 +122,7 @@ export default class FilterHandler {
         result.meta.key = 'rule.gdpr';
         result.exists = {
             field: 'rule.gdpr'
-        }
+        };
         delete result.query;
         return result;
     }

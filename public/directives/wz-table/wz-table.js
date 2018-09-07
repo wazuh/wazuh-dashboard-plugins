@@ -29,7 +29,7 @@ app.directive('wzTable', function() {
             rowSizes: '=rowSizes',
             extraLimit: '=extraLimit'
         },
-        controller: function($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter, $window) {          
+        controller($scope, apiReq, $timeout, shareAgent, $location, errorHandler, wzTableFilter, $window) {          
             /**
              * Calculate number of table rows depending on the screen height 
              */
@@ -322,13 +322,13 @@ app.directive('wzTable', function() {
                         checkIfArray(item[key.value || key]) || '---';
             };
         },
-        template: template
+        template
     }
 })
 .service('wzTableFilter',() => {
     const filters = [];
     return {
-        set: array => { if(Array.isArray(array)) { filters.length = 0; filters.push(...array); } },
-        get: () => filters
+        set (array) { if(Array.isArray(array)) { filters.length = 0; filters.push(...array); } },
+        get () { return filters }
     };
 });
