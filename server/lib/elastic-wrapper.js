@@ -468,11 +468,12 @@ export class ElasticWrapper {
      * @param {*} id
      * @param {*} doc
      */
-    async updateWazuhIndexDocument(id,doc){
+    async updateWazuhIndexDocument(req,doc){
         try {
-            if(!id || !doc) return Promise.reject(new Error('No valid parameters given'))
+            const id = typeof req === 'object' && req.payload ? req.payload.id : req;
+            if(!id || !doc) throw new Error('No valid parameters given')
 
-            const data = await this.elasticRequest.callWithInternalUser('update', {
+            const data = await this.elasticRequest.callWithRequest(req, 'update', {
                 index: '.wazuh',
                 type : 'wazuh-configuration',
                 id   : id,

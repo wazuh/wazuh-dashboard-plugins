@@ -61,7 +61,8 @@ class StatusController {
             this.$scope.agentsCountDisconnected   = stats.Disconnected;
             this.$scope.agentsCountNeverConnected = stats['Never connected'];
             this.$scope.agentsCountTotal          = total;
-            this.$scope.agentsCoverity            = (active / total) * 100;
+
+            this.$scope.agentsCoverity            = total ? (active / total) * 100 : 0;
     
             this.$scope.daemons       = daemons;
             this.$scope.managerInfo   = managerInfo;
