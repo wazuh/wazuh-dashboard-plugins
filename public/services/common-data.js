@@ -14,7 +14,7 @@ import { uiModules } from 'ui/modules'
 const app = uiModules.get('app/wazuh', []);
 
 class CommonData {
-    constructor($rootScope, $timeout, genericReq, appState, errorHandler, $location, shareAgent) {
+    constructor($rootScope, $timeout, genericReq, appState, errorHandler, $location, shareAgent, globalState) {
         this.$rootScope   = $rootScope;
         this.$timeout     = $timeout;
         this.genericReq   = genericReq;
@@ -22,7 +22,39 @@ class CommonData {
         this.errorHandler = errorHandler;
         this.$location    = $location;
         this.shareAgent   = shareAgent;
+        this.globalState  = globalState;
     }
+
+    removeDuplicateRuleGroups(group) {
+        if(!this.globalState || !this.globalState.filters) return;
+        const globalRuleGroupFilters = this.globalState.filters.map(item => {
+            if(item.query && item.query.match && item.query.match["rule.groups"] && item.query.match["rule.groups"].query) {
+                return item.query.match["rule.groups"].query
+            }
+            
+            return null;            
+        })
+
+        if(globalRuleGroupFilters.includes(group)) {
+            this.globalState.filters.splice(globalRuleGroupFilters.indexOf(group), 1);
+        }
+    }
+
+    removeDuplicateExists(condition) {
+        if(!this.globalState || !this.globalState.filters) return;
+        const globalRuleExistsFilters = this.globalState.filters.map(item => {
+            if(item.exists && item.exists.field) {
+                return item.exists.field
+            }
+            
+            return null;            
+        })
+
+        if(globalRuleExistsFilters.includes(condition)) {
+            this.globalState.filters.splice(globalRuleExistsFilters.indexOf(condition), 1);
+        }
+    }
+
 
     af(filterHandler, tab, localChange, agent) {
         try{
@@ -51,10 +83,13 @@ class CommonData {
 
             if(tab !== 'general'){
                 if(tab === 'pci') {
+                    this.removeDuplicateExists('rule.pci_dss')
                     filters.push(filterHandler.pciQuery())
                 } else if(tab === 'gdpr') {
+                    this.removeDuplicateExists('rule.gdpr')
                     filters.push(filterHandler.gdprQuery())
                 } else {
+                    this.removeDuplicateRuleGroups(tabFilters[tab].group)
                     filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
                 }
             }
