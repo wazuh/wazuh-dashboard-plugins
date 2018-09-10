@@ -2,6 +2,39 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 410
+
+### Added
+
+-   The _Inventory_ tab has been redesigned ([#873](https://github.com/wazuh/wazuh-kibana-app/pull/873)):
+    -   Added new network interfaces and port tables.
+    -   Improved design using metric information bars and intuitive status indicators.
+-   Added refresh functionality to the _Settings > Logs_ tab ([#852](https://github.com/wazuh/wazuh-kibana-app/pull/852)):
+    -   Now everytime the user opens the tab, the logs will be reloaded.
+    -   A new button to force the update has been added on the top left corner of the logs table.
+-   Added `tags` and `recursion_level` configuration options to _Management/Agent > Configuration_ tabs ([#850](https://github.com/wazuh/wazuh-kibana-app/pull/850)).
+-   The _Kuery_ search syntax has been added again to the app ([#851](https://github.com/wazuh/wazuh-kibana-app/pull/851)).
+-   Added a first batch of [_Mocha_](https://mochajs.org/) tests and other quality of code improvements to the app ([#859](https://github.com/wazuh/wazuh-kibana-app/pull/859)).
+-   Now you can open specific rule details (the _Management > Ruleset_ tab) when clicking on the `rule.id` value on the _Discover_ tab ([#862](https://github.com/wazuh/wazuh-kibana-app/pull/862)).
+-   Now you can click on the rule ID value on the _Management > Ruleset_ tab to search for related alerts on the _Discover_ tab ([#863](https://github.com/wazuh/wazuh-kibana-app/pull/863)).
+
+### Changed
+
+-   The index pattern known fields have been updated up to 567 ([#872](https://github.com/wazuh/wazuh-kibana-app/pull/872)).
+-   Now the _Inventory_ tab will always be available for all agents, and a descriptive message will appear if the agent doesn't have `syscollector` enabled ([#879](https://github.com/wazuh/wazuh-kibana-app/pull/879)).
+
+### Fixed
+
+-   Fixed a bug where the _Inventory_ tab was unavailable if the user reloads the page while on the _Agents > Configuration_ tab ([#845](https://github.com/wazuh/wazuh-kibana-app/pull/845)).
+-   Fixed some _Overview > VirusTotal_ visualizations ([#846](https://github.com/wazuh/wazuh-kibana-app/pull/846)).
+-   Fixed a bug where the _Settings > Extensions_ tab wasn't being properly hidden when there's no API entries inserted ([#847](https://github.com/wazuh/wazuh-kibana-app/pull/847)).
+-   Fixed a bug where the _Current API_ indicator on the top navbar wasn't being properly updated when the user deletes all the API entries ([#848](https://github.com/wazuh/wazuh-kibana-app/pull/848)).
+-   Fixed a bug where the _Agents coverage_ metric were not displaying a proper value when the manager has 0 registered agents ([#849](https://github.com/wazuh/wazuh-kibana-app/pull/849)).
+-   Fixed a bug where the `wazuh-basic` user role was able to update API entries (it should be forbidden) ([#853](https://github.com/wazuh/wazuh-kibana-app/pull/853)).
+-   Fixed a bug where the visualizations had scroll bars on the PDF reports ([#870](https://github.com/wazuh/wazuh-kibana-app/pull/870)).
+-   Fixed a bug on the _Dev tools_ tab where the user couldn't execute the first request block if there was blank lines above it ([#871](https://github.com/wazuh/wazuh-kibana-app/pull/871)).
+-   Fixed a bug on pinned filters when opening tabs where the implicit filter was the same, making them stuck and unremovable from other tabs ([#878](https://github.com/wazuh/wazuh-kibana-app/pull/878)).
+
 ## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 409
 
 ### Added
