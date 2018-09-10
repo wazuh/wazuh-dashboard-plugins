@@ -104,8 +104,6 @@ app.controller('settingsController', function(
   const getCurrentAPIIndex = () => {
     // eslint-disable-next-line 
     $scope.apiEntries.map((entry, index, array) => {
-      // eslint-disable-line
-      // eslint-disable-line
       if (entry._id === $scope.currentDefault) currentApiEntryIndex = index;
     });
   };
