@@ -9,30 +9,30 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
 class RawVisualizations {
-    constructor() {
-        this.list = [];
-    }
+  constructor() {
+    this.list = [];
+  }
 
-    addItem(item) {
-        this.list.push(item);
-    }
+  addItem(item) {
+    this.list.push(item);
+  }
 
-    assignItems(items) {
-        this.list = Array.isArray(items) ? items : [];
-    }
+  assignItems(items) {
+    this.list = Array.isArray(items) ? items : [];
+  }
 
-    getList() {
-        return this.list;
-    }
+  getList() {
+    return this.list;
+  }
 
-    removeAll() {
-        this.list = [];
-    }
+  removeAll() {
+    this.list = [];
+  }
 }
 
 app.service('rawVisualizations', RawVisualizations);

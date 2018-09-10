@@ -9,6 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './blank-screen-controller'
-import './health-check'
-import './reporting'
+import './blank-screen-controller';
+import './health-check';
+import './reporting';

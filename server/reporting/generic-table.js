@@ -19,79 +19,84 @@
  * @param {String} title Optional. Title for the table
  */
 export default (document, items, columns, keys, title, givenRows = false) => {
+  if (!document || !columns || !columns.length) {
+    throw new Error('Missing parameters when building table');
+  }
 
-    if(!document || !columns || !columns.length) {
-        throw new Error('Missing parameters when building table');
-    }
+  if (title) {
+    document.content.push({ text: title, style: 'h4' });
+    document.content.push({ text: '\n' });
+  }
 
-    if(title) {
-        document.content.push({ text: title, style: 'h4' });
-        document.content.push({text:'\n'})
-    }
-
-    if(!items || !items.length) {
-        document.content.push({ text: 'No results match your search criteria', style:'standard'});
-        return;
-    }
-
-    const rowSize = givenRows ? items[0].length : keys.length;
-    const rows    = givenRows ? items : [];
-    const modifiedRows = [];
-    if(!givenRows){
-        for(const item of items){
-            const str = new Array(rowSize).fill('---');
-            for(let i=0; i<keys.length; i++){
-                if(keys[i].includes('.')){
-                    const parent = keys[i].split('.')[0];
-                    const child  = keys[i].split('.')[1];
-                    if(item[parent] && item[parent][child]) {
-                        str[i] = item[parent][child];
-                    }
-                } else if(item[keys[i]]) {
-                    str[i] = item[keys[i]];
-                }                
-            }
-            rows.push(str.map(cell => {
-                return {text:cell,style:'standard'};
-            }));                        
-        }
-    } else {
-        
-        for(const row of rows){
-            modifiedRows.push(row.map(cell => {
-                return {text:cell,style:'standard'};
-            }));
-        }
-    }
-
-    const fullBody = [];
-
-    const widths = new Array(rowSize-1).fill('auto');
-    widths.push('*');
-    fullBody.push(
-        columns.map(col => {
-            return {text:col,style:'whiteColor',border:[0,0,0,0]};
-        }) 
-    );
-
-    if(givenRows){
-        fullBody.push(...modifiedRows);
-    } else {
-        fullBody.push(...rows);
-    }
-
+  if (!items || !items.length) {
     document.content.push({
-        fontSize:8,
-        table: {
-            headerRows:1,
-            widths,
-            body: fullBody
-        },
-        layout: {
-            fillColor: i => i === 0 ? '#78C8DE' : null,
-            hLineColor: () => '#78C8DE',
-            hLineWidth: () => 1,
-            vLineWidth: () => 0
-        }
+      text: 'No results match your search criteria',
+      style: 'standard'
     });
+    return;
+  }
+
+  const rowSize = givenRows ? items[0].length : keys.length;
+  const rows = givenRows ? items : [];
+  const modifiedRows = [];
+  if (!givenRows) {
+    for (const item of items) {
+      const str = new Array(rowSize).fill('---');
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i].includes('.')) {
+          const parent = keys[i].split('.')[0];
+          const child = keys[i].split('.')[1];
+          if (item[parent] && item[parent][child]) {
+            str[i] = item[parent][child];
+          }
+        } else if (item[keys[i]]) {
+          str[i] = item[keys[i]];
+        }
+      }
+      rows.push(
+        str.map(cell => {
+          return { text: cell, style: 'standard' };
+        })
+      );
+    }
+  } else {
+    for (const row of rows) {
+      modifiedRows.push(
+        row.map(cell => {
+          return { text: cell, style: 'standard' };
+        })
+      );
+    }
+  }
+
+  const fullBody = [];
+
+  const widths = new Array(rowSize - 1).fill('auto');
+  widths.push('*');
+  fullBody.push(
+    columns.map(col => {
+      return { text: col, style: 'whiteColor', border: [0, 0, 0, 0] };
+    })
+  );
+
+  if (givenRows) {
+    fullBody.push(...modifiedRows);
+  } else {
+    fullBody.push(...rows);
+  }
+
+  document.content.push({
+    fontSize: 8,
+    table: {
+      headerRows: 1,
+      widths,
+      body: fullBody
+    },
+    layout: {
+      fillColor: i => (i === 0 ? '#78C8DE' : null),
+      hLineColor: () => '#78C8DE',
+      hLineWidth: () => 1,
+      vLineWidth: () => 0
+    }
+  });
 };
