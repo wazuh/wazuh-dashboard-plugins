@@ -58,5 +58,8 @@ export default {
     iface: 'Interface',
     broadcast: 'Broadcast',
     proto: 'Protocol',
-    address: 'Address'
+    address: 'Address',
+    protocol: 'Protocol',
+    'local.ip': 'Local',
+    'remote.ip': 'Remote'
 };
