@@ -332,7 +332,11 @@ app.directive('wzTable', function() {
             });
 
             $scope.nonDecoderValue = (key,item) => {
-                return  key === 'os.name' ?
+                return  key.value === 'local.ip' ?
+                        (item.local && item.local.ip ? `${item.local.ip}:${item.local.port}` : false) || '---' :
+                        key === 'remote.ip' ?
+                        (item.remote && item.remote.ip ? `${item.remote.ip}:${item.remote.port}` : false) || '---' :
+                        key === 'os.name' ?
                         (item.os && item.os.name ? item.os.name : false) || '---' :
                         key === 'os.version' ?
                         (item.os && item.os.version ? item.os.version : false) || '---' :
