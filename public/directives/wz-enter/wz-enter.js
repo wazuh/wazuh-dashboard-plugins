@@ -9,20 +9,20 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules }  from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzEnter', function () {
-    return function (scope, element, attrs) {
-        element.bind("keydown keypress", function (event) {
-            if(event.which === 13) {
-                scope.$apply(function (){
-                    scope.$eval(attrs.wzEnter);
-                });
-
-                event.preventDefault();
-            }
+app.directive('wzEnter', function() {
+  return function(scope, element, attrs) {
+    element.bind('keydown keypress', function(event) {
+      if (event.which === 13) {
+        scope.$apply(function() {
+          scope.$eval(attrs.wzEnter);
         });
-    };
+
+        event.preventDefault();
+      }
+    });
+  };
 });

@@ -10,11 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 export default {
-    audit     : true,
-    pci       : true,
-    oscap     : true,
-    aws       : false,
-    ciscat    : false,
-    virustotal: false,
-    gdpr      : true
-}
+  audit: true,
+  pci: true,
+  oscap: true,
+  aws: false,
+  ciscat: false,
+  virustotal: false,
+  gdpr: true
+};

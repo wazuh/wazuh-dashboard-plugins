@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './management'
-import './configuration'
-import './status'
-import './logs'
-import './groups'
-import './rules'
-import './decoders'
-import './monitoring'
+import './management';
+import './configuration';
+import './status';
+import './logs';
+import './groups';
+import './rules';
+import './decoders';
+import './monitoring';

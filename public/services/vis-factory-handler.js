@@ -9,60 +9,76 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
 class VisFactoryService {
-    constructor($rootScope, appState, genericReq, discoverPendingUpdates, rawVisualizations, tabVisualizations, loadedVisualizations, commonData, visHandlers) {
-        this.$rootScope             = $rootScope;
-        this.appState               = appState;
-        this.genericReq             = genericReq;
-        this.discoverPendingUpdates = discoverPendingUpdates;
-        this.rawVisualizations      = rawVisualizations;
-        this.tabVisualizations      = tabVisualizations;
-        this.loadedVisualizations   = loadedVisualizations;
-        this.commonData             = commonData;
-        this.visHandlers            = visHandlers;
-    }
+  constructor(
+    $rootScope,
+    appState,
+    genericReq,
+    discoverPendingUpdates,
+    rawVisualizations,
+    tabVisualizations,
+    loadedVisualizations,
+    commonData,
+    visHandlers
+  ) {
+    this.$rootScope = $rootScope;
+    this.appState = appState;
+    this.genericReq = genericReq;
+    this.discoverPendingUpdates = discoverPendingUpdates;
+    this.rawVisualizations = rawVisualizations;
+    this.tabVisualizations = tabVisualizations;
+    this.loadedVisualizations = loadedVisualizations;
+    this.commonData = commonData;
+    this.visHandlers = visHandlers;
+  }
 
-    clear(onlyAgent = false) {
-        if(!onlyAgent) this.visHandlers.removeAll();
-        this.discoverPendingUpdates.removeAll();
-        this.rawVisualizations.removeAll();
-        this.loadedVisualizations.removeAll();
-    }
+  clear(onlyAgent = false) {
+    if (!onlyAgent) this.visHandlers.removeAll();
+    this.discoverPendingUpdates.removeAll();
+    this.rawVisualizations.removeAll();
+    this.loadedVisualizations.removeAll();
+  }
 
-    clearAll() {
-        this.clear();
-        this.tabVisualizations.removeAll();
-    }
+  clearAll() {
+    this.clear();
+    this.tabVisualizations.removeAll();
+  }
 
-    async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
-        try {
-            const data = await this.genericReq.request('GET',`/api/wazuh-elastic/create-vis/overview-${tab}/${this.appState.getCurrentPattern()}`)
-            this.rawVisualizations.assignItems(data.data.raw);
-            this.commonData.assignFilters(filterHandler, tab, localChange);
-            this.$rootScope.$emit('changeTabView',{tabView:subtab})
-            this.$rootScope.$broadcast('updateVis');
-            return;
-        } catch (error) {
-            return Promise.reject(error)
-        }
+  async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
+    try {
+      const data = await this.genericReq.request(
+        'GET',
+        `/api/wazuh-elastic/create-vis/overview-${tab}/${this.appState.getCurrentPattern()}`
+      );
+      this.rawVisualizations.assignItems(data.data.raw);
+      this.commonData.assignFilters(filterHandler, tab, localChange);
+      this.$rootScope.$emit('changeTabView', { tabView: subtab });
+      this.$rootScope.$broadcast('updateVis');
+      return;
+    } catch (error) {
+      return Promise.reject(error);
     }
+  }
 
-    async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
-        try {
-            const data = await this.genericReq.request('GET',`/api/wazuh-elastic/create-vis/agents-${tab}/${this.appState.getCurrentPattern()}`)
-            this.rawVisualizations.assignItems(data.data.raw);
-            this.commonData.assignFilters(filterHandler, tab, localChange, id)
-            this.$rootScope.$emit('changeTabView',{tabView:subtab});
-            this.$rootScope.$broadcast('updateVis');
-            return;
-        } catch (error) {
-            return Promise.reject(error)
-        }
+  async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
+    try {
+      const data = await this.genericReq.request(
+        'GET',
+        `/api/wazuh-elastic/create-vis/agents-${tab}/${this.appState.getCurrentPattern()}`
+      );
+      this.rawVisualizations.assignItems(data.data.raw);
+      this.commonData.assignFilters(filterHandler, tab, localChange, id);
+      this.$rootScope.$emit('changeTabView', { tabView: subtab });
+      this.$rootScope.$broadcast('updateVis');
+      return;
+    } catch (error) {
+      return Promise.reject(error);
     }
+  }
 }
 
 app.service('visFactoryService', VisFactoryService);

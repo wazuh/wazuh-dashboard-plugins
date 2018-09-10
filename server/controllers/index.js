@@ -9,9 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { WazuhElasticCtrl }    from './wazuh-elastic';
+import { WazuhElasticCtrl } from './wazuh-elastic';
 import { WazuhApiElasticCtrl } from './wazuh-api-elastic';
-import { WazuhApiCtrl }        from './wazuh-api';
-import { WazuhReportingCtrl }  from './wazuh-reporting';
+import { WazuhApiCtrl } from './wazuh-api';
+import { WazuhReportingCtrl } from './wazuh-reporting';
 
-export { WazuhElasticCtrl, WazuhApiElasticCtrl, WazuhApiCtrl, WazuhReportingCtrl };
+export {
+  WazuhElasticCtrl,
+  WazuhApiElasticCtrl,
+  WazuhApiCtrl,
+  WazuhReportingCtrl
+};

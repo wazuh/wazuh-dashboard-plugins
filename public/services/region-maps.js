@@ -10,32 +10,32 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
-const app = uiModules.get('app/wazuh', [])
+const app = uiModules.get('app/wazuh', []);
 
 app
-.service('regionmapsConfig', function () {
+  .service('regionmapsConfig', function() {
     return {
-        // Intended noop function and empty array
-        noop() {},
-        layers: []
-    }
-})
-.service('mapConfig', function () {
+      // Intended noop function and empty array
+      noop() {},
+      layers: []
+    };
+  })
+  .service('mapConfig', function() {
     return {
-        // Intended noop function 
-        noop() {}
-    }
-})
-.service('tilemapsConfig', function () {
+      // Intended noop function
+      noop() {}
+    };
+  })
+  .service('tilemapsConfig', function() {
     return {
-        // Intended noop function and false properties
-        noop() {},
-        deprecated: {
-            config: {
-                options: false
-            }
+      // Intended noop function and false properties
+      noop() {},
+      deprecated: {
+        config: {
+          options: false
         }
-    }
-});
+      }
+    };
+  });

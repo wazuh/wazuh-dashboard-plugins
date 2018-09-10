@@ -9,22 +9,27 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('blankScreenController', function($scope, $location, errorHandler, wzMisc) {
-    const catchedError = wzMisc.getBlankScr()
-    if (catchedError) {
-        let parsed = null;
-        try {
-            parsed = errorHandler.handle(catchedError,'',false,true);
-        } catch (error) { } // eslint-disable-line
-        $scope.errorToShow = parsed || catchedError;
-        wzMisc.setBlankScr(false)
-        if (!$scope.$$phase) $scope.$digest();
-    }
-    $scope.goOverview = () => {
-        $location.path('/overview');
-    }
+app.controller('blankScreenController', function(
+  $scope,
+  $location,
+  errorHandler,
+  wzMisc
+) {
+  const catchedError = wzMisc.getBlankScr();
+  if (catchedError) {
+    let parsed = null;
+    try {
+      parsed = errorHandler.handle(catchedError, '', false, true);
+    } catch (error) {} // eslint-disable-line
+    $scope.errorToShow = parsed || catchedError;
+    wzMisc.setBlankScr(false);
+    if (!$scope.$$phase) $scope.$digest();
+  }
+  $scope.goOverview = () => {
+    $location.path('/overview');
+  };
 });
